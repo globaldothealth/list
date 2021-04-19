@@ -381,6 +381,12 @@ export default function App(): JSX.Element {
     const [filterBreadcrumbs, setFilterBreadcrumbs] = React.useState<
         ChipData[]
     >([]);
+    const [filtersModalOpen, setFiltersModalOpen] = React.useState<boolean>(
+        false,
+    );
+    const [activeFilterInput, setActiveFilterInput] = React.useState<string>(
+        '',
+    );
     const classes = useStyles();
 
     const savedSearchQuery = localStorage.getItem('searchQuery');
@@ -556,7 +562,17 @@ export default function App(): JSX.Element {
                         {location.pathname === '/cases' && user ? (
                             <>
                                 <div className={classes.searchBar}>
-                                    <SearchBar rootComponentRef={rootRef} />
+                                    <SearchBar
+                                        rootComponentRef={rootRef}
+                                        filtersModalOpen={filtersModalOpen}
+                                        setFiltersModalOpen={
+                                            setFiltersModalOpen
+                                        }
+                                        activeFilterInput={activeFilterInput}
+                                        setActiveFilterInput={
+                                            setActiveFilterInput
+                                        }
+                                    />
                                 </div>
                                 <DownloadButton />
                             </>
@@ -749,6 +765,8 @@ export default function App(): JSX.Element {
                                     handleBreadcrumbDelete={
                                         handleFilterBreadcrumbDelete
                                     }
+                                    setFiltersModalOpen={setFiltersModalOpen}
+                                    setActiveFilterInput={setActiveFilterInput}
                                 />
                             </Route>
                         )}

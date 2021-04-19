@@ -66,10 +66,18 @@ const StyledInputAdornment = withStyles({
 
 interface SearchBarProps {
     rootComponentRef: React.RefObject<HTMLDivElement>;
+    filtersModalOpen: boolean;
+    setFiltersModalOpen: (value: boolean) => void;
+    activeFilterInput: string;
+    setActiveFilterInput: (value: string) => void;
 }
 
 export default function SearchBar({
     rootComponentRef,
+    filtersModalOpen,
+    setFiltersModalOpen,
+    activeFilterInput,
+    setActiveFilterInput,
 }: SearchBarProps): JSX.Element {
     const classes = searchBarStyles();
     const location = useLocation();
@@ -82,7 +90,6 @@ export default function SearchBar({
             ? URLToSearchQuery(location.search)
             : '',
     );
-    const [filtersModalOpen, setFiltersModalOpen] = useState<boolean>(false);
 
     const guideButtonRef = React.useRef<HTMLButtonElement>(null);
 
@@ -121,7 +128,7 @@ export default function SearchBar({
             setIsUserTyping(false);
             history.push({
                 pathname: '/cases',
-                search: searchQueryToURL(debouncedSearch),
+                search: searchQueryToURL(searchInput),
             });
         }
     };
@@ -211,6 +218,8 @@ export default function SearchBar({
             <FiltersModal
                 isOpen={filtersModalOpen}
                 handleClose={() => setFiltersModalOpen(false)}
+                activeFilterInput={activeFilterInput}
+                setActiveFilterInput={setActiveFilterInput}
             />
         </>
     );

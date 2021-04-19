@@ -117,6 +117,8 @@ interface Props
 
     filterBreadcrumbs: ChipData[];
     handleBreadcrumbDelete: (breadcrumbToDelete: ChipData) => void;
+    setFiltersModalOpen: (value: boolean) => void;
+    setActiveFilterInput: (value: string) => void;
 }
 
 const styles = (theme: Theme) =>
@@ -648,7 +650,8 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
     handleAddFilterClick(e: React.MouseEvent<HTMLDivElement>, filter: string) {
         e.preventDefault();
 
-        // @TODO: Open filters modal and focus appropriate input
+        this.props.setFiltersModalOpen(true);
+        this.props.setActiveFilterInput(filter);
     }
 
     render(): JSX.Element {

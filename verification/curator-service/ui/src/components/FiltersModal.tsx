@@ -60,7 +60,9 @@ const useStyles = makeStyles((theme: Theme) =>
 
 interface FiltersModalProps {
     isOpen: boolean;
+    activeFilterInput: string;
     handleClose: () => void;
+    setActiveFilterInput: (value: string) => void;
 }
 
 export interface FilterFormValues {
@@ -84,7 +86,9 @@ export interface FilterFormValues {
 
 export default function FiltersModal({
     isOpen,
+    activeFilterInput,
     handleClose,
+    setActiveFilterInput,
 }: FiltersModalProps) {
     const classes = useStyles();
     const location = useLocation();
@@ -169,6 +173,7 @@ export default function FiltersModal({
                     {/* GENERAL */}
                     <div>
                         <TextField
+                            autoFocus={activeFilterInput === 'country'}
                             id="country"
                             name="country"
                             label="Country"
@@ -190,6 +195,7 @@ export default function FiltersModal({
                         >
                             <InputLabel id="gender-label">Gender</InputLabel>
                             <Select
+                                autoFocus={activeFilterInput === 'gender'}
                                 labelId="gender-label"
                                 id="gender"
                                 name="gender"
@@ -203,6 +209,9 @@ export default function FiltersModal({
                             </Select>
                         </FormControl>
                         <TextField
+                            autoFocus={
+                                activeFilterInput === 'verificationstatus'
+                            }
                             id="verificationStatus"
                             name="verificationstatus"
                             label="Verification status"
@@ -231,6 +240,7 @@ export default function FiltersModal({
                                 Location admin 1
                             </InputLabel>
                             <OutlinedInput
+                                autoFocus={activeFilterInput === 'admin1'}
                                 id="admin1"
                                 type="text"
                                 label="Location admin 1"
@@ -248,6 +258,7 @@ export default function FiltersModal({
                                 Location admin 2
                             </InputLabel>
                             <OutlinedInput
+                                autoFocus={activeFilterInput === 'admin2'}
                                 id="admin2"
                                 type="text"
                                 label="Location admin 2"
@@ -265,6 +276,7 @@ export default function FiltersModal({
                                 Location admin 3
                             </InputLabel>
                             <OutlinedInput
+                                autoFocus={activeFilterInput === 'admin3'}
                                 id="admin3"
                                 type="text"
                                 label="Location admin 3"
@@ -280,6 +292,7 @@ export default function FiltersModal({
 
                     <div>
                         <TextField
+                            autoFocus={activeFilterInput === 'nationality'}
                             id="nationality"
                             label="Nationality"
                             name="nationality"
@@ -297,6 +310,7 @@ export default function FiltersModal({
                             }
                         />
                         <TextField
+                            autoFocus={activeFilterInput === 'occupation'}
                             id="occupation"
                             label="Occupation"
                             name="occupation"
@@ -314,6 +328,7 @@ export default function FiltersModal({
                             }
                         />
                         <TextField
+                            autoFocus={activeFilterInput === 'outcome'}
                             id="outcome"
                             label="Outcome"
                             name="outcome"
@@ -333,6 +348,7 @@ export default function FiltersModal({
 
                     <div>
                         <TextField
+                            autoFocus={activeFilterInput === 'variantofconcern'}
                             id="variantofconcern"
                             label="Variant of concern"
                             name="variantofconcern"
@@ -350,6 +366,9 @@ export default function FiltersModal({
                             }
                         />
                         <TextField
+                            autoFocus={
+                                activeFilterInput === 'dateconfirmedbefore'
+                            }
                             id="dateconfirmedbefore"
                             label="Date confirmed before"
                             name="dateconfirmedbefore"
@@ -368,6 +387,9 @@ export default function FiltersModal({
                             }
                         />
                         <TextField
+                            autoFocus={
+                                activeFilterInput === 'dateconfirmedafter'
+                            }
                             id="dateconfirmedafter"
                             label="Date confirmed after"
                             name="dateconfirmedafter"
@@ -391,6 +413,7 @@ export default function FiltersModal({
 
                     <div>
                         <TextField
+                            autoFocus={activeFilterInput === 'curatoremail'}
                             id="curatoremail"
                             label="Curator email"
                             name="curatoremail"
@@ -408,6 +431,7 @@ export default function FiltersModal({
                             }
                         />
                         <TextField
+                            autoFocus={activeFilterInput === 'caseid'}
                             id="caseid"
                             label="Case ID"
                             name="caseid"
@@ -424,6 +448,7 @@ export default function FiltersModal({
                             }
                         />
                         <TextField
+                            autoFocus={activeFilterInput === 'sourceurl'}
                             id="sourceurl"
                             label="Source URL"
                             name="sourceurl"
@@ -444,6 +469,7 @@ export default function FiltersModal({
 
                     <div>
                         <TextField
+                            autoFocus={activeFilterInput === 'uploadid'}
                             id="uploadid"
                             label="Upload ID"
                             name="uploadid"
