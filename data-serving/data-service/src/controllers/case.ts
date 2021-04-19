@@ -126,7 +126,7 @@ export class CasesController {
         const page = Number(req.query.page) || 1;
         const limit = Number(req.query.limit) || 10;
         const countLimit = Number(req.query.count_limit) || 10000;
-        
+
         if (page < 1) {
             res.status(422).json({ message: 'page must be > 0' });
             return;
@@ -760,12 +760,8 @@ export class CasesController {
                   $text: { $search: parsedSearch.fullTextSearch },
               }
             : {};
-            
-            casesQuery = [
-               {$match: query}
-             ];             
-   
-        const filters = parsedSearch.filters.map((f) => {            
+        casesQuery = [{ $match: query }];
+        const filters = parsedSearch.filters.map((f) => {
             if (f.values.length == 1) {
                 const searchTerm = f.values[0];
                 if (searchTerm === '*') {
@@ -776,10 +772,26 @@ export class CasesController {
                             },
                         },
                     };
-                } else {                    
+                } else {
                     if (f.dateOperator) {
+                        const dateRangeType =
+                            f.dateOperator === '$gt'
+                                ? 'dateRange.start'
+                                : 'dateRange.end';
                         return {
-                            $match: {[f.path]: { [f.dateOperator]: new Date(f.values[0].toString())}}}
+                            $match: {
+                                [f.path]: {
+                                    $elemMatch: {
+                                        name: 'confirmed',
+                                        [dateRangeType]: {
+                                            [f.dateOperator]: new Date(
+                                                f.values[0].toString(),
+                                            ),
+                                        },
+                                    },
+                                },
+                            },
+                        };
                     } else {
                         return {
                             $match: {
