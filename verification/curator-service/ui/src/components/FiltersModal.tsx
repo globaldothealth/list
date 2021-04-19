@@ -115,6 +115,15 @@ export default function FiltersModal({
         },
     });
 
+    // Reset focus on change
+    useEffect(() => {
+        if (activeFilterInput === '') return;
+
+        setActiveFilterInput('');
+
+        // eslint-disable-next-line
+    }, [formik.values]);
+
     const handleClearFiltersClick = () => {
         setFormValues({});
         formik.resetForm();
