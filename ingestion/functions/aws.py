@@ -18,6 +18,7 @@ AWS_JOB_QUEUE_ARN = "arn:aws:batch:us-east-1:612888738066:job-queue/ingestion-qu
 DEFAULT_VCPU = 1
 DEFAULT_MEMORY_MIB = 2048
 DEFAULT_JOB_QUEUE = "ingestion-queue"
+DEFAULT_TIMEOUT_MIN = 60
 DEFAULT_SCHEDULE_EXPRESSION = "rate(1 day)"
 
 
@@ -36,12 +37,16 @@ def get_parser_name_source(source_id, env):
 
 
 def job_definition(
-    source_id: str, env: str, vcpu: int = DEFAULT_VCPU, memory: int = DEFAULT_MEMORY_MIB
+    source_id: str, env: str, vcpu: int = DEFAULT_VCPU,
+    memory: int = DEFAULT_MEMORY_MIB, timeout: int = DEFAULT_TIMEOUT_MIN
 ):
     return {
         "jobDefinitionName": f"{source_id}-{env}",
         "type": "container",
         "parameters": {},
+        "timeout": {
+            "attemptDurationSeconds": timeout * 60
+        },
         "containerProperties": {
             "image": AWS_IMAGE,
             "vcpus": vcpu,
@@ -118,6 +123,13 @@ deregister    Deregister a Batch job definition
             type=int,
             default=DEFAULT_MEMORY_MIB,
         )
+        parser.add_argument(
+            "-t",
+            "--timeout",
+            help="Maximum time allocated to job in minutes (default=60)",
+            type=int,
+            default=DEFAULT_TIMEOUT_MIN,
+        )
 
         args = parser.parse_args(sys.argv[2:])
         if args.env == "local":
@@ -139,6 +151,7 @@ deregister    Deregister a Batch job definition
                         args.env,
                         args.cpu,
                         args.memory,
+                        args.timeout,
                     )
                 )
             )
