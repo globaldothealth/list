@@ -62,10 +62,27 @@ curator                     dev-curator.ghdsi.org,curator.ghdsi.org   ad9f940574
 
 We use a deployment file for the data service and for the curator service, check out `data.yaml` and `curator.yaml`.
 
-To update the deployments use:
+To update the deployments, first do a dry run:
+
+```shell
+kubectl apply -f data.yaml -f curator.yaml --dry-run=server
+```
+
+For more verbose output use:
+
+```shell
+kubectl apply -f data.yaml -f curator.yaml --dry-run=server --output=yaml
+```
+
+Then once changes look good, use:
 
 ```shell
 kubectl apply -f data.yaml -f curator.yaml
+```
+
+To confirm changes occurred, use:
+```shell
+kubectl get pod <POD_NAME> --output=yaml
 ```
 
 ## Reading server logs
