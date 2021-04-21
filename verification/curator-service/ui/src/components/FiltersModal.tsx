@@ -15,11 +15,11 @@ import {
     FormControl,
     InputLabel,
     OutlinedInput,
-    InputAdornment,
-    IconButton,
+    // InputAdornment,
+    // IconButton,
 } from '@material-ui/core';
-import { HelpOutline } from '@material-ui/icons';
-import { AppTooltip } from './common-form-fields/AppTooltip';
+// import { HelpOutline } from '@material-ui/icons';
+// import { AppTooltip } from './common-form-fields/AppTooltip';
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -131,47 +131,48 @@ export default function FiltersModal({
         handleClose();
     };
 
-    const tooltipHelpIcon = (tooltipContent: JSX.Element) => {
-        return (
-            <InputAdornment position="end">
-                <AppTooltip maxwidth="auto" arrow title={tooltipContent}>
-                    <IconButton edge="end">
-                        <HelpOutline className={classes.helpIcon} />
-                    </IconButton>
-                </AppTooltip>
-            </InputAdornment>
-        );
-    };
+    // COMMENTED OUT UNTIL CONTENT FOR TOOLTIPS IS PROVIDED
+    // const tooltipHelpIcon = (tooltipContent: JSX.Element) => {
+    //     return (
+    //         <InputAdornment position="end">
+    //             <AppTooltip maxwidth="auto" arrow title={tooltipContent}>
+    //                 <IconButton edge="end">
+    //                     <HelpOutline className={classes.helpIcon} />
+    //                 </IconButton>
+    //             </AppTooltip>
+    //         </InputAdornment>
+    //     );
+    // };
 
-    const admin1Tooltip = (
-        <>
-            <strong>Location admin 1</strong>
-            <p>
-                Aliqua esse officia nostrud veniam id ut nostrud in
-                reprehenderit ea reprehenderit excepteur cillum.
-            </p>
-        </>
-    );
+    // const admin1Tooltip = (
+    //     <>
+    //         <strong>Location admin 1</strong>
+    //         <p>
+    //             Aliqua esse officia nostrud veniam id ut nostrud in
+    //             reprehenderit ea reprehenderit excepteur cillum.
+    //         </p>
+    //     </>
+    // );
 
-    const admin2Tooltip = (
-        <>
-            <strong>Location admin 2</strong>
-            <p>
-                Aliqua esse officia nostrud veniam id ut nostrud in
-                reprehenderit ea reprehenderit excepteur cillum.
-            </p>
-        </>
-    );
+    // const admin2Tooltip = (
+    //     <>
+    //         <strong>Location admin 2</strong>
+    //         <p>
+    //             Aliqua esse officia nostrud veniam id ut nostrud in
+    //             reprehenderit ea reprehenderit excepteur cillum.
+    //         </p>
+    //     </>
+    // );
 
-    const admin3Tooltip = (
-        <>
-            <strong>Location admin 3</strong>
-            <p>
-                Aliqua esse officia nostrud veniam id ut nostrud in
-                reprehenderit ea reprehenderit excepteur cillum.
-            </p>
-        </>
-    );
+    // const admin3Tooltip = (
+    //     <>
+    //         <strong>Location admin 3</strong>
+    //         <p>
+    //             Aliqua esse officia nostrud veniam id ut nostrud in
+    //             reprehenderit ea reprehenderit excepteur cillum.
+    //         </p>
+    //     </>
+    // );
 
     return (
         <Dialog open={isOpen} maxWidth={'xl'} onClose={handleClose}>
@@ -256,7 +257,7 @@ export default function FiltersModal({
                                 name="admin1"
                                 value={formik.values.admin1}
                                 onChange={formik.handleChange}
-                                endAdornment={tooltipHelpIcon(admin1Tooltip)}
+                                // endAdornment={tooltipHelpIcon(admin1Tooltip)}
                             />
                         </FormControl>
                         <FormControl
@@ -274,7 +275,7 @@ export default function FiltersModal({
                                 name="admin2"
                                 value={formik.values.admin2}
                                 onChange={formik.handleChange}
-                                endAdornment={tooltipHelpIcon(admin2Tooltip)}
+                                // endAdornment={tooltipHelpIcon(admin2Tooltip)}
                             />
                         </FormControl>
                         <FormControl
@@ -292,7 +293,7 @@ export default function FiltersModal({
                                 name="admin3"
                                 value={formik.values.admin3}
                                 onChange={formik.handleChange}
-                                endAdornment={tooltipHelpIcon(admin3Tooltip)}
+                                // endAdornment={tooltipHelpIcon(admin3Tooltip)}
                             />
                         </FormControl>
                     </div>
