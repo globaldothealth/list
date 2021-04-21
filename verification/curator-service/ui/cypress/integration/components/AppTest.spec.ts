@@ -4,6 +4,24 @@ describe('App', function () {
         cy.task('clearSourcesDB', {});
     });
 
+    it('allows the user to search by variant', function () {
+        cy.login();
+        cy.visit('/cases');
+
+
+        cy.addCase({
+            country: 'Peru',
+            variant: 'B.1.351',
+            sourceUrl: 'www.variantb1351.com'
+        });
+
+        cy.get('input#search-field').type(
+            'variant:B.1.351{enter}',
+        );
+
+        cy.contains('www.variantb1351.com');
+    });
+    
     it('allows the user to search by date and an additional filter', function () {
         cy.login();
 
@@ -34,6 +52,8 @@ describe('App', function () {
         cy.contains('2020-02-15').should('not.exist');
         cy.contains('Germany').should('not.exist');
     });
+
+
 
     it('allows the user to search by date', function () {
         cy.login();
