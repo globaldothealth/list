@@ -115,10 +115,10 @@ interface Props
 
     onChangePageSize: (pageSize: number) => void;
 
-    setSearch: (value: string) => void;
-    search: string;
     filterBreadcrumbs: ChipData[];
     handleBreadcrumbDelete: (breadcrumbToDelete: ChipData) => void;
+    setFiltersModalOpen: (value: boolean) => void;
+    setActiveFilterInput: (value: string) => void;
 }
 
 const styles = (theme: Theme) =>
@@ -649,13 +649,9 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
 
     handleAddFilterClick(e: React.MouseEvent<HTMLDivElement>, filter: string) {
         e.preventDefault();
-        // Avoids duplicated search parameters
-        if (this.props.search.includes(filter)) return;
 
-        this.props.setSearch(
-            this.props.search +
-                (this.props.search ? ` ${filter}:` : `${filter}:`),
-        );
+        this.props.setFiltersModalOpen(true);
+        this.props.setActiveFilterInput(filter);
     }
 
     render(): JSX.Element {
@@ -1028,9 +1024,9 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                             let listUrl = this.state.url;
                             listUrl += '?limit=' + query.pageSize;
                             listUrl += '&page=' + (this.state.page + 1);
+                            // Limit the maximum number of documents that are being counted in mongoDB in order to make queries faster
                             listUrl += '&count_limit=10000';
                             if (this.state.searchQuery !== '') {
-                                // Limit the maximum number of documents that are being counted in mongoDB in order to make queries faster
                                 listUrl += '&q=' + this.state.searchQuery;
                             }
                             this.setState({ isLoading: true, error: '' });

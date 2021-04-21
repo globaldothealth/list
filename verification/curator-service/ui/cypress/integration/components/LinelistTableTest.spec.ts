@@ -277,8 +277,7 @@ describe('Linelist table', function () {
         cy.get('li').contains('5').click();
         cy.wait('@getCases');
         cy.contains('Filter').click();
-        cy.get('li').contains('country').click();
-        cy.get('input[id="search-field"]').type('France{enter}');
+        cy.get('input[id="country"]').type('France{enter}');
         cy.wait('@getCases');
 
         cy.get('input[type="checkbox"]').eq(0).click();
@@ -289,7 +288,8 @@ describe('Linelist table', function () {
         cy.get('button[title="Verify selected rows"]').click();
         cy.wait('@updateCases');
         cy.wait('@getCases');
-        cy.get('input[id="search-field"]').clear().type('{enter}');
+        cy.contains('Filter').click();
+        cy.contains('Clear filters').click();
         cy.wait('@getCases');
         cy.contains('rows').click();
 
@@ -303,8 +303,7 @@ describe('Linelist table', function () {
         cy.get('li').contains('5').click();
         cy.wait('@getCases');
         cy.contains('Filter').click();
-        cy.get('li').contains('country').click();
-        cy.get('input[id="search-field"]').type('France{enter}');
+        cy.get('input[id="country"]').type('France{enter}');
         cy.wait('@getCases');
         cy.get('input[type="checkbox"]').eq(0).click();
         cy.contains('Select all 7 rows').click();
@@ -313,7 +312,8 @@ describe('Linelist table', function () {
         cy.get('button[title="Unverify selected rows"]').click();
         cy.wait('@updateCases');
         cy.wait('@getCases');
-        cy.get('input[id="search-field"]').clear().type('{enter}');
+        cy.contains('Filter').click();
+        cy.contains('Clear filters').click();
         cy.wait('@getCases');
         cy.contains('rows').click();
         cy.get('li').contains('10').click();
@@ -325,9 +325,8 @@ describe('Linelist table', function () {
     it('displays search errors', function () {
         cy.visit('/cases');
         cy.contains('Filter').click();
-        cy.get('li').contains('country').click();
-        cy.get('input[id="search-field"]').type('{enter}');
-        cy.contains(/Invalid search query/);
+        cy.get('input[id="country"]').type('!{enter}');
+        cy.contains(/Error: Request failed with status code 400/);
     });
 
     it('Can search', function () {
@@ -340,15 +339,19 @@ describe('Linelist table', function () {
         cy.visit('/cases');
         cy.contains('France');
         cy.contains('Germany');
+
         cy.contains('Filter').click();
-        cy.get('li').contains('country').click();
-        cy.get('input[id="search-field"]').type('uruguay{enter}');
+        cy.get('input[id="country"]').type('uruguay{enter}');
         cy.contains('France').should('not.exist');
         cy.contains('Germany').should('not.exist');
-        cy.get('input[id="search-field"]').clear().type('France{enter}');
+
+        cy.contains('Filter').click();
+        cy.get('input[id="country"]').clear().type('France{enter}');
         cy.get('td[value="France"]');
         cy.contains('Germany').should('not.exist');
-        cy.get('button[aria-label="clear search"]').click();
+
+        cy.contains('Filter').click();
+        cy.contains('Clear filters').click();
         cy.contains('France');
         cy.contains('Germany');
     });
@@ -364,8 +367,7 @@ describe('Linelist table', function () {
         cy.contains('France');
         cy.contains('United Kingdom');
         cy.contains('Filter').click();
-        cy.get('li').contains('country').click();
-        cy.get('input[id="search-field"]').type('France{enter}');
+        cy.get('input[id="country"]').type('France{enter}');
         cy.contains('United Kingdom').should('not.exist');
 
         // Navigate to case details and back
@@ -375,10 +377,9 @@ describe('Linelist table', function () {
         cy.contains(/View case\b/).should('not.exist');
 
         // Search is maintained
-        cy.get('input[id="search-field"]').should(
-            'have.value',
-            'country:France',
-        );
+        cy.contains('Filter').click();
+        cy.get('input[id="country"]').should('have.value', 'France');
+
         cy.get('td[value="France"]');
         cy.contains('United Kingdom').should('not.exist');
     });
@@ -395,7 +396,9 @@ describe('Linelist table', function () {
         cy.visit('/cases');
         cy.wait('@getCases');
         cy.contains('rows').click();
-        cy.route('GET', '/api/cases/?limit=5&page=1&count_limit=10000').as('get5Cases');
+        cy.route('GET', '/api/cases/?limit=5&page=1&count_limit=10000').as(
+            'get5Cases',
+        );
         cy.get('li').contains('5').click();
         cy.wait('@get5Cases');
         cy.get('input[type="checkbox"]').should('have.length', 6);
@@ -409,8 +412,7 @@ describe('Linelist table', function () {
         cy.contains('Select all 7 rows').should('not.exist');
 
         cy.contains('Filter').click();
-        cy.get('li').contains('country').click();
-        cy.get('input[id="search-field"]').type('France{enter}');
+        cy.get('input[id="country"]').type('France{enter}');
 
         // Select all option available after search
         cy.get('input[type="checkbox"]').eq(0).click();
@@ -440,8 +442,7 @@ describe('Linelist table', function () {
         cy.contains('rows').click();
         cy.get('li').contains('5').click();
         cy.contains('Filter').click();
-        cy.get('li').contains('country').click();
-        cy.get('input[id="search-field"]').type('France{enter}');
+        cy.get('input[id="country"]').type('France{enter}');
         cy.get('input[type="checkbox"]').eq(0).click();
         cy.contains('Select all 7 rows').click();
         cy.server();
@@ -452,7 +453,8 @@ describe('Linelist table', function () {
         cy.wait('@deleteCases');
 
         cy.contains('No records to display');
-        cy.get('input[id="search-field"]').clear().type('{enter}');
+        cy.contains('Filter').click();
+        cy.contains('Clear filters').click();
         cy.contains('France').should('not.exist');
         cy.contains('Germany');
         cy.contains('United Kingdom');
@@ -471,7 +473,9 @@ describe('Linelist table', function () {
         cy.visit('/cases');
         cy.wait('@getCases');
         cy.contains('rows').click();
-        cy.route('GET', '/api/cases/?limit=5&page=1&count_limit=10000').as('getFirstPage');
+        cy.route('GET', '/api/cases/?limit=5&page=1&count_limit=10000').as(
+            'getFirstPage',
+        );
         cy.get('li').contains('5').click();
         cy.wait('@getFirstPage');
 
@@ -496,7 +500,9 @@ describe('Linelist table', function () {
         cy.visit('/cases');
         cy.wait('@getCases');
         cy.contains('rows').click();
-        cy.route('GET', '/api/cases/?limit=5&page=1&count_limit=10000').as('getFirstPage');
+        cy.route('GET', '/api/cases/?limit=5&page=1&count_limit=10000').as(
+            'getFirstPage',
+        );
         cy.get('li').contains('5').click();
         cy.wait('@getFirstPage');
 
