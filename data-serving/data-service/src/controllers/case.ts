@@ -760,7 +760,9 @@ export class CasesController {
                   $text: { $search: parsedSearch.fullTextSearch },
               }
             : {};
+
         casesQuery = [{ $match: query }];
+
         const filters = parsedSearch.filters.map((f) => {
             if (f.values.length == 1) {
                 const searchTerm = f.values[0];
@@ -774,21 +776,12 @@ export class CasesController {
                     };
                 } else {
                     if (f.dateOperator) {
-                        const dateRangeType =
-                            f.dateOperator === '$gt'
-                                ? 'dateRange.start'
-                                : 'dateRange.end';
                         return {
                             $match: {
                                 [f.path]: {
-                                    $elemMatch: {
-                                        name: 'confirmed',
-                                        [dateRangeType]: {
-                                            [f.dateOperator]: new Date(
-                                                f.values[0].toString(),
-                                            ),
-                                        },
-                                    },
+                                    [f.dateOperator]: new Date(
+                                        f.values[0].toString(),
+                                    ),
                                 },
                             },
                         };

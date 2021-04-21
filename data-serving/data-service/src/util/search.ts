@@ -30,8 +30,8 @@ const keywords = new Map<string, string>([
     ['admin2', 'location.administrativeAreaLevel2'],
     ['admin3', 'location.administrativeAreaLevel3'],
     ['variant', 'variant.name'],
-    ['dateconfirmedafter', 'events'],
-    ['dateconfirmedbefore', 'events'],
+    ['dateconfirmedafter', 'events.dateRange.start'],
+    ['dateconfirmedbefore', 'events.dateRange.end'],
 ]);
 
 export default function parseSearchQuery(q: string): ParsedSearch {
