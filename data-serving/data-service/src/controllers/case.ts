@@ -800,7 +800,6 @@ export class CasesController {
             : {};
 
         casesQuery = [{ $match: query }];
-
         const filters = parsedSearch.filters.map((f) => {
             if (f.values.length == 1) {
                 const searchTerm = f.values[0];
@@ -814,12 +813,21 @@ export class CasesController {
                     };
                 } else {
                     if (f.dateOperator) {
+                        const dateRangeType =
+                            f.dateOperator === '$gt'
+                                ? 'dateRange.start'
+                                : 'dateRange.end';
                         return {
                             $match: {
                                 [f.path]: {
-                                    [f.dateOperator]: new Date(
-                                        f.values[0].toString(),
-                                    ),
+                                    $elemMatch: {
+                                        name: 'confirmed',
+                                        [dateRangeType]: {
+                                            [f.dateOperator]: new Date(
+                                                f.values[0].toString(),
+                                            ),
+                                        },
+                                    },
                                 },
                             },
                         };
@@ -841,7 +849,7 @@ export class CasesController {
                 };
             }
         });
-        casesQuery = _.concat(casesQuery, filters);        
+        casesQuery = _.concat(casesQuery, filters);
         return casesQuery;
     }
 
