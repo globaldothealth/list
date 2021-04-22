@@ -50,7 +50,7 @@ describe('GET', () => {
             .expect('Content-Type', /json/)
             .expect(200);
 
-        expect(res.body._id).toEqual(c._id.toString());
+        expect(res.body[0]._id).toEqual(c._id.toString());
     });
     it('one absent item should return 404 NOT FOUND', () => {
         return request(app)
