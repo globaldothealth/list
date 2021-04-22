@@ -91,7 +91,6 @@ export default class CasesController {
             const accessKeyId = process.env.AWS_ACCESS_KEY_ID;
             const secretKey = process.env.AWS_SECRET_ACCESS_KEY;
             const sourceAddress = process.env.AWS_SES_SENDER;
-            const sourceARN = process.env.AWS_SES_SENDER_ARN;
             const correlationId = crypto.randomBytes(16).toString("hex");
             const worker = new Worker('./src/workers/downloadAsync.js', { 
                 workerData: {
@@ -103,7 +102,6 @@ export default class CasesController {
                     secretKey,
                     correlationId,
                     sourceAddress,
-                    sourceARN,
             }});
             /* we don't care what happens when the worker finishes, but for debugging
              * I'm going to log this.
