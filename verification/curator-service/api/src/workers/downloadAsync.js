@@ -1,6 +1,11 @@
 const { workerData } = require('worker_threads');
 const axios = require('axios');
 const AWS = require('aws-sdk');
+const pino = require('pino');
+
+const logger = pino({
+    prettyPrint: { colorize: false },
+});
 
 // make the request to the data service
 try {
@@ -54,19 +59,19 @@ ${base64}
         ses.sendRawEmail({
             RawMessage: { Data: mailMessage },
           }, (err, data) => {
-            console.log(`sent email with correlation id ${workerData.correlationId}`);
+            logger.info(`sent email with correlation id ${workerData.correlationId}`);
             if (err)
             {
-                console.error('error:');
-                console.error(err);
+                logger.error('error:');
+                logger.error(err);
             }
             if (data)
             {
-                console.log(`response from Amazon:`);
-                console.log(data);
+                logger.info(`response from Amazon:`);
+                logger.info(data);
             }
         });
     });
 } catch (err) {
-    console.error(err);
+    logger.error(err);
 }
