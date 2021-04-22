@@ -35,8 +35,8 @@ try {
                     Data: 'Greetings from global.health',
                 },
             },
-            ReturnPath: 'downloads@global.health',
-            Source: 'downloads@global.health',
+            ReturnPath: workerData.sourceAddress,
+            Source: workerData.sourceAddress,
         },(err, data) => {
             console.log(`sent email with correlation id ${workerData.correlationId}`);
             if (err)
@@ -46,7 +46,8 @@ try {
             }
             if (data)
             {
-                console.log(`response from Amazon: ${data}`);
+                console.log(`response from Amazon:`);
+                console.log(data);
             }
         });
     });
