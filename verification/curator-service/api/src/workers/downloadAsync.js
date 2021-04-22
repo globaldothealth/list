@@ -32,9 +32,9 @@ try {
          * to write email attachments by hand (and trolling Usenet groups with spurious
          * attachments) will have to suffice.
          */
-        var mailMessage = `From: "Global.Health" <${workerData.sourceAddress}>
+        var mailMessage = `From: "Global.health" <${workerData.sourceAddress}>
 To: ${workerData.email}
-Subject: Here is your global.health download
+Subject: Here is your Global.health download
 Content-Type: multipart/mixed; boundary="part-boundary"
 
 --part-boundary
@@ -45,7 +45,7 @@ Please see the attached list of cases in response to your query ${workerData.que
 
 Kind regards,
 
-The Global.Health team.
+The Global.health team.
 
 --part-boundary
 Content-Type: text/plain; name="g_dot_h_cases.csv"
