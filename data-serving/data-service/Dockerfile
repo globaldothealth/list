@@ -27,7 +27,7 @@ RUN npm run build
 EXPOSE 3000
 # Expose v8 inspector on port 9229.
 # If you start node with the --inspect option you'll be able to connnect by pointing Chromium to chrome://inspect
-EXPOSE 9229
+# EXPOSE 9229
 
 # Specify a command for up to this step.
 CMD [ "npm", "start" ]
