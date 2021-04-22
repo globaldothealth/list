@@ -28,8 +28,38 @@ export class CasesController {
      * Handles HTTP GET /api/cases/:id.
      */
     get = async (req: Request, res: Response): Promise<void> => {
-        const c = await Case.findById(req.params.id).lean();
-        if (!c) {
+        // Check if this case's source is excluded
+        const c = await Case.aggregate([
+            {
+                $match: {
+                    _id: new ObjectId(req.params.id),
+                },
+            },
+            {
+                $addFields: {
+                    sourceID: {
+                        $toObjectId: '$caseReference.sourceId',
+                    },
+                },
+            },
+            {
+                $lookup: {
+                    localField: 'sourceID',
+                    foreignField: '_id',
+                    from: 'sources',
+                    as: 'source',
+                },
+            },
+            {
+                $addFields: {
+                    isSourceExcluded: {
+                        $anyElementTrue: '$source.excludeFromLineList',
+                    },
+                },
+            },
+        ]);
+
+        if (c.length === 0) {
             res.status(404).send({
                 message: `Case with ID ${req.params.id} not found.`,
             });
