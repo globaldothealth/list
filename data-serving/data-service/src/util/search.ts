@@ -61,7 +61,6 @@ export default function parseSearchQuery(q: string): ParsedSearch {
 
         // We don't tokenize so "text" is a string, not an array of strings.
         res.fullTextSearch = searchParsedResult.text as string;
-
         // Get the keywords into our result struct.
         keywords.forEach((path, keyword): void => {
             // Enable to filter by date
