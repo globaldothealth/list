@@ -11,7 +11,6 @@ import { parseDownloadedCase } from '../util/case';
 import axios from 'axios';
 import { logger } from '../util/logger';
 import stringify from 'csv-stringify/lib/sync';
-import yaml from 'js-yaml';
 import _ from 'lodash';
 
 class GeocodeNotFoundError extends Error {}
@@ -769,12 +768,10 @@ export class CasesController {
                   $text: { $search: parsedSearch.fullTextSearch },
               }
             : {};
-            
-            casesQuery = [
-               {$match: query}
-             ];             
-   
-        const filters = parsedSearch.filters.map((f) => {            
+
+        casesQuery = [{ $match: query }];
+
+        const filters = parsedSearch.filters.map((f) => {
             if (f.values.length == 1) {
                 const searchTerm = f.values[0];
                 if (searchTerm === '*') {
@@ -785,10 +782,17 @@ export class CasesController {
                             },
                         },
                     };
-                } else {                    
+                } else {
                     if (f.dateOperator) {
                         return {
-                            $match: {[f.path]: { [f.dateOperator]: new Date(f.values[0].toString())}}}
+                            $match: {
+                                [f.path]: {
+                                    [f.dateOperator]: new Date(
+                                        f.values[0].toString(),
+                                    ),
+                                },
+                            },
+                        };
                     } else {
                         return {
                             $match: {
