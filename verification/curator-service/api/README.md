@@ -54,7 +54,7 @@ Now look in `/tmp/headers.txt` or wherever you saved the headers. You'll see a `
 
 Copy everything from "connect.sid=LONG_STRING_OF_NONSENSE", excluding the semicolon. Now use that in your calls to other API endpoints like this:
 
-    $ curl -X POST -H 'Content-Type: application/x-www-form-urlencoded' -F 'query=country:Brazil' --cookie 'connect.sid=s%LONG_STRING_OF_NONSENSE' http://localhost:3001/api/cases/download
+    $ curl -X POST -H 'Content-Type: application/x-www-form-urlencoded' -F 'query=country:Brazil' --cookie 'connect.sid=LONG_STRING_OF_NONSENSE' http://localhost:3001/api/cases/download
 
 (notice that `/auth/register` doesn't have an `/api` prefix and all the other methods do!)
 

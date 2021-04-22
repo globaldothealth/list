@@ -565,7 +565,6 @@ paths:
         post:
             summary: >
                 Emails a CSV attachment of cases matching the search query.
-                You cannot supply both query and caseIds.
             tags: [Case]
             operationId: downloadAsync
             requestBody:
