@@ -800,6 +800,10 @@ export class CasesController {
             : {};
 
         casesQuery = [{ $match: query }];
+<<<<<<< HEAD
+=======
+
+>>>>>>> origin/1685-Unable-to-filter-by-Variant
         const filters = parsedSearch.filters.map((f) => {
             if (f.values.length == 1) {
                 const searchTerm = f.values[0];
@@ -820,6 +824,7 @@ export class CasesController {
                         return {
                             $match: {
                                 [f.path]: {
+<<<<<<< HEAD
                                     $elemMatch: {
                                         name: 'confirmed',
                                         [dateRangeType]: {
@@ -828,6 +833,11 @@ export class CasesController {
                                             ),
                                         },
                                     },
+=======
+                                    [f.dateOperator]: new Date(
+                                        f.values[0].toString(),
+                                    ),
+>>>>>>> origin/1685-Unable-to-filter-by-Variant
                                 },
                             },
                         };
