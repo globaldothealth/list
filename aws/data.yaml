@@ -54,10 +54,10 @@ spec:
           resources:
             requests:
               memory: "3Gi"
-              cpu: "500m"
+              cpu: "768m"
             limits:
               memory: "3Gi"
-              cpu: "768m"
+              cpu: "1500m"
 ---
 apiVersion: apps/v1
 kind: Deployment
