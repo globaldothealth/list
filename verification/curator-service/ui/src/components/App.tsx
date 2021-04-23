@@ -698,7 +698,7 @@ export default function App(): JSX.Element {
                             <div className={classes.spacer}></div>
                             <div className={classes.divider}></div>
                             <a
-                                href="https://github.com/globaldothealth/list/blob/main/data-serving/scripts/export-data/case_fields.yaml"
+                                href="https://github.com/globaldothealth/list/blob/main/data-serving/scripts/export-data/functions/01-split/fields.txt"
                                 rel="noopener noreferrer"
                                 target="_blank"
                                 data-testid="dictionaryButton"
