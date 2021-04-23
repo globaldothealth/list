@@ -153,11 +153,14 @@ export class CasesController {
      * Handles HTTP GET /api/cases.
      */
     list = async (req: Request, res: Response): Promise<void> => {
+        logger.info("List method entrypoint");
         const page = Number(req.query.page) || 1;
         const limit = Number(req.query.limit) || 10;
         const countLimit = Number(req.query.count_limit) || 10000;
         const sortBy = Number(req.query.sort_by);
         const sortByOrder = Number(req.query.order);
+
+        logger.info("Got query params");
 
         if (page < 1) {
             res.status(422).json({ message: 'page must be > 0' });
@@ -175,16 +178,18 @@ export class CasesController {
             res.status(422).json({ message: 'q must be a unique string' });
             return;
         }
+        logger.info("Got past 422s");
         try {
             const caseAggregation = this.caseAggregationFromQuery(
                 req.query.q ?? '',
             );
+            logger.info("Got case aggregation from query");
             const excludingRestrictedSources = this.excludeRestrictedSourcesFromCaseAggregation(
                 caseAggregation,
             );
-
+            logger.info("Excluded restricted sources");
             const sortByKeyword = getSortByKeyword(sortBy);
-
+            logger.info("Sorted by keyword");
             const addingCount = _.concat(excludingRestrictedSources, [
                 {
                     $facet: {
@@ -225,12 +230,14 @@ export class CasesController {
                     },
                 },
             ]);
+            logger.info("Added count");
             // Do a fetch of documents and another fetch in parallel for total documents
             // count used in pagination.
             const results = await Case.aggregate(addingCount).collation({
                 locale: 'en_US',
                 strength: 2,
             });
+            logger.info("Got results");
             const docs = results[0].docs;
             const total = results[0].total ?? 0;
             // If we have more items than limit, add a response param
@@ -242,9 +249,11 @@ export class CasesController {
                     nextPage: page + 1,
                     total: total,
                 });
+                logger.info("Got multiple pages of results");
                 return;
             }
             // If we fetched all available data, just return it.
+            logger.info("Got one page of results");
             res.json({ cases: docs, total: total });
         } catch (e) {
             if (e instanceof ParsingError) {
