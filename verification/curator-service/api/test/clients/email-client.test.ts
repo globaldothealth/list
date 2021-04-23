@@ -15,7 +15,8 @@ describe('initialize', () => {
 });
 
 describe('send', () => {
-    it('sends specified properties via email', async () => {
+    // This email service is not currently in use
+    it.skip('sends specified properties via email', async () => {
         jest.setTimeout(15000);
 
         const client = await new EmailClient().initialize();
