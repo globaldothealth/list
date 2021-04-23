@@ -93,12 +93,6 @@ export default function parseSearchQuery(q: string): ParsedSearch {
                     dateOperator: searchParsedResult.dateOperator,
                 });
             }
-
-            res.filters.push({
-                path: path,
-                values: searchParsedResult[keyword],
-                dateOperator: searchParsedResult.dateOperator,
-            });
         });
         if (res.filters.length === 0 && !res.fullTextSearch) {
             throw new ParsingError(`Invalid search query ${q}`);

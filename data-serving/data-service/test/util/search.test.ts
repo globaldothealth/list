@@ -41,7 +41,7 @@ describe('search query', () => {
         const res = parseSearchQuery(
             'curator:foo@bar.com,baz@meh.com gender:male nationality:swiss ' +
                 'occupation:"clock maker" country:switzerland outcome:recovered ' +
-                'caseid:abc123 uploadid:def456 sourceurl:wsj.com  verificationstatus:verified ' +
+                'caseid:605c8f6a7ee6c2d7fd2670cc uploadid:def456 sourceurl:wsj.com  verificationstatus:verified ' +
                 'admin1:"some admin 1" admin2:"some admin 2" admin3:"some admin 3"' +
                 'variant:"B.1.351"',
         );
