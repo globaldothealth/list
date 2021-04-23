@@ -17,7 +17,7 @@ afterEach(() => {
 
 it('loads and displays case', async () => {
     const axiosResponse = {
-        data: fullCase,
+        data: [fullCase],
         status: 200,
         statusText: 'OK',
         config: {},
@@ -134,7 +134,7 @@ it('loads and displays case', async () => {
 
 it('can go to the edit page', async () => {
     const axiosResponse = {
-        data: fullCase,
+        data: [fullCase],
         status: 200,
         statusText: 'OK',
         config: {},
@@ -166,7 +166,7 @@ it('can go to the edit page', async () => {
 
 it('does not show the edit button when not enabled', async () => {
     const axiosResponse = {
-        data: fullCase,
+        data: [fullCase],
         status: 200,
         statusText: 'OK',
         config: {},

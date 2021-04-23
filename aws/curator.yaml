@@ -20,7 +20,7 @@ spec:
     spec:
       containers:
         - name: curator
-          image: ghcr.io/globaldothealth/list/curatorservice:1.5.1
+          image: ghcr.io/globaldothealth/list/curatorservice:main
           ports:
             - containerPort: 3001
           livenessProbe:
@@ -80,6 +80,16 @@ spec:
                 secretKeyRef:
                   name: curator-dev-969ttc49f5
                   key: email_user_password
+            - name: AWS_SES_REGION
+              valueFrom:
+                secretKeyRef:
+                  name: curator-dev-bch28c9gkm
+                  key: aws_ses_region
+            - name: AWS_SES_SENDER
+              valueFrom:
+                secretKeyRef:
+                  name: curator-dev-bch28c9gkm
+                  key: aws_ses_sender
           resources:
             requests:
               memory: "256Mi"
@@ -165,6 +175,16 @@ spec:
                 secretKeyRef:
                   name: curator-prod-9gkgc49f9h
                   key: email_user_password
+            - name: AWS_SES_REGION
+              valueFrom:
+                secretKeyRef:
+                  name: curator-prod-4mtk8mh9t2
+                  key: aws_ses_region
+            - name: AWS_SES_SENDER
+              valueFrom:
+                secretKeyRef:
+                  name: curator-prod-4mtk8mh9t2
+                  key: aws_ses_sender
           resources:
             requests:
               memory: "512Mi"

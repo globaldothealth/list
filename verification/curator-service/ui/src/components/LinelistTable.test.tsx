@@ -1,6 +1,12 @@
 import '@testing-library/jest-dom/extend-expect';
 
-import { fireEvent, render, wait, screen } from '@testing-library/react';
+import {
+    fireEvent,
+    render,
+    wait,
+    screen,
+    within,
+} from '@testing-library/react';
 
 import LinelistTable from './LinelistTable';
 import { MemoryRouter } from 'react-router-dom';
@@ -122,7 +128,7 @@ it('loads and displays cases', async () => {
 
     expect(mockedAxios.get).toHaveBeenCalledTimes(1);
     expect(mockedAxios.get).toHaveBeenCalledWith(
-        '/api/cases/?limit=50&page=1&count_limit=10000',
+        '/api/cases/?limit=50&page=1&count_limit=10000&sort_by=0&order=1',
     );
     expect(await findByText('www.example.com')).toBeInTheDocument();
     expect(await findByText('some admin 1')).toBeInTheDocument();
@@ -266,7 +272,7 @@ it('can delete a row', async () => {
     );
     expect(mockedAxios.get).toHaveBeenCalledTimes(1);
     expect(mockedAxios.get).toHaveBeenCalledWith(
-        '/api/cases/?limit=50&page=1&count_limit=10000',
+        '/api/cases/?limit=50&page=1&count_limit=10000&sort_by=0&order=1',
     );
     const row = await findByText('www.example.com');
     expect(row).toBeInTheDocument();
@@ -365,7 +371,7 @@ it('can cancel delete action', async () => {
     );
     expect(mockedAxios.get).toHaveBeenCalledTimes(1);
     expect(mockedAxios.get).toHaveBeenCalledWith(
-        '/api/cases/?limit=50&page=1&count_limit=10000',
+        '/api/cases/?limit=50&page=1&count_limit=10000&sort_by=0&order=1',
     );
     const row = await findByText('www.example.com');
     expect(row).toBeInTheDocument();
@@ -444,7 +450,7 @@ it('cannot edit data if not curator', async () => {
     );
     expect(mockedAxios.get).toHaveBeenCalledTimes(1);
     expect(mockedAxios.get).toHaveBeenCalledWith(
-        '/api/cases/?limit=50&page=1&count_limit=10000',
+        '/api/cases/?limit=50&page=1&count_limit=10000&sort_by=0&order=1',
     );
     const row = await findByText('www.example.com');
     expect(row).toBeInTheDocument();
@@ -599,4 +605,48 @@ it('paginates through data', async () => {
 
         expect(getAllByText('France')).toHaveLength(5);
     });
+});
+
+it('sorts data based on selected field', async () => {
+    render(
+        <MemoryRouter>
+            <LinelistTable
+                user={curator}
+                // eslint-disable-next-line @typescript-eslint/no-empty-function
+                search=""
+                setSearch={setSearch}
+                filterBreadcrumbs={[]}
+                page={0}
+                pageSize={10}
+                onChangePage={jest.fn()}
+                onChangePageSize={jest.fn()}
+                handleBreadcrumbDelete={jest.fn()}
+            />
+        </MemoryRouter>,
+    );
+
+    const sortBySelect = screen.getByLabelText(/Sort by/i);
+    expect(sortBySelect).toBeInTheDocument();
+    expect(sortBySelect).toHaveTextContent(/none/i);
+
+    fireEvent.mouseDown(sortBySelect);
+    const sortByOptions = await screen.findAllByTestId('sortby-option');
+    expect(sortByOptions).toHaveLength(7);
+
+    //Simualate selection
+    const listbox = within(screen.getByRole('listbox'));
+    fireEvent.click(listbox.getByText(/confirmed date/i));
+    expect(screen.getByLabelText(/Sort by/i)).toHaveTextContent(
+        /confirmed date/i,
+    );
+
+    //Check if order select input is shown after choosing field to sort by
+    const sortingOrderSelect = await screen.findByLabelText(/Order/i);
+    expect(sortingOrderSelect).toBeInTheDocument();
+    expect(sortingOrderSelect).toHaveTextContent(/descending/i);
+
+    fireEvent.mouseDown(sortingOrderSelect);
+    const orderListbox = within(screen.getByRole('listbox'));
+    fireEvent.click(orderListbox.getByText(/ascending/i));
+    expect(screen.getByLabelText(/Order/i)).toHaveTextContent(/ascending/i);
 });

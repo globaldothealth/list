@@ -74,6 +74,7 @@
     "express-status-monitor": "^1.3.3",
     "lodash": "^4.17.20",
     "longjohn": "^0.2.12",
+    "mimemessage": "^1.0.5",
     "mongoose": "^5.10.5",
     "nodemailer": "^6.4.11",
     "passport": "^0.4.1",

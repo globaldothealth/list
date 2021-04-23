@@ -1,35 +1,61 @@
-import { URLToSearchQuery, searchQueryToURL } from './searchQuery';
+import {
+    URLToSearchQuery,
+    searchQueryToURL,
+    filtersToURL,
+    URLToFilters,
+} from './searchQuery';
+import { FilterFormValues } from '../FiltersModal';
 
 describe('Search query - string to url', () => {
     it('converts given string to url search parameters', () => {
-        expect(searchQueryToURL('gender: male country: china')).toEqual(
-            'gender=male&country=china',
+        expect(searchQueryToURL('Got infected at work - India')).toEqual(
+            'q=Got+infected+at+work+-+India',
+        );
+    });
+
+    it('converts filter keywords - values object to url search parameters', () => {
+        const testFilters: FilterFormValues = {
+            country: 'France',
+            gender: 'Female',
+            outcome: 'Recovered',
+        };
+        expect(filtersToURL(testFilters)).toEqual(
+            'country=France&gender=Female&outcome=Recovered',
         );
     });
 
     it('is able to convert filter values with spaces into valid url search params', () => {
-        expect(searchQueryToURL('country: New Zealand')).toEqual(
-            'country=New+Zealand',
-        );
-    });
+        const testFilters: FilterFormValues = {
+            country: 'United States',
+        };
 
-    it('creates valid search query when no filters are added', () => {
-        expect(searchQueryToURL('got infected at work - India')).toEqual(
-            'q=got+infected+at+work+-+India',
+        expect(filtersToURL(testFilters)).toEqual(
+            'country=%22United+States%22',
         );
     });
 });
 
 describe('Search query - url to string', () => {
-    it('converts url search parameters into normal string', () => {
+    it('converts url search parameters into filters', () => {
         expect(URLToSearchQuery('?country=china&gender=female')).toEqual(
             'country:china gender:female',
         );
     });
 
-    it('converts search query from url to normal string', () => {
+    it('converts url search parameters to search query', () => {
         expect(URLToSearchQuery('?q=got+infected+at+work+-+India')).toEqual(
             'got infected at work - India',
+        );
+    });
+
+    it('converts url search parameters to filters object', () => {
+        const testResponse: FilterFormValues = {
+            country: 'France',
+            gender: 'Female',
+        };
+
+        expect(URLToFilters('?country=France&gender=Female')).toEqual(
+            testResponse,
         );
     });
 });
