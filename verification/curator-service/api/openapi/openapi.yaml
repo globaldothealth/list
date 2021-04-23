@@ -561,6 +561,27 @@ paths:
                     $ref: '#/components/responses/200CasesDownload'
                 '500':
                     $ref: '#/components/responses/500'
+    /cases/downloadAsync:
+        post:
+            summary: >
+                Emails a CSV attachment of cases matching the search query.
+            tags: [Case]
+            operationId: downloadAsync
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            properties:
+                                query:
+                                    description: >
+                                        Cases matching this query will be returned.
+                                    type: string
+            responses:
+                '204':
+                    $ref: '#/components/responses/204'
+                '500':
+                    $ref: '#/components/responses/500'
     /cases/getDownloadLink:
         get:
             summary: >
@@ -1935,6 +1956,8 @@ components:
                 application/json:
                     schema:
                         $ref: '#/components/schemas/LocationArray'
+        '204':
+            description: Empty
         '400':
             description: Malformed request
         '403':
