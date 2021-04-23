@@ -24,6 +24,7 @@ export default function GHListLogo(props: any) {
                     {`.st0 {fill:#221F1F; pointer-events: bounding-box;}
                      .st1{fill:#0E766A; pointer-events: bounding-box;}
                     .st2{fill:none;stroke:#010101;stroke-width:6;stroke-miterlimit:10;}
+                    .rect{pointer-events:all}
                 `}
                 </style>
                 <a
@@ -31,6 +32,14 @@ export default function GHListLogo(props: any) {
                     data-testid="home-button-gh"
                     rel="noopener noreferrer"
                 >
+                    <rect
+                        className="rect"
+                        fill="none"
+                        x="0"
+                        y="0"
+                        width="1500"
+                        height="1211"
+                    />
                     <g>
                         <path
                             className="st0"
@@ -70,6 +79,14 @@ export default function GHListLogo(props: any) {
                     data-testid="home-button-data"
                     rel="noopener noreferrer"
                 >
+                    <rect
+                        className="rect"
+                        fill="none"
+                        x="1500"
+                        y="0"
+                        width="3000"
+                        height="1211"
+                    />
                     <g>
                         <g>
                             <path

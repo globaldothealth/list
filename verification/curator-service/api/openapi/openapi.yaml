@@ -396,6 +396,20 @@ paths:
                       minimum: 100
                       default: 10000
                       maximum: 50000
+                - name: sort_by
+                  in: query
+                  description: Keyword to sort by
+                  required: false
+                  schema:
+                      type: integer
+                      default: 0
+                - name: order
+                  in: query
+                  description: Sorting order
+                  required: false
+                  schema:
+                      type: integer
+                      default: 0
                 - name: q
                   in: query
                   description: The search query

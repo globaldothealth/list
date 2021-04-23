@@ -5,12 +5,12 @@ import { ObjectId, QuerySelector } from 'mongodb';
 import { GeocodeOptions, Geocoder, Resolution } from '../geocoding/geocoder';
 import { NextFunction, Request, Response } from 'express';
 import parseSearchQuery, { ParsingError } from '../util/search';
+import { SortBy, SortByOrder, getSortByKeyword } from '../util/case';
 import { parseDownloadedCase } from '../util/case';
 
 import axios from 'axios';
 import { logger } from '../util/logger';
 import stringify from 'csv-stringify/lib/sync';
-import yaml from 'js-yaml';
 import _ from 'lodash';
 
 class GeocodeNotFoundError extends Error {}
@@ -28,8 +28,38 @@ export class CasesController {
      * Handles HTTP GET /api/cases/:id.
      */
     get = async (req: Request, res: Response): Promise<void> => {
-        const c = await Case.findById(req.params.id).lean();
-        if (!c) {
+        // Check if this case's source is excluded
+        const c = await Case.aggregate([
+            {
+                $match: {
+                    _id: new ObjectId(req.params.id),
+                },
+            },
+            {
+                $addFields: {
+                    sourceID: {
+                        $toObjectId: '$caseReference.sourceId',
+                    },
+                },
+            },
+            {
+                $lookup: {
+                    localField: 'sourceID',
+                    foreignField: '_id',
+                    from: 'sources',
+                    as: 'source',
+                },
+            },
+            {
+                $addFields: {
+                    isSourceExcluded: {
+                        $anyElementTrue: '$source.excludeFromLineList',
+                    },
+                },
+            },
+        ]);
+
+        if (c.length === 0) {
             res.status(404).send({
                 message: `Case with ID ${req.params.id} not found.`,
             });
@@ -93,8 +123,8 @@ export class CasesController {
                 .get<string>(
                     'https://raw.githubusercontent.com/globaldothealth/list/main/data-serving/scripts/export-data/functions/01-split/fields.txt',
                 )
-                .then((yamlRes) => {
-                    const columns = yamlRes.data.split('\n');
+                .then((txtRes) => {
+                    const columns = txtRes.data.split('\n');
                     const parsedCases = _.map(
                         matchingCases,
                         parseDownloadedCase,
@@ -126,7 +156,9 @@ export class CasesController {
         const page = Number(req.query.page) || 1;
         const limit = Number(req.query.limit) || 10;
         const countLimit = Number(req.query.count_limit) || 10000;
-        
+        const sortBy = Number(req.query.sort_by);
+        const sortByOrder = Number(req.query.order);
+
         if (page < 1) {
             res.status(422).json({ message: 'page must be > 0' });
             return;
@@ -150,6 +182,9 @@ export class CasesController {
             const excludingRestrictedSources = this.excludeRestrictedSourcesFromCaseAggregation(
                 caseAggregation,
             );
+
+            const sortByKeyword = getSortByKeyword(sortBy);
+
             const addingCount = _.concat(excludingRestrictedSources, [
                 {
                     $facet: {
@@ -166,15 +201,18 @@ export class CasesController {
                         ],
                         docs: [
                             {
+                                $sort: {
+                                    [sortByKeyword]:
+                                        sortByOrder === SortByOrder.Ascending
+                                            ? 1
+                                            : -1,
+                                },
+                            },
+                            {
                                 $skip: limit * (page - 1),
                             },
                             {
                                 $limit: limit + 1,
-                            },
-                            {
-                                $sort: {
-                                    'revisionMetadata.creationMetadata.date': -1,
-                                },
                             },
                         ],
                     },
@@ -760,12 +798,9 @@ export class CasesController {
                   $text: { $search: parsedSearch.fullTextSearch },
               }
             : {};
-            
-            casesQuery = [
-               {$match: query}
-             ];             
-   
-        const filters = parsedSearch.filters.map((f) => {            
+
+        casesQuery = [{ $match: query }];
+        const filters = parsedSearch.filters.map((f) => {
             if (f.values.length == 1) {
                 const searchTerm = f.values[0];
                 if (searchTerm === '*') {
@@ -776,10 +811,26 @@ export class CasesController {
                             },
                         },
                     };
-                } else {                    
+                } else {
                     if (f.dateOperator) {
+                        const dateRangeType =
+                            f.dateOperator === '$gt'
+                                ? 'dateRange.start'
+                                : 'dateRange.end';
                         return {
-                            $match: {[f.path]: { [f.dateOperator]: new Date(f.values[0].toString())}}}
+                            $match: {
+                                [f.path]: {
+                                    $elemMatch: {
+                                        name: 'confirmed',
+                                        [dateRangeType]: {
+                                            [f.dateOperator]: new Date(
+                                                f.values[0].toString(),
+                                            ),
+                                        },
+                                    },
+                                },
+                            },
+                        };
                     } else {
                         return {
                             $match: {
@@ -798,7 +849,7 @@ export class CasesController {
                 };
             }
         });
-        casesQuery = _.concat(casesQuery, filters);        
+        casesQuery = _.concat(casesQuery, filters);
         return casesQuery;
     }
 
