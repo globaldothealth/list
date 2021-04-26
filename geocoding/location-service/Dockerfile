@@ -14,11 +14,11 @@ WORKDIR /usr/src/app/geocoding/location-service
 USER flask
 
 # install dependencies
-COPY requirements.txt .
+COPY geocoding/location-service/requirements.txt .
 RUN python3 -mpip install -r requirements.txt
 
 # deploy the app source
-COPY . .
+COPY geocoding/location-service/. .
 
 # expose the Flask app port
 EXPOSE 8080
