@@ -396,7 +396,9 @@ export class CasesController {
     batchUpsert = async (req: Request, res: Response): Promise<void> => {
         try {
             // Batch validate cases first.
+            logger.info('batchUpsert: entrypoint');
             const errors = await this.batchValidate(req.body.cases);
+            logger.info('batchUpsert: validated cases');
             if (errors.length > 0) {
                 res.status(207).send({
                     phase: 'VALIDATE',
@@ -406,6 +408,7 @@ export class CasesController {
                 });
                 return;
             }
+            logger.info('batchUpsert: preparing bulk write');
             const bulkWriteResult = await Case.bulkWrite(
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 req.body.cases.map((c: any) => {
@@ -436,6 +439,7 @@ export class CasesController {
                 }),
                 { ordered: false },
             );
+            logger.info('batchUpsert: finished bulk write');
             res.status(200).json({
                 phase: 'UPSERT',
                 numCreated:
