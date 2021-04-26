@@ -3,9 +3,15 @@ FROM python:3.8-buster
 RUN apt-get update -y
 RUN apt-get install -y python3-pip
 
+# create a user
+
+RUN useradd -ms /bin/bash flask
+
 # create the deployment area
 RUN mkdir -p /usr/src/app/geocoding/location-service
+RUN chown flask:flask /usr/src/app/geocoding/location-service
 WORKDIR /usr/src/app/geocoding/location-service
+USER flask
 
 # install dependencies
 COPY requirements.txt .
