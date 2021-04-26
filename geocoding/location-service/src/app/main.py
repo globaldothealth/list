@@ -7,7 +7,7 @@ app = Flask(__name__)
 
 
 @app.route("/health")
-def index() -> str:
+def index() -> str:   
     return jsonify({"status": "Healthy"})
 
 @app.route("/geocode")
