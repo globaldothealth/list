@@ -8,4 +8,4 @@ def index() -> str:
     return jsonify({"status": "Healthy"})
         
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=80)
+    app.run(host='0.0.0.0', port=8080)
