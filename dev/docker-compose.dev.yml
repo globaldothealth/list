@@ -1,5 +1,8 @@
 version: "3.7"
 services:
+  geocoding:
+    environment:
+      DEBUG: "True"
   mongo:
     volumes:
       - ../verification/scripts:/verification/scripts
