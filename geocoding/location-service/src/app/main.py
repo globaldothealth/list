@@ -1,7 +1,7 @@
 from flask import Flask, jsonify, request
 from os import environ
 
-from src.lib.mapbox_client import mapbox_geocode
+from src.integration.mapbox_client import mapbox_geocode
 
 app = Flask(__name__)
 
