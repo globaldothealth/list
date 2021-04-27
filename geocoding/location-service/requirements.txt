@@ -17,6 +17,7 @@ jmespath==0.10.0
 json-schema==0.3
 mapbox==0.18.0
 MarkupSafe==1.1.1
+mock==4.0.3
 msgpack==1.0.2
 packaging==20.9
 pluggy==0.13.1
