@@ -7,7 +7,12 @@ app = Flask(__name__)
 
 
 @app.route("/health")
-def index() -> str:   
+def index() -> str:
+    if 'MAPBOX_TOKEN' not in environ:
+        return jsonify({
+            "status": "Unhealthy",
+            "reason": "Mapbox API token is not present"
+        }), 500
     return jsonify({"status": "Healthy"})
 
 @app.route("/geocode")
