@@ -1,4 +1,5 @@
 import json
+from lru import LRU
 from src.integration.mapbox_client import mapbox_geocode
 
 
@@ -12,7 +13,7 @@ class Geocoder:
     def __init__(self, api_token):
         """Needs a mapbox API token."""
         self.api_token = api_token
-        self.cache = {}
+        self.cache = LRU(500)
 
     def resolutionToMapboxType(self, resolution):
         """Map (sorrynotsorry) from our names for administrative regions to mapbox's names."""
