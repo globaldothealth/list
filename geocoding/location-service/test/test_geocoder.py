@@ -36,3 +36,13 @@ class GeocodeTests(unittest.TestCase):
         print("feats[0]")
         print(feats)
         assert feats[0] == wantFeature
+
+    @patch('src.app.geocoder.mapbox_geocode')
+    def test_canReturnNoResults(self, mapbox_patch):
+        mapbox_patch.return_value = {
+            'features': [
+            ]
+        }
+        geocoder = Geocoder('api_token')
+        feats = geocoder.geocode('some query')
+        assert len(feats) == 0
