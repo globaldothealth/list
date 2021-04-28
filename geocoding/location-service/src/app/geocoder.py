@@ -61,7 +61,7 @@ class Geocoder:
         # TODO fill in the administrative areas
         return res
 
-    def geocode(self, query, options):
+    def geocode(self, query, options={}):
         types = None
         if 'limitToResolution' in options:
             types = [self.resolutionToMapboxType(i) for i in options['limitToResolution']]
