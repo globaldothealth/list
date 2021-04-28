@@ -1,3 +1,4 @@
+import json
 from src.integration.mapbox_client import mapbox_geocode
 
 class Geocoder:
@@ -10,6 +11,7 @@ class Geocoder:
     def __init__(self, api_token):
         """Needs a mapbox API token."""
         self.api_token = api_token
+        self.cache = {}
     
     def resolutionToMapboxType(self, resolution):
         """Map (sorrynotsorry) from our names for administrative regions to mapbox's names."""
@@ -62,8 +64,16 @@ class Geocoder:
         return res
 
     def geocode(self, query, options={}):
+        cacheKey = json.dumps({
+            'query': query.lower(),
+            'options': options
+        })
+        if cacheKey in self.cache:
+            return self.cache[cacheKey]
         types = None
         if 'limitToResolution' in options:
             types = [self.resolutionToMapboxType(i) for i in options['limitToResolution']]
         geoResult = mapbox_geocode(self.api_token, query, types=types, limit=5, languages=['en'])
-        return [self.unpackGeoJson(feature) for feature in geoResult['features']]
+        response = [self.unpackGeoJson(feature) for feature in geoResult['features']]
+        self.cache[cacheKey] = response
+        return response

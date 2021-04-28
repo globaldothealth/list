@@ -46,3 +46,18 @@ class GeocodeTests(unittest.TestCase):
         geocoder = Geocoder('api_token')
         feats = geocoder.geocode('some query')
         assert len(feats) == 0
+
+    @patch('src.app.geocoder.mapbox_geocode')
+    def test_cachesMapboxResponses(self, mapbox_patch):
+        mapbox_patch.return_value = {
+            'features': [
+            ],
+        }
+        geocoder = Geocoder('api_token')
+        feats = geocoder.geocode('some query', {
+            'limitToResolution': [ Geocoder.Admin3, Geocoder.Admin2 ]
+        })
+        feats2 = geocoder.geocode('some query', {
+            'limitToResolution': [ Geocoder.Admin3, Geocoder.Admin2 ]
+        })
+        mapbox_patch.assert_called_once()
