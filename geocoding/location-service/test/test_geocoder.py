@@ -4,6 +4,7 @@ from mock import patch
 
 from src.app.geocoder import Geocoder
 
+
 class GeocodeTests(unittest.TestCase):
 
     def setUp(self):
@@ -20,7 +21,7 @@ class GeocodeTests(unittest.TestCase):
         }
         geocoder = Geocoder('api_token')
         feats = geocoder.geocode('some query', {
-            'limitToResolution': [ Geocoder.Admin3, Geocoder.Admin2 ]
+            'limitToResolution': [Geocoder.Admin3, Geocoder.Admin2]
         })
         assert len(feats) == 1
         wantFeature = {
@@ -55,9 +56,10 @@ class GeocodeTests(unittest.TestCase):
         }
         geocoder = Geocoder('api_token')
         feats = geocoder.geocode('some query', {
-            'limitToResolution': [ Geocoder.Admin3, Geocoder.Admin2 ]
+            'limitToResolution': [Geocoder.Admin3, Geocoder.Admin2]
         })
         feats2 = geocoder.geocode('some query', {
-            'limitToResolution': [ Geocoder.Admin3, Geocoder.Admin2 ]
+            'limitToResolution': [Geocoder.Admin3, Geocoder.Admin2]
         })
         mapbox_patch.assert_called_once()
+        assert feats == feats2
