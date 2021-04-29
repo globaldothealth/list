@@ -36,7 +36,7 @@ class TestAdminsFetcher(unittest.TestCase):
         assert filled_location == location
 
     @patch('src.app.admins_fetcher.mapbox_tile_query')
-    def test_itFetchesMissingAdmins(self, mock_call):
+    def test_itFetchesMissingAdminsFromTheCacheIfPossible(self, mock_call):
         admins = self.db['admins']
         admins.insert_many([
             {
@@ -89,7 +89,8 @@ class TestAdminsFetcher(unittest.TestCase):
             'name': 'the',
             'place': 'to be',
         }
-        filled_geocode = self.fetcher.fill_admins(geocode)
+        filled_geocode = self.fetcher.fill_admins(geocode.copy())
+        self.fetcher.fill_admins(geocode.copy())
         mock_call.assert_called_once()
         assert filled_geocode['administrativeAreaLevel1'] == 'some admin 1'
         assert filled_geocode['administrativeAreaLevel2'] == 'some admin 2'

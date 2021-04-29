@@ -1,3 +1,6 @@
+import json
+from lru import LRU
+
 from src.integration.mapbox_client import mapbox_tile_query
 
 
@@ -6,11 +9,17 @@ class AdminsFetcher:
     def __init__(self,access_token,db):
         self.access_token = access_token
         self.admins = db['admins']
+        self.cache = LRU(500)
     
     def fill_admins(self, geocode):
         if 'administrativeAreaLevel1' in geocode and 'administrativeAreaLevel2' in geocode and 'administrativeAreaLevel3' in geocode:
             return geocode
-        response = mapbox_tile_query(self.access_token, geocode['geometry'])
+        cacheKey = json.dumps(geocode)
+        if cacheKey in self.cache:
+            response = self.cache[cacheKey]
+        else:
+            response = mapbox_tile_query(self.access_token, geocode['geometry'])
+            self.cache[cacheKey] = response
         for feature in response['features']:
             layer = feature['properties']['tilequery']['layer']
             name = self.getName(feature['properties']['id'])
