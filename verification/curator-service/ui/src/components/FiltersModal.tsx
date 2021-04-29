@@ -213,31 +213,41 @@ export default function FiltersModal({
                                 value={formik.values.gender || ''}
                                 onChange={formik.handleChange}
                             >
-                                <MenuItem value="">None</MenuItem>
+                                <MenuItem value="" disabled>
+                                    None
+                                </MenuItem>
                                 <MenuItem value="male">Male</MenuItem>
                                 <MenuItem value="female">Female</MenuItem>
                             </Select>
                         </FormControl>
-                        <TextField
-                            autoFocus={
-                                activeFilterInput === 'verificationstatus'
-                            }
-                            id="verificationStatus"
-                            name="verificationstatus"
-                            label="Verification status"
-                            type="text"
+                        <FormControl
                             variant="outlined"
-                            value={formik.values.verificationstatus || ''}
-                            onChange={formik.handleChange}
-                            error={
-                                formik.touched.verificationstatus &&
-                                Boolean(formik.errors.verificationstatus)
-                            }
-                            helperText={
-                                formik.touched.verificationstatus &&
-                                formik.errors.verificationstatus
-                            }
-                        />
+                            className={classes.formControl}
+                        >
+                            <InputLabel id="verification-label">
+                                Verification status
+                            </InputLabel>
+                            <Select
+                                autoFocus={
+                                    activeFilterInput === 'verificationstatus'
+                                }
+                                labelId="varification-label"
+                                id="verificationStatus"
+                                name="verificationstatus"
+                                label="Verification Status"
+                                value={formik.values.verificationstatus || ''}
+                                onChange={formik.handleChange}
+                            >
+                                <MenuItem value="" disabled>
+                                    None
+                                </MenuItem>
+                                <MenuItem value="unverified">
+                                    Unverified
+                                </MenuItem>
+                                <MenuItem value="verified">Verified</MenuItem>
+                                <MenuItem value="excluded">Excluded</MenuItem>
+                            </Select>
+                        </FormControl>
                     </div>
 
                     {/* LOCATION ADMIN */}
