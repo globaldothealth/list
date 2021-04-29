@@ -21,6 +21,24 @@ describe('App', function () {
 
         cy.contains('www.variantb1351.com');
     });
+
+
+    it('allows the user to search by nationality', function () {
+        cy.login();
+        cy.visit('/cases');
+
+
+        cy.addCase({
+            country: 'Russia',
+            nationalities: ['American', 'Filipino', 'Polish'],
+        });
+
+        cy.get('input#search-field').type(
+            'nationality:filipino',
+        );
+
+        cy.contains('American, Filipino, Polish');
+    });
     
     it('allows the user to search by date and an additional filter', function () {
         cy.login();
