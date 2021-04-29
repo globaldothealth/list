@@ -15,7 +15,7 @@ class TestAdminsFetcher(unittest.TestCase):
 
     def tearDown(self):
         self.mongo.close()
-    
+
     @patch('src.app.admins_fetcher.mapbox_tile_query')
     def test_itDoesNotFetchWhenNotNeeded(self, mock_call):
         location = {
