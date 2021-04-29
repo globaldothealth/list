@@ -62,10 +62,27 @@ curator                     dev-curator.ghdsi.org,curator.ghdsi.org   ad9f940574
 
 We use a deployment file for the data service and for the curator service, check out `data.yaml` and `curator.yaml`.
 
-To update the deployments use:
+To update the deployments, first do a dry run:
+
+```shell
+kubectl apply -f data.yaml -f curator.yaml --dry-run=server
+```
+
+For more verbose output use:
+
+```shell
+kubectl apply -f data.yaml -f curator.yaml --dry-run=server --output=yaml
+```
+
+Then once changes look good, use:
 
 ```shell
 kubectl apply -f data.yaml -f curator.yaml
+```
+
+To confirm changes occurred, use:
+```shell
+kubectl get pod <POD_NAME> --output=yaml
 ```
 
 ## Reading server logs
@@ -117,6 +134,8 @@ Deployments require secrets to connect to MongoDB for example or set up OAuth.
 
 Here is the list of environment variables that should be filled with secrets and their purpose:
 
+- `AWS_SES_REGION`: Amazon Web Services region used for the Simple Email Service.
+- `AWS_SES_SENDER`: Sender email address for Simple Email Service. This must be verified in the SES dashboard.
 - `AWS_ACCESS_KEY_ID`: _(optional)_ Amazon Web Services Access Key ID for a service account used to talk to Lambda/Cloudwatch AWS services. You can leave this one out when developing locally and have no need to talk work with the automated ingestion pipeline. Configure this access key from the [AWS console](https://console.aws.amazon.com/).
 - `AWS_SECRET_ACCESS_KEY`: _(optional)_ Amazon Web Services Secret Access Key that is shown to you only once when generating a new access key from the AWS console or CLI. This must be the secret access key correpsonding to the specified `AWS_ACCESS_KEY_ID`. You can leave this one out when developing locally and have no need to talk work with the automated ingestion pipeline. Configure this secret access key from the [AWS console](https://console.aws.amazon.com/).
 - `DB_CONNECTION_STRING`: _(required)_ The Mongo DB connection string as per [official documentation](https://docs.mongodb.com/manual/reference/connection-string/). Cases, sources, users and sessions are stored in MongoDB so this is required. Configure this connection string from the [Mongo Atlas console](https://cloud.mongodb.com/v2/5ea89a90db26a511f1804cf8#security/database/users).
