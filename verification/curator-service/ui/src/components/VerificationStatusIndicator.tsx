@@ -21,10 +21,7 @@ export default function VerificationStatusIndicator(props: Props): JSX.Element {
     if (props.status === VerificationStatus.Verified) {
         helpText = 'Verified';
         iconElement = <VerifiedIcon data-testid="verified-svg" />;
-    } else if (props.status === VerificationStatus.Unverified) {
-        helpText = 'Unverified';
-        iconElement = <UnverifiedIcon data-testid="unverified-svg" />;
-    } else {
+    } else if (props.status === VerificationStatus.Excluded) {
         if (props.exclusionData) {
             const { date, note } = props.exclusionData;
             helpText = `Excluded. Date: ${renderDate(date)}, Note: ${note}`;
@@ -33,6 +30,9 @@ export default function VerificationStatusIndicator(props: Props): JSX.Element {
         }
 
         iconElement = <ExcludedIcon data-testid="excluded-svg" />;
+    } else {
+        helpText = 'Unverified';
+        iconElement = <UnverifiedIcon data-testid="unverified-svg" />;
     }
 
     return (
