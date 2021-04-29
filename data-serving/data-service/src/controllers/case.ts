@@ -5,7 +5,7 @@ import { ObjectId, QuerySelector } from 'mongodb';
 import { GeocodeOptions, Geocoder, Resolution } from '../geocoding/geocoder';
 import { NextFunction, Request, Response } from 'express';
 import parseSearchQuery, { ParsingError } from '../util/search';
-import { SortBy, SortByOrder, getSortByKeyword } from '../util/case';
+import { SortByOrder, getSortByKeyword } from '../util/case';
 import { parseDownloadedCase } from '../util/case';
 
 import axios from 'axios';
