@@ -2,7 +2,7 @@
 
 ## Overview
 
-This directory contains AWS [Lambda functions](https://aws.amazon.com/lambda/)
+This directory contains the parsing functions
 used in the Global Health ingestion system.
 
 The objective of the ingestion system is to facilitate a semi-automated
@@ -18,65 +18,57 @@ The structure of ingestion is roughly as shown below:
 
 At a high-level:
 
-1. **Actuation** is done by an AWS CloudWatch Events Scheduled Rule (one for
+1. **Actuation** is done by an AWS EventBridge Events Scheduled Rule (one for
 each source). The scheduled rule is defined, alongside the remainder of source
 configuration, via the Global Health
 [curator UI](../../verification/curator-service/ui/)
 sources page.
-2. **Retrieval** is performed by a single
-[global retrieval function](./retrieval/retrieval.py),
+2. **Retrieval** is performed by a combined
+ [retrieval and parsing function](./retrieval/retrieval.py),
 which downloads (b) and persists (c) data in accordance with the source
 configuration, retrieved from the
 [curator API](../../verification/curator-service/api/)
-(a).
-3. **Parsing** is performed by custom, per-source
-[parsing functions](./parsing/).
-These are actuated directly by the global retrieval function (2d) (if specified
-in the source configuration), and accomplish the conversion of raw source
-content (3a) to the Global Health format. Converted data is written to the
+(a). The retrieval function uses the curator API to fetch which parser submodule to call.
+
+   **Parsing** is performed by custom, per-source
+[parsing functions](./parsing/) that are called from the retrieval function, and convert of raw source
+content stored in S3 to the Global Health format. Converted data is written to the
 central [data service](../../data-serving/data-service/) (for now, proxied via
-the curator API, which offers an exposed, authenticated endpoint) (3b). While
-there's no metadata currently written from parsing functions, the option is
-available (3c).
+the curator API, which offers an exposed, authenticated endpoint).
+
+**Note**: In the previous architecture using AWS Lambda, parsing and retrieval ran in different process, now they have been combined into one.
 
 ## Development
 
 ### tl;dr
 
-Ingestion functions are managed, developed, and deployed using the AWS
-Serverless Application Model
-([SAM](https://aws.amazon.com/serverless/sam/)). Functions are written in
-Python and executed on a version 3.8 runtime. See set up instructions and
+Ingestion functions are managed, developed, and deployed using AWS
+Batch. See set up instructions and
 common commands, below.
 
-If you are using VSCode you can find [common settings](https://github.com/globaldothealth/list/blob/main/dev/.vscode/settings.json) around linting/style. The [CI pipeline](https://github.com/globaldothealth/list/blob/main/.github/workflows/ingestion-functions-python.yml) runs flake8 so make sure you at least have this running in your editor.
+If you are using Visual Studio Code (VSCode) you can find [common settings](https://github.com/globaldothealth/list/blob/main/dev/.vscode/settings.json) around linting/style. The [CI pipeline](https://github.com/globaldothealth/list/blob/main/.github/workflows/ingestion-functions-python.yml) runs flake8 so make sure you at least have this running in your editor.
 
-You can find more information on linting in visual studio [here](https://code.visualstudio.com/docs/python/linting).
+You can find more information on linting in VSCode [here](https://code.visualstudio.com/docs/python/linting).
 
 ### Setup for folks without AWS access
 
-If you're a first-time contributor to the project and don't have access to the S3 bucket containing the service account keys, you can run the ingestion and parsing functions fully locally, in the `retrieval/valid_scheduled_event.json`, add this auth param to it:
-
-```json
-"auth": {
-   "email": "local@ingestion.function"
-}
-```
-
-This will make the functions log-in as a new user specified by this email and use the cookies generated for this user instead of the service account creds stored on S3.
-
-Note that this only works in a local environment as the handler to register a user isn't exposed in production for obvious reasons.
-
-Unfortunately there is no way to mount local volumes to store/retrieve source
-contents instead of relying on S3 which means testing e2e locally isn't possible.
-If you want to use another storage system for testing feel free to send a PR.
+Local end-to-end (e2e) testing without AWS access is currently a work-in-progress. You should still be able to write parsers and test locally the components that don't require access to the curator API.
 
 ### One-time setup for people with AWS access
 
 #### Prerequisites
 
-1. Have valid AWS credentials configured in accordance with
-[these instructions](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-getting-started-set-up-credentials.html).
+1. Install the [AWS CLI](https://aws.amazon.com/cli/). You can also install it using your favourite package manager:
+
+|OS               |Command|
+|-----------------|----------------------------------------------|
+|Windows          |`winget install -e --id Amazon.AWSCLI`        |
+|macOS            |`brew install awscli`                         |
+|Debian, Ubuntu   |`sudo apt install awscli`                     |
+|Fedora, RHEL     |`sudo dnf install awscli`                     |
+
+Note that some of these repositories may be carrying v1 of AWS CLI, compared to the current stable v2. Our workflows are currently compatible with both v1 and v2, so this shouldn't be an issue.
+1. Run `aws configure` to set AWS credentials
 1. Have Python 3.8 installed on your machine. To check what versions you have
 installed, and to see which versions correspond to the `python` and `python3`
 commands, run the following:
@@ -86,9 +78,11 @@ ls -l /usr/bin/python*
 ```
 
 #### Setup
+1. Setup and enter a virtual environment in `ingestion/functions`
 
-1. Install the AWS SAM CLI, following
-[these instructions](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html).
+       python3.8 -m venv venv
+       source venv/bin/activate
+  
 1. For each function you're planning to work with, be sure you have required
 modules installed, e.g. via:
 
@@ -96,28 +90,26 @@ modules installed, e.g. via:
 # In each parsing's subdir:
 python3.8 -m pip install -r requirements.txt
 # In the /ingestion/functions (necessary to run unit tests).
-python3.8 -m pip install -r ci-requirements.txt
+python3.8 -m pip install -r requirements.txt
 ```
 
-*NB:* Be sure you're using Python 3.8, which corresponds to the runtime of
-the Lambda functions as configured in the [SAM template](./template.yaml). See
-prerequisites, to check this.
-
-You can validate changes to the SAM template by running `sam validate`.
+*NB:* Be sure you're using Python 3.8, which corresponds to the runtime of the job definitions run using Batch.
 
 ### Writing and editing functions
 
-For the most part, writing functions is writing standard Python business logic.
-The primary caveat is that the business logic to be executed must be wrapped in
-the Lambda handler API. Read more about that
-[here](https://docs.aws.amazon.com/lambda/latest/dg/python-handler.html), or
-more generally about Python Lambda development
-[here](https://docs.aws.amazon.com/lambda/latest/dg/lambda-python.html).
-The points at which the Lambda integration is most apparent are in testing and
-execution of code.
+For the most part, writing functions is writing standard Python business logic. Each parsing function has a boilerplate code at the end which allows it to be invoked from retrieval with an JSON object describing the parameters for the parsing function:
 
-You are free to write the parsers however you like.
-It's best to get inspiration from existing functions though and the only prerequisite for it showing up in the UI once your PR is merged in is that its name must include _"ParsingFunction"_.
+```python
+def event_handler(event):
+    return parsing_lib.run(event, parse_cases)
+
+if __name__ == "__main__":
+    with open('input_event.json') as f:
+        event = json.load(f)
+        event_handler(event)
+```
+
+You are free to write the parsers however you like. Use the existing functions as a template to get started.
 
 ### Writing a parser
 
@@ -130,13 +122,13 @@ parsing/example
 ├── __init__.py      # Required to make this a proper python package, usually empty.
 ├── example.py       # Write your parsing code here.
 ├── example_test.py  # Always add unit tests.
-├── input_event.json # AWS Cloudwatch event used when testing locally, will be described below.
+├── input_event.json # AWS EventBridge event used when testing locally, will be described below.
 ├── requirements.txt # Any special third-party dependency that your parser requires, this file is required even if it's empty.
 └── sample_data.csv  # Some sample data used in unit tests, usually copied verbatim from a real source.
 ```
 
-At minima, a parser must generate a list of cases that conform to the openAPI
-specifications. If you have a local stack running, go to the [OpenAPI UI](http://localhost:3001/api-docs) to check the structure of a `Case` object. Otherwise you can always [check it online](https://curator.ghdsi.org/api-docs/) as well.
+At a minimum, a parser must generate a list of cases that conform to the openAPI
+specifications. If you have a local stack running, go to the [OpenAPI UI](http://localhost:3001/api-docs) to check the structure of a `Case` object. Otherwise you can always [check it online](https://data.covid-19.global.health/api-docs/) as well.
 
 A minimal case looks like this:
 
@@ -204,29 +196,6 @@ Prefer sending queries that go from smallest to biggest regions as mapbox can ge
 
 Fields and nested structs should be preferably not set (or set to `None`) rather than set to an empty value (for example unknown age shouldn't be set to `''` and unknown demographics altogether shouldn't be set to `{}`).
 
-Once you are done writing the parser, it needs to be included in the [SAM template](/ingestion/functions/template.yaml) to be made available in production, you can refer to how other functions were added there for example:
-
-```yaml
-# This name must contain "ParsingFunction" in it as a convention.
-ExampleParsingFunction:
-    Type: AWS::Serverless::Function
-    Properties:
-        # This is the package in which you wrote your parsing code.
-        CodeUri: parsing/example/
-        # This is the handler in your package in format: file_name.function_name
-        Handler: example.lambda_handler
-        Description: Example parser
-        # This is required for running in AWS.
-        Policies:
-        - AWSLambdaBasicExecutionRole
-        - AWSLambdaReadOnlyAccess
-        # Adjust this based on your memory requirements (local runs prints the max memory usage at the end of the run, it's usually good to check if the allocated memory is enough especially for parsers that cannot parse cases one by one (like some JSON parsers which hold the whole data set in memory).
-        MemorySize: 512
-        # This is required to access the common code layer for parsers.
-        Layers:
-        - !Ref ParsingLibLayer
-```
-
 #### Unit tests
 
 Unit testing is mostly standard `pytest`, with a caveat to be sure that tests
@@ -236,76 +205,35 @@ are run with the correct Python version. E.g.,
 python3.8 -m pytest test/my_test.py
 ```
 
+#### Integration and End-to-end tests
+
+Testing beyond unit level happens inside of a docker-compose stack.
+
+To run, [install Docker](https://docs.docker.com/get-docker/), and then run
+
+```shell
+./test_docker.sh
+```
+
 #### Manual local run
 
-**IMPORTANT**: Local runs still require access to a service account hosted on s3. Follow #754 for updates on how to run functions with your own creds.
+Local e2e testing is currently not available.
 
-You need AWS sam CLi installed on your system, [follow the instructions](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html) on their website to install it.
+You can test in the live dev environment. To do this, first switch to the virtual environment in `ingestion/functions`, and then run the following to start a retrieval.
 
-Run the stack locally using `/dev/run_stack.sh` and follow the [instructions](https://github.com/globaldothealth/list/blob/main/dev/README.md#permissions) to make sure you're an `admin` to be able to give the role account doing the fetch/parsing the right to call your local stack. This step is described below.
+    EPID_INGESTION_ENV=dev EPID_INGESTION_SOURCE_ID=source_id python retrieval/retrieval.py
 
-Go to the [UI](http://localhost:3002/sources) and add a new source for your parser by clicking on `CREATE NEW` -> `New automated source`.
-
-![new automated source](assets/new-automated-source.png).
-
-Once you give it a name, a URL and save it, it will be given an ID.
-
-![new source](assets/new-source-id.png)
-
-Put that ID in the [retrieval/valid_scheduled_event.json](/ingestion/functions/retrieval/valid_scheduled_event.json) file, it should now look something like:
-
-```json
-{
-    "env": "local",
-    "sourceId": "<paste the source ID here>",
-    "auth": {
-      "email": "local@ingestion.function"
-    }
-}
-```
-
-Next invoke the `RetrievalFunction` like this:
-
-```shell
-cd ingestion/functions
-sam build
-sam local invoke "RetrievalFunction" -e retrieval/valid_scheduled_event.json --docker-network=host
-```
-
-If you get a 403 error, go to the [user administration page](http://localhost:3002/users) and assign the `curator` role to the `ingestion@covid-19-map-277002.iam.gserviceaccount.com` service account there or just make sure you added the "auth" property to the event as described in the [auth section](#setup-for-folks-without-aws-access)
-
-Upon success you'll see in the output something like
-`{"bucket":"epid-sources-raw","key":"5f311a9795e338003016593a/2020/08/10/1009/content.csv"}`
-
-In your parser package's `input_event.json` set the `s3Key` as `5f311a9795e338003016593a/2020/08/10/1009/content.csv` and the `sourceId` to `5f311a9795e338003016593a`. **Set values according to the output you got, do not copy-paste what's written in this document.**
-
-Next you can invoke your parsing function:
-
-```shell
-sam local invoke "MyParsingFunction" -e my/dir/input_event.json --docker-network=host
-```
-
-Run this from the base `ingestion/functions` dir. The `MyParsingFunction` name should
-correspond to the name of the resource as defined in the SAM `template.yaml`;
-for more information on the template, read
-[this article](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-specification.html).
-
-If all goes well you should see the number of cases created/updated (i.e. `{"count_created":4079,"count_updated":0}`).
-
-Test via [unit tests](#Unit-tests) prior to sending PRs. A GitHub
-action
-[verifying the SAM build](../../.github/workflows/ingestion-aws-sam-build.yml)
-is run on pull requests.
+where you use the source ID corresponding to your parser that has been configured in [dev-data](https://dev-data.covid-19.global.health).
 
 #### Debugging of parsers
 
 When a parser is running locally via `sam local invoke`, you can access its container by listing the current docker containers with `docker container ps` and then you can inspect the container you want using its ID. This allows you to see which environment variables are set and is useful to debug potential memory exceeded errors or dangling parsers that are waiting to timeout for some obscure reason. Some useful debugging commands include `docker logs <container id>`, `docker container inspect <container id>` and `docker container stats <container id>`.
 
-For live parsers, you can look in the [AWS console](https://console.aws.amazon.com/lambda/home?region=us-east-1#/functions) directly, all `print()` calls are logged to Cloudwatch which is useful for debugging.
+For live parsers, you can look in the [AWS console](https://console.aws.amazon.com/lambda/home?region=us-east-1#/functions) directly, all `print()` calls are logged to CloudWatch which is useful for debugging.
 
 Example live debugging workflow:
 
-1. [Check the Curator portal for errors](https://curator.ghdsi.org/uploads). In this example, I'll use the error in the Mexico parser from 2020-10-20.
+1. [Check the Curator portal for errors](https://data.covid-19.global.health/uploads). In this example, I'll use the error in the Mexico parser from 2020-10-20.
 2. Use the AWS console to find the logs. I'm doing this in the command line, so `aws logs describe-log-groups` shows the log groups. Only one of them has "Mexico" in the name, so that's the one I want.
 3. `aws logs describe-log-streams --log-group-name {GROUP_NAME}` shows me the log stream names, conveniently ordered by date as it's the latest (the last in the list) that I want. They also are named after the date, if you're searching for a particular run.
 4. `aws logs get-log-events --log-group-name {GROUP_NAME} --log-stream-name '{STREAM_NAME}'` shows the log events. Notice that the stream name is in single quotes to avoid shell expansion of its name.
@@ -319,57 +247,20 @@ Steps 5-6 may take longer than indicated.
 
 If the ingestion process is not running as intended, but the previous steps reveal no clear issues with the parsing logic, or there are no logs present at all, the issue might be located upstream in the retrieval function.
 
-The best place to start in this case is with the Cloudwatch logs, which should provide some hints in the case that the retrieval function was invoked but did not complete as intended.
+The best place to start in this case is with the CloudWatch logs, which should provide some hints in the case that the retrieval function was invoked but did not complete as intended.
 
 However, there is the possibility that a misconfiguration might prevent retrieval from even initiating, and that on top of that it might fail silently. In this more frustrating case, the only clue that something is wrong might be the sudden lack of invocations/logs.
 
-In this case, start with the following steps:
+To debug these cases, you can try replicating the retrieval run on dev (or even prod, if the problem can't be replicated in dev, and you wouldn't mind running the parser on production). To do so follow the steps above in the section on running locally.
 
-1. Navigate to AWS Lambda in the AWS Console.
-2. Submit a test event *to the retrieval function* for a parser that you wouldn't mind having run in production. An example of this might look like the following:
-
-```
-{
-    "env": "prod", 
-    "sourceId": "5fc113a6e78c687887f68c5a"
-}
-```
-
-3. If there is something wrong with the configuration this should trigger an error.
-4. If there was no error, check the triggers to make sure that they are still in effect.
-5. If the triggers are still in effect, check the GitHub repository to make sure that there have been no recent changes to the function or to `template.yaml`
-
-##### EFS
-
-A common source for silent failure is a misconfiguration of the Security Group that allows access to EFS. If you think this might be the cause, check to make sure that the Security Group and Subnets are set as follows under the VPC tab:
-
-```
-Parameters:
-  SecurityGroupIds:
-    Type: CommaDelimitedList
-    Default: sg-0f3446d2b82eff09a
-  SubnetIDs:
-    Type: CommaDelimitedList
-    Description: The list of SubnetIDs in your Virtual Private Cloud (VPC)
-    Default: subnet-01cdb8802584b0891,subnet-0ce56af866d39d69e,subnet-02ac7023a699cfce3,subnet-060e2152a9beb6300,subnet-00253e04dfd3b0269,subnet-0efa6c09f2e0ce2e1
-  EFSpath:
-    Type: String
-    Default: /mnt/efs
-```
+Another cause of errors could be that code changes are not being pushed to the Amazon ECR registry, which is used to run retrieval.
 
 ### Deployment
 
 Deployment is accomplished automatically via a dedicated
-[GitHub action](../../.github/workflows/ingestion-aws-sam-deploy.yml). If
-there's a need to deploy directly, run:
+[GitHub action](../../.github/workflows/ingestion-python-deploy.yml).
 
-```shell
-sam build
-sam deploy
-```
-
-From the base `ingestion/functions` dir. The deployment configuration will be
-inferred from the `samconfig.toml` file. Follow the confirmation dialogues.
+Setup of new parsers and the associated job definitions and EventBridge rules are still manual.
 
 ### Writing a parser where deduplication of patients cannot be done
 
@@ -377,11 +268,11 @@ Some sources do not provide a unique ID for each case allowing us to update exis
 
 To accomodate for that, here is the procedure to write a parser that only imports data that is three days old (a reasonable threshold chosen arbitrarily, feel free to tune it according to your source's freshness):
 
-1. write the parser, it must produces all cases for its input source, the `parsing/common/parsing_lib.py` library will ensure no duplicates are entered if you follow the next steps
-2. to set up your parser for ingestion, edit your source in the curator portal UI: set the date filter to only fetch data up to 3 days ago
-3. run the parser once to import all the data up to 3 days before today
-4. edit the source again to only fetch data from exactly 3 days ago
-5. set the AWS Schedule Expression for your source and have the parser run every day
+1. Write the parser, it must produces all cases for its input source, the `parsing/common/parsing_lib.py` library will ensure no duplicates are entered if you follow the next steps
+2. To set up your parser for ingestion, edit your source in the curator portal UI: set the date filter to only fetch data up to 3 days ago
+3. Run the parser once to import all the data up to 3 days before today
+4. Edit the source again to only fetch data from exactly 3 days ago
+5. Set the AWS Schedule Expression for your source and have the parser run every day
 
 That parser will now import a day worth of data with a lag of 3 days, this delay is deemed is acceptable given the inability to dedupe cases.
 

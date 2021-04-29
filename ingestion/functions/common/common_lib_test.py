@@ -2,7 +2,7 @@ import pytest
 import requests
 
 from common import common_lib
-from mock import patch
+from unittest.mock import patch
 
 _SOURCE_API_URL = "https://foo.bar"
 _SOURCE_ID = "abc123"

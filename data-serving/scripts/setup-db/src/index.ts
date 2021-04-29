@@ -6,8 +6,7 @@ interface SetupDatabaseParameters {
     collectionName: string;
     schemaPath: string;
     indexesPath: string;
-    /** If not specified, deletes only imported documents. Defaults to false. */
-    deleteAllDocuments: boolean;
+    deleteAllDocuments: boolean;  // defaults to false
 }
 
 const setupDatabase = async ({
@@ -42,15 +41,12 @@ const setupDatabase = async ({
             )
         ) {
             collection = await database.getCollection(collectionName);
-            const query = deleteAllDocuments
-                ? {}
-                : { importedCase: { $exists: true, $ne: null } };
-            const results = await collection.remove(query);
-            print(
-                `Dropped ${
-                    deleteAllDocuments ? 'all' : 'imported'
-                } documents (${results.nRemoved} total) 🗑️`,
-            );
+            if (deleteAllDocuments) {
+                const results = await collection.remove({});
+                print(
+                    `Dropped all documents: (${results.nRemoved} total) 🗑️`,
+                );
+            }
 
             await database.runCommand({
                 collMod: collectionName,
