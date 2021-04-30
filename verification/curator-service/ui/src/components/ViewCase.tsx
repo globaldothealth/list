@@ -155,9 +155,7 @@ function CaseDetails(props: CaseDetailsProps): JSX.Element {
         if (props.c.isSourceExcluded) {
             return 'Excluded';
         } else {
-            return props.c.caseReference.verificationStatus
-                ? props.c.caseReference.verificationStatus
-                : 'Unknown';
+            return props.c.caseReference.verificationStatus || 'Unverified';
         }
     };
 

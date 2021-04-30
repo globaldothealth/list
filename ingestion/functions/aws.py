@@ -451,22 +451,53 @@ deregister    Deregister a Batch job definition
         parser.add_argument(
             "-q", "--queue", help="Which job queue to use", default=DEFAULT_JOB_QUEUE
         )
+        parser.add_argument(
+            "-t", "--timeout", help="Override job maximum time from job definition", type=int
+        )
+        parser.add_argument("-s", "--start-date", help="Start date for backfill")
+        parser.add_argument("-e", "--end-date", help="End date for backfill")
         args = parser.parse_args(sys.argv[2:])
-        job_name = (
-            f"{datetime.utcnow().isoformat(timespec='seconds').replace(':', '')}Z"
-            f"_{args.job_definition}"
-        )
-        r = self.batch_client.submit_job(
-            jobName=job_name, jobQueue=args.queue, jobDefinition=args.job_definition
-        )
+
+        if bool(args.start_date) ^ bool(args.end_date):
+            print("Specify both start and end date in YYYY-MM-DD format")
+            sys.exit(1)
+
+        job_name = args.job_definition + ("-backfill" if args.start_date else "")
+        job_submission = {
+            "jobName": job_name,
+            "jobQueue": args.queue,
+            "jobDefinition": args.job_definition
+        }
+        if args.timeout:
+            job_submission["timeout"] = {"attemptDurationSeconds": args.timeout * 60}
+        if args.start_date:
+            try:
+                start = datetime.strptime(args.start_date, "%Y-%m-%d")
+                end = datetime.strptime(args.end_date, "%Y-%m-%d")
+            except ValueError:
+                print("Start and end dates should be in YYYY-MM-DD format")
+                sys.exit(1)
+            if start > end:
+                print(f"Start date {args.start_date} should be before end date {args.end_date}")
+                sys.exit(1)
+            job_submission["containerOverrides"] = {
+                "environment": [
+                    {
+                        "name": "EPID_INGESTION_PARSING_DATE_RANGE",
+                        "value": f"{args.start_date},{args.end_date}"
+                    }
+                ]
+            }
+
+        r = self.batch_client.submit_job(**job_submission)
+
         if r["ResponseMetadata"]["HTTPStatusCode"] == 200:
-            print(
-                f"Submitted {job_name}\n"
-                f"Job definition {args.job_definition} in queue {args.queue}"
-            )
+            print(f"Submitted job for {args.job_definition} in queue {args.queue}")
+            if args.start_date:
+                print(f"Backfilling from {args.start_date} to {args.end_date}")
         else:
             print(
-                f"Failed submission for definition {args.job_definition} in queue {args.queue}"
+                f"Failed submission for {args.job_definition} in queue {args.queue}"
             )
             pprint(r["ResponseMetadata"])
 
