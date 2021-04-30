@@ -33,9 +33,11 @@ describe('App', function () {
             nationalities: ['American', 'Filipino', 'Polish'],
         });
 
-        cy.get('input#search-field').type(
-            'nationality:filipino',
+        cy.get('.filter-button').click();
+        cy.get('#nationality').type(
+            'filipino',
         );
+        cy.get('[data-test-id="search-by-filter-button"]').click();
 
         cy.contains('American, Filipino, Polish');
     });
