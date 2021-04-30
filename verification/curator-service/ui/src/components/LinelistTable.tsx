@@ -956,7 +956,9 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                             },
                             title: (
                                 <div className={classes.centeredContent}>
-                                    <VerificationStatusHeader />
+                                    <VerificationStatusHeader onClickAction={(
+                                        e: React.MouseEvent<HTMLDivElement>,
+                                    ) => this.handleAddFilterClick(e, 'verificationstatus')} />
                                 </div>
                             ),
                             field: 'verificationStatus',
