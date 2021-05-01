@@ -41,7 +41,7 @@ def job_definition(
     memory: int = DEFAULT_MEMORY_MIB, timeout: int = DEFAULT_TIMEOUT_MIN
 ):
     return {
-        "jobDefinitionName": f"{source_name}-{env}",
+        "jobDefinitionName": f"{source_name}-ingestor-{env}",
         "type": "container",
         "parameters": {},
         "timeout": {
@@ -145,11 +145,12 @@ deregister    Deregister a Batch job definition
             sys.exit(1)
         if parser_name:
             print(f"Source {args.source_id} will be parsed by parsing.{parser_name}")
+            source_name = parser_name.replace(".", "-")
+            print(f"Registering job definition for source {source_name}")
             pprint(
                 self.batch_client.register_job_definition(
                     **job_definition(
-                        parser_name.replace(".", "_"),
-                        args.source_id,
+                        source_name,
                         args.env,
                         args.cpu,
                         args.memory,
@@ -331,7 +332,6 @@ deregister    Deregister a Batch job definition
         args = parser.parse_args(sys.argv[2:])
         state = "DISABLED"
         description = ""
-        target_id = ""
         if args.enabled:
             state = "ENABLED"
         if args.target_name:

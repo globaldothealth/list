@@ -2,6 +2,7 @@ version: "3.7"
 services:
   geocoding:
     environment:
+      DB: "covid19"
       ENABLE_FAKE_GEOCODER: "True"
   curator:
     environment:
