@@ -7,7 +7,7 @@
     "format": "CSV",
     "automation": {
         "parser": {
-            "awsLambdaArn": "arn:aws:lambda:region:id:function:name"
+            "awsLambdaArn": "arn:aws:batch:region:id:function:name"
         },
         "schedule": {
             "awsRuleArn": "arn:aws:events:region:id:rule/name",
