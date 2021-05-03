@@ -144,10 +144,14 @@ export default function SearchBar({
                     onChange={(event): void => {
                         setSearchInput(event.target.value);
                     }}
-                    onKeyDown={() => {
+                    onKeyDown={(e) => {
                         if (!isUserTyping) {
                             setIsUserTyping(true);
                         }
+                        if (e.key === ":") {
+                            e.preventDefault();
+                            alert('Please do not type filters in the searchbar. \nInstead, access them from the "Filters" menu.')
+                          }
                     }}
                     placeholder="Search"
                     value={searchInput}
