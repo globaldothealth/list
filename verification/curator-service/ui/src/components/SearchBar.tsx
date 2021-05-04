@@ -140,8 +140,8 @@ export default function SearchBar({
         setFiltersModalOpen(true)
     };
 
-    function handleSetModalAlert(newValue: any) {
-        setModalAlert(newValue);
+    function handleSetModalAlert(shouldTheAlertStillBeOpen: any) {
+        setModalAlert(shouldTheAlertStillBeOpen);
       }
 
     return (
