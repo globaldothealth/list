@@ -5,3 +5,6 @@ class FakeGeocoder:
 
     def seed(self, key, response):
         self.values[key] = response
+
+    def clear(self):
+        self.values = {}
