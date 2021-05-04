@@ -4,7 +4,6 @@ describe('App', function () {
         cy.task('clearSourcesDB', {});
     });
 
-
     it('allows the user to search by date', function () {
         cy.login();
 
@@ -30,9 +29,17 @@ describe('App', function () {
 
         cy.get('.filter-button').click();
         cy.get('#dateconfirmedafter').type('2020-04-30');
-        if (cy.get('.iubenda-cs-accept-btn')) {
-            cy.get('.iubenda-cs-accept-btn').click();
-        }
+
+        cy.get('body').then(($body) => {
+            // synchronously ask for the body's text
+            // and do something based on whether it includes
+            // another string
+
+            if ($body.find('.iubenda-cs-accept-btn').length) {
+                // input was found, do something else here
+                cy.get('.iubenda-cs-accept-btn').click();
+            }
+        });
 
         cy.get('button[data-test-id="search-by-filter-button"]').click();
 
@@ -301,5 +308,4 @@ describe('App', function () {
             .should('have.attr', 'href')
             .and('equal', '/');
     });
-
 });
