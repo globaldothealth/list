@@ -133,6 +133,13 @@ export default function SearchBar({
         }
     };
 
+    const disallowFilteringInSearchBar = (e:any) => {
+        e.preventDefault();
+        alert(
+            'Please do not type filters in the searchbar. \nInstead, access them from the "Filters" menu.',
+        );
+    };
+
     return (
         <>
             <div className={classes.searchRoot}>
@@ -148,10 +155,10 @@ export default function SearchBar({
                         if (!isUserTyping) {
                             setIsUserTyping(true);
                         }
-                        if (e.key === ":") {
-                            e.preventDefault();
-                            alert('Please do not type filters in the searchbar. \nInstead, access them from the "Filters" menu.')
-                          }
+                        if (e.key === ':') {
+                            disallowFilteringInSearchBar(e);
+                            setIsUserTyping(true);
+                        }
                     }}
                     placeholder="Search"
                     value={searchInput}
