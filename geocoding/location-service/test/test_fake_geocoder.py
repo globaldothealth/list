@@ -22,3 +22,7 @@ class FakeGeocoderTests(unittest.TestCase):
             'name': 'Lyon',
         })
         assert response.status == '200 OK'
+
+    def test_itCanClearGeocodes(self):
+        response = self.client.post('/geocode/clear')
+        assert response.status == '200 OK'

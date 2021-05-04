@@ -23,11 +23,19 @@ def geocode():
     api_key = environ['MAPBOX_TOKEN']
     return mapbox_geocode(api_key, query)
 
+
 @app.route("/geocode/seed", methods=['POST'])
 def seed_fake_geocoder():
     obj = request.json
     fake_geocoder.seed(obj['name'], obj)
     return ''
+
+
+@app.route("/geocode/clear", methods=['POST'])
+def clear_fake_geocoder():
+    fake_geocoder.clear()
+    return ''
+
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8080)
