@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useDebugValue } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useLocation, useHistory } from 'react-router-dom';
 import { useFormik } from 'formik';
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
@@ -57,8 +57,7 @@ const useStyles = makeStyles((theme: Theme) =>
             color: '#ccc',
         },
         alertBox: {
-            // margin: theme.spacing(4),
-            paddingLeft: '32px',
+            margin: '0 32px',
         },
     }),
 );
@@ -69,7 +68,7 @@ interface FiltersModalProps {
     handleClose: () => void;
     setActiveFilterInput: (value: string) => void;
     showModalAlert: boolean;
-    onChange: any;
+    closeAlert: any;
 }
 
 export interface FilterFormValues {
@@ -82,7 +81,7 @@ export interface FilterFormValues {
     nationality?: string;
     occupation?: string;
     outcome?: string;
-    variantofconcern?: string;
+    variant?: string;
     dateconfirmedafter?: string;
     dateconfirmedbefore?: string;
     curatoremail?: string;
@@ -97,7 +96,7 @@ export default function FiltersModal({
     handleClose,
     setActiveFilterInput,
     showModalAlert,
-    onChange,
+    closeAlert,
 }: FiltersModalProps) {
     const classes = useStyles();
     const location = useLocation();
@@ -118,6 +117,7 @@ export default function FiltersModal({
         enableReinitialize: true,
         initialValues: formValues,
         onSubmit: (values) => {
+            handleSetModalAlert();
             handleClose();
             const searchQuery = filtersToURL(values);
             history.push({ pathname: '/cases', search: searchQuery });
@@ -142,7 +142,12 @@ export default function FiltersModal({
 
 
     function handleSetModalAlert() {
-        onChange(!showModalAlert);
+        closeAlert(!showModalAlert);
+    }
+
+    const closeAndResetAlert = () => {
+        handleClose();
+        closeAlert(false);
     }
 
     // COMMENTED OUT UNTIL CONTENT FOR TOOLTIPS IS PROVIDED
@@ -189,7 +194,7 @@ export default function FiltersModal({
     // );
 
     return (
-        <Dialog open={isOpen} maxWidth={'xl'} onClose={handleClose}>
+        <Dialog open={isOpen} maxWidth={'xl'} onClose={closeAndResetAlert}>
             <DialogTitle>Apply filters</DialogTitle>
             {showModalAlert && (
                 <Alert
@@ -390,21 +395,21 @@ export default function FiltersModal({
 
                     <div>
                         <TextField
-                            autoFocus={activeFilterInput === 'variantofconcern'}
-                            id="variantofconcern"
+                            autoFocus={activeFilterInput === 'variant'}
+                            id="variant"
                             label="Variant of concern"
-                            name="variantofconcern"
+                            name="variant"
                             type="text"
                             variant="outlined"
-                            value={formik.values.variantofconcern || ''}
+                            value={formik.values.variant || ''}
                             onChange={formik.handleChange}
                             error={
-                                formik.touched.variantofconcern &&
-                                Boolean(formik.errors.variantofconcern)
+                                formik.touched.variant &&
+                                Boolean(formik.errors.variant)
                             }
                             helperText={
-                                formik.touched.variantofconcern &&
-                                formik.errors.variantofconcern
+                                formik.touched.variant &&
+                                formik.errors.variant
                             }
                         />
                         <TextField
@@ -544,6 +549,7 @@ export default function FiltersModal({
                             color="primary"
                             variant="contained"
                             type="submit"
+                            data-test-id="search-by-filter-button"
                             className={classes.searchBtn}
                         >
                             Filter

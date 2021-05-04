@@ -18,6 +18,7 @@ import { useDebounce } from '../hooks/useDebounce';
 import FiltersModal from './FiltersModal';
 import { searchQueryToURL, URLToSearchQuery } from './util/searchQuery';
 import { useLocation, useHistory } from 'react-router-dom';
+import { KeyboardEvent } from 'react'
 
 const searchBarStyles = makeStyles((theme: Theme) => ({
     searchRoot: {
@@ -133,14 +134,14 @@ export default function SearchBar({
         }
     };
 
-    const disallowFilteringInSearchBar = (e: any) => {
+    const disallowFilteringInSearchBar = (e: KeyboardEvent<HTMLInputElement> ) => {
         e.preventDefault();
         setIsUserTyping(false);
         setModalAlert(true);
         setFiltersModalOpen(true)
     };
 
-    function handleSetModalAlert(shouldTheAlertStillBeOpen: any) {
+    function handleSetModalAlert(shouldTheAlertStillBeOpen: boolean) {
         setModalAlert(shouldTheAlertStillBeOpen);
       }
 
@@ -152,10 +153,11 @@ export default function SearchBar({
                     data-testid="searchbar"
                     name="searchbar"
                     onKeyPress={handleKeyPress}
+                    autoComplete="off"
                     onChange={(event): void => {
                         setSearchInput(event.target.value);
                     }}
-                    onKeyDown={(e) => {
+                    onKeyDown={(e: KeyboardEvent<HTMLInputElement>) => {
                         if (!isUserTyping) {
                             setIsUserTyping(true);
                         }
@@ -163,7 +165,7 @@ export default function SearchBar({
                             disallowFilteringInSearchBar(e);
                         }
                     }}
-                    placeholder="Search"
+                    placeholder="Fulltext search"
                     value={searchInput}
                     variant="outlined"
                     fullWidth
@@ -175,6 +177,7 @@ export default function SearchBar({
                                     <Button
                                         color="primary"
                                         startIcon={<FilterListIcon />}
+                                        className="filter-button"
                                         onClick={() =>
                                             setFiltersModalOpen(true)
                                         }
@@ -193,7 +196,7 @@ export default function SearchBar({
                                         })}
                                         ref={guideButtonRef}
                                     >
-                                        Search guide
+                                        Data guide
                                     </Button>
                                     <SearchGuideDialog
                                         isOpen={isSearchGuideOpen}
@@ -235,7 +238,7 @@ export default function SearchBar({
                 activeFilterInput={activeFilterInput}
                 setActiveFilterInput={setActiveFilterInput}
                 showModalAlert={modalAlert}
-                onChange={handleSetModalAlert}
+                closeAlert={handleSetModalAlert}
             />
         </>
     );
