@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useDebugValue } from 'react';
 import { useLocation, useHistory } from 'react-router-dom';
 import { useFormik } from 'formik';
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
@@ -18,6 +18,7 @@ import {
     // InputAdornment,
     // IconButton,
 } from '@material-ui/core';
+import { Alert } from '@material-ui/lab';
 // import { HelpOutline } from '@material-ui/icons';
 // import { AppTooltip } from './common-form-fields/AppTooltip';
 
@@ -55,6 +56,10 @@ const useStyles = makeStyles((theme: Theme) =>
         helpIcon: {
             color: '#ccc',
         },
+        alertBox: {
+            // margin: theme.spacing(4),
+            paddingLeft: '32px',
+        },
     }),
 );
 
@@ -63,6 +68,8 @@ interface FiltersModalProps {
     activeFilterInput: string;
     handleClose: () => void;
     setActiveFilterInput: (value: string) => void;
+    showModalAlert: boolean;
+    onChange: any;
 }
 
 export interface FilterFormValues {
@@ -89,6 +96,8 @@ export default function FiltersModal({
     activeFilterInput,
     handleClose,
     setActiveFilterInput,
+    showModalAlert,
+    onChange,
 }: FiltersModalProps) {
     const classes = useStyles();
     const location = useLocation();
@@ -130,6 +139,11 @@ export default function FiltersModal({
         history.push({ pathname: '/cases', search: '' });
         handleClose();
     };
+
+
+    function handleSetModalAlert() {
+        onChange(!showModalAlert);
+    }
 
     // COMMENTED OUT UNTIL CONTENT FOR TOOLTIPS IS PROVIDED
     // const tooltipHelpIcon = (tooltipContent: JSX.Element) => {
@@ -177,7 +191,15 @@ export default function FiltersModal({
     return (
         <Dialog open={isOpen} maxWidth={'xl'} onClose={handleClose}>
             <DialogTitle>Apply filters</DialogTitle>
-
+            {showModalAlert && (
+                <Alert
+                    severity="info"
+                    onClose={() => {handleSetModalAlert()}}
+                    className={classes.alertBox}
+                >
+                    Please do not use filters in the Search Bar, use them here instead.
+                </Alert>
+            )}
             <DialogContent>
                 <form className={classes.root} onSubmit={formik.handleSubmit}>
                     {/* GENERAL */}

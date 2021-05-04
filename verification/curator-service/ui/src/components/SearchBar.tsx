@@ -90,7 +90,7 @@ export default function SearchBar({
             ? URLToSearchQuery(location.search)
             : '',
     );
-
+    const [modalAlert, setModalAlert] = useState<boolean>(false);
     const guideButtonRef = React.useRef<HTMLButtonElement>(null);
 
     // Set search query debounce to 1000ms
@@ -133,12 +133,16 @@ export default function SearchBar({
         }
     };
 
-    const disallowFilteringInSearchBar = (e:any) => {
+    const disallowFilteringInSearchBar = (e: any) => {
         e.preventDefault();
-        alert(
-            'Please do not type filters in the searchbar. \nInstead, access them from the "Filters" menu.',
-        );
+        setIsUserTyping(false);
+        setModalAlert(true);
+        setFiltersModalOpen(true)
     };
+
+    function handleSetModalAlert(newValue: any) {
+        setModalAlert(newValue);
+      }
 
     return (
         <>
@@ -157,7 +161,6 @@ export default function SearchBar({
                         }
                         if (e.key === ':') {
                             disallowFilteringInSearchBar(e);
-                            setIsUserTyping(true);
                         }
                     }}
                     placeholder="Search"
@@ -231,6 +234,8 @@ export default function SearchBar({
                 handleClose={() => setFiltersModalOpen(false)}
                 activeFilterInput={activeFilterInput}
                 setActiveFilterInput={setActiveFilterInput}
+                showModalAlert={modalAlert}
+                onChange={handleSetModalAlert}
             />
         </>
     );
