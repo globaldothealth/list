@@ -31,12 +31,7 @@ describe('App', function () {
         cy.get('#dateconfirmedafter').type('2020-04-30');
 
         cy.get('body').then(($body) => {
-            // synchronously ask for the body's text
-            // and do something based on whether it includes
-            // another string
-
             if ($body.find('.iubenda-cs-accept-btn').length) {
-                // input was found, do something else here
                 cy.get('.iubenda-cs-accept-btn').click();
             }
         });
