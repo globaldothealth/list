@@ -22,7 +22,6 @@ import bodyParser from 'body-parser';
 import cookieParser from 'cookie-parser';
 import dotenv from 'dotenv';
 import express from 'express';
-import expressStatusMonitor from 'express-status-monitor';
 import mongo from 'connect-mongo';
 import mongoose from 'mongoose';
 import passport from 'passport';
@@ -33,10 +32,6 @@ import { logger } from './util/logger';
 import S3 from 'aws-sdk/clients/s3';
 
 const app = express();
-
-if (process.env.NODE_ENV !== 'test') {
-    app.use(expressStatusMonitor());
-}
 
 app.use(express.json({ limit: '50mb', type: 'application/json' }));
 app.use(
