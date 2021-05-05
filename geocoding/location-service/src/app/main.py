@@ -2,10 +2,14 @@ from flask import Flask, jsonify, request
 from os import environ
 
 from src.app.fake_geocoder import FakeGeocoder
+from src.app.geocoder import Geocoder
+from src.app.geocoder_suggester import GeocodeSuggester
 from src.integration.mapbox_client import mapbox_geocode
 
 app = Flask(__name__)
 fake_geocoder = FakeGeocoder()
+#mapbox_geocoder = Geocoder(environ['MAPBOX_TOKEN'])
+suggester = GeocodeSuggester([fake_geocoder])
 
 @app.route("/health")
 def index() -> str:
@@ -36,6 +40,13 @@ def clear_fake_geocoder():
     fake_geocoder.clear()
     return ''
 
+
+@app.route("/geocode/suggest")
+def suggest_geocode():
+    try:
+        return jsonify(suggester.suggest(request.args))
+    except ValueError:
+        return f"Bad limitToResolution value {request.args.get('limitToResolution', str)}", 422
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8080)

@@ -1,16 +1,13 @@
 import unittest
-
 from src.app import main
 
 
-class FakeGeocoderTests(unittest.TestCase):
+class SuggestionsTest(unittest.TestCase):
 
     def setUp(self):
         main.app.config['TESTING'] = True
         self.client = main.app.test_client()
-
-    def test_itCanSeedGeocodes(self):
-        response = self.client.post('/geocode/seed', json={
+        self.lyon = {
             'administrativeAreaLevel1': 'Rhône',
             'country': 'France',
             'geometry': {
@@ -18,9 +15,10 @@ class FakeGeocoderTests(unittest.TestCase):
                 'longitude': 4.84139
             },
             'name': 'Lyon',
-        })
-        assert response.status == '200 OK'
+        }
 
-    def test_itCanClearGeocodes(self):
-        response = self.client.post('/geocode/clear')
+    def test_seededGeocodesAreSuggested(self):
+        self.client.post('/geocode/seed', json=self.lyon)
+        response = self.client.get('/geocode/suggest?q=Lyon&limitToResolution=Country,Admin1')
         assert response.status == '200 OK'
+        assert response.json == [self.lyon]

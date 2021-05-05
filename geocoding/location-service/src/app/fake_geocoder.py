@@ -8,3 +8,9 @@ class FakeGeocoder:
 
     def clear(self):
         self.values = {}
+
+    def geocode(self, query, opts):
+        if query in self.values:
+            return [self.values[query]]
+        else:
+            return []
