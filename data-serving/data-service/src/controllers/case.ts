@@ -236,10 +236,12 @@ export class CasesController {
             logger.info('Added count');
             // Do a fetch of documents and another fetch in parallel for total documents
             // count used in pagination.
-            const results = await Case.aggregate(addingCount).collation({
-                locale: 'en_US',
-                strength: 2,
-            });
+            const results = await Case.aggregate(addingCount)
+                .allowDiskUse(true)
+                .collation({
+                    locale: 'en_US',
+                    strength: 2,
+                });
             logger.info('Got results');
             const docs = results[0].docs;
             const total = results[0].total ?? 0;
