@@ -13,7 +13,7 @@ import FilterListIcon from '@material-ui/icons/FilterList';
 import HelpIcon from '@material-ui/icons/HelpOutline';
 import SearchIcon from '@material-ui/icons/Search';
 import clsx from 'clsx';
-import SearchGuideDialog from './SearchGuideDialog';
+import DataGuideDialog from './DataGuideDialog';
 import { useDebounce } from '../hooks/useDebounce';
 import FiltersModal from './FiltersModal';
 import { searchQueryToURL, URLToSearchQuery } from './util/searchQuery';
@@ -84,7 +84,7 @@ export default function SearchBar({
     const history = useHistory();
 
     const [isUserTyping, setIsUserTyping] = useState<boolean>(false);
-    const [isSearchGuideOpen, setIsSearchGuideOpen] = useState<boolean>(false);
+    const [isDataGuideOpen, setIsDataGuideOpen] = useState<boolean>(false);
     const [searchInput, setSearchInput] = useState<string>(
         location.search.includes('?q=')
             ? URLToSearchQuery(location.search)
@@ -118,8 +118,8 @@ export default function SearchBar({
         //eslint-disable-next-line
     }, [debouncedSearch]);
 
-    const toggleSearchGuide = async (): Promise<void> => {
-        setIsSearchGuideOpen((isOpen) => !isOpen);
+    const toggleDataGuide = async (): Promise<void> => {
+        setIsDataGuideOpen((isOpen) => !isOpen);
     };
 
     const handleKeyPress = (ev: React.KeyboardEvent<HTMLDivElement>): void => {
@@ -174,17 +174,17 @@ export default function SearchBar({
                                     <Button
                                         color="primary"
                                         startIcon={<HelpIcon />}
-                                        onClick={toggleSearchGuide}
+                                        onClick={toggleDataGuide}
                                         className={clsx({
-                                            [classes.activeButton]: isSearchGuideOpen,
+                                            [classes.activeButton]: isDataGuideOpen,
                                         })}
                                         ref={guideButtonRef}
                                     >
-                                        Search guide
+                                        Data guide
                                     </Button>
-                                    <SearchGuideDialog
-                                        isOpen={isSearchGuideOpen}
-                                        onToggle={toggleSearchGuide}
+                                    <DataGuideDialog
+                                        isOpen={isDataGuideOpen}
+                                        onToggle={toggleDataGuide}
                                         rootComponentRef={rootComponentRef}
                                         triggerComponentRef={guideButtonRef}
                                     />
