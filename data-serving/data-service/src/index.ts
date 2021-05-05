@@ -41,7 +41,7 @@ if (process.env.NODE_ENV !== 'test') {
 dotenv.config();
 const env = validateEnv();
 
-const deployment_envs = ["prod", "dev"];
+const deployment_envs = ['prod', 'dev'];
 if (!deployment_envs.includes(env.SERVICE_ENV)) {
     require('longjohn');
 }

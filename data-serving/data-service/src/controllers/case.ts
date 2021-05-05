@@ -5,7 +5,7 @@ import { ObjectId, QuerySelector } from 'mongodb';
 import { GeocodeOptions, Geocoder, Resolution } from '../geocoding/geocoder';
 import { NextFunction, Request, Response } from 'express';
 import parseSearchQuery, { ParsingError } from '../util/search';
-import { SortBy, SortByOrder, getSortByKeyword } from '../util/case';
+import { SortByOrder, getSortByKeyword } from '../util/case';
 import { parseDownloadedCase } from '../util/case';
 
 import axios from 'axios';
@@ -157,8 +157,8 @@ export class CasesController {
         const page = Number(req.query.page) || 1;
         const limit = Number(req.query.limit) || 10;
         const countLimit = Number(req.query.count_limit) || 10000;
-        const sortBy = Number(req.query.sort_by);
-        const sortByOrder = Number(req.query.order);
+        const sortBy = Number(req.query.sort_by) || 0;
+        const sortByOrder = Number(req.query.order) || 0;
 
         logger.info('Got query params');
 
@@ -178,18 +178,29 @@ export class CasesController {
             res.status(422).json({ message: 'q must be a unique string' });
             return;
         }
+
         logger.info('Got past 422s');
         try {
             const caseAggregation = this.caseAggregationFromQuery(
                 req.query.q ?? '',
             );
             logger.info('Got case aggregation from query');
+
+            const sortByKeyword = getSortByKeyword(sortBy);
+            const sortedQuery = _.concat(caseAggregation, [
+                {
+                    $sort: {
+                        [sortByKeyword]:
+                            sortByOrder === SortByOrder.Ascending ? 1 : -1,
+                    },
+                },
+            ]);
+            logger.info('Sorted by keyword');
+
             const excludingRestrictedSources = this.excludeRestrictedSourcesFromCaseAggregation(
-                caseAggregation,
+                sortedQuery,
             );
             logger.info('Excluded restricted sources');
-            const sortByKeyword = getSortByKeyword(sortBy);
-            logger.info('Sorted by keyword');
             const addingCount = _.concat(excludingRestrictedSources, [
                 {
                     $facet: {
@@ -211,14 +222,6 @@ export class CasesController {
                             {
                                 $limit: limit + 1,
                             },
-                            {
-                                $sort: {
-                                    [sortByKeyword]:
-                                        sortByOrder === SortByOrder.Ascending
-                                            ? 1
-                                            : -1,
-                                },
-                            },
                         ],
                     },
                 },
@@ -233,10 +236,12 @@ export class CasesController {
             logger.info('Added count');
             // Do a fetch of documents and another fetch in parallel for total documents
             // count used in pagination.
-            const results = await Case.aggregate(addingCount).collation({
-                locale: 'en_US',
-                strength: 2,
-            });
+            const results = await Case.aggregate(addingCount)
+                .allowDiskUse(true)
+                .collation({
+                    locale: 'en_US',
+                    strength: 2,
+                });
             logger.info('Got results');
             const docs = results[0].docs;
             const total = results[0].total ?? 0;

@@ -18,7 +18,7 @@ DEV = "dev"
 PROD = "prod"
 
 DEV_CURATOR_URL = "https://dev-data.covid-19.global.health/api/sources"
-PROD_CURATOR_URL = "https://curator.ghdsi.org/api/sources"
+PROD_CURATOR_URL = "https://data.covid-19.global.health/api/sources"
 
 ENV_TO_URL = {
 	DEV: DEV_CURATOR_URL,
