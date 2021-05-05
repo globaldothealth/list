@@ -138,7 +138,8 @@ def write_to_server(
         total_wait = 0
         wait = 10  # initial wait time in seconds
         print(f"Sending {len(batch)} cases, total so far: {counter['total']}")
-        while total_wait <= MAX_WAIT_TIME:
+        # Exponential backoff in dev and prod, but not for local testing
+        while total_wait <= (MAX_WAIT_TIME if env in ["dev", "prod"] else 0):
             res = requests.post(put_api_url, json={"cases": batch},
                                 headers=headers, cookies=cookies)
             if res.status_code in [200, 207]:  # 207 is used for validation error
