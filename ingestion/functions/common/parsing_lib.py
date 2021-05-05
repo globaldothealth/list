@@ -141,7 +141,7 @@ def write_to_server(
         while total_wait <= MAX_WAIT_TIME:
             res = requests.post(put_api_url, json={"cases": batch},
                                 headers=headers, cookies=cookies)
-            if res and res.status_code == 200:
+            if res.status_code in [200, 207]:  # 207 is used for validation error
                 break
             print(f"Request failed, status={res.status_code}, response={res.text}, retrying in {wait} seconds...")
             time.sleep(wait)
