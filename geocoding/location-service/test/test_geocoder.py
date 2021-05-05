@@ -4,6 +4,10 @@ from mock import patch
 
 from src.app.geocoder import Geocoder
 
+class FakeAdminsFetcher:
+    def fill_admins(self, unused):
+        return unused
+
 
 class GeocodeTests(unittest.TestCase):
 
@@ -19,7 +23,7 @@ class GeocodeTests(unittest.TestCase):
                 self.lyon
             ],
         }
-        geocoder = Geocoder('api_token')
+        geocoder = Geocoder('api_token', FakeAdminsFetcher())
         feats = geocoder.geocode('some query', {
             'limitToResolution': [Geocoder.Admin3, Geocoder.Admin2]
         })
@@ -44,7 +48,7 @@ class GeocodeTests(unittest.TestCase):
             'features': [
             ]
         }
-        geocoder = Geocoder('api_token')
+        geocoder = Geocoder('api_token', FakeAdminsFetcher())
         feats = geocoder.geocode('some query')
         assert len(feats) == 0
 
@@ -54,7 +58,7 @@ class GeocodeTests(unittest.TestCase):
             'features': [
             ],
         }
-        geocoder = Geocoder('api_token')
+        geocoder = Geocoder('api_token', FakeAdminsFetcher())
         feats = geocoder.geocode('some query', {
             'limitToResolution': [Geocoder.Admin3, Geocoder.Admin2]
         })

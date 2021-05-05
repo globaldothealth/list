@@ -10,10 +10,11 @@ class Geocoder:
     Admin1 = 'Admin1'
     Point = 'Point'
 
-    def __init__(self, api_token):
+    def __init__(self, api_token, admins_fetcher):
         """Needs a mapbox API token."""
         self.api_token = api_token
         self.cache = LRU(500)
+        self.admins_fetcher = admins_fetcher
 
     def resolutionToMapboxType(self, resolution):
         """Map (sorrynotsorry) from our names for administrative regions to mapbox's names."""
@@ -62,7 +63,7 @@ class Geocoder:
             'place': self.getFeatureDescriptionFromContext(contexts, 'poi'),
             'geoResolution': self.getResolution(contexts)
         }
-        # TODO fill in the administrative areas
+        self.admins_fetcher.fill_admins(res)
         return res
 
     def geocode(self, query, options={}):
