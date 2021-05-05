@@ -7,9 +7,17 @@ from src.app.geocoder_suggester import GeocodeSuggester
 from src.integration.mapbox_client import mapbox_geocode
 
 app = Flask(__name__)
+
+geocoders = []
 fake_geocoder = FakeGeocoder()
-#mapbox_geocoder = Geocoder(environ['MAPBOX_TOKEN'])
-suggester = GeocodeSuggester([fake_geocoder])
+
+if 'ENABLE_FAKE_GEOCODER' in environ:
+    geocoders.append(fake_geocoder)
+if 'MAPBOX_TOKEN' in environ:
+    mapbox_geocoder = Geocoder(environ['MAPBOX_TOKEN'])
+    geocoders.append(mapbox_geocoder)
+
+suggester = GeocodeSuggester(geocoders)
 
 @app.route("/health")
 def index() -> str:
