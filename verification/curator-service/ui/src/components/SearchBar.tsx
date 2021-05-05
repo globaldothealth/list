@@ -161,6 +161,7 @@ export default function SearchBar({
                                     <Button
                                         color="primary"
                                         startIcon={<FilterListIcon />}
+                                        className="filter-button"
                                         onClick={() =>
                                             setFiltersModalOpen(true)
                                         }
