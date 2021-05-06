@@ -11,10 +11,22 @@ from src.integration.mapbox_client import mapbox_geocode
 app = Flask(__name__)
 
 geocoders = []
-fake_geocoder = FakeGeocoder()
 
 if 'ENABLE_FAKE_GEOCODER' in environ:
+    fake_geocoder = FakeGeocoder()
+    @app.route("/geocode/seed", methods=['POST'])
+    def seed_fake_geocoder():
+        obj = request.json
+        fake_geocoder.seed(obj['name'], obj)
+        return ''
+
+    @app.route("/geocode/clear", methods=['POST'])
+    def clear_fake_geocoder():
+        fake_geocoder.clear()
+        return ''
+
     geocoders.append(fake_geocoder)
+
 if 'MAPBOX_TOKEN' in environ:
     access_token = environ['MAPBOX_TOKEN']
     mongo_client = None
@@ -42,19 +54,6 @@ def geocode():
     query = request.args.get('q', type=str)
     api_key = environ['MAPBOX_TOKEN']
     return mapbox_geocode(api_key, query)
-
-
-@app.route("/geocode/seed", methods=['POST'])
-def seed_fake_geocoder():
-    obj = request.json
-    fake_geocoder.seed(obj['name'], obj)
-    return ''
-
-
-@app.route("/geocode/clear", methods=['POST'])
-def clear_fake_geocoder():
-    fake_geocoder.clear()
-    return ''
 
 
 @app.route("/geocode/suggest")
