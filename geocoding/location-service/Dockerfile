@@ -17,7 +17,7 @@ USER flask
 RUN pip install poetry
 COPY geocoding/location-service/pyproject.toml .
 COPY geocoding/location-service/poetry.lock .
-RUN poetry install
+RUN /home/flask/.local/bin/poetry install
 
 # deploy the app source
 COPY geocoding/location-service/. .
@@ -26,4 +26,4 @@ COPY geocoding/location-service/. .
 EXPOSE 8080
 # Run!
 
-CMD ["poetry", "run", "python3", "-m", "src.app.main"]
+CMD ["/home/flask/.local/bin/poetry", "run", "python3", "-m", "src.app.main"]
