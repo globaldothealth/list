@@ -201,7 +201,7 @@ const downloadDataModalStyles = makeStyles((theme: Theme) => ({
 
 const sortSelectStyles = makeStyles((theme: Theme) => ({
     formControl: {
-        minWidth: 120,
+        minWidth: 150,
         margin: '0 20px 0 0',
     },
 }));
@@ -436,6 +436,7 @@ export function SortSelect({
                     name="sortBy"
                     value={sortBy}
                     onChange={handleChange}
+                    className="sort-by-label-select-menu"
                 >
                     {sortKeywords.map((keyword) => (
                         <MenuItem
