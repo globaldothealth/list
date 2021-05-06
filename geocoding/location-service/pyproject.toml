@@ -6,7 +6,7 @@ authors = ["Global.health: a Data Science Initiative <ghdsi.info@gmail.com>"]
 license = "MIT"
 
 [tool.poetry.dependencies]
-python = "^3.9"
+python = "^3.8"
 attrs = "20.3.0"
 boto3 = "1.17.57"
 botocore = "1.20.57"
