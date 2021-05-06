@@ -436,7 +436,6 @@ export function SortSelect({
                     name="sortBy"
                     value={sortBy}
                     onChange={handleChange}
-                    className="sort-by-label-select-menu"
                 >
                     {sortKeywords.map((keyword) => (
                         <MenuItem
