@@ -148,6 +148,7 @@ deregister    Deregister a Batch job definition
             pprint(
                 self.batch_client.register_job_definition(
                     **job_definition(
+                        parser_name.replace(".", "_"),
                         args.source_id,
                         args.env,
                         args.cpu,
@@ -168,19 +169,6 @@ deregister    Deregister a Batch job definition
                 "should be 'folder.parser' if the parser is at parsing/folder/parser.py"
             )
             sys.exit(1)
-        print(f"Register {args.source_id} (environment {args.env})")
-        source_name = args.parser.replace(".", "-")
-        print(f"Registering job definition for source {source_name}")
-        pprint(
-            self.client.register_job_definition(
-                **job_definition(
-                    source_name,
-                    args.env,
-                    args.cpu,
-                    args.memory,
-                )
-            )
-        )
 
     def _job_definitions(self):
         jobs = self.batch_client.describe_job_definitions()
