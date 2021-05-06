@@ -1,5 +1,5 @@
 import pymongo
-from flask import Flask, jsonify, request
+from flask import Blueprint, Flask, jsonify, request
 from os import environ
 
 from src.app.admins_fetcher import AdminsFetcher
@@ -13,19 +13,21 @@ app = Flask(__name__)
 geocoders = []
 
 if 'ENABLE_FAKE_GEOCODER' in environ:
+    faking_it = Blueprint('fake_geocoder', __name__)
     fake_geocoder = FakeGeocoder()
-    @app.route("/geocode/seed", methods=['POST'])
+    @faking_it.route("/geocode/seed", methods=['POST'])
     def seed_fake_geocoder():
         obj = request.json
         fake_geocoder.seed(obj['name'], obj)
         return ''
 
-    @app.route("/geocode/clear", methods=['POST'])
+    @faking_it.route("/geocode/clear", methods=['POST'])
     def clear_fake_geocoder():
         fake_geocoder.clear()
         return ''
 
     geocoders.append(fake_geocoder)
+    app.register_blueprint(faking_it)
 
 if 'MAPBOX_TOKEN' in environ:
     access_token = environ['MAPBOX_TOKEN']
