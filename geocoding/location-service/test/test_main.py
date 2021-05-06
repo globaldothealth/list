@@ -28,3 +28,7 @@ def test_unhealthy_when_mapbox_key_not_set(client):
     assert "status" in result
     assert result["status"] == "Unhealthy"
     assert result["reason"] == "Mapbox API token is not present"
+
+def test_does_not_attempt_geocode_with_no_query(client):
+    response = client.get("/geocode")
+    assert response.status == '400 BAD REQUEST'
