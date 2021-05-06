@@ -52,6 +52,8 @@ def index() -> str:
 @app.route("/geocode")
 def geocode():
     query = request.args.get('q', type=str)
+    if not query:
+        return "No query supplied", 400
     api_key = environ['MAPBOX_TOKEN']
     return mapbox_geocode(api_key, query)
 
