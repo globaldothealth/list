@@ -14,8 +14,10 @@ WORKDIR /usr/src/app/geocoding/location-service
 USER flask
 
 # install dependencies
-COPY geocoding/location-service/requirements.txt .
-RUN python3 -mpip install -r requirements.txt
+RUN pip install poetry
+COPY geocoding/location-service/pyproject.toml .
+COPY geocoding/location-service/poetry.lock .
+RUN poetry install
 
 # deploy the app source
 COPY geocoding/location-service/. .
@@ -24,4 +26,4 @@ COPY geocoding/location-service/. .
 EXPOSE 8080
 # Run!
 
-CMD ["python3", "-m", "src.app.main"]
+CMD ["poetry", "run", "python3", "-m", "src.app.main"]
