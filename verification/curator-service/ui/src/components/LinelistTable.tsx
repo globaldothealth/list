@@ -201,7 +201,7 @@ const downloadDataModalStyles = makeStyles((theme: Theme) => ({
 
 const sortSelectStyles = makeStyles((theme: Theme) => ({
     formControl: {
-        minWidth: 120,
+        minWidth: 150,
         margin: '0 20px 0 0',
     },
 }));
