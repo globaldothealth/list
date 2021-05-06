@@ -25,7 +25,6 @@ import YAML from 'yamljs';
 import bodyParser from 'body-parser';
 import dotenv from 'dotenv';
 import express from 'express';
-import expressStatusMonitor from 'express-status-monitor';
 import mongoose from 'mongoose';
 import swaggerUi from 'swagger-ui-express';
 import validateEnv from './util/validate-env';
@@ -34,14 +33,10 @@ import { RateLimiter } from 'limiter';
 
 const app = express();
 
-if (process.env.NODE_ENV !== 'test') {
-    app.use(expressStatusMonitor());
-}
-
 dotenv.config();
 const env = validateEnv();
 
-const deployment_envs = ["prod", "dev"];
+const deployment_envs = ['prod', 'dev'];
 if (!deployment_envs.includes(env.SERVICE_ENV)) {
     require('longjohn');
 }

@@ -100,6 +100,7 @@ interface TableRow {
         date: string;
         note: string;
     };
+    nationalities?: any;
 }
 
 interface LocationState {
@@ -200,7 +201,7 @@ const downloadDataModalStyles = makeStyles((theme: Theme) => ({
 
 const sortSelectStyles = makeStyles((theme: Theme) => ({
     formControl: {
-        minWidth: 120,
+        minWidth: 150,
         margin: '0 20px 0 0',
     },
 }));
@@ -956,7 +957,9 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                             },
                             title: (
                                 <div className={classes.centeredContent}>
-                                    <VerificationStatusHeader />
+                                    <VerificationStatusHeader onClickAction={(
+                                        e: React.MouseEvent<HTMLDivElement>,
+                                    ) => this.handleAddFilterClick(e, 'verificationstatus')} />
                                 </div>
                             ),
                             field: 'verificationStatus',
@@ -1068,6 +1071,21 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                             field: 'longitude',
                         },
                         {
+                            title: (
+                                <ColumnHeaderTitle
+                                    theClass={classes.centeredContent}
+                                    columnTitle="Nationality"
+                                    onClickAction={(
+                                        e: React.MouseEvent<HTMLDivElement>,
+                                    ) =>
+                                        this.handleAddFilterClick(e, 'nationality')
+                                    }
+                                />
+                            ),
+
+                            field: 'nationalities',
+                         },
+                        {
                             title: 'Age',
                             field: 'age',
                             render: (rowData) =>
@@ -1151,7 +1169,18 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                 .then((result) => {
                                     const flattenedCases: TableRow[] = [];
                                     const cases = result.data.cases;
+                                    const nationalitiesRender = (nationalities: any) => {
+                                        if (nationalities) {
+                                            nationalities.sort();
+                                            const nationalitiesString = nationalities.join(', ');
+                                            return nationalitiesString
+                                        } else {
+                                            return null;
+                                        }
+                                    }
                                     for (const c of cases) {
+                                        nationalitiesRender(c.demographics?.nationalities);
+
                                         const confirmedEvent = c.events.find(
                                             (event) =>
                                                 event.name === 'confirmed',
@@ -1187,6 +1216,7 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                                 c.demographics?.ageRange?.end,
                                             ],
                                             gender: c.demographics?.gender,
+                                            nationalities: nationalitiesRender(c.demographics?.nationalities),
                                             outcome: c.events.find(
                                                 (event) =>
                                                     event.name === 'outcome',
