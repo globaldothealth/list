@@ -957,9 +957,16 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                             },
                             title: (
                                 <div className={classes.centeredContent}>
-                                    <VerificationStatusHeader onClickAction={(
-                                        e: React.MouseEvent<HTMLDivElement>,
-                                    ) => this.handleAddFilterClick(e, 'verificationstatus')} />
+                                    <VerificationStatusHeader
+                                        onClickAction={(
+                                            e: React.MouseEvent<HTMLDivElement>,
+                                        ) =>
+                                            this.handleAddFilterClick(
+                                                e,
+                                                'verificationstatus',
+                                            )
+                                        }
+                                    />
                                 </div>
                             ),
                             field: 'verificationStatus',
@@ -1078,13 +1085,16 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                     onClickAction={(
                                         e: React.MouseEvent<HTMLDivElement>,
                                     ) =>
-                                        this.handleAddFilterClick(e, 'nationality')
+                                        this.handleAddFilterClick(
+                                            e,
+                                            'nationality',
+                                        )
                                     }
                                 />
                             ),
 
                             field: 'nationalities',
-                         },
+                        },
                         {
                             title: 'Age',
                             field: 'age',
@@ -1169,17 +1179,23 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                 .then((result) => {
                                     const flattenedCases: TableRow[] = [];
                                     const cases = result.data.cases;
-                                    const nationalitiesRender = (nationalities: any) => {
+                                    const nationalitiesRender = (
+                                        nationalities: any,
+                                    ) => {
                                         if (nationalities) {
                                             nationalities.sort();
-                                            const nationalitiesString = nationalities.join(', ');
-                                            return nationalitiesString
+                                            const nationalitiesString = nationalities.join(
+                                                ', ',
+                                            );
+                                            return nationalitiesString;
                                         } else {
                                             return null;
                                         }
-                                    }
+                                    };
                                     for (const c of cases) {
-                                        nationalitiesRender(c.demographics?.nationalities);
+                                        nationalitiesRender(
+                                            c.demographics?.nationalities,
+                                        );
 
                                         const confirmedEvent = c.events.find(
                                             (event) =>
@@ -1216,7 +1232,9 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                                 c.demographics?.ageRange?.end,
                                             ],
                                             gender: c.demographics?.gender,
-                                            nationalities: nationalitiesRender(c.demographics?.nationalities),
+                                            nationalities: nationalitiesRender(
+                                                c.demographics?.nationalities,
+                                            ),
                                             outcome: c.events.find(
                                                 (event) =>
                                                     event.name === 'outcome',
@@ -1293,6 +1311,11 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                         <Chip
                                             label="Filters"
                                             color="primary"
+                                            onClick={() =>
+                                                this.props.setFiltersModalOpen(
+                                                    true,
+                                                )
+                                            }
                                             className={classes.breadcrumbChip}
                                         />
                                     )}
@@ -1306,6 +1329,14 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                                         breadcrumb,
                                                     )
                                                 }
+                                                onClick={() => {
+                                                    this.props.setFiltersModalOpen(
+                                                        true,
+                                                    );
+                                                    this.props.setActiveFilterInput(
+                                                        breadcrumb.key,
+                                                    );
+                                                }}
                                                 className={
                                                     classes.breadcrumbChip
                                                 }
