@@ -14,6 +14,7 @@ import React from 'react';
 import axios from 'axios';
 import range from 'lodash/range';
 import userEvent from '@testing-library/user-event';
+import { SortBy, SortByOrder } from '../constants/types';
 
 jest.mock('axios');
 const mockedAxios = axios as jest.Mocked<typeof axios>;
@@ -113,15 +114,18 @@ it('loads and displays cases', async () => {
         <MemoryRouter>
             <LinelistTable
                 user={curator}
-                // eslint-disable-next-line @typescript-eslint/no-empty-function
-                search=""
-                setSearch={setSearch}
                 filterBreadcrumbs={[]}
                 page={0}
                 pageSize={50}
                 onChangePage={jest.fn()}
                 onChangePageSize={jest.fn()}
                 handleBreadcrumbDelete={jest.fn()}
+                setFiltersModalOpen={jest.fn()}
+                setActiveFilterInput={jest.fn()}
+                sortBy={0}
+                sortByOrder={1}
+                setSortBy={jest.fn()}
+                setSortByOrder={jest.fn()}
             />
         </MemoryRouter>,
     );
@@ -187,15 +191,18 @@ it('API errors are displayed', async () => {
         <MemoryRouter>
             <LinelistTable
                 user={curator}
-                // eslint-disable-next-line @typescript-eslint/no-empty-function
-                search=""
-                setSearch={setSearch}
                 filterBreadcrumbs={[]}
                 page={0}
                 pageSize={50}
                 onChangePage={jest.fn()}
                 onChangePageSize={jest.fn()}
                 handleBreadcrumbDelete={jest.fn()}
+                setFiltersModalOpen={jest.fn()}
+                setActiveFilterInput={jest.fn()}
+                sortBy={0}
+                sortByOrder={1}
+                setSortBy={jest.fn()}
+                setSortByOrder={jest.fn()}
             />
         </MemoryRouter>,
     );
@@ -258,15 +265,18 @@ it('can delete a row', async () => {
         <MemoryRouter>
             <LinelistTable
                 user={curator}
-                // eslint-disable-next-line @typescript-eslint/no-empty-function
-                search=""
-                setSearch={setSearch}
                 filterBreadcrumbs={[]}
                 page={0}
                 pageSize={50}
                 onChangePage={jest.fn()}
                 onChangePageSize={jest.fn()}
                 handleBreadcrumbDelete={jest.fn()}
+                setFiltersModalOpen={jest.fn()}
+                setActiveFilterInput={jest.fn()}
+                sortBy={0}
+                sortByOrder={1}
+                setSortBy={jest.fn()}
+                setSortByOrder={jest.fn()}
             />
         </MemoryRouter>,
     );
@@ -357,15 +367,18 @@ it('can cancel delete action', async () => {
         <MemoryRouter>
             <LinelistTable
                 user={curator}
-                // eslint-disable-next-line @typescript-eslint/no-empty-function
-                search=""
-                setSearch={setSearch}
                 filterBreadcrumbs={[]}
                 page={0}
                 pageSize={50}
                 onChangePage={jest.fn()}
                 onChangePageSize={jest.fn()}
                 handleBreadcrumbDelete={jest.fn()}
+                setFiltersModalOpen={jest.fn()}
+                setActiveFilterInput={jest.fn()}
+                sortBy={0}
+                sortByOrder={1}
+                setSortBy={jest.fn()}
+                setSortByOrder={jest.fn()}
             />
         </MemoryRouter>,
     );
@@ -436,15 +449,18 @@ it('cannot edit data if not curator', async () => {
                     email: 'foo@bar.com',
                     roles: [],
                 }}
-                // eslint-disable-next-line @typescript-eslint/no-empty-function
-                search=""
-                setSearch={setSearch}
                 filterBreadcrumbs={[]}
                 page={0}
                 pageSize={50}
                 onChangePage={jest.fn()}
                 onChangePageSize={jest.fn()}
                 handleBreadcrumbDelete={jest.fn()}
+                setFiltersModalOpen={jest.fn()}
+                setActiveFilterInput={jest.fn()}
+                sortBy={0}
+                sortByOrder={1}
+                setSortBy={jest.fn()}
+                setSortByOrder={jest.fn()}
             />
         </MemoryRouter>,
     );
@@ -502,15 +518,18 @@ it('initializes with correct page and page size values', async () => {
         <MemoryRouter>
             <LinelistTable
                 user={curator}
-                // eslint-disable-next-line @typescript-eslint/no-empty-function
-                search=""
-                setSearch={setSearch}
                 filterBreadcrumbs={[]}
                 page={1}
                 pageSize={10}
                 onChangePage={jest.fn()}
                 onChangePageSize={jest.fn()}
                 handleBreadcrumbDelete={jest.fn()}
+                setFiltersModalOpen={jest.fn()}
+                setActiveFilterInput={jest.fn()}
+                sortBy={0}
+                sortByOrder={1}
+                setSortBy={jest.fn()}
+                setSortByOrder={jest.fn()}
             />
         </MemoryRouter>,
     );
@@ -569,15 +588,18 @@ it('paginates through data', async () => {
         <MemoryRouter>
             <LinelistTable
                 user={curator}
-                // eslint-disable-next-line @typescript-eslint/no-empty-function
-                search=""
-                setSearch={setSearch}
                 filterBreadcrumbs={[]}
                 page={0}
                 pageSize={10}
                 onChangePage={changePage}
                 onChangePageSize={changePageSize}
                 handleBreadcrumbDelete={jest.fn()}
+                setFiltersModalOpen={jest.fn()}
+                setActiveFilterInput={jest.fn()}
+                sortBy={0}
+                sortByOrder={1}
+                setSortBy={jest.fn()}
+                setSortByOrder={jest.fn()}
             />
         </MemoryRouter>,
     );
@@ -605,48 +627,4 @@ it('paginates through data', async () => {
 
         expect(getAllByText('France')).toHaveLength(5);
     });
-});
-
-it('sorts data based on selected field', async () => {
-    render(
-        <MemoryRouter>
-            <LinelistTable
-                user={curator}
-                // eslint-disable-next-line @typescript-eslint/no-empty-function
-                search=""
-                setSearch={setSearch}
-                filterBreadcrumbs={[]}
-                page={0}
-                pageSize={10}
-                onChangePage={jest.fn()}
-                onChangePageSize={jest.fn()}
-                handleBreadcrumbDelete={jest.fn()}
-            />
-        </MemoryRouter>,
-    );
-
-    const sortBySelect = screen.getByLabelText(/Sort by/i);
-    expect(sortBySelect).toBeInTheDocument();
-    expect(sortBySelect).toHaveTextContent(/none/i);
-
-    fireEvent.mouseDown(sortBySelect);
-    const sortByOptions = await screen.findAllByTestId('sortby-option');
-    expect(sortByOptions).toHaveLength(7);
-
-    //Simualate selection
-    const listbox = within(screen.getByRole('listbox'));
-    fireEvent.click(listbox.getByText(/confirmed date/i));
-    expect(screen.getByLabelText(/Sort by/i)).toHaveTextContent(
-        /confirmed date/i,
-    );
-
-    //Check if order select input is shown after choosing field to sort by
-    const sortingOrderSelect = await screen.findByLabelText(/Order/i);
-    expect(sortingOrderSelect).toBeInTheDocument();
-    expect(sortingOrderSelect).toHaveTextContent(/descending/i);
-
-    fireEvent.mouseDown(sortingOrderSelect);
-    const orderListbox = within(screen.getByRole('listbox'));
-    fireEvent.click(orderListbox.getByText(/ascending/i));
-    expect(screen.getByLabelText(/Order/i)).toHaveTextContent(/ascending/i);
 });

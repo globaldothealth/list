@@ -59,6 +59,7 @@ import { useLastLocation } from 'react-router-last-location';
 import PolicyLink from './PolicyLink';
 import { Auth } from 'aws-amplify';
 import { useCookieBanner } from '../hooks/useCookieBanner';
+import { SortBy, SortByOrder } from '../constants/types';
 
 const theme = createMuiTheme({
     palette: {
@@ -386,6 +387,10 @@ export default function App(): JSX.Element {
     );
     const [activeFilterInput, setActiveFilterInput] = React.useState<string>(
         '',
+    );
+    const [sortBy, setSortBy] = useState<SortBy>(SortBy.Default);
+    const [sortByOrder, setSortByOrder] = useState<SortByOrder>(
+        SortByOrder.Descending,
     );
     const classes = useStyles();
 
@@ -767,6 +772,10 @@ export default function App(): JSX.Element {
                                     }
                                     setFiltersModalOpen={setFiltersModalOpen}
                                     setActiveFilterInput={setActiveFilterInput}
+                                    sortBy={sortBy}
+                                    sortByOrder={sortByOrder}
+                                    setSortBy={setSortBy}
+                                    setSortByOrder={setSortByOrder}
                                 />
                             </Route>
                         )}
