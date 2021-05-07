@@ -1,6 +1,6 @@
 import { GeocodeResult, Resolution } from '../../src/geocoding/geocoder';
 
-import Geocoder from '../../src/geocoding/remoteGeocoder';
+import RemoteGeocoder from '../../src/geocoding/remoteGeocoder';
 import axios from 'axios';
 
 jest.mock('axios');
@@ -18,7 +18,9 @@ describe('remote geocoder', () => {
             statusText: 'OK',
             data: expectedResponse,
         });
-        const geocoder = new Geocoder('https://example.com/location-service');
+        const geocoder = new RemoteGeocoder(
+            'https://example.com/location-service',
+        );
         const response = await geocoder.geocode('22 Acacia Avenue', {
             limitToCountry: ['UK'],
             limitToResolution: [Resolution.Admin1],
