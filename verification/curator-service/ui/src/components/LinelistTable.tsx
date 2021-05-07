@@ -1308,6 +1308,11 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                         <Chip
                                             label="Filters"
                                             color="primary"
+                                            onClick={() =>
+                                                this.props.setFiltersModalOpen(
+                                                    true,
+                                                )
+                                            }
                                             className={classes.breadcrumbChip}
                                         />
                                     )}
@@ -1321,6 +1326,14 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                                         breadcrumb,
                                                     )
                                                 }
+                                                onClick={() => {
+                                                    this.props.setFiltersModalOpen(
+                                                        true,
+                                                    );
+                                                    this.props.setActiveFilterInput(
+                                                        breadcrumb.key,
+                                                    );
+                                                }}
                                                 className={
                                                     classes.breadcrumbChip
                                                 }
