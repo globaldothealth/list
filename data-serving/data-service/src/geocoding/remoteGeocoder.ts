@@ -1,7 +1,7 @@
 import { GeocodeOptions, GeocodeResult } from './geocoder';
 import axios from 'axios';
 
-export default class Geocoder {
+export default class RemoteGeocoder {
     constructor(private readonly baseUrl: string) {}
 
     async geocode(
