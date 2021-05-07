@@ -136,9 +136,9 @@ export default function FiltersModal({
 
     const handleClearFiltersClick = () => {
         setFormValues({});
-        formik.resetForm();
-        history.push({ pathname: '/cases', search: '' });
-        handleClose();
+        // commented in case we want in future the button to reset the filters already applied 
+        // formik.resetForm();
+        // history.push({ pathname: '/cases', search: '' });
     };
 
 
