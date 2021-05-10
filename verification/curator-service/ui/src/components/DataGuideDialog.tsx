@@ -135,12 +135,14 @@ const SearchGuideDialog = ({
                             <strong>To sort</strong>, use the dropdown menu on
                             the left and choose ascending or descending.
                         </Typography>
+                        <Typography className={classes.textSection}>
+                            <strong>For full-text search</strong>, enter any
+                            combination of search terms.
+                        </Typography>
                         <Typography>
-                            <strong>To search</strong>, enter any combination of
-                            open-text, numbers, or keywords mapped to our
-                            standard schema. You can use the icons on the right
-                            to navigate results and click on any individual
-                            record to see more detailed case information.
+                            You can use the icons on the right to navigate
+                            results and click on any individual record to see
+                            more detailed case information.
                         </Typography>
                     </Box>
                 </div>
