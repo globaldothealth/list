@@ -18,6 +18,7 @@ import {
     // InputAdornment,
     // IconButton,
 } from '@material-ui/core';
+import { Alert } from '@material-ui/lab';
 // import { HelpOutline } from '@material-ui/icons';
 // import { AppTooltip } from './common-form-fields/AppTooltip';
 
@@ -55,6 +56,9 @@ const useStyles = makeStyles((theme: Theme) =>
         helpIcon: {
             color: '#ccc',
         },
+        alertBox: {
+            margin: '0 32px',
+        },
     }),
 );
 
@@ -63,6 +67,8 @@ interface FiltersModalProps {
     activeFilterInput: string;
     handleClose: () => void;
     setActiveFilterInput: (value: string) => void;
+    showModalAlert: boolean;
+    closeAlert: any;
 }
 
 export interface FilterFormValues {
@@ -75,7 +81,7 @@ export interface FilterFormValues {
     nationality?: string;
     occupation?: string;
     outcome?: string;
-    variantofconcern?: string;
+    variant?: string;
     dateconfirmedafter?: string;
     dateconfirmedbefore?: string;
     curatoremail?: string;
@@ -89,6 +95,8 @@ export default function FiltersModal({
     activeFilterInput,
     handleClose,
     setActiveFilterInput,
+    showModalAlert,
+    closeAlert,
 }: FiltersModalProps) {
     const classes = useStyles();
     const location = useLocation();
@@ -109,6 +117,7 @@ export default function FiltersModal({
         enableReinitialize: true,
         initialValues: formValues,
         onSubmit: (values) => {
+            handleSetModalAlert();
             handleClose();
             const searchQuery = filtersToURL(values);
             history.push({ pathname: '/cases', search: searchQuery });
@@ -130,6 +139,16 @@ export default function FiltersModal({
         history.push({ pathname: '/cases', search: '' });
         handleClose();
     };
+
+
+    function handleSetModalAlert() {
+        closeAlert(!showModalAlert);
+    }
+
+    const closeAndResetAlert = () => {
+        handleClose();
+        closeAlert(false);
+    }
 
     // COMMENTED OUT UNTIL CONTENT FOR TOOLTIPS IS PROVIDED
     // const tooltipHelpIcon = (tooltipContent: JSX.Element) => {
@@ -175,9 +194,17 @@ export default function FiltersModal({
     // );
 
     return (
-        <Dialog open={isOpen} maxWidth={'xl'} onClose={handleClose}>
+        <Dialog open={isOpen} maxWidth={'xl'} onClose={closeAndResetAlert}>
             <DialogTitle>Apply filters</DialogTitle>
-
+            {showModalAlert && (
+                <Alert
+                    severity="info"
+                    onClose={() => {handleSetModalAlert()}}
+                    className={classes.alertBox}
+                >
+                    Please do not use filters in the Search Bar, use them here instead.
+                </Alert>
+            )}
             <DialogContent>
                 <form className={classes.root} onSubmit={formik.handleSubmit}>
                     {/* GENERAL */}
@@ -368,21 +395,21 @@ export default function FiltersModal({
 
                     <div>
                         <TextField
-                            autoFocus={activeFilterInput === 'variantofconcern'}
-                            id="variantofconcern"
+                            autoFocus={activeFilterInput === 'variant'}
+                            id="variant"
                             label="Variant of concern"
-                            name="variantofconcern"
+                            name="variant"
                             type="text"
                             variant="outlined"
-                            value={formik.values.variantofconcern || ''}
+                            value={formik.values.variant || ''}
                             onChange={formik.handleChange}
                             error={
-                                formik.touched.variantofconcern &&
-                                Boolean(formik.errors.variantofconcern)
+                                formik.touched.variant &&
+                                Boolean(formik.errors.variant)
                             }
                             helperText={
-                                formik.touched.variantofconcern &&
-                                formik.errors.variantofconcern
+                                formik.touched.variant &&
+                                formik.errors.variant
                             }
                         />
                         <TextField

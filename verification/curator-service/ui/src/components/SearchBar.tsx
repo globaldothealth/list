@@ -18,6 +18,7 @@ import { useDebounce } from '../hooks/useDebounce';
 import FiltersModal from './FiltersModal';
 import { searchQueryToURL, URLToSearchQuery } from './util/searchQuery';
 import { useLocation, useHistory } from 'react-router-dom';
+import { KeyboardEvent } from 'react'
 
 const searchBarStyles = makeStyles((theme: Theme) => ({
     searchRoot: {
@@ -90,7 +91,7 @@ export default function SearchBar({
             ? URLToSearchQuery(location.search)
             : '',
     );
-
+    const [modalAlert, setModalAlert] = useState<boolean>(false);
     const guideButtonRef = React.useRef<HTMLButtonElement>(null);
 
     // Set search query debounce to 1000ms
@@ -133,6 +134,17 @@ export default function SearchBar({
         }
     };
 
+    const disallowFilteringInSearchBar = (e: KeyboardEvent<HTMLInputElement> ) => {
+        e.preventDefault();
+        setIsUserTyping(false);
+        setModalAlert(true);
+        setFiltersModalOpen(true)
+    };
+
+    function handleSetModalAlert(shouldTheAlertStillBeOpen: boolean) {
+        setModalAlert(shouldTheAlertStillBeOpen);
+      }
+
     return (
         <>
             <div className={classes.searchRoot}>
@@ -141,15 +153,19 @@ export default function SearchBar({
                     data-testid="searchbar"
                     name="searchbar"
                     onKeyPress={handleKeyPress}
+                    autoComplete="off"
                     onChange={(event): void => {
                         setSearchInput(event.target.value);
                     }}
-                    onKeyDown={() => {
+                    onKeyDown={(e: KeyboardEvent<HTMLInputElement>) => {
                         if (!isUserTyping) {
                             setIsUserTyping(true);
                         }
+                        if (e.key === ':') {
+                            disallowFilteringInSearchBar(e);
+                        }
                     }}
-                    placeholder="Search"
+                    placeholder="Fulltext search"
                     value={searchInput}
                     variant="outlined"
                     fullWidth
@@ -221,6 +237,8 @@ export default function SearchBar({
                 handleClose={() => setFiltersModalOpen(false)}
                 activeFilterInput={activeFilterInput}
                 setActiveFilterInput={setActiveFilterInput}
+                showModalAlert={modalAlert}
+                closeAlert={handleSetModalAlert}
             />
         </>
     );
