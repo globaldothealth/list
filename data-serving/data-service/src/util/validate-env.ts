@@ -14,6 +14,10 @@ export default function validateEnv(): Readonly<{
         // eslint-disable-next-line indent
     } {
     return cleanEnv(process.env, {
+        LOCATION_SERVICE_URL: str({
+            desc: 'Base location for the geocoding service',
+            devDefault: 'http://location',
+        }),
         DB_CONNECTION_STRING: str({
             desc: 'MongoDB URI provided to MongoClient.',
             devDefault: 'mongodb://localhost:27017/covid19',
