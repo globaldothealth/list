@@ -90,6 +90,11 @@ export interface FilterFormValues {
     uploadid?: string;
 }
 
+interface FilterFormErrors {
+    dateconfirmedbefore?: string | null;
+    dateconfirmedafter?: string | null;
+}
+
 export default function FiltersModal({
     isOpen,
     activeFilterInput,
@@ -113,9 +118,33 @@ export default function FiltersModal({
         setFormValues(newFilters);
     }, [location.search]);
 
+    const validateForm = (values: FilterFormValues) => {
+        const errors: FilterFormErrors = {};
+
+        if (
+            values.dateconfirmedbefore &&
+            new Date(values.dateconfirmedbefore) > new Date()
+        ) {
+            errors.dateconfirmedbefore =
+                "Date confirmed before can't be a future date";
+        }
+
+        if (
+            values.dateconfirmedafter &&
+            new Date(values.dateconfirmedafter) > new Date()
+        ) {
+            errors.dateconfirmedafter =
+                "Date confirmed after can't be a future date";
+        }
+
+        return errors;
+    };
+
     const formik = useFormik({
         enableReinitialize: true,
         initialValues: formValues,
+        validate: validateForm,
+        validateOnChange: true,
         onSubmit: (values) => {
             handleSetModalAlert();
             handleClose();
@@ -140,7 +169,6 @@ export default function FiltersModal({
         handleClose();
     };
 
-
     function handleSetModalAlert() {
         closeAlert(!showModalAlert);
     }
@@ -148,7 +176,7 @@ export default function FiltersModal({
     const closeAndResetAlert = () => {
         handleClose();
         closeAlert(false);
-    }
+    };
 
     // COMMENTED OUT UNTIL CONTENT FOR TOOLTIPS IS PROVIDED
     // const tooltipHelpIcon = (tooltipContent: JSX.Element) => {
@@ -199,10 +227,13 @@ export default function FiltersModal({
             {showModalAlert && (
                 <Alert
                     severity="info"
-                    onClose={() => {handleSetModalAlert()}}
+                    onClose={() => {
+                        handleSetModalAlert();
+                    }}
                     className={classes.alertBox}
                 >
-                    Please do not use filters in the Search Bar, use them here instead.
+                    Please do not use filters in the Search Bar, use them here
+                    instead.
                 </Alert>
             )}
             <DialogContent>
@@ -408,8 +439,7 @@ export default function FiltersModal({
                                 Boolean(formik.errors.variant)
                             }
                             helperText={
-                                formik.touched.variant &&
-                                formik.errors.variant
+                                formik.touched.variant && formik.errors.variant
                             }
                         />
                         <TextField
@@ -550,6 +580,7 @@ export default function FiltersModal({
                             variant="contained"
                             type="submit"
                             data-test-id="search-by-filter-button"
+                            name="filterButton"
                             className={classes.searchBtn}
                         >
                             Filter
