@@ -290,6 +290,7 @@ describe('Linelist table', function () {
         cy.wait('@getCases');
         cy.contains('Filter').click();
         cy.contains('Clear filters').click();
+        cy.get('button[data-test-id="search-by-filter-button"]').click();
         cy.wait('@getCases');
         cy.contains('rows').click();
 
@@ -352,6 +353,7 @@ describe('Linelist table', function () {
 
         cy.contains('Filter').click();
         cy.contains('Clear filters').click();
+        cy.get('button[data-test-id="search-by-filter-button"]').click();
         cy.contains('France');
         cy.contains('Germany');
     });
@@ -456,6 +458,7 @@ describe('Linelist table', function () {
         cy.contains('No records to display');
         cy.contains('Filter').click();
         cy.contains('Clear filters').click();
+        cy.get('button[data-test-id="search-by-filter-button"]').click();
         cy.contains('France').should('not.exist');
         cy.contains('Germany');
         cy.contains('United Kingdom');
