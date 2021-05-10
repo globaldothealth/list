@@ -1,0 +1,144 @@
+# Kubernetes deployment file for the Global Health service on AWS.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: location-dev
+  labels:
+    environment: dev
+    app: location
+spec:
+  selector:
+    matchLabels:
+      environment: dev
+      app: location
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        environment: dev
+        app: location
+    spec:
+      containers:
+        - name: location
+          image: ghcr.io/globaldothealth/list/locationservice:main
+          ports:
+            - containerPort: 8080
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          env:
+            - name: DB_CONNECTION_STRING
+              valueFrom:
+                secretKeyRef:
+                  # Note: There is no strong separation of secrets between
+                  # services, no big deal if that's named after a secret that
+                  # was originally read from the dadta service. In fact it's
+                  # best if they are shared, so they use the same DB.
+                  name: data-dev-ddhhd4mmhf
+                  key: db_connection_string
+            - name: SERVICE_ENV
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.labels['environment']
+            - name: MAPBOX_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  # Note: There is no strong separation of secrets between
+                  # services, no big deal if that's named after a secret that
+                  # was originally read from the curator service.
+                  name: curator-dev-bch28c9gkm
+                  key: mapbox_token
+          resources:
+            requests:
+              memory: "3Gi"
+              cpu: "500m"
+            limits:
+              memory: "3Gi"
+              cpu: "768m"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: location-prod
+  labels:
+    environment: prod
+    app: location
+spec:
+  selector:
+    matchLabels:
+      environment: prod
+      app: location
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        environment: prod
+        app: location
+    spec:
+      containers:
+        - name: data
+          image: ghcr.io/globaldothealth/list/locationservice:1.4.4
+          ports:
+            - containerPort: 8080
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          env:
+            - name: DB_CONNECTION_STRING
+              valueFrom:
+                secretKeyRef:
+                  # Note: There is no strong separation of secrets between
+                  # services, no big deal if that's named after a secret that
+                  # was originally read from the dadta service. In fact it's
+                  # best if they are shared, so they use the same DB.
+                  name: data-prod-bdh6659ckt
+                  key: db_connection_string
+            - name: SERVICE_ENV
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.labels['environment']
+            - name: MAPBOX_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  # Note: There is no strong separation of secrets between
+                  # services, no big deal if that's named after a secret that
+                  # was originally read from the curator service.
+                  name: curator-prod-4mtk8mh9t2
+                  key: mapbox_token
+          resources:
+            requests:
+              memory: "3Gi"
+              cpu: "500m"
+            limits:
+              memory: "3Gi"
+              cpu: "768m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: location-dev
+spec:
+  selector:
+    app: location
+    environment: dev
+  ports:
+    - port: 80
+      targetPort: 8080
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: location-prod
+spec:
+  selector:
+    app: location
+    environment: prod
+  ports:
+    - port: 80
+      targetPort: 8080

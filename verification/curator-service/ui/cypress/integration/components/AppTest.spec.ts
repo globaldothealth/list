@@ -4,21 +4,46 @@ describe('App', function () {
         cy.task('clearSourcesDB', {});
     });
 
-    it('allows the user to search by variant', function () {
+    it('allows the user to search by date', function () {
         cy.login();
+
+        cy.task('clearCasesDB', {});
+
+        const countries: any = ['Germany', 'France', 'India', 'Italy'];
+        const confirmedDate: any = [
+            '2020-05-01',
+            '2020-02-15',
+            '2020-03-22',
+            '2020-06-03',
+        ];
+
+        for (let i = 0; i < countries.length; i++) {
+            cy.addCase({
+                country: countries[i],
+                notes: 'some notes',
+                startConfirmedDate: confirmedDate[i],
+            });
+        }
+
         cy.visit('/cases');
 
-        cy.addCase({
-            country: 'Peru',
-            variant: 'B.1.351',
-            sourceUrl: 'www.variantb1351.com',
+        cy.get('.filter-button').click();
+        cy.get('#dateconfirmedafter').type('2020-04-30');
+
+        cy.get('body').then(($body) => {
+            if ($body.find('.iubenda-cs-accept-btn').length) {
+                cy.get('.iubenda-cs-accept-btn').click();
+            }
         });
 
-        cy.get('input#search-field').type('variant:B.1.351{enter}');
+        cy.get('button[data-test-id="search-by-filter-button"]').click();
 
-        cy.contains('www.variantb1351.com');
+        cy.contains('2020-05-01');
+        cy.contains('2020-06-03');
+        cy.contains('2020-02-15').should('not.exist');
     });
-    
+
+
     it('allows the user to search by nationality', function () {
         cy.login();
         cy.visit('/cases');
@@ -37,7 +62,25 @@ describe('App', function () {
 
         cy.contains('American, Filipino, Polish');
     });
-    
+
+
+    it('allows the user to search by variant', function () {
+        cy.login();
+
+        cy.addCase({
+            country: 'Peru',
+            variant: 'B.1.351',
+            sourceUrl: 'www.variantb1351.com',
+        });
+
+        cy.visit('/cases');
+
+        cy.get('.filter-button').click();
+        cy.get('#variant').type('B.1.351{Enter}');
+
+        cy.contains('www.variantb1351.com');
+    });
+
     it('allows the user to search by date and an additional filter', function () {
         cy.login();
 
@@ -58,45 +101,20 @@ describe('App', function () {
         }
 
         cy.visit('/cases');
-
-        cy.get('input#search-field').type(
-            'dateconfirmedafter:2020-04-30 country:italy{enter}',
-        );
+        
+        cy.get('body').then(($body) => {
+            if ($body.find('.iubenda-cs-accept-btn').length) {
+                cy.get('.iubenda-cs-accept-btn').click();
+            }
+        });        cy.get('.filter-button').click();
+        
+        cy.get('#dateconfirmedafter').type('2020-04-30');
+        cy.get('#country').type('italy{Enter}');
 
         cy.contains('2020-06-03');
         cy.contains('Italy');
         cy.contains('2020-02-15').should('not.exist');
         cy.contains('Germany').should('not.exist');
-    });
-
-    it('allows the user to search by date', function () {
-        cy.login();
-
-        const countries: any = ['Germany', 'France', 'India', 'Italy'];
-        const confirmedDate: any = [
-            '2020-05-01',
-            '2020-02-15',
-            '2020-03-22',
-            '2020-06-03',
-        ];
-
-        for (let i = 0; i < countries.length; i++) {
-            cy.addCase({
-                country: countries[i],
-                notes: 'some notes',
-                startConfirmedDate: confirmedDate[i],
-            });
-        }
-
-        cy.visit('/cases');
-
-        cy.get('input#search-field').type(
-            'dateconfirmedafter:2020-04-30{enter}',
-        );
-
-        cy.contains('2020-05-01');
-        cy.contains('2020-06-03');
-        cy.contains('2020-02-15').should('not.exist');
     });
 
     it('takes user to home page when home button is clicked', function () {

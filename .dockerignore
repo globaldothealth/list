@@ -12,4 +12,14 @@
 */*/node_modules
 */*/npm-debug.log
 
+# geocoding/location-service
+__pycache__/
+*/__pycache__/
+*/*/__pycache__/
+*/*/*/__pycache__/
+*.py[cod]
+*/*.py[cod]
+*/*/*.py[cod]
+*/*/*/*.py[cod]
+
 .git
