@@ -143,7 +143,7 @@ export default function FiltersModal({
 
 
     function handleSetModalAlert() {
-        closeAlert(!showModalAlert);
+        closeAlert(false);
     }
 
     const closeAndResetAlert = () => {
