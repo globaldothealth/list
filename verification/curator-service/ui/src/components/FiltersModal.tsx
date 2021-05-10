@@ -116,7 +116,8 @@ export default function FiltersModal({
     const formik = useFormik({
         enableReinitialize: true,
         initialValues: formValues,
-        onSubmit: (values) => {
+        onSubmit: (values: any) => {
+            Object.keys(values).map(k => values[k] = typeof values[k] == 'string' ? values[k].trim() : values[k]);
             handleSetModalAlert();
             handleClose();
             const searchQuery = filtersToURL(values);
