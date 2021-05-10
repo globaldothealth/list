@@ -124,6 +124,10 @@ describe('<LinelistTable />', () => {
                     handleBreadcrumbDelete={jest.fn()}
                     setFiltersModalOpen={jest.fn()}
                     setActiveFilterInput={jest.fn()}
+                    sortBy={0}
+                    sortByOrder={1}
+                    setSortBy={jest.fn()}
+                    setSortByOrder={jest.fn()}
                 />
             </MemoryRouter>,
         );
@@ -197,6 +201,10 @@ describe('<LinelistTable />', () => {
                     handleBreadcrumbDelete={jest.fn()}
                     setFiltersModalOpen={jest.fn()}
                     setActiveFilterInput={jest.fn()}
+                    sortBy={0}
+                    sortByOrder={1}
+                    setSortBy={jest.fn()}
+                    setSortByOrder={jest.fn()}
                 />
             </MemoryRouter>,
         );
@@ -267,6 +275,10 @@ describe('<LinelistTable />', () => {
                     handleBreadcrumbDelete={jest.fn()}
                     setFiltersModalOpen={jest.fn()}
                     setActiveFilterInput={jest.fn()}
+                    sortBy={0}
+                    sortByOrder={1}
+                    setSortBy={jest.fn()}
+                    setSortByOrder={jest.fn()}
                 />
             </MemoryRouter>,
         );
@@ -304,6 +316,7 @@ describe('<LinelistTable />', () => {
         fireEvent.click(getByText(/Delete/));
         fireEvent.click(getByText(/Yes/));
         expect(mockedAxios.delete).toHaveBeenCalledTimes(1);
+
         expect(mockedAxios.delete).toHaveBeenCalledWith(
             '/api/cases/' + cases[0]._id,
         );
@@ -311,7 +324,6 @@ describe('<LinelistTable />', () => {
         // Check table data is reloaded
         expect(mockedAxios.get).toHaveBeenCalledTimes(1);
         const noRec = await findByText(/No records to display/);
-        expect(noRec).toBeInTheDocument();
     });
 
     it('can cancel delete action', async () => {
@@ -365,6 +377,10 @@ describe('<LinelistTable />', () => {
                     handleBreadcrumbDelete={jest.fn()}
                     setFiltersModalOpen={jest.fn()}
                     setActiveFilterInput={jest.fn()}
+                    sortBy={0}
+                    sortByOrder={1}
+                    setSortBy={jest.fn()}
+                    setSortByOrder={jest.fn()}
                 />
             </MemoryRouter>,
         );
@@ -443,6 +459,10 @@ describe('<LinelistTable />', () => {
                     handleBreadcrumbDelete={jest.fn()}
                     setFiltersModalOpen={jest.fn()}
                     setActiveFilterInput={jest.fn()}
+                    sortBy={0}
+                    sortByOrder={1}
+                    setSortBy={jest.fn()}
+                    setSortByOrder={jest.fn()}
                 />
             </MemoryRouter>,
         );
@@ -508,6 +528,10 @@ describe('<LinelistTable />', () => {
                     handleBreadcrumbDelete={jest.fn()}
                     setFiltersModalOpen={jest.fn()}
                     setActiveFilterInput={jest.fn()}
+                    sortBy={0}
+                    sortByOrder={1}
+                    setSortBy={jest.fn()}
+                    setSortByOrder={jest.fn()}
                 />
             </MemoryRouter>,
         );
@@ -574,6 +598,10 @@ describe('<LinelistTable />', () => {
                     handleBreadcrumbDelete={jest.fn()}
                     setFiltersModalOpen={jest.fn()}
                     setActiveFilterInput={jest.fn()}
+                    sortBy={0}
+                    sortByOrder={1}
+                    setSortBy={jest.fn()}
+                    setSortByOrder={jest.fn()}
                 />
             </MemoryRouter>,
         );
@@ -603,49 +631,6 @@ describe('<LinelistTable />', () => {
         });
     });
 
-    it('sorts data based on selected field', async () => {
-        render(
-            <MemoryRouter>
-                <LinelistTable
-                    user={curator}
-                    filterBreadcrumbs={[]}
-                    page={0}
-                    pageSize={10}
-                    onChangePage={jest.fn()}
-                    onChangePageSize={jest.fn()}
-                    handleBreadcrumbDelete={jest.fn()}
-                    setFiltersModalOpen={jest.fn()}
-                    setActiveFilterInput={jest.fn()}
-                />
-            </MemoryRouter>,
-        );
-
-        const sortBySelect = screen.getByLabelText(/Sort by/i);
-        expect(sortBySelect).toBeInTheDocument();
-        expect(sortBySelect).toHaveTextContent(/none/i);
-
-        fireEvent.mouseDown(sortBySelect);
-        const sortByOptions = await screen.findAllByTestId('sortby-option');
-        expect(sortByOptions).toHaveLength(7);
-
-        //Simualate selection
-        const listbox = within(screen.getByRole('listbox'));
-        fireEvent.click(listbox.getByText(/confirmed date/i));
-        expect(screen.getByLabelText(/Sort by/i)).toHaveTextContent(
-            /confirmed date/i,
-        );
-
-        //Check if order select input is shown after choosing field to sort by
-        const sortingOrderSelect = await screen.findByLabelText(/Order/i);
-        expect(sortingOrderSelect).toBeInTheDocument();
-        expect(sortingOrderSelect).toHaveTextContent(/descending/i);
-
-        fireEvent.mouseDown(sortingOrderSelect);
-        const orderListbox = within(screen.getByRole('listbox'));
-        fireEvent.click(orderListbox.getByText(/ascending/i));
-        expect(screen.getByLabelText(/Order/i)).toHaveTextContent(/ascending/i);
-    });
-
     it('displays filter breadcrumbs', () => {
         const breadcrumbs: ChipData[] = [
             { key: 'country', value: 'Peru' },
@@ -664,6 +649,10 @@ describe('<LinelistTable />', () => {
                     handleBreadcrumbDelete={jest.fn()}
                     setFiltersModalOpen={jest.fn()}
                     setActiveFilterInput={jest.fn()}
+                    sortBy={0}
+                    sortByOrder={1}
+                    setSortBy={jest.fn()}
+                    setSortByOrder={jest.fn()}
                 />
             </MemoryRouter>,
         );
@@ -693,6 +682,10 @@ describe('<LinelistTable />', () => {
                     handleBreadcrumbDelete={jest.fn()}
                     setFiltersModalOpen={setFiltersModalOpen}
                     setActiveFilterInput={jest.fn()}
+                    sortBy={0}
+                    sortByOrder={1}
+                    setSortBy={jest.fn()}
+                    setSortByOrder={jest.fn()}
                 />
             </MemoryRouter>,
         );

@@ -515,4 +515,36 @@ describe('Linelist table', function () {
 
         cy.contains('1-5 of 7').should('exist');
     });
+
+    it('Can sort the data', () => {
+        cy.addCase({
+            country: 'Germany',
+            notes: 'some notes',
+            sourceUrl: 'foo.bar',
+        });
+        cy.addCase({
+            country: 'France',
+            notes: 'some notes',
+            sourceUrl: 'foo.bar',
+        });
+        cy.addCase({
+            country: 'Argentina',
+            notes: 'some notes',
+            sourceUrl: 'foo.bar',
+        });
+        cy.server();
+        cy.route('GET', '/api/cases/*').as('getCases');
+        cy.visit('/cases');
+        cy.wait('@getCases');
+
+        cy.route(
+            'GET',
+            '/api/cases/?limit=50&page=1&count_limit=10000&sort_by=2&order=1',
+        ).as('getSortedByCountry');
+        cy.get('#sort-by-select').click();
+        cy.get('li').contains('Country').click();
+        cy.wait('@getSortedByCountry');
+
+        cy.get('tr').eq(2).contains('td', 'Germany');
+    });
 });
