@@ -117,7 +117,7 @@ Resources:
         - Arn: arn:aws:elasticfilesystem:us-east-1:612888738066:access-point/fsap-047be197871c040c2
           LocalMountPath: !Ref EFSpath
       Policies:
-        - AWSLambdaFullAccess
+        - AWSLambda_FullAccess
         - AWSLambdaVPCAccessExecutionRole
         - AmazonElasticFileSystemClientReadWriteAccess
 
@@ -137,7 +137,7 @@ Resources:
       Layers:
         - arn:aws:lambda:us-east-1:612888738066:layer:awsdatawrangler:1
       Policies:
-        - AWSLambdaFullAccess
+        - AWSLambda_FullAccess
 
   Bucket:
     Type: 'AWS::S3::Bucket'
