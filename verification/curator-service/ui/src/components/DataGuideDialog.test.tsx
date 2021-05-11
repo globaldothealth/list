@@ -1,7 +1,7 @@
 import React from 'react';
 import { fireEvent, render, wait } from '@testing-library/react';
 import { Button } from '@material-ui/core';
-import SearchGuideDialog from './SearchGuideDialog';
+import DataGuideDialog from './DataGuideDialog';
 
 const SearchGuideTestCase = ({ defaultOpen = false }): JSX.Element => {
     const [isOpen, setIsOpen] = React.useState<boolean>(defaultOpen);
@@ -14,7 +14,7 @@ const SearchGuideTestCase = ({ defaultOpen = false }): JSX.Element => {
             <Button ref={buttonRef} onClick={toggleDialog}>
                 Open
             </Button>
-            <SearchGuideDialog
+            <DataGuideDialog
                 isOpen={isOpen}
                 onToggle={toggleDialog}
                 rootComponentRef={rootRef}

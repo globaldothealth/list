@@ -145,7 +145,14 @@ export default function FiltersModal({
         initialValues: formValues,
         validate: validateForm,
         validateOnChange: true,
-        onSubmit: (values) => {
+        onSubmit: (values: any) => {
+            Object.keys(values).map(
+                (k) =>
+                    (values[k] =
+                        typeof values[k] == 'string'
+                            ? values[k].trim()
+                            : values[k]),
+            );
             handleSetModalAlert();
             handleClose();
             const searchQuery = filtersToURL(values);
@@ -164,13 +171,13 @@ export default function FiltersModal({
 
     const handleClearFiltersClick = () => {
         setFormValues({});
-        formik.resetForm();
-        history.push({ pathname: '/cases', search: '' });
-        handleClose();
+        // commented in case we want in future the button to reset the filters already applied
+        // formik.resetForm();
+        // history.push({ pathname: '/cases', search: '' });
     };
 
     function handleSetModalAlert() {
-        closeAlert(!showModalAlert);
+        closeAlert(false);
     }
 
     const closeAndResetAlert = () => {
