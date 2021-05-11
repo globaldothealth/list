@@ -60,7 +60,13 @@ class GeocodeTests(unittest.TestCase):
         }
         geocoder = Geocoder('api_token', FakeAdminsFetcher())
         feats = geocoder.geocode('some query', { 'limitToCountry': ['us'] })
-        mapbox_patch.assert_called_with('api_token', 'some query', types=None, limit=5, languages=['en'], country=['us'])
+        mapbox_patch.assert_called_with('api_token',
+            'some query',
+            types=None,
+            limit=5,
+            languages=['en'],
+            country=['us'],
+            rate_limit=geocoder.rate_limit)
 
     @patch('src.app.geocoder.mapbox_geocode')
     def test_cachesMapboxResponses(self, mapbox_patch):

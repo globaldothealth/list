@@ -1,4 +1,5 @@
 import json
+import ratelimiter
 from lru import LRU
 from src.integration.mapbox_client import mapbox_geocode
 
@@ -10,8 +11,9 @@ class Geocoder:
     Admin1 = 'Admin1'
     Point = 'Point'
 
-    def __init__(self, api_token, admins_fetcher):
+    def __init__(self, api_token, admins_fetcher, rate_limit=600):
         """Needs a mapbox API token."""
+        self.rate_limit = ratelimiter.RateLimiter(max_calls=rate_limit, period=60)
         self.api_token = api_token
         self.cache = LRU(500)
         self.admins_fetcher = admins_fetcher
@@ -79,7 +81,7 @@ class Geocoder:
         countries = None
         if 'limitToCountry' in options:
             countries = options['limitToCountry']
-        geoResult = mapbox_geocode(self.api_token, query, types=types, limit=5, languages=['en'], country=countries)
+        geoResult = mapbox_geocode(self.api_token, query, types=types, limit=5, languages=['en'], country=countries, rate_limit=self.rate_limit)
         response = [self.unpackGeoJson(feature) for feature in geoResult['features']]
         self.cache[cacheKey] = response
         return response
