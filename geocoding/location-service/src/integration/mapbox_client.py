@@ -1,4 +1,5 @@
 import mapbox
+import requests
 
 
 def mapbox_geocode(access_token, query, types=None, languages=None, limit=None):
@@ -9,4 +10,7 @@ def mapbox_geocode(access_token, query, types=None, languages=None, limit=None):
 
 def mapbox_tile_query(access_token, query):
     """Request the full hierarchy of administrative areas for a given location."""
-    pass
+    uri = f"https://api.mapbox.com/v4/mapbox.enterprise-boundaries-a1-v2,mapbox.enterprise-boundaries-a2-v2,mapbox.enterprise-boundaries-a3-v2/tilequery/{query.longitude},{query.latitude}.json?access_token={accessToken}"
+    res = requests.get(uri)
+    return res.json
+
