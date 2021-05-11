@@ -1,3 +1,4 @@
+import json
 import pymongo
 from flask import Blueprint, Flask, jsonify, request
 from os import environ
@@ -56,8 +57,20 @@ def geocode():
     query = request.args.get('q', type=str)
     if not query:
         return "No query supplied", 400
-    api_key = environ['MAPBOX_TOKEN']
-    return mapbox_geocode(api_key, query)
+    options = {}
+    resolution = request.args.get('limitToResolution', type=str)
+    listOfResolutions = json.loads(resolution)
+    if len(listOfResolutions) > 0:
+        options['limitToResolution'] = listOfResolutions
+    countries = request.args.get('limitToCountry', type=str)
+    listOfCountries = json.loads(countries)
+    if len(listOfCountries) > 0:
+        options['limitToCountry'] = listOfCountries
+    for g in geocoders:
+        locations = g.geocode(query, options)
+        if len(locations) > 0:
+            return jsonify(locations)
+    return jsonify([])
 
 
 @app.route("/geocode/suggest")
