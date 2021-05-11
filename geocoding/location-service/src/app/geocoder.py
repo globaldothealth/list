@@ -76,7 +76,10 @@ class Geocoder:
         types = None
         if 'limitToResolution' in options:
             types = [self.resolutionToMapboxType(i) for i in options['limitToResolution']]
-        geoResult = mapbox_geocode(self.api_token, query, types=types, limit=5, languages=['en'])
+        countries = None
+        if 'limitToCountry' in options:
+            countries = options['limitToCountry']
+        geoResult = mapbox_geocode(self.api_token, query, types=types, limit=5, languages=['en'], country=countries)
         response = [self.unpackGeoJson(feature) for feature in geoResult['features']]
         self.cache[cacheKey] = response
         return response
