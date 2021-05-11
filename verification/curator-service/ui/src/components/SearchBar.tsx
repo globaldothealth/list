@@ -18,7 +18,7 @@ import { useDebounce } from '../hooks/useDebounce';
 import FiltersModal from './FiltersModal';
 import { searchQueryToURL, URLToSearchQuery } from './util/searchQuery';
 import { useLocation, useHistory } from 'react-router-dom';
-import { KeyboardEvent } from 'react'
+import { KeyboardEvent } from 'react';
 
 const searchBarStyles = makeStyles((theme: Theme) => ({
     searchRoot: {
@@ -134,16 +134,18 @@ export default function SearchBar({
         }
     };
 
-    const disallowFilteringInSearchBar = (e: KeyboardEvent<HTMLInputElement> ) => {
+    const disallowFilteringInSearchBar = (
+        e: KeyboardEvent<HTMLInputElement>,
+    ) => {
         e.preventDefault();
         setIsUserTyping(false);
         setModalAlert(true);
-        setFiltersModalOpen(true)
+        setFiltersModalOpen(true);
     };
 
     function handleSetModalAlert(shouldTheAlertStillBeOpen: boolean) {
         setModalAlert(shouldTheAlertStillBeOpen);
-      }
+    }
 
     return (
         <>
