@@ -35,9 +35,11 @@ if 'MAPBOX_TOKEN' in environ:
     mongo_client = None
     if 'DB_CONNECTION_STRING' in environ:
         mongo_client = pymongo.MongoClient(environ['DB_CONNECTION_STRING'])
-
-    admins_fetcher = AdminsFetcher(access_token, mongo_client)
-    mapbox_geocoder = Geocoder(access_token, admins_fetcher)
+    rate_limit = 600 # requests per minute, default
+    if 'MAPBOX_GEOCODE_RATE_LIMIT_PER_MIN' in environ:
+        rate_limit = int(environ['MAPBOX_GEOCODE_RATE_LIMIT_PER_MIN'])
+    admins_fetcher = AdminsFetcher(access_token, mongo_client, rate_limit=rate_limit)
+    mapbox_geocoder = Geocoder(access_token, admins_fetcher, rate_limit=rate_limit)
     geocoders.append(mapbox_geocoder)
 
 suggester = GeocodeSuggester(geocoders)
