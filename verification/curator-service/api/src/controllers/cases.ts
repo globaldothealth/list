@@ -1,9 +1,10 @@
 import { Request, Response } from 'express';
-
+import { Worker } from 'worker_threads';
 import { User, UserDocument } from '../model/user';
 import axios from 'axios';
 import { logger } from '../util/logger';
 import AWS from 'aws-sdk';
+import crypto from 'crypto';
 
 // Don't set client-side timeouts for requests to the data service.
 // TODO: Make this more fine-grained once we fix
@@ -62,6 +63,45 @@ export default class CasesController {
                 res.status(err.response.status).send(err.response.data);
                 return;
             }
+            res.status(500).send(err);
+        }
+    };
+
+    /** DownloadAsync spawns a worker thread that forwards the request to the data service
+     * and emails the streamed response as a csv attachment. It will only email to the
+     * logged-in user, and it replies immediately with 204. Any error will be reported
+     * in the email, except the error of not being able to email which we can only log.
+     * 
+     * Question for code reviewers: do we want to retry on errors? If so we need to introduce
+     * a message bus rather than just using background workers, and we're probably back at the
+     * point where we use Batch for this.*/
+     downloadAsync = async (req: Request, res: Response): Promise<void> => {
+        try {
+            const user = req.user as UserDocument;
+            const url = this.dataServerURL + '/api' + req.url.replace('Async', '');
+            // the worker needs access to the AWS configuration.
+            const region = process.env.AWS_SES_REGION;
+            const accessKeyId = process.env.AWS_ACCESS_KEY_ID;
+            const secretKey = process.env.AWS_SECRET_ACCESS_KEY;
+            const sourceAddress = process.env.AWS_SES_SENDER;
+            const correlationId = crypto.randomBytes(16).toString("hex");
+            const worker = new Worker('./src/workers/downloadAsync.js', { 
+                workerData: {
+                    query: req.body.query as string,
+                    email: user.email,
+                    url,
+                    region,
+                    accessKeyId,
+                    secretKey,
+                    correlationId,
+                    sourceAddress,
+            }});
+            /* we don't care what happens when the worker finishes, but for debugging
+             * I'm going to log this.
+             */
+            worker.on('exit', (code) => { logger.info(`worker with id ${correlationId} exited. code: ${code}`) });
+            res.status(204).end();
+        } catch (err) {
             res.status(500).send(err);
         }
     };

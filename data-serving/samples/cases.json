@@ -215,7 +215,67 @@
             "lives_in_Wuhan": "false",
             "reported_market_exposure": "true"
         }
-    },
+    }, 
+    {
+       "caseReference": {
+           "sourceId": "5ea86423bae6982635d2a116",
+           "sourceUrl": "https://epistat.wiv-isp.be/Covid/",
+           "verificationStatus": "UNVERIFIED"
+       },
+       "demographics": {
+           "ageRange": {
+               "start": 56.0,
+               "end": 56.0
+           },
+           "gender": "Female"
+       },
+       "location": {
+           "country": "Peru",
+           "geometry": {
+               "latitude": -12.071769999999958,
+               "longitude": -77.11783999999994
+           },
+           "name": "Non-empty name",
+           "geoResolution": "Point"
+       },
+       "events": [
+           {
+               "name": "confirmed",
+               "dateRange": {
+                   "start": {
+                       "$date": "2020-03-28T00:00:00Z"
+                   },
+                   "end": {
+                       "$date": "2020-03-28T00:00:00Z"
+                   }
+               }
+           }
+       ],
+       "variant": {
+           "name": "B.1.351"
+       },
+       "revisionMetadata": {
+           "revisionNumber": 0,
+           "creationMetadata": {
+               "curator": "TR",
+               "date": {
+                   "$date": {
+                       "$numberLong": "1587614400000"
+                   }
+               }
+           }
+       },
+       "importedCase": {
+           "ID": "010-751",
+           "city": "La Perla",
+           "province": "Callao",
+           "country": "Peru",
+           "date_confirmation": "28.03.2020",
+           "chronic_disease_binary": "False",
+           "admin_id": "15077.0",
+           "travel_history_binary": "False"
+       }
+   },
     {
         "demographics": {
             "gender": "Male"

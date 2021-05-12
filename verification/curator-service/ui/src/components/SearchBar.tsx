@@ -3,8 +3,6 @@ import {
     Button,
     IconButton,
     InputAdornment,
-    Menu,
-    MenuItem,
     TextField,
     Theme,
     makeStyles,
@@ -15,8 +13,12 @@ import FilterListIcon from '@material-ui/icons/FilterList';
 import HelpIcon from '@material-ui/icons/HelpOutline';
 import SearchIcon from '@material-ui/icons/Search';
 import clsx from 'clsx';
-import SearchGuideDialog from './SearchGuideDialog';
+import DataGuideDialog from './DataGuideDialog';
 import { useDebounce } from '../hooks/useDebounce';
+import FiltersModal from './FiltersModal';
+import { searchQueryToURL, URLToSearchQuery } from './util/searchQuery';
+import { useLocation, useHistory } from 'react-router-dom';
+import { KeyboardEvent } from 'react';
 
 const searchBarStyles = makeStyles((theme: Theme) => ({
     searchRoot: {
@@ -64,192 +66,182 @@ const StyledInputAdornment = withStyles({
 })(InputAdornment);
 
 interface SearchBarProps {
-    onSearchChange: (search: string) => void;
     rootComponentRef: React.RefObject<HTMLDivElement>;
-    search: string;
+    filtersModalOpen: boolean;
+    setFiltersModalOpen: (value: boolean) => void;
+    activeFilterInput: string;
+    setActiveFilterInput: (value: string) => void;
 }
 
 export default function SearchBar({
-    onSearchChange,
     rootComponentRef,
-    search,
+    filtersModalOpen,
+    setFiltersModalOpen,
+    activeFilterInput,
+    setActiveFilterInput,
 }: SearchBarProps): JSX.Element {
     const classes = searchBarStyles();
+    const location = useLocation();
+    const history = useHistory();
 
     const [isUserTyping, setIsUserTyping] = useState<boolean>(false);
-    const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-    const [isSearchGuideOpen, setIsSearchGuideOpen] = useState<boolean>(false);
-    const [searchInput, setSearchInput] = useState<string>(search);
-
+    const [isDataGuideOpen, setIsDataGuideOpen] = useState<boolean>(false);
+    const [searchInput, setSearchInput] = useState<string>(
+        location.search.includes('?q=')
+            ? URLToSearchQuery(location.search)
+            : '',
+    );
+    const [modalAlert, setModalAlert] = useState<boolean>(false);
     const guideButtonRef = React.useRef<HTMLButtonElement>(null);
 
     // Set search query debounce to 1000ms
-    const debouncedSearch = useDebounce(searchInput, 1000);
+    const debouncedSearch = useDebounce(searchInput, 2000);
 
+    // Update search input based on search query
     useEffect(() => {
-        setSearchInput(search);
-    }, [search]);
+        if (!location.search.includes('?q=')) {
+            setSearchInput('');
+            return;
+        }
+
+        setSearchInput(URLToSearchQuery(location.search));
+    }, [location.search]);
 
     // Apply filter parameters after delay
     useEffect(() => {
         if (!isUserTyping) return;
 
-        onSearchChange(debouncedSearch);
         setIsUserTyping(false);
+        history.push({
+            pathname: '/cases',
+            search: searchQueryToURL(debouncedSearch),
+        });
         //eslint-disable-next-line
     }, [debouncedSearch]);
 
-    const handleFilterClick = (
-        event: React.MouseEvent<HTMLButtonElement>,
-    ): void => {
-        setAnchorEl(event.currentTarget);
-    };
-
-    const handleFilterClose = (): void => {
-        setAnchorEl(null);
-    };
-
-    const clickItem = (text: string): void => {
-        if (!searchInput.includes(text)) {
-            setSearchInput(
-                searchInput + (searchInput ? ` ${text}:` : `${text}:`),
-            );
-        }
-
-        handleFilterClose();
-    };
-
-    const toggleSearchGuide = async (): Promise<void> => {
-        setIsSearchGuideOpen((isOpen) => !isOpen);
+    const toggleDataGuide = async (): Promise<void> => {
+        setIsDataGuideOpen((isOpen) => !isOpen);
     };
 
     const handleKeyPress = (ev: React.KeyboardEvent<HTMLDivElement>): void => {
         if (ev.key === 'Enter') {
             ev.preventDefault();
-            onSearchChange(searchInput);
             setIsUserTyping(false);
+            history.push({
+                pathname: '/cases',
+                search: searchQueryToURL(searchInput),
+            });
         }
     };
 
+    const disallowFilteringInSearchBar = (
+        e: KeyboardEvent<HTMLInputElement>,
+    ) => {
+        e.preventDefault();
+        setIsUserTyping(false);
+        setModalAlert(true);
+        setFiltersModalOpen(true);
+    };
+
+    function handleSetModalAlert(shouldTheAlertStillBeOpen: boolean) {
+        setModalAlert(shouldTheAlertStillBeOpen);
+    }
+
     return (
-        <div className={classes.searchRoot}>
-            <StyledSearchTextField
-                id="search-field"
-                data-testid="searchbar"
-                name="searchbar"
-                onKeyPress={handleKeyPress}
-                onChange={(event): void => {
-                    setSearchInput(event.target.value);
-                }}
-                onKeyDown={() => {
-                    if (!isUserTyping) {
-                        setIsUserTyping(true);
-                    }
-                }}
-                placeholder="Search"
-                value={searchInput}
-                variant="outlined"
-                fullWidth
-                InputProps={{
-                    margin: 'dense',
-                    startAdornment: (
-                        <>
-                            <StyledInputAdornment position="start">
-                                <Button
-                                    color="primary"
-                                    startIcon={<FilterListIcon />}
-                                    onClick={handleFilterClick}
-                                >
-                                    Filter
-                                </Button>
-                                <div className={classes.divider}></div>
-                            </StyledInputAdornment>
-                            <InputAdornment position="start">
-                                <Button
-                                    color="primary"
-                                    startIcon={<HelpIcon />}
-                                    onClick={toggleSearchGuide}
-                                    className={clsx({
-                                        [classes.activeButton]: isSearchGuideOpen,
-                                    })}
-                                    ref={guideButtonRef}
-                                >
-                                    Search guide
-                                </Button>
-                                <SearchGuideDialog
-                                    isOpen={isSearchGuideOpen}
-                                    onToggle={toggleSearchGuide}
-                                    rootComponentRef={rootComponentRef}
-                                    triggerComponentRef={guideButtonRef}
-                                />
-                                <div className={classes.divider}></div>
-                                <SearchIcon color="primary" />
+        <>
+            <div className={classes.searchRoot}>
+                <StyledSearchTextField
+                    id="search-field"
+                    data-testid="searchbar"
+                    name="searchbar"
+                    onKeyPress={handleKeyPress}
+                    autoComplete="off"
+                    onChange={(event): void => {
+                        setSearchInput(event.target.value);
+                    }}
+                    onKeyDown={(e: KeyboardEvent<HTMLInputElement>) => {
+                        if (!isUserTyping) {
+                            setIsUserTyping(true);
+                        }
+                        if (e.key === ':') {
+                            disallowFilteringInSearchBar(e);
+                        }
+                    }}
+                    placeholder="Fulltext search"
+                    value={searchInput}
+                    variant="outlined"
+                    fullWidth
+                    InputProps={{
+                        margin: 'dense',
+                        startAdornment: (
+                            <>
+                                <StyledInputAdornment position="start">
+                                    <Button
+                                        color="primary"
+                                        startIcon={<FilterListIcon />}
+                                        className="filter-button"
+                                        onClick={() =>
+                                            setFiltersModalOpen(true)
+                                        }
+                                    >
+                                        Filter
+                                    </Button>
+                                    <div className={classes.divider}></div>
+                                </StyledInputAdornment>
+                                <InputAdornment position="start">
+                                    <Button
+                                        color="primary"
+                                        startIcon={<HelpIcon />}
+                                        onClick={toggleDataGuide}
+                                        className={clsx({
+                                            [classes.activeButton]: isDataGuideOpen,
+                                        })}
+                                        ref={guideButtonRef}
+                                    >
+                                        Data guide
+                                    </Button>
+                                    <DataGuideDialog
+                                        isOpen={isDataGuideOpen}
+                                        onToggle={toggleDataGuide}
+                                        rootComponentRef={rootComponentRef}
+                                        triggerComponentRef={guideButtonRef}
+                                    />
+                                    <div className={classes.divider}></div>
+                                    <SearchIcon color="primary" />
+                                </InputAdornment>
+                            </>
+                        ),
+                        endAdornment: (
+                            <InputAdornment position="end">
+                                {searchInput && (
+                                    <IconButton
+                                        color="primary"
+                                        aria-label="clear search"
+                                        onClick={(): void => {
+                                            setSearchInput('');
+                                            history.push({
+                                                pathname: '/cases',
+                                                search: '',
+                                            });
+                                        }}
+                                    >
+                                        <CloseIcon />
+                                    </IconButton>
+                                )}
                             </InputAdornment>
-                        </>
-                    ),
-                    endAdornment: (
-                        <InputAdornment position="end">
-                            {searchInput && (
-                                <IconButton
-                                    color="primary"
-                                    aria-label="clear search"
-                                    onClick={(): void => {
-                                        setSearchInput('');
-                                        onSearchChange('');
-                                    }}
-                                >
-                                    <CloseIcon />
-                                </IconButton>
-                            )}
-                        </InputAdornment>
-                    ),
-                }}
+                        ),
+                    }}
+                />
+            </div>
+
+            <FiltersModal
+                isOpen={filtersModalOpen}
+                handleClose={() => setFiltersModalOpen(false)}
+                activeFilterInput={activeFilterInput}
+                setActiveFilterInput={setActiveFilterInput}
+                showModalAlert={modalAlert}
+                closeAlert={handleSetModalAlert}
             />
-            <Menu
-                anchorEl={anchorEl}
-                getContentAnchorEl={null}
-                anchorOrigin={{
-                    vertical: 'bottom',
-                    horizontal: 'left',
-                }}
-                open={Boolean(anchorEl)}
-                onClose={handleFilterClose}
-            >
-                {[
-                    { desc: 'curator email', value: 'curator' },
-                    { desc: 'gender', value: 'gender' },
-                    { desc: 'nationality', value: 'nationality' },
-                    { desc: 'occupation', value: 'occupation' },
-                    { desc: 'country', value: 'country' },
-                    { desc: 'outcome', value: 'outcome' },
-                    { desc: 'case ID', value: 'caseid' },
-                    { desc: 'source URL', value: 'sourceurl' },
-                    {
-                        desc: 'verification status',
-                        value: 'verificationstatus',
-                    },
-                    { desc: 'upload ID', value: 'uploadid' },
-                    { desc: 'location admin 1', value: 'admin1' },
-                    { desc: 'location admin 2', value: 'admin2' },
-                    { desc: 'location admin 3', value: 'admin3' },
-                    { desc: 'variant of concern', value: 'variant' },
-                    {
-                        desc: 'date confirmed after',
-                        value: 'dateconfirmedafter',
-                    },
-                    {
-                        desc: 'date confirmed before',
-                        value: 'dateconfirmedbefore',
-                    },
-                ].map((item) => (
-                    <MenuItem
-                        key={item.value}
-                        onClick={(): void => clickItem(item.value)}
-                    >
-                        {item.desc}
-                    </MenuItem>
-                ))}
-            </Menu>
-        </div>
+        </>
     );
 }

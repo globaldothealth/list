@@ -27,8 +27,11 @@ def setup_directories():
     Make sure directories exist on EFS.
     """
     print("Creating directories...")
-    os.makedirs("/mnt/efs/in/")
-    os.makedirs("/mnt/efs/out/")
+    for path in ["/mnt/efs/in", "/mnt/efs/out"]:
+        if os.path.exists(path):
+            print(f"Cleaning up existing {path}")
+            shutil.rmtree(path)
+        os.makedirs(path)
     print("Directories created.")
 
 

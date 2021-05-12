@@ -56,9 +56,9 @@ export default function ViewCase(props: Props): JSX.Element {
     useEffect(() => {
         setLoading(true);
         axios
-            .get<Case>(`/api/cases/${props.id}`)
+            .get<Case[]>(`/api/cases/${props.id}`)
             .then((resp) => {
-                setCase(resp.data);
+                setCase(resp.data[0]);
                 setErrorMessage(undefined);
             })
             .catch((e) => {
@@ -124,6 +124,10 @@ const useStyles = makeStyles((theme) => ({
         borderRadius: theme.spacing(1),
         marginTop: theme.spacing(1),
     },
+    casebox: {
+        paddingRight: '20px',
+        wordBreak: 'break-all',
+    },
 }));
 
 function ageRange(range?: { start: number; end: number }): string {
@@ -146,6 +150,15 @@ function CaseDetails(props: CaseDetailsProps): JSX.Element {
             containerId: 'scroll-container',
         });
     };
+
+    const isExcluded = () => {
+        if (props.c.isSourceExcluded) {
+            return 'Excluded';
+        } else {
+            return props.c.caseReference.verificationStatus || 'Unverified';
+        }
+    };
+
     return (
         <>
             {showNavMenu && (
@@ -238,8 +251,9 @@ function CaseDetails(props: CaseDetailsProps): JSX.Element {
                         </Link>
                     )}
                 </Typography>
-                {props.c.caseReference.verificationStatus ===
-                    VerificationStatus.Excluded && (
+                {(props.c.caseReference.verificationStatus ===
+                    VerificationStatus.Excluded ||
+                    props.c.isSourceExcluded) && (
                     <MuiAlert
                         classes={{ root: classes.alert }}
                         variant="outlined"
@@ -250,7 +264,10 @@ function CaseDetails(props: CaseDetailsProps): JSX.Element {
                     </MuiAlert>
                 )}
                 <Paper className={classes.paper} variant="outlined" square>
-                    <Scroll.Element name="case-data">
+                    <Scroll.Element
+                        name="case-data"
+                        className={classes.casebox}
+                    >
                         <Typography
                             className={classes.sectionTitle}
                             variant="overline"
@@ -319,12 +336,7 @@ function CaseDetails(props: CaseDetailsProps): JSX.Element {
 
                             {/* Consider surfacing this as a top-level icon on this page. */}
                             <RowHeader title="Verification status" />
-                            <RowContent
-                                content={
-                                    props.c.caseReference?.verificationStatus ||
-                                    'Unknown'
-                                }
-                            />
+                            <RowContent content={isExcluded()} />
 
                             {props.c.revisionMetadata?.updateMetadata && (
                                 <>
@@ -350,7 +362,10 @@ function CaseDetails(props: CaseDetailsProps): JSX.Element {
                 </Paper>
 
                 <Paper className={classes.paper} variant="outlined" square>
-                    <Scroll.Element name="demographics"></Scroll.Element>
+                    <Scroll.Element
+                        name="demographics"
+                        className={classes.casebox}
+                    ></Scroll.Element>
                     <Typography
                         className={classes.sectionTitle}
                         variant="overline"
@@ -384,7 +399,7 @@ function CaseDetails(props: CaseDetailsProps): JSX.Element {
                 </Paper>
 
                 <Paper className={classes.paper} variant="outlined" square>
-                    <Scroll.Element name="location">
+                    <Scroll.Element name="location" className={classes.casebox}>
                         <Typography
                             className={classes.sectionTitle}
                             variant="overline"
@@ -398,7 +413,10 @@ function CaseDetails(props: CaseDetailsProps): JSX.Element {
                 </Paper>
 
                 <Paper className={classes.paper} variant="outlined" square>
-                    <Scroll.Element name="event-history">
+                    <Scroll.Element
+                        name="event-history"
+                        className={classes.casebox}
+                    >
                         <Typography
                             className={classes.sectionTitle}
                             variant="overline"
@@ -502,7 +520,7 @@ function CaseDetails(props: CaseDetailsProps): JSX.Element {
                 </Paper>
 
                 <Paper className={classes.paper} variant="outlined" square>
-                    <Scroll.Element name="symptoms">
+                    <Scroll.Element name="symptoms" className={classes.casebox}>
                         <Typography
                             className={classes.sectionTitle}
                             variant="overline"
@@ -553,7 +571,10 @@ function CaseDetails(props: CaseDetailsProps): JSX.Element {
                 </Paper>
 
                 <Paper className={classes.paper} variant="outlined" square>
-                    <Scroll.Element name="transmission">
+                    <Scroll.Element
+                        name="transmission"
+                        className={classes.casebox}
+                    >
                         <Typography
                             className={classes.sectionTitle}
                             variant="overline"
@@ -591,7 +612,10 @@ function CaseDetails(props: CaseDetailsProps): JSX.Element {
                 </Paper>
 
                 <Paper className={classes.paper} variant="outlined" square>
-                    <Scroll.Element name="travel-history">
+                    <Scroll.Element
+                        name="travel-history"
+                        className={classes.casebox}
+                    >
                         <Typography
                             className={classes.sectionTitle}
                             variant="overline"
@@ -623,7 +647,10 @@ function CaseDetails(props: CaseDetailsProps): JSX.Element {
                 </Paper>
 
                 <Paper className={classes.paper} variant="outlined" square>
-                    <Scroll.Element name="pathogens">
+                    <Scroll.Element
+                        name="pathogens"
+                        className={classes.casebox}
+                    >
                         <Typography
                             className={classes.sectionTitle}
                             variant="overline"
@@ -649,7 +676,7 @@ function CaseDetails(props: CaseDetailsProps): JSX.Element {
                     </Scroll.Element>
                 </Paper>
                 <Paper className={classes.paper} variant="outlined" square>
-                    <Scroll.Element name="notes">
+                    <Scroll.Element name="notes" className={classes.casebox}>
                         <Typography
                             className={classes.sectionTitle}
                             variant="overline"

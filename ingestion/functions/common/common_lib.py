@@ -7,23 +7,27 @@ API calls, and it's information that could be easily encoded as state in an
 object.
 """
 
+import os
+import json
 import tempfile
 import requests
+import functools
 
 import google
 import google.auth.transport.requests
 
 from enum import Enum
+from pathlib import Path
 from google.oauth2 import service_account
 
 _ENV_TO_SOURCE_API_URL = {
     "local": "http://localhost:3001/api",
-    "dev": "https://dev-curator.ghdsi.org/api",
-    "prod": "https://curator.ghdsi.org/api"
+    "dev": "https://dev-data.covid-19.global.health/api",
+    "prod": "https://data.covid-19.global.health/api"
 }
 _SERVICE_ACCOUNT_CRED_FILE = "covid-19-map-277002-0943eeb6776b.json"
 _METADATA_BUCKET = "epid-ingestion"
-
+MIN_SOURCE_ID_LENGTH, MAX_SOURCE_ID_LENGTH = 24, 24
 
 class UploadError(Enum):
     """Upload error categories corresponding to the G.h Source API."""
@@ -120,15 +124,16 @@ def obtain_api_credentials(s3_client):
     Creates HTTP headers credentialed for access to the Global Health Source API.
     """
     try:
-        with tempfile.NamedTemporaryFile() as local_creds_file:
+        fd, local_creds_file_name = tempfile.mkstemp()
+        with os.fdopen(fd) as _:
             print(
                 "Retrieving service account credentials from "
                 f"s3://{_METADATA_BUCKET}/{_SERVICE_ACCOUNT_CRED_FILE}")
             s3_client.download_file(_METADATA_BUCKET,
                                     _SERVICE_ACCOUNT_CRED_FILE,
-                                    local_creds_file.name)
+                                    local_creds_file_name)
             credentials = service_account.Credentials.from_service_account_file(
-                local_creds_file.name, scopes=["email"])
+                local_creds_file_name, scopes=["email"])
             headers = {}
             request = google.auth.transport.requests.Request()
             credentials.refresh(request)
@@ -146,3 +151,34 @@ def get_source_api_url(env):
     if env not in _ENV_TO_SOURCE_API_URL:
         raise ValueError(f"No source API URL found for provided env: {env}")
     return _ENV_TO_SOURCE_API_URL[env]
+
+
+def python_module(folder: Path, root: Path):
+    """Returns the unique python module in folder relative to root"""
+    modules = [f for f in Path(folder).glob("*.py")
+               if "test" not in str(f) and "__init__.py" not in str(f)]
+    if len(modules) == 1:  # Ensure there is a unique python module
+        return str(modules[0].relative_to(root)).replace('/', '.')[:-3]
+    else:
+        return None
+
+
+@functools.lru_cache
+def get_source_id_parser_map(parser_root: Path = None):
+    """Returns a mapping of source IDs to parser information"""
+    parser_root = parser_root or Path(__file__).parent.parent
+    input_event_files = [
+        f for f in parser_root.rglob("input_event.json")
+        if all(not str(f).startswith(prefix)
+               for prefix in [".aws-sam", "common", "parsing/example"])
+    ]
+    m = {}  # map from source id -> parser information
+    for input_event_file in input_event_files:
+        input_event = json.loads(input_event_file.read_text())
+        sourceId = input_event["sourceId"]
+        if not MIN_SOURCE_ID_LENGTH <= len(sourceId) <= MAX_SOURCE_ID_LENGTH:
+            continue
+        del input_event["sourceId"]
+        m[sourceId] = input_event
+        m[sourceId]["python_module"] = python_module(input_event_file.parent, parser_root)
+    return m

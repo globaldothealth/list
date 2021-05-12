@@ -57,9 +57,12 @@ const styles = (theme: Theme) =>
                 listStyleType: 'none',
             },
         },
+        textSection: {
+            marginBottom: '1rem',
+        },
     });
 
-// additional offsets to keep the position ideally below the search guide button
+// additional offsets to keep the position ideally below the data guide button
 const LEFT_OFFSET = -16;
 const TOP_OFFSET = 6;
 
@@ -118,31 +121,29 @@ const SearchGuideDialog = ({
                                 Welcome to Global.health Data!
                             </Typography>
                         </Box>
-                        <Typography>
-                            You can use the following keywords to search our
-                            line-list database by selecting from the filter
-                            list, clicking on a column header, or manually
-                            entering in the search box using the syntax
-                            "keyword: value"
+                        <Typography className={classes.textSection}>
+                            You can explore our line-list dataset by{' '}
+                            <strong>filtering</strong>, <strong>sorting</strong>
+                            , or <strong>searching</strong>.
                         </Typography>
-                        <ul className={classes.list}>
-                            <li>curator</li>
-                            <li>gender</li>
-                            <li>nationality</li>
-                            <li>occupation</li>
-                            <li>country</li>
-                            <li>outcome</li>
-                            <li>caseid</li>
-                            <li>sourceurl</li>
-                            <li>verificationstatus</li>
-                            <li>uploadid</li>
-                            <li>admin1</li>
-                            <li>admin2</li>
-                            <li>admin3</li>
-                            <li>variant</li>
-                            <li>dateconfirmedbefore</li>
-                            <li>dateconfirmedafter</li>
-                        </ul>
+                        <Typography className={classes.textSection}>
+                            <strong>To filter</strong>, click the "Filter"
+                            button or a column header and enter parameters for
+                            any of the available fields.
+                        </Typography>
+                        <Typography className={classes.textSection}>
+                            <strong>To sort</strong>, use the dropdown menu on
+                            the left and choose ascending or descending.
+                        </Typography>
+                        <Typography className={classes.textSection}>
+                            <strong>For full-text search</strong>, enter any
+                            combination of search terms.
+                        </Typography>
+                        <Typography>
+                            You can use the icons on the right to navigate
+                            results and click on any individual record to see
+                            more detailed case information.
+                        </Typography>
                     </Box>
                 </div>
             </Draggable>

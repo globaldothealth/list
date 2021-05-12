@@ -396,6 +396,20 @@ paths:
                       minimum: 100
                       default: 10000
                       maximum: 50000
+                - name: sort_by
+                  in: query
+                  description: Keyword to sort by
+                  required: false
+                  schema:
+                      type: integer
+                      default: 0
+                - name: order
+                  in: query
+                  description: Sorting order
+                  required: false
+                  schema:
+                      type: integer
+                      default: 0
                 - name: q
                   in: query
                   description: The search query
@@ -567,32 +581,27 @@ paths:
                     $ref: '#/components/responses/200CasesDownload'
                 '500':
                     $ref: '#/components/responses/500'
-    /cases/downloadLarge:
+    /cases/downloadAsync:
         post:
             summary: >
-                Makes request to AWS to generate link that allows downloading
-                larger amount of data filtered by search query
+                Emails a CSV attachment of cases matching the search query.
             tags: [Case]
-            operationId: downloadLargeCases
+            operationId: downloadAsync
             requestBody:
                 content:
                     application/json:
                         schema:
+                            type: object
                             properties:
-                                format:
-                                    description: Format in which data should be downloaded
-                                    type: string
                                 query:
-                                    description: Search query to filter data to be downloaded
-                                    type: string
-                                email:
-                                    description: Email address to which notification should be sourceEntryId
+                                    description: >
+                                        Cases matching this query will be returned.
                                     type: string
             responses:
-                '200':
-                    $ref: '#components/responses/200CasesLargeDownload'
+                '204':
+                    $ref: '#/components/responses/204'
                 '500':
-                    $ref: '#components/responses/500'
+                    $ref: '#/components/responses/500'
     /cases/getDownloadLink:
         post:
             summary: >
@@ -1986,6 +1995,8 @@ components:
                 application/json:
                     schema:
                         $ref: '#/components/schemas/LocationArray'
+        '204':
+            description: Empty
         '400':
             description: Malformed request
         '403':

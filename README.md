@@ -38,6 +38,8 @@ You can tell if a case was imported from the manually created spreadsheets data 
 
 ![Data Service Github Packages Push](https://github.com/globaldothealth/list/workflows/Data%20Service%20Github%20Packages%20Push/badge.svg)
 
+![Geocoding location-service Python CI](https://github.com/globaldothealth/list/actions/workflows/geocoding-service-python.yml/badge.svg)
+
 ![Integration Tests CI](https://github.com/globaldothealth/list/workflows/Integration%20Tests%20CI/badge.svg)
 
 ![Ingestion functions AWS SAM deploy](https://github.com/globaldothealth/list/workflows/Ingestion%20functions%20AWS%20SAM%20deploy/badge.svg)

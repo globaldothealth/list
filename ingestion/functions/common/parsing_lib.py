@@ -9,6 +9,8 @@ from typing import Callable, Dict, Generator, Any, List
 import boto3
 import requests
 
+import common_lib
+
 ENV_FIELD = "env"
 SOURCE_URL_FIELD = "sourceUrl"
 S3_BUCKET_FIELD = "s3Bucket"
@@ -19,6 +21,7 @@ DATE_FILTER_FIELD = "dateFilter"
 DATE_RANGE_FIELD = "dateRange"
 AUTH_FIELD = "auth"
 
+MAX_WAIT_TIME = 600  # 10 minutes maximum wait for response
 # Expected date fields format.
 DATE_FORMATS = ["%m/%d/%YZ", "%m/%d/%Y"]
 
@@ -29,22 +32,13 @@ CASES_BATCH_SIZE = 250
 
 s3_client = boto3.client("s3")
 
-# Layer code, like common_lib, is added to the path by AWS.
-# To test locally (e.g. via pytest), we have to modify sys.path.
-# pylint: disable=import-error
-try:
-    import common_lib
-except ImportError:
-    sys.path.append(
-        os.path.join(
-            os.path.dirname(os.path.abspath(__file__)),
-            os.pardir,
-            os.pardir,
-            os.pardir,
-            os.pardir,
-            'common'))
-    import common_lib
-
+if os.environ.get("DOCKERIZED"):
+    s3_client = boto3.client("s3",
+        endpoint_url=os.environ.get("AWS_ENDPOINT", "http://localstack:4566"),
+        aws_access_key_id=os.environ.get("AWS_ACCESS_KEY_ID", "test"),
+        aws_secret_access_key=os.environ.get("AWS_SECRET_ACCESS_KEY", "test"),
+        region_name=os.environ.get("AWS_REGION", "us-east-1")
+    )
 
 def extract_event_fields(event: Dict):
     print('Extracting fields from event', event)
@@ -131,7 +125,7 @@ def batch_of(cases: Generator[Dict, None, None], max_items: int) -> List[Dict]:
 def write_to_server(
         cases: Generator[Dict, None, None],
         env: str, source_id: str, upload_id: str, headers, cookies,
-        cases_batch_size: int, remaining_time_func: Callable[[], float]):
+        cases_batch_size: int):
     """Upserts the provided cases via the G.h Case API."""
     put_api_url = f"{common_lib.get_source_api_url(env)}/cases/batchUpsert"
     counter = collections.Counter()
@@ -141,18 +135,25 @@ def write_to_server(
         # End of batch.
         if not batch:
             break
+        total_wait = 0
+        wait = 10  # initial wait time in seconds
         print(f"Sending {len(batch)} cases, total so far: {counter['total']}")
-        res = requests.post(put_api_url, json={"cases": batch},
-                            headers=headers, cookies=cookies)
+        # Exponential backoff in dev and prod, but not for local testing
+        while total_wait <= (MAX_WAIT_TIME if env in ["dev", "prod"] else 0):
+            res = requests.post(put_api_url, json={"cases": batch},
+                                headers=headers, cookies=cookies)
+            if res.status_code in [200, 207]:  # 207 is used for validation error
+                break
+            print(f"Request failed, status={res.status_code}, response={res.text}, retrying in {wait} seconds...")
+            time.sleep(wait)
+            total_wait += wait
+            wait *= 2
+
         if res and res.status_code == 200:
             counter['total'] += len(batch)
             now = time.time()
             cps = int(counter['total'] / (now - start_time))
             print(f'\tCurrent speed: {cps} cases/sec')
-            remaining_sec = int(remaining_time_func() / 1000)
-            max_estimate = int(counter['total'] + remaining_sec * cps)
-            print(
-                f'\tMax estimate: {max_estimate} in the remaining {remaining_sec} sec')
             res_json = res.json()
             counter['numCreated'] += res_json["numCreated"]
             counter['numUpdated'] += res_json["numUpdated"]
@@ -256,9 +257,8 @@ def filter_cases_by_date(
         return case_data
 
 
-def run_lambda(
+def run(
         event: Dict,
-        context: Any,
         parsing_function: Callable[[str, str, str], Generator[Dict, None, None]]):
     """
     Encapsulates all of the work performed by a parsing Lambda.
@@ -270,17 +270,12 @@ def run_lambda(
         This must contain `s3Bucket`, `s3Key`, and `sourceUrl` fields specifying
         the details of the stored source content.
 
-    context: object, required
-        Lambda Context runtime methods and attributes.
-        For more information, see:
-          https://docs.aws.amazon.com/lambda/latest/dg/python-context-object.html
-
     parsing_function: function, required
         Python function that parses raw source data into G.h case data.
         This function must accept (in order): a file containing raw source
         data, a string representing the source UUID, and a string representing
         the source URL. It must yield each case conforming to the G.h
-        case format as per https://curator.ghdsi.org/api-docs/.
+        case format as per https://data.covid-19.global.health/api-docs/.
         For an example, see:
           https://github.com/globaldothealth/list/blob/main/ingestion/functions/parsing/india/india.py#L57
 
@@ -305,11 +300,12 @@ def run_lambda(
         upload_id = common_lib.create_upload_record(
             env, source_id, api_creds, cookies)
     try:
-        local_data_file = tempfile.NamedTemporaryFile("wb")
+        fd, local_data_file_name = tempfile.mkstemp()
+        local_data_file = os.fdopen(fd, "wb")
         retrieve_raw_data_file(s3_bucket, s3_key, local_data_file)
-        print(f'Raw file retrieved at {local_data_file.name}')
+        print(f'Raw file retrieved at {local_data_file_name}')
         case_data = parsing_function(
-            local_data_file.name, source_id,
+            local_data_file_name, source_id,
             source_url)
         excluded_case_ids = retrieve_excluded_case_ids(source_id, date_filter, date_range, env)
         final_cases = prepare_cases(case_data, upload_id, excluded_case_ids)
@@ -322,7 +318,7 @@ def run_lambda(
                 api_creds, cookies),
             env, source_id, upload_id,
             api_creds, cookies,
-            CASES_BATCH_SIZE, context.get_remaining_time_in_millis)
+            CASES_BATCH_SIZE)
         common_lib.finalize_upload(
             env, source_id, upload_id, api_creds, cookies, count_created,
             count_updated)
@@ -331,3 +327,7 @@ def run_lambda(
         common_lib.complete_with_error(
             e, env, common_lib.UploadError.INTERNAL_ERROR, source_id, upload_id,
             api_creds, cookies)
+    finally:
+        local_data_file.close()
+        if os.path.exists(local_data_file_name):
+            os.remove(local_data_file_name)

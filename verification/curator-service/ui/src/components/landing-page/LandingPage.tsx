@@ -299,7 +299,7 @@ export default function LandingPage({
                         </div>
                         <div className={classes.link}>
                             <a
-                                href="https://github.com/globaldothealth/list/blob/main/data-serving/scripts/export-data/case_fields.yaml"
+                                href="https://github.com/globaldothealth/list/blob/main/data-serving/scripts/export-data/functions/01-split/fields.txt"
                                 rel="noopener noreferrer"
                                 target="_blank"
                             >

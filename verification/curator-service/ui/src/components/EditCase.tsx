@@ -27,9 +27,9 @@ export default function EditCase(props: Props): JSX.Element {
     useEffect(() => {
         setLoading(true);
         axios
-            .get<Case>(`/api/cases/${props.id}`)
+            .get<Case[]>(`/api/cases/${props.id}`)
             .then((resp) => {
-                setCase(resp.data);
+                setCase(resp.data[0]);
                 setErrorMessage(undefined);
             })
             .catch((e) => {
