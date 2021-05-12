@@ -1,3 +1,4 @@
+import json
 import os
 import sys
 from datetime import date, datetime
@@ -11,10 +12,10 @@ try:
 except ImportError:
     sys.path.append(
         os.path.join(
-            os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "common/python"
-        )
-    )
+            os.path.dirname(os.path.abspath(__file__)),
+            os.pardir,os.pardir, 'common'))
     import parsing_lib
+
 
 _AGE_INDEX = 5
 _GENDER_INDEX = 4
@@ -275,5 +276,11 @@ def parse_cases(raw_data_file: str, source_id: str, source_url: str):
                 raise ValueError("Unhandled data: {}".format(ve))
 
 
-def lambda_handler(event, context):
-    return parsing_lib.run_lambda(event, context, parse_cases)
+
+def event_handler(event):
+    return parsing_lib.run(event, parse_cases)
+
+if __name__ == "__main__":
+    with open('input_event.json') as f:
+        event = json.load(f)
+        event_handler(event)

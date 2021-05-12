@@ -91,7 +91,7 @@ describe('<App />', () => {
         );
         expect(await findByTestId('dictionaryButton')).toHaveAttribute(
             'href',
-            'https://github.com/globaldothealth/list/blob/main/data-serving/scripts/export-data/case_fields.yaml',
+            'https://github.com/globaldothealth/list/blob/main/data-serving/scripts/export-data/functions/01-split/fields.txt',
         );
         expect(await findByTestId('acknowledgmentsButton')).toHaveAttribute(
             'href',
@@ -192,7 +192,8 @@ describe('<App />', () => {
             ).toBeInTheDocument();
         });
     });
-    it('it adds the date confirmed filter by clicking on column header', async () => {
+
+    it('it opens filters modal and focuses appropriate input by clicking on column header', async () => {
         const axiosResponse = {
             data: {
                 name: 'Alice Smith',
@@ -216,16 +217,15 @@ describe('<App />', () => {
             </Router>,
         );
 
-        const searchField = (await screen.findByPlaceholderText(
-            /Search/i,
-        )) as HTMLInputElement;
-        const columnHeader = screen.getByText(/Confirmed Date/i);
-
-        expect(searchField).toBeInTheDocument();
-        expect(searchField.value).toBe('');
+        expect(
+            await screen.findByText(/COVID-19 Linelist/i),
+        ).toBeInTheDocument();
+        const columnHeader = screen.getByText(/Country/i);
         userEvent.click(columnHeader);
 
-        expect(searchField.value).toBe('dateconfirmedafter:');
+        // expect(searchField.value).toBe('dateconfirmedafter:');
+        expect(await screen.findByText(/Apply filters/i)).toBeInTheDocument();
+        expect(screen.getByRole('textbox', { name: /country/i })).toHaveFocus();
     });
 
     describe('Download dataset', () => {

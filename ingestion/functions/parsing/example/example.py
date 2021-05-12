@@ -1,6 +1,7 @@
 import os
 import sys
 import csv
+import json
 
 # Layer code, like parsing_lib, is added to the path by AWS.
 # To test locally (e.g. via pytest), we have to modify sys.path.
@@ -42,5 +43,10 @@ def parse_cases(raw_data_file: str, source_id: str, source_url: str):
             yield case
 
 
-def lambda_handler(event, context):
-    return parsing_lib.run_lambda(event, context, parse_cases)
+def event_handler(event):
+    return parsing_lib.run(event, parse_cases)
+
+if __name__ == "__main__":
+    with open('input_event.json') as f:
+        event = json.load(f)
+        event_handler(event)

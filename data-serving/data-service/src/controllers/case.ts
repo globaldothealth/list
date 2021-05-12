@@ -5,12 +5,12 @@ import { ObjectId, QuerySelector } from 'mongodb';
 import { GeocodeOptions, Geocoder, Resolution } from '../geocoding/geocoder';
 import { NextFunction, Request, Response } from 'express';
 import parseSearchQuery, { ParsingError } from '../util/search';
+import { SortByOrder, getSortByKeyword } from '../util/case';
 import { parseDownloadedCase } from '../util/case';
 
 import axios from 'axios';
 import { logger } from '../util/logger';
 import stringify from 'csv-stringify/lib/sync';
-import yaml from 'js-yaml';
 import _ from 'lodash';
 
 class GeocodeNotFoundError extends Error {}
@@ -28,8 +28,38 @@ export class CasesController {
      * Handles HTTP GET /api/cases/:id.
      */
     get = async (req: Request, res: Response): Promise<void> => {
-        const c = await Case.findById(req.params.id).lean();
-        if (!c) {
+        // Check if this case's source is excluded
+        const c = await Case.aggregate([
+            {
+                $match: {
+                    _id: new ObjectId(req.params.id),
+                },
+            },
+            {
+                $addFields: {
+                    sourceID: {
+                        $toObjectId: '$caseReference.sourceId',
+                    },
+                },
+            },
+            {
+                $lookup: {
+                    localField: 'sourceID',
+                    foreignField: '_id',
+                    from: 'sources',
+                    as: 'source',
+                },
+            },
+            {
+                $addFields: {
+                    isSourceExcluded: {
+                        $anyElementTrue: '$source.excludeFromLineList',
+                    },
+                },
+            },
+        ]);
+
+        if (c.length === 0) {
             res.status(404).send({
                 message: `Case with ID ${req.params.id} not found.`,
             });
@@ -192,9 +222,14 @@ export class CasesController {
      * Handles HTTP GET /api/cases.
      */
     list = async (req: Request, res: Response): Promise<void> => {
+        logger.info('List method entrypoint');
         const page = Number(req.query.page) || 1;
         const limit = Number(req.query.limit) || 10;
         const countLimit = Number(req.query.count_limit) || 10000;
+        const sortBy = Number(req.query.sort_by) || 0;
+        const sortByOrder = Number(req.query.order) || 0;
+
+        logger.info('Got query params');
 
         if (page < 1) {
             res.status(422).json({ message: 'page must be > 0' });
@@ -212,13 +247,29 @@ export class CasesController {
             res.status(422).json({ message: 'q must be a unique string' });
             return;
         }
+
+        logger.info('Got past 422s');
         try {
             const caseAggregation = this.caseAggregationFromQuery(
                 req.query.q ?? '',
             );
+            logger.info('Got case aggregation from query');
+
+            const sortByKeyword = getSortByKeyword(sortBy);
+            const sortedQuery = _.concat(caseAggregation, [
+                {
+                    $sort: {
+                        [sortByKeyword]:
+                            sortByOrder === SortByOrder.Ascending ? 1 : -1,
+                    },
+                },
+            ]);
+            logger.info('Sorted by keyword');
+
             const excludingRestrictedSources = this.excludeRestrictedSourcesFromCaseAggregation(
-                caseAggregation,
+                sortedQuery,
             );
+            logger.info('Excluded restricted sources');
             const addingCount = _.concat(excludingRestrictedSources, [
                 {
                     $facet: {
@@ -240,11 +291,6 @@ export class CasesController {
                             {
                                 $limit: limit + 1,
                             },
-                            {
-                                $sort: {
-                                    'revisionMetadata.creationMetadata.date': -1,
-                                },
-                            },
                         ],
                     },
                 },
@@ -256,12 +302,16 @@ export class CasesController {
                     },
                 },
             ]);
+            logger.info('Added count');
             // Do a fetch of documents and another fetch in parallel for total documents
             // count used in pagination.
-            const results = await Case.aggregate(addingCount).collation({
-                locale: 'en_US',
-                strength: 2,
-            });
+            const results = await Case.aggregate(addingCount)
+                .allowDiskUse(true)
+                .collation({
+                    locale: 'en_US',
+                    strength: 2,
+                });
+            logger.info('Got results');
             const docs = results[0].docs;
             const total = results[0].total ?? 0;
             // If we have more items than limit, add a response param
@@ -273,9 +323,11 @@ export class CasesController {
                     nextPage: page + 1,
                     total: total,
                 });
+                logger.info('Got multiple pages of results');
                 return;
             }
             // If we fetched all available data, just return it.
+            logger.info('Got one page of results');
             res.json({ cases: docs, total: total });
         } catch (e) {
             if (e instanceof ParsingError) {
@@ -418,7 +470,9 @@ export class CasesController {
     batchUpsert = async (req: Request, res: Response): Promise<void> => {
         try {
             // Batch validate cases first.
+            logger.info('batchUpsert: entrypoint');
             const errors = await this.batchValidate(req.body.cases);
+            logger.info('batchUpsert: validated cases');
             if (errors.length > 0) {
                 res.status(207).send({
                     phase: 'VALIDATE',
@@ -428,6 +482,7 @@ export class CasesController {
                 });
                 return;
             }
+            logger.info('batchUpsert: preparing bulk write');
             const bulkWriteResult = await Case.bulkWrite(
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 req.body.cases.map((c: any) => {
@@ -458,6 +513,7 @@ export class CasesController {
                 }),
                 { ordered: false },
             );
+            logger.info('batchUpsert: finished bulk write');
             res.status(200).json({
                 phase: 'UPSERT',
                 numCreated:
@@ -831,7 +887,6 @@ export class CasesController {
             : {};
 
         casesQuery = [{ $match: query }];
-
         const filters = parsedSearch.filters.map((f) => {
             if (f.values.length == 1) {
                 const searchTerm = f.values[0];
@@ -845,12 +900,21 @@ export class CasesController {
                     };
                 } else {
                     if (f.dateOperator) {
+                        const dateRangeType =
+                            f.dateOperator === '$gt'
+                                ? 'dateRange.start'
+                                : 'dateRange.end';
                         return {
                             $match: {
                                 [f.path]: {
-                                    [f.dateOperator]: new Date(
-                                        f.values[0].toString(),
-                                    ),
+                                    $elemMatch: {
+                                        name: 'confirmed',
+                                        [dateRangeType]: {
+                                            [f.dateOperator]: new Date(
+                                                f.values[0].toString(),
+                                            ),
+                                        },
+                                    },
                                 },
                             },
                         };

@@ -14,9 +14,10 @@ try:
 except ImportError:
     sys.path.append(
         os.path.join(
-            os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
-            "common/python"))
+            os.path.dirname(os.path.abspath(__file__)),
+            os.pardir,os.pardir, 'common'))
     import parsing_lib
+    
 
 _AGE = "age_group"
 _GENDER = "sex"
@@ -183,7 +184,6 @@ def parse_cases(raw_data_file: str, source_id: str, source_url: str, last_date: 
                 except ValueError as ve:
                     raise ValueError(f"error converting case: {ve}")
 
-
 def prepare_manual_import(raw_data_file: str, source_url: str, last_date: str = None):
     """Prepares JSON file for import to MongoDB"""
     last_date = last_date or (datetime.now() - timedelta(days=2)).date().isoformat()
@@ -203,14 +203,10 @@ def prepare_manual_import(raw_data_file: str, source_url: str, last_date: str = 
             f.write(json.dumps(c) + "\n")
 
 
-def lambda_handler(event, context):
-    return parsing_lib.run_lambda(event, context, parse_cases)
-
+def event_handler(event):
+    return parsing_lib.run(event, parse_cases)
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser()
-    parser.add_argument("file", help="Source file to import from")
-    parser.add_argument("url", help="Source URL")
-    parser.add_argument("--last-date", help="Drop all cases starting from this date")
-    args = parser.parse_args()
-    prepare_manual_import(args.file, args.url, args.last_date)
+    with open('input_event.json') as f:
+        event = json.load(f)
+        event_handler(event)

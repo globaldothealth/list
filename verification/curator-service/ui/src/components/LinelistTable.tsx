@@ -51,6 +51,7 @@ import CaseIncludeDialog from './CaseIncludeDialog';
 import renderDate, { renderDateRange } from './util/date';
 import { URLToSearchQuery } from './util/searchQuery';
 import { ChipData } from './App';
+import { SortBy, SortByOrder } from '../constants/types';
 
 // Limit number of data that can be displayed or downloaded to avoid long execution times of mongo queries
 const DATA_LIMIT = 10000;
@@ -103,6 +104,7 @@ interface TableRow {
         date: string;
         note: string;
     };
+    nationalities?: any;
 }
 
 interface LocationState {
@@ -119,16 +121,20 @@ interface Props
     user: User;
     page: number;
     pageSize: number;
+    sortBy: SortBy;
+    sortByOrder: SortByOrder;
 
     onChangePage: (page: number) => void;
 
     onChangePageSize: (pageSize: number) => void;
 
-    setSearch: (value: string) => void;
-    search: string;
     filterBreadcrumbs: ChipData[];
     handleBreadcrumbDelete: (breadcrumbToDelete: ChipData) => void;
     setTotalDataCount: (value: number) => void;
+    setFiltersModalOpen: (value: boolean) => void;
+    setActiveFilterInput: (value: string) => void;
+    setSortBy: (value: SortBy) => void;
+    setSortByOrder: (value: SortByOrder) => void;
 }
 
 const styles = (theme: Theme) =>
@@ -216,6 +222,13 @@ const downloadDataModalStyles = makeStyles((theme: Theme) =>
         },
     }),
 );
+
+const sortSelectStyles = makeStyles((theme: Theme) => ({
+    formControl: {
+        minWidth: 150,
+        margin: '0 20px 0 0',
+    },
+}));
 
 function RowMenu(props: {
     rowId: string;
@@ -397,6 +410,88 @@ function RowMenu(props: {
                 }
                 caseIds={[props.rowId]}
             />
+        </>
+    );
+}
+
+interface SortSelectProps {
+    sortBy: SortBy;
+    sortByOrder: SortByOrder;
+    handleSortByChange: (sortBy: SortBy) => void;
+    handleSortByOrderChange: (sortByOrder: SortByOrder) => void;
+}
+
+export function SortSelect({
+    sortBy,
+    sortByOrder,
+    handleSortByChange,
+    handleSortByOrderChange,
+}: SortSelectProps): JSX.Element {
+    const classes = sortSelectStyles();
+
+    const sortKeywords = [
+        { name: 'None', value: SortBy.Default },
+        { name: 'Confirmed date', value: SortBy.ConfirmedDate },
+        { name: 'Country', value: SortBy.Country },
+        { name: 'Location admin 1', value: SortBy.Admin1 },
+        { name: 'Location admin 2', value: SortBy.Admin2 },
+        { name: 'Location admin 3', value: SortBy.Admin3 },
+        { name: 'Age', value: SortBy.Age },
+    ];
+
+    const handleChange = (
+        event: React.ChangeEvent<{ value: unknown; name?: string | undefined }>,
+    ) => {
+        const { value, name } = event.target;
+
+        if (name === 'sortBy') {
+            handleSortByChange(value as SortBy);
+        } else {
+            handleSortByOrderChange(value as SortByOrder);
+        }
+    };
+
+    return (
+        <>
+            <FormControl className={classes.formControl}>
+                <InputLabel id="sort-by-label">Sort by</InputLabel>
+                <Select
+                    id="sort-by-select"
+                    labelId="sort-by-label"
+                    name="sortBy"
+                    value={sortBy}
+                    onChange={handleChange}
+                >
+                    {sortKeywords.map((keyword) => (
+                        <MenuItem
+                            value={keyword.value}
+                            key={keyword.value}
+                            data-testid="sortby-option"
+                        >
+                            {keyword.name}
+                        </MenuItem>
+                    ))}
+                </Select>
+            </FormControl>
+
+            {sortBy !== SortBy.Default && (
+                <FormControl className={classes.formControl}>
+                    <InputLabel id="sort-by-order-label">Order</InputLabel>
+                    <Select
+                        labelId="sort-by-order-label"
+                        name="sortByOrder"
+                        value={sortByOrder}
+                        onChange={handleChange}
+                    >
+                        <MenuItem value={SortByOrder.Ascending}>
+                            Ascending
+                        </MenuItem>
+                        <MenuItem value={SortByOrder.Descending}>
+                            Descending
+                        </MenuItem>
+                    </Select>
+                </FormControl>
+            )}
         </>
     );
 }
@@ -677,6 +772,7 @@ export function DownloadButton({
         </>
     );
 }
+
 interface ColumnHeaderProps {
     theClass: any;
     columnTitle: string;
@@ -738,6 +834,8 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
             this,
         );
         this.getExcludedCaseIds = this.getExcludedCaseIds.bind(this);
+        this.handleSortByChange = this.handleSortByChange.bind(this);
+        this.handleSortByOrderChange = this.handleSortByOrderChange.bind(this);
     }
 
     componentDidMount() {
@@ -762,6 +860,16 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
     }
     componentWillUnmount(): void {
         this.unlisten();
+    }
+
+    handleSortByChange(sortBy: SortBy): void {
+        this.props.setSortBy(sortBy);
+        this.tableRef.current?.onQueryChange();
+    }
+
+    handleSortByOrderChange(sortByOrder: SortByOrder): void {
+        this.props.setSortByOrder(sortByOrder);
+        this.tableRef.current?.onQueryChange();
     }
 
     async deleteCases(): Promise<void> {
@@ -886,13 +994,9 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
 
     handleAddFilterClick(e: React.MouseEvent<HTMLDivElement>, filter: string) {
         e.preventDefault();
-        // Avoids duplicated search parameters
-        if (this.props.search.includes(filter)) return;
 
-        this.props.setSearch(
-            this.props.search +
-                (this.props.search ? ` ${filter}:` : `${filter}:`),
-        );
+        this.props.setFiltersModalOpen(true);
+        this.props.setActiveFilterInput(filter);
     }
 
     render(): JSX.Element {
@@ -1084,7 +1188,16 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                             },
                             title: (
                                 <div className={classes.centeredContent}>
-                                    <VerificationStatusHeader />
+                                    <VerificationStatusHeader
+                                        onClickAction={(
+                                            e: React.MouseEvent<HTMLDivElement>,
+                                        ) =>
+                                            this.handleAddFilterClick(
+                                                e,
+                                                'verificationstatus',
+                                            )
+                                        }
+                                    />
                                 </div>
                             ),
                             field: 'verificationStatus',
@@ -1196,6 +1309,24 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                             field: 'longitude',
                         },
                         {
+                            title: (
+                                <ColumnHeaderTitle
+                                    theClass={classes.centeredContent}
+                                    columnTitle="Nationality"
+                                    onClickAction={(
+                                        e: React.MouseEvent<HTMLDivElement>,
+                                    ) =>
+                                        this.handleAddFilterClick(
+                                            e,
+                                            'nationality',
+                                        )
+                                    }
+                                />
+                            ),
+
+                            field: 'nationalities',
+                        },
+                        {
                             title: 'Age',
                             field: 'age',
                             render: (rowData) =>
@@ -1266,7 +1397,9 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                             listUrl += '?limit=' + query.pageSize;
                             listUrl += '&page=' + (this.state.page + 1);
                             // Limit the maximum number of documents that are being counted in mongoDB in order to make queries faster
-                            listUrl += `&count_limit=${DATA_LIMIT}`;
+                            listUrl += '&count_limit=10000';
+                            listUrl += '&sort_by=' + this.props.sortBy;
+                            listUrl += '&order=' + this.props.sortByOrder;
                             if (this.state.searchQuery !== '') {
                                 listUrl += '&q=' + this.state.searchQuery;
                             }
@@ -1277,7 +1410,24 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                 .then((result) => {
                                     const flattenedCases: TableRow[] = [];
                                     const cases = result.data.cases;
+                                    const nationalitiesRender = (
+                                        nationalities: any,
+                                    ) => {
+                                        if (nationalities) {
+                                            nationalities.sort();
+                                            const nationalitiesString = nationalities.join(
+                                                ', ',
+                                            );
+                                            return nationalitiesString;
+                                        } else {
+                                            return null;
+                                        }
+                                    };
                                     for (const c of cases) {
+                                        nationalitiesRender(
+                                            c.demographics?.nationalities,
+                                        );
+
                                         const confirmedEvent = c.events.find(
                                             (event) =>
                                                 event.name === 'confirmed',
@@ -1313,6 +1463,9 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                                 c.demographics?.ageRange?.end,
                                             ],
                                             gender: c.demographics?.gender,
+                                            nationalities: nationalitiesRender(
+                                                c.demographics?.nationalities,
+                                            ),
                                             outcome: c.events.find(
                                                 (event) =>
                                                     event.name === 'outcome',
@@ -1376,11 +1529,27 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                         COVID-19 Linelist
                                     </Typography>
 
+                                    <SortSelect
+                                        sortBy={this.props.sortBy}
+                                        sortByOrder={this.props.sortByOrder}
+                                        handleSortByChange={
+                                            this.handleSortByChange
+                                        }
+                                        handleSortByOrderChange={
+                                            this.handleSortByOrderChange
+                                        }
+                                    />
+
                                     {this.props.filterBreadcrumbs.length >
                                         0 && (
                                         <Chip
                                             label="Filters"
                                             color="primary"
+                                            onClick={() =>
+                                                this.props.setFiltersModalOpen(
+                                                    true,
+                                                )
+                                            }
                                             className={classes.breadcrumbChip}
                                         />
                                     )}
@@ -1394,6 +1563,14 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                                         breadcrumb,
                                                     )
                                                 }
+                                                onClick={() => {
+                                                    this.props.setFiltersModalOpen(
+                                                        true,
+                                                    );
+                                                    this.props.setActiveFilterInput(
+                                                        breadcrumb.key,
+                                                    );
+                                                }}
                                                 className={
                                                     classes.breadcrumbChip
                                                 }

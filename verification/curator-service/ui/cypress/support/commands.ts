@@ -16,6 +16,8 @@ declare global {
                 transmissionPlaces?: string[];
                 uploadIds?: string[];
                 startConfirmedDate?: any;
+                variant?: any;
+                sourceUrl?: any;
             }) => void;
             login: (opts?: {
                 name: string;
@@ -41,6 +43,9 @@ export function addCase(opts: {
     transmissionPlaces?: string[];
     uploadIds?: string;
     startConfirmedDate?: any;
+    variant?: string;
+    caseid?: string;
+    sourceUrl?: string;
 }): void {
     cy.request({
         method: 'POST',
@@ -48,7 +53,7 @@ export function addCase(opts: {
         body: {
             caseReference: {
                 sourceId: '5ef8e943dfe6e00030892d58',
-                sourceUrl: 'www.example.com',
+                sourceUrl: opts.sourceUrl || 'www.example.com',
                 uploadIds: opts.uploadIds,
             },
             demographics: {
@@ -63,6 +68,9 @@ export function addCase(opts: {
                     longitude: 12,
                 },
                 name: opts.country,
+            },
+            variant: {
+                name: opts.variant,
             },
             events: [
                 {
