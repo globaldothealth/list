@@ -2,9 +2,11 @@ import datetime
 import json
 import os
 import tarfile
-import shutil
+import tempfile
+import contextlib
 
 import boto3
+
 
 def all_files_processed(bucket, folder, full_path):
     """
@@ -16,26 +18,10 @@ def all_files_processed(bucket, folder, full_path):
     bucket_obj = s3.Bucket(bucket)
     file_count = len([x for x in bucket_obj.objects.filter(Prefix=folder)])
 
-    ready_to_combine = False
-    if file_count == number_of_parts:
-        ready_to_combine = True
-
-    return ready_to_combine
-
-def setup_directories():
-    """
-    Make sure directories exist on EFS.
-    """
-    print("Creating directories...")
-    for path in ["/mnt/efs/in", "/mnt/efs/out"]:
-        if os.path.exists(path):
-            print(f"Cleaning up existing {path}")
-            shutil.rmtree(path)
-        os.makedirs(path)
-    print("Directories created.")
+    return file_count == number_of_parts
 
 
-def get_files(bucket, folder):
+def get_files(bucket, folder, download_folder):
     """
     Retrieve all chunks from S3.
     """
@@ -45,16 +31,18 @@ def get_files(bucket, folder):
     all_keys = [x.key for x in bucket_obj.objects.filter(Prefix=folder)]
     downloaded_files = []
     for k in all_keys:
-        filename = "/mnt/efs/in/" + k.split("/")[-1]
+        filename = os.path.join(download_folder, k.split("/")[-1])
         s3.Object(bucket, k).download_file(filename)
         downloaded_files.append(filename)
     print("Files retrieved!")
     return downloaded_files
 
 
-def combine_files(downloaded_files):
-    combined_file = "/mnt/efs/out/latestdata.csv"
-    with open(combined_file, "wb") as fout:
+def combine_and_compress(downloaded_files):
+    """
+    Combine and compress data, data dictionary, and acknowledgements to tar.gz.
+    """
+    with tempfile.NamedTemporaryFile(dir="/mnt/efs", delete=False) as fout:
         # first file:
         with open(downloaded_files[0], "rb") as f:
             fout.write(f.read())
@@ -63,19 +51,16 @@ def combine_files(downloaded_files):
             with open(k, "rb") as f:
                 next(f)  # skip the header
                 fout.write(f.read())
-    return combined_file
-
-
-def compress_file(input_file):
-    """
-    Add combined file, data dictionary, and acknowledgements to tar.gz.
-    """
     now = datetime.datetime.now().strftime("%Y-%m-%d")
-    compressed_file = "/mnt/efs/latestdata.tar.gz"
+    _, compressed_file = tempfile.mkstemp(dir="/mnt/efs")
     with tarfile.open(compressed_file, "w:gz") as tar:
-        tar.add(input_file, f"globaldothealth_{now}.csv")
+        tar.add(fout.name, f"globaldothealth_{now}.csv")
         tar.add('data_dictionary.csv', 'data_dictionary.csv')
         tar.add('citation_data.rtf', 'citation_data.rtf')
+    # Attempt cleanup of uncompressed file
+    with contextlib.suppress(FileNotFoundError):
+        os.remove(fout.name)
+
     return compressed_file
 
 
@@ -84,22 +69,15 @@ def upload_to_production(compressed_file):
     Upload tar.gz file to s3.
     """
     now = datetime.datetime.now().strftime("%Y-%m-%d")
-    filename = compressed_file.split("/")[-1]
     s3 = boto3.resource("s3")
     s3.Object("covid-19-data-export",
-              f"latest/{filename}").upload_file(compressed_file)
+              "latest/latestdata.tar.gz").upload_file(compressed_file)
     s3.Object("covid-19-data-export", f"archive/{now}.tar.gz").upload_file(
         compressed_file
     )
-
-def cleanup_directories():
-    """
-    Remove processing directories from EFS.
-    """
-    print("Cleaning up...")
-    shutil.rmtree("/mnt/efs/out/")
-    shutil.rmtree("/mnt/efs/in/")
-    print("Temporary directories and files removed.")
+    # Attempt cleanup of compressed file
+    with contextlib.suppress(FileNotFoundError):
+        os.remove(compressed_file)
 
 
 def lambda_handler(event, context):
@@ -121,6 +99,7 @@ def lambda_handler(event, context):
     """
     if type(event) == str:
         event = json.loads(event)
+    print("Received event:", event)
     record = event["Records"][0]
     bucket = record["s3"]["bucket"]["name"]
     key = record["s3"]["object"]["key"]
@@ -129,9 +108,7 @@ def lambda_handler(event, context):
 
     if all_files_processed(bucket, folder, full_path):
         print("All chunks parsed! Starting merge...")
-        setup_directories()
-        downloaded_files = get_files(bucket, folder)
-        combined_file = combine_files(downloaded_files)
-        compressed_file = compress_file(combined_file)
-        upload_to_production(compressed_file)
-        cleanup_directories()
+        with tempfile.TemporaryDirectory(dir="/mnt/efs") as download_folder:
+            downloaded_files = get_files(bucket, folder, download_folder)
+            compressed_file = combine_and_compress(downloaded_files)
+            upload_to_production(compressed_file)
