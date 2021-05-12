@@ -60,10 +60,10 @@ Resources:
       MemorySize: 1024
       Policies:
         - S3CrudPolicy:
-            BucketName: global-dot-health-data-export-bucket
+            BucketName: global-dot-health-data-export-bucket-2
       Environment:
         Variables:
-          EXPORT_BUCKET: global-dot-health-data-export-bucket
+          EXPORT_BUCKET: global-dot-health-data-export-bucket-2
 
   DataExportParseFunction:
     Type: AWS::Serverless::Function
@@ -86,10 +86,10 @@ Resources:
                   Value: processing/parse/
       Policies:
         - S3CrudPolicy:
-            BucketName: global-dot-health-data-export-bucket
+            BucketName: global-dot-health-data-export-bucket-2
       Environment:
         Variables:
-          EXPORT_BUCKET: global-dot-health-data-export-bucket
+          EXPORT_BUCKET: global-dot-health-data-export-bucket-2
 
   DataExportCombineFunction:
     Type: AWS::Serverless::Function
@@ -142,5 +142,5 @@ Resources:
   Bucket:
     Type: 'AWS::S3::Bucket'
     Properties:
-      BucketName: global-dot-health-data-export-bucket
+      BucketName: global-dot-health-data-export-bucket-2
 
