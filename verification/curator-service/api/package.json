@@ -74,7 +74,7 @@
     "longjohn": "^0.2.12",
     "mimemessage": "^1.0.5",
     "mongoose": "^5.10.5",
-    "nodemailer": "^6.4.11",
+    "nodemailer": "^6.4.16",
     "passport": "^0.4.1",
     "passport-google-oauth20": "^2.0.0",
     "passport-http-bearer": "^1.0.1",
