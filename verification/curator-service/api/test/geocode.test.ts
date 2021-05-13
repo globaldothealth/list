@@ -48,7 +48,7 @@ describe('Geocode', () => {
             .expect('Content-Type', /json/);
         expect(mockedAxios.get).toHaveBeenCalledTimes(1);
         expect(mockedAxios.get).toHaveBeenCalledWith(
-            'http://localhost:3000/api/geocode/suggest?q=Lyon',
+            'http://location/geocode/suggest?q=Lyon',
         );
     });
     it('proxies clear calls', async () => {
@@ -60,7 +60,7 @@ describe('Geocode', () => {
         await curatorRequest.post('/api/geocode/clear').expect(200);
         expect(mockedAxios.post).toHaveBeenCalledTimes(1);
         expect(mockedAxios.post).toHaveBeenCalledWith(
-            'http://localhost:3000/api/geocode/clear',
+            'http://location/geocode/clear',
             {},
         );
     });
@@ -76,7 +76,7 @@ describe('Geocode', () => {
             .expect(200);
         expect(mockedAxios.post).toHaveBeenCalledTimes(1);
         expect(mockedAxios.post).toHaveBeenCalledWith(
-            'http://localhost:3000/api/geocode/seed',
+            'http://location/geocode/seed',
             {
                 loc: 'foo',
             },
