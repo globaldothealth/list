@@ -3,6 +3,7 @@ services:
   geocoding:
     environment:
       DEBUG: "True"
+      ENABLE_FAKE_GEOCODER: "True"
   mongo:
     volumes:
       - ../verification/scripts:/verification/scripts
