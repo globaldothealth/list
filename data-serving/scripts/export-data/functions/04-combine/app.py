@@ -35,6 +35,7 @@ def get_files(bucket, folder, download_folder):
         s3.Object(bucket, k).download_file(filename)
         downloaded_files.append(filename)
     print("Files retrieved!")
+    print(downloaded_files)
     return downloaded_files
 
 
@@ -110,5 +111,7 @@ def lambda_handler(event, context):
         print("All chunks parsed! Starting merge...")
         with tempfile.TemporaryDirectory(dir="/mnt/efs") as download_folder:
             downloaded_files = get_files(bucket, folder, download_folder)
+            print("Compressing file...")
             compressed_file = combine_and_compress(downloaded_files)
+            print("Uploading to S3 bucket...")
             upload_to_production(compressed_file)
