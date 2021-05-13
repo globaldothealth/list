@@ -16,6 +16,13 @@ install_dependencies() {
   fi
 }
 
+echo "Running geocoding service API tests"
+pushd `dirname "$0"`/../geocoding/location-service
+poetry install
+poetry update
+./run_tests.sh
+popd
+
 install_dependencies /../verification/curator-service/api/
 echo "Running curator service API tests"
 npm --prefix=`dirname "$0"`/../verification/curator-service/api/ run-script test-silent
