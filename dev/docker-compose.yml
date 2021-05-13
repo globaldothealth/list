@@ -45,7 +45,7 @@ services:
       EMAIL_USER_PASSWORD: "${EMAIL_USER_PASSWORD}"
       GOOGLE_OAUTH_CLIENT_ID: "${GOOGLE_OAUTH_CLIENT_ID}"
       GOOGLE_OAUTH_CLIENT_SECRET: "${GOOGLE_OAUTH_CLIENT_SECRET}"
-      LOCATION_SERVICE_URL: "http://geocoding:3003"
+      LOCATION_SERVICE_URL: "http://geocoding:8080"
     healthcheck:
       test: ["CMD", "curl", "-f", "http://curator:3001"]
       interval: 30s
