@@ -1,6 +1,8 @@
 import csv
 import json
+import gzip
 import os
+import tempfile
 from functools import reduce
 
 import boto3
@@ -263,11 +265,16 @@ def get_chunk(event):
 
 def upload_processed_chunk(processed_file):
     """
-    Upload parsed .csv file to s3.
+    Upload parsed .csv file to s3 after compressing
     """
-    filename = "/".join(processed_file.split("/")[-2:])
+    filename = "/".join(processed_file.split("/")[-2:]) + ".gz"
+    _, compressed_file = tempfile.mkstemp()
+    with open(processed_file, "rb") as fin, gzip.open(compressed_file, "wb") as fout:
+        fout.writelines(fin)
     s3 = boto3.resource("s3")
-    s3.Object(bucket, f"processing/combine/{filename}").upload_file(processed_file)
+    s3.Object(bucket, f"processing/combine/{filename}").upload_file(compressed_file)
+    if os.path.exists(compressed_file):
+        os.remove(compressed_file)
 
 
 def lambda_handler(event, context):

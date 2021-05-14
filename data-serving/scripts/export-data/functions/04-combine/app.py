@@ -4,6 +4,7 @@ import os
 import tarfile
 import tempfile
 import contextlib
+from pathlib import Path
 
 import boto3
 
@@ -39,30 +40,19 @@ def get_files(bucket, folder, download_folder):
     return downloaded_files
 
 
-def combine_and_compress(downloaded_files):
+def combine(downloaded_files):
     """
-    Combine and compress data, data dictionary, and acknowledgements to tar.gz.
+    Combine compressed data, data dictionary, and acknowledgements to tar file
     """
-    with tempfile.NamedTemporaryFile(dir="/mnt/efs", delete=False) as fout:
-        # first file:
-        with open(downloaded_files[0], "rb") as f:
-            fout.write(f.read())
-        # now the rest:
-        for k in downloaded_files[1:]:
-            with open(k, "rb") as f:
-                next(f)  # skip the header
-                fout.write(f.read())
     now = datetime.datetime.now().strftime("%Y-%m-%d")
-    _, compressed_file = tempfile.mkstemp(dir="/mnt/efs")
-    with tarfile.open(compressed_file, "w:gz") as tar:
-        tar.add(fout.name, f"globaldothealth_{now}.csv")
+    _, tarred_file = tempfile.mkstemp(dir="/mnt/efs")
+    with tarfile.open(tarred_file, "w") as tar:
+        for d in downloaded_files:
+            tar.add(d, f"{Path(d).stem}_{now}.csv.gz")
         tar.add('data_dictionary.csv', 'data_dictionary.csv')
         tar.add('citation_data.rtf', 'citation_data.rtf')
-    # Attempt cleanup of uncompressed file
-    with contextlib.suppress(FileNotFoundError):
-        os.remove(fout.name)
 
-    return compressed_file
+    return tarred_file
 
 
 def upload_to_production(compressed_file):
@@ -72,8 +62,8 @@ def upload_to_production(compressed_file):
     now = datetime.datetime.now().strftime("%Y-%m-%d")
     s3 = boto3.resource("s3")
     s3.Object("covid-19-data-export",
-              "latest/latestdata.tar.gz").upload_file(compressed_file)
-    s3.Object("covid-19-data-export", f"archive/{now}.tar.gz").upload_file(
+              "latest/latestdata.tar").upload_file(compressed_file)
+    s3.Object("covid-19-data-export", f"archive/{now}.tar").upload_file(
         compressed_file
     )
     # Attempt cleanup of compressed file
@@ -111,7 +101,7 @@ def lambda_handler(event, context):
         print("All chunks parsed! Starting merge...")
         with tempfile.TemporaryDirectory(dir="/mnt/efs") as download_folder:
             downloaded_files = get_files(bucket, folder, download_folder)
-            print("Compressing file...")
-            compressed_file = combine_and_compress(downloaded_files)
+            print("Creating tarball...")
+            tarball = combine(downloaded_files)
             print("Uploading to S3 bucket...")
-            upload_to_production(compressed_file)
+            upload_to_production(tarball)
