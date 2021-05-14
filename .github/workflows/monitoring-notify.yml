@@ -1,0 +1,23 @@
+name: Data monitoring notifications
+
+on:
+  schedule:
+    # Every day at 8AM UTC
+    - cron: "0 8 * * *"
+
+jobs:
+  monitoring-notify:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ingestion/monitoring
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python 3.8
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.8
+    - name: Install dependencies
+      run: pip install -r requirements.txt
+    - name: Run metrics script
+      run: python daily_metrics.py
