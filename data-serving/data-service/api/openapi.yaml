@@ -16,8 +16,6 @@ tags:
       description: Case related operations
     - name: Suggest
       description: Suggestion for input of cases
-    - name: Geocode
-      description: Geolocation of a case
 paths:
     /cases:
         get:
@@ -545,57 +543,6 @@ paths:
                     $ref: '#/components/responses/422'
                 '500':
                     $ref: '#/components/responses/500'
-    /geocode/seed:
-        post:
-            tags: [Geocode]
-            summary: Adds geocodes to the geocoding database
-            operationId: seedGeocodes
-            requestBody:
-                description: A single geocode record
-                required: true
-                content:
-                    application/json:
-                        schema:
-                            type: object
-            responses:
-                '200':
-                    $ref: '#/components/responses/200'
-    /geocode/clear:
-        post:
-            tags: [Geocode]
-            summary: Clears geocodes from the geocoding database
-            operationId: clearGeocodes
-            responses:
-                '200':
-                    $ref: '#/components/responses/200'
-    /geocode/suggest:
-        get:
-            tags: [Suggest, Geocode]
-            summary: Suggests geocodes for a given query string
-            operationId: suggestGeocodes
-            parameters:
-                - name: q
-                  in: query
-                  description: The location string for which to find geocodes
-                  required: true
-                  allowReserved: true
-                  schema:
-                      type: string
-                - name: limitToResolution
-                  in: query
-                  allowReserved: true
-                  schema:
-                      type: string
-                  description: >
-                      Comma-separated list of resolutions to restrict geocoding to.
-                      Allowed values are: Point, Admin3, Admin2, Admin1, Country.
-            responses:
-                '200':
-                    $ref: '#/components/responses/200LocationArray'
-                '422':
-                    $ref: '#/components/responses/422'
-                '500':
-                    $ref: '#/components/responses/500'
     /excludedCaseIds:
         get:
             summary: Lists IDs of excluded cases for a specified source
@@ -1105,12 +1052,6 @@ components:
                 application/json:
                     schema:
                         $ref: '#/components/schemas/OccupationArray'
-        '200LocationArray':
-            description: OK
-            content:
-                application/json:
-                    schema:
-                        $ref: '#/components/schemas/LocationArray'
         '201Case':
             description: Created
             content:
