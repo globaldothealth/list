@@ -45,7 +45,7 @@ def compare(d1, d2):
     total1 = sum(x["casecount"] for x in d1)
     total2 = sum(x["casecount"] for x in d2)
     if total2 == total1:
-        lines.append(f"No *overall* case count change from {last_day}")
+        lines.append(f"No overall case count change from {last_day}")
     elif total2 > total1:
         lines.append(f"*New cases added*: {total2 - total1} since {last_day}\n")
     else:
