@@ -48,7 +48,7 @@ def combine(downloaded_files):
     _, tarred_file = tempfile.mkstemp(dir="/mnt/efs")
     with tarfile.open(tarred_file, "w") as tar:
         for d in downloaded_files:
-            tar.add(d, f"{Path(d).stem}_{now}.csv.gz")
+            tar.add(d, f"{Path(d).stem.replace('processed.csv', '')}{now}.csv.gz")
         tar.add('data_dictionary.csv', 'data_dictionary.csv')
         tar.add('citation_data.rtf', 'citation_data.rtf')
 
