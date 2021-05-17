@@ -7,7 +7,7 @@ export interface ParsedSearch {
     filters: {
         path: string;
         values: string[] | ObjectId[];
-        dateOperator: string;
+        dateOperator?: string;
     }[];
 }
 
@@ -98,5 +98,7 @@ export default function parseSearchQuery(q: string): ParsedSearch {
             throw new ParsingError(`Invalid search query ${q}`);
         }
     }
+    console.log(res.filters);
+
     return res;
 }
