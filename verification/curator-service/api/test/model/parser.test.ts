@@ -13,7 +13,9 @@ describe('validate', () => {
         delete missingArn.awsLambdaArn;
 
         return new Parser(missingArn).validate((e) => {
-            expect(e.name).toBe(Error.ValidationError.name);
+            expect(e).not.toBeNull();
+            if (e)
+                expect(e.name).toBe(Error.ValidationError.name);
         });
     });
 

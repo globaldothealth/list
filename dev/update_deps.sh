@@ -8,6 +8,9 @@ npm --prefix=`dirname "$0"`/../data-serving/scripts/setup-db/ prune
 npm --prefix=`dirname "$0"`/../verification/curator-service/ui/ prune
 
 echo 'Updating dependencies. ⬆'
+pushd `dirname "$0"`/../geocoding/location-service
+poetry update
+popd
 npm --prefix=`dirname "$0"`/../verification/curator-service/api/ update
 npm --prefix=`dirname "$0"`/../data-serving/data-service/ update
 npm --prefix=`dirname "$0"`/../data-serving/scripts/setup-db/ update

@@ -19,7 +19,8 @@ describe('validate', () => {
             ...fullModel,
             ...{ ageRange: { start: -0.1 } },
         }).validate((e) => {
-            expect(e.name).toBe(Error.ValidationError.name);
+            expect(e).not.toBeNull();
+            if (e) expect(e.name).toBe(Error.ValidationError.name);
         });
     });
 
@@ -28,7 +29,8 @@ describe('validate', () => {
             ...fullModel,
             ...{ ageRange: { start: 121 } },
         }).validate((e) => {
-            expect(e.name).toBe(Error.ValidationError.name);
+            expect(e).not.toBeNull();
+            if (e) expect(e.name).toBe(Error.ValidationError.name);
         });
     });
 
@@ -37,7 +39,8 @@ describe('validate', () => {
             ...fullModel,
             ...{ ageRange: { end: -2 } },
         }).validate((e) => {
-            expect(e.name).toBe(Error.ValidationError.name);
+            expect(e).not.toBeNull();
+            if (e) expect(e.name).toBe(Error.ValidationError.name);
         });
     });
 
@@ -53,7 +56,8 @@ describe('validate', () => {
             ...fullModel,
             ...{ ageRange: { end: 120.1 } },
         }).validate((e) => {
-            expect(e.name).toBe(Error.ValidationError.name);
+            expect(e).not.toBeNull();
+            if (e) expect(e.name).toBe(Error.ValidationError.name);
         });
     });
 
