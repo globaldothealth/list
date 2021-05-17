@@ -88,7 +88,8 @@ def retrieve_excluded_case_ids(source_id: str, date_filter: Dict, date_range: Di
     res = requests.get(excluded_case_ids_endpoint_url)
     if res and res.status_code == 200:
         res_json = res.json()
-        res_json["cases"]
+        return res_json["cases"]
+    return None
 
 def prepare_cases(cases: Generator[Dict, None, None], upload_id: str, excluded_case_ids: list):
     """
