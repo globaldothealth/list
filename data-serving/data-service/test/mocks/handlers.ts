@@ -11,7 +11,7 @@ export const clear = () => {
 };
 
 export const handlers = [
-    rest.get('http://location/geocode', (req, res, ctx) => {
+    rest.get('http://localhost:3003/geocode', (req, res, ctx) => {
         const query = req.url.searchParams.get('q');
         if (!query) {
             return res(ctx.status(400));
