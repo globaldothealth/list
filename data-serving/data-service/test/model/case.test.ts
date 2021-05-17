@@ -6,17 +6,19 @@ import minimalModel from './data/case.minimal.json';
 
 describe('validate', () => {
     it('model without caseReference is invalid', async () => {
-        const noCaseReference = { ...minimalModel };
+        const noCaseReference: any = { ...minimalModel };
         delete noCaseReference.caseReference;
 
         return new Case({ ...noCaseReference }).validate((e) => {
-            expect(e.name).toBe(Error.ValidationError.name);
+            expect(e).not.toBeNull();
+            if (e) expect(e.name).toBe(Error.ValidationError.name);
         });
     });
 
     it('model without events is invalid', async () => {
         return new Case({ ...minimalModel, events: [] }).validate((e) => {
-            expect(e.name).toBe(Error.ValidationError.name);
+            expect(e).not.toBeNull();
+            if (e) expect(e.name).toBe(Error.ValidationError.name);
         });
     });
 
@@ -26,7 +28,8 @@ describe('validate', () => {
             ...minimalModel,
             events: [notConfirmedEvent],
         }).validate((e) => {
-            expect(e.name).toBe(Error.ValidationError.name);
+            expect(e).not.toBeNull();
+            if (e) expect(e.name).toBe(Error.ValidationError.name);
         });
     });
 
@@ -46,22 +49,26 @@ describe('custom instance methods', () => {
     });
     it('equalsJSON returns true for case differing in caseReference', () => {
         const c = new Case(fullModel);
-        delete fullModel.caseReference;
-        expect(c.equalsJSON(fullModel)).toBe(true);
+        const comparison: any = fullModel;
+        delete comparison.caseReference;
+        expect(c.equalsJSON(comparison)).toBe(true);
     });
     it('equalsJSON returns true for case differing in revisionMetadata', () => {
         const c = new Case(fullModel);
-        delete fullModel.revisionMetadata;
-        expect(c.equalsJSON(fullModel)).toBe(true);
+        const comparison: any = fullModel;
+        delete comparison.revisionMetadata;
+        expect(c.equalsJSON(comparison)).toBe(true);
     });
     it('equalsJSON returns true for case differing in importedCase', () => {
         const c = new Case(fullModel);
-        delete fullModel.importedCase;
-        expect(c.equalsJSON(fullModel)).toBe(true);
+        const comparison: any = fullModel;
+        delete comparison.importedCase;
+        expect(c.equalsJSON(comparison)).toBe(true);
     });
     it('equalsJSON returns false for semantically differing case', () => {
         const c = new Case(fullModel);
-        delete fullModel.demographics.gender;
-        expect(c.equalsJSON(fullModel)).toBe(false);
+        const comparison: any = fullModel;
+        delete comparison.demographics.gender;
+        expect(c.equalsJSON(comparison)).toBe(false);
     });
 });

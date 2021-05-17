@@ -9,11 +9,12 @@ const Event = mongoose.model<EventDocument>('Event', eventSchema);
 
 describe('validate', () => {
     it('a event without a name is invalid', async () => {
-        const missingName = { ...minimalModel };
+        const missingName: any = { ...minimalModel };
         delete missingName.name;
 
         return new Event(missingName).validate((e) => {
-            expect(e.name).toBe(Error.ValidationError.name);
+            expect(e).not.toBeNull();
+            if (e) expect(e.name).toBe(Error.ValidationError.name);
         });
     });
 

@@ -11,14 +11,14 @@ const DateRange = mongoose.model<DateRangeDocument>(
 
 describe('validate', () => {
     it('an open-ended date range document is valid', async () => {
-        const openEndedModel = { ...fullModel };
+        const openEndedModel: any = { ...fullModel };
         delete openEndedModel.end;
 
         return new DateRange(openEndedModel).validate();
     });
 
     it('an open-start date range document is valid', async () => {
-        const openStartModel = { ...fullModel };
+        const openStartModel: any = { ...fullModel };
         delete openStartModel.start;
 
         return new DateRange(openStartModel).validate();
