@@ -49,7 +49,7 @@ Resources:
       Environment:
         Variables:
           EXPORT_FUNCTION: !Ref DataExportExportFunction
-          CHUNK_SIZE: 500000
+          CHUNK_SIZE: 250000
 
   DataExportExportFunction:
     Type: AWS::Serverless::Function
