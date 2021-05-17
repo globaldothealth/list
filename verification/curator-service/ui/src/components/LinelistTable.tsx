@@ -54,7 +54,7 @@ import { ChipData } from './App';
 import { SortBy, SortByOrder } from '../constants/types';
 
 // Limit number of data that can be displayed or downloaded to avoid long execution times of mongo queries
-const DATA_LIMIT = 10000;
+const DATA_LIMIT = 5;
 
 interface ListResponse {
     cases: Case[];
@@ -531,29 +531,27 @@ export function DownloadButton({
                     window.location.href = response.data.signedUrl;
                 } catch (err) {
                     alert(
-                        'There was an error while downloading data, please try again later.',
+                        `There was an error while downloading data, please try again later. ${err}`,
                     );
                 }
                 break;
 
             case 'mailDataset':
                 try {
-                    const response = await axios({
+                    await axios({
                         method: 'post',
-                        url: '/api/cases/downloadLarge',
+                        url: '/api/cases/downloadAsync',
                         data: {
                             format: formatType,
                             query: searchQuery,
-                            email: userEmailAddress,
                         },
                         headers: {
                             'Content-Type': 'application/json',
                         },
                     });
-                    console.log(response);
                 } catch (err) {
                     alert(
-                        'There was an error while downloading data, please try again later.',
+                        `There was an error while downloading data, please try again later. ${err}`,
                     );
                 }
                 break;
@@ -587,7 +585,7 @@ export function DownloadButton({
                     link.click();
                 } catch (err) {
                     alert(
-                        'There was an error while downloading data, please try again later.',
+                        `There was an error while downloading data, please try again later. ${err}`,
                     );
                 }
                 break;
@@ -1397,7 +1395,7 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                             listUrl += '?limit=' + query.pageSize;
                             listUrl += '&page=' + (this.state.page + 1);
                             // Limit the maximum number of documents that are being counted in mongoDB in order to make queries faster
-                            listUrl += '&count_limit=10000';
+                            listUrl += `&count_limit=${DATA_LIMIT}`;
                             listUrl += '&sort_by=' + this.props.sortBy;
                             listUrl += '&order=' + this.props.sortByOrder;
                             if (this.state.searchQuery !== '') {

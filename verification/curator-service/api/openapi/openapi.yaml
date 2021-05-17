@@ -393,7 +393,7 @@ paths:
                   schema:
                       type: integer
                       format: int32
-                      minimum: 100
+                      minimum: 1
                       default: 10000
                       maximum: 50000
                 - name: sort_by
@@ -546,10 +546,9 @@ paths:
     /cases/download:
         post:
             summary: >
-                Streams a CSV attachment of all cases. If a query is supplied the
-                CSV only contains cases matching the search query. If caseIds are
-                supplied the CSV only contains cases with those ids. You cannot supply
-                both query and caseIds.
+                Streams a CSV, TSV or JSON attachment of cases matching the search query. 
+                If caseIds are supplied the CSV only contains cases with those ids. 
+                You cannot supply both query and caseIds.
             tags: [Case]
             operationId: downloadCases
             requestBody:
@@ -559,7 +558,7 @@ paths:
                             type: object
                             properties:
                                 caseIds:
-                                    description: Cases corresponding to these ids will returned
+                                    description: Cases corresponding to these ids will be returned
                                     type: array
                                     items:
                                         type: string
