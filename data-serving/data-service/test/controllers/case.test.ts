@@ -8,6 +8,12 @@ import minimalCase from './../model/data/case.minimal.json';
 import caseMustGeocode from './../model/data/case.mustgeocode.json';
 import mongoose from 'mongoose';
 import request from 'supertest';
+import { setupServer } from 'msw/node';
+import {
+    seed as seedFakeGeocodes,
+    clear as clearFakeGeocodes,
+    handlers,
+} from '../mocks/handlers';
 
 let mongoServer: MongoMemoryServer;
 
@@ -24,18 +30,26 @@ const invalidRequest = {
 };
 
 const realDate = Date.now;
+const mockLocationServer = setupServer(...handlers);
 
 beforeAll(async () => {
+    mockLocationServer.listen();
     mongoServer = new MongoMemoryServer();
     global.Date.now = jest.fn(() => new Date('2020-12-12T12:12:37Z').getTime());
 });
 
 beforeEach(async () => {
+    clearFakeGeocodes();
     await Case.deleteMany({});
     return CaseRevision.deleteMany({});
 });
 
+afterEach(() => {
+    mockLocationServer.resetHandlers();
+});
+
 afterAll(async () => {
+    mockLocationServer.close();
     global.Date.now = realDate;
     return mongoServer.stop();
 });
@@ -518,25 +532,19 @@ describe('POST', () => {
         );
     });
     it('geocodes everything that is necessary', async () => {
-        await request(app)
-            .post('/api/geocode/seed')
-            .send({
-                country: 'Canada',
-                geoResolution: 'Country',
-                geometry: { latitude: 42.42, longitude: 11.11 },
-                name: 'Canada',
-            })
-            .expect(200);
-        await request(app)
-            .post('/api/geocode/seed')
-            .send({
-                administrativeAreaLevel1: 'Quebec',
-                country: 'Canada',
-                geoResolution: 'Admin1',
-                geometry: { latitude: 33.33, longitude: 99.99 },
-                name: 'Montreal',
-            })
-            .expect(200);
+        seedFakeGeocodes('Canada', {
+            country: 'Canada',
+            geoResolution: 'Country',
+            geometry: { latitude: 42.42, longitude: 11.11 },
+            name: 'Canada',
+        });
+        seedFakeGeocodes('Montreal', {
+            administrativeAreaLevel1: 'Quebec',
+            country: 'Canada',
+            geoResolution: 'Admin1',
+            geometry: { latitude: 33.33, longitude: 99.99 },
+            name: 'Montreal',
+        });
         await request(app)
             .post('/api/cases')
             .send({
@@ -555,7 +563,6 @@ describe('POST', () => {
         ).toBeDefined();
     });
     it('throws if cannot geocode', async () => {
-        await request(app).post('/api/geocode/clear').expect(200);
         await request(app)
             .post('/api/cases')
             .send({

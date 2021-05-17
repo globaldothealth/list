@@ -40,6 +40,8 @@ spec:
                   fieldPath: metadata.labels['environment']
             - name: DATASERVER_URL
               value: "http://data-dev"
+            - name: LOCATION_SERVICE_URL
+              value: "http://location-dev"
             - name: DB_CONNECTION_STRING
               valueFrom:
                 secretKeyRef:
@@ -135,6 +137,8 @@ spec:
                   fieldPath: metadata.labels['environment']
             - name: DATASERVER_URL
               value: "http://data-prod"
+            - name: LOCATION_SERVICE_URL
+              value: "http://location-prod"
             - name: DB_CONNECTION_STRING
               valueFrom:
                 secretKeyRef:

@@ -13,6 +13,7 @@ export default function validateEnv(): Readonly<{
     GLOBAL_RETRIEVAL_FUNCTION_ARN: string;
     GOOGLE_OAUTH_CLIENT_ID: string;
     GOOGLE_OAUTH_CLIENT_SECRET: string;
+    LOCATION_SERVICE_URL: string;
     PORT: number;
     SERVICE_ENV: string;
     SESSION_COOKIE_KEY: string;
@@ -77,6 +78,10 @@ export default function validateEnv(): Readonly<{
         GOOGLE_OAUTH_CLIENT_SECRET: str({
             desc: 'OAuth client secret from the Google developer console',
             devDefault: 'replace to enable auth',
+        }),
+        LOCATION_SERVICE_URL: str({
+            desc: 'Base location for the geocoding service',
+            devDefault: 'http://location',
         }),
         PORT: port({ default: 3001 }),
         SERVICE_ENV: str({

@@ -9,29 +9,32 @@ const Location = mongoose.model<LocationDocument>('Location', locationSchema);
 
 describe('validate', () => {
     it('a location without a geo resolution is invalid', async () => {
-        const noGeoResolution = { ...minimalModel };
+        const noGeoResolution: any = { ...minimalModel };
         delete noGeoResolution.geoResolution;
 
         return new Location(noGeoResolution).validate((e) => {
-            expect(e.name).toBe(Error.ValidationError.name);
+            expect(e).not.toBeNull();
+            if (e) expect(e.name).toBe(Error.ValidationError.name);
         });
     });
 
     it('a location without a geometry is invalid', async () => {
-        const noGeometry = { ...minimalModel };
+        const noGeometry: any = { ...minimalModel };
         delete noGeometry.geometry;
 
         return new Location(noGeometry).validate((e) => {
-            expect(e.name).toBe(Error.ValidationError.name);
+            expect(e).not.toBeNull();
+            if (e) expect(e.name).toBe(Error.ValidationError.name);
         });
     });
 
     it('a location without a name is invalid', async () => {
-        const noName = { ...minimalModel };
+        const noName: any = { ...minimalModel };
         delete noName.name;
 
         return new Location(noName).validate((e) => {
-            expect(e.name).toBe(Error.ValidationError.name);
+            expect(e).not.toBeNull();
+            if (e) expect(e.name).toBe(Error.ValidationError.name);
         });
     });
 
@@ -42,7 +45,8 @@ describe('validate', () => {
                 latitude: 40.6,
             },
         }).validate((e) => {
-            expect(e.name).toBe(Error.ValidationError.name);
+            expect(e).not.toBeNull();
+            if (e) expect(e.name).toBe(Error.ValidationError.name);
         });
     });
 
@@ -53,7 +57,8 @@ describe('validate', () => {
                 longitude: -73.9,
             },
         }).validate((e) => {
-            expect(e.name).toBe(Error.ValidationError.name);
+            expect(e).not.toBeNull();
+            if (e) expect(e.name).toBe(Error.ValidationError.name);
         });
     });
 

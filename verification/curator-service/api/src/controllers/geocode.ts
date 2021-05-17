@@ -5,12 +5,12 @@ import { logger } from '../util/logger';
 
 /** Dumb proxy to geocoder in data service */
 export default class GeocodeProxy {
-    constructor(private readonly dataServerURL: string) {}
+    constructor(private readonly locationServiceURL: string) {}
 
     suggest = async (req: Request, res: Response): Promise<void> => {
         try {
             const response = await axios.get(
-                this.dataServerURL + '/api' + req.url,
+                this.locationServiceURL + req.url,
             );
             res.status(response.status).json(response.data);
             return;
@@ -26,7 +26,7 @@ export default class GeocodeProxy {
 
     seed = async (req: Request, res: Response): Promise<void> => {
         const response = await axios.post(
-            this.dataServerURL + '/api' + req.url,
+            this.locationServiceURL + req.url,
             req.body,
         );
         res.status(response.status).send();
@@ -34,7 +34,7 @@ export default class GeocodeProxy {
 
     clear = async (req: Request, res: Response): Promise<void> => {
         const response = await axios.post(
-            this.dataServerURL + '/api' + req.url,
+            this.locationServiceURL + req.url,
             req.body,
         );
         res.status(response.status).send();
