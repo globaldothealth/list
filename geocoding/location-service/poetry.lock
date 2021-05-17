@@ -376,7 +376,7 @@ six = ">=1.5"
 
 [[package]]
 name = "ratelimiter"
-version = "1.2.0.post0"
+version = "1.2.0"
 description = "Simple python rate limiting object"
 category = "main"
 optional = false
@@ -493,7 +493,7 @@ locale = ["Babel (>=1.3)"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.8"
-content-hash = "442a8d03e4497c644c86dc5fc93d18d614dfbb8094fc6de2da3c8fa19dc071f9"
+content-hash = "6a6af2cbc7545d604a7cbe87aa19cc84025a9e906adcc82efdc52c8ca78dd2f2"
 
 [metadata.files]
 atomicwrites = [
@@ -767,8 +767,8 @@ python-dateutil = [
     {file = "python_dateutil-2.8.1-py2.py3-none-any.whl", hash = "sha256:75bb3f31ea686f1197762692a9ee6a7550b59fc6ca3a1f4b5d7e32fb98e2da2a"},
 ]
 ratelimiter = [
-    {file = "ratelimiter-1.2.0.post0-py3-none-any.whl", hash = "sha256:a52be07bc0bb0b3674b4b304550f10c769bbb00fead3072e035904474259809f"},
-    {file = "ratelimiter-1.2.0.post0.tar.gz", hash = "sha256:5c395dcabdbbde2e5178ef3f89b568a3066454a6ddc223b76473dac22f89b4f7"},
+    {file = "ratelimiter-1.2.0-py2.py3-none-any.whl", hash = "sha256:d22d933016b803df8c08e6532b9b84678bf4557164d611a4817db9e5434fcd72"},
+    {file = "ratelimiter-1.2.0.tar.gz", hash = "sha256:f724b256264afdeab0225ec174728b0f8af1afd1cc122463150daf226b411fb6"},
 ]
 requests = [
     {file = "requests-2.25.1-py2.py3-none-any.whl", hash = "sha256:c210084e36a42ae6b9219e00e48287def368a26d03a048ddad7bfee44f75871e"},
