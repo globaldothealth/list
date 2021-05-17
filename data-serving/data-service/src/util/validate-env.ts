@@ -13,7 +13,7 @@ export default function validateEnv(): Readonly<{
     return cleanEnv(process.env, {
         LOCATION_SERVICE_URL: str({
             desc: 'Base location for the geocoding service',
-            devDefault: 'http://location',
+            devDefault: 'http://localhost:3003',
         }),
         DB_CONNECTION_STRING: str({
             desc: 'MongoDB URI provided to MongoClient.',
