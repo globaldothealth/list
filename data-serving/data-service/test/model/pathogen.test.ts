@@ -9,26 +9,29 @@ const Pathogen = mongoose.model<PathogenDocument>('Pathogen', pathogenSchema);
 
 describe('validate', () => {
     it('a pathogen without a name is invalid', async () => {
-        const missingName = { ...minimalModel };
+        const missingName: any = { ...minimalModel };
         delete missingName.name;
 
         return new Pathogen(missingName).validate((e) => {
-            expect(e.name).toBe(Error.ValidationError.name);
+            expect(e).not.toBeNull();
+            if (e) expect(e.name).toBe(Error.ValidationError.name);
         });
     });
 
     it('a pathogen without an id is invalid', async () => {
-        const missingId = { ...minimalModel };
+        const missingId: any = { ...minimalModel };
         delete missingId.id;
 
         return new Pathogen(missingId).validate((e) => {
-            expect(e.name).toBe(Error.ValidationError.name);
+            expect(e).not.toBeNull();
+            if (e) expect(e.name).toBe(Error.ValidationError.name);
         });
     });
 
     it('a non-integer pathogen id is invalid', async () => {
         return new Pathogen({ ...minimalModel, id: 1.1 }).validate((e) => {
-            expect(e.name).toBe(Error.ValidationError.name);
+            expect(e).not.toBeNull();
+            if (e) expect(e.name).toBe(Error.ValidationError.name);
         });
     });
 
