@@ -1531,11 +1531,6 @@ components:
                         type: string
             required:
                 - cases
-        downloadLarge:
-            type: object
-            properties:
-                message:
-                    type: string
         SignedUrl:
             type: object
             properties:
@@ -1878,12 +1873,6 @@ components:
                 text/csv:
                     schema:
                         description: A CSV with headers detailing case data.
-        '200CasesLargeDownload':
-            description: OK
-            content:
-                application/json:
-                    schema:
-                        $ref: '#/components/schemas/downloadLarge'
         '200FullDataSetDownload':
             description: OK
             content:
