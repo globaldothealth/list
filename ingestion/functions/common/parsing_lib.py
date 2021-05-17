@@ -130,7 +130,7 @@ def write_to_server(
         cases_batch_size: int):
     """Upserts the provided cases via the G.h Case API."""
     put_api_url = f"{common_lib.get_source_api_url(env)}/cases/batchUpsert"
-    counter = collections.Counter()
+    counter = collections.defaultdict(int)
     counter['batch_num'] = 0
     start_time = time.time()
     encountered_207 = False
