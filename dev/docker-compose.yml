@@ -65,6 +65,7 @@ services:
       - geocoding
     environment:
       DB_CONNECTION_STRING: "mongodb://mongo:27017/covid19"
+      LOCATION_SERVICE_URL: "http://geocoding:8080"
       MAPBOX_TOKEN: "${MAPBOX_TOKEN}"
     healthcheck:
       test: ["CMD", "curl", "-f", "http://data:3000"]
