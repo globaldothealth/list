@@ -1,4 +1,5 @@
 import datetime
+import json
 import os
 import sys
 import tempfile
@@ -129,9 +130,14 @@ def write_to_server(
         cases_batch_size: int):
     """Upserts the provided cases via the G.h Case API."""
     put_api_url = f"{common_lib.get_source_api_url(env)}/cases/batchUpsert"
-    counter = collections.Counter()
+    counter = collections.defaultdict(int)
+    counter['batch_num'] = 0
     start_time = time.time()
+    encountered_207 = False
+    validation_messages = {}
     while True:
+        batch_num = counter['batch_num']
+        counter['batch_num'] += 1
         batch = batch_of(cases, cases_batch_size)
         # End of batch.
         if not batch:
@@ -150,7 +156,7 @@ def write_to_server(
             total_wait += wait
             wait *= 2
 
-        if res and res.status_code == 200:
+        if res and res.status_code==200:
             counter['total'] += len(batch)
             now = time.time()
             cps = int(counter['total'] / (now - start_time))
@@ -159,24 +165,35 @@ def write_to_server(
             counter['numCreated'] += res_json["numCreated"]
             counter['numUpdated'] += res_json["numUpdated"]
             continue
+        elif res.status_code == 207:
+            # 207 encompasses both geocoding and case schema validation errors.
+            # We can consider separating geocoding issues, but for now classifying it
+            # as a validation problem is pretty reasonable.
+            # The motivation for continuing past 207 errors is https://github.com/globaldothealth/list/issues/1849
+            encountered_207 = True
+            validation_messages[f"batch_{batch_num}"] = res.text
+            continue
+
         # Response can contain an 'error' field which describe each error that
         # occurred, it will be contained in the res.text here below.
         e = RuntimeError(
             f'Error sending cases to server, status={res.status_code}, response={res.text}')
-        # 207 encompasses both geocoding and case schema validation errors.
-        # We can consider separating geocoding issues, but for now classifying it
-        # as a validation problem is pretty reasonable.
-        upload_error = (common_lib.UploadError.VALIDATION_ERROR
-                        if res.status_code == 207 else
-                        common_lib.UploadError.DATA_UPLOAD_ERROR)
+        upload_error = common_lib.UploadError.DATA_UPLOAD_ERROR
         common_lib.complete_with_error(
             e, env, upload_error,
             source_id, upload_id, headers, cookies,
             count_created=counter['numCreated'],
             count_updated=counter['numUpdated'])
         return
-    print(
-        f'sent {counter["total"]} cases in {time.time() - start_time} seconds')
+    print(f'sent {counter["total"]} cases in {time.time() - start_time} seconds')
+    if encountered_207 == True:
+        e = RuntimeError(f'Validation errors encountered, details:\n{json.dumps(validation_messages)}')
+        common_lib.complete_with_error(
+            e, env, common_lib.UploadError.VALIDATION_ERROR,
+            source_id, upload_id, headers, cookies,
+            count_created=counter['numCreated'],
+            count_updated=counter['numUpdated'])
+        return
     return counter['numCreated'], counter['numUpdated']
 
 
