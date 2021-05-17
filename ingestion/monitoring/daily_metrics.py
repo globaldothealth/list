@@ -44,6 +44,11 @@ def compare(d1, d2):
     lines = []
     total1 = sum(x["casecount"] for x in d1)
     total2 = sum(x["casecount"] for x in d2)
+    countries = [x["_id"] for x in d2 if x["casecount"]]
+    lines.append(
+        f"*{total2:,}* cases from *{len(set(countries))}* countries "
+        + ("(including one null country)" if None in countries else "")
+    )
     if total2 == total1:
         lines.append(f"No overall case count change from {last_day}")
     elif total2 > total1:
@@ -96,7 +101,9 @@ if __name__ == "__main__":
     if WEBHOOK_URL:
         response = requests.post(WEBHOOK_URL, json={"text": ret})
         if response.status_code != 200:
-            print(f"Slack notification failed with {response.status_code}: {response.text}")
+            print(
+                f"Slack notification failed with {response.status_code}: {response.text}"
+            )
             sys.exit(1)
     if "⚠️" in ret:
         sys.exit(1)  # Trigger CI failure as an additional notification
