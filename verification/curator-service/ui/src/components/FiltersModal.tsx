@@ -30,6 +30,9 @@ const useStyles = makeStyles((theme: Theme) =>
                 width: '25ch',
             },
         },
+        dialogContent: {
+            paddingBottom: '24px',
+        },
         textField: {
             width: '25ch',
             margin: theme.spacing(1),
@@ -243,7 +246,7 @@ export default function FiltersModal({
                     instead.
                 </Alert>
             )}
-            <DialogContent>
+            <DialogContent className={classes.dialogContent}>
                 <form className={classes.root} onSubmit={formik.handleSubmit}>
                     {/* GENERAL */}
                     <div>
