@@ -79,6 +79,8 @@ export class CasesController {
             return;
         }
 
+        const queryLimit = Number(req.body.limit);
+
         // Goofy Mongoose types require this.
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         let casesQuery: any[];
@@ -112,13 +114,13 @@ export class CasesController {
             );
 
             let matchingCases: any;
-            if (req.body.limit) {
-                matchingCases = await Case.aggregate(
-                    casesIgnoringExcluded,
-                ).collation({
-                    locale: 'en_US',
-                    strength: 2,
-                });
+            if (queryLimit) {
+                matchingCases = await Case.aggregate(casesIgnoringExcluded)
+                    .collation({
+                        locale: 'en_US',
+                        strength: 2,
+                    })
+                    .limit(queryLimit);
             } else {
                 matchingCases = await Case.aggregate(
                     casesIgnoringExcluded,
@@ -140,6 +142,8 @@ export class CasesController {
 
             res.setHeader('Cache-Control', 'no-cache');
             res.setHeader('Pragma', 'no-cache');
+
+            logger.info('format: ' + req.body.format);
 
             switch (req.body.format) {
                 case 'csv':
