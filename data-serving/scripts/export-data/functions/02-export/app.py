@@ -1,6 +1,5 @@
 """Exports MongoDB data to a csv or json file."""
 
-import argparse
 import datetime
 import os
 import subprocess
@@ -39,9 +38,9 @@ def export_chunk(skip, limit, num_cases, num_chunk, num_chunks, field_names):
         [
             "./mongoexport",
             f'--uri="{uri}"',
-            f'--collection="cases"',
+            '--collection="cases"',
             f'--fields="{field_names}"',
-            f'--type="csv"',
+            '--type="csv"',
             f'--out="/tmp/{chunk_fn}"',
             "--jsonArray",
             f"--skip={skip}",

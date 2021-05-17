@@ -49,7 +49,7 @@ Resources:
       Environment:
         Variables:
           EXPORT_FUNCTION: !Ref DataExportExportFunction
-          CHUNK_SIZE: 100000
+          CHUNK_SIZE: 250000
 
   DataExportExportFunction:
     Type: AWS::Serverless::Function
@@ -60,10 +60,10 @@ Resources:
       MemorySize: 1024
       Policies:
         - S3CrudPolicy:
-            BucketName: global-dot-health-data-export-bucket
+            BucketName: global-dot-health-data-export-bucket-2
       Environment:
         Variables:
-          EXPORT_BUCKET: global-dot-health-data-export-bucket
+          EXPORT_BUCKET: global-dot-health-data-export-bucket-2
 
   DataExportParseFunction:
     Type: AWS::Serverless::Function
@@ -86,10 +86,10 @@ Resources:
                   Value: processing/parse/
       Policies:
         - S3CrudPolicy:
-            BucketName: global-dot-health-data-export-bucket
+            BucketName: global-dot-health-data-export-bucket-2
       Environment:
         Variables:
-          EXPORT_BUCKET: global-dot-health-data-export-bucket
+          EXPORT_BUCKET: global-dot-health-data-export-bucket-2
 
   DataExportCombineFunction:
     Type: AWS::Serverless::Function
@@ -117,7 +117,11 @@ Resources:
         - Arn: arn:aws:elasticfilesystem:us-east-1:612888738066:access-point/fsap-047be197871c040c2
           LocalMountPath: !Ref EFSpath
       Policies:
-        - AWSLambdaFullAccess
+        - S3CrudPolicy:
+            BucketName: global-dot-health-data-export-bucket-2
+        - S3CrudPolicy:
+            BucketName: covid-19-data-export
+        - AWSLambda_FullAccess
         - AWSLambdaVPCAccessExecutionRole
         - AmazonElasticFileSystemClientReadWriteAccess
 
@@ -137,10 +141,12 @@ Resources:
       Layers:
         - arn:aws:lambda:us-east-1:612888738066:layer:awsdatawrangler:1
       Policies:
-        - AWSLambdaFullAccess
+        - S3CrudPolicy:
+            BucketName: covid-19-aggregates
+        - AWSLambda_FullAccess
 
   Bucket:
     Type: 'AWS::S3::Bucket'
     Properties:
-      BucketName: global-dot-health-data-export-bucket
+      BucketName: global-dot-health-data-export-bucket-2
 
