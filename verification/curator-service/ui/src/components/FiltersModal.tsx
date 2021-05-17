@@ -73,7 +73,7 @@ interface FiltersModalProps {
 
 export interface FilterFormValues {
     country?: string;
-    gender?: '' | 'Male' | 'Female';
+    gender?: '' | 'Male' | 'Female' | 'No gender';
     verificationstatus?: string;
     admin1?: string;
     admin2?: string;
@@ -240,11 +240,12 @@ export default function FiltersModal({
                                 value={formik.values.gender || ''}
                                 onChange={formik.handleChange}
                             >
-                                <MenuItem value="" disabled>
+                                <MenuItem value="">
                                     None
                                 </MenuItem>
                                 <MenuItem value="male">Male</MenuItem>
                                 <MenuItem value="female">Female</MenuItem>
+                                <MenuItem value="noGender">Not provided</MenuItem>
                             </Select>
                         </FormControl>
                         <FormControl
