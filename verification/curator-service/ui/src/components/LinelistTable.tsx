@@ -75,8 +75,6 @@ interface LinelistTableState {
 
     selectedVerificationStatus: VerificationStatus;
     searchQuery: string;
-    sortBy: SortBy;
-    sortByOrder: SortByOrder;
 }
 
 // Material table doesn't handle structured fields well, we flatten all fields in this row.
@@ -117,6 +115,8 @@ interface Props
     user: User;
     page: number;
     pageSize: number;
+    sortBy: SortBy;
+    sortByOrder: SortByOrder;
 
     onChangePage: (page: number) => void;
 
@@ -126,6 +126,8 @@ interface Props
     handleBreadcrumbDelete: (breadcrumbToDelete: ChipData) => void;
     setFiltersModalOpen: (value: boolean) => void;
     setActiveFilterInput: (value: string) => void;
+    setSortBy: (value: SortBy) => void;
+    setSortByOrder: (value: SortByOrder) => void;
 }
 
 const styles = (theme: Theme) =>
@@ -432,6 +434,7 @@ export function SortSelect({
             <FormControl className={classes.formControl}>
                 <InputLabel id="sort-by-label">Sort by</InputLabel>
                 <Select
+                    id="sort-by-select"
                     labelId="sort-by-label"
                     name="sortBy"
                     value={sortBy}
@@ -585,8 +588,6 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                 encodeURIComponent(
                     URLToSearchQuery(this.props.location.search),
                 ) ?? '',
-            sortBy: SortBy.Default,
-            sortByOrder: SortByOrder.Descending,
         };
         this.deleteCases = this.deleteCases.bind(this);
         this.setCaseVerification = this.setCaseVerification.bind(this);
@@ -628,17 +629,13 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
     }
 
     handleSortByChange(sortBy: SortBy): void {
-        this.setState(
-            { page: 0, sortBy },
-            this.tableRef.current?.onQueryChange(),
-        );
+        this.props.setSortBy(sortBy);
+        this.tableRef.current?.onQueryChange();
     }
 
     handleSortByOrderChange(sortByOrder: SortByOrder): void {
-        this.setState(
-            { page: 0, sortByOrder },
-            this.tableRef.current?.onQueryChange(),
-        );
+        this.props.setSortByOrder(sortByOrder);
+        this.tableRef.current?.onQueryChange();
     }
 
     async deleteCases(): Promise<void> {
@@ -1167,8 +1164,8 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                             listUrl += '&page=' + (this.state.page + 1);
                             // Limit the maximum number of documents that are being counted in mongoDB in order to make queries faster
                             listUrl += '&count_limit=10000';
-                            listUrl += '&sort_by=' + this.state.sortBy;
-                            listUrl += '&order=' + this.state.sortByOrder;
+                            listUrl += '&sort_by=' + this.props.sortBy;
+                            listUrl += '&order=' + this.props.sortByOrder;
                             if (this.state.searchQuery !== '') {
                                 listUrl += '&q=' + this.state.searchQuery;
                             }
@@ -1296,8 +1293,8 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                     </Typography>
 
                                     <SortSelect
-                                        sortBy={this.state.sortBy}
-                                        sortByOrder={this.state.sortByOrder}
+                                        sortBy={this.props.sortBy}
+                                        sortByOrder={this.props.sortByOrder}
                                         handleSortByChange={
                                             this.handleSortByChange
                                         }

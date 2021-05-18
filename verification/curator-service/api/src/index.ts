@@ -18,7 +18,6 @@ import SourcesController from './controllers/sources';
 import UploadsController from './controllers/uploads';
 import { ValidationError } from 'express-openapi-validator/dist/framework/types';
 import YAML from 'yamljs';
-import bodyParser from 'body-parser';
 import cookieParser from 'cookie-parser';
 import dotenv from 'dotenv';
 import express from 'express';
@@ -317,9 +316,9 @@ new EmailClient(env.EMAIL_USER_ADDRESS, env.EMAIL_USER_PASSWORD)
             usersController.listRoles,
         );
 
-        const geocodeProxy = new GeocodeProxy(env.DATASERVER_URL);
+        const geocodeProxy = new GeocodeProxy(env.LOCATION_SERVICE_URL);
 
-        // Forward geocode requests to data service.
+        // Forward geocode requests to location service.
         apiRouter.get(
             '/geocode/suggest',
             mustHaveAnyRole(['curator']),

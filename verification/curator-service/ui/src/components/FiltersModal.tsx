@@ -30,6 +30,9 @@ const useStyles = makeStyles((theme: Theme) =>
                 width: '25ch',
             },
         },
+        dialogContent: {
+            paddingBottom: '24px',
+        },
         textField: {
             width: '25ch',
             margin: theme.spacing(1),
@@ -90,6 +93,11 @@ export interface FilterFormValues {
     uploadid?: string;
 }
 
+interface FilterFormErrors {
+    dateconfirmedbefore?: string | null;
+    dateconfirmedafter?: string | null;
+}
+
 export default function FiltersModal({
     isOpen,
     activeFilterInput,
@@ -113,10 +121,41 @@ export default function FiltersModal({
         setFormValues(newFilters);
     }, [location.search]);
 
+    const validateForm = (values: FilterFormValues) => {
+        const errors: FilterFormErrors = {};
+
+        if (
+            values.dateconfirmedbefore &&
+            new Date(values.dateconfirmedbefore) > new Date()
+        ) {
+            errors.dateconfirmedbefore =
+                "Date confirmed before can't be a future date";
+        }
+
+        if (
+            values.dateconfirmedafter &&
+            new Date(values.dateconfirmedafter) > new Date()
+        ) {
+            errors.dateconfirmedafter =
+                "Date confirmed after can't be a future date";
+        }
+
+        return errors;
+    };
+
     const formik = useFormik({
         enableReinitialize: true,
         initialValues: formValues,
-        onSubmit: (values) => {
+        validate: validateForm,
+        validateOnChange: true,
+        onSubmit: (values: any) => {
+            Object.keys(values).map(
+                (k) =>
+                    (values[k] =
+                        typeof values[k] == 'string'
+                            ? values[k].trim()
+                            : values[k]),
+            );
             handleSetModalAlert();
             handleClose();
             const searchQuery = filtersToURL(values);
@@ -135,20 +174,19 @@ export default function FiltersModal({
 
     const handleClearFiltersClick = () => {
         setFormValues({});
-        formik.resetForm();
-        history.push({ pathname: '/cases', search: '' });
-        handleClose();
+        // commented in case we want in future the button to reset the filters already applied
+        // formik.resetForm();
+        // history.push({ pathname: '/cases', search: '' });
     };
 
-
     function handleSetModalAlert() {
-        closeAlert(!showModalAlert);
+        closeAlert(false);
     }
 
     const closeAndResetAlert = () => {
         handleClose();
         closeAlert(false);
-    }
+    };
 
     // COMMENTED OUT UNTIL CONTENT FOR TOOLTIPS IS PROVIDED
     // const tooltipHelpIcon = (tooltipContent: JSX.Element) => {
@@ -199,13 +237,16 @@ export default function FiltersModal({
             {showModalAlert && (
                 <Alert
                     severity="info"
-                    onClose={() => {handleSetModalAlert()}}
+                    onClose={() => {
+                        handleSetModalAlert();
+                    }}
                     className={classes.alertBox}
                 >
-                    Please do not use filters in the Search Bar, use them here instead.
+                    Please do not use filters in the Search Bar, use them here
+                    instead.
                 </Alert>
             )}
-            <DialogContent>
+            <DialogContent className={classes.dialogContent}>
                 <form className={classes.root} onSubmit={formik.handleSubmit}>
                     {/* GENERAL */}
                     <div>
@@ -409,8 +450,7 @@ export default function FiltersModal({
                                 Boolean(formik.errors.variant)
                             }
                             helperText={
-                                formik.touched.variant &&
-                                formik.errors.variant
+                                formik.touched.variant && formik.errors.variant
                             }
                         />
                         <TextField
@@ -551,6 +591,7 @@ export default function FiltersModal({
                             variant="contained"
                             type="submit"
                             data-test-id="search-by-filter-button"
+                            name="filterButton"
                             className={classes.searchBtn}
                         >
                             Filter
