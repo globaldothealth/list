@@ -214,6 +214,8 @@ Images used in deployments are pulled from the Github Container Registry where i
 
 Check out the registries for the [curator service](https://github.com/orgs/globaldothealth/packages/container/list%2Fcuratorservice/) and [data service](https://github.com/orgs/globaldothealth/packages/container/list%2Fdataservice/).
 
+If you add a service, the packages will be _private_ by default which will make `k8s` have "image pull" errors as it won't be able to fetch the configured images from the Github Container Registry. You have to go to the [global.health packages list](https://github.com/orgs/globaldothealth/packages), find your new package, and in its settings change its visibility from private to public. This is a one-time action for each new package.
+
 ## Releases
 
 We follow [semantic versioning](https://semver.org/) which is basically:
