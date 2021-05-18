@@ -16,10 +16,8 @@ import {
 } from './controllers/preprocessor';
 
 import { Case } from './model/case';
-import FakeGeocoder from './geocoding/fake';
-import GeocodeSuggester from './geocoding/suggest';
 import { Geocoder } from './geocoding/geocoder';
-import MapboxGeocoder from './geocoding/mapbox';
+import RemoteGeocoder from './geocoding/remoteGeocoder';
 import { middleware as OpenApiValidatorMiddleware } from 'express-openapi-validator';
 import YAML from 'yamljs';
 import bodyParser from 'body-parser';
@@ -29,7 +27,6 @@ import mongoose from 'mongoose';
 import swaggerUi from 'swagger-ui-express';
 import validateEnv from './util/validate-env';
 import { logger } from './util/logger';
-import { RateLimiter } from 'limiter';
 
 const app = express();
 
@@ -91,28 +88,15 @@ app.use(
 );
 
 const apiRouter = express.Router();
-// Chain geocoders so that during dev/integration tests we can use the fake one.
-// It might also just be useful to have various geocoders plugged-in at some point.
+// Geocoders configured as an array so that alternate sources can be added.
 const geocoders = new Array<Geocoder>();
-if (env.ENABLE_FAKE_GEOCODER) {
-    logger.info('Using fake geocoder');
-    const fakeGeocoder = new FakeGeocoder();
-    apiRouter.post('/geocode/seed', fakeGeocoder.seed);
-    apiRouter.post('/geocode/clear', fakeGeocoder.clear);
-    geocoders.push(fakeGeocoder);
+const remoteGeocodingLocation = env.LOCATION_SERVICE_URL;
+if (remoteGeocodingLocation) {
+    logger.info(`Using remote geocoder at ${remoteGeocodingLocation}`);
+    const remoteCoder = new RemoteGeocoder(remoteGeocodingLocation);
+    geocoders.push(remoteCoder);
 }
-if (env.MAPBOX_TOKEN !== '') {
-    logger.info('Using mapbox geocoder');
-    geocoders.push(
-        new MapboxGeocoder(
-            env.MAPBOX_TOKEN,
-            env.MAPBOX_PERMANENT_GEOCODE
-                ? 'mapbox.places-permanent'
-                : 'mapbox.places',
-            new RateLimiter(env.MAPBOX_GEOCODE_RATE_LIMIT_PER_MIN, 'minute'),
-        ),
-    );
-}
+
 const caseController = new cases.CasesController(geocoders);
 
 apiRouter.get('/cases/:id([a-z0-9]{24})', caseController.get);
@@ -168,10 +152,6 @@ apiRouter.delete(
 );
 apiRouter.post('/cases/batchStatusChange', caseController.batchStatusChange);
 apiRouter.get('/excludedCaseIds', caseController.listExcludedCaseIds);
-
-// Suggest locations based on the request's "q" query param.
-const geocodeSuggester = new GeocodeSuggester(geocoders);
-apiRouter.get('/geocode/suggest', geocodeSuggester.suggest);
 
 app.use('/api', apiRouter);
 

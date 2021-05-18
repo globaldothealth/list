@@ -14,7 +14,9 @@ describe('validate', () => {
         badArn.awsRuleArn = 'invalid:arn:aws:events:region:rule/field';
 
         return new Schedule(badArn).validate((e) => {
-            expect(e.name).toBe(Error.ValidationError.name);
+            expect(e).not.toBeNull();
+            if (e)
+                expect(e.name).toBe(Error.ValidationError.name);
         });
     });
 
@@ -23,7 +25,9 @@ describe('validate', () => {
         delete missingExpression.awsScheduleExpression;
 
         return new Schedule(missingExpression).validate((e) => {
-            expect(e.name).toBe(Error.ValidationError.name);
+            expect(e).not.toBeNull();
+            if (e)
+                expect(e.name).toBe(Error.ValidationError.name);
         });
     });
 
@@ -32,7 +36,9 @@ describe('validate', () => {
         badSchedule.awsScheduleExpression = 'rate(1 hour';
 
         return new Schedule(badSchedule).validate((e) => {
-            expect(e.name).toBe(Error.ValidationError.name);
+            expect(e).not.toBeNull();
+            if (e)
+                expect(e.name).toBe(Error.ValidationError.name);
         });
     });
 

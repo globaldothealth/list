@@ -6,20 +6,22 @@ import mongoose from 'mongoose';
 
 describe('validate', () => {
     it('revision metadata without revision number is invalid', async () => {
-        const noRevisionNumber = { ...minimalModel };
+        const noRevisionNumber: any = { ...minimalModel };
         delete noRevisionNumber.revisionNumber;
 
         return new RevisionMetadata(noRevisionNumber).validate((e) => {
-            expect(e.name).toBe(Error.ValidationError.name);
+            expect(e).not.toBeNull();
+            if (e) expect(e.name).toBe(Error.ValidationError.name);
         });
     });
 
     it('revision metadata without creation metadata is invalid', async () => {
-        const noCreationMetadata = { ...minimalModel };
+        const noCreationMetadata: any = { ...minimalModel };
         delete noCreationMetadata.creationMetadata;
 
         return new RevisionMetadata(noCreationMetadata).validate((e) => {
-            expect(e.name).toBe(Error.ValidationError.name);
+            expect(e).not.toBeNull();
+            if (e) expect(e.name).toBe(Error.ValidationError.name);
         });
     });
 
@@ -28,7 +30,8 @@ describe('validate', () => {
             ...minimalModel,
             ...{ revisionNumber: 2.2 },
         }).validate((e) => {
-            expect(e.name).toBe(Error.ValidationError.name);
+            expect(e).not.toBeNull();
+            if (e) expect(e.name).toBe(Error.ValidationError.name);
         });
     });
 
@@ -37,16 +40,21 @@ describe('validate', () => {
             ...minimalModel,
             ...{ creationMetadata: { revisionNumber: 0 } },
         }).validate((e) => {
-            expect(e.name).toBe(Error.ValidationError.name);
+            expect(e).not.toBeNull();
+            if (e) expect(e.name).toBe(Error.ValidationError.name);
         });
     });
 
     it('revision metadata beyond revision 0 without update metadata is invalid', async () => {
-        const noUpdateMetadata = { ...fullModel, ...{ revisionNumber: 1 } };
+        const noUpdateMetadata: any = {
+            ...fullModel,
+            ...{ revisionNumber: 1 },
+        };
         delete noUpdateMetadata.updateMetadata;
 
         return new RevisionMetadata(noUpdateMetadata).validate((e) => {
-            expect(e.name).toBe(Error.ValidationError.name);
+            expect(e).not.toBeNull();
+            if (e) expect(e.name).toBe(Error.ValidationError.name);
         });
     });
 

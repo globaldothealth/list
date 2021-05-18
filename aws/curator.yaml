@@ -40,6 +40,8 @@ spec:
                   fieldPath: metadata.labels['environment']
             - name: DATASERVER_URL
               value: "http://data-dev"
+            - name: LOCATION_SERVICE_URL
+              value: "http://location-dev"
             - name: DB_CONNECTION_STRING
               valueFrom:
                 secretKeyRef:
@@ -119,7 +121,7 @@ spec:
     spec:
       containers:
         - name: curator
-          image: ghcr.io/globaldothealth/list/curatorservice:1.5.82
+          image: ghcr.io/globaldothealth/list/curatorservice:1.5.93
           ports:
             - containerPort: 3001
           livenessProbe:
@@ -135,6 +137,8 @@ spec:
                   fieldPath: metadata.labels['environment']
             - name: DATASERVER_URL
               value: "http://data-prod"
+            - name: LOCATION_SERVICE_URL
+              value: "http://location-prod"
             - name: DB_CONNECTION_STRING
               valueFrom:
                 secretKeyRef:

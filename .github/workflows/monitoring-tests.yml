@@ -1,0 +1,31 @@
+name: Data monitoring tests
+
+on:
+  push:
+    branches: [main]
+    paths:
+    - '.github/workflows/monitoring-tests.yml'
+    - 'ingestion/monitoring/**'
+  pull_request:
+    paths:
+    - '.github/workflows/monitoring-tests.yml'
+    - 'ingestion/monitoring/**'
+
+jobs:
+  monitoring-tests:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ingestion/monitoring
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python 3.8
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.8
+    - name: Install dependencies
+      run: |
+        pip install -r requirements.txt
+        pip install pytest
+    - name: Run tests
+      run: pytest

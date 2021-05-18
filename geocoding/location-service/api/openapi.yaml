@@ -1,0 +1,130 @@
+openapi: 3.0.3
+info:
+    title: Global Health geolocation service
+    description: Server for looking up geographic infomration for Global Health line-list data
+    termsOfService: 'https://www.healthmap.org/about/termsofuse/'
+    contact:
+        name: Healthmap
+        url: http://www.diseasedaily.org/about
+        email: info@healthmap.org
+    license:
+        name: MIT
+        url: 'https://opensource.org/licenses/MIT'
+    version: 1.0.0
+tags:
+    - name: Geocode
+      description: Geolocation of a case
+paths:
+    /geocode/seed:
+        post:
+            tags: [Geocode]
+            summary: Adds geocodes to the geocoding database
+            operationId: seedGeocodes
+            requestBody:
+                description: A single geocode record
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: object
+            responses:
+                '200':
+                    $ref: '#/components/responses/200'
+    /geocode/clear:
+        post:
+            tags: [Geocode]
+            summary: Clears geocodes from the geocoding database
+            operationId: clearGeocodes
+            responses:
+                '200':
+                    $ref: '#/components/responses/200'
+    /geocode/suggest:
+        get:
+            tags: [Suggest, Geocode]
+            summary: Suggests geocodes for a given query string
+            operationId: suggestGeocodes
+            parameters:
+                - name: q
+                  in: query
+                  description: The location string for which to find geocodes
+                  required: true
+                  allowReserved: true
+                  schema:
+                      type: string
+                - name: limitToResolution
+                  in: query
+                  allowReserved: true
+                  schema:
+                      type: string
+                  description: >
+                      Comma-separated list of resolutions to restrict geocoding to.
+                      Allowed values are: Point, Admin3, Admin2, Admin1, Country.
+            responses:
+                '200':
+                    $ref: '#/components/responses/200LocationArray'
+                '422':
+                    $ref: '#/components/responses/422'
+                '500':
+                    $ref: '#/components/responses/500'
+components:
+    schemas:
+        Location:
+            type: object
+            properties:
+                query:
+                    type: string
+                country:
+                    type: string
+                administrativeAreaLevel1:
+                    type: string
+                administrativeAreaLevel2:
+                    type: string
+                administrativeAreaLevel3:
+                    type: string
+                place:
+                    type: string
+                name:
+                    type: string
+                geoResolution:
+                    type: string
+                geometry:
+                    type: object
+                    properties:
+                        latitude:
+                            type: number
+                            minimum: -90
+                            maximum: 90
+                        longitude:
+                            type: number
+                            minimum: -180
+                            maximum: 180
+                    required:
+                        - latitude
+                        - longitude
+        LocationArray:
+            description: A list of geo locations
+            type: array
+            items:
+                $ref: '#/components/schemas/Location'
+    responses:
+        '200LocationArray':
+            description: OK
+            content:
+                application/json:
+                    schema:
+                        $ref: '#/components/schemas/LocationArray'
+        '200':
+            description: OK
+        '400':
+            description: Malformed request
+        '403':
+            description: Forbidden
+        '404':
+            description: Not found
+        '422':
+            description: Unprocessable entity
+        '500':
+            description: Internal server error
+servers:
+    - url: http://localhost:8080/
+      description: Local server

@@ -680,7 +680,7 @@ export class CasesController {
             searchQuery: req.body.query,
             count: false,
         });
-        Case.deleteMany(casesQuery, (err) => {
+        Case.deleteMany(casesQuery, (err: any) => {
             if (err) {
                 res.status(500).json(err);
                 return;
