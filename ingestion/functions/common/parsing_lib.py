@@ -165,13 +165,29 @@ def write_to_server(
             counter['numCreated'] += res_json["numCreated"]
             counter['numUpdated'] += res_json["numUpdated"]
             continue
-        elif res.status_code == 207:
+        elif res and res.status_code == 207:
             # 207 encompasses both geocoding and case schema validation errors.
             # We can consider separating geocoding issues, but for now classifying it
             # as a validation problem is pretty reasonable.
             # The motivation for continuing past 207 errors is https://github.com/globaldothealth/list/issues/1849
+            # Notice that the backend doesn't process _any_ cases in a batch with an error,
+            # so you could have a batch with 250 cases where one doesn't have a necessary field
+            # and all the other 249 haven't been touched.
             encountered_207 = True
-            validation_messages[f"batch_{batch_num}"] = res.text
+            # The errors from the backend tell us which cases failed and for what reason. Make it
+            # easier to diagnose by extracting the failing case and attaching it to the error message.
+            res_json = res.json()
+            if 'errors' in res_json:
+                def add_input_to_error(error):
+                    res = dict(error)
+                    res['input'] = batch[error['index']]
+                    return res
+                augmented_errors = [add_input_to_error(e) for e in res_json['errors']]
+                reported_error = dict(res_json)
+                reported_error['errors'] = augmented_errors
+                validation_messages[f"batch_{batch_num}"] = json.dumps(reported_error)
+            else:
+                validation_messages[f"batch_{batch_num}"] = res.text
             continue
 
         # Response can contain an 'error' field which describe each error that
