@@ -131,11 +131,11 @@ export default class CasesController {
         const month = ('0' + (dateObj.getMonth() + 1)).slice(-2);
         const year = dateObj.getFullYear();
 
-        const filename = `gh_${year}-${month}-${day}.tar.gz`;
+        const filename = `gh_${year}-${month}-${day}.tar`;
 
         const params = {
             Bucket: 'covid-19-data-export',
-            Key: 'latest/latestdata.tar.gz',
+            Key: 'latest/latestdata.tar',
             Expires: 5 * 60,
             ResponseContentDisposition:
                 'attachment; filename ="' + filename + '"',

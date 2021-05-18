@@ -19,7 +19,8 @@ describe('validate', () => {
             ...minimalModel,
             ...{ sampleCollectionDate: Date.parse('2019-10-31') },
         }).validate((e) => {
-            expect(e.name).toBe(Error.ValidationError.name);
+            expect(e).not.toBeNull();
+            if (e) expect(e.name).toBe(Error.ValidationError.name);
         });
     });
 
@@ -28,7 +29,8 @@ describe('validate', () => {
             ...minimalModel,
             ...{ sequenceLength: 2.2 },
         }).validate((e) => {
-            expect(e.name).toBe(Error.ValidationError.name);
+            expect(e).not.toBeNull();
+            if (e) expect(e.name).toBe(Error.ValidationError.name);
         });
     });
 

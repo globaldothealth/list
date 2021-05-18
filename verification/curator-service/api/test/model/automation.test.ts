@@ -53,7 +53,9 @@ describe('validate', () => {
         const wrapper = { automation: bothParsing };
 
         return new Wrapper(wrapper).validate((e) => {
-            expect(e.name).toBe(Error.ValidationError.name);
+            expect(e).not.toBeNull();
+            if (e)
+                expect(e.name).toBe(Error.ValidationError.name);
         });
     });
 
