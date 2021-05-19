@@ -151,6 +151,10 @@ def write_to_server(
                                 headers=headers, cookies=cookies)
             if res.status_code in [200, 207]:  # 207 is used for validation error
                 break
+            if res.status_code == 500 and "401" in res.text:
+                print(f"Request failed, status={res.status_code}, response={res.text}, reauthenticating...")
+                headers = common_lib.obtain_api_credentials(s3_client)
+                continue
             print(f"Request failed, status={res.status_code}, response={res.text}, retrying in {wait} seconds...")
             time.sleep(wait)
             total_wait += wait
