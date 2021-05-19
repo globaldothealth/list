@@ -100,7 +100,7 @@ def prepare_cases(cases: Generator[Dict, None, None], upload_id: str, excluded_c
     """
     for case in cases:
         case["caseReference"]["uploadIds"] = [upload_id]
-        if excluded_case_ids is None or not case["caseReference"]["sourceEntryId"] in excluded_case_ids:
+        if (excluded_case_ids is None) or ("sourceEntryId" not in case["caseReference"]) or (not case["caseReference"]["sourceEntryId"] in excluded_case_ids):
             yield remove_nested_none_and_empty(case)
 
 
