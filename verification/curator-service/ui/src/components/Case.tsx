@@ -56,6 +56,7 @@ export interface Location {
     query?: string;
     // Optional to hint geocoding results.
     limitToResolution?: string;
+    theSearchArray?: any;
 }
 
 export interface Geometry {

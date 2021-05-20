@@ -28,6 +28,7 @@ import renderDate, { renderDateRange } from './util/date';
 import shortId from 'shortid';
 import useMediaQuery from '@material-ui/core/useMediaQuery';
 import { useTheme } from '@material-ui/core/styles';
+import Highlighter from 'react-highlight-words';
 
 const styles = makeStyles((theme) => ({
     errorMessage: {
@@ -40,6 +41,7 @@ interface Props {
     id: string;
     enableEdit?: boolean;
     onModalClose: () => void;
+    theSearch: any;
 }
 
 interface State {
@@ -49,9 +51,13 @@ interface State {
 }
 
 export default function ViewCase(props: Props): JSX.Element {
+    const { theSearch } = props;
     const [c, setCase] = useState<Case>();
     const [loading, setLoading] = useState<boolean>(false);
     const [errorMessage, setErrorMessage] = useState<string>();
+
+    const theSearchArray = theSearch.split(' ');
+    console.log(theSearchArray);
 
     useEffect(() => {
         setLoading(true);
@@ -82,7 +88,13 @@ export default function ViewCase(props: Props): JSX.Element {
                     {errorMessage}
                 </MuiAlert>
             )}
-            {c && <CaseDetails enableEdit={props.enableEdit} c={c} />}
+            {c && (
+                <CaseDetails
+                    enableEdit={props.enableEdit}
+                    c={c}
+                    theSearchArray={theSearchArray}
+                />
+            )}
         </AppModal>
     );
 }
@@ -90,6 +102,7 @@ export default function ViewCase(props: Props): JSX.Element {
 interface CaseDetailsProps {
     c: Case;
     enableEdit?: boolean;
+    theSearchArray: any;
 }
 
 const useStyles = makeStyles((theme) => ({
@@ -151,6 +164,10 @@ function CaseDetails(props: CaseDetailsProps): JSX.Element {
         });
     };
 
+    
+
+    console.log('casedetails', props);
+    
     const isExcluded = () => {
         if (props.c.isSourceExcluded) {
             return 'Excluded';
@@ -407,7 +424,7 @@ function CaseDetails(props: CaseDetailsProps): JSX.Element {
                             Location
                         </Typography>
                         <Grid container className={classes.grid}>
-                            <LocationRows loc={props.c.location} />
+                            <LocationRows loc={props.c.location} theSearchArray={props.theSearchArray} />
                         </Grid>
                     </Scroll.Element>
                 </Paper>
@@ -726,11 +743,11 @@ function VariantRows(props: { variant: Variant }): JSX.Element {
     );
 }
 
-function LocationRows(props: { loc?: Location }): JSX.Element {
+function LocationRows(props: { loc?: Location, theSearchArray?:any }): JSX.Element {
     return (
         <>
             <RowHeader title="Location" />
-            <RowContent content={props.loc?.name || ''} />
+            <RowContent content={props.loc?.name || ''} wordsToHighlight={props.theSearchArray} />
 
             <RowHeader title="Location type" />
             <RowContent content={props.loc?.geoResolution || ''} />
@@ -781,7 +798,7 @@ function TravelRow(props: { travel: Travel }): JSX.Element {
             <RowHeader title="Primary reason of travel" />
             <RowContent content={props.travel.purpose || ''} />
 
-            <LocationRows loc={props.travel.location} />
+            <LocationRows loc={props.travel.location}  />
         </>
     );
 }
@@ -804,7 +821,9 @@ function RowHeader(props: { title: string }): JSX.Element {
     );
 }
 
-function RowContent(props: { content: string; isLink?: boolean }): JSX.Element {
+function RowContent(props: { content: string; isLink?: boolean, wordsToHighlight?: any }): JSX.Element {
+    console.log(props.wordsToHighlight);
+    
     return (
         <Grid item xs={8}>
             {props.isLink && props.content ? (
@@ -813,7 +832,15 @@ function RowContent(props: { content: string; isLink?: boolean }): JSX.Element {
                     rel="noopener noreferrer"
                     target="_blank"
                 >
-                    {props.content}
+                    {props.wordsToHighlight 
+                    ? <Highlighter
+                    highlightStyle={{ fontWeight: 'bold' }}
+                        searchWords={['Wuhan']}
+                        autoEscape={true}
+                        textToHighlight={props.content}
+                    /> 
+                    : "asfsd"}
+                    
                 </a>
             ) : (
                 props.content
