@@ -60,6 +60,8 @@ import PolicyLink from './PolicyLink';
 import { Auth } from 'aws-amplify';
 import { useCookieBanner } from '../hooks/useCookieBanner';
 import { SortBy, SortByOrder } from '../constants/types';
+import { URLToSearchQuery } from './util/searchQuery';
+
 
 const theme = createMuiTheme({
     palette: {
@@ -392,6 +394,7 @@ export default function App(): JSX.Element {
     const [sortByOrder, setSortByOrder] = useState<SortByOrder>(
         SortByOrder.Descending,
     );
+    const [searchQuery, setSearchQuery] = useState('')
     const classes = useStyles();
 
     const savedSearchQuery = localStorage.getItem('searchQuery');
@@ -443,10 +446,12 @@ export default function App(): JSX.Element {
         searchParams.forEach((value, key) => {
             tempFilterBreadcrumbs.push({ key, value });
         });
+        
 
         setFilterBreadcrumbs(tempFilterBreadcrumbs);
         //eslint-disable-next-line
     }, [location.search]);
+    
 
     useEffect(() => {
         const menuIndex = menuList.findIndex((menuItem) => {
@@ -540,6 +545,16 @@ export default function App(): JSX.Element {
             search: searchParams.toString(),
         });
     };
+    
+
+    useEffect(() => {
+        if (location.pathname === '/cases/view' ) return
+            setSearchQuery(URLToSearchQuery(location.search));            
+    
+        //eslint-disable-next-line
+    }, [location.search]);
+
+
 
     return (
         <div className={classes.root} ref={rootRef}>
@@ -854,6 +869,7 @@ export default function App(): JSX.Element {
                                             id={match.params.id}
                                             enableEdit={hasAnyRole(['curator'])}
                                             onModalClose={onModalClose}
+                                            theSearch={searchQuery}
                                         />
                                     );
                                 }}
