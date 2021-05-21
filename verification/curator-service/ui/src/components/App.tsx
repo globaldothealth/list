@@ -548,9 +548,9 @@ export default function App(): JSX.Element {
     
 
     useEffect(() => {
-        if (location.pathname === '/cases/view' ) return
-            setSearchQuery(URLToSearchQuery(location.search));            
-    
+        if (location.pathname.includes('/cases/view') ) return
+            setSearchQuery(URLToSearchQuery(location.search));      
+                
         //eslint-disable-next-line
     }, [location.search]);
 
