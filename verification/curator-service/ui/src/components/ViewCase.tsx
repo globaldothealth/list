@@ -14,7 +14,6 @@ import {
     VerificationStatus,
 } from './Case';
 import React, { useEffect, useState } from 'react';
-
 import AppModal from './AppModal';
 import EditIcon from '@material-ui/icons/EditOutlined';
 import { Link } from 'react-router-dom';
@@ -55,9 +54,10 @@ export default function ViewCase(props: Props): JSX.Element {
     const [c, setCase] = useState<Case>();
     const [loading, setLoading] = useState<boolean>(false);
     const [errorMessage, setErrorMessage] = useState<string>();
+    const [theSearchArray, setTheSearchArray] = useState<any>([]);
 
-    const theSearchArray = theSearch.split(' ');
-    console.log(theSearchArray);
+
+
 
     useEffect(() => {
         setLoading(true);
@@ -75,6 +75,14 @@ export default function ViewCase(props: Props): JSX.Element {
     }, [props.id]);
 
     const classes = styles();
+
+    useEffect(() => {
+        setTheSearchArray(props.theSearch.split(' '));
+    }, [props.theSearch]);
+
+    console.log(theSearch);
+
+
     return (
         <AppModal title="View case" onModalClose={props.onModalClose}>
             {loading && <LinearProgress />}
@@ -99,6 +107,9 @@ export default function ViewCase(props: Props): JSX.Element {
     );
 }
 
+interface LocationState {
+    search: string;
+}
 interface CaseDetailsProps {
     c: Case;
     enableEdit?: boolean;
@@ -164,9 +175,8 @@ function CaseDetails(props: CaseDetailsProps): JSX.Element {
         });
     };
 
-    
 
-    console.log('casedetails', props);
+    console.log('props.theSearchArray', props.theSearchArray);
     
     const isExcluded = () => {
         if (props.c.isSourceExcluded) {
