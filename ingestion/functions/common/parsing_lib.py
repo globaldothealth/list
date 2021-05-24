@@ -361,7 +361,7 @@ def run(
             try:
                 common_lib.finalize_upload(
                     env, source_id, upload_id, api_creds, cookies, count_created,
-                    count_updated, s3_client)
+                    count_updated)
                 break
             except RuntimeError as e:
                 if "401" in e.args[0]:  # reauthenticate
