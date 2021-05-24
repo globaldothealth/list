@@ -3,6 +3,7 @@ import sys
 from datetime import datetime
 import csv
 import json
+import copy
 
 # Layer code, like parsing_lib, is added to the path by AWS.
 # To test locally (e.g. via pytest), we have to modify sys.path.
@@ -158,9 +159,10 @@ def parse_cases(raw_data_file, source_id, source_url):
                     case['notes'] = entry['notes']
 
                 for _ in range(int(entry['number.of.cases'])):
-                    case["caseReference"]["sourceEntryId"] = f"voc_{case_count}"
+                    unique_case = copy.deepcopy(case)
+                    unique_case["caseReference"]["sourceEntryId"] = f"voc_{case_count}"
                     case_count += 1
-                    yield case
+                    yield unique_case
 
 
 def event_handler(event):
