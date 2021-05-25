@@ -13,7 +13,7 @@ import {
     Variant,
     VerificationStatus,
 } from './Case';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext} from 'react';
 import AppModal from './AppModal';
 import EditIcon from '@material-ui/icons/EditOutlined';
 import { Link } from 'react-router-dom';
@@ -40,7 +40,7 @@ interface Props {
     id: string;
     enableEdit?: boolean;
     onModalClose: () => void;
-    theSearch: any;
+    theSearch: string;
 }
 
 interface State {
@@ -54,10 +54,7 @@ export default function ViewCase(props: Props): JSX.Element {
     const [c, setCase] = useState<Case>();
     const [loading, setLoading] = useState<boolean>(false);
     const [errorMessage, setErrorMessage] = useState<string>();
-    const [theSearchArray, setTheSearchArray] = useState<any>([]);
-
-
-
+    // const [theSearchArray, setTheSearchArray] = useState<any>([]);
 
     useEffect(() => {
         setLoading(true);
@@ -76,12 +73,11 @@ export default function ViewCase(props: Props): JSX.Element {
 
     const classes = styles();
 
-    useEffect(() => {
-        setTheSearchArray(props.theSearch.split(' '));
-    }, [props.theSearch]);
+    const SearchContext = React.createContext(theSearch);
 
-    console.log(theSearch);
-
+    // useEffect(() => {
+    //     setTheSearchArray(props.theSearch.split(' '));
+    // }, [props.theSearch]);
 
     return (
         <AppModal title="View case" onModalClose={props.onModalClose}>
@@ -97,11 +93,13 @@ export default function ViewCase(props: Props): JSX.Element {
                 </MuiAlert>
             )}
             {c && (
-                <CaseDetails
-                    enableEdit={props.enableEdit}
-                    c={c}
-                    theSearchArray={theSearchArray}
-                />
+                <SearchContext.Provider value={theSearch}>
+                    <CaseDetails
+                        enableEdit={props.enableEdit}
+                        c={c}
+                        theSearchArray={theSearch}
+                    />
+                </SearchContext.Provider>
             )}
         </AppModal>
     );
@@ -175,9 +173,10 @@ function CaseDetails(props: CaseDetailsProps): JSX.Element {
         });
     };
 
+    const searchValue = useContext(SearchContext);
 
     console.log('props.theSearchArray', props.theSearchArray);
-    
+
     const isExcluded = () => {
         if (props.c.isSourceExcluded) {
             return 'Excluded';
@@ -434,7 +433,10 @@ function CaseDetails(props: CaseDetailsProps): JSX.Element {
                             Location
                         </Typography>
                         <Grid container className={classes.grid}>
-                            <LocationRows loc={props.c.location} theSearchArray={props.theSearchArray} />
+                            <LocationRows
+                                loc={props.c.location}
+                                theSearchArray={props.theSearchArray}
+                            />
                         </Grid>
                     </Scroll.Element>
                 </Paper>
@@ -753,11 +755,17 @@ function VariantRows(props: { variant: Variant }): JSX.Element {
     );
 }
 
-function LocationRows(props: { loc?: Location, theSearchArray?:any }): JSX.Element {
+function LocationRows(props: {
+    loc?: Location;
+    theSearchArray?: any;
+}): JSX.Element {
     return (
         <>
             <RowHeader title="Location" />
-            <RowContent content={props.loc?.name || ''} wordsToHighlight={props.theSearchArray} />
+            <RowContent
+                content={props.loc?.name || ''}
+                wordsToHighlight={props.theSearchArray}
+            />
 
             <RowHeader title="Location type" />
             <RowContent content={props.loc?.geoResolution || ''} />
@@ -808,7 +816,7 @@ function TravelRow(props: { travel: Travel }): JSX.Element {
             <RowHeader title="Primary reason of travel" />
             <RowContent content={props.travel.purpose || ''} />
 
-            <LocationRows loc={props.travel.location}  />
+            <LocationRows loc={props.travel.location} />
         </>
     );
 }
@@ -831,9 +839,13 @@ function RowHeader(props: { title: string }): JSX.Element {
     );
 }
 
-function RowContent(props: { content: string; isLink?: boolean, wordsToHighlight?: any }): JSX.Element {
+function RowContent(props: {
+    content: string;
+    isLink?: boolean;
+    wordsToHighlight?: any;
+}): JSX.Element {
     console.log(props.wordsToHighlight);
-    
+
     return (
         <Grid item xs={8}>
             {props.isLink && props.content ? (
@@ -842,15 +854,16 @@ function RowContent(props: { content: string; isLink?: boolean, wordsToHighlight
                     rel="noopener noreferrer"
                     target="_blank"
                 >
-                    {props.wordsToHighlight 
-                    ? <Highlighter
-                    highlightStyle={{ fontWeight: 'bold' }}
-                        searchWords={['Wuhan']}
-                        autoEscape={true}
-                        textToHighlight={props.content}
-                    /> 
-                    : "asfsd"}
-                    
+                    {props.wordsToHighlight ? (
+                        <Highlighter
+                            highlightStyle={{ fontWeight: 'bold' }}
+                            searchWords={['Wuhan']}
+                            autoEscape={true}
+                            textToHighlight={props.content}
+                        />
+                    ) : (
+                        'asfsd'
+                    )}
                 </a>
             ) : (
                 props.content
