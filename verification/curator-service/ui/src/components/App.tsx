@@ -582,7 +582,6 @@ export default function App(): JSX.Element {
                                 </div>
                                 <DownloadButton
                                     totalCasesCount={totalDataCount}
-                                    userEmailAddress={user.email}
                                 />
                             </>
                         ) : (

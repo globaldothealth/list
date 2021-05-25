@@ -254,12 +254,9 @@ describe('<App />', () => {
             );
 
             fireEvent.click(await screen.findByText(/download dataset/i));
-
-            await wait(() => {
-                expect(
-                    screen.getByText(/Please choose the file export format/i),
-                ).toBeInTheDocument();
-            });
+            expect(
+                await screen.findByText(/download full dataset/i),
+            ).toBeInTheDocument();
         });
     });
 });

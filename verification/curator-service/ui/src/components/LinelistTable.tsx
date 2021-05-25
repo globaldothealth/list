@@ -54,7 +54,7 @@ import { ChipData } from './App';
 import { SortBy, SortByOrder } from '../constants/types';
 
 // Limit number of data that can be displayed or downloaded to avoid long execution times of mongo queries
-const DATA_LIMIT = 5;
+const DATA_LIMIT = 10000;
 
 interface ListResponse {
     cases: Case[];
@@ -498,12 +498,10 @@ export function SortSelect({
 
 interface DownloadButtonProps {
     totalCasesCount: number;
-    userEmailAddress: string;
 }
 
 export function DownloadButton({
     totalCasesCount,
-    userEmailAddress,
 }: DownloadButtonProps): JSX.Element {
     const location = useLocation<LocationState>();
     const [isDownloadModalOpen, setIsDownloadModalOpen] = useState<boolean>(
@@ -512,7 +510,7 @@ export function DownloadButton({
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const classes = downloadDataModalStyles();
 
-    const downloadDataSet = async (formatType: string, dataSet: string) => {
+    const downloadDataSet = async (dataSet: string, formatType?: string) => {
         setIsLoading(true);
 
         const searchQuery: string = URLToSearchQuery(location.search);
@@ -522,7 +520,7 @@ export function DownloadButton({
                     const response = await axios({
                         method: 'post',
                         url: '/api/cases/getDownloadLink',
-                        data: { format: formatType },
+                        data: { format: 'csv' },
                         headers: {
                             'Content-Type': 'application/json',
                         },
@@ -646,30 +644,34 @@ export function DownloadButton({
                 fullWidth
             >
                 <DialogTitle>Download dataset</DialogTitle>
-                <FormControl className={classes.formControl}>
-                    <InputLabel
-                        shrink
-                        id="demo-simple-select-placeholder-label-label"
-                    ></InputLabel>
-                    <Select
-                        labelId="demo-simple-select-placeholder-label-label"
-                        id="demo-simple-select-placeholder-label"
-                        value={fileFormat}
-                        onChange={handleFileFormatChange}
-                        displayEmpty
-                        className={classes.MuiInputBase}
-                    >
-                        <MenuItem value="">
-                            <em>Data format</em>
-                        </MenuItem>
-                        <MenuItem value="csv">csv</MenuItem>
-                        <MenuItem value="tsv">tsv</MenuItem>
-                        <MenuItem value="json">json</MenuItem>
-                    </Select>
-                    <FormHelperText>
-                        Please choose the file export format
-                    </FormHelperText>
-                </FormControl>
+
+                {!showFullDatasetButton && (
+                    <FormControl className={classes.formControl}>
+                        <InputLabel
+                            shrink
+                            id="demo-simple-select-placeholder-label-label"
+                        ></InputLabel>
+                        <Select
+                            labelId="demo-simple-select-placeholder-label-label"
+                            id="demo-simple-select-placeholder-label"
+                            value={fileFormat}
+                            onChange={handleFileFormatChange}
+                            displayEmpty
+                            className={classes.MuiInputBase}
+                        >
+                            <MenuItem value="">
+                                <em>Data format</em>
+                            </MenuItem>
+                            <MenuItem value="csv">csv</MenuItem>
+                            <MenuItem value="tsv">tsv</MenuItem>
+                            <MenuItem value="json">json</MenuItem>
+                        </Select>
+                        <FormHelperText>
+                            Please choose the file export format
+                        </FormHelperText>
+                    </FormControl>
+                )}
+
                 <DialogContent>
                     {showFullDatasetButton && (
                         <Typography variant="body2">
@@ -683,29 +685,15 @@ export function DownloadButton({
 
                     {isLoading && <LinearProgress className={classes.loader} />}
                     {showFullDatasetButton && (
-                        <Tooltip
-                            title={disabledButtonTooltipText}
-                            placement="top"
+                        <Button
+                            variant="contained"
+                            color="primary"
+                            className={classes.downloadButton}
+                            onClick={() => downloadDataSet('fullDataset')}
+                            disabled={isLoading}
                         >
-                            <span>
-                                <Button
-                                    variant="contained"
-                                    color="primary"
-                                    className={classes.downloadButton}
-                                    onClick={() =>
-                                        downloadDataSet(
-                                            fileFormat,
-                                            'fullDataset',
-                                        )
-                                    }
-                                    disabled={
-                                        isLoading || downloadButtonDisabled
-                                    }
-                                >
-                                    Download Full Dataset
-                                </Button>
-                            </span>
-                        </Tooltip>
+                            Download Full Dataset
+                        </Button>
                     )}
                     {!showFullDatasetButton && (
                         <Tooltip
@@ -719,8 +707,8 @@ export function DownloadButton({
                                     className={classes.downloadButton}
                                     onClick={() =>
                                         downloadDataSet(
-                                            fileFormat,
                                             'partialDataset',
+                                            fileFormat,
                                         )
                                     }
                                     disabled={
@@ -746,8 +734,8 @@ export function DownloadButton({
                                     className={classes.downloadButton}
                                     onClick={() =>
                                         downloadDataSet(
-                                            fileFormat,
                                             'mailDataset',
+                                            fileFormat,
                                         )
                                     }
                                     disabled={
