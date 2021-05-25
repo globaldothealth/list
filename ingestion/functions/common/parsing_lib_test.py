@@ -368,6 +368,42 @@ def test_write_to_server_raises_error_for_failed_batch_upsert_with_validation_er
     assert False
 
 
+def test_write_to_server_records_input_for_failed_batch_upsert_with_validation_errors(
+        requests_mock, mock_source_api_url_fixture):
+    import parsing_lib  # Import locally to avoid superseding mock
+    # TODO: Complete removal of URL env var.
+    os.environ["SOURCE_API_URL"] = _SOURCE_API_URL
+    full_source_url = f"{_SOURCE_API_URL}/cases/batchUpsert"
+    requests_mock.register_uri(
+        "POST", full_source_url, json={
+            'errors': [
+                {
+                    'index': 0,
+                    'message': 'You done goofed.',
+                },
+            ],
+        }, status_code=207),
+    upload_id = "123456789012345678901234"
+    update_upload_url = f"{_SOURCE_API_URL}/sources/{_SOURCE_ID}/uploads/{upload_id}"
+    requests_mock.register_uri("PUT", update_upload_url, json={})
+
+    try:
+        parsing_lib.write_to_server(
+            iter([_PARSED_CASE]),
+            "env", _SOURCE_ID, upload_id, {},
+            {},
+            parsing_lib.CASES_BATCH_SIZE)
+    except RuntimeError as e:
+        assert requests_mock.request_history[0].url == full_source_url
+        assert requests_mock.request_history[1].url == update_upload_url
+        assert requests_mock.request_history[-1].json(
+        ) == {"status": "ERROR", "summary": {"error": common_lib.UploadError.VALIDATION_ERROR.name}}
+        assert e.args[0].find('Hanuman Nagar, Darbhanga, Bihar, India') != -1
+        return
+    # We got the wrong exception or no exception, fail the test.
+    assert False
+
+
 @patch('parsing_lib.get_today')
 def test_filter_cases_by_date_keeps_exact_with_EQ(mock_today):
     import parsing_lib  # Import locally to avoid superseding mock

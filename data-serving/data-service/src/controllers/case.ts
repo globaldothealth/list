@@ -903,6 +903,15 @@ export class CasesController {
                         },
                     };
                 } else {
+                    if (f.path === 'demographics.gender') {
+                        return {
+                            $match: {
+                                [f.path]: {
+                                    $exists: false,
+                                },
+                            },
+                        };
+                    }
                     if (f.dateOperator) {
                         const dateRangeType =
                             f.dateOperator === '$gt'
