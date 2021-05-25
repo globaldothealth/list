@@ -33,7 +33,7 @@ afterEach(() => {
     mockedAxios.put.mockClear();
 });
 
-const DATA_LIMIT = 5;
+const DATA_LIMIT = 10000;
 
 describe('<LinelistTable />', () => {
     it('loads and displays cases', async () => {
