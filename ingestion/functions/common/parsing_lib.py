@@ -100,7 +100,7 @@ def prepare_cases(cases: Generator[Dict, None, None], upload_id: str, excluded_c
     """
     for case in cases:
         case["caseReference"]["uploadIds"] = [upload_id]
-        if excluded_case_ids is None or not case["caseReference"]["sourceEntryId"] in excluded_case_ids:
+        if (excluded_case_ids is None) or ("sourceEntryId" not in case["caseReference"]) or (not case["caseReference"]["sourceEntryId"] in excluded_case_ids):
             yield remove_nested_none_and_empty(case)
 
 
@@ -151,6 +151,10 @@ def write_to_server(
                                 headers=headers, cookies=cookies)
             if res.status_code in [200, 207]:  # 207 is used for validation error
                 break
+            if res.status_code == 500 and "401" in res.text:
+                print(f"Request failed, status={res.status_code}, response={res.text}, reauthenticating...")
+                headers = common_lib.obtain_api_credentials(s3_client)
+                continue
             print(f"Request failed, status={res.status_code}, response={res.text}, retrying in {wait} seconds...")
             time.sleep(wait)
             total_wait += wait
@@ -165,13 +169,29 @@ def write_to_server(
             counter['numCreated'] += res_json["numCreated"]
             counter['numUpdated'] += res_json["numUpdated"]
             continue
-        elif res.status_code == 207:
+        elif res and res.status_code == 207:
             # 207 encompasses both geocoding and case schema validation errors.
             # We can consider separating geocoding issues, but for now classifying it
             # as a validation problem is pretty reasonable.
             # The motivation for continuing past 207 errors is https://github.com/globaldothealth/list/issues/1849
+            # Notice that the backend doesn't process _any_ cases in a batch with an error,
+            # so you could have a batch with 250 cases where one doesn't have a necessary field
+            # and all the other 249 haven't been touched.
             encountered_207 = True
-            validation_messages[f"batch_{batch_num}"] = res.text
+            # The errors from the backend tell us which cases failed and for what reason. Make it
+            # easier to diagnose by extracting the failing case and attaching it to the error message.
+            res_json = res.json()
+            if 'errors' in res_json:
+                def add_input_to_error(error):
+                    res = dict(error)
+                    res['input'] = batch[error['index']]
+                    return res
+                augmented_errors = [add_input_to_error(e) for e in res_json['errors']]
+                reported_error = dict(res_json)
+                reported_error['errors'] = augmented_errors
+                validation_messages[f"batch_{batch_num}"] = json.dumps(reported_error)
+            else:
+                validation_messages[f"batch_{batch_num}"] = res.text
             continue
 
         # Response can contain an 'error' field which describe each error that
@@ -337,9 +357,16 @@ def run(
             env, source_id, upload_id,
             api_creds, cookies,
             CASES_BATCH_SIZE)
-        common_lib.finalize_upload(
-            env, source_id, upload_id, api_creds, cookies, count_created,
-            count_updated)
+        for _ in range(5):  # Maximum number of attempts to finalize upload
+            try:
+                common_lib.finalize_upload(
+                    env, source_id, upload_id, api_creds, cookies, count_created,
+                    count_updated)
+                break
+            except RuntimeError as e:
+                if "401" in e.args[0]:  # reauthenticate
+                    print("Finalizing upload failed with 401, reauthenticating...")
+                    api_creds = common_lib.obtain_api_credentials(s3_client)
         return {"count_created": count_created, "count_updated": count_updated}
     except Exception as e:
         common_lib.complete_with_error(
