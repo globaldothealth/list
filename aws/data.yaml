@@ -44,7 +44,7 @@ spec:
                 fieldRef:
                   fieldPath: metadata.labels['environment']
             - name: LOCATION_SERVICE_URL
-              value: "http://location-prod"
+              value: "http://location-dev"
           resources:
             requests:
               memory: "3Gi"
