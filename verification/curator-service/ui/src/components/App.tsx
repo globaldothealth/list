@@ -394,7 +394,7 @@ export default function App(): JSX.Element {
     const [sortByOrder, setSortByOrder] = useState<SortByOrder>(
         SortByOrder.Descending,
     );
-    const [searchQuery, setSearchQuery] = useState('')
+    const [searchQuery, setSearchQuery] = useState('');
     const classes = useStyles();
 
     const savedSearchQuery = localStorage.getItem('searchQuery');
@@ -446,12 +446,10 @@ export default function App(): JSX.Element {
         searchParams.forEach((value, key) => {
             tempFilterBreadcrumbs.push({ key, value });
         });
-        
 
         setFilterBreadcrumbs(tempFilterBreadcrumbs);
         //eslint-disable-next-line
     }, [location.search]);
-    
 
     useEffect(() => {
         const menuIndex = menuList.findIndex((menuItem) => {
@@ -545,16 +543,15 @@ export default function App(): JSX.Element {
             search: searchParams.toString(),
         });
     };
-    
 
     useEffect(() => {
-        if (location.pathname.includes('/cases/view') ) return
-            setSearchQuery(URLToSearchQuery(location.search));      
-                
+        if (location.pathname.includes('/cases/view')) return;
+        setSearchQuery(URLToSearchQuery(location.search));
+
         //eslint-disable-next-line
     }, [location.search]);
 
-
+    const SearchContext = React.createContext(searchQuery);
 
     return (
         <div className={classes.root} ref={rootRef}>
@@ -865,12 +862,18 @@ export default function App(): JSX.Element {
                                 path="/cases/view/:id"
                                 render={({ match }): JSX.Element => {
                                     return (
-                                        <ViewCase
-                                            id={match.params.id}
-                                            enableEdit={hasAnyRole(['curator'])}
-                                            onModalClose={onModalClose}
-                                            theSearch={searchQuery}
-                                        />
+                                        <SearchContext.Provider
+                                            value={searchQuery}
+                                        >
+                                            <ViewCase
+                                                id={match.params.id}
+                                                enableEdit={hasAnyRole([
+                                                    'curator',
+                                                ])}
+                                                onModalClose={onModalClose}
+                                                theSearch={searchQuery}
+                                            />
+                                        </SearchContext.Provider>
                                     );
                                 }}
                             />
