@@ -77,9 +77,7 @@ def finalize_upload(
                        json=update,
                        headers=headers,
                        cookies=cookies)
-    if not res or res.status_code != 200:
-        raise RuntimeError(
-            f'Error updating upload record, status={res.status_code}, response={res.text}')
+    return res.status_code, res.text
 
 
 def complete_with_error(
