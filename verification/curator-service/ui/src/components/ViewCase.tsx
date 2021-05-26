@@ -13,7 +13,7 @@ import {
     Variant,
     VerificationStatus,
 } from './Case';
-import React, { useEffect, useState, useContext} from 'react';
+import React, { useEffect, useState } from 'react';
 import AppModal from './AppModal';
 import EditIcon from '@material-ui/icons/EditOutlined';
 import { Link } from 'react-router-dom';
@@ -28,6 +28,8 @@ import shortId from 'shortid';
 import useMediaQuery from '@material-ui/core/useMediaQuery';
 import { useTheme } from '@material-ui/core/styles';
 import Highlighter from 'react-highlight-words';
+import { useSelector } from 'react-redux';
+import { selectSearchQuery } from './App/redux/selectors';
 
 const styles = makeStyles((theme) => ({
     errorMessage: {
@@ -40,7 +42,6 @@ interface Props {
     id: string;
     enableEdit?: boolean;
     onModalClose: () => void;
-    theSearch: string;
 }
 
 interface State {
@@ -50,14 +51,9 @@ interface State {
 }
 
 export default function ViewCase(props: Props): JSX.Element {
-    const { theSearch } = props;
     const [c, setCase] = useState<Case>();
     const [loading, setLoading] = useState<boolean>(false);
     const [errorMessage, setErrorMessage] = useState<string>();
-    // const [theSearchArray, setTheSearchArray] = useState<any>([]);
-
-    const searchValue = useContext(SearchContext);
-
 
     useEffect(() => {
         setLoading(true);
@@ -76,11 +72,6 @@ export default function ViewCase(props: Props): JSX.Element {
 
     const classes = styles();
 
-
-    // useEffect(() => {
-    //     setTheSearchArray(props.theSearch.split(' '));
-    // }, [props.theSearch]);
-
     return (
         <AppModal title="View case" onModalClose={props.onModalClose}>
             {loading && <LinearProgress />}
@@ -94,13 +85,7 @@ export default function ViewCase(props: Props): JSX.Element {
                     {errorMessage}
                 </MuiAlert>
             )}
-            {c && (
-                    <CaseDetails
-                        enableEdit={props.enableEdit}
-                        c={c}
-                        theSearchArray={theSearch}
-                    />
-            )}
+            {c && <CaseDetails enableEdit={props.enableEdit} c={c} />}
         </AppModal>
     );
 }
@@ -111,7 +96,6 @@ interface LocationState {
 interface CaseDetailsProps {
     c: Case;
     enableEdit?: boolean;
-    theSearchArray: any;
 }
 
 const useStyles = makeStyles((theme) => ({
@@ -172,9 +156,6 @@ function CaseDetails(props: CaseDetailsProps): JSX.Element {
             containerId: 'scroll-container',
         });
     };
-
-
-    console.log('props.theSearchArray', props.theSearchArray);
 
     const isExcluded = () => {
         if (props.c.isSourceExcluded) {
@@ -432,10 +413,7 @@ function CaseDetails(props: CaseDetailsProps): JSX.Element {
                             Location
                         </Typography>
                         <Grid container className={classes.grid}>
-                            <LocationRows
-                                loc={props.c.location}
-                                theSearchArray={props.theSearchArray}
-                            />
+                            <LocationRows loc={props.c.location} />
                         </Grid>
                     </Scroll.Element>
                 </Paper>
@@ -761,10 +739,7 @@ function LocationRows(props: {
     return (
         <>
             <RowHeader title="Location" />
-            <RowContent
-                content={props.loc?.name || ''}
-                wordsToHighlight={props.theSearchArray}
-            />
+            <RowContent content={props.loc?.name || ''} />
 
             <RowHeader title="Location type" />
             <RowContent content={props.loc?.geoResolution || ''} />
@@ -838,12 +813,11 @@ function RowHeader(props: { title: string }): JSX.Element {
     );
 }
 
-function RowContent(props: {
-    content: string;
-    isLink?: boolean;
-    wordsToHighlight?: any;
-}): JSX.Element {
-    console.log(props.wordsToHighlight);
+function RowContent(props: { content: string; isLink?: boolean }): JSX.Element {
+    const searchQuery = useSelector(selectSearchQuery);
+    const searchQueryArray = searchQuery.split(' ');
+
+    console.log('content: ' + props.content);
 
     return (
         <Grid item xs={8}>
@@ -853,19 +827,20 @@ function RowContent(props: {
                     rel="noopener noreferrer"
                     target="_blank"
                 >
-                    {props.wordsToHighlight ? (
-                        <Highlighter
-                            highlightStyle={{ fontWeight: 'bold' }}
-                            searchWords={['Wuhan']}
-                            autoEscape={true}
-                            textToHighlight={props.content}
-                        />
-                    ) : (
-                        'asfsd'
-                    )}
+                    <Highlighter
+                        highlightStyle={{ fontWeight: 'bold' }}
+                        searchWords={searchQueryArray}
+                        autoEscape={true}
+                        textToHighlight={props.content}
+                    />
                 </a>
             ) : (
-                props.content
+                <Highlighter
+                    highlightStyle={{ fontWeight: 'bold' }}
+                    searchWords={searchQueryArray}
+                    autoEscape={true}
+                    textToHighlight={props.content}
+                />
             )}
         </Grid>
     );

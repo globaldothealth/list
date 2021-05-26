@@ -47,7 +47,7 @@ import CaseExcludeDialog from './CaseExcludeDialog';
 import CaseIncludeDialog from './CaseIncludeDialog';
 import renderDate, { renderDateRange } from './util/date';
 import { URLToSearchQuery } from './util/searchQuery';
-import { ChipData } from './App';
+import { ChipData } from './App/App';
 import { SortBy, SortByOrder } from '../constants/types';
 
 interface ListResponse {
