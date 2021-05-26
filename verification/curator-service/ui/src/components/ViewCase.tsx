@@ -56,6 +56,9 @@ export default function ViewCase(props: Props): JSX.Element {
     const [errorMessage, setErrorMessage] = useState<string>();
     // const [theSearchArray, setTheSearchArray] = useState<any>([]);
 
+    const searchValue = useContext(SearchContext);
+
+
     useEffect(() => {
         setLoading(true);
         axios
@@ -73,7 +76,6 @@ export default function ViewCase(props: Props): JSX.Element {
 
     const classes = styles();
 
-    const SearchContext = React.createContext(theSearch);
 
     // useEffect(() => {
     //     setTheSearchArray(props.theSearch.split(' '));
@@ -93,13 +95,11 @@ export default function ViewCase(props: Props): JSX.Element {
                 </MuiAlert>
             )}
             {c && (
-                <SearchContext.Provider value={theSearch}>
                     <CaseDetails
                         enableEdit={props.enableEdit}
                         c={c}
                         theSearchArray={theSearch}
                     />
-                </SearchContext.Provider>
             )}
         </AppModal>
     );
@@ -173,7 +173,6 @@ function CaseDetails(props: CaseDetailsProps): JSX.Element {
         });
     };
 
-    const searchValue = useContext(SearchContext);
 
     console.log('props.theSearchArray', props.theSearchArray);
 
