@@ -92,9 +92,8 @@ def test_finalize_upload_raises_error_for_failed_request(
         update_upload_url,
         [{"status_code": 500}])
 
-    try:
-        common_lib.finalize_upload("env", _SOURCE_ID, upload_id, {}, {}, 42, 0)
-    except RuntimeError:
+    status, _ = common_lib.finalize_upload("env", _SOURCE_ID, upload_id, {}, {}, 42, 0)
+    if status == 500:
         assert len(requests_mock.request_history) == 1
         assert requests_mock.request_history[0].url == update_upload_url
         return
