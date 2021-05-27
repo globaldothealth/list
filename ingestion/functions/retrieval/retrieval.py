@@ -78,7 +78,7 @@ def get_source_details(env, source_id, upload_id, api_headers, cookies):
             return api_json["origin"]["url"], api_json["format"], api_json.get(
                 "automation", {}).get(
                 "parser", {}).get(
-                "awsBatchJobDefinitionArn", ""), api_json.get(
+                "awsLambdaArn", ""), api_json.get(
                 'dateFilter', {})
         upload_error = (
             common_lib.UploadError.SOURCE_CONFIGURATION_NOT_FOUND
