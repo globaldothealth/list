@@ -27,4 +27,6 @@ jobs:
     - name: Install dependencies
       run: pip install -r requirements.txt
     - name: Run metrics script
+      env:
+        SLACK_WEBHOOK_METRICS_URL: ${{ secrets.SLACK_WEBHOOK_METRICS_URL }}
       run: python daily_metrics.py
