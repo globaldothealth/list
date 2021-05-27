@@ -103,7 +103,7 @@ def test_e2e(valid_event, requests_mock, mock_source_api_url_fixture, tempdir="/
     requests_mock.get(
         full_source_url,
         json={"origin": {"url": origin_url, "license": "MIT"}, "format": "JSON",
-              "automation": {"parser": {"awsBatchJobDefinitionArn": "example.example"}},
+              "automation": {"parser": {"awsLambdaArn": "example.example"}},
               "dateFilter": date_filter})
 
     # Mock the request to retrieve source content.
@@ -179,7 +179,7 @@ def test_get_source_details_returns_parser_arn_if_present(
         f"{_SOURCE_API_URL}/sources/{source_id}",
         json={"origin": {"url": content_url, "license": "MIT"},
               "format": "JSON",
-              "automation": {"parser": {"awsBatchJobDefinitionArn": job_def_arn}}})
+              "automation": {"parser": {"awsLambdaArn": job_def_arn}}})
     result = retrieval.get_source_details(
         "env", source_id, "upload_id", {}, {})
     assert result[2] == job_def_arn
