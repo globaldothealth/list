@@ -1,0 +1,5 @@
+{
+	"jobRoleArn": "arn:aws:iam::612888738066:role/gdh-ingestion-job-role",
+ 	"jobQueueArn": "arn:aws:batch:us-east-1:612888738066:job-queue/ingestion-queue",
+ 	"eventRoleArn": "arn:aws:iam::612888738066:role/service-role/AWS_Events_Invoke_Batch_Job_Queue_1312384119"
+}

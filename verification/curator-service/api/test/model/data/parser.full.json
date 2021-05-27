@@ -1,3 +1,3 @@
 {
-    "awsLambdaArn": "arn:aws:lambda:region:id:function:name"
+    "awsLambdaArn": "arn:aws:batch:region:id:function:name"
 }

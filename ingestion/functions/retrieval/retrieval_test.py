@@ -103,7 +103,7 @@ def test_e2e(valid_event, requests_mock, mock_source_api_url_fixture, tempdir="/
     requests_mock.get(
         full_source_url,
         json={"origin": {"url": origin_url, "license": "MIT"}, "format": "JSON",
-              "automation": {"parser": {"awsLambdaArn": "parser.example.example"}},
+              "automation": {"parser": {"awsBatchJobDefinitionArn": "example.example"}},
               "dateFilter": date_filter})
 
     # Mock the request to retrieve source content.
@@ -114,7 +114,7 @@ def test_e2e(valid_event, requests_mock, mock_source_api_url_fixture, tempdir="/
     common_lib.obtain_api_credentials.assert_called_once()
     retrieval.invoke_parser.assert_called_once_with(
         valid_event["env"],
-        "parser.example.example",
+        "parsing.example.example",
         source_id, upload_id, {}, None,
         response["key"],
         origin_url, date_filter, valid_event["parsingDateRange"])
@@ -124,6 +124,14 @@ def test_e2e(valid_event, requests_mock, mock_source_api_url_fixture, tempdir="/
     assert response["bucket"] == retrieval.OUTPUT_BUCKET
     assert source_id in response["key"]
     assert response["upload_id"] == upload_id
+
+
+def test_get_parser_module():
+    from retrieval import retrieval
+    parser = "japan-japan-ingestor-test"
+    exp = "parsing.japan.japan"
+    act = retrieval.get_parser_module(parser)
+    assert exp == act
 
 
 def test_extract_event_fields_returns_env_source_id_and_date_range(valid_event):
@@ -166,15 +174,15 @@ def test_get_source_details_returns_parser_arn_if_present(
     from retrieval import retrieval  # Import locally to avoid superseding mock
     source_id = "id"
     content_url = "http://bar.baz"
-    lambda_arn = "lambdaArn"
+    job_def_arn = "testArn"
     requests_mock.get(
         f"{_SOURCE_API_URL}/sources/{source_id}",
         json={"origin": {"url": content_url, "license": "MIT"},
               "format": "JSON",
-              "automation": {"parser": {"awsLambdaArn": lambda_arn}}})
+              "automation": {"parser": {"awsBatchJobDefinitionArn": job_def_arn}}})
     result = retrieval.get_source_details(
         "env", source_id, "upload_id", {}, {})
-    assert result[2] == lambda_arn
+    assert result[2] == job_def_arn
 
 
 def test_get_source_details_raises_error_if_source_not_found(

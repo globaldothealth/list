@@ -1,8 +1,8 @@
 import { Request, Response } from 'express';
 import { Source, SourceDocument } from '../model/source';
 
+import AwsBatchClient from '../clients/aws-batch-client';
 import AwsEventsClient from '../clients/aws-events-client';
-import AwsLambdaClient from '../clients/aws-lambda-client';
 import EmailClient from '../clients/email-client';
 
 /**
@@ -30,9 +30,8 @@ enum NotificationType {
 export default class SourcesController {
     constructor(
         private readonly emailClient: EmailClient,
-        private readonly lambdaClient: AwsLambdaClient,
+        private readonly batchClient: AwsBatchClient,
         private readonly awsEventsClient: AwsEventsClient,
-        private readonly retrievalFunctionArn: string,
     ) {}
 
     /**
@@ -157,7 +156,7 @@ export default class SourcesController {
                     source.toAwsRuleName(),
                     source.toAwsRuleDescription(),
                     source.automation.schedule.awsScheduleExpression,
-                    this.retrievalFunctionArn,
+                    this.batchClient.jobQueueArn,
                     source.toAwsRuleTargetId(),
                     source._id.toString(),
                     source.toAwsStatementId(),
@@ -168,7 +167,7 @@ export default class SourcesController {
                 await this.awsEventsClient.deleteRule(
                     source.toAwsRuleName(),
                     source.toAwsRuleTargetId(),
-                    this.retrievalFunctionArn,
+                    this.batchClient.jobQueueArn,
                     source.toAwsStatementId(),
                 );
                 source.set('automation.schedule', undefined);
@@ -241,7 +240,7 @@ export default class SourcesController {
                 source.toAwsRuleName(),
                 source.toAwsRuleDescription(),
                 source.automation.schedule.awsScheduleExpression,
-                this.retrievalFunctionArn,
+                this.batchClient.jobQueueArn,
                 source.toAwsRuleTargetId(),
                 source._id.toString(),
                 source.toAwsStatementId(),
@@ -264,7 +263,7 @@ export default class SourcesController {
             await this.awsEventsClient.deleteRule(
                 source.toAwsRuleName(),
                 source.toAwsRuleTargetId(),
-                this.retrievalFunctionArn,
+                this.batchClient.jobQueueArn,
                 source.toAwsStatementId(),
             );
             await this.sendNotifications(source, NotificationType.Remove);
@@ -284,7 +283,7 @@ export default class SourcesController {
                           end: req.query.parse_end_date as string,
                       }
                     : undefined;
-            const output = await this.lambdaClient.invokeRetrieval(
+            const output = await this.batchClient.doRetrieval(
                 req.params.id,
                 parseDateRange,
             );
@@ -298,7 +297,7 @@ export default class SourcesController {
     /** Lists available parsers for automated ingestion */
     listParsers = async (req: Request, res: Response): Promise<void> => {
         try {
-            const output = await this.lambdaClient.listParsers();
+            const output = await this.batchClient.listParsers();
             res.json(output);
         } catch (err) {
             res.status(500).json(err);
