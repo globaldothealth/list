@@ -10,10 +10,11 @@ export default function validateEnv(): Readonly<{
     EMAIL_USER_ADDRESS: string;
     EMAIL_USER_PASSWORD: string;
     ENABLE_LOCAL_AUTH: boolean;
-    GLOBAL_RETRIEVAL_FUNCTION_ARN: string;
+    EVENT_ROLE_ARN: string;
     GOOGLE_OAUTH_CLIENT_ID: string;
     GOOGLE_OAUTH_CLIENT_SECRET: string;
     LOCATION_SERVICE_URL: string;
+    JOB_QUEUE_ARN: string;
     PORT: number;
     SERVICE_ENV: string;
     SESSION_COOKIE_KEY: string;
@@ -66,10 +67,9 @@ export default function validateEnv(): Readonly<{
             devDefault: true,
             default: false,
         }),
-        GLOBAL_RETRIEVAL_FUNCTION_ARN: str({
-            desc: 'AWS ARN for the global source retrieval Lambda function',
-            default:
-                'arn:aws:lambda:us-east-1:612888738066:function:epid-ingestion-RetrievalFunction-1CEVOE6F2OOIV',
+        EVENT_ROLE_ARN: str({
+            desc: 'AWS ARN for EventBridge rules',
+            devDefault: 'default-dev-arn',
         }),
         GOOGLE_OAUTH_CLIENT_ID: str({
             desc: 'OAuth client ID from the Google developer console',
@@ -82,6 +82,10 @@ export default function validateEnv(): Readonly<{
         LOCATION_SERVICE_URL: str({
             desc: 'Base location for the geocoding service',
             devDefault: 'http://location',
+        }),
+        JOB_QUEUE_ARN: str({
+            desc: 'AWS ARN for Batch job queue',
+            devDefault: 'default-dev-arn',
         }),
         PORT: port({ default: 3001 }),
         SERVICE_ENV: str({
