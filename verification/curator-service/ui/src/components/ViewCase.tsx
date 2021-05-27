@@ -817,8 +817,6 @@ function RowContent(props: { content: string; isLink?: boolean }): JSX.Element {
     const searchQuery = useSelector(selectSearchQuery);
     const searchQueryArray = searchQuery.split(' ');
 
-    console.log('content: ' + props.content);
-
     return (
         <Grid item xs={8}>
             {props.isLink && props.content ? (
