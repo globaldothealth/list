@@ -5,12 +5,7 @@ import { Router } from 'react-router-dom';
 import ViewCase from './ViewCase';
 import axios from 'axios';
 import { createMemoryHistory } from 'history';
-import { render, fireEvent } from './util/test-utils'
-import {
-    prettyDOM
-} from '@testing-library/react';
-import { Logger } from '@aws-amplify/core';
-
+import { render, fireEvent } from './util/test-utils';
 
 jest.mock('axios');
 const mockedAxios = axios as jest.Mocked<typeof axios>;
@@ -28,7 +23,7 @@ it('loads and displays case', async () => {
         headers: {},
     };
     mockedAxios.get.mockResolvedValueOnce(axiosResponse);
-    
+
     const { findByText, getByText } = render(
         <ViewCase
             id="abc123"
@@ -188,7 +183,6 @@ it('does not show the edit button when not enabled', async () => {
     );
     expect(mockedAxios.get).toHaveBeenCalledTimes(1);
     expect(mockedAxios.get).toHaveBeenCalledWith('/api/cases/abc123');
-
 
     expect(
         await findByText(/Case 5ef8e943dfe6e00030892d58/),
