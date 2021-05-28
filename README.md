@@ -1,6 +1,6 @@
 # Global.Health List
 
-[Global.Health](https://global.health)'s mission is to enable rapid sharing of trusted and open public health data to
+[Global.health](https://global.health)'s mission is to enable rapid sharing of trusted and open public health data to
 advance the response to infectious diseases.
 
 This repository contains the servers and scripts that support its data curation efforts.
@@ -15,44 +15,47 @@ You can tell if a case was imported from the manually created spreadsheets data 
 
 ## Frontends
 
-- [dev](https://dev-curator.ghdsi.org)
-- [prod](https://curator.ghdsi.org)
+- [dev](https://dev-data.covid-19.global.health)
+- [prod](https://data.covid-19.global.health)
 
 ## Daily exports of case data
 
-- [output](data/README.md)
-- [data dictionary](data-serving/scripts/export-data/case_fields.yaml)
-- [script](data-serving/scripts/export-data/README.md)
+A daily export of case data can be downloaded from the data portal. The data
+is generated using this [script](data-serving/scripts/export-data/README.md), with
+this [data dictionary](data-serving/scripts/export-data/functions/01-split/fields.txt).
 
 ## CI/CD status
 
-[All actions](https://github.com/globaldothealth/list/actions)
+* [**All actions**](https://github.com/globaldothealth/list/actions)
 
-![Curator Service Github Packages Push](https://github.com/globaldothealth/list/workflows/Curator%20Service%20Github%20Packages%20Push/badge.svg)
+* **Docker images**
 
-![Export prod case data](https://github.com/globaldothealth/list/workflows/Export%20prod%20case%20data/badge.svg)
+   ![Curator Service Github Packages Push](https://github.com/globaldothealth/list/workflows/Curator%20Service%20Github%20Packages%20Push/badge.svg)
 
-![Suggest python scripts](https://github.com/globaldothealth/list/workflows/Suggest%20python%20scripts/badge.svg)
+   ![Data Service Github Packages Push](https://github.com/globaldothealth/list/workflows/Data%20Service%20Github%20Packages%20Push/badge.svg)
 
-![Update case data in dev](https://github.com/globaldothealth/list/workflows/Update%20case%20data%20in%20dev/badge.svg)
+   ![Geocoding Service Github Packages Push](https://github.com/globaldothealth/list/actions/workflows/geocoding-service-package.yml/badge.svg)
 
-![Data Service Github Packages Push](https://github.com/globaldothealth/list/workflows/Data%20Service%20Github%20Packages%20Push/badge.svg)
+   ![Ingestion functions deploy](https://github.com/globaldothealth/list/actions/workflows/ingestion-functions-deploy.yml/badge.svg)
 
-![Geocoding location-service Python CI](https://github.com/globaldothealth/list/actions/workflows/geocoding-service-python.yml/badge.svg)
+* **Tests**
 
-![Integration Tests CI](https://github.com/globaldothealth/list/workflows/Integration%20Tests%20CI/badge.svg)
+   ![Geocoding location-service Python CI](https://github.com/globaldothealth/list/actions/workflows/geocoding-service-python.yml/badge.svg)
 
-![Ingestion functions AWS SAM deploy](https://github.com/globaldothealth/list/workflows/Ingestion%20functions%20AWS%20SAM%20deploy/badge.svg)
+   ![Integration Tests CI](https://github.com/globaldothealth/list/workflows/Integration%20Tests%20CI/badge.svg)
 
-![Ingestion functions AWS SAM build](https://github.com/globaldothealth/list/workflows/Ingestion%20functions%20AWS%20SAM%20build/badge.svg)
+   ![Ingestion functions Python CI](https://github.com/globaldothealth/list/workflows/Ingestion%20functions%20Python%20CI/badge.svg)
 
-![Ingestion functions Python CI](https://github.com/globaldothealth/list/workflows/Ingestion%20functions%20Python%20CI/badge.svg)
+   ![Data service Node.js CI](https://github.com/globaldothealth/list/workflows/Data%20service%20Node.js%20CI/badge.svg)
 
-![Data service Node.js CI](https://github.com/globaldothealth/list/workflows/Data%20service%20Node.js%20CI/badge.svg)
+   ![Curator UI Node.js CI](https://github.com/globaldothealth/list/workflows/Curator%20UI%20Node.js%20CI/badge.svg)
 
-![Curator UI Node.js CI](https://github.com/globaldothealth/list/workflows/Curator%20UI%20Node.js%20CI/badge.svg)
+   ![Curator API Node.js CI](https://github.com/globaldothealth/list/workflows/Curator%20API%20Node.js%20CI/badge.svg)
 
-![Curator API Node.js CI](https://github.com/globaldothealth/list/workflows/Curator%20API%20Node.js%20CI/badge.svg)
+   ![Suggest python scripts](https://github.com/globaldothealth/list/workflows/Suggest%20python%20scripts/badge.svg)
+
+* **Monitoring** ![Data monitoring notifications](https://github.com/globaldothealth/list/actions/workflows/monitoring-notify.yml/badge.svg)
+
 
 ## Components
 
@@ -61,6 +64,8 @@ You can tell if a case was imported from the manually created spreadsheets data 
 - [The curator service](verification/curator-service/api) in `verification/curator-service/api` serves as the backend
   for the curator portal, which enables curators to view, enter, update, and verify cases; manage data sources and their
   ingestion; and manage portal access.
+- [The geocoding service](geocoding/location-service) geocodes locations and is
+  used by the data service, but can be used standalone as well.
 - [The curator UI](verification/curator-service/ui) in `verification/curator-service/ui` is the frontend for the curator
   portal.
 
@@ -93,7 +98,7 @@ You can tell if a case was imported from the manually created spreadsheets data 
 
 ### API docs
 
-- [Curator service](HTTPS://curator.ghdsi.org/api-docs)
+- [Curator service](https://data.covid-19.global.health/api-docs)
 - [Local curator service](http://localhost:3001/api-docs)
 - [Local data service](http://localhost:3000/api-docs)
 
