@@ -815,7 +815,7 @@ function RowHeader(props: { title: string }): JSX.Element {
 
 function RowContent(props: { content: string; isLink?: boolean }): JSX.Element {
     const searchQuery = useSelector(selectSearchQuery);
-    const searchQueryArray = searchQuery.match(/(?<=")[^"]+(?=")|\w+/g) ?? [];
+   const searchQueryArray = searchQuery.match(/(?<=")[^"]+(?=")|\w+/g) ?? [];
 
     return (
         <Grid item xs={8}>
