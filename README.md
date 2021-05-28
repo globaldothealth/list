@@ -1,4 +1,4 @@
-# Global.Health List
+# Global.health List
 
 [Global.health](https://global.health)'s mission is to enable rapid sharing of trusted and open public health data to
 advance the response to infectious diseases.
@@ -54,7 +54,9 @@ this [data dictionary](data-serving/scripts/export-data/functions/01-split/field
 
    ![Suggest python scripts](https://github.com/globaldothealth/list/workflows/Suggest%20python%20scripts/badge.svg)
 
-* **Monitoring** ![Data monitoring notifications](https://github.com/globaldothealth/list/actions/workflows/monitoring-notify.yml/badge.svg)
+* **Monitoring**
+
+   ![Data monitoring notifications](https://github.com/globaldothealth/list/actions/workflows/monitoring-notify.yml/badge.svg)
 
 
 ## Components
