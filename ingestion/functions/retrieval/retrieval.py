@@ -185,12 +185,6 @@ def upload_to_s3(
             api_headers, cookies)
 
 
-def get_parser_module(parser):
-    parser_name = re.sub(r"-ingestor-\w+", r"", parser)
-    parser_name = re.sub(r"-", r".", parser_name)
-    return f"parsing.{parser_name}"
-
-
 def invoke_parser(
     env, parser_module, source_id, upload_id, api_headers, cookies, s3_object_key,
         source_url, date_filter, parsing_date_range):
@@ -289,7 +283,7 @@ def run_retrieval(tempdir=TEMP_PATH):
                      source_id, upload_id, auth_headers, cookies)
     if parser:
         for _, s3_object_key in file_names_s3_object_keys:
-            parser_module = get_parser_module(parser)
+            parser_module = common_lib.get_parser_module(parser)
             invoke_parser(
                 env, parser_module,
                 source_id, upload_id, auth_headers, cookies,

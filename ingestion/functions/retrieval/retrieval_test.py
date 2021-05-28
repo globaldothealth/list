@@ -126,14 +126,6 @@ def test_e2e(valid_event, requests_mock, mock_source_api_url_fixture, tempdir="/
     assert response["upload_id"] == upload_id
 
 
-def test_get_parser_module():
-    from retrieval import retrieval
-    parser = "japan-japan-ingestor-test"
-    exp = "parsing.japan.japan"
-    act = retrieval.get_parser_module(parser)
-    assert exp == act
-
-
 def test_extract_event_fields_returns_env_source_id_and_date_range(valid_event):
     from retrieval import retrieval
     env, source_id, date_range, _ = retrieval.extract_event_fields(valid_event)
