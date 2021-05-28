@@ -102,14 +102,14 @@ a fallback if the UI triggers for ingestion are not working.
 
 1. You'll need AWS access, follow the steps in the previous section.
 2. Once you've got AWS setup, run the following in `ingestion/functions` after switching
-  to the virtualenv:
+   to the virtualenv:
 
-      source venv/bin/activate
-      python aws.py jobdefs
+       source venv/bin/activate
+       python aws.py jobdefs
 
-  This should show existing **job definitions**. Job definitions are templates that
-  tell AWS Batch which parser to run and in which environment (dev or prod). If this
-  command doesn't work, contact the engineering team to setup access.
+   This should show existing **job definitions**. Job definitions are templates that
+   tell AWS Batch which parser to run and in which environment (dev or prod). If this
+   command doesn't work, contact the engineering team to setup access.
 
 3. Check if the ingestion you want to run already has an associated job definition
    corresponding to the environment you want to run in:
