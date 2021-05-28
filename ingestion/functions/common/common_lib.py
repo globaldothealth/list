@@ -8,6 +8,7 @@ object.
 """
 
 import os
+import re
 import json
 import tempfile
 import requests
@@ -159,6 +160,12 @@ def python_module(folder: Path, root: Path):
         return str(modules[0].relative_to(root)).replace('/', '.')[:-3]
     else:
         return None
+
+
+def get_parser_module(parser):
+    parser_name = re.sub(r"-ingestor-\w+", r"", parser)
+    parser_name = re.sub(r"-", r".", parser_name)
+    return f"parsing.{parser_name}"
 
 
 @functools.lru_cache
