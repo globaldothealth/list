@@ -827,6 +827,7 @@ function RowContent(props: { content: string; isLink?: boolean }): JSX.Element {
                 >
                     <Highlighter
                         highlightStyle={{ fontWeight: 'bold' }}
+                        className="highlighted"
                         searchWords={searchQueryArray}
                         autoEscape={true}
                         textToHighlight={props.content}
@@ -835,6 +836,7 @@ function RowContent(props: { content: string; isLink?: boolean }): JSX.Element {
             ) : (
                 <Highlighter
                     highlightStyle={{ fontWeight: 'bold' }}
+                    className="highlighted"
                     searchWords={searchQueryArray}
                     autoEscape={true}
                     textToHighlight={props.content}
