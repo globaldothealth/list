@@ -2,6 +2,7 @@ import codecs
 import io
 import mimetypes
 import os
+import re
 import sys
 import tempfile
 import zipfile
@@ -24,7 +25,6 @@ READ_CHUNK_BYTES = 2048
 HEADER_CHUNK_BYTES = 1024 * 1024
 CSV_CHUNK_BYTES = 2 * 1024 * 1024
 
-lambda_client = boto3.client("lambda", region_name="us-east-1")
 s3_client = boto3.client("s3")
 
 if os.environ.get("DOCKERIZED"):
@@ -186,9 +186,8 @@ def upload_to_s3(
 
 
 def invoke_parser(
-    env, parser, source_id, upload_id, api_headers, cookies, s3_object_key,
+    env, parser_module, source_id, upload_id, api_headers, cookies, s3_object_key,
         source_url, date_filter, parsing_date_range):
-    python_module = f"parsing.{parser}"
     payload = {
         "env": env,
         "s3Bucket": OUTPUT_BUCKET,
@@ -199,9 +198,9 @@ def invoke_parser(
         "dateFilter": date_filter,
         "dateRange": parsing_date_range,
     }
-    print(f"Invoking parser ({python_module})")
+    print(f"Invoking parser ({parser_module})")
     sys.path.append(str(Path(__file__).parent.parent))  # ingestion/functions
-    importlib.import_module(python_module).event_handler(payload)
+    importlib.import_module(parser_module).event_handler(payload)
 
 
 def get_today():
@@ -284,8 +283,9 @@ def run_retrieval(tempdir=TEMP_PATH):
                      source_id, upload_id, auth_headers, cookies)
     if parser:
         for _, s3_object_key in file_names_s3_object_keys:
+            parser_module = common_lib.get_parser_module(parser)
             invoke_parser(
-                env, parser,
+                env, parser_module,
                 source_id, upload_id, auth_headers, cookies,
                 s3_object_key, url, date_filter, parsing_date_range)
     return {
