@@ -18,7 +18,7 @@ import { useDebounce } from '../hooks/useDebounce';
 import FiltersModal from './FiltersModal';
 import { searchQueryToURL, URLToSearchQuery } from './util/searchQuery';
 import { useLocation, useHistory } from 'react-router-dom';
-import { KeyboardEvent } from 'react'
+import { KeyboardEvent, ChangeEvent } from 'react'
 
 const searchBarStyles = makeStyles((theme: Theme) => ({
     searchRoot: {
@@ -134,7 +134,7 @@ export default function SearchBar({
         }
     };
 
-    const disallowFilteringInSearchBar = (e: KeyboardEvent<HTMLInputElement> ) => {
+    const disallowFilteringInSearchBar = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | KeyboardEvent<HTMLInputElement>) => {
         e.preventDefault();
         setIsUserTyping(false);
         setModalAlert(true);
@@ -143,6 +143,16 @@ export default function SearchBar({
 
     function handleSetModalAlert(shouldTheAlertStillBeOpen: boolean) {
         setModalAlert(shouldTheAlertStillBeOpen);
+      }
+
+      function checkIfThereIsColon(event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>, eventTargetValue:string) {
+        let searchStringStrippedOutColon = eventTargetValue;
+        if (eventTargetValue.includes(":")) {
+            searchStringStrippedOutColon = eventTargetValue.replace(/:/g, '<disallowed character>');
+            disallowFilteringInSearchBar(event);
+        }
+
+        return searchStringStrippedOutColon;
       }
 
     return (
@@ -155,7 +165,7 @@ export default function SearchBar({
                     onKeyPress={handleKeyPress}
                     autoComplete="off"
                     onChange={(event): void => {
-                        setSearchInput(event.target.value);
+                        setSearchInput(checkIfThereIsColon(event, event.target.value));
                     }}
                     onKeyDown={(e: KeyboardEvent<HTMLInputElement>) => {
                         if (!isUserTyping) {
