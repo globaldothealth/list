@@ -144,3 +144,10 @@ def test_get_source_api_url_raises_error_for_unmapped_env():
     except ValueError:
         return
     assert not "Should have raised a ValueError exception"
+
+
+def test_get_parser_module():
+    parser = "japan-japan-ingestor-test"
+    exp = "parsing.japan.japan"
+    act = common_lib.get_parser_module(parser)
+    assert exp == act

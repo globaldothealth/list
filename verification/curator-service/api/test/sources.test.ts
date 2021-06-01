@@ -4,7 +4,7 @@ const mockDeleteRule = jest.fn().mockResolvedValue({});
 const mockPutRule = jest
     .fn()
     .mockResolvedValue('arn:aws:events:fake:event:rule/name');
-const mockInvoke = jest.fn().mockResolvedValue({ Payload: '' });
+const mockDoRetrieval = jest.fn().mockResolvedValue({ Payload: '' });
 const mockSend = jest.fn();
 const mockInitialize = jest.fn().mockResolvedValue({ send: mockSend });
 
@@ -22,9 +22,9 @@ jest.mock('../src/clients/aws-events-client', () => {
         return { deleteRule: mockDeleteRule, putRule: mockPutRule };
     });
 });
-jest.mock('../src/clients/aws-lambda-client', () => {
+jest.mock('../src/clients/aws-batch-client', () => {
     return jest.fn().mockImplementation(() => {
-        return { invokeRetrieval: mockInvoke };
+        return { doRetrieval: mockDoRetrieval };
     });
 });
 jest.mock('../src/clients/email-client', () => {
@@ -267,7 +267,7 @@ describe('PUT', () => {
             source.toAwsRuleName(),
             source.toAwsRuleDescription(),
             scheduleExpression,
-            expect.any(String),
+            undefined,
             source.toAwsRuleTargetId(),
             source._id.toString(),
             source.toAwsStatementId(),
@@ -392,7 +392,7 @@ describe('PUT', () => {
                 automation: {
                     parser: {
                         awsLambdaArn:
-                            'arn:aws:lambda:us-east-1:612888738066:function:some-func',
+                            'arn:aws:batch:us-east-1:612888738066:job-definition:some-def',
                     },
                 },
             })
@@ -474,7 +474,7 @@ describe('POST', () => {
             createdSource.toAwsRuleName(),
             createdSource.toAwsRuleDescription(),
             scheduleExpression,
-            expect.any(String),
+            undefined,
             createdSource.toAwsRuleTargetId(),
             createdSource._id.toString(),
             createdSource.toAwsStatementId(),
@@ -553,7 +553,7 @@ describe('DELETE', () => {
         expect(mockDeleteRule).toHaveBeenCalledWith(
             source.toAwsRuleName(),
             source.toAwsRuleTargetId(),
-            expect.any(String),
+            undefined,
             source.toAwsStatementId(),
         );
     });
@@ -601,7 +601,7 @@ describe('retrieval', () => {
         await curatorRequest
             .post(`/api/sources/${sourceId}/retrieve`)
             .expect(200);
-        expect(mockInvoke).toHaveBeenCalledWith(sourceId, undefined);
+        expect(mockDoRetrieval).toHaveBeenCalledWith(sourceId, undefined);
     });
     it('forwards optional date params', async () => {
         const sourceId = '424242424242424242424242';
@@ -613,6 +613,6 @@ describe('retrieval', () => {
                 `/api/sources/${sourceId}/retrieve?parse_start_date=${startDate}&parse_end_date=${endDate}`,
             )
             .expect(200);
-        expect(mockInvoke).toHaveBeenCalledWith(sourceId, parseRange);
+        expect(mockDoRetrieval).toHaveBeenCalledWith(sourceId, parseRange);
     });
 });

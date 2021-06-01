@@ -364,7 +364,7 @@ def run(
             )
             if status == 200:
                 break
-            elif status == 401:
+            elif status == 500 and "401" in text:
                 print("Finalizing upload failed with 401, reauthenticating...")
                 api_creds = common_lib.obtain_api_credentials(s3_client)
                 continue

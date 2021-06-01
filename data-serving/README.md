@@ -1,4 +1,3 @@
-
 # All things data
 
 ## Database design
@@ -48,12 +47,14 @@ G.h has millions of case records that predate the new curator portal. These are 
 [separate repo](https://github.com/beoutbreakprepared/nCoV2019).
 
 We can convert these cases to a json format that conforms to the `cases` collection schema and ingest these into a
-MongoDD instance using these scripts:
-1. [Convert the data only](https://github.com/globaldothealth/list/tree/main/data-serving/scripts/convert-data)
+MongoDB instance using these scripts:
+1. [Convert the data only](https://github.com/globaldothealth/list/tree/main/database/convert-data)
+
+#### FIXME: this does not exist
 1. [Convert & ingest the data into MongoDB](https://github.com/globaldothealth/list/tree/main/data-serving/scripts/data-pipeline)
 
 As of writing, there is a
-[Github workflow to automate this conversion & import once a day to the prod MongoDb instance](https://github.com/globaldothealth/list/blob/main/.github/workflows/case-data-update-prod.yml);
+[Github workflow to automate this conversion & import once a day to the prod MongoDB instance](https://github.com/globaldothealth/list/blob/main/.github/workflows/case-data-update-prod.yml);
 however, this is likely to be disabled and future imports will be done selectively.
 
 ### Exporting data

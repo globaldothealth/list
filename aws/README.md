@@ -1,6 +1,6 @@
 # Production infrastructure
 
-This directory contains the configuration files for the production infrastructure of the Global Health project.
+This directory contains the configuration files for the production infrastructure of the Global.health project.
 
 ## One-time setup
 
@@ -32,32 +32,40 @@ The basic deployment/pods/services configuration looks like:
 
 ```
 kubectl get deployments
-NAME           READY   UP-TO-DATE   AVAILABLE   AGE
-curator-dev    1/1     1            1           19h
-curator-prod   1/1     1            1           19h
-data-dev       1/1     1            1           19h
-data-prod      1/1     1            1           19h
+------------------------------------------------------
+NAME            READY   UP-TO-DATE   AVAILABLE   AGE
+curator-dev     1/1     1            1           357d
+curator-prod    2/2     2            2           357d
+data-dev        1/1     1            1           2d6h
+data-prod       2/2     2            2           357d
+location-dev    1/1     1            1           10d
+location-prod   2/2     2            2           10d
 
 kubectl get pods
-NAME                           READY   STATUS    RESTARTS   AGE
-curator-dev-69d6f94954-qrc2v   1/1     Running   0          14m
-curator-prod-dfb49646-qz5zp    1/1     Running   0          14m
-data-dev-6f686ffdb6-jt6tl      1/1     Running   0          14m
-data-prod-bd57576d8-p8wp4      1/1     Running   0          14m
+-----------------------------------------------------------------
+NAME                             READY   STATUS    RESTARTS   AGE
+curator-dev-7c65fdd7bc-jkfnn     1/1     Running   0          26h
+curator-prod-94ccbc565-qtmph     1/1     Running   1          26h
+curator-prod-94ccbc565-v7rvs     1/1     Running   0          26h
+data-dev-66676656f6-897p8        1/1     Running   0          26h
+data-prod-7d479ddbbc-fdkgb       1/1     Running   0          26h
+data-prod-7d479ddbbc-qq256       1/1     Running   0          26h
+location-dev-5986bf6f77-f8mmb    1/1     Running   0          26h
+location-prod-6d674b7b47-lxj2z   1/1     Running   0          26h
+location-prod-6d674b7b47-zfgk2   1/1     Running   0          26h
 
 kubectl get services
-NAME           TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)   AGE
-curator-dev    ClusterIP   10.100.222.22    <none>        80/TCP    110m
-curator-prod   ClusterIP   10.100.43.67     <none>        80/TCP    3h7m
-data-dev       ClusterIP   10.100.204.152   <none>        80/TCP    3h7m
-data-prod      ClusterIP   10.100.59.189    <none>        80/TCP    3h7m
-kubernetes     ClusterIP   10.100.0.1       <none>        443/TCP   3h25m
-
-kubectl get ingress
-NAME                        HOSTS                                     ADDRESS                                                                         PORTS     AGE
-cm-acme-http-solver-k9bzb   curator.ghdsi.org                         ad9f94057436541e5a5d6b4f9b2deec0-1e4e71b2092ca07c.elb.us-east-1.amazonaws.com   80        31s
-cm-acme-http-solver-mvg2s   dev-curator.ghdsi.org                     ad9f94057436541e5a5d6b4f9b2deec0-1e4e71b2092ca07c.elb.us-east-1.amazonaws.com   80        31s
-curator                     dev-curator.ghdsi.org,curator.ghdsi.org   ad9f94057436541e5a5d6b4f9b2deec0-1e4e71b2092ca07c.elb.us-east-1.amazonaws.com   80, 443   34s
+--------------------------------------------------------------------------------------------------------------------------------------------------
+NAME                 TYPE           CLUSTER-IP       EXTERNAL-IP                                                              PORT(S)         AGE
+curator-dev          ClusterIP      10.100.222.22    <none>                                                                   80/TCP          357d
+curator-dev-aws-1    LoadBalancer   10.100.175.60    a1fc85431766047dda91ffcb74696fa4-156204500.us-east-1.elb.amazonaws.com   443:32233/TCP   105d
+curator-prod         ClusterIP      10.100.43.67     <none>                                                                   80/TCP          357d
+curator-prod-aws-1   LoadBalancer   10.100.165.255   ae37d40a64ae44960b885564ddee19cf-419585441.us-east-1.elb.amazonaws.com   443:31681/TCP   105d
+data-dev             ClusterIP      10.100.204.152   <none>                                                                   80/TCP          357d
+data-prod            ClusterIP      10.100.59.189    <none>                                                                   80/TCP          357d
+kubernetes           ClusterIP      10.100.0.1       <none>                                                                   443/TCP         357d
+location-dev         ClusterIP      10.100.234.147   <none>                                                                   80/TCP          10d
+location-prod        ClusterIP      10.100.68.234    <none>                                                                   80/TCP          10d
 ```
 
 We use a deployment file for the data service and for the curator service, check out `data.yaml` and `curator.yaml`.
@@ -65,19 +73,19 @@ We use a deployment file for the data service and for the curator service, check
 To update the deployments, first do a dry run:
 
 ```shell
-kubectl apply -f data.yaml -f curator.yaml --dry-run=server
+kubectl apply -f data.yaml -f curator.yaml -f location.yaml --dry-run=server
 ```
 
 For more verbose output use:
 
 ```shell
-kubectl apply -f data.yaml -f curator.yaml --dry-run=server --output=yaml
+kubectl apply -f data.yaml -f curator.yaml -f location.yaml --dry-run=server --output=yaml
 ```
 
 Then once changes look good, use:
 
 ```shell
-kubectl apply -f data.yaml -f curator.yaml
+kubectl apply -f data.yaml -f curator.yaml -f location.yaml
 ```
 
 To confirm changes occurred, use:
@@ -91,17 +99,22 @@ To read the server logs first find the pod whose logs you want to read.
 
 ```shell
 kubectl get pods
-NAME                            READY   STATUS    RESTARTS   AGE
-curator-dev-6cff5859df-dddbw    1/1     Running   0          148m
-curator-prod-5bf5c88f58-g2489   1/1     Running   0          139m
-data-dev-566fb67694-xfzkj       1/1     Running   0          148m
-data-prod-5b78bdc66d-dwf2k      1/1     Running   4          139m
+NAME                             READY   STATUS    RESTARTS   AGE
+curator-dev-7c65fdd7bc-jkfnn     1/1     Running   0          26h
+curator-prod-94ccbc565-qtmph     1/1     Running   1          26h
+curator-prod-94ccbc565-v7rvs     1/1     Running   0          26h
+data-dev-66676656f6-897p8        1/1     Running   0          26h
+data-prod-7d479ddbbc-fdkgb       1/1     Running   0          26h
+data-prod-7d479ddbbc-qq256       1/1     Running   0          26h
+location-dev-5986bf6f77-f8mmb    1/1     Running   0          26h
+location-prod-6d674b7b47-lxj2z   1/1     Running   0          26h
+location-prod-6d674b7b47-zfgk2   1/1     Running   0          26h
 ```
 
 Then call logs on the pod you want to read from.
 
 ```shell
-kubectl logs data-prod-5b78bdc66d-dwf2k
+kubectl logs data-prod-7d479ddbbc-qq256
 ```
 
 ## Getting access to the cluster
@@ -192,7 +205,7 @@ If for some reason a secret has been compromised or if you want to perform a rot
 
 5. Change reference to new secret in deployment configs.
 
-6. Apply configuration changes. (`kubectl apply -f curator.yaml -f data.yaml`)
+6. Apply configuration changes. (`kubectl apply -f curator.yaml -f data.yaml -f location.yaml`)
 
 7. Verify new deployment works as intended.
 
@@ -253,11 +266,10 @@ In a few seconds the push should be complete.
 
 You can list the existing tags/versions with `git tag` or on the [github repo](https://github.com/globaldothealth/list/releases).
 
-### `main` image tag for dev
+### `latest` image tag for dev
 
-Dev instances of curator and data services are using the `main` image tag, that's not best practice as the images are not reloaded automatically - better approach is pending
-[Flux-based deployment](https://github.com/globaldothealth/list/issues/673). The latest image with the `main`
-tag is fetched when a deployment is updated in kubernetes. To update dev to the `main` image, do:
+Dev instances of curator and data services are using the `latest` image tag. Using this tag lets kubernetes know
+that the image should always be fetched when restarting the service, which can be done using the following:
 
 ```shell
 kubectl rollout restart deployment/curator-dev
@@ -299,14 +311,14 @@ kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/cont
 Our ingress routes to the dev and prod curator services were installed with:
 
 ```shell
-kubectl apply -f curator-ingress.yam
+kubectl apply -f curator-ingress.yaml
 kubectl apply -f curator-ingress-config-map.yaml -n ingress-nginx
 ```
 
 The curator services are exposed here:
 
-- [dev](https://dev-curator.ghdsi.org)
-- [prod](https://curator.ghdsi.org)
+- [dev](https://dev-data.covid-19.global.health)
+- [prod](https://data.covid-19.global.health)
 
 ## Kubernetes dashboard
 
