@@ -70,6 +70,7 @@
     "express": "^4.17.1",
     "express-openapi-validator": "^4.9.0",
     "express-session": "^1.17.1",
+    "jszip": "^3.6.0",
     "lodash": "^4.17.21",
     "longjohn": "^0.2.12",
     "mimemessage": "^1.0.5",

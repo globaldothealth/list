@@ -115,14 +115,6 @@ export default class CasesController {
     };
 
     /* getDownloadLink generates signed URL to download full data set from AWS S3 */
-    downloadLarge = (req: Request, res: Response): void => {
-        // @TODO: Make request to AWS to generate link needed to download large data sources
-        // Placeholder for now
-        logger.info(req.body);
-        res.status(200).send({ message: 'OK' });
-    };
-
-    /* getDownloadLink generates signed URL to download full data set from AWS S3 */
     getDownloadLink = async (req: Request, res: Response): Promise<void> => {
         const dateObj = new Date();
 
