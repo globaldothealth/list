@@ -45,11 +45,11 @@ describe('Linelist table', function () {
         });
         cy.visit('/cases');
         cy.contains('France');
-        cy.contains(/View case\b/).should('not.exist');
+        cy.contains(/Case details\b/).should('not.exist');
         cy.contains('td', 'France').click({ force: true });
-        cy.contains(/View case\b/);
+        cy.contains(/Case details\b/);
         cy.get('button[aria-label="close overlay"').click();
-        cy.contains(/View case\b/).should('not.exist');
+        cy.contains(/Case details\b/).should('not.exist');
     });
 
     it('Can delete a case', function () {
@@ -375,9 +375,9 @@ describe('Linelist table', function () {
 
         // Navigate to case details and back
         cy.get('td[value="France"]').click();
-        cy.contains(/View case\b/);
+        cy.contains(/Case details\b/);
         cy.get('button[aria-label="close overlay"').click();
-        cy.contains(/View case\b/).should('not.exist');
+        cy.contains(/Case details\b/).should('not.exist');
 
         // Search is maintained
         cy.contains('Filter').click();
