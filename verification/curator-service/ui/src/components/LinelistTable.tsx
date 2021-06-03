@@ -52,9 +52,10 @@ import renderDate, { renderDateRange } from './util/date';
 import { URLToSearchQuery } from './util/searchQuery';
 import { ChipData } from './App';
 import { SortBy, SortByOrder } from '../constants/types';
+import { SnackbarAlert } from './SnackbarAlert';
 
 // Limit number of data that can be displayed or downloaded to avoid long execution times of mongo queries
-const DATA_LIMIT = 10000;
+const DATA_LIMIT = 5;
 
 interface ListResponse {
     cases: Case[];
@@ -509,6 +510,11 @@ export function DownloadButton({
         false,
     );
     const [isLoading, setIsLoading] = useState<boolean>(false);
+    const [fileFormat, setFileFormat] = useState('');
+    const [showFullDatasetButton, setShowFullDatasetButton] = useState(true);
+    const [downloadButtonDisabled, setDownloadButtonDisable] = useState(true);
+    const [snackbarOpen, setSnackbarOpen] = useState(false);
+
     const classes = downloadDataModalStyles();
 
     const downloadDataSet = async (dataSet: string, formatType?: string) => {
@@ -537,7 +543,7 @@ export function DownloadButton({
 
             case 'mailDataset':
                 try {
-                    await axios({
+                    const response = await axios({
                         method: 'post',
                         url: '/api/cases/downloadAsync',
                         data: {
@@ -548,6 +554,10 @@ export function DownloadButton({
                             'Content-Type': 'application/json',
                         },
                     });
+
+                    if (response.status === 204) {
+                        setSnackbarOpen(true);
+                    }
                 } catch (err) {
                     alert(
                         `There was an error while downloading data, please try again later. ${err}`,
@@ -594,10 +604,6 @@ export function DownloadButton({
         setIsDownloadModalOpen(false);
     };
 
-    const [fileFormat, setFileFormat] = useState('');
-    const [showFullDatasetButton, setShowFullDatasetButton] = useState(true);
-    const [downloadButtonDisabled, setDownloadButtonDisable] = useState(true);
-
     const disabledButtonTooltipText = downloadButtonDisabled
         ? 'Please first select the file format you want to download'
         : '';
@@ -628,6 +634,12 @@ export function DownloadButton({
 
     return (
         <>
+            <SnackbarAlert
+                isOpen={snackbarOpen}
+                setIsOpen={setSnackbarOpen}
+                message="Email sent successfully. Please check your inbox."
+                type="success"
+            />
             <StyledDownloadButton
                 variant="outlined"
                 color="primary"
