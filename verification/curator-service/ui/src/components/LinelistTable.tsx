@@ -55,7 +55,7 @@ import { SortBy, SortByOrder } from '../constants/types';
 import { SnackbarAlert } from './SnackbarAlert';
 
 // Limit number of data that can be displayed or downloaded to avoid long execution times of mongo queries
-const DATA_LIMIT = 5;
+const DATA_LIMIT = 10000;
 
 interface ListResponse {
     cases: Case[];
