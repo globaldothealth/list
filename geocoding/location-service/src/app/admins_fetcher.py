@@ -23,6 +23,9 @@ class AdminsFetcher:
         else:
             response = mapbox_tile_query(self.access_token, geocode['geometry'], rate_limit=self.rate_limit)
             self.cache[cacheKey] = response
+        if not 'features' in response:
+            # probably your API key doesn't support the premium APIs, skip this step
+            return geocode
         for feature in response['features']:
             layer = feature['properties']['tilequery']['layer']
             name = self.getName(feature['properties']['id'])
