@@ -30,7 +30,7 @@ import { useTheme } from '@material-ui/core/styles';
 import Highlighter from 'react-highlight-words';
 import { useSelector } from 'react-redux';
 import { selectSearchQuery } from './App/redux/selectors';
-import { Alert } from '@material-ui/lab';
+import Chip from '@material-ui/core/Chip';
 
 const styles = makeStyles((theme) => ({
     errorMessage: {
@@ -135,6 +135,10 @@ const useStyles = makeStyles((theme) => ({
         paddingRight: '20px',
         wordBreak: 'break-all',
     },
+    breadcrumbChip: {
+        margin: theme.spacing(0.5),
+        marginRight: '10px',
+    },
 }));
 
 function ageRange(range?: { start: number; end: number }): string {
@@ -151,10 +155,7 @@ function CaseDetails(props: CaseDetailsProps): JSX.Element {
     const showNavMenu = useMediaQuery(theme.breakpoints.up('sm'));
     const classes = useStyles();
 
-    const [handleClose, setHandleClose] = React.useState<boolean>(
-        false,
-    );
-
+    // const [handleClose, setHandleClose] = React.useState<boolean>(false);
 
     const scrollTo = (name: string): void => {
         Scroll.scroller.scrollTo(name, {
@@ -173,7 +174,6 @@ function CaseDetails(props: CaseDetailsProps): JSX.Element {
     };
 
     const searchedKeywords = useSelector(selectSearchQuery);
-
 
     return (
         <>
@@ -250,16 +250,19 @@ function CaseDetails(props: CaseDetailsProps): JSX.Element {
                 }}
             >
                 {' '}
-                {!handleClose && <Alert
-                    severity="info"
-                    icon={false}
-                    onClose={() => setHandleClose(true)}
-                    // className={classes.alertBox}
-                >
-                
-                    {`Showing results based on search query: ${searchedKeywords}`}
-                </Alert>
-}
+                {searchedKeywords && (
+                    <>
+                        <Chip
+                            label="Searched query:"
+                            color="primary"
+                            onClick={() => console.log('clicked')}
+                            className={classes.breadcrumbChip}
+                        />
+                        <Chip
+                            label={`${searchedKeywords}`}
+                        />
+                    </>
+                )}
                 <Typography className={classes.caseTitle} variant="h5">
                     Case {props.c._id}{' '}
                     {props.enableEdit && (
