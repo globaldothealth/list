@@ -58,7 +58,7 @@ describe('doRetrieval', () => {
         submitJobSpy.mockResolvedValueOnce({
             jobName: ingestorName,
             $metadata: {
-                HTTPStatusCode: 200
+                httpStatusCode: 200
             }
         });
         describeJobDefinitionsSpy.mockResolvedValueOnce(mockJobDefinitions);
@@ -84,7 +84,7 @@ describe('doRetrieval', () => {
     });
     it('throws when the aws api returns an non-200 from the submit job call', async () => {
         describeJobDefinitionsSpy.mockResolvedValueOnce(mockJobDefinitions);
-        const metadata = {HTTPStatusCode: 400};
+        const metadata = {httpStatusCode: 400};
         submitJobSpy.mockResolvedValueOnce({
             $metadata: metadata
         });
