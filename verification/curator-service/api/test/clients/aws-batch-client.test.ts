@@ -57,9 +57,7 @@ describe('doRetrieval', () => {
         };
         submitJobSpy.mockResolvedValueOnce({
             jobName: ingestorName,
-            $metadata: {
-                httpStatusCode: 200
-            }
+            jobId: ingestorName
         });
         describeJobDefinitionsSpy.mockResolvedValueOnce(mockJobDefinitions);
         const res = await client.doRetrieval(sourceID, {
@@ -82,12 +80,9 @@ describe('doRetrieval', () => {
             expectedError,
         );
     });
-    it('throws when the aws api returns an non-200 from the submit job call', async () => {
+    it('throws when the aws api does not return a jobID from the submit job call', async () => {
         describeJobDefinitionsSpy.mockResolvedValueOnce(mockJobDefinitions);
-        const metadata = {httpStatusCode: 400};
-        submitJobSpy.mockResolvedValueOnce({
-            $metadata: metadata
-        });
+        submitJobSpy.mockResolvedValueOnce({});
         return expect(client.doRetrieval(sourceID)).rejects.toThrowError(
         );
     });
