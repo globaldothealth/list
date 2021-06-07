@@ -98,11 +98,10 @@ export default class AwsBatchClient {
             			: undefined
         		})
                 .promise();
-            let response = res as any;
-            if (response.$metadata.httpStatusCode != 200){
-            	logger.error(response);
+            if (!res.jobId) {
+            	logger.error(res);
             	throw Error(
-                    `Retrieving source "${sourceId}" content: ${response.$metadata}`,
+                    `Retrieving source "${sourceId}" content: ${res}`,
                 );
             }
             let ret = {jobName: res.jobName};
