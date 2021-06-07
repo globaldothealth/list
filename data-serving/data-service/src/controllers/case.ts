@@ -402,21 +402,25 @@ export class CasesController {
         try {
             // Batch validate cases first.
             logger.info('batchUpsert: entrypoint');
-            const errors = await this.batchValidate(req.body.cases);
+            const cases = req.body.cases;
+            const errors = await this.batchValidate(cases);
             logger.info('batchUpsert: validated cases');
             if (errors.length > 0) {
-                res.status(207).send({
-                    phase: 'VALIDATE',
-                    numCreated: 0,
-                    numUpdated: 0,
-                    errors: errors,
+                // drop any invalid cases but don't give up yet: upsert the remainder
+                const badCases = _.orderBy(errors, 'index', 'desc').map(
+                    (o) => o.index,
+                );
+                badCases.forEach((i) => {
+                    cases.splice(i, 1);
                 });
-                return;
+                logger.info(
+                    `batchUpsert: dropped ${errors.length} invalid cases`,
+                );
             }
             logger.info('batchUpsert: preparing bulk write');
             const bulkWriteResult = await Case.bulkWrite(
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                req.body.cases.map((c: any) => {
+                cases.map((c: any) => {
                     delete c.caseCount;
                     if (
                         c.caseReference?.sourceId &&
@@ -445,13 +449,14 @@ export class CasesController {
                 { ordered: false },
             );
             logger.info('batchUpsert: finished bulk write');
-            res.status(200).json({
+            const status = errors.length > 0 ? 207 : 200;
+            res.status(status).json({
                 phase: 'UPSERT',
                 numCreated:
                     (bulkWriteResult.insertedCount || 0) +
                     (bulkWriteResult.upsertedCount || 0),
                 numUpdated: bulkWriteResult.modifiedCount,
-                errors: [],
+                errors,
             });
             return;
         } catch (err) {
