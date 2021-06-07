@@ -34,7 +34,10 @@ if 'MAPBOX_TOKEN' in environ:
     access_token = environ['MAPBOX_TOKEN']
     mongo_client = None
     if 'DB_CONNECTION_STRING' in environ:
-        mongo_client = pymongo.MongoClient(environ['DB_CONNECTION_STRING'])
+        # searching for 'pymongo can auth on command line but not in container' leads to suggestions
+        # to add the 'authSource' parameter on connection ¯\_(ツ)_/¯
+        # e.g. https://www.reddit.com/r/learnpython/comments/m8ieht/am_trying_to_use_python_with_mongodb_and_am/
+        mongo_client = pymongo.MongoClient(environ['DB_CONNECTION_STRING'], authSource='admin')
     rate_limit = int(environ.get('MAPBOX_GEOCODE_RATE_LIMIT_PER_MIN', 600))
     admins_fetcher = AdminsFetcher(access_token, mongo_client.get_database(environ['DB']), rate_limit=rate_limit)
     mapbox_geocoder = Geocoder(access_token, admins_fetcher, rate_limit=rate_limit)
