@@ -20,7 +20,7 @@ spec:
     spec:
       containers:
         - name: curator
-          image: ghcr.io/globaldothealth/list/curatorservice:latest
+          image: ghcr.io/globaldothealth/list/curatorservice:main
           ports:
             - containerPort: 3001
           livenessProbe:
