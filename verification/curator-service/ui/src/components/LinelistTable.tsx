@@ -409,7 +409,8 @@ export function SortSelect({
 
     const sortKeywords = [
         { name: 'None', value: SortBy.Default },
-        { name: 'Confirmed date', value: SortBy.ConfirmedDate },
+        // Commenting out until fix is found for big queries sorting in mongodb
+        // { name: 'Confirmed date', value: SortBy.ConfirmedDate },
         { name: 'Country', value: SortBy.Country },
         { name: 'Location admin 1', value: SortBy.Admin1 },
         { name: 'Location admin 2', value: SortBy.Admin2 },

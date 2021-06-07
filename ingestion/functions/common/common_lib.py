@@ -8,6 +8,7 @@ object.
 """
 
 import os
+import re
 import json
 import tempfile
 import requests
@@ -77,9 +78,7 @@ def finalize_upload(
                        json=update,
                        headers=headers,
                        cookies=cookies)
-    if not res or res.status_code != 200:
-        raise RuntimeError(
-            f'Error updating upload record, status={res.status_code}, response={res.text}')
+    return res.status_code, res.text
 
 
 def complete_with_error(
@@ -161,6 +160,12 @@ def python_module(folder: Path, root: Path):
         return str(modules[0].relative_to(root)).replace('/', '.')[:-3]
     else:
         return None
+
+
+def get_parser_module(parser):
+    parser_name = re.sub(r"-ingestor-\w+", r"", parser)
+    parser_name = re.sub(r"-", r".", parser_name)
+    return f"parsing.{parser_name}"
 
 
 @functools.lru_cache

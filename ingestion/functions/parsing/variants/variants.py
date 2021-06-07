@@ -3,6 +3,7 @@ import sys
 from datetime import datetime
 import csv
 import json
+import copy
 
 # Layer code, like parsing_lib, is added to the path by AWS.
 # To test locally (e.g. via pytest), we have to modify sys.path.
@@ -16,15 +17,11 @@ except ImportError:
             'common/python'))
     import parsing_lib
 
-def convert_date(raw_date: str, p1=False):
+def convert_date(raw_date: str):
     """
     Convert raw date field into a value interpretable by the dataserver.
-    If parsing P1 data, dates are in different format so set p1 to True
     """
-    if p1:
-        date = datetime.strptime(raw_date, "%Y-%m-%d")
-    else:
-        date = datetime.strptime(raw_date, "%d/%m/%Y")
+    date = datetime.strptime(raw_date, "%d/%m/%Y")
     return date.strftime("%m/%d/%YZ")
 
 def convert_location(entry):
@@ -162,9 +159,10 @@ def parse_cases(raw_data_file, source_id, source_url):
                     case['notes'] = entry['notes']
 
                 for _ in range(int(entry['number.of.cases'])):
-                    case["caseReference"]["sourceEntryId"] = f"B.1.351_{case_count}"
+                    unique_case = copy.deepcopy(case)
+                    unique_case["caseReference"]["sourceEntryId"] = f"voc_{case_count}"
                     case_count += 1
-                    yield case
+                    yield unique_case
 
 
 def event_handler(event):
