@@ -637,10 +637,11 @@ describe('POST', () => {
         expect(await CaseRevision.collection.countDocuments()).toEqual(0);
     });
     it('batch upsert with any invalid case should return 207', async () => {
-        await request(app)
+        const res = await request(app)
             .post('/api/cases/batchUpsert')
             .send({ cases: [minimalCase, invalidRequest], ...curatorMetadata })
-            .expect(207, /VALIDATE/);
+            .expect(207, /Case validation failed/);
+        expect(res.body.numCreated).toEqual(1);
     });
     it('batch upsert with empty cases should return 400', async () => {
         return request(app)
