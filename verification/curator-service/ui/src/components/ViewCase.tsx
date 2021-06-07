@@ -174,6 +174,16 @@ function CaseDetails(props: CaseDetailsProps): JSX.Element {
     };
 
     const searchedKeywords = useSelector(selectSearchQuery);
+    const searchedKeywordsString = searchedKeywords.split(' ');
+    const searchedKeywordsStringOnlyFilters = searchedKeywordsString.filter(
+        (e) => e.includes(':'),
+    );
+    const removeFiltersFromSearchedText = searchedKeywords
+        .replace(/[^\s.,?!]*:+[^\s.,?!]*/g, '')
+        .trim();
+
+    console.log(removeFiltersFromSearchedText.length);
+    console.log(removeFiltersFromSearchedText);
 
     return (
         <>
@@ -258,9 +268,27 @@ function CaseDetails(props: CaseDetailsProps): JSX.Element {
                             onClick={() => console.log('clicked')}
                             className={classes.breadcrumbChip}
                         />
-                        <Chip
-                            label={`${searchedKeywords}`}
-                        />
+
+                        {removeFiltersFromSearchedText.length > 0 && (
+                            <Chip label={`${removeFiltersFromSearchedText}`} />
+                        )}
+
+                        {searchedKeywordsStringOnlyFilters.length > 0 &&
+                            searchedKeywordsStringOnlyFilters.map(
+                                (breadcrumb) => {
+                                    const breadcrumbWithoutColon = breadcrumb.replace(
+                                        /:/g,
+                                        ' - ',
+                                    );
+
+                                    return (
+                                        <Chip
+                                            key={breadcrumb}
+                                            label={`${breadcrumbWithoutColon}`}
+                                        />
+                                    );
+                                },
+                            )}
                     </>
                 )}
                 <Typography className={classes.caseTitle} variant="h5">
