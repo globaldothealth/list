@@ -99,7 +99,7 @@ export default class AwsBatchClient {
         		})
                 .promise();
             let response = res as any;
-            if (response.$metadata.HTTPStatusCode != 200){
+            if (response.$metadata.httpStatusCode != 200){
             	logger.error(response);
             	throw Error(
                     `Retrieving source "${sourceId}" content: ${response.$metadata}`,
