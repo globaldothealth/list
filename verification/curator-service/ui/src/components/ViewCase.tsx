@@ -137,7 +137,7 @@ const useStyles = makeStyles((theme) => ({
     },
     breadcrumbChip: {
         margin: theme.spacing(0.5),
-        marginRight: '10px',
+        marginRight: '8px',
     },
 }));
 
@@ -174,16 +174,14 @@ function CaseDetails(props: CaseDetailsProps): JSX.Element {
     };
 
     const searchedKeywords = useSelector(selectSearchQuery);
-    const searchedKeywordsString = searchedKeywords.split(' ');
+    const searchedKeywordsString =
+        searchedKeywords.match(/(?:[^\s"]+|"[^"]*")+/g) ?? []; //match double quoted words
     const searchedKeywordsStringOnlyFilters = searchedKeywordsString.filter(
         (e) => e.includes(':'),
     );
     const removeFiltersFromSearchedText = searchedKeywords
-        .replace(/[^\s.,?!]*:+[^\s.,?!]*/g, '')
+        .replace(/(?:\w+:(?:\w+|(?:"[\w ]+")))/g, '') //match filters with colons and filters with double quotes words with space inside
         .trim();
-
-    console.log(removeFiltersFromSearchedText.length);
-    console.log(removeFiltersFromSearchedText);
 
     return (
         <>
@@ -285,6 +283,7 @@ function CaseDetails(props: CaseDetailsProps): JSX.Element {
                                         <Chip
                                             key={breadcrumb}
                                             label={`${breadcrumbWithoutColon}`}
+                                            className={classes.breadcrumbChip}
                                         />
                                     );
                                 },
