@@ -357,9 +357,19 @@ def run(
             env, source_id, upload_id,
             api_creds, cookies,
             CASES_BATCH_SIZE)
-        common_lib.finalize_upload(
-            env, source_id, upload_id, api_creds, cookies, count_created,
-            count_updated)
+        for _ in range(5):  # Maximum number of attempts to finalize upload
+            status, text = common_lib.finalize_upload(
+                env, source_id, upload_id, api_creds, cookies, count_created,
+                count_updated
+            )
+            if status == 200:
+                break
+            elif status == 500 and "401" in text:
+                print("Finalizing upload failed with 401, reauthenticating...")
+                api_creds = common_lib.obtain_api_credentials(s3_client)
+                continue
+            else:
+                raise RuntimeError(f'Error updating upload record, status={status}, response={text}')
         return {"count_created": count_created, "count_updated": count_updated}
     except Exception as e:
         common_lib.complete_with_error(

@@ -8,6 +8,7 @@ import {
 import { NextFunction, Request, Response } from 'express';
 import session, { SessionOptions } from 'express-session';
 
+import AwsBatchClient from './clients/aws-batch-client';
 import AwsEventsClient from './clients/aws-events-client';
 import AwsLambdaClient from './clients/aws-lambda-client';
 import CasesController from './controllers/cases';
@@ -104,15 +105,20 @@ if (process.env.NODE_ENV === 'production') {
 }
 app.use(session(sess));
 
+const awsBatchClient = new AwsBatchClient(
+    env.SERVICE_ENV,
+    env.JOB_QUEUE_ARN,
+    env.AWS_SERVICE_REGION,
+);
 // Configure connection to AWS services.
 const awsLambdaClient = new AwsLambdaClient(
-    env.GLOBAL_RETRIEVAL_FUNCTION_ARN,
     env.SERVICE_ENV,
     env.AWS_SERVICE_REGION,
 );
 const awsEventsClient = new AwsEventsClient(
     env.AWS_SERVICE_REGION,
-    awsLambdaClient,
+    awsBatchClient,
+    env.EVENT_ROLE_ARN,
     env.SERVICE_ENV,
 );
 const s3Client = new S3({ region: 'us-east-1', signatureVersion: 'v4' });
@@ -154,9 +160,8 @@ new EmailClient(env.EMAIL_USER_ADDRESS, env.EMAIL_USER_PASSWORD)
         // Configure sources controller.
         const sourcesController = new SourcesController(
             emailClient,
-            awsLambdaClient,
+            awsBatchClient,
             awsEventsClient,
-            env.GLOBAL_RETRIEVAL_FUNCTION_ARN,
         );
         apiRouter.get(
             '/sources',

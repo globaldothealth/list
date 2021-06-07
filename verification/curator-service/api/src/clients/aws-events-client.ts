@@ -1,7 +1,8 @@
 import AWS from 'aws-sdk';
-import AwsLambdaClient from './aws-lambda-client';
+import AwsBatchClient from './aws-batch-client';
 import assertString from '../util/assert-string';
 import { logger } from '../util/logger';
+
 
 /**
  * Client to interact with the AWS CloudWatch Events API.
@@ -17,7 +18,8 @@ export default class AwsEventsClient {
     private readonly cloudWatchEventsClient: AWS.CloudWatchEvents;
     constructor(
         awsRegion: string,
-        private readonly lambdaClient: AwsLambdaClient,
+        readonly batchClient: AwsBatchClient,
+        readonly eventRoleArn: string,
         private readonly serviceEnv: string,
     ) {
         AWS.config.update({ region: awsRegion });
@@ -29,9 +31,6 @@ export default class AwsEventsClient {
     /**
      * Proxies a PutRule request to the AWS CloudWatch API.
      *
-     * If Lambda target details are specified, creates a target and applies a
-     * permission to the target resource-based policy to allow invocation.
-     *
      * For the full API definition, see:
      *   https://docs.aws.amazon.com/eventbridge/latest/APIReference/API_PutRule.html
      */
@@ -42,7 +41,7 @@ export default class AwsEventsClient {
         targetArn?: string,
         targetId?: string,
         sourceId?: string,
-        statementId?: string,
+        statementId?: string
     ): Promise<string> => {
         try {
             const putRuleParams = {
@@ -62,42 +61,19 @@ export default class AwsEventsClient {
                     Rule: ruleName,
                     Targets: [
                         {
-                            Arn: targetArn,
+                            Arn: this.batchClient.jobQueueArn,
                             Id: targetId,
-                            Input: JSON.stringify({
-                                env: this.serviceEnv,
-                                sourceId: sourceId,
-                            }),
-                        },
-                    ],
+                            RoleArn: this.eventRoleArn,
+                            BatchParameters: {
+                                JobDefinition: targetArn,
+                                JobName: ruleName,
+                            },
+                        }
+                    ]
                 };
                 await this.cloudWatchEventsClient
                     .putTargets(putTargetsParams)
                     .promise();
-
-                try {
-                    await this.lambdaClient.addInvokeFromEventPermission(
-                        response.RuleArn,
-                        targetArn,
-                        statementId,
-                    );
-                } catch (err) {
-                    // Adding an invocation permission can fail if such a
-                    // permission already exists. Under these circumstances
-                    // (indicated by a 409), we don't want to throw.
-                    //
-                    // We could retrieve the Lambda policy, and grep it for the
-                    // RuleArn prior to calling addPermission, but it's another
-                    // method to worry about, and it isn't any more robust than
-                    // this mechanism.
-                    if (err.statusCode === 409) {
-                        logger.info(
-                            `Permission with statement ID ${statementId} already exists; continuing.`,
-                        );
-                        return response.RuleArn;
-                    }
-                    throw err;
-                }
             }
             return response.RuleArn;
         } catch (err) {
@@ -120,7 +96,7 @@ export default class AwsEventsClient {
         ruleName: string,
         targetId: string,
         targetArn: string,
-        sourceId: string,
+        sourceId: string
     ): Promise<void> => {
         try {
             const removeTargetsParams = {
@@ -130,7 +106,6 @@ export default class AwsEventsClient {
             await this.cloudWatchEventsClient
                 .removeTargets(removeTargetsParams)
                 .promise();
-            await this.lambdaClient.removePermission(targetArn, sourceId);
             const deleteRuleParams = { Name: ruleName };
             await this.cloudWatchEventsClient
                 .deleteRule(deleteRuleParams)

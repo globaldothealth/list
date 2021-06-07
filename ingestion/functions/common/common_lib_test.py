@@ -92,9 +92,8 @@ def test_finalize_upload_raises_error_for_failed_request(
         update_upload_url,
         [{"status_code": 500}])
 
-    try:
-        common_lib.finalize_upload("env", _SOURCE_ID, upload_id, {}, {}, 42, 0)
-    except RuntimeError:
+    status, _ = common_lib.finalize_upload("env", _SOURCE_ID, upload_id, {}, {}, 42, 0)
+    if status == 500:
         assert len(requests_mock.request_history) == 1
         assert requests_mock.request_history[0].url == update_upload_url
         return
@@ -145,3 +144,10 @@ def test_get_source_api_url_raises_error_for_unmapped_env():
     except ValueError:
         return
     assert not "Should have raised a ValueError exception"
+
+
+def test_get_parser_module():
+    parser = "japan-japan-ingestor-test"
+    exp = "parsing.japan.japan"
+    act = common_lib.get_parser_module(parser)
+    assert exp == act

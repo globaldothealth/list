@@ -3,7 +3,7 @@
 ## Overview
 
 This directory contains the parsing functions
-used in the Global Health ingestion system.
+used in the Global.health ingestion system.
 
 The objective of the ingestion system is to facilitate a semi-automated
 workflow accomplishing the retrieval of epidemiological source data, the
@@ -94,6 +94,60 @@ python3.8 -m pip install -r requirements.txt
 ```
 
 *NB:* Be sure you're using Python 3.8, which corresponds to the runtime of the job definitions run using Batch.
+
+#### Manual ingestion
+
+You should be able to run ingestion using the curator UI. This exists as
+a fallback if the UI triggers for ingestion are not working.
+
+1. You'll need AWS access, follow the steps in the previous section.
+2. Once you've got AWS setup, run the following in `ingestion/functions` after switching
+   to the virtualenv:
+
+       source venv/bin/activate
+       python aws.py jobdefs
+
+   This should show existing **job definitions**. Job definitions are templates that
+   tell AWS Batch which parser to run and in which environment (dev or prod). If this
+   command doesn't work, contact the engineering team to setup access.
+
+3. Check if the ingestion you want to run already has an associated job definition
+   corresponding to the environment you want to run in:
+   `python aws.py jobdefs | grep colombia.*prod` to search for Colombia ingestion
+   in prod, which gives
+
+       ACTIVE colombia-colombia-ingestor-prod
+
+4. If step 3 shows that a job definition is available, you can **submit** a job:
+
+       python aws.py submit colombia-colombia-ingestor-prod
+
+   Check the submit help options `python aws.py submit --help`. The most common
+   options to use are `-t` (or `--timeout)` to specify the maximum number of *minutes*
+   the ingestion is allowed to run. The default is 60 minutes, which is fine for
+   daily ingestion, but might not be enough time to run a backfill.
+
+   To run a **backfill**, use the `-s` (`--start-date`) and `-e` (`--end-date`)
+   flags to delimit the backfill duration. You can now skip to step 6.
+
+5. If there's no existing job definition for a source, you'll need to **register** one.
+   Registration creates a new job definition which can be used to submit jobs.
+
+   First, add the parser to the source in the curator UI. The parser must be named
+   as follows: `<subfolder>-<parser>-ingestor-<env>`. So for example, if you wanted
+   to add a job definition corresponding to the parser `parsing/peru/peru.py` in
+   the *dev* instance, you would put this as the parser `peru-peru-ingestor-dev`.
+   Then, run the following:
+
+       python aws.py register -e prod|dev <source_id> <parser>
+
+   Here `<parser>` has to be of the form `subfolder.parser` such as `peru.peru` under
+   the parsing folder. This will check that the parser corresponds to that in the
+   curator UI, and create the job definition. You can then submit a job.
+
+6. Once your job has been submitted, you can view its logs through the Cloudwatch
+   AWS portal. The logs are stored in the `/aws/batch/job` log group. Once the job
+   is finished, the status of the upload will also be updated in the curator UI.
 
 ### Writing and editing functions
 
