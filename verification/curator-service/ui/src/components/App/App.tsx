@@ -62,7 +62,9 @@ import { useCookieBanner } from '../../hooks/useCookieBanner';
 import { SortBy, SortByOrder } from '../../constants/types';
 import { URLToSearchQuery } from '../util/searchQuery';
 import { useAppDispatch } from '../../hooks/redux';
-import { setSearchQuery } from './redux/appSlice';
+import { setSearchQuery, setFilterBreadcrumbs, deleteFilterBreadcrumbs} from './redux/appSlice';
+// import { selectFilterBreadcrumbs} from './redux/selectors';
+// import { useSelector } from 'react-redux';
 
 const theme = createMuiTheme({
     palette: {
@@ -384,9 +386,9 @@ export default function App(): JSX.Element {
     const lastLocation = useLastLocation();
     const history = useHistory();
     const location = useLocation<LocationState>();
-    const [filterBreadcrumbs, setFilterBreadcrumbs] = React.useState<
-        ChipData[]
-    >([]);
+    // const [filterBreadcrumbs, setFilterBreadcrumbs] = React.useState<
+    //     ChipData[]
+    // >([]);
     const [filtersModalOpen, setFiltersModalOpen] = React.useState<boolean>(
         false,
     );
@@ -438,10 +440,13 @@ export default function App(): JSX.Element {
 
     // Update filter breadcrumbs
     useEffect(() => {
-        if (location.pathname !== '/cases' || location.search.includes('?q=')) {
-            setFilterBreadcrumbs([]);
+        if (!location.pathname.includes('/cases')) {
+            dispatch(setFilterBreadcrumbs([]));
             return;
         }
+
+
+
 
         const searchParams = new URLSearchParams(location.search);
         const tempFilterBreadcrumbs: ChipData[] = [];
@@ -449,7 +454,7 @@ export default function App(): JSX.Element {
             tempFilterBreadcrumbs.push({ key, value });
         });
 
-        setFilterBreadcrumbs(tempFilterBreadcrumbs);
+        dispatch(setFilterBreadcrumbs(tempFilterBreadcrumbs));
         //eslint-disable-next-line
     }, [location.search]);
 
@@ -530,15 +535,21 @@ export default function App(): JSX.Element {
         // eslint-disable-next-line
     }, [savedSearchQuery]);
 
+    // const theBreadCrumbs = useSelector(selectFilterBreadcrumbs);
+
     // Function for deleting filter breadcrumbs
     const handleFilterBreadcrumbDelete = (breadcrumbToDelete: ChipData) => {
-        setFilterBreadcrumbs((filterBreadcrumbs) =>
-            filterBreadcrumbs.filter(
-                (breadcrumb) => breadcrumb.key !== breadcrumbToDelete.key,
-            ),
-        );
+        // setFilterBreadcrumbs((filterBreadcrumbs) =>
+        //     filterBreadcrumbs.filter(
+        //         (breadcrumb) => breadcrumb.key !== breadcrumbToDelete.key,
+        //     ),
+        // );
+
 
         const searchParams = new URLSearchParams(location.search);
+      
+        dispatch(deleteFilterBreadcrumbs(breadcrumbToDelete))
+
         searchParams.delete(breadcrumbToDelete.key);
         history.push({
             pathname: '/cases',
@@ -552,6 +563,8 @@ export default function App(): JSX.Element {
 
         //eslint-disable-next-line
     }, [location.search]);
+
+
 
     return (
         <div className={classes.root} ref={rootRef}>
@@ -778,7 +791,6 @@ export default function App(): JSX.Element {
                                     pageSize={listPageSize}
                                     onChangePage={setListPage}
                                     onChangePageSize={setListPageSize}
-                                    filterBreadcrumbs={filterBreadcrumbs}
                                     handleBreadcrumbDelete={
                                         handleFilterBreadcrumbDelete
                                     }
