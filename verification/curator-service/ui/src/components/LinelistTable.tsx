@@ -49,12 +49,18 @@ import renderDate, { renderDateRange } from './util/date';
 import { URLToSearchQuery } from './util/searchQuery';
 import { ChipData } from './App/App';
 import { SortBy, SortByOrder } from '../constants/types';
+import {connect, ConnectedProps} from 'react-redux';
+import {RootState} from '../store';
 
 interface ListResponse {
     cases: Case[];
     nextPage: number;
     total: number;
 }
+
+const mapStateToProps = (state:RootState) => ({ filterBreadcrumbs: state.app.filterBreadcrumbs });
+const connector = connect(mapStateToProps);
+type PropsFromRedux = ConnectedProps<typeof connector>;
 
 interface LinelistTableState {
     url: string;
@@ -109,8 +115,8 @@ interface LocationState {
     pageSize: number;
 }
 
-interface Props
-    extends RouteComponentProps<never, never, LocationState>,
+interface Props 
+    extends PropsFromRedux, RouteComponentProps<never, never, LocationState>,
         WithStyles<typeof styles> {
     user: User;
     page: number;
@@ -122,7 +128,6 @@ interface Props
 
     onChangePageSize: (pageSize: number) => void;
 
-    filterBreadcrumbs: ChipData[];
     handleBreadcrumbDelete: (breadcrumbToDelete: ChipData) => void;
     setFiltersModalOpen: (value: boolean) => void;
     setActiveFilterInput: (value: string) => void;
@@ -1635,4 +1640,4 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
     }
 }
 
-export default withRouter(withStyles(styles)(LinelistTable));
+export default connector(withRouter(withStyles(styles)(LinelistTable)));
