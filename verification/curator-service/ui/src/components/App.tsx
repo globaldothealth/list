@@ -364,6 +364,7 @@ export default function App(): JSX.Element {
         return null;
     };
 
+    const [totalDataCount, setTotalDataCount] = useState<number>(0);
     const showMenu = useMediaQuery(theme.breakpoints.up('sm'));
     const [user, setUser] = useState<User | undefined>();
     const [drawerOpen, setDrawerOpen] = useState<boolean>(false);
@@ -579,7 +580,9 @@ export default function App(): JSX.Element {
                                         }
                                     />
                                 </div>
-                                <DownloadButton />
+                                <DownloadButton
+                                    totalCasesCount={totalDataCount}
+                                />
                             </>
                         ) : (
                             <span className={classes.spacer}></span>
@@ -770,6 +773,7 @@ export default function App(): JSX.Element {
                                     handleBreadcrumbDelete={
                                         handleFilterBreadcrumbDelete
                                     }
+                                    setTotalDataCount={setTotalDataCount}
                                     setFiltersModalOpen={setFiltersModalOpen}
                                     setActiveFilterInput={setActiveFilterInput}
                                     sortBy={sortBy}

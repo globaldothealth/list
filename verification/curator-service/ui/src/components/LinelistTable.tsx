@@ -1,6 +1,7 @@
-import React, { RefObject, useState } from 'react';
-import { RouteComponentProps, withRouter } from 'react-router-dom';
+import React, { RefObject, useState, useEffect } from 'react';
+import { RouteComponentProps, withRouter, useLocation } from 'react-router-dom';
 import axios from 'axios';
+import qs from 'qs';
 import { round } from 'lodash';
 import {
     Button,
@@ -20,8 +21,10 @@ import {
     withStyles,
     LinearProgress,
     InputLabel,
-    Select,
+    FormHelperText,
     FormControl,
+    Select,
+    Tooltip,
 } from '@material-ui/core';
 import { createStyles } from '@material-ui/core/styles';
 import { WithStyles } from '@material-ui/core/styles/withStyles';
@@ -49,6 +52,10 @@ import renderDate, { renderDateRange } from './util/date';
 import { URLToSearchQuery } from './util/searchQuery';
 import { ChipData } from './App';
 import { SortBy, SortByOrder } from '../constants/types';
+import { SnackbarAlert } from './SnackbarAlert';
+
+// Limit number of data that can be displayed or downloaded to avoid long execution times of mongo queries
+const DATA_LIMIT = 10000;
 
 interface ListResponse {
     cases: Case[];
@@ -124,6 +131,7 @@ interface Props
 
     filterBreadcrumbs: ChipData[];
     handleBreadcrumbDelete: (breadcrumbToDelete: ChipData) => void;
+    setTotalDataCount: (value: number) => void;
     setFiltersModalOpen: (value: boolean) => void;
     setActiveFilterInput: (value: string) => void;
     setSortBy: (value: SortBy) => void;
@@ -192,14 +200,29 @@ const StyledDownloadButton = withStyles((theme: Theme) => ({
     },
 }))(Button);
 
-const downloadDataModalStyles = makeStyles((theme: Theme) => ({
-    downloadButton: {
-        margin: '16px 0',
-    },
-    loader: {
-        marginTop: '16px',
-    },
-}));
+const downloadDataModalStyles = makeStyles((theme: Theme) =>
+    createStyles({
+        downloadButton: {
+            margin: '16px 0',
+            width: '100%',
+        },
+        loader: {
+            marginTop: '16px',
+        },
+        formControl: {
+            maxWidth: '50%',
+            margin: '8px 8px 8px 24px',
+        },
+        selectMenu: {
+            paddingLeft: '20px',
+        },
+        MuiInputBase: {
+            '& .MuiInput-input': {
+                paddingLeft: '20px',
+            },
+        },
+    }),
+);
 
 const sortSelectStyles = makeStyles((theme: Theme) => ({
     formControl: {
@@ -475,37 +498,155 @@ export function SortSelect({
     );
 }
 
-export function DownloadButton(): JSX.Element {
+interface DownloadButtonProps {
+    totalCasesCount: number;
+}
+
+export function DownloadButton({
+    totalCasesCount,
+}: DownloadButtonProps): JSX.Element {
+    const location = useLocation<LocationState>();
     const [isDownloadModalOpen, setIsDownloadModalOpen] = useState<boolean>(
         false,
     );
     const [isLoading, setIsLoading] = useState<boolean>(false);
+    const [fileFormat, setFileFormat] = useState('');
+    const [showFullDatasetButton, setShowFullDatasetButton] = useState(true);
+    const [downloadButtonDisabled, setDownloadButtonDisable] = useState(true);
+    const [snackbarOpen, setSnackbarOpen] = useState(false);
+
     const classes = downloadDataModalStyles();
 
-    const downloadDataSet = async () => {
+    const downloadDataSet = async (dataSet: string, formatType?: string) => {
         setIsLoading(true);
-        try {
-            const response = await axios.get('/api/cases/getDownloadLink');
-            window.location.href = response.data.signedUrl;
-            setIsLoading(false);
-            setIsDownloadModalOpen(false);
-        } catch (err) {
-            alert(
-                'There was an error while downloading data, please try again later.',
-            );
-            setIsLoading(false);
+
+        const searchQuery: string = URLToSearchQuery(location.search);
+        switch (dataSet) {
+            case 'fullDataset':
+                try {
+                    const response = await axios({
+                        method: 'post',
+                        url: '/api/cases/getDownloadLink',
+                        data: { format: 'csv' },
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                    });
+
+                    window.location.href = response.data.signedUrl;
+                } catch (err) {
+                    alert(
+                        `There was an error while downloading data, please try again later. ${err}`,
+                    );
+                }
+                break;
+
+            case 'mailDataset':
+                try {
+                    const response = await axios({
+                        method: 'post',
+                        url: '/api/cases/downloadAsync',
+                        data: {
+                            format: formatType,
+                            query: searchQuery,
+                        },
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                    });
+
+                    if (response.status === 204) {
+                        setSnackbarOpen(true);
+                    }
+                } catch (err) {
+                    alert(
+                        `There was an error while downloading data, please try again later. ${err}`,
+                    );
+                }
+                break;
+
+            case 'partialDataset':
+                try {
+                    const response = await axios({
+                        method: 'post',
+                        url: '/api/cases/download',
+                        data: qs.stringify({
+                            format: formatType,
+                            limit: DATA_LIMIT,
+                            query: searchQuery,
+                        }),
+                        responseType: 'blob',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                        },
+                    });
+
+                    const filename = response.headers['content-disposition']
+                        .split('filename=')[1]
+                        .replace(/["]/g, '');
+                    const downloadUrl = window.URL.createObjectURL(
+                        new Blob([response.data]),
+                    );
+                    const link = document.createElement('a');
+                    link.href = downloadUrl;
+                    link.setAttribute('download', filename);
+                    document.body.appendChild(link);
+                    link.click();
+                } catch (err) {
+                    alert(
+                        `There was an error while downloading data, please try again later. ${err}`,
+                    );
+                }
+                break;
         }
+
+        setIsLoading(false);
+        setIsDownloadModalOpen(false);
+    };
+
+    const disabledButtonTooltipText = downloadButtonDisabled
+        ? 'Please first select the file format you want to download'
+        : '';
+
+    useEffect(() => {
+        if (location.search !== '') {
+            setShowFullDatasetButton(false);
+        } else {
+            setShowFullDatasetButton(true);
+        }
+    }, [location.search]);
+
+    const handleFileFormatChange = (
+        event: React.ChangeEvent<{ value: unknown }>,
+    ) => {
+        if (
+            event.target.value === 'csv' ||
+            event.target.value === 'tsv' ||
+            event.target.value === 'json'
+        ) {
+            setDownloadButtonDisable(false);
+        } else {
+            setDownloadButtonDisable(true);
+        }
+
+        setFileFormat(event.target.value as string);
     };
 
     return (
         <>
+            <SnackbarAlert
+                isOpen={snackbarOpen}
+                setIsOpen={setSnackbarOpen}
+                message="Email sent successfully. Please check your inbox."
+                type="success"
+            />
             <StyledDownloadButton
                 variant="outlined"
                 color="primary"
                 onClick={(): void => setIsDownloadModalOpen(true)}
                 startIcon={<SaveAltIcon />}
             >
-                Download full dataset
+                Download dataset
             </StyledDownloadButton>
             <Dialog
                 open={isDownloadModalOpen}
@@ -513,27 +654,118 @@ export function DownloadButton(): JSX.Element {
                 // Stops the click being propagated to the table which
                 // would trigger the onRowClick action.
                 onClick={(e): void => e.stopPropagation()}
+                fullWidth
             >
-                <DialogTitle>Download full dataset</DialogTitle>
+                <DialogTitle>Download dataset</DialogTitle>
+
+                {!showFullDatasetButton && (
+                    <FormControl className={classes.formControl}>
+                        <InputLabel
+                            shrink
+                            id="demo-simple-select-placeholder-label-label"
+                        ></InputLabel>
+                        <Select
+                            labelId="demo-simple-select-placeholder-label-label"
+                            id="demo-simple-select-placeholder-label"
+                            value={fileFormat}
+                            onChange={handleFileFormatChange}
+                            displayEmpty
+                            className={classes.MuiInputBase}
+                        >
+                            <MenuItem value="">
+                                <em>Data format</em>
+                            </MenuItem>
+                            <MenuItem value="csv">csv</MenuItem>
+                            <MenuItem value="tsv">tsv</MenuItem>
+                            <MenuItem value="json">json</MenuItem>
+                        </Select>
+                        <FormHelperText>
+                            Please choose the file export format
+                        </FormHelperText>
+                    </FormControl>
+                )}
+
                 <DialogContent>
-                    <Typography variant="body2">
-                        This download link provides access to the full
-                        Global.health line list dataset, cached daily at 12:00am
-                        UTC. Any cases added past that time will not be in the
-                        current download, but will be available the next day.
-                    </Typography>
+                    {showFullDatasetButton && (
+                        <Typography variant="body2">
+                            This download link provides access to the full
+                            Global.health line list dataset, cached daily at
+                            12:00am UTC. Any cases added past that time will not
+                            be in the current download, but will be available
+                            the next day.
+                        </Typography>
+                    )}
 
                     {isLoading && <LinearProgress className={classes.loader} />}
-
-                    <Button
-                        variant="contained"
-                        color="primary"
-                        className={classes.downloadButton}
-                        onClick={downloadDataSet}
-                        disabled={isLoading}
-                    >
-                        Download
-                    </Button>
+                    {showFullDatasetButton && (
+                        <Button
+                            variant="contained"
+                            color="primary"
+                            className={classes.downloadButton}
+                            onClick={() => downloadDataSet('fullDataset')}
+                            disabled={isLoading}
+                        >
+                            Download Full Dataset
+                        </Button>
+                    )}
+                    {!showFullDatasetButton && (
+                        <Tooltip
+                            title={disabledButtonTooltipText}
+                            placement="top"
+                        >
+                            <span>
+                                <Button
+                                    variant="contained"
+                                    color="primary"
+                                    className={classes.downloadButton}
+                                    onClick={() =>
+                                        downloadDataSet(
+                                            'partialDataset',
+                                            fileFormat,
+                                        )
+                                    }
+                                    disabled={
+                                        isLoading || downloadButtonDisabled
+                                    }
+                                >
+                                    {totalCasesCount >= DATA_LIMIT
+                                        ? `Download up to ${DATA_LIMIT} rows immediately`
+                                        : `Download ${totalCasesCount} rows`}
+                                </Button>
+                            </span>
+                        </Tooltip>
+                    )}
+                    {!showFullDatasetButton && totalCasesCount >= DATA_LIMIT && (
+                        <Tooltip
+                            title={disabledButtonTooltipText}
+                            placement="top"
+                        >
+                            <span>
+                                <Button
+                                    variant="contained"
+                                    color="primary"
+                                    className={classes.downloadButton}
+                                    onClick={() =>
+                                        downloadDataSet(
+                                            'mailDataset',
+                                            fileFormat,
+                                        )
+                                    }
+                                    disabled={
+                                        isLoading || downloadButtonDisabled
+                                    }
+                                >
+                                    Download more than {DATA_LIMIT} rows through
+                                    link delivered by email
+                                </Button>
+                                <p>
+                                    Please add info@global.health to your email
+                                    contacts list or check spam so that you
+                                    don't miss the download link
+                                </p>
+                            </span>
+                        </Tooltip>
+                    )}
                 </DialogContent>
             </Dialog>
         </>
@@ -1164,7 +1396,7 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                             listUrl += '?limit=' + query.pageSize;
                             listUrl += '&page=' + (this.state.page + 1);
                             // Limit the maximum number of documents that are being counted in mongoDB in order to make queries faster
-                            listUrl += '&count_limit=10000';
+                            listUrl += `&count_limit=${DATA_LIMIT}`;
                             listUrl += '&sort_by=' + this.props.sortBy;
                             listUrl += '&order=' + this.props.sortByOrder;
                             if (this.state.searchQuery !== '') {
@@ -1258,6 +1490,9 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                                     ?.verificationStatus,
                                         });
                                     }
+                                    this.props.setTotalDataCount(
+                                        result.data.total,
+                                    );
                                     this.setState({
                                         totalNumRows: result.data.total,
                                         selectedRowsCurrentPage: [],
@@ -1400,7 +1635,7 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                         pagination: {
                             labelDisplayedRows:
                                 // this value has to correspond to count_limit param in /api/cases query
-                                this.state.totalNumRows === 10000
+                                this.state.totalNumRows === DATA_LIMIT
                                     ? '{from}-{to} of many'
                                     : '{from}-{to} of {count}',
                         },

@@ -33,6 +33,8 @@ afterEach(() => {
     mockedAxios.put.mockClear();
 });
 
+const DATA_LIMIT = 10000;
+
 describe('<LinelistTable />', () => {
     it('loads and displays cases', async () => {
         const cases = [
@@ -122,6 +124,7 @@ describe('<LinelistTable />', () => {
                     onChangePage={jest.fn()}
                     onChangePageSize={jest.fn()}
                     handleBreadcrumbDelete={jest.fn()}
+                    setTotalDataCount={jest.fn()}
                     setFiltersModalOpen={jest.fn()}
                     setActiveFilterInput={jest.fn()}
                     sortBy={0}
@@ -134,7 +137,7 @@ describe('<LinelistTable />', () => {
 
         expect(mockedAxios.get).toHaveBeenCalledTimes(1);
         expect(mockedAxios.get).toHaveBeenCalledWith(
-            '/api/cases/?limit=50&page=1&count_limit=10000&sort_by=0&order=1',
+            `/api/cases/?limit=50&page=1&count_limit=${DATA_LIMIT}&sort_by=0&order=1`,
         );
         expect(await findByText('www.example.com')).toBeInTheDocument();
         expect(await findByText('some admin 1')).toBeInTheDocument();
@@ -199,6 +202,7 @@ describe('<LinelistTable />', () => {
                     onChangePage={jest.fn()}
                     onChangePageSize={jest.fn()}
                     handleBreadcrumbDelete={jest.fn()}
+                    setTotalDataCount={jest.fn()}
                     setFiltersModalOpen={jest.fn()}
                     setActiveFilterInput={jest.fn()}
                     sortBy={0}
@@ -272,6 +276,7 @@ describe('<LinelistTable />', () => {
                     pageSize={50}
                     onChangePage={jest.fn()}
                     onChangePageSize={jest.fn()}
+                    setTotalDataCount={jest.fn()}
                     handleBreadcrumbDelete={jest.fn()}
                     setFiltersModalOpen={jest.fn()}
                     setActiveFilterInput={jest.fn()}
@@ -284,7 +289,7 @@ describe('<LinelistTable />', () => {
         );
         expect(mockedAxios.get).toHaveBeenCalledTimes(1);
         expect(mockedAxios.get).toHaveBeenCalledWith(
-            '/api/cases/?limit=50&page=1&count_limit=10000&sort_by=0&order=1',
+            `/api/cases/?limit=50&page=1&count_limit=${DATA_LIMIT}&sort_by=0&order=1`,
         );
         const row = await findByText('www.example.com');
         expect(row).toBeInTheDocument();
@@ -374,6 +379,7 @@ describe('<LinelistTable />', () => {
                     pageSize={50}
                     onChangePage={jest.fn()}
                     onChangePageSize={jest.fn()}
+                    setTotalDataCount={jest.fn()}
                     handleBreadcrumbDelete={jest.fn()}
                     setFiltersModalOpen={jest.fn()}
                     setActiveFilterInput={jest.fn()}
@@ -386,7 +392,7 @@ describe('<LinelistTable />', () => {
         );
         expect(mockedAxios.get).toHaveBeenCalledTimes(1);
         expect(mockedAxios.get).toHaveBeenCalledWith(
-            '/api/cases/?limit=50&page=1&count_limit=10000&sort_by=0&order=1',
+            `/api/cases/?limit=50&page=1&count_limit=${DATA_LIMIT}&sort_by=0&order=1`,
         );
         const row = await findByText('www.example.com');
         expect(row).toBeInTheDocument();
@@ -456,6 +462,7 @@ describe('<LinelistTable />', () => {
                     pageSize={50}
                     onChangePage={jest.fn()}
                     onChangePageSize={jest.fn()}
+                    setTotalDataCount={jest.fn()}
                     handleBreadcrumbDelete={jest.fn()}
                     setFiltersModalOpen={jest.fn()}
                     setActiveFilterInput={jest.fn()}
@@ -468,7 +475,7 @@ describe('<LinelistTable />', () => {
         );
         expect(mockedAxios.get).toHaveBeenCalledTimes(1);
         expect(mockedAxios.get).toHaveBeenCalledWith(
-            '/api/cases/?limit=50&page=1&count_limit=10000&sort_by=0&order=1',
+            `/api/cases/?limit=50&page=1&count_limit=${DATA_LIMIT}&sort_by=0&order=1`,
         );
         const row = await findByText('www.example.com');
         expect(row).toBeInTheDocument();
@@ -525,6 +532,7 @@ describe('<LinelistTable />', () => {
                     pageSize={10}
                     onChangePage={jest.fn()}
                     onChangePageSize={jest.fn()}
+                    setTotalDataCount={jest.fn()}
                     handleBreadcrumbDelete={jest.fn()}
                     setFiltersModalOpen={jest.fn()}
                     setActiveFilterInput={jest.fn()}
@@ -595,6 +603,7 @@ describe('<LinelistTable />', () => {
                     pageSize={10}
                     onChangePage={changePage}
                     onChangePageSize={changePageSize}
+                    setTotalDataCount={jest.fn()}
                     handleBreadcrumbDelete={jest.fn()}
                     setFiltersModalOpen={jest.fn()}
                     setActiveFilterInput={jest.fn()}
@@ -646,6 +655,7 @@ describe('<LinelistTable />', () => {
                     pageSize={10}
                     onChangePage={jest.fn()}
                     onChangePageSize={jest.fn()}
+                    setTotalDataCount={jest.fn()}
                     handleBreadcrumbDelete={jest.fn()}
                     setFiltersModalOpen={jest.fn()}
                     setActiveFilterInput={jest.fn()}
@@ -679,6 +689,7 @@ describe('<LinelistTable />', () => {
                     pageSize={10}
                     onChangePage={jest.fn()}
                     onChangePageSize={jest.fn()}
+                    setTotalDataCount={jest.fn()}
                     handleBreadcrumbDelete={jest.fn()}
                     setFiltersModalOpen={setFiltersModalOpen}
                     setActiveFilterInput={jest.fn()}
