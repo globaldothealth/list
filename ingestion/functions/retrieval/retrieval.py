@@ -130,7 +130,7 @@ def retrieve_content(
         print(f"Downloading {source_format} content from {url}")
         if url.startswith('s3://'):
             # strip the prefix
-            s3Location = url.removeprefix('s3://')
+            s3Location = url[5:]
             # split at the first /
             [s3Bucket, s3Key] = s3Location.split('/', 1)
             # get it!
