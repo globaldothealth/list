@@ -347,7 +347,10 @@ def test_write_to_server_raises_error_for_failed_batch_upsert_with_validation_er
     os.environ["SOURCE_API_URL"] = _SOURCE_API_URL
     full_source_url = f"{_SOURCE_API_URL}/cases/batchUpsert"
     requests_mock.register_uri(
-        "POST", full_source_url, json={}, status_code=207),
+        "POST", full_source_url, json={ 
+            'numCreated': 0,
+            'numUpdated': 0,
+        }, status_code=207),
     upload_id = "123456789012345678901234"
     update_upload_url = f"{_SOURCE_API_URL}/sources/{_SOURCE_ID}/uploads/{upload_id}"
     requests_mock.register_uri("PUT", update_upload_url, json={})
@@ -382,6 +385,8 @@ def test_write_to_server_records_input_for_failed_batch_upsert_with_validation_e
                     'message': 'You done goofed.',
                 },
             ],
+            'numCreated': 0,
+            'numUpdated': 0,
         }, status_code=207),
     upload_id = "123456789012345678901234"
     update_upload_url = f"{_SOURCE_API_URL}/sources/{_SOURCE_ID}/uploads/{upload_id}"
