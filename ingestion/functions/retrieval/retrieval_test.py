@@ -8,7 +8,6 @@ import sys
 import zipfile
 
 from unittest.mock import MagicMock, patch
-from moto import mock_s3
 
 try:
     import common_lib
@@ -242,14 +241,12 @@ def test_retrieve_content_persists_downloaded_json_locally(requests_mock):
         assert json.load(f)["data"] == "yes"
 
 
-@mock_s3
 def test_retrieve_content_from_s3():
     from retrieval import retrieval  # Import locally to avoid superseding mock
     source_id = "id"
     content_url = "s3://foo/bar"
     format = "JSON"
-    conn = boto3.resource('s3', region_name='us-east-1')
-    bucket = conn.create_bucket(Bucket='foo')
+    bucket = s3_client.create_bucket(Bucket='foo')
     bucket.put_object(Key='bar', Body=b'{"data": "yes"}')
     files_s3_keys = retrieval.retrieve_content(
         "env", source_id, "upload_id", content_url, format, {}, {}, tempdir="/tmp")
