@@ -1,6 +1,6 @@
 import { Case, CaseDocument } from '../model/case';
 import { EventDocument } from '../model/event';
-import { DocumentQuery, Error, Query } from 'mongoose';
+import { Aggregate, DocumentQuery, Error, Query } from 'mongoose';
 import { ObjectId, QuerySelector } from 'mongodb';
 import { GeocodeOptions, Geocoder, Resolution } from '../geocoding/geocoder';
 import { NextFunction, Request, Response } from 'express';
@@ -113,22 +113,23 @@ export class CasesController {
                 casesQuery,
             );
 
-            let matchingCases: any;
+            // Limit number of results if present
+            // eslint-disable-next-line
+            let limitedQuery: any[] = [];
             if (queryLimit) {
-                matchingCases = await Case.aggregate(casesIgnoringExcluded)
-                    .collation({
-                        locale: 'en_US',
-                        strength: 2,
-                    })
-                    .limit(queryLimit);
-            } else {
-                matchingCases = await Case.aggregate(
-                    casesIgnoringExcluded,
-                ).collation({
-                    locale: 'en_US',
-                    strength: 2,
-                });
+                limitedQuery = _.concat(casesIgnoringExcluded, [
+                    { $limit: queryLimit },
+                ]);
             }
+
+            const matchingCases = await Case.aggregate(
+                limitedQuery.length !== 0
+                    ? limitedQuery
+                    : casesIgnoringExcluded,
+            ).collation({
+                locale: 'en_US',
+                strength: 2,
+            });
 
             //Get current date
             const dateObj = new Date();
