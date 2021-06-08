@@ -241,6 +241,20 @@ def test_retrieve_content_persists_downloaded_json_locally(requests_mock):
         assert json.load(f)["data"] == "yes"
 
 
+@pytest.mark.skipif(not os.environ.get("DOCKERIZED", False),
+                    reason="Running integration tests outside of mock environment disabled")
+def test_retrieve_content_from_s3():
+    from retrieval import retrieval  # Import locally to avoid superseding mock
+    source_id = "id"
+    content_url = "s3://epid-sources-raw/bar"
+    format = "JSON"
+    s3_client.put_object(Bucket='epid-sources-raw', Key='bar', Body=b'{"data": "yes"}')
+    files_s3_keys = retrieval.retrieve_content(
+        "env", source_id, "upload_id", content_url, format, {}, {}, tempdir="/tmp")
+    with open(files_s3_keys[0][0], "r") as f:
+        assert json.load(f)["data"] == "yes"
+
+
 def test_retrieve_content_persists_downloaded_csv_locally(requests_mock):
     from retrieval import retrieval  # Import locally to avoid superseding mock
     source_id = "id"
