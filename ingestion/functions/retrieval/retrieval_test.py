@@ -8,7 +8,6 @@ import sys
 import zipfile
 
 from unittest.mock import MagicMock, patch
-from moto import mock_s3
 
 try:
     import common_lib
@@ -242,7 +241,6 @@ def test_retrieve_content_persists_downloaded_json_locally(requests_mock):
         assert json.load(f)["data"] == "yes"
 
 
-@mock_s3
 def test_retrieve_content_from_s3():
     from retrieval import retrieval  # Import locally to avoid superseding mock
     source_id = "id"
