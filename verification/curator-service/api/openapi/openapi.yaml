@@ -1131,6 +1131,7 @@ components:
                         url:
                             type: string
                             example: https://opendata.digilugu.ee/opendata_covid19_test_results.csv
+                            description: Source location, can be http, https, or s3 schemes.
                         license:
                             type: string
                             example: MIT
