@@ -255,6 +255,8 @@ def test_retrieve_content_from_s3():
         "env", source_id, "upload_id", content_url, format, {}, {}, tempdir="/tmp")
     with open(files_s3_keys[0][0], "r") as f:
         assert json.load(f)["data"] == "yes"
+    bucket.objects.all().delete()
+    bucket.delete()
 
 
 def test_retrieve_content_persists_downloaded_csv_locally(requests_mock):
