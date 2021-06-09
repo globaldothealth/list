@@ -1,7 +1,10 @@
+/* eslint-disable */
 const { workerData } = require('worker_threads');
 const axios = require('axios');
 const AWS = require('aws-sdk');
 const pino = require('pino');
+const JSZip = require('jszip');
+const fs = require('fs');
 
 const logger = pino({
     prettyPrint: { colorize: false },
@@ -14,64 +17,130 @@ try {
         url: workerData.url,
         data: {
             query: workerData.query,
+            format: workerData.format,
         },
         responseType: 'blob',
-    }).then((response) => {
-        const buffer = Buffer.from(response.data, 'utf-8');
-        const base64 = buffer.toString('base64');
-        // send the email using SES
+    }).then(async (response) => {
+        let responseData;
+        let contentType;
+
+        if (workerData.format === 'json') {
+            responseData = JSON.stringify(response.data);
+            contentType = 'application/json';
+        } else {
+            responseData = response.data;
+            contentType = 'text/plain';
+        }
+
+        const dateObj = new Date();
+
+        // adjust 0 before single digit date
+        const day = ('0' + dateObj.getDate()).slice(-2);
+        const month = ('0' + (dateObj.getMonth() + 1)).slice(-2);
+        const year = dateObj.getFullYear();
+
+        const filename = `gh_${year}-${month}-${day}`;
+
+        // Compress file
+        const buffer = Buffer.from(responseData, 'utf-8');
+        const zip = new JSZip();
+        zip.file(`${filename}.${workerData.format}`, buffer);
+        const zippedFile = await new Promise((resolve, reject) => {
+            zip.generateAsync({ type: 'nodebuffer'}).then((content) => {
+                resolve(content);
+            }).catch((error) => {
+                reject(error);
+            });
+        });
+        
         AWS.config.update({
             accessKeyId: workerData.accessKeyId,
             secretAccessKey: workerData.secretKey,
             region: workerData.region,
         });
-        const ses = new AWS.SES({apiVersion: '2010-12-01'});
-        /* I originally tried using the mimemessage library for this, but because the
-         * worker is outside the main .ts app the build pipeline just shook the module
-         * out of the tree so it would crash at runtime. So, old-school knowledge of how
-         * to write email attachments by hand (and trolling Usenet groups with spurious
-         * attachments) will have to suffice.
-         */
-        var mailMessage = `From: "Global.health" <${workerData.sourceAddress}>
-To: ${workerData.email}
-Subject: Here is your Global.health download
-Content-Type: multipart/mixed; boundary="part-boundary"
+        const ses = new AWS.SES({ apiVersion: '2010-12-01' });
 
---part-boundary
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+        // Upload file to S3
+        const s3 = new AWS.S3();
 
-Please see the attached list of cases in response to your query ${workerData.query}.
+        const fileKey = `${dateObj.getTime()}/${filename}.zip`;
+        const params = {
+            Bucket: 'covid19-filtered-downloads',
+            Key: fileKey,
+            Body: zippedFile,
+            ContentType: 'application/zip',
+        }
 
-Kind regards,
-
-The Global.health team.
-
---part-boundary
-Content-Type: text/plain; name="g_dot_h_cases.csv"
-Content-Disposition: attachment; filename="g_dot_h_cases.csv"
-Content-Transfer-Encoding: base64
-
-${base64}
-
---part-boundary--`;
-
-        ses.sendRawEmail({
-            RawMessage: { Data: mailMessage },
-          }, (err, data) => {
-            logger.info(`sent email with correlation id ${workerData.correlationId}`);
-            if (err)
-            {
-                logger.error('error:');
-                logger.error(err);
+        try {
+            await new Promise((resolve, reject) => {
+                s3.putObject(params, (error, data) => {
+                    if (error) reject(error);
+                    
+                    resolve(data);
+                });
+            });
+            
+            // Generate presigned url
+            const urlParams = {
+                Bucket: 'covid19-filtered-downloads',
+                Key: fileKey,
+                Expires: 24 * 60 * 3, // 3 days
+                ResponseContentDisposition:
+                    `attachment; filename ="${filename}.zip"`,
             }
-            if (data)
-            {
-                logger.info(`response from Amazon:`);
+
+            const signedUrl = await new Promise((resolve, reject) => {
+                s3.getSignedUrl('getObject', urlParams, (error, url) => {
+                    if (error) reject(error);
+
+                    resolve(url);
+                });
+            });
+
+            // Send signed url via email to user
+            const mailMessage = `
+            <p>Please visit the link below to download list of cases in response to your query <strong>${workerData.query}</strong>.</p>
+
+            <a href="${signedUrl}">Click here to download the data</a>
+            
+            <p>Kind regards,</p>
+            
+            <p>The Global.health team.</p>`;
+
+            const emailParams = {
+                Destination: {
+                    ToAddresses: [
+                        workerData.email
+                    ]
+                },
+                Message: {
+                    Body: {
+                        Html: {
+                            Charset: "UTF-8",
+                            Data: mailMessage
+                        },                    
+                    },
+                    Subject: {
+                        Charset: 'UTF-8',
+                        Data: 'Here is your Global.health download' 
+                    }
+                },
+                Source: 'ghdsi.info@gmail.com'
+            };
+
+            ses.sendEmail(emailParams).promise().then((data) => {
+                logger.info(
+                    `sent email with correlation id ${workerData.correlationId}`,
+                );
+                logger.info('response from Amazon:');
                 logger.info(data);
-            }
-        });
-    });
+            }).catch((error) => {
+                throw(error);
+            });                        
+        } catch (error) {            
+            logger.error(error);
+        }                
+    });        
 } catch (err) {
     logger.error(err);
 }

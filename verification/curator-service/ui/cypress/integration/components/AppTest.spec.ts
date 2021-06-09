@@ -43,11 +43,9 @@ describe('App', function () {
         cy.contains('2020-02-15').should('not.exist');
     });
 
-
     it('allows the user to search by nationality', function () {
         cy.login();
         cy.visit('/cases');
-
 
         cy.addCase({
             country: 'Russia',
@@ -55,14 +53,11 @@ describe('App', function () {
         });
 
         cy.get('.filter-button').click();
-        cy.get('#nationality').type(
-            'filipino',
-        );
+        cy.get('#nationality').type('filipino');
         cy.get('[data-test-id="search-by-filter-button"]').click();
 
         cy.contains('American, Filipino, Polish');
     });
-
 
     it('allows the user to search by variant', function () {
         cy.login();
@@ -101,13 +96,14 @@ describe('App', function () {
         }
 
         cy.visit('/cases');
-        
+
         cy.get('body').then(($body) => {
             if ($body.find('.iubenda-cs-accept-btn').length) {
                 cy.get('.iubenda-cs-accept-btn').click();
             }
-        });        cy.get('.filter-button').click();
-        
+        });
+        cy.get('.filter-button').click();
+
         cy.get('#dateconfirmedafter').type('2020-04-30');
         cy.get('#country').type('italy{Enter}');
 

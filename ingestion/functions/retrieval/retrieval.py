@@ -128,9 +128,18 @@ def retrieve_content(
                 e, env, common_lib.UploadError.SOURCE_CONFIGURATION_ERROR,
                 source_id, upload_id, api_headers, cookies)
         print(f"Downloading {source_format} content from {url}")
-        headers = {"user-agent": "GHDSI/1.0 (http://ghdsi.org)"}
-        r = requests.get(url, headers=headers)
-        r.raise_for_status()
+        if url.startswith('s3://'):
+            # strip the prefix
+            s3Location = url[5:]
+            # split at the first /
+            [s3Bucket, s3Key] = s3Location.split('/', 1)
+            # get it!
+            content = s3_client.get_object(Bucket=s3Bucket, Key=s3Key)['Body'].read()
+        else:
+            headers = {"user-agent": "GHDSI/1.0 (http://ghdsi.org)"}
+            r = requests.get(url, headers=headers)
+            r.raise_for_status()
+            content = r.content
         print('Download finished')
 
         key_filename_part = f"content.{source_format.lower()}"
@@ -140,7 +149,7 @@ def retrieve_content(
         # sources.
         # Make the encoding of retrieved content consistent (UTF-8) for all
         # parsers as per https://github.com/globaldothealth/list/issues/867.
-        bytesio = raw_content(url, r.content, tempdir)
+        bytesio = raw_content(url, content, tempdir)
         print('detecting encoding of retrieved content.')
         # Read 2MB to be quite sure about the encoding.
         detected_enc = detect(bytesio.read(2 << 20))

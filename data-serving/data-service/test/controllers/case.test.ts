@@ -637,10 +637,11 @@ describe('POST', () => {
         expect(await CaseRevision.collection.countDocuments()).toEqual(0);
     });
     it('batch upsert with any invalid case should return 207', async () => {
-        await request(app)
+        const res = await request(app)
             .post('/api/cases/batchUpsert')
             .send({ cases: [minimalCase, invalidRequest], ...curatorMetadata })
-            .expect(207, /VALIDATE/);
+            .expect(207, /Case validation failed/);
+        expect(res.body.numCreated).toEqual(1);
     });
     it('batch upsert with empty cases should return 400', async () => {
         return request(app)
@@ -656,7 +657,7 @@ describe('POST', () => {
             await c2.save();
             const res = await request(app)
                 .post('/api/cases/download')
-                .send({})
+                .send({ format: 'csv' })
                 .expect('Content-Type', 'text/csv')
                 .expect(200);
             expect(res.text).toContain(
@@ -674,6 +675,7 @@ describe('POST', () => {
                 .post('/api/cases/download')
                 .send({
                     query: 'country:',
+                    format: 'csv',
                 })
                 .expect(422, done);
         });
@@ -686,6 +688,7 @@ describe('POST', () => {
                 .send({
                     query: 'country:India',
                     caseIds: [c._id],
+                    format: 'csv',
                 })
                 .expect(400, done);
         });
@@ -703,6 +706,7 @@ describe('POST', () => {
                 .post('/api/cases/download')
                 .send({
                     caseIds: [matchingCase._id, matchingCase2._id],
+                    format: 'csv',
                 })
                 .expect('Content-Type', 'text/csv')
                 .expect(200);
@@ -735,6 +739,7 @@ describe('POST', () => {
                 .post('/api/cases/download')
                 .send({
                     query: matchingNotes,
+                    format: 'csv',
                 })
                 .expect('Content-Type', 'text/csv')
                 .expect(200);
@@ -760,6 +765,7 @@ describe('POST', () => {
                 .post('/api/cases/download')
                 .send({
                     query: 'country:Germany',
+                    format: 'csv',
                 })
                 .expect('Content-Type', 'text/csv')
                 .expect(200);
@@ -797,11 +803,46 @@ describe('POST', () => {
             await excludedCase.save();
             const res = await request(app)
                 .post('/api/cases/download')
-                .send({})
+                .send({ format: 'csv' })
                 .expect('Content-Type', 'text/csv')
                 .expect(200);
             expect(res.text).not.toContain('notshared.example.com');
         });
+    });
+    it('should return results in proper format', async () => {
+        const matchedCase = new Case(minimalCase);
+        matchedCase.location.country = 'Germany';
+        await matchedCase.save();
+
+        //CSV
+        await request(app)
+            .post('/api/cases/download')
+            .send({
+                query: 'country:Germany',
+                format: 'csv',
+            })
+            .expect('Content-Type', 'text/csv')
+            .expect(200);
+
+        //TSV
+        await request(app)
+            .post('/api/cases/download')
+            .send({
+                query: 'country:Germany',
+                format: 'tsv',
+            })
+            .expect('Content-Type', 'text/tsv')
+            .expect(200);
+
+        //JSON
+        await request(app)
+            .post('/api/cases/download')
+            .send({
+                query: 'country:Germany',
+                format: 'json',
+            })
+            .expect('Content-Type', 'application/json')
+            .expect(200);
     });
 
     describe('batch status change', () => {
