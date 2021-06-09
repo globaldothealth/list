@@ -387,9 +387,6 @@ export default function App(): JSX.Element {
     const lastLocation = useLastLocation();
     const history = useHistory();
     const location = useLocation<LocationState>();
-    // const [filterBreadcrumbs, setFilterBreadcrumbs] = React.useState<
-    //     ChipData[]
-    // >([]);
     const [filtersModalOpen, setFiltersModalOpen] = React.useState<boolean>(
         false,
     );
@@ -533,7 +530,6 @@ export default function App(): JSX.Element {
         // eslint-disable-next-line
     }, [savedSearchQuery]);
 
-    // const theBreadCrumbs = useSelector(selectFilterBreadcrumbs);
 
     // Function for deleting filter breadcrumbs
     const handleFilterBreadcrumbDelete = (breadcrumbToDelete: ChipData) => {
