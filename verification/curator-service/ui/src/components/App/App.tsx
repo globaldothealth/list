@@ -442,21 +442,17 @@ export default function App(): JSX.Element {
     // Update filter breadcrumbs
     useEffect(() => {
         if (!location.pathname.includes('/cases')) {
-            console.log(location.pathname)
-            console.log(location.pathname.includes('/cases'))
             dispatch(setFilterBreadcrumbs([]));
             return;
         }
-
-        const searchParams = new URLSearchParams(location.search);
-        const tempFilterBreadcrumbs: ChipData[] = [];
-        searchParams.forEach((value, key) => {
-            tempFilterBreadcrumbs.push({ key, value });
-        });
-
-        console.log(tempFilterBreadcrumbs);
-        
-        dispatch(setFilterBreadcrumbs(tempFilterBreadcrumbs));
+        if (location.pathname === '/cases') {
+            const searchParams = new URLSearchParams(location.search);
+            const tempFilterBreadcrumbs: ChipData[] = [];
+            searchParams.forEach((value, key) => {
+                tempFilterBreadcrumbs.push({ key, value });
+            });
+            dispatch(setFilterBreadcrumbs(tempFilterBreadcrumbs));
+        }
         //eslint-disable-next-line
     }, [location.search]);
 
@@ -541,17 +537,8 @@ export default function App(): JSX.Element {
 
     // Function for deleting filter breadcrumbs
     const handleFilterBreadcrumbDelete = (breadcrumbToDelete: ChipData) => {
-        // setFilterBreadcrumbs((filterBreadcrumbs) =>
-        //     filterBreadcrumbs.filter(
-        //         (breadcrumb) => breadcrumb.key !== breadcrumbToDelete.key,
-        //     ),
-        // );
-
-
         const searchParams = new URLSearchParams(location.search);
-      
         dispatch(deleteFilterBreadcrumbs(breadcrumbToDelete))
-
         searchParams.delete(breadcrumbToDelete.key);
         history.push({
             pathname: '/cases',
