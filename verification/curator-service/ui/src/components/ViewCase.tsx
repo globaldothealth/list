@@ -256,7 +256,6 @@ function CaseDetails(props: CaseDetailsProps): JSX.Element {
                         <Chip
                             label="Searched query:"
                             color="primary"
-                            onClick={() => console.log('clicked')}
                             className={classes.breadcrumbChip}
                         />
 
@@ -756,7 +755,6 @@ function VariantRows(props: { variant: Variant }): JSX.Element {
 
 function LocationRows(props: {
     loc?: Location;
-    theSearchArray?: any;
 }): JSX.Element {
     return (
         <>
