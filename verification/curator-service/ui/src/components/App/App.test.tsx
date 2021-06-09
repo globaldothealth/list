@@ -8,14 +8,7 @@ import {
 } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { createMemoryHistory } from 'history';
-<<<<<<< HEAD:verification/curator-service/ui/src/components/App/App.test.tsx
 import { render, fireEvent, screen } from '../util/test-utils'
-
-
-=======
-import { DownloadButton } from './LinelistTable';
-import { debug } from 'console';
->>>>>>> 7e462793d4f5b7fcfe90fcc6af12bec718b3d00d:verification/curator-service/ui/src/components/App.test.tsx
 
 jest.mock('axios');
 // Mock charts page so that requests for mongo charts are not sent
