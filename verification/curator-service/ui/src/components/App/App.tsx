@@ -442,12 +442,11 @@ export default function App(): JSX.Element {
     // Update filter breadcrumbs
     useEffect(() => {
         if (!location.pathname.includes('/cases')) {
+            console.log(location.pathname)
+            console.log(location.pathname.includes('/cases'))
             dispatch(setFilterBreadcrumbs([]));
             return;
         }
-
-
-
 
         const searchParams = new URLSearchParams(location.search);
         const tempFilterBreadcrumbs: ChipData[] = [];
@@ -455,6 +454,8 @@ export default function App(): JSX.Element {
             tempFilterBreadcrumbs.push({ key, value });
         });
 
+        console.log(tempFilterBreadcrumbs);
+        
         dispatch(setFilterBreadcrumbs(tempFilterBreadcrumbs));
         //eslint-disable-next-line
     }, [location.search]);

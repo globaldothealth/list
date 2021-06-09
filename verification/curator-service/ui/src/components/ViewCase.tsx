@@ -29,7 +29,7 @@ import useMediaQuery from '@material-ui/core/useMediaQuery';
 import { useTheme } from '@material-ui/core/styles';
 import Highlighter from 'react-highlight-words';
 import { useSelector } from 'react-redux';
-import { selectSearchQuery } from './App/redux/selectors';
+import { selectSearchQuery, selectFilterBreadcrumbs } from './App/redux/selectors';
 import Chip from '@material-ui/core/Chip';
 
 const styles = makeStyles((theme) => ({
@@ -174,14 +174,18 @@ function CaseDetails(props: CaseDetailsProps): JSX.Element {
     };
 
     const searchedKeywords = useSelector(selectSearchQuery);
-    const searchedKeywordsString =
-        searchedKeywords.match(/(?:[^\s"]+|"[^"]*")+/g) ?? []; //match double quoted words
-    const searchedKeywordsStringOnlyFilters = searchedKeywordsString.filter(
-        (e) => e.includes(':'),
-    );
+    // const searchedKeywordsString =
+    //     searchedKeywords.match(/(?:[^\s"]+|"[^"]*")+/g) ?? []; //match double quoted words
+    // const searchedKeywordsStringOnlyFilters = searchedKeywordsString.filter(
+    //     (e) => e.includes(':'),
+    // );
     const removeFiltersFromSearchedText = searchedKeywords
         .replace(/(?:\w+:(?:\w+|(?:"[\w ]+")))/g, '') //match filters with colons and filters with double quotes words with space inside
         .trim();
+
+        const filtersBreadcrumb = useSelector(selectFilterBreadcrumbs);
+        console.log("filtersBreadcrumb",filtersBreadcrumb);
+        
 
     return (
         <>
@@ -271,22 +275,17 @@ function CaseDetails(props: CaseDetailsProps): JSX.Element {
                             <Chip label={`${removeFiltersFromSearchedText}`} />
                         )}
 
-                        {searchedKeywordsStringOnlyFilters.length > 0 &&
-                            searchedKeywordsStringOnlyFilters.map(
-                                (breadcrumb) => {
-                                    const breadcrumbWithoutColon = breadcrumb.replace(
-                                        /:/g,
-                                        ' - ',
-                                    );
-
-                                    return (
-                                        <Chip
-                                            key={breadcrumb}
-                                            label={`${breadcrumbWithoutColon}`}
-                                            className={classes.breadcrumbChip}
-                                        />
-                                    );
-                                },
+                        {
+                            filtersBreadcrumb.map(
+                                (breadcrumb) => (
+                                    <Chip
+                                        key={breadcrumb.key}
+                                        label={`${breadcrumb.key} - ${breadcrumb.value}`}
+                                        className={
+                                            classes.breadcrumbChip
+                                        }
+                                    />
+                                ),
                             )}
                     </>
                 )}
