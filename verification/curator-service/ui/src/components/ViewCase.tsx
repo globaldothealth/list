@@ -29,7 +29,10 @@ import useMediaQuery from '@material-ui/core/useMediaQuery';
 import { useTheme } from '@material-ui/core/styles';
 import Highlighter from 'react-highlight-words';
 import { useSelector } from 'react-redux';
-import { selectSearchQuery, selectFilterBreadcrumbs } from './App/redux/selectors';
+import {
+    selectSearchQuery,
+    selectFilterBreadcrumbs,
+} from './App/redux/selectors';
 import Chip from '@material-ui/core/Chip';
 
 const styles = makeStyles((theme) => ({
@@ -155,8 +158,6 @@ function CaseDetails(props: CaseDetailsProps): JSX.Element {
     const showNavMenu = useMediaQuery(theme.breakpoints.up('sm'));
     const classes = useStyles();
 
-    // const [handleClose, setHandleClose] = React.useState<boolean>(false);
-
     const scrollTo = (name: string): void => {
         Scroll.scroller.scrollTo(name, {
             duration: 100,
@@ -174,18 +175,7 @@ function CaseDetails(props: CaseDetailsProps): JSX.Element {
     };
 
     const searchedKeywords = useSelector(selectSearchQuery);
-    // const searchedKeywordsString =
-    //     searchedKeywords.match(/(?:[^\s"]+|"[^"]*")+/g) ?? []; //match double quoted words
-    // const searchedKeywordsStringOnlyFilters = searchedKeywordsString.filter(
-    //     (e) => e.includes(':'),
-    // );
-    const removeFiltersFromSearchedText = searchedKeywords
-        .replace(/(?:\w+:(?:\w+|(?:"[\w ]+")))/g, '') //match filters with colons and filters with double quotes words with space inside
-        .trim();
-
-        const filtersBreadcrumb = useSelector(selectFilterBreadcrumbs);
-        console.log("filtersBreadcrumb",filtersBreadcrumb);
-        
+    const filtersBreadcrumb = useSelector(selectFilterBreadcrumbs);
 
     return (
         <>
@@ -261,7 +251,6 @@ function CaseDetails(props: CaseDetailsProps): JSX.Element {
                     marginLeft: showNavMenu ? '10em' : '0',
                 }}
             >
-                {' '}
                 {searchedKeywords && (
                     <>
                         <Chip
@@ -271,22 +260,13 @@ function CaseDetails(props: CaseDetailsProps): JSX.Element {
                             className={classes.breadcrumbChip}
                         />
 
-                        {removeFiltersFromSearchedText.length > 0 && (
-                            <Chip label={`${removeFiltersFromSearchedText}`} />
-                        )}
-
-                        {
-                            filtersBreadcrumb.map(
-                                (breadcrumb) => (
-                                    <Chip
-                                        key={breadcrumb.key}
-                                        label={`${breadcrumb.key} - ${breadcrumb.value}`}
-                                        className={
-                                            classes.breadcrumbChip
-                                        }
-                                    />
-                                ),
-                            )}
+                        {filtersBreadcrumb.map((breadcrumb) => (
+                            <Chip
+                                key={breadcrumb.key}
+                                label={`${breadcrumb.key} - ${breadcrumb.value}`}
+                                className={classes.breadcrumbChip}
+                            />
+                        ))}
                     </>
                 )}
                 <Typography className={classes.caseTitle} variant="h5">
