@@ -38,13 +38,6 @@ export default class CasesController {
         }
     };
 
-    todaysDate = (): string => {
-        const today = new Date();
-        return `${today.getFullYear()}_${
-            today.getMonth() + 1
-        }_${today.getDate()}`;
-    };
-
     /** Download forwards the request to the data service and streams the
      * streamed response as a csv attachment. */
     download = async (req: Request, res: Response): Promise<void> => {
@@ -55,10 +48,10 @@ export default class CasesController {
                 data: req.body,
                 responseType: 'stream',
             }).then((response) => {
-                res.setHeader('Content-Type', 'text/csv');
+                res.setHeader('Content-Type', response.headers['content-type']);
                 res.setHeader(
                     'Content-Disposition',
-                    `attachment; filename="globalhealth_covid19_cases_${this.todaysDate()}.csv"`,
+                    response.headers['content-disposition'],
                 );
                 res.setHeader('Cache-Control', 'no-cache');
                 res.setHeader('Pragma', 'no-cache');
@@ -78,23 +71,26 @@ export default class CasesController {
      * and emails the streamed response as a csv attachment. It will only email to the
      * logged-in user, and it replies immediately with 204. Any error will be reported
      * in the email, except the error of not being able to email which we can only log.
-     * 
+     *
      * Question for code reviewers: do we want to retry on errors? If so we need to introduce
      * a message bus rather than just using background workers, and we're probably back at the
      * point where we use Batch for this.*/
-     downloadAsync = async (req: Request, res: Response): Promise<void> => {
+    downloadAsync = async (req: Request, res: Response): Promise<void> => {
         try {
             const user = req.user as UserDocument;
-            const url = this.dataServerURL + '/api' + req.url.replace('Async', '');
+            const url =
+                this.dataServerURL + '/api' + req.url.replace('Async', '');
             // the worker needs access to the AWS configuration.
             const region = process.env.AWS_SES_REGION;
             const accessKeyId = process.env.AWS_ACCESS_KEY_ID;
             const secretKey = process.env.AWS_SECRET_ACCESS_KEY;
             const sourceAddress = process.env.AWS_SES_SENDER;
-            const correlationId = crypto.randomBytes(16).toString("hex");
-            const worker = new Worker('./src/workers/downloadAsync.js', { 
+            const correlationId = crypto.randomBytes(16).toString('hex');
+
+            const worker = new Worker('./src/workers/downloadAsync.js', {
                 workerData: {
                     query: req.body.query as string,
+                    format: req.body.format,
                     email: user.email,
                     url,
                     region,
@@ -102,11 +98,16 @@ export default class CasesController {
                     secretKey,
                     correlationId,
                     sourceAddress,
-            }});
+                },
+            });
             /* we don't care what happens when the worker finishes, but for debugging
              * I'm going to log this.
              */
-            worker.on('exit', (code) => { logger.info(`worker with id ${correlationId} exited. code: ${code}`) });
+            worker.on('exit', (code) => {
+                logger.info(
+                    `worker with id ${correlationId} exited. code: ${code}`,
+                );
+            });
             res.status(204).end();
         } catch (err) {
             res.status(500).send(err);

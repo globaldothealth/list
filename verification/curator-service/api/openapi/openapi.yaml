@@ -546,10 +546,9 @@ paths:
     /cases/download:
         post:
             summary: >
-                Streams a CSV attachment of all cases. If a query is supplied the
-                CSV only contains cases matching the search query. If caseIds are
-                supplied the CSV only contains cases with those ids. You cannot supply
-                both query and caseIds.
+                Streams a CSV, TSV or JSON attachment of cases matching the search query. 
+                If caseIds are supplied the CSV only contains cases with those ids. 
+                You cannot supply both query and caseIds.
             tags: [Case]
             operationId: downloadCases
             requestBody:
@@ -557,10 +556,9 @@ paths:
                     application/x-www-form-urlencoded:
                         schema:
                             type: object
-                            maxProperties: 1
                             properties:
                                 caseIds:
-                                    description: Cases corresponding to these ids will returned
+                                    description: Cases corresponding to these ids will be returned
                                     type: array
                                     items:
                                         type: string
@@ -569,6 +567,13 @@ paths:
                                     description: >
                                         Cases matching this query will be returned. This is ignored
                                         if empty.
+                                    type: string
+                                limit:
+                                    description: >
+                                        Max number of rows that can be downloaded when query is provided
+                                    type: string
+                                format:
+                                    description: Format of data to be downloaded
                                     type: string
             responses:
                 '200':
@@ -597,11 +602,19 @@ paths:
                 '500':
                     $ref: '#/components/responses/500'
     /cases/getDownloadLink:
-        get:
+        post:
             summary: >
                 Generates signed URL to download full data set from AWS S3
             tags: [Case]
             operationId: generateSignedUrl
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            properties:
+                                format:
+                                    description: Format in which data should be downloaded
+                                    type: string
             responses:
                 '200':
                     $ref: '#/components/responses/200FullDataSetDownload'
@@ -1131,6 +1144,7 @@ components:
                         url:
                             type: string
                             example: https://opendata.digilugu.ee/opendata_covid19_test_results.csv
+                            description: Source location, can be http, https, or s3 schemes.
                         license:
                             type: string
                             example: MIT

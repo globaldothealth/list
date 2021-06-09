@@ -10,7 +10,7 @@ class AdminsFetcher:
     def __init__(self, access_token, db, rate_limit=600):
         self.rate_limit = ratelimiter.RateLimiter(max_calls=rate_limit, period=60)
         self.access_token = access_token
-        self.admins = db['admins']
+        self.admins = db.get_collection('admins')
         self.cache = LRU(500)
 
     def fill_admins(self, geocode):

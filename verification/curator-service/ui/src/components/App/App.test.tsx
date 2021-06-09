@@ -8,9 +8,14 @@ import {
 } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { createMemoryHistory } from 'history';
+<<<<<<< HEAD:verification/curator-service/ui/src/components/App/App.test.tsx
 import { render, fireEvent, screen } from '../util/test-utils'
 
 
+=======
+import { DownloadButton } from './LinelistTable';
+import { debug } from 'console';
+>>>>>>> 7e462793d4f5b7fcfe90fcc6af12bec718b3d00d:verification/curator-service/ui/src/components/App.test.tsx
 
 jest.mock('axios');
 // Mock charts page so that requests for mongo charts are not sent
@@ -224,5 +229,37 @@ describe('<App />', () => {
         // expect(searchField.value).toBe('dateconfirmedafter:');
         expect(await screen.findByText(/Apply filters/i)).toBeInTheDocument();
         expect(screen.getByRole('textbox', { name: /country/i })).toHaveFocus();
+    });
+
+    describe('Download dataset', () => {
+        it('Displays download dialog after clicking DownloadButton', async () => {
+            const axiosResponse = {
+                data: {
+                    name: 'Alice Smith',
+                    email: 'foo@bar.com',
+                    roles: ['admin'],
+                },
+                status: 200,
+                statusText: 'OK',
+                config: {},
+                headers: {},
+            };
+            mockedAxios.get.mockResolvedValueOnce(axiosResponse);
+            const history = createMemoryHistory({
+                initialEntries: ['/cases'],
+                initialIndex: 0,
+            });
+
+            render(
+                <Router history={history}>
+                    <App />
+                </Router>,
+            );
+
+            fireEvent.click(await screen.findByText(/download dataset/i));
+            expect(
+                await screen.findByText(/download full dataset/i),
+            ).toBeInTheDocument();
+        });
     });
 });

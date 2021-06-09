@@ -1,6 +1,6 @@
 import { Case, CaseDocument } from '../model/case';
 import { EventDocument } from '../model/event';
-import { DocumentQuery, Error, Query } from 'mongoose';
+import { Aggregate, DocumentQuery, Error, Query } from 'mongoose';
 import { ObjectId, QuerySelector } from 'mongodb';
 import { GeocodeOptions, Geocoder, Resolution } from '../geocoding/geocoder';
 import { NextFunction, Request, Response } from 'express';
@@ -74,6 +74,13 @@ export class CasesController {
      * Handles HTTP POST /api/cases/download.
      */
     download = async (req: Request, res: Response): Promise<void> => {
+        if (req.body.query && req.body.caseIds) {
+            res.status(400).json({ message: 'Bad request' });
+            return;
+        }
+
+        const queryLimit = Number(req.body.limit);
+
         // Goofy Mongoose types require this.
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         let casesQuery: any[];
@@ -105,39 +112,106 @@ export class CasesController {
             const casesIgnoringExcluded = this.excludeRestrictedSourcesFromCaseAggregation(
                 casesQuery,
             );
+
+            // Limit number of results if present
+            // eslint-disable-next-line
+            let limitedQuery: any[] = [];
+            if (queryLimit) {
+                limitedQuery = _.concat(casesIgnoringExcluded, [
+                    { $limit: queryLimit },
+                ]);
+            }
+
             const matchingCases = await Case.aggregate(
-                casesIgnoringExcluded,
+                limitedQuery.length !== 0
+                    ? limitedQuery
+                    : casesIgnoringExcluded,
             ).collation({
                 locale: 'en_US',
                 strength: 2,
             });
 
-            res.setHeader('Content-Type', 'text/csv');
-            res.setHeader(
-                'Content-Disposition',
-                'attachment; filename="cases.csv"',
-            );
+            //Get current date
+            const dateObj = new Date();
+
+            // adjust 0 before single digit date
+            const day = ('0' + dateObj.getDate()).slice(-2);
+            const month = ('0' + (dateObj.getMonth() + 1)).slice(-2);
+            const year = dateObj.getFullYear();
+
+            const filename = `gh_${year}-${month}-${day}`;
+
             res.setHeader('Cache-Control', 'no-cache');
             res.setHeader('Pragma', 'no-cache');
-            axios
-                .get<string>(
-                    'https://raw.githubusercontent.com/globaldothealth/list/main/data-serving/scripts/export-data/functions/01-split/fields.txt',
-                )
-                .then((txtRes) => {
-                    const columns = txtRes.data.split('\n');
-                    const parsedCases = _.map(
-                        matchingCases,
-                        parseDownloadedCase,
+
+            logger.info('format: ' + req.body.format);
+
+            switch (req.body.format) {
+                case 'csv':
+                    res.setHeader('Content-Type', 'text/csv');
+                    res.setHeader(
+                        'Content-Disposition',
+                        `attachment; filename="${filename}.csv"`,
                     );
-                    const stringifiedCases = stringify(parsedCases, {
-                        header: true,
-                        columns: columns,
-                    });
-                    res.setHeader('content-type', 'text/csv');
-                    res.end(stringifiedCases);
-                });
+                    axios
+                        .get<string>(
+                            'https://raw.githubusercontent.com/globaldothealth/list/main/data-serving/scripts/export-data/functions/01-split/fields.txt',
+                        )
+                        .then((txtRes) => {
+                            const columns = txtRes.data.split('\n');
+                            const parsedCases = _.map(
+                                matchingCases,
+                                parseDownloadedCase,
+                            );
+                            const stringifiedCases = stringify(parsedCases, {
+                                header: true,
+                                columns: columns,
+                            });
+                            res.end(stringifiedCases);
+                        });
+                    break;
+
+                case 'tsv':
+                    res.setHeader('Content-Type', 'text/tsv');
+                    res.setHeader(
+                        'Content-Disposition',
+                        `attachment; filename="${filename}.tsv"`,
+                    );
+                    axios
+                        .get<string>(
+                            'https://raw.githubusercontent.com/globaldothealth/list/main/data-serving/scripts/export-data/functions/01-split/fields.txt',
+                        )
+                        .then((txtRes) => {
+                            const columns = txtRes.data.split('\n');
+                            const parsedCases = _.map(
+                                matchingCases,
+                                parseDownloadedCase,
+                            );
+                            const stringifiedCases = stringify(parsedCases, {
+                                header: true,
+                                columns: columns,
+                                delimiter: '\t',
+                            });
+                            res.end(stringifiedCases);
+                        });
+                    break;
+
+                case 'json':
+                    const data = JSON.stringify(matchingCases);
+                    res.setHeader('Content-Type', 'application/json');
+                    res.setHeader(
+                        'Content-Disposition',
+                        `attachment; filename="${filename}.json"`,
+                    );
+                    res.end(data);
+                    break;
+
+                default:
+                    break;
+            }
         } catch (e) {
             if (e instanceof ParsingError) {
+                logger.info('Error: ' + e);
                 res.status(422).json({ message: e.message });
                 return;
             }
@@ -402,21 +476,25 @@ export class CasesController {
         try {
             // Batch validate cases first.
             logger.info('batchUpsert: entrypoint');
-            const errors = await this.batchValidate(req.body.cases);
+            const cases = req.body.cases;
+            const errors = await this.batchValidate(cases);
             logger.info('batchUpsert: validated cases');
             if (errors.length > 0) {
-                res.status(207).send({
-                    phase: 'VALIDATE',
-                    numCreated: 0,
-                    numUpdated: 0,
-                    errors: errors,
+                // drop any invalid cases but don't give up yet: upsert the remainder
+                const badCases = _.orderBy(errors, 'index', 'desc').map(
+                    (o) => o.index,
+                );
+                badCases.forEach((i) => {
+                    cases.splice(i, 1);
                 });
-                return;
+                logger.info(
+                    `batchUpsert: dropped ${errors.length} invalid cases`,
+                );
             }
             logger.info('batchUpsert: preparing bulk write');
             const bulkWriteResult = await Case.bulkWrite(
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                req.body.cases.map((c: any) => {
+                cases.map((c: any) => {
                     delete c.caseCount;
                     if (
                         c.caseReference?.sourceId &&
@@ -445,13 +523,14 @@ export class CasesController {
                 { ordered: false },
             );
             logger.info('batchUpsert: finished bulk write');
-            res.status(200).json({
+            const status = errors.length > 0 ? 207 : 200;
+            res.status(status).json({
                 phase: 'UPSERT',
                 numCreated:
                     (bulkWriteResult.insertedCount || 0) +
                     (bulkWriteResult.upsertedCount || 0),
                 numUpdated: bulkWriteResult.modifiedCount,
-                errors: [],
+                errors,
             });
             return;
         } catch (err) {
