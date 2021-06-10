@@ -1166,6 +1166,10 @@ components:
                     description: >
                         Whether cases from this source should be left out of the line list feed.
                     type: boolean
+                hasStableIdentifiers:
+                    description: >
+                        Whether the source includes identifiers for individual cases that remain the same over time.
+                    type: boolean
                 automation:
                     type: object
                     properties:
