@@ -11,7 +11,7 @@ import {
     Typography,
     useMediaQuery,
 } from '@material-ui/core';
-import LinelistTable, { DownloadButton } from './LinelistTable';
+import LinelistTable, { DownloadButton } from '../LinelistTable';
 import {
     Link,
     Redirect,
@@ -24,16 +24,16 @@ import React, { useEffect, useState } from 'react';
 import { Theme, makeStyles } from '@material-ui/core/styles';
 
 import AddIcon from '@material-ui/icons/Add';
-import AutomatedBackfill from './AutomatedBackfill';
-import AutomatedSourceForm from './AutomatedSourceForm';
-import BulkCaseForm from './BulkCaseForm';
-import CaseForm from './CaseForm';
-import Charts from './Charts';
+import AutomatedBackfill from '../AutomatedBackfill';
+import AutomatedSourceForm from '../AutomatedSourceForm';
+import BulkCaseForm from '../BulkCaseForm';
+import CaseForm from '../CaseForm';
+import Charts from '../Charts';
 import Drawer from '@material-ui/core/Drawer';
-import EditCase from './EditCase';
-import GHListLogo from './GHListLogo';
+import EditCase from '../EditCase';
+import GHListLogo from '../GHListLogo';
 import HomeIcon from '@material-ui/icons/Home';
-import LandingPage from './landing-page/LandingPage';
+import LandingPage from '../landing-page/LandingPage';
 import LinkIcon from '@material-ui/icons/Link';
 import List from '@material-ui/core/List';
 import ListIcon from '@material-ui/icons/List';
@@ -42,24 +42,29 @@ import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
 import MenuIcon from '@material-ui/icons/Menu';
 import PeopleIcon from '@material-ui/icons/People';
-import Profile from './Profile';
+import Profile from '../Profile';
 import PublishIcon from '@material-ui/icons/Publish';
-import SearchBar from './SearchBar';
-import SourceTable from './SourceTable';
-import TermsOfUse from './TermsOfUse';
+import SearchBar from '../SearchBar';
+import SourceTable from '../SourceTable';
+import TermsOfUse from '../TermsOfUse';
 import { ThemeProvider } from '@material-ui/core/styles';
-import UploadsTable from './UploadsTable';
-import User from './User';
-import Users from './Users';
-import ViewCase from './ViewCase';
+import UploadsTable from '../UploadsTable';
+import User from '../User';
+import Users from '../Users';
+import ViewCase from '../ViewCase';
 import axios from 'axios';
 import clsx from 'clsx';
 import { createMuiTheme } from '@material-ui/core/styles';
 import { useLastLocation } from 'react-router-last-location';
-import PolicyLink from './PolicyLink';
+import PolicyLink from '../PolicyLink';
 import { Auth } from 'aws-amplify';
-import { useCookieBanner } from '../hooks/useCookieBanner';
-import { SortBy, SortByOrder } from '../constants/types';
+import { useCookieBanner } from '../../hooks/useCookieBanner';
+import { SortBy, SortByOrder } from '../../constants/types';
+import { URLToSearchQuery } from '../util/searchQuery';
+import { useAppDispatch } from '../../hooks/redux';
+import { setSearchQuery, setFilterBreadcrumbs, deleteFilterBreadcrumbs} from './redux/appSlice';
+// import { selectFilterBreadcrumbs} from './redux/selectors';
+// import { useSelector } from 'react-redux';
 
 const theme = createMuiTheme({
     palette: {
@@ -354,6 +359,8 @@ export interface ChipData {
 }
 
 export default function App(): JSX.Element {
+    const dispatch = useAppDispatch();
+
     const CookieBanner = () => {
         const { initCookieBanner } = useCookieBanner();
 
@@ -380,9 +387,6 @@ export default function App(): JSX.Element {
     const lastLocation = useLastLocation();
     const history = useHistory();
     const location = useLocation<LocationState>();
-    const [filterBreadcrumbs, setFilterBreadcrumbs] = React.useState<
-        ChipData[]
-    >([]);
     const [filtersModalOpen, setFiltersModalOpen] = React.useState<boolean>(
         false,
     );
@@ -434,18 +438,18 @@ export default function App(): JSX.Element {
 
     // Update filter breadcrumbs
     useEffect(() => {
-        if (location.pathname !== '/cases' || location.search.includes('?q=')) {
-            setFilterBreadcrumbs([]);
+        if (!location.pathname.includes('/cases')) {
+            dispatch(setFilterBreadcrumbs([]));
             return;
         }
-
-        const searchParams = new URLSearchParams(location.search);
-        const tempFilterBreadcrumbs: ChipData[] = [];
-        searchParams.forEach((value, key) => {
-            tempFilterBreadcrumbs.push({ key, value });
-        });
-
-        setFilterBreadcrumbs(tempFilterBreadcrumbs);
+        if (location.pathname === '/cases') {
+            const searchParams = new URLSearchParams(location.search);
+            const tempFilterBreadcrumbs: ChipData[] = [];
+            searchParams.forEach((value, key) => {
+                tempFilterBreadcrumbs.push({ key, value });
+            });
+            dispatch(setFilterBreadcrumbs(tempFilterBreadcrumbs));
+        }
         //eslint-disable-next-line
     }, [location.search]);
 
@@ -526,21 +530,26 @@ export default function App(): JSX.Element {
         // eslint-disable-next-line
     }, [savedSearchQuery]);
 
+
     // Function for deleting filter breadcrumbs
     const handleFilterBreadcrumbDelete = (breadcrumbToDelete: ChipData) => {
-        setFilterBreadcrumbs((filterBreadcrumbs) =>
-            filterBreadcrumbs.filter(
-                (breadcrumb) => breadcrumb.key !== breadcrumbToDelete.key,
-            ),
-        );
-
         const searchParams = new URLSearchParams(location.search);
+        dispatch(deleteFilterBreadcrumbs(breadcrumbToDelete))
         searchParams.delete(breadcrumbToDelete.key);
         history.push({
             pathname: '/cases',
             search: searchParams.toString(),
         });
     };
+
+    useEffect(() => {
+        if (location.pathname.includes('/cases/view')) return;
+        dispatch(setSearchQuery(URLToSearchQuery(location.search)));
+
+        //eslint-disable-next-line
+    }, [location.search]);
+
+
 
     return (
         <div className={classes.root} ref={rootRef}>
@@ -769,7 +778,6 @@ export default function App(): JSX.Element {
                                     pageSize={listPageSize}
                                     onChangePage={setListPage}
                                     onChangePageSize={setListPageSize}
-                                    filterBreadcrumbs={filterBreadcrumbs}
                                     handleBreadcrumbDelete={
                                         handleFilterBreadcrumbDelete
                                     }
