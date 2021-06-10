@@ -30,6 +30,9 @@
             "excludeFromLineList": {
                 "bsonType": "boolean"
             },
+            "hasStableIdentifiers": {
+                "bsonType": "boolean"
+            },
             "automation": {
                 "bsonType": "object",
                 "properties": {
