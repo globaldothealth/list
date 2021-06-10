@@ -835,7 +835,10 @@ export class CasesController {
                         },
                     };
                 } else {
-                    if (f.path === 'demographics.gender') {
+                    if (
+                        f.path === 'demographics.gender' &&
+                        f.values[0] === 'noGender'
+                    ) {
                         return {
                             $match: {
                                 [f.path]: {
