@@ -323,6 +323,104 @@ it('can edit a row', async () => {
     expect(oldRow).not.toBeInTheDocument();
 });
 
+it.only('can edit the boolean fields in a row', async () => {
+    const sources = [
+        {
+            _id: 'abc123',
+            name: 'source_name',
+            origin: {
+                url: 'origin url',
+                license: 'origin license',
+            },
+            automation: {
+                parser: {
+                    awsLambdaArn: 'lambda arn',
+                },
+                schedule: {
+                    awsRuleArn: 'rule arn',
+                },
+            },
+            excludeFromLineList: false,
+            hasStableIdentifiers: false,
+        },
+    ];
+    const axiosResponse = {
+        data: {
+            sources: sources,
+            total: 15,
+        },
+        status: 200,
+        statusText: 'OK',
+        config: {},
+        headers: {},
+    };
+    mockedAxios.get.mockResolvedValueOnce(axiosResponse);
+
+    // Load table
+    const { getByText, findByText, queryByText } = render(<SourceTable />);
+    expect(mockedAxios.get).toHaveBeenCalledTimes(1);
+    expect(mockedAxios.get).toHaveBeenCalledWith(
+        '/api/sources/?limit=10&page=1',
+    );
+    const row = await findByText('origin url');
+    expect(row).toBeInTheDocument();
+
+    // Edit sources
+    const editedSources = [
+        {
+            _id: 'abc123',
+            name: 'source_name',
+            format: 'format',
+            origin: {
+                url: 'origin url',
+                license: 'origin license',
+            },
+            automation: {
+                parser: {
+                    awsLambdaArn: 'lambda arn',
+                },
+                schedule: {
+                    awsRuleArn: 'rule arn',
+                },
+            },
+            excludeFromLineList: true,
+            hasStableIdentifiers: true,
+        },
+    ];
+    const axiosGetAfterEditResponse = {
+        data: {
+            sources: editedSources,
+            total: 15,
+        },
+        status: 200,
+        statusText: 'OK',
+        config: {},
+        headers: {},
+    };
+    const axiosEditResponse = {
+        data: {
+            source: editedSources[0],
+        },
+        status: 200,
+        statusText: 'OK',
+        config: {},
+        headers: {},
+    };
+    mockedAxios.put.mockResolvedValueOnce(axiosEditResponse);
+    mockedAxios.get.mockResolvedValueOnce(axiosGetAfterEditResponse);
+
+    const editButton = getByText(/edit/);
+    fireEvent.click(editButton);
+    const confirmButton = getByText(/check/);
+    fireEvent.click(confirmButton);
+    expect(mockedAxios.put).toHaveBeenCalledTimes(1);
+
+    // Check table data is reloaded
+    expect(mockedAxios.get).toHaveBeenCalledTimes(1);
+    const editedRow = await findByText('origin url');
+    expect(editedRow).toBeInTheDocument();
+});
+
 it('can edit a row even if sending notifications on edit fails', async () => {
     const sources = [
         {
