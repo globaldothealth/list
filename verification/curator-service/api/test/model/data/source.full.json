@@ -32,5 +32,7 @@
     "notificationRecipients": [
         "foo@bar.com",
         "bar@baz.com"
-    ]
+    ],
+    "excludeFromLineList": false,
+    "hasStableIdentifiers": true
 }
