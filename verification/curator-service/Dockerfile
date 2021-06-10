@@ -10,6 +10,7 @@ WORKDIR /usr/src/app/verification/curator-service/api
 # where available (npm@5+)
 COPY verification/curator-service/api/package*.json ./
 # RUN npm clean install
+RUN npm cache clean --force
 RUN npm ci
 # Bundle app source
 COPY verification/curator-service/api/. .
