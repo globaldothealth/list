@@ -15,7 +15,7 @@ import FieldTitle from './common-form-fields/FieldTitle';
 import MuiAlert from '@material-ui/lab/Alert';
 import React from 'react';
 import { SelectField } from './common-form-fields/FormikFields';
-import { TextField } from 'formik-material-ui';
+import { TextField, CheckboxWithLabel } from 'formik-material-ui';
 import User from './User';
 import axios from 'axios';
 import { useHistory } from 'react-router-dom';
@@ -213,16 +213,15 @@ export default function AutomatedSourceForm(props: Props): JSX.Element {
                                     />
                                 </div>
                                 <div className={classes.formSection}>
-                                    <label>
-                                        <FastField
-                                            name="excludeFromLineList"
-                                            type="checkbox"
-                                            helperText="Whether cases from this source can appear in the line list"
-                                            required
-                                            data-testid="excludeFromlineList"
-                                        />
-                                        Exclude from Line List?
-                                    </label>
+                                    <FastField
+                                        name="excludeFromLineList"
+                                        component={CheckboxWithLabel}
+                                        type="checkbox"
+                                        helperText="Whether cases from this source can appear in the line list"
+                                        required
+                                        data-testid="excludeFromLineList"
+                                        Label={{ label: 'Exclude From Line List?' }}
+                                    />
                                 </div>
                                 <div className={classes.formSection}>
                                     <ChipInput
