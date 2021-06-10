@@ -32,6 +32,7 @@ it('renders form', async () => {
     expect(getByTestId('format')).toBeInTheDocument();
     expect(getByTestId('recipients')).toBeInTheDocument();
     expect(getByTestId('excludeFromLineList')).toBeInTheDocument();
+    expect(getByTestId('hasStableIdentifiers')).toBeInTheDocument();
 
     // Buttons
     expect(getByText(/create source/i)).toBeEnabled();

@@ -85,6 +85,7 @@ export interface AutomatedSourceFormValues {
     format: string;
     notificationRecipients: string[];
     excludeFromLineList: boolean;
+    hasStableIdentifiers: boolean;
 }
 
 const AutomatedSourceFormSchema = Yup.object().shape({
@@ -94,6 +95,7 @@ const AutomatedSourceFormSchema = Yup.object().shape({
     license: Yup.string().required('Required'),
     notificationRecipients: Yup.array().of(Yup.string().email()),
     excludeFromLineList: Yup.boolean().required('Required'),
+    hasStableIdentifiers: Yup.boolean().required('Required'),
 });
 
 export default function AutomatedSourceForm(props: Props): JSX.Element {
@@ -110,6 +112,7 @@ export default function AutomatedSourceForm(props: Props): JSX.Element {
             format: values.format,
             notificationRecipients: values.notificationRecipients,
             excludeFromLineList: values.excludeFromLineList,
+            hasStableIdentifiers: values.hasStableIdentifiers,
         };
         try {
             await axios.post('/api/sources', newSource);
@@ -139,6 +142,7 @@ export default function AutomatedSourceForm(props: Props): JSX.Element {
                     license: '',
                     notificationRecipients: [props.user.email],
                     excludeFromLineList: false,
+                    hasStableIdentifiers: true,
                 }}
                 onSubmit={async (values): Promise<void> => {
                     await createSource(values);
@@ -221,6 +225,17 @@ export default function AutomatedSourceForm(props: Props): JSX.Element {
                                         required
                                         data-testid="excludeFromLineList"
                                         Label={{ label: 'Exclude From Line List?' }}
+                                    />
+                                </div>
+                                <div className={classes.formSection}>
+                                    <FastField
+                                        name="hasStableIdentifiers"
+                                        component={CheckboxWithLabel}
+                                        type="checkbox"
+                                        helperText="Whether cases from this source have unique, unchanging identifiers"
+                                        required
+                                        data-testid="hasStableIdentifiers"
+                                        Label={{ label: 'Source has Stable Identifiers?' }}
                                     />
                                 </div>
                                 <div className={classes.formSection}>
