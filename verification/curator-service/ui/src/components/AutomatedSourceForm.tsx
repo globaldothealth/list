@@ -84,6 +84,7 @@ export interface AutomatedSourceFormValues {
     name: string;
     format: string;
     notificationRecipients: string[];
+    excludeFromLineList: boolean;
 }
 
 const AutomatedSourceFormSchema = Yup.object().shape({
@@ -92,6 +93,7 @@ const AutomatedSourceFormSchema = Yup.object().shape({
     format: Yup.string().required('Required'),
     license: Yup.string().required('Required'),
     notificationRecipients: Yup.array().of(Yup.string().email()),
+    excludeFromLineList: Yup.boolean().required('Required'),
 });
 
 export default function AutomatedSourceForm(props: Props): JSX.Element {
@@ -107,6 +109,7 @@ export default function AutomatedSourceForm(props: Props): JSX.Element {
             origin: { url: values.url, license: values.license },
             format: values.format,
             notificationRecipients: values.notificationRecipients,
+            excludeFromLineList: values.excludeFromLineList,
         };
         try {
             await axios.post('/api/sources', newSource);
@@ -135,6 +138,7 @@ export default function AutomatedSourceForm(props: Props): JSX.Element {
                     format: '',
                     license: '',
                     notificationRecipients: [props.user.email],
+                    excludeFromLineList: false,
                 }}
                 onSubmit={async (values): Promise<void> => {
                     await createSource(values);
@@ -207,6 +211,18 @@ export default function AutomatedSourceForm(props: Props): JSX.Element {
                                         values={Object.values(Format)}
                                         required
                                     />
+                                </div>
+                                <div className={classes.formSection}>
+                                    <label>
+                                        <FastField
+                                            name="excludeFromLineList"
+                                            type="checkbox"
+                                            helperText="Whether cases from this source can appear in the line list"
+                                            required
+                                            data-testid="excludeFromlineList"
+                                        />
+                                        Exclude from Line List?
+                                    </label>
                                 </div>
                                 <div className={classes.formSection}>
                                     <ChipInput
