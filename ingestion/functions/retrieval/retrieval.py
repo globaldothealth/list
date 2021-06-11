@@ -272,12 +272,12 @@ def run_retrieval(tempdir=TEMP_PATH):
     parsing_date_range = os.getenv('EPID_INGESTION_PARSING_DATE_RANGE', {})
     if isinstance(parsing_date_range, str):  # date range specified with comma
         parsing_date_range = dict(zip(["start", "end"], parsing_date_range.split(",")))
-    local_auth = os.getenv('EPID_INGESTION_AUTH', {})
+    local_email = os.getenv('EPID_INGESTION_EMAIL', '')
 
     auth_headers = None
     cookies = None
-    if local_auth and env == 'local':
-        cookies = common_lib.login(local_auth['email'])
+    if local_email and env == 'local':
+        cookies = common_lib.login(local_email)
     else:
         auth_headers = common_lib.obtain_api_credentials(s3_client)
     upload_id = common_lib.create_upload_record(
