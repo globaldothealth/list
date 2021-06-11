@@ -36,6 +36,7 @@ EMAIL_USER_PASSWORD=<Password for the above email address>
 GOOGLE_OAUTH_CLIENT_ID=<oauth client id to enable OAuth>
 GOOGLE_OAUTH_CLIENT_SECRET=<oauth client secret>
 MAPBOX_TOKEN=<Mapbox API token>
+MAPBOX_GEOCODE_RATE_LIMIT_PER_MIN=<Mapbox API rate limit, default = 600>
 REACT_APP_PUBLIC_MAPBOX_TOKEN=<Different Mapbox API token>
 REACT_APP_POLICY_PUBLIC_ID=<Public id for Iubenda service that provides legal policies>
 REACT_APP_COOKIE_CONSENT_PUBLIC_ID=<Public ID for Iubenda service that provides cookie consent banner>

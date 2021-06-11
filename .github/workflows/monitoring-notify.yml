@@ -1,0 +1,32 @@
+name: Data monitoring notifications
+
+on:
+  schedule:
+    # Every day at 8AM UTC
+    - cron: "0 8 * * *"
+
+jobs:
+  monitoring-notify:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ingestion/monitoring
+    steps:
+    - uses: actions/checkout@v2
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: us-east-1
+
+    - name: Set up Python 3.8
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.8
+    - name: Install dependencies
+      run: pip install -r requirements.txt
+    - name: Run metrics script
+      env:
+        SLACK_WEBHOOK_METRICS_URL: ${{ secrets.SLACK_WEBHOOK_METRICS_URL }}
+      run: python daily_metrics.py

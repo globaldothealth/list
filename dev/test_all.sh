@@ -16,6 +16,13 @@ install_dependencies() {
   fi
 }
 
+echo "Running geocoding service API tests"
+pushd `dirname "$0"`/../geocoding/location-service
+poetry install
+poetry update
+./run_tests.sh
+popd
+
 install_dependencies /../verification/curator-service/api/
 echo "Running curator service API tests"
 npm --prefix=`dirname "$0"`/../verification/curator-service/api/ run-script test-silent
@@ -29,7 +36,7 @@ npm --prefix=`dirname "$0"`/../verification/curator-service/ui/ run-script test-
 RUNNING=$(curl localhost:3002 --silent | grep "DOCTYPE" || true)
 if [ -z "$RUNNING" ]; then
   echo "Starting stack..."
-  nohup ./run_stack.sh &
+  nohup ./run_stack.sh | tee &
 fi
 
 until $(curl localhost:3002 --silent --fail | grep "DOCTYPE" > /dev/null); do

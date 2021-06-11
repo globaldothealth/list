@@ -87,8 +87,8 @@ export const caseSchema = new mongoose.Schema(
 // TODO: Type request Cases.
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 caseSchema.methods.equalsJSON = function (jsonCase: any): boolean {
-    const thisJson = this.toJSON();
-    const other = new Case(jsonCase).toJSON();
+    const thisJson = this.toJSON() as any;
+    const other = new Case(jsonCase).toJSON() as any;
     return (
         _.isEqual(thisJson.demographics, other.demographics) &&
         _.isEqual(thisJson.events, other.events) &&

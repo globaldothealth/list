@@ -174,7 +174,7 @@ describe('Curator', function () {
 
             // View the case from the message bar.
             cy.get('button[data-testid="view-case-btn"').click({ force: true });
-            cy.contains(/View case\b/);
+            cy.contains(/Case details\b/);
             // Go back to linelist.
             cy.visit('/cases');
 

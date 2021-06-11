@@ -8,6 +8,7 @@ services:
     ports:
       - "3003:8080"
     environment:
+      DB: "covid19"
       DB_CONNECTION_STRING: "mongodb://mongo:27017/covid19"
       MAPBOX_TOKEN: "${MAPBOX_TOKEN}"
     healthcheck:
@@ -45,6 +46,7 @@ services:
       EMAIL_USER_PASSWORD: "${EMAIL_USER_PASSWORD}"
       GOOGLE_OAUTH_CLIENT_ID: "${GOOGLE_OAUTH_CLIENT_ID}"
       GOOGLE_OAUTH_CLIENT_SECRET: "${GOOGLE_OAUTH_CLIENT_SECRET}"
+      LOCATION_SERVICE_URL: "http://geocoding:8080"
     healthcheck:
       test: ["CMD", "curl", "-f", "http://curator:3001"]
       interval: 30s
@@ -64,6 +66,7 @@ services:
       - geocoding
     environment:
       DB_CONNECTION_STRING: "mongodb://mongo:27017/covid19"
+      LOCATION_SERVICE_URL: "http://geocoding:8080"
       MAPBOX_TOKEN: "${MAPBOX_TOKEN}"
     healthcheck:
       test: ["CMD", "curl", "-f", "http://data:3000"]

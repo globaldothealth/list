@@ -8,6 +8,12 @@ import minimalCase from './../model/data/case.minimal.json';
 import caseMustGeocode from './../model/data/case.mustgeocode.json';
 import mongoose from 'mongoose';
 import request from 'supertest';
+import { setupServer } from 'msw/node';
+import {
+    seed as seedFakeGeocodes,
+    clear as clearFakeGeocodes,
+    handlers,
+} from '../mocks/handlers';
 
 let mongoServer: MongoMemoryServer;
 
@@ -24,18 +30,26 @@ const invalidRequest = {
 };
 
 const realDate = Date.now;
+const mockLocationServer = setupServer(...handlers);
 
 beforeAll(async () => {
+    mockLocationServer.listen();
     mongoServer = new MongoMemoryServer();
     global.Date.now = jest.fn(() => new Date('2020-12-12T12:12:37Z').getTime());
 });
 
 beforeEach(async () => {
+    clearFakeGeocodes();
     await Case.deleteMany({});
     return CaseRevision.deleteMany({});
 });
 
+afterEach(() => {
+    mockLocationServer.resetHandlers();
+});
+
 afterAll(async () => {
+    mockLocationServer.close();
     global.Date.now = realDate;
     return mongoServer.stop();
 });
@@ -518,25 +532,19 @@ describe('POST', () => {
         );
     });
     it('geocodes everything that is necessary', async () => {
-        await request(app)
-            .post('/api/geocode/seed')
-            .send({
-                country: 'Canada',
-                geoResolution: 'Country',
-                geometry: { latitude: 42.42, longitude: 11.11 },
-                name: 'Canada',
-            })
-            .expect(200);
-        await request(app)
-            .post('/api/geocode/seed')
-            .send({
-                administrativeAreaLevel1: 'Quebec',
-                country: 'Canada',
-                geoResolution: 'Admin1',
-                geometry: { latitude: 33.33, longitude: 99.99 },
-                name: 'Montreal',
-            })
-            .expect(200);
+        seedFakeGeocodes('Canada', {
+            country: 'Canada',
+            geoResolution: 'Country',
+            geometry: { latitude: 42.42, longitude: 11.11 },
+            name: 'Canada',
+        });
+        seedFakeGeocodes('Montreal', {
+            administrativeAreaLevel1: 'Quebec',
+            country: 'Canada',
+            geoResolution: 'Admin1',
+            geometry: { latitude: 33.33, longitude: 99.99 },
+            name: 'Montreal',
+        });
         await request(app)
             .post('/api/cases')
             .send({
@@ -555,7 +563,6 @@ describe('POST', () => {
         ).toBeDefined();
     });
     it('throws if cannot geocode', async () => {
-        await request(app).post('/api/geocode/clear').expect(200);
         await request(app)
             .post('/api/cases')
             .send({
@@ -630,10 +637,11 @@ describe('POST', () => {
         expect(await CaseRevision.collection.countDocuments()).toEqual(0);
     });
     it('batch upsert with any invalid case should return 207', async () => {
-        await request(app)
+        const res = await request(app)
             .post('/api/cases/batchUpsert')
             .send({ cases: [minimalCase, invalidRequest], ...curatorMetadata })
-            .expect(207, /VALIDATE/);
+            .expect(207, /Case validation failed/);
+        expect(res.body.numCreated).toEqual(1);
     });
     it('batch upsert with empty cases should return 400', async () => {
         return request(app)
@@ -649,7 +657,7 @@ describe('POST', () => {
             await c2.save();
             const res = await request(app)
                 .post('/api/cases/download')
-                .send({})
+                .send({ format: 'csv' })
                 .expect('Content-Type', 'text/csv')
                 .expect(200);
             expect(res.text).toContain(
@@ -667,6 +675,7 @@ describe('POST', () => {
                 .post('/api/cases/download')
                 .send({
                     query: 'country:',
+                    format: 'csv',
                 })
                 .expect(422, done);
         });
@@ -679,6 +688,7 @@ describe('POST', () => {
                 .send({
                     query: 'country:India',
                     caseIds: [c._id],
+                    format: 'csv',
                 })
                 .expect(400, done);
         });
@@ -696,6 +706,7 @@ describe('POST', () => {
                 .post('/api/cases/download')
                 .send({
                     caseIds: [matchingCase._id, matchingCase2._id],
+                    format: 'csv',
                 })
                 .expect('Content-Type', 'text/csv')
                 .expect(200);
@@ -728,6 +739,7 @@ describe('POST', () => {
                 .post('/api/cases/download')
                 .send({
                     query: matchingNotes,
+                    format: 'csv',
                 })
                 .expect('Content-Type', 'text/csv')
                 .expect(200);
@@ -753,6 +765,7 @@ describe('POST', () => {
                 .post('/api/cases/download')
                 .send({
                     query: 'country:Germany',
+                    format: 'csv',
                 })
                 .expect('Content-Type', 'text/csv')
                 .expect(200);
@@ -790,11 +803,46 @@ describe('POST', () => {
             await excludedCase.save();
             const res = await request(app)
                 .post('/api/cases/download')
-                .send({})
+                .send({ format: 'csv' })
                 .expect('Content-Type', 'text/csv')
                 .expect(200);
             expect(res.text).not.toContain('notshared.example.com');
         });
+    });
+    it('should return results in proper format', async () => {
+        const matchedCase = new Case(minimalCase);
+        matchedCase.location.country = 'Germany';
+        await matchedCase.save();
+
+        //CSV
+        await request(app)
+            .post('/api/cases/download')
+            .send({
+                query: 'country:Germany',
+                format: 'csv',
+            })
+            .expect('Content-Type', 'text/csv')
+            .expect(200);
+
+        //TSV
+        await request(app)
+            .post('/api/cases/download')
+            .send({
+                query: 'country:Germany',
+                format: 'tsv',
+            })
+            .expect('Content-Type', 'text/tsv')
+            .expect(200);
+
+        //JSON
+        await request(app)
+            .post('/api/cases/download')
+            .send({
+                query: 'country:Germany',
+                format: 'json',
+            })
+            .expect('Content-Type', 'application/json')
+            .expect(200);
     });
 
     describe('batch status change', () => {

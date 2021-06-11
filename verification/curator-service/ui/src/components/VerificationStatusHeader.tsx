@@ -5,15 +5,19 @@ import { ReactComponent as VerificationHeaderSvg } from './assets/verification_h
 interface ColumnHeaderProps {
     onClickAction: (e: React.MouseEvent<HTMLDivElement>) => void;
 }
-const VerificationStatusHeader: React.FC<ColumnHeaderProps> = ({onClickAction}) => {
+const VerificationStatusHeader: React.FC<ColumnHeaderProps> = ({
+    onClickAction,
+}) => {
     return (
-        <Tooltip title="Verification status: Verified, Unverified or Excluded" onClick={onClickAction}>
+        <Tooltip
+            title="Verification status: Verified, Unverified or Excluded"
+            onClick={onClickAction}
+        >
             <IconButton>
                 <VerificationHeaderSvg />
             </IconButton>
         </Tooltip>
     );
-}
+};
 
 export default VerificationStatusHeader;
-

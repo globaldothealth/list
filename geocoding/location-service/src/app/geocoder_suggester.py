@@ -20,8 +20,9 @@ class GeocodeSuggester:
             return []
         opts = { }
         if 'limitToResolution' in request:
-            limit = []
             opts['limitToResolution'] = [self.limitToValidResolution(x) for x in request['limitToResolution'].split(',')]
+        if 'limitToCountry' in request:
+            opts['limitToCountry'] = request['limitToCountry'].split(',')
         for g in self.geocoders:
             suggestions = g.geocode(request['q'], opts)
             if len(suggestions) > 0:

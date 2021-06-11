@@ -33,7 +33,8 @@ def get_parser_name_source(source_id, env):
         )
     except RuntimeError:
         return (False, None)
-    return (True, parser) if len(parser.split(".")) == 2 else (True, None)
+    parser_module = common_lib.get_parser_module(parser)  # parsing.folder.subfolder
+    return (True, parser_module) if parser_module.count(".") == 2 else (True, None)
 
 
 def job_definition(
@@ -41,7 +42,7 @@ def job_definition(
     memory: int = DEFAULT_MEMORY_MIB, timeout: int = DEFAULT_TIMEOUT_MIN
 ):
     return {
-        "jobDefinitionName": f"{source_name}-{env}",
+        "jobDefinitionName": f"{source_name}-ingestor-{env}",
         "type": "container",
         "parameters": {},
         "timeout": {
@@ -144,11 +145,13 @@ deregister    Deregister a Batch job definition
             )
             sys.exit(1)
         if parser_name:
-            print(f"Source {args.source_id} will be parsed by parsing.{parser_name}")
+            print(f"Source {args.source_id} will be parsed by {parser_name}")
+            source_name = parser_name.replace(".", "-").replace("parsing-", "")
+            print(f"Registering job definition for source {source_name}")
             pprint(
                 self.batch_client.register_job_definition(
                     **job_definition(
-                        parser_name.replace(".", "_"),
+                        source_name,
                         args.source_id,
                         args.env,
                         args.cpu,
@@ -157,8 +160,8 @@ deregister    Deregister a Batch job definition
                     )
                 )
             )
-            if args.parser == parser_name:
-                print(f"Source {args.source_id} will be parsed by parsing.{parser_name}")
+            if "parsing." + args.parser == parser_name:
+                print(f"Source {args.source_id} will be parsed by {parser_name}")
             else:
                 print(f"Parser {parser_name} for source {args.source_id} in environment {args.env} does not match input {args.parser}")
                 sys.exit(1)
@@ -331,7 +334,6 @@ deregister    Deregister a Batch job definition
         args = parser.parse_args(sys.argv[2:])
         state = "DISABLED"
         description = ""
-        target_id = ""
         if args.enabled:
             state = "ENABLED"
         if args.target_name:

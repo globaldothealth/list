@@ -45,11 +45,11 @@ describe('Linelist table', function () {
         });
         cy.visit('/cases');
         cy.contains('France');
-        cy.contains(/View case\b/).should('not.exist');
+        cy.contains(/Case details\b/).should('not.exist');
         cy.contains('td', 'France').click({ force: true });
-        cy.contains(/View case\b/);
+        cy.contains(/Case details\b/);
         cy.get('button[aria-label="close overlay"').click();
-        cy.contains(/View case\b/).should('not.exist');
+        cy.contains(/Case details\b/).should('not.exist');
     });
 
     it('Can delete a case', function () {
@@ -290,6 +290,7 @@ describe('Linelist table', function () {
         cy.wait('@getCases');
         cy.contains('Filter').click();
         cy.contains('Clear filters').click();
+        cy.get('button[data-test-id="search-by-filter-button"]').click();
         cy.wait('@getCases');
         cy.contains('rows').click();
 
@@ -314,6 +315,7 @@ describe('Linelist table', function () {
         cy.wait('@getCases');
         cy.contains('Filter').click();
         cy.contains('Clear filters').click();
+        cy.get('button[data-test-id="search-by-filter-button"]').click();
         cy.wait('@getCases');
         cy.contains('rows').click();
         cy.get('li').contains('10').click();
@@ -352,6 +354,7 @@ describe('Linelist table', function () {
 
         cy.contains('Filter').click();
         cy.contains('Clear filters').click();
+        cy.get('button[data-test-id="search-by-filter-button"]').click();
         cy.contains('France');
         cy.contains('Germany');
     });
@@ -372,9 +375,9 @@ describe('Linelist table', function () {
 
         // Navigate to case details and back
         cy.get('td[value="France"]').click();
-        cy.contains(/View case\b/);
+        cy.contains(/Case details\b/);
         cy.get('button[aria-label="close overlay"').click();
-        cy.contains(/View case\b/).should('not.exist');
+        cy.contains(/Case details\b/).should('not.exist');
 
         // Search is maintained
         cy.contains('Filter').click();
@@ -456,6 +459,7 @@ describe('Linelist table', function () {
         cy.contains('No records to display');
         cy.contains('Filter').click();
         cy.contains('Clear filters').click();
+        cy.get('button[data-test-id="search-by-filter-button"]').click();
         cy.contains('France').should('not.exist');
         cy.contains('Germany');
         cy.contains('United Kingdom');
@@ -514,5 +518,37 @@ describe('Linelist table', function () {
         cy.get('input[id="search-field"]').type('France{enter}');
 
         cy.contains('1-5 of 7').should('exist');
+    });
+
+    it('Can sort the data', () => {
+        cy.addCase({
+            country: 'Germany',
+            notes: 'some notes',
+            sourceUrl: 'foo.bar',
+        });
+        cy.addCase({
+            country: 'France',
+            notes: 'some notes',
+            sourceUrl: 'foo.bar',
+        });
+        cy.addCase({
+            country: 'Argentina',
+            notes: 'some notes',
+            sourceUrl: 'foo.bar',
+        });
+        cy.server();
+        cy.route('GET', '/api/cases/*').as('getCases');
+        cy.visit('/cases');
+        cy.wait('@getCases');
+
+        cy.route(
+            'GET',
+            '/api/cases/?limit=50&page=1&count_limit=10000&sort_by=2&order=1',
+        ).as('getSortedByCountry');
+        cy.get('#sort-by-select').click();
+        cy.get('li').contains('Country').click();
+        cy.wait('@getSortedByCountry');
+
+        cy.get('tr').eq(2).contains('td', 'Germany');
     });
 });

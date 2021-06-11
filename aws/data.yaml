@@ -21,6 +21,7 @@ spec:
       containers:
         - name: data
           image: ghcr.io/globaldothealth/list/dataservice:main
+          imagePullPolicy: Always
           ports:
             - containerPort: 3000
           livenessProbe:
@@ -43,14 +44,8 @@ spec:
               valueFrom:
                 fieldRef:
                   fieldPath: metadata.labels['environment']
-            - name: MAPBOX_TOKEN
-              valueFrom:
-                secretKeyRef:
-                  # Note: There is no strong separation of secrets between
-                  # services, no big deal if that's named after a secret that
-                  # was originally read from the curator service.
-                  name: curator-dev-bch28c9gkm
-                  key: mapbox_token
+            - name: LOCATION_SERVICE_URL
+              value: "http://location-dev"
           resources:
             requests:
               memory: "3Gi"
@@ -80,7 +75,7 @@ spec:
     spec:
       containers:
         - name: data
-          image: ghcr.io/globaldothealth/list/dataservice:1.5.82
+          image: ghcr.io/globaldothealth/list/dataservice:1.6.2
           ports:
             - containerPort: 3000
           livenessProbe:
@@ -99,14 +94,8 @@ spec:
               valueFrom:
                 fieldRef:
                   fieldPath: metadata.labels['environment']
-            - name: MAPBOX_TOKEN
-              valueFrom:
-                secretKeyRef:
-                  # Note: There is no strong separation of secrets between
-                  # services, no big deal if that's named after a secret that
-                  # was originally read from the curator service.
-                  name: curator-prod-4mtk8mh9t2
-                  key: mapbox_token
+            - name: LOCATION_SERVICE_URL
+              value: "http://location-prod"
           resources:
             requests:
               memory: "3Gi"

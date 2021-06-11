@@ -21,6 +21,7 @@ spec:
       containers:
         - name: curator
           image: ghcr.io/globaldothealth/list/curatorservice:main
+          imagePullPolicy: Always
           ports:
             - containerPort: 3001
           livenessProbe:
@@ -34,12 +35,18 @@ spec:
             # Run with node debug mode set to http, net, and tls.
             - name: NODE_DEBUG
               value: "http,net,tls"
+            - name: EVENT_ROLE_ARN
+              value: "arn:aws:iam::612888738066:role/service-role/AWS_Events_Invoke_Batch_Job_Queue_1312384119"
+            - name: JOB_QUEUE_ARN
+              value: "arn:aws:batch:us-east-1:612888738066:job-queue/ingestion-queue"
             - name: SERVICE_ENV
               valueFrom:
                 fieldRef:
                   fieldPath: metadata.labels['environment']
             - name: DATASERVER_URL
               value: "http://data-dev"
+            - name: LOCATION_SERVICE_URL
+              value: "http://location-dev"
             - name: DB_CONNECTION_STRING
               valueFrom:
                 secretKeyRef:
@@ -119,7 +126,7 @@ spec:
     spec:
       containers:
         - name: curator
-          image: ghcr.io/globaldothealth/list/curatorservice:1.5.82
+          image: ghcr.io/globaldothealth/list/curatorservice:1.6.2
           ports:
             - containerPort: 3001
           livenessProbe:
@@ -129,12 +136,18 @@ spec:
             initialDelaySeconds: 10
             periodSeconds: 10
           env:
+            - name: EVENT_ROLE_ARN
+              value: "arn:aws:iam::612888738066:role/service-role/AWS_Events_Invoke_Batch_Job_Queue_1312384119"
+            - name: JOB_QUEUE_ARN
+              value: "arn:aws:batch:us-east-1:612888738066:job-queue/ingestion-queue"
             - name: SERVICE_ENV
               valueFrom:
                 fieldRef:
                   fieldPath: metadata.labels['environment']
             - name: DATASERVER_URL
               value: "http://data-prod"
+            - name: LOCATION_SERVICE_URL
+              value: "http://location-prod"
             - name: DB_CONNECTION_STRING
               valueFrom:
                 secretKeyRef:

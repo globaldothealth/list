@@ -14,7 +14,9 @@ describe('validate', () => {
         delete missingName.url;
 
         return new Origin(missingName).validate((e) => {
-            expect(e.name).toBe(Error.ValidationError.name);
+            expect(e).not.toBeNull();
+            if (e)
+                expect(e.name).toBe(Error.ValidationError.name);
         });
     });
 

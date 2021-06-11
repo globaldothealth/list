@@ -20,6 +20,11 @@
   "keywords": [],
   "author": "",
   "license": "MIT",
+  "config": {
+    "mongodbMemoryServer": {
+      "version": "latest"
+    }
+  },
   "devDependencies": {
     "@shelf/jest-mongodb": "^1.2.3",
     "@types/chai": "^4.2.12",
@@ -70,11 +75,13 @@
     "express": "^4.17.1",
     "express-openapi-validator": "^4.9.0",
     "express-session": "^1.17.1",
-    "lodash": "^4.17.20",
+    "jszip": "^3.6.0",
+    "lodash": "^4.17.21",
     "longjohn": "^0.2.12",
     "mimemessage": "^1.0.5",
+    "mongodb-memory-server": "^6.6.7",
     "mongoose": "^5.10.5",
-    "nodemailer": "^6.4.11",
+    "nodemailer": "^6.4.16",
     "passport": "^0.4.1",
     "passport-google-oauth20": "^2.0.0",
     "passport-http-bearer": "^1.0.1",

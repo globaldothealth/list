@@ -103,7 +103,7 @@ def test_e2e(valid_event, requests_mock, mock_source_api_url_fixture, tempdir="/
     requests_mock.get(
         full_source_url,
         json={"origin": {"url": origin_url, "license": "MIT"}, "format": "JSON",
-              "automation": {"parser": {"awsLambdaArn": "parser.example.example"}},
+              "automation": {"parser": {"awsLambdaArn": "example.example"}},
               "dateFilter": date_filter})
 
     # Mock the request to retrieve source content.
@@ -114,7 +114,7 @@ def test_e2e(valid_event, requests_mock, mock_source_api_url_fixture, tempdir="/
     common_lib.obtain_api_credentials.assert_called_once()
     retrieval.invoke_parser.assert_called_once_with(
         valid_event["env"],
-        "parser.example.example",
+        "parsing.example.example",
         source_id, upload_id, {}, None,
         response["key"],
         origin_url, date_filter, valid_event["parsingDateRange"])
@@ -166,15 +166,15 @@ def test_get_source_details_returns_parser_arn_if_present(
     from retrieval import retrieval  # Import locally to avoid superseding mock
     source_id = "id"
     content_url = "http://bar.baz"
-    lambda_arn = "lambdaArn"
+    job_def_arn = "testArn"
     requests_mock.get(
         f"{_SOURCE_API_URL}/sources/{source_id}",
         json={"origin": {"url": content_url, "license": "MIT"},
               "format": "JSON",
-              "automation": {"parser": {"awsLambdaArn": lambda_arn}}})
+              "automation": {"parser": {"awsLambdaArn": job_def_arn}}})
     result = retrieval.get_source_details(
         "env", source_id, "upload_id", {}, {})
-    assert result[2] == lambda_arn
+    assert result[2] == job_def_arn
 
 
 def test_get_source_details_raises_error_if_source_not_found(
@@ -237,6 +237,20 @@ def test_retrieve_content_persists_downloaded_json_locally(requests_mock):
         "env", source_id, "upload_id", content_url, format, {}, {}, tempdir="/tmp")
     assert requests_mock.request_history[0].url == content_url
     assert "GHDSI" in requests_mock.request_history[0].headers["user-agent"]
+    with open(files_s3_keys[0][0], "r") as f:
+        assert json.load(f)["data"] == "yes"
+
+
+@pytest.mark.skipif(not os.environ.get("DOCKERIZED", False),
+                    reason="Running integration tests outside of mock environment disabled")
+def test_retrieve_content_from_s3():
+    from retrieval import retrieval  # Import locally to avoid superseding mock
+    source_id = "id"
+    content_url = "s3://epid-sources-raw/bar"
+    format = "JSON"
+    s3_client.put_object(Bucket='epid-sources-raw', Key='bar', Body=b'{"data": "yes"}')
+    files_s3_keys = retrieval.retrieve_content(
+        "env", source_id, "upload_id", content_url, format, {}, {}, tempdir="/tmp")
     with open(files_s3_keys[0][0], "r") as f:
         assert json.load(f)["data"] == "yes"
 

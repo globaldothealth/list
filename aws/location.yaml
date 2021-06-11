@@ -21,6 +21,7 @@ spec:
       containers:
         - name: location
           image: ghcr.io/globaldothealth/list/locationservice:main
+          imagePullPolicy: Always
           ports:
             - containerPort: 8080
           livenessProbe:
@@ -30,6 +31,8 @@ spec:
             initialDelaySeconds: 10
             periodSeconds: 10
           env:
+            - name: DB
+              value: covid19
             - name: DB_CONNECTION_STRING
               valueFrom:
                 secretKeyRef:
@@ -80,7 +83,7 @@ spec:
     spec:
       containers:
         - name: data
-          image: ghcr.io/globaldothealth/list/locationservice:1.4.4
+          image: ghcr.io/globaldothealth/list/locationservice:1.6.2
           ports:
             - containerPort: 8080
           livenessProbe:
@@ -90,6 +93,8 @@ spec:
             initialDelaySeconds: 10
             periodSeconds: 10
           env:
+            - name: DB
+              value: covid19
             - name: DB_CONNECTION_STRING
               valueFrom:
                 secretKeyRef:
