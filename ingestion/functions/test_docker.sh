@@ -9,4 +9,4 @@ function cleanup() {
 
 trap cleanup EXIT
 
-docker-compose -f docker-compose.yml up --build --exit-code-from test
+docker-compose -f docker-compose-test.yml up --build --exit-code-from test

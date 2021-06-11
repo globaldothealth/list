@@ -3,7 +3,7 @@
 set -eou pipefail
 
 if [ "$DOCKERIZED" == "True" ] ; then
-  ./setup_s3.sh
+  ./setup_s3_test.sh
 fi
 
 python3 -m pytest .
