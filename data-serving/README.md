@@ -5,7 +5,7 @@
 G.h case data, as well as the source, user, and session data for the curator portal, is stored in a MongoDB database.
 
 We have multiple instances of MongoDB, ranging from local instances for development, to dev (for
-http://dev-curator.ghdsi.org/), to prod (for http://curator.ghdsi.org/).
+https://dev-data.covid-19.global.health/), to prod (for https://data.covid-19.global.health/).
 
 Each instance has a `covid19` database, which in turn has collections for each type of data, e.g. `cases`, `users`, etc.
 
