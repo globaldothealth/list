@@ -1999,7 +1999,7 @@ components:
 servers:
     - url: http://localhost:3001/api
       description: Local server
-    - url: http://dev-curator.ghdsi.org/api
+    - url: http://dev-data.covid-19.global.health/api
       description: Development server
-    - url: http://curator.ghdsi.org/api
+    - url: http://data.covid-19.global.health/api
       description: Production server

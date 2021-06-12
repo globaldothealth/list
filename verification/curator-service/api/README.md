@@ -10,7 +10,7 @@ Cases are unique occurences of a person having tested positive to a particular i
 
 Human curators go over official reports/news articles and enter detailed information about those cases to help researchers consume that data to build epidemiologic models for example.
 
-Given proper permissions, one can see the cases in the UI at https://curator.ghdsi.org/cases.
+Given proper permissions, one can see the cases in the UI at https://data.covid-19.global.health/cases.
 
 ## Sources
 
@@ -18,21 +18,21 @@ A source is an authoritative URL provided by an organization (government, NGO or
 
 Curators can go over those sources to enter the data manually as described earlier or automated scrapers and parsers can go over the more structured sources and try to automatically create the relevant cases data.
 
-Given proper permissions, one can see the sources in the UI at https://curator.ghdsi.org/sources.
+Given proper permissions, one can see the sources in the UI at https://data.covid-19.global.health/sources.
 
 ## Users
 
 Users are either service-accounts API users (authenticated with bearer tokens) or human users (authenticated with Google OAuth 2.0). Authentication, roles and users in general is described in more details in the `../auth.md` document.
 
-You can see your profile in the UI at https://curator.ghdsi.org/profile.
+You can see your profile in the UI at https://data.covid-19.global.health/profile.
 
-Given proper permissions, one can see the users in the UI at https://curator.ghdsi.org/users.
+Given proper permissions, one can see the users in the UI at https://data.covid-19.global.health/users.
 
 ## Open API
 
 The developer-focused Open API definitions can be found in `openapi/openapi.yaml` and a Swagger UI is exposed at the `/api-docs` HTTP endpoint.
 
-For example: https://curator.ghdsi.org/api-docs/
+For example: https://data.covid-19.global.health/api-docs/
 
 ## Development
 

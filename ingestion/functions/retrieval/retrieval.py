@@ -136,7 +136,7 @@ def retrieve_content(
             # get it!
             content = s3_client.get_object(Bucket=s3Bucket, Key=s3Key)['Body'].read()
         else:
-            headers = {"user-agent": "GHDSI/1.0 (http://ghdsi.org)"}
+            headers = {"user-agent": "GHDSI/1.0 (https://global.health)"}
             r = requests.get(url, headers=headers)
             r.raise_for_status()
             content = r.content
