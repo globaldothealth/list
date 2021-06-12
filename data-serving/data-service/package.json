@@ -61,10 +61,8 @@
     "typescript": "^3.9.7"
   },
   "dependencies": {
-    "@mapbox/mapbox-sdk": "^0.11.0",
     "@types/js-yaml": "^3.12.5",
     "@types/lru-cache": "^5.1.0",
-    "@types/mapbox__mapbox-sdk": "^0.6.2",
     "@types/multer": "^1.4.4",
     "@types/swagger-ui-express": "^4.1.2",
     "@types/yamljs": "^0.2.31",
