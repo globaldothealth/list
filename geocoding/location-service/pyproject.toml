@@ -2,7 +2,7 @@
 name = "location-service"
 version = "1.0.0"
 description = "Geocoding for global.health"
-authors = ["Global.health: a Data Science Initiative <ghdsi.info@gmail.com>"]
+authors = ["Global.health: a Data Science Initiative <info@global.health>"]
 license = "MIT"
 
 [tool.poetry.dependencies]
