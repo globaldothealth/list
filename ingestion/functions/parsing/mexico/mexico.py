@@ -27,7 +27,6 @@ _STATES = maps["states"]
 
 _MUNICIPALITIES = maps["municipalities"]
 
-
 def convert_location(state_code: str, municipality_code: str):
     """
     Convert state and municipality codes into location query.
@@ -130,6 +129,7 @@ def convert_notes(
     migrant: str,
     immunosuppressed: str,
     smoker: str,
+    identifies_indigenous: str,
     other: str,
 ):
     raw_notes = []
@@ -145,6 +145,8 @@ def convert_notes(
         raw_notes.append("Patient with immunosupression")
     if smoker == "1":
         raw_notes.append("Smoker")
+    if identifies_indigenous == "1":
+        raw_notes.append("Self-identifies as indigenous")
     if other == "1":
         raw_notes.append("Unspecified pre-existing condition")
     notes = (", ").join(raw_notes)
@@ -160,6 +162,16 @@ def parse_cases(raw_data_file: str, source_id: str, source_url: str):
     with open(raw_data_file, "r") as f:
         reader = csv.DictReader(f)
         for row in reader:
+            classification = parsing_lib.safe_int(row.get('CLASIFICACION_FINAL', None))
+            # 1	CASO DE COVID-19 CONFIRMADO POR ASOCIACIÓN CLÍNICA EPIDEMIOLÓGICA
+            # 2	CASO DE COVID-19 CONFIRMADO POR COMITÉ DE  DICTAMINACIÓN
+            # 3	CASO DE SARS-COV-2  CONFIRMADO
+            # 4	INVÁLIDO POR LABORATORIO
+            # 5	NO REALIZADO POR LABORATORIO
+            # 6	CASO SOSPECHOSO
+            # 7	NEGATIVO A SARS-COV-2
+            if classification not in [1, 2, 3]:
+                continue
             try:
                 case = {
                     "caseReference": {
@@ -199,6 +211,7 @@ def parse_cases(raw_data_file: str, source_id: str, source_url: str):
                     row["MIGRANTE"],
                     row["INMUSUPR"],
                     row["TABAQUISMO"],
+                    row["INDIGENA"],
                     row["OTRA_COM"],
                 )
                 if notes:
@@ -211,6 +224,7 @@ def parse_cases(raw_data_file: str, source_id: str, source_url: str):
 
 def event_handler(event):
     return parsing_lib.run(event, parse_cases)
+
 
 if __name__ == "__main__":
     with open('input_event.json') as f:
