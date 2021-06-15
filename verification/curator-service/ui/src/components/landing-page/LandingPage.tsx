@@ -1,7 +1,6 @@
 import React, { useEffect } from 'react';
 import { Paper, Typography } from '@material-ui/core';
 import { Theme, makeStyles } from '@material-ui/core/styles';
-import GoogleButton from 'react-google-button';
 import { useLastLocation } from 'react-router-last-location';
 import useMediaQuery from '@material-ui/core/useMediaQuery';
 
@@ -48,10 +47,7 @@ const useStyles = makeStyles((theme: Theme) => ({
         display: 'block',
         margin: '4px 0',
     },
-    googleButton: {
-        margin: '35px 0 0 0',
-        fontWeight: 400,
-    },
+
     registerLengend: {
         color: theme.custom.palette.landingPage.descriptionTextColor,
     },
@@ -185,7 +181,6 @@ export default function LandingPage({
                 </div>
             </div>
 
-            <GoogleButton className={classes.googleButton} />
 
             <SignInForm />
 
