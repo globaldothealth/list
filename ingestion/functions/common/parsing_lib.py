@@ -41,6 +41,14 @@ if os.environ.get("DOCKERIZED"):
         region_name=os.environ.get("AWS_REGION", "us-east-1")
     )
 
+
+def safe_int(x):
+    try:
+        return int(x)
+    except (ValueError, TypeError):
+        return None
+
+
 def extract_event_fields(event: Dict):
     print('Extracting fields from event', event)
     if any(
