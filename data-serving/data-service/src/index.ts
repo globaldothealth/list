@@ -133,6 +133,12 @@ apiRouter.post(
     createBatchUpdateCaseRevisions,
     caseController.batchUpdate,
 );
+apiRouter.post('/cases/markPendingRemoval', caseController.markPendingRemoval);
+apiRouter.post('/cases/removePendingCases', caseController.removePendingCases);
+apiRouter.post(
+    '/cases/clearPendingRemovalStatus',
+    caseController.clearPendingRemovalStatus,
+);
 apiRouter.put(
     '/cases/:id([a-z0-9]{24})',
     setRevisionMetadata,
