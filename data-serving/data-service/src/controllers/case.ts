@@ -780,6 +780,57 @@ export class CasesController {
         res.status(200).json({ cases: caseIds }).end();
     };
 
+    /** Indicate that each case for the given source is pending deletion. */
+    markPendingRemoval = async (req: Request, res: Response): Promise<void> => {
+        try {
+            const cases = await Case.find({
+                'caseReference.sourceId': req.query.sourceId?.toString(),
+            });
+            cases.forEach((c) => {
+                c.pendingRemoval = true;
+                c.save();
+            });
+            res.status(201).end();
+        } catch (err) {
+            res.status(500).json(err).end();
+        }
+    };
+
+    /** Unset the pending deletion flag for cases from this source. */
+    clearPendingRemovalStatus = async (
+        req: Request,
+        res: Response,
+    ): Promise<void> => {
+        try {
+            const cases = await Case.find({
+                'caseReference.sourceId': req.query.sourceId?.toString(),
+            });
+            cases.forEach((c) => {
+                c.pendingRemoval = false;
+                c.save();
+            });
+            res.status(201).end();
+        } catch (err) {
+            res.status(500).json(err).end();
+        }
+    };
+
+    /** remove any case for this source which has the pending deletion mark */
+    removePendingCases = async (req: Request, res: Response): Promise<void> => {
+        try {
+            await Case.deleteMany({
+                'caseReference.sourceId': {
+                    $eq: req.query.sourceId?.toString(),
+                },
+                pendingRemoval: true,
+            });
+            res.status(201).end();
+        } catch (err) {
+            console.error(err);
+            res.status(500).json(err).end();
+        }
+    };
+
     private excludeRestrictedSourcesFromCaseAggregation(casesQuery: any[]) {
         return _.concat(casesQuery, [
             {
