@@ -18,6 +18,11 @@ import FormGroup from '@material-ui/core/FormGroup';
 import Checkbox from '@material-ui/core/Checkbox';
 import Typography from '@material-ui/core/Typography';
 import GoogleButton from 'react-google-button';
+import {    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogContentText,
+    DialogTitle} from '@material-ui/core';
 
 const useStyles = makeStyles((theme: Theme) => ({
     checkboxRoot: {
@@ -41,6 +46,15 @@ const useStyles = makeStyles((theme: Theme) => ({
         fontWeight: 'bold',
         color: theme.palette.primary.main,
         cursor: 'pointer',
+    },
+    forgotPassword: {
+        fontWeight: 'normal',
+        color: theme.palette.primary.main,
+        cursor: 'pointer',
+        fontSize: 'small',
+        marginTop: '-8px',
+        display: 'flex',
+        justifyContent: 'flex-end',
     },
     labelRequired: {
         color: theme.palette.error.main,
@@ -72,6 +86,7 @@ export default function SignInForm() {
 
     const [passwordVisible, setPasswordVisible] = useState(false);
     const [registrationScreenOn, setRgistrationScrenOn] = useState(false);
+    const [forgotPasswordScreenOn, setForgotPasswordScreenOn] = useState(false);
 
     const validationSchema = Yup.object().shape({
         email: Yup.string()
@@ -186,6 +201,17 @@ export default function SignInForm() {
                                     {formik.touched.password &&
                                         formik.errors.password}
                                 </FormHelperText>
+                                <Typography className={classes.title}>
+                                    <span
+                                        className={classes.forgotPassword}
+                                        onClick={() =>
+                                            setForgotPasswordScreenOn(true)
+                                        }
+                                    >
+                                        {' '}
+                                        Forgot your password?
+                                    </span>
+                                </Typography>
                             </FormControl>
                         </div>
 
@@ -259,6 +285,15 @@ export default function SignInForm() {
                         />
                     </FormGroup>
 
+                    <Button
+                        type="submit"
+                        variant="contained"
+                        color="primary"
+                        className={classes.signInButton}
+                    >
+                        Sign in
+                    </Button>
+
                     <Typography className={classes.title}>
                         Don't have an account?{' '}
                         <span
@@ -269,17 +304,9 @@ export default function SignInForm() {
                             Sign up!
                         </span>
                     </Typography>
-
-                    <Button
-                        type="submit"
-                        variant="contained"
-                        color="primary"
-                        className={classes.signInButton}
-                    >
-                        Sign in
-                    </Button>
                 </form>
             )}
+
             {registrationScreenOn && (
                 <form onSubmit={formik.handleSubmit}>
                     <div className={classes.formFlexContainer}>
@@ -475,6 +502,15 @@ export default function SignInForm() {
                         />
                     </FormGroup>
 
+                    <Button
+                        type="submit"
+                        variant="contained"
+                        color="primary"
+                        className={classes.signInButton}
+                    >
+                        Sign up
+                    </Button>
+
                     <Typography className={classes.title}>
                         Do you have already an account?{' '}
                         <span
@@ -485,16 +521,109 @@ export default function SignInForm() {
                             Sign in!
                         </span>
                     </Typography>
+                </form>
+            )}
+
+            {/* {forgotPasswordScreenOn &&  
+            <form onSubmit={formik.handleSubmit}>
+                    <div className={classes.formFlexContainer}>
+                        <div className="normalSigninFields">
+                            <Typography className={classes.title}>
+                                Forgot your Password?
+                            </Typography>
+                            <Typography className={classes.title}>
+                                Don't worry! Just fill in your email address and we'll send you a link to reset your password.
+                            </Typography>
+                            <TextField
+                                fullWidth
+                                className={classes.inpputField}
+                                variant="outlined"
+                                id="email"
+                                name="email"
+                                label="Email"
+                                value={formik.values.email}
+                                onChange={formik.handleChange}
+                                error={
+                                    formik.touched.email &&
+                                    Boolean(formik.errors.email)
+                                }
+                                helperText={
+                                    formik.touched.email && formik.errors.email
+                                }
+                            />
+                        </div>
+                    </div>
+
                     <Button
                         type="submit"
                         variant="contained"
                         color="primary"
                         className={classes.signInButton}
                     >
-                        Sign up
+                        Reset password
+                    </Button>
+
+                    <Typography className={classes.title}>
+                        Do you remember the password?{' '}
+                        <span
+                            className={classes.link}
+                            onClick={() => setForgotPasswordScreenOn(false)}
+                        >
+                            {' '}
+                            Sign in!
+                        </span>
+                    </Typography>
+                </form>} */}
+
+
+                <Dialog
+                open={forgotPasswordScreenOn}
+                onClose={(): void => setForgotPasswordScreenOn(false)}
+                // Stops the click being propagated to the table which
+                // would trigger the onRowClick action.
+                onClick={(e): void => e.stopPropagation()}
+            >
+                <DialogTitle>
+                Forgot your Password?
+                </DialogTitle>
+                <DialogContent>
+                    <DialogContentText>
+                    Don't worry! Just fill in your email address and we'll send you a link to reset your password.
+                    </DialogContentText>
+                    <form onSubmit={formik.handleSubmit}>
+                    <div className={classes.formFlexContainer}>
+                        <div className="normalSigninFields">
+                            <TextField
+                                fullWidth
+                                className={classes.inpputField}
+                                variant="outlined"
+                                id="email"
+                                name="email"
+                                label="Email"
+                                value={formik.values.email}
+                                onChange={formik.handleChange}
+                                error={
+                                    formik.touched.email &&
+                                    Boolean(formik.errors.email)
+                                }
+                                helperText={
+                                    formik.touched.email && formik.errors.email
+                                }
+                            />
+                        </div>
+                    </div>
+
+                    <Button
+                        type="submit"
+                        variant="contained"
+                        color="primary"
+                        className={classes.signInButton}
+                    >
+                        Send reset link
                     </Button>
                 </form>
-            )}
+                </DialogContent>
+            </Dialog>
         </>
     );
 }
