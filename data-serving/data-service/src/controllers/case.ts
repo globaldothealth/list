@@ -857,10 +857,7 @@ export class CasesController {
     /** Indicate that each case for the given source is pending deletion. */
     markPendingRemoval = async (req: Request, res: Response): Promise<void> => {
         try {
-            const cases = await Case.find({
-                'caseReference.sourceId': req.query.sourceId?.toString(),
-            });
-            cases.forEach((c) => {
+            req.body.cases.forEach((c: CaseDocument) => {
                 c.pendingRemoval = true;
                 c.save();
             });
@@ -876,10 +873,7 @@ export class CasesController {
         res: Response,
     ): Promise<void> => {
         try {
-            const cases = await Case.find({
-                'caseReference.sourceId': req.query.sourceId?.toString(),
-            });
-            cases.forEach((c) => {
+            req.body.cases.forEach((c: CaseDocument) => {
                 c.pendingRemoval = false;
                 c.save();
             });

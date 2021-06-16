@@ -206,6 +206,24 @@ export const findCasesToUpdate = async (
     next();
 };
 
+export const findCasesForSource = async (
+    request: Request,
+    response: Response,
+    next: NextFunction,
+): Promise<void> => {
+    // find the appropriate cases
+    const cases = await Case.find({
+        'caseReference.sourceId': request.query.sourceId?.toString(),
+    });
+    request.body.cases = cases;
+    // and store the curator email
+    request.body.curator = {
+        email: request.query.email,
+    };
+
+    next();
+};
+
 export const setBatchUpdateRevisionMetadata = async (
     request: Request,
     response: Response,
