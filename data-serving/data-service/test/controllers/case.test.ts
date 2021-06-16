@@ -1664,7 +1664,9 @@ describe('pending removal markers', async () => {
         await c2.save();
 
         await request(app)
-            .post(`/api/cases/markPendingRemoval?sourceId=${sourceId1}`)
+            .post(
+                `/api/cases/markPendingRemoval?sourceId=${sourceId1}&email=curator%40example.com`,
+            )
             .expect(201);
 
         const pendingCases = await Case.find({
@@ -1692,7 +1694,9 @@ describe('pending removal markers', async () => {
         await c2.save();
 
         await request(app)
-            .post(`/api/cases/clearPendingRemovalStatus?sourceId=${sourceId1}`)
+            .post(
+                `/api/cases/clearPendingRemovalStatus?sourceId=${sourceId1}&email=curator%40example.com`,
+            )
             .expect(201);
 
         const pendingCases = await Case.find({
