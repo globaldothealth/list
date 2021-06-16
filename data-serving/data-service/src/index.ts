@@ -11,6 +11,7 @@ import {
     createCaseRevision,
     findCasesForSource,
     findCasesToUpdate,
+    findPendingCaseIdsForRemovalFromSource,
     setBatchUpdateRevisionMetadata,
     setBatchUpsertFields,
     setRevisionMetadata,
@@ -141,7 +142,14 @@ apiRouter.post(
     createBatchUpdateCaseRevisions,
     caseController.markPendingRemoval,
 );
-apiRouter.post('/cases/removePendingCases', caseController.removePendingCases);
+
+apiRouter.post(
+    '/cases/removePendingCases',
+    findPendingCaseIdsForRemovalFromSource,
+    createBatchDeleteCaseRevisions,
+    caseController.batchDel,
+);
+
 apiRouter.post(
     '/cases/clearPendingRemovalStatus',
     findCasesForSource,
