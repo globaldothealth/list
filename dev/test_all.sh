@@ -36,7 +36,7 @@ npm --prefix=`dirname "$0"`/../verification/curator-service/ui/ run-script test-
 RUNNING=$(curl localhost:3002 --silent | grep "DOCTYPE" || true)
 if [ -z "$RUNNING" ]; then
   echo "Starting stack..."
-  nohup ./run_stack.sh | tee &
+  nohup ./run_full_stack.sh | tee &
 fi
 
 until $(curl localhost:3002 --silent --fail | grep "DOCTYPE" > /dev/null); do
@@ -45,5 +45,6 @@ until $(curl localhost:3002 --silent --fail | grep "DOCTYPE" > /dev/null); do
 done
 
 echo "Stack running"
+
 echo "Running UI browser tests"
 npm --prefix=`dirname "$0"`/../verification/curator-service/ui/ run-script cypress-run
