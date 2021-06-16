@@ -1,6 +1,7 @@
 import axios from 'axios';
 import { Request, Response } from 'express';
 import { Source, SourceDocument } from '../model/source';
+import { UserDocument } from '../model/user';
 
 import AwsBatchClient from '../clients/aws-batch-client';
 import AwsEventsClient from '../clients/aws-events-client';
@@ -287,7 +288,8 @@ export default class SourcesController {
             return;
         }
         try {
-            const response = await axios.post(`${this.dataServerURL}/api/cases/markPendingRemoval?sourceId=${req.params.id}`);
+            const user = req.user as UserDocument;
+            const response = await axios.post(`${this.dataServerURL}/api/cases/markPendingRemoval?sourceId=${req.params.id}&email=${user.email}`);
             if (response.status == 201) {
                 res.sendStatus(201).end();
             } else {
@@ -334,7 +336,8 @@ export default class SourcesController {
             return;
         }
         try {
-            const response = await axios.post(`${this.dataServerURL}/api/cases/clearPendingRemovalStatus?sourceId=${req.params.id}`);
+            const user = req.user as UserDocument;
+            const response = await axios.post(`${this.dataServerURL}/api/cases/clearPendingRemovalStatus?sourceId=${req.params.id}&email=${user.email}`);
             if (response.status == 201) {
                 res.sendStatus(201).end();
             } else {
