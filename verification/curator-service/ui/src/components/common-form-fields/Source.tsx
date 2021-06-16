@@ -12,7 +12,7 @@ import Scroll from 'react-scroll';
 import { TextField } from 'formik-material-ui';
 import { StyledTooltip } from '../new-case-form-fields/StyledTooltip';
 import axios from 'axios';
-import { filter as filterCollection, throttle } from 'lodash';
+import { throttle } from 'lodash';
 
 interface SourceProps {
     initialValue?: CaseReference;
