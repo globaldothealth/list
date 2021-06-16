@@ -350,6 +350,72 @@ paths:
                     $ref: '#/components/responses/422'
                 '500':
                     $ref: '#/components/responses/500'
+    /cases/markPendingRemoval:
+        post:
+            summary: Mark cases from the identified source as awaiting deletion.
+            operationId: markPendingRemoval
+            tags: [Ingestion]
+            parameters:
+                - in: query
+                  name: sourceId
+                  description: The source identifier for affected cases
+                  required: true
+                  schema:
+                        type: string
+                        pattern: '^[a-f\d]{24}$'
+                - in: query
+                  name: email
+                  description: The curator email address
+                  required: true
+                  schema:
+                        type: string
+            responses:
+                '204':
+                    $ref: '#/components/responses/204'
+                '500':
+                    $ref: '#/components/responses/500'
+    /cases/removePendingCases:
+        post:
+            summary: Remove any cases for the identified source marked as awaiting deletion.
+            operationId: removePendingCases
+            tags: [Ingestion]
+            parameters:
+                - name: sourceId
+                  in: query
+                  description: The source identifier for affected cases
+                  required: true
+                  schema:
+                        type: string
+                        pattern: '^[a-f\d]{24}$'
+            responses:
+                '204':
+                    $ref: '#/components/responses/204'
+                '500':
+                    $ref: '#/components/responses/500'
+    /cases/clearPendingRemovalStatus:
+        post:
+            summary: Clear the 'awaiting deletion' mark from any cases from the identified source.
+            operationId: clearPendingRemovalStatus
+            tags: [Ingestion]
+            parameters:
+                - in: query
+                  name: sourceId
+                  description: The source identifier for affected cases
+                  required: true
+                  schema:
+                        type: string
+                        pattern: '^[a-f\d]{24}$'
+                - in: query
+                  name: email
+                  description: The curator email address
+                  required: true
+                  schema:
+                        type: string
+            responses:
+                '204':
+                    $ref: '#/components/responses/204'
+                '500':
+                    $ref: '#/components/responses/500'
     /cases/symptoms:
         get:
             summary: Lists most frequently used symptoms
@@ -1084,6 +1150,10 @@ components:
                         $ref: '#/components/schemas/BatchUpsertCaseResponse'
         '200':
             description: OK
+        '201':
+            description: Created
+        '204':
+            description: No content
         '400':
             description: Malformed request
         '403':

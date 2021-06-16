@@ -1686,3 +1686,114 @@ describe('DELETE', () => {
         expect(await CaseRevision.collection.countDocuments()).toEqual(0);
     });
 });
+
+describe('pending removal markers', async () => {
+    it('marks cases from a given source ID for deletion', async () => {
+        const c1 = new Case(minimalCase);
+        const sourceId1 = '5ea86423bae6982635d2e1f8';
+        const entryId1 = 'def456';
+        c1.set('caseReference.sourceId', sourceId1);
+        c1.set('caseReference.sourceEntryId', entryId1);
+        await c1.save();
+
+        const c2 = new Case(minimalCase);
+        const sourceId2 = '5ea86423bae6982635d2e1f9';
+        const entryId2 = 'abc123';
+        c2.set('caseReference.sourceId', sourceId2);
+        c2.set('caseReference.sourceEntryId', entryId2);
+        await c2.save();
+
+        await request(app)
+            .post(
+                `/api/cases/markPendingRemoval?sourceId=${sourceId1}&email=curator%40example.com`,
+            )
+            .expect(204);
+
+        const pendingCases = await Case.find({
+            pendingRemoval: true,
+        });
+        expect(pendingCases.length).toEqual(1);
+        expect(pendingCases[0].caseReference.sourceEntryId).toEqual(entryId1);
+    });
+
+    it('removes deletion-pending markers from cases with a given source ID', async () => {
+        const c1 = new Case(minimalCase);
+        const sourceId1 = '5ea86423bae6982635d2e1f8';
+        const entryId1 = 'def456';
+        c1.set('caseReference.sourceId', sourceId1);
+        c1.set('caseReference.sourceEntryId', entryId1);
+        c1.pendingRemoval = true;
+        await c1.save();
+
+        const c2 = new Case(minimalCase);
+        const sourceId2 = '5ea86423bae6982635d2e1f9';
+        const entryId2 = 'abc123';
+        c2.set('caseReference.sourceId', sourceId2);
+        c2.set('caseReference.sourceEntryId', entryId2);
+        c2.pendingRemoval = true;
+        await c2.save();
+
+        await request(app)
+            .post(
+                `/api/cases/clearPendingRemovalStatus?sourceId=${sourceId1}&email=curator%40example.com`,
+            )
+            .expect(204);
+
+        const pendingCases = await Case.find({
+            pendingRemoval: true,
+        });
+        expect(pendingCases.length).toEqual(1);
+        expect(pendingCases[0].caseReference.sourceEntryId).toEqual(entryId2);
+    });
+
+    it('deletes pending cases with a given source ID', async () => {
+        const c1 = new Case(minimalCase);
+        const sourceId1 = '5ea86423bae6982635d2e1f8';
+        const entryId1 = 'def456';
+        c1.set('caseReference.sourceId', sourceId1);
+        c1.set('caseReference.sourceEntryId', entryId1);
+        c1.pendingRemoval = true;
+        await c1.save();
+
+        const c2 = new Case(minimalCase);
+        const sourceId2 = '5ea86423bae6982635d2e1f9';
+        const entryId2 = 'abc123';
+        c2.set('caseReference.sourceId', sourceId2);
+        c2.set('caseReference.sourceEntryId', entryId2);
+        c2.pendingRemoval = true;
+        await c2.save();
+
+        await request(app)
+            .post(`/api/cases/removePendingCases?sourceId=${sourceId1}`)
+            .expect(204);
+
+        const allCases = await Case.find({});
+        expect(allCases.length).toEqual(1);
+        expect(allCases[0].caseReference.sourceEntryId).toEqual(entryId2);
+    });
+
+    it('deletes only the pending cases from the source', async () => {
+        const c1 = new Case(minimalCase);
+        const sourceId1 = '5ea86423bae6982635d2e1f8';
+        const entryId1 = 'def456';
+        c1.set('caseReference.sourceId', sourceId1);
+        c1.set('caseReference.sourceEntryId', entryId1);
+        c1.pendingRemoval = true;
+        await c1.save();
+
+        const c2 = new Case(minimalCase);
+        const entryId2 = 'abc123';
+        c2.set('caseReference.sourceId', sourceId1);
+        c2.set('caseReference.sourceEntryId', entryId2);
+        c2.pendingRemoval = false;
+        await c2.save();
+
+        await request(app)
+            .post(`/api/cases/removePendingCases?sourceId=${sourceId1}`)
+            .expect(204);
+
+        const allCases = await Case.find({});
+        expect(allCases.length).toEqual(1);
+        expect(allCases[0].caseReference.sourceEntryId).toEqual(entryId2);
+    });
+});
