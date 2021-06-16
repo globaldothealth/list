@@ -13,6 +13,7 @@ export default function validateEnv(): Readonly<{
     EVENT_ROLE_ARN: string;
     GOOGLE_OAUTH_CLIENT_ID: string;
     GOOGLE_OAUTH_CLIENT_SECRET: string;
+    LOCALSTACK_URL: string;
     LOCATION_SERVICE_URL: string;
     JOB_QUEUE_ARN: string;
     PORT: number;
@@ -79,6 +80,10 @@ export default function validateEnv(): Readonly<{
             desc: 'OAuth client secret from the Google developer console',
             devDefault: 'replace to enable auth',
         }),
+        LOCALSTACK_URL: str({
+            desc: 'Mock AWS address',
+            devDefault: 'http://localstack:4566'
+        }),
         LOCATION_SERVICE_URL: str({
             desc: 'Base location for the geocoding service',
             devDefault: 'http://location',
@@ -89,7 +94,7 @@ export default function validateEnv(): Readonly<{
         }),
         PORT: port({ default: 3001 }),
         SERVICE_ENV: str({
-            choices: ['local', 'dev', 'prod'],
+            choices: ['local', 'locale2e', 'dev', 'prod'],
             desc: 'Environment in which the service is running',
             devDefault: 'local',
         }),
