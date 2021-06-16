@@ -861,7 +861,7 @@ export class CasesController {
                 c.pendingRemoval = true;
                 c.save();
             });
-            res.status(201).end();
+            res.status(204).end();
         } catch (err) {
             res.status(500).json(err).end();
         }
@@ -877,24 +877,8 @@ export class CasesController {
                 c.pendingRemoval = false;
                 c.save();
             });
-            res.status(201).end();
+            res.status(204).end();
         } catch (err) {
-            res.status(500).json(err).end();
-        }
-    };
-
-    /** remove any case for this source which has the pending deletion mark */
-    removePendingCases = async (req: Request, res: Response): Promise<void> => {
-        try {
-            await Case.deleteMany({
-                'caseReference.sourceId': {
-                    $eq: req.query.sourceId?.toString(),
-                },
-                pendingRemoval: true,
-            });
-            res.status(201).end();
-        } catch (err) {
-            console.error(err);
             res.status(500).json(err).end();
         }
     };
