@@ -18,6 +18,7 @@ interface SourceProps {
     initialValue?: CaseReference;
     hasSourceEntryId?: boolean;
     freeSolo?: boolean;
+    sourcesWithStableIdentifiers?: boolean,
 }
 
 const TooltipText = () => (
@@ -54,6 +55,7 @@ export default class Source extends React.Component<SourceProps, {}> {
                 <SourcesAutocomplete
                     initialValue={this.props.initialValue}
                     freeSolo={freeSolo}
+                    sourcesWithStableIdentifiers={this.props.sourcesWithStableIdentifiers}
                 />
                 {this.props.hasSourceEntryId && (
                     <FastField
@@ -78,6 +80,7 @@ interface SourceData {
     _id: string;
     name: string;
     origin: OriginData;
+    hasStableIdentifiers?: boolean;
 }
 
 interface ListSourcesResponse {
@@ -87,6 +90,7 @@ interface ListSourcesResponse {
 interface SourceAutocompleteProps {
     initialValue?: CaseReferenceForm;
     freeSolo: boolean;
+    sourcesWithStableIdentifiers?: boolean;
 }
 
 export interface CaseReferenceForm extends CaseReference {
@@ -150,11 +154,21 @@ export function SourcesAutocomplete(
                             params: request,
                         },
                     );
-                    callback(resp.data.sources);
+                    // this filtering could also be done server-side but there isn't a big number of sources
+                    if (props.sourcesWithStableIdentifiers)
+                    {
+                        callback(resp.data.sources.filter(s => {
+                            return s.hasStableIdentifiers === undefined || s.hasStableIdentifiers === true;
+                        }));
+                    }
+                    else
+                    {
+                        callback(resp.data.sources);
+                    }
                 },
                 250,
             ),
-        [],
+        [props.sourcesWithStableIdentifiers],
     );
 
     const sourceURLValidation = (str: string) => {

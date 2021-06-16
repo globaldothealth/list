@@ -8,6 +8,7 @@ import {
 import { CaseRevision } from '../model/case-revision';
 import { DocumentQuery } from 'mongoose';
 import _ from 'lodash';
+import { nextTick } from 'process';
 
 // TODO: Type this as RevisionMetadataDocument.
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -203,6 +204,39 @@ export const findCasesToUpdate = async (
     delete request.body.query;
     delete request.body.case;
 
+    next();
+};
+
+export const findCasesForSource = async (
+    request: Request,
+    response: Response,
+    next: NextFunction,
+): Promise<void> => {
+    // find the appropriate cases
+    const cases = await Case.find({
+        'caseReference.sourceId': request.query.sourceId?.toString(),
+    });
+    request.body.cases = cases;
+    // and store the curator email
+    request.body.curator = {
+        email: request.query.email,
+    };
+
+    next();
+};
+
+export const findPendingCaseIdsForRemovalFromSource = async (
+    request: Request,
+    response: Response,
+    next: NextFunction,
+): Promise<void> => {
+    const caseIds = await Case.find({
+        'caseReference.sourceId': {
+            $eq: request.query.sourceId?.toString(),
+        },
+        pendingRemoval: true,
+    });
+    request.body.caseIds = caseIds.map((c: CaseDocument) => c._id);
     next();
 };
 
