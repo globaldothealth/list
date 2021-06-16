@@ -3,8 +3,9 @@ import AWS, { AWSError } from 'aws-sdk';
 import AWSMock from 'aws-sdk-mock';
 import AwsBatchClient from '../../src/clients/aws-batch-client';
 import AwsEventsClient from '../../src/clients/aws-events-client';
+import validateEnv from '../../src/util/validate-env';
 
-const _ENV = 'test';
+const env = validateEnv();
 
 let client: AwsEventsClient;
 const deleteRuleSpy = jest.fn().mockResolvedValueOnce({});
@@ -32,10 +33,11 @@ beforeEach(() => {
     AWSMock.mock('CloudWatchEvents', 'putTargets', putTargetsSpy);
     AWSMock.mock('CloudWatchEvents', 'removeTargets', removeTargetsSpy);
     client = new AwsEventsClient(
+        env.SERVICE_ENV,
+        env.LOCALSTACK_URL,
         'us-east-1',
-        new AwsBatchClient('test', 'test-arn', 'us-east-1'),
+        new AwsBatchClient(env.SERVICE_ENV, env.LOCALSTACK_URL, 'test-arn', 'us-east-1'),
         'test-arn',
-        _ENV,
     );
 });
 

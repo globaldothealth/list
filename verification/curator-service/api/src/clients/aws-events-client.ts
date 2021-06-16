@@ -17,15 +17,24 @@ import { logger } from '../util/logger';
 export default class AwsEventsClient {
     private readonly cloudWatchEventsClient: AWS.CloudWatchEvents;
     constructor(
+        private readonly serviceEnv: string,
+        private readonly localstackURL: string,
         awsRegion: string,
         readonly batchClient: AwsBatchClient,
         readonly eventRoleArn: string,
-        private readonly serviceEnv: string,
     ) {
         AWS.config.update({ region: awsRegion });
-        this.cloudWatchEventsClient = new AWS.CloudWatchEvents({
-            apiVersion: '2015-10-07',
-        });
+        if (serviceEnv == 'locale2e') {
+            this.cloudWatchEventsClient = new AWS.CloudWatchEvents({
+                apiVersion: '2015-10-07',
+                endpoint: localstackURL,
+            });
+        }
+        else {
+            this.cloudWatchEventsClient = new AWS.CloudWatchEvents({
+                apiVersion: '2015-10-07',
+            });
+        }
     }
 
     /**

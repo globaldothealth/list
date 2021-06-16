@@ -107,19 +107,22 @@ app.use(session(sess));
 
 const awsBatchClient = new AwsBatchClient(
     env.SERVICE_ENV,
+    env.LOCALSTACK_URL,
     env.JOB_QUEUE_ARN,
     env.AWS_SERVICE_REGION,
 );
 // Configure connection to AWS services.
 const awsLambdaClient = new AwsLambdaClient(
     env.SERVICE_ENV,
+    env.LOCALSTACK_URL,
     env.AWS_SERVICE_REGION,
 );
 const awsEventsClient = new AwsEventsClient(
+    env.SERVICE_ENV,
+    env.LOCALSTACK_URL,
     env.AWS_SERVICE_REGION,
     awsBatchClient,
     env.EVENT_ROLE_ARN,
-    env.SERVICE_ENV,
 );
 const s3Client = new S3({ region: 'us-east-1', signatureVersion: 'v4' });
 
@@ -132,6 +135,7 @@ authController.configurePassport(
     env.GOOGLE_OAUTH_CLIENT_ID,
     env.GOOGLE_OAUTH_CLIENT_SECRET,
 );
+
 if (env.ENABLE_LOCAL_AUTH) {
     authController.configureLocalAuth();
 }

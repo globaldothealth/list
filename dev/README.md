@@ -40,6 +40,7 @@ MAPBOX_GEOCODE_RATE_LIMIT_PER_MIN=<Mapbox API rate limit, default = 600>
 REACT_APP_PUBLIC_MAPBOX_TOKEN=<Different Mapbox API token>
 REACT_APP_POLICY_PUBLIC_ID=<Public id for Iubenda service that provides legal policies>
 REACT_APP_COOKIE_CONSENT_PUBLIC_ID=<Public ID for Iubenda service that provides cookie consent banner>
+LOCALSTACK_API_KEY=<Localstack (mock AWS) API key>
 ```
 
 These values are stored in a dedicated secret manager. To request AWS credentials, or for access to

@@ -1,0 +1,72 @@
+version: "3.7"
+services:
+  geocoding:
+    environment:
+      DEBUG: "True"
+      ENABLE_FAKE_GEOCODER: "True"
+  mongo:
+    volumes:
+      - ../verification/scripts:/verification/scripts
+  curator:
+    command: "npm run dev"
+    volumes:
+      - ../verification/curator-service/api/src:/usr/src/app/verification/curator-service/api/src
+      - ../verification/curator-service/api/openapi:/usr/src/app/verification/curator-service/api/openapi
+    environment:
+      LOCALHOST_URL: "http://localstack:4566"
+      SERVICE_ENV: "locale2e"
+      AFTER_LOGIN_REDIRECT_URL: "http://localhost:3002"
+  data:
+    command: "npm run dev"
+    volumes:
+      - ../data-serving/data-service/src:/usr/src/app/data-serving/data-service/src
+      - ../data-serving/data-service/api:/usr/src/app/data-serving/data-service/api
+  curatorui:
+    command: "npm run start-noenv"
+    volumes:
+      - ../verification/curator-service/ui/src:/usr/src/app/verification/curator-service/ui/src
+    environment:
+      # We can't use curator:3001 here because that's an internal DNS,
+      # not accessible from the user's browser.
+      # In production simply /auth/google would work.
+      REACT_APP_LOGIN_URL: "http://localhost:3001/auth/google"
+      REACT_APP_PUBLIC_MAPBOX_TOKEN: "${REACT_APP_PUBLIC_MAPBOX_TOKEN}"
+      REACT_APP_POLICY_PUBLIC_ID: "${REACT_APP_POLICY_PUBLIC_ID}"
+      REACT_APP_COOKIE_CONSENT_PUBLIC_ID: "${REACT_APP_COOKIE_CONSENT_PUBLIC_ID}"
+      ENABLE_LOCAL_AUTH: "true"
+  localstack:
+    image: localstack/localstack-full
+    ports:
+      - "53:53"
+      - "443:443"
+      - "4566:4566"
+      - "4571:4571"
+      - "8080:8080"
+    environment:
+      AWS_ACCESS_KEY_ID: fake
+      AWS_SECRET_ACCESS_KEY: fake
+      LOCALSTACK_API_KEY: "${LOCALSTACK_API_KEY}"
+      SERVICES: s3,ec2,ses,batch,events,iam,lambda
+      DEBUG: 1
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:4566/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+  setup-localstack:
+    build:
+      context: ./
+    depends_on:
+      - localstack
+    environment:
+      AWS_ACCESS_KEY_ID: "fake"
+      AWS_SECRET_ACCESS_KEY: "fake"
+      AWS_DEFAULT_REGION: "us-east-1"
+      AWS_ENDPOINT: "http://localstack:4566"
+      DATA_BUCKET_NAME: "covid-19-data-export"
+      DOWNLOAD_BUCKET_NAME: "covid19-filtered-downloads"
+      BATCH_QUEUE_NAME: "ingestion-queue"
+      SES_EMAIL_ADDRESS: "info@global.health"
