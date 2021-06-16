@@ -168,7 +168,7 @@ export function SourcesAutocomplete(
                 },
                 250,
             ),
-        [],
+        [props.sourcesWithStableIdentifiers],
     );
 
     const sourceURLValidation = (str: string) => {
