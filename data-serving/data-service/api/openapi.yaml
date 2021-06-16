@@ -356,13 +356,19 @@ paths:
             operationId: markPendingRemoval
             tags: [Ingestion]
             parameters:
-                - name: sourceId
-                  in: query
+                - in: query
+                  name: sourceId
                   description: The source identifier for affected cases
                   required: true
                   schema:
                         type: string
                         pattern: '^[a-f\d]{24}$'
+                - in: query
+                  name: email
+                  description: The curator email address
+                  required: true
+                  schema:
+                        type: string
             responses:
                 '201':
                     $ref: '#/components/responses/201'
@@ -392,13 +398,19 @@ paths:
             operationId: clearPendingRemovalStatus
             tags: [Ingestion]
             parameters:
-                - name: sourceId
-                  in: query
+                - in: query
+                  name: sourceId
                   description: The source identifier for affected cases
                   required: true
                   schema:
                         type: string
                         pattern: '^[a-f\d]{24}$'
+                - in: query
+                  name: email
+                  description: The curator email address
+                  required: true
+                  schema:
+                        type: string
             responses:
                 '201':
                     $ref: '#/components/responses/201'
