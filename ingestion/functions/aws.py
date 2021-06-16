@@ -334,9 +334,12 @@ deregister    Deregister a Batch job definition
         parser.add_argument(
             "-e", "--enabled", help="Enable rule", action="store_true", required=False
         )
+        parser.add_argument(
+            "-d", "--description", help="Rule description", type=str, required=False
+        )
         args = parser.parse_args(sys.argv[2:])
         state = "DISABLED"
-        description = ""
+        description = args.description if args.description else ""
         if args.enabled:
             state = "ENABLED"
         if args.target_name:
@@ -346,7 +349,6 @@ deregister    Deregister a Batch job definition
             if not args.job_name:
                 print("Job name required for target creation")
                 sys.exit(2)
-            description = f"Scheduled Batch ingestion rule for source: {args.source_name}"
 
         try:
             self.event_bridge_client.put_rule(
