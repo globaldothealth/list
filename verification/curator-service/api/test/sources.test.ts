@@ -652,7 +652,7 @@ describe('marking sources for deletion', async () => {
             `/api/sources/${source._id}/markPendingRemoval`
         )
         .expect(201);
-        expect(mockedAxios.post).toHaveBeenCalledWith(`http://localhost:3000/api/cases/markPendingRemoval?sourceId=${source._id}`);
+        expect(mockedAxios.post).toHaveBeenCalledWith(`http://localhost:3000/api/cases/markPendingRemoval?sourceId=${source._id}&email=${baseUser.email}`);
     });
 });
 
@@ -687,7 +687,7 @@ describe('clearing pending-deletion flag', async () => {
             `/api/sources/${source._id}/clearPendingRemovalStatus`
         )
         .expect(201);
-        expect(mockedAxios.post).toHaveBeenCalledWith(`http://localhost:3000/api/cases/clearPendingRemovalStatus?sourceId=${source._id}`);
+        expect(mockedAxios.post).toHaveBeenCalledWith(`http://localhost:3000/api/cases/clearPendingRemovalStatus?sourceId=${source._id}&email=${baseUser.email}`);
     });
 });
 
