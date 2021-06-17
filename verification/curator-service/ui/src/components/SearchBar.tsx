@@ -19,6 +19,10 @@ import FiltersModal from './FiltersModal';
 import { searchQueryToURL, URLToSearchQuery } from './util/searchQuery';
 import { useLocation, useHistory } from 'react-router-dom';
 import { KeyboardEvent, ChangeEvent } from 'react';
+import { useSelector } from 'react-redux';
+import {
+    selectFilterBreadcrumbs,
+} from './App/redux/selectors';
 
 const searchBarStyles = makeStyles((theme: Theme) => ({
     searchRoot: {
@@ -98,6 +102,16 @@ export default function SearchBar({
     const guideButtonRef = React.useRef<HTMLButtonElement>(null);
 
     const [searchError, setSearchError] = useState<boolean>(false);
+
+    const filtersBreadcrumb = useSelector(selectFilterBreadcrumbs);
+
+    useEffect(() => {
+        if (filtersBreadcrumb.length > 0) {
+            setSearchError(false) 
+            return;
+        }
+
+    }, [filtersBreadcrumb]);
 
     // Set search query debounce to 1000ms
     const debouncedSearch = useDebounce(searchInput, 2000);
