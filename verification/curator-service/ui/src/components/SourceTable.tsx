@@ -562,11 +562,11 @@ class SourceTable extends React.Component<Props, SourceTableState> {
                                 title: 'Source has stable case identifiers?',
                                 field: 'hasStableIdentifiers',
                                 render: (row): JSX.Element => (
-                                    <Switch disabled checked={row.hasStableIdentifiers ?? true}/>
+                                    <Switch disabled checked={row.hasStableIdentifiers ?? false}/>
                                 ),
                                 editComponent: (props): JSX.Element => (
-                                    // assume true because historically we didn't ask
-                                    <Switch checked={props.value ?? true} 
+                                    // assume false because that's the more likely case
+                                    <Switch checked={props.value ?? false} 
                                     onChange={(event):void => {
                                         props.onChange(event.target.checked)
                                     }}/>
