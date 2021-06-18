@@ -357,8 +357,8 @@ def run(
             env, common_lib.UploadError.INTERNAL_ERROR, source_id, upload_id,
             api_creds, cookies)
     source_info = source_info_request.json()
-    # treat absense of evidence as meaning the source _does_ have stable IDs, because we didn't ask before
-    has_stable_ids = source_info.get('hasStableIdentifiers', True)
+    # treat absence of evidence as meaning the source _does not_ have stable IDs, as that's more likely
+    has_stable_ids = source_info.get('hasStableIdentifiers', False)
     try:
         fd, local_data_file_name = tempfile.mkstemp()
         local_data_file = os.fdopen(fd, "wb")
