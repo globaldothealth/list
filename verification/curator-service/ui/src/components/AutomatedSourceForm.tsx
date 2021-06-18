@@ -142,7 +142,7 @@ export default function AutomatedSourceForm(props: Props): JSX.Element {
                     license: '',
                     notificationRecipients: [props.user.email],
                     excludeFromLineList: false,
-                    hasStableIdentifiers: true,
+                    hasStableIdentifiers: false,
                 }}
                 onSubmit={async (values): Promise<void> => {
                     await createSource(values);
