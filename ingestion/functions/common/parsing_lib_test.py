@@ -153,6 +153,13 @@ def test_e2e(
         full_source_url,
         json={"numCreated": num_created,
               "numUpdated": num_updated})
+    source_info_url = f"{_SOURCE_API_URL}/sources/{input_event['sourceId']}"
+    requests_mock.get(
+        source_info_url,
+        json={
+            "hasStableIds": True
+        }
+    )
 
     # Delete the provided upload ID to force parsing_lib to create a new upload.
     # Mock the create and update upload calls.
@@ -183,9 +190,10 @@ def test_e2e(
     response = parsing_lib.run(input_event, fake_parsing_fn)
 
     assert requests_mock.request_history[0].url == create_upload_url
-    assert requests_mock.request_history[1].url == excluded_case_ids_url
-    assert requests_mock.request_history[2].url == full_source_url
-    assert requests_mock.request_history[3].url == update_upload_url
+    assert requests_mock.request_history[1].url == source_info_url
+    assert requests_mock.request_history[2].url == excluded_case_ids_url
+    assert requests_mock.request_history[3].url == full_source_url
+    assert requests_mock.request_history[4].url == update_upload_url
     assert response["count_created"] == num_created
     assert response["count_updated"] == num_updated
 
