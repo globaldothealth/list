@@ -27,6 +27,8 @@ _STATES = maps["states"]
 
 _MUNICIPALITIES = maps["municipalities"]
 
+_MUNICIPALITY_COORD = maps["municipality_coords"]
+
 def convert_location(state_code: str, municipality_code: str):
     """
     Convert state and municipality codes into location query.
@@ -44,8 +46,22 @@ def convert_location(state_code: str, municipality_code: str):
         except KeyError:
             print(f"State Code Missing: {state_code}")
     query_string = ", ".join(query_list + ["MÉXICO"])
-    return {"query": query_string}
-
+    try:
+        municipality_code = state_code + municipality_code
+        return {
+            "administrativeAreaLevel1": _STATES[state_code],
+            "administrativeAreaLevel2": _MUNICIPALITIES[municipality_code],
+            "administrativeAreaLevel3": _MUNICIPALITIES[municipality_code],
+            "geoResolution": "Admin2",
+            "country": "Mexico",
+            "name": query_string,
+            "geometry": {
+                "latitude": _MUNICIPALITY_COORD[municipality_code]["latitude"],
+                "longitude": _MUNICIPALITY_COORD[municipality_code]["longitude"]
+            }
+        }
+    except KeyError:
+        return {"query": query_string}
 
 def convert_date(raw_date):
     """
