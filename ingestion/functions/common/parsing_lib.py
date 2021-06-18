@@ -358,7 +358,9 @@ def run(
             api_creds, cookies)
     source_info = source_info_request.json()
     # treat absence of evidence as meaning the source _does not_ have stable IDs, as that's more likely
-    has_stable_ids = source_info.get('hasStableIdentifiers', False)
+    # ^^ correct behaviour, but switching to True before #1954
+    #    is fixed, as new curator API endpoints are not in -stable.
+    has_stable_ids = source_info.get('hasStableIdentifiers', True)
     try:
         fd, local_data_file_name = tempfile.mkstemp()
         local_data_file = os.fdopen(fd, "wb")
