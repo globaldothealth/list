@@ -300,6 +300,10 @@ def filter_cases_by_date(
         return case_data
 
 
+class ParserError(Exception):
+    pass
+
+
 def run(
         event: Dict,
         parsing_function: Callable[[str, str, str], Generator[Dict, None, None]]):
@@ -342,19 +346,24 @@ def run(
     if not upload_id:
         upload_id = common_lib.create_upload_record(
             env, source_id, api_creds, cookies)
+    # grab the source object
+    base_url = common_lib.get_source_api_url(env)
+    source_info_url = f"{base_url}/source/{source_id}"
+    source_info_request = requests.get(source_info_url)
+    # if that failed then just bail, we can't ingest the cases
+    if source_info_request.status_code > 299: # yes I'm ignoring redirects
+        common_lib.complete_with_error(
+            ParserError(f"Retrieving source info for source {source_id} yielded HTTP status {source_info_request.status_code}"),
+            env, common_lib.UploadError.INTERNAL_ERROR, source_id, upload_id,
+            api_creds, cookies)
+    source_info = source_info_request.json()
+    # treat absense of evidence as meaning the source _does_ have stable IDs, because we didn't ask before
+    has_stable_ids = source_info.get('hasStableIdentifiers', True)
     try:
         fd, local_data_file_name = tempfile.mkstemp()
         local_data_file = os.fdopen(fd, "wb")
         retrieve_raw_data_file(s3_bucket, s3_key, local_data_file)
         print(f'Raw file retrieved at {local_data_file_name}')
-        # grab the source object
-        base_url = common_lib.get_source_api_url(env)
-        source_info_url = f"{base_url}/source/{source_id}"
-        source_info_request = requests.get(source_info_url)
-        source_info_request.raise_for_status()
-        source_info = source_info_request.json()
-        # treat absense of evidence as meaning the source _does_ have stable IDs, because we didn't ask before
-        has_stable_ids = source_info.get('hasStableIdentifiers', True)
 
         if has_stable_ids is not True:
             mark_pending_url = f"{base_url}/source/{source_id}/markPendingRemoval"
