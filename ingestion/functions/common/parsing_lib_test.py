@@ -157,7 +157,7 @@ def test_e2e(
     requests_mock.get(
         source_info_url,
         json={
-            "hasStableIds": True
+            "hasStableIdentifiers": True
         }
     )
 
@@ -194,6 +194,85 @@ def test_e2e(
     assert requests_mock.request_history[2].url == excluded_case_ids_url
     assert requests_mock.request_history[3].url == full_source_url
     assert requests_mock.request_history[4].url == update_upload_url
+    assert response["count_created"] == num_created
+    assert response["count_updated"] == num_updated
+
+
+@pytest.mark.skipif(not os.environ.get("DOCKERIZED", False),
+                    reason="Running integration tests outside of mock environment disabled")
+def test_e2e_with_unstable_case_ids(
+    input_event, sample_data, requests_mock,
+        mock_source_api_url_fixture):
+    import parsing_lib  # Import locally to avoid superseding mock
+    common_lib = mock_source_api_url_fixture
+    common_lib.login = MagicMock(name="login")
+
+    s3_client.put_object(
+        Bucket=input_event[parsing_lib.S3_BUCKET_FIELD],
+        Key=input_event[parsing_lib.S3_KEY_FIELD],
+        Body=json.dumps(sample_data))
+
+    # Mock the batch upsert call.
+    # TODO: Complete removal of URL env var.
+    os.environ["SOURCE_API_URL"] = _SOURCE_API_URL
+    full_source_url = f"{_SOURCE_API_URL}/cases/batchUpsert"
+    num_created = 10
+    num_updated = 5
+    requests_mock.post(
+        full_source_url,
+        json={"numCreated": num_created,
+              "numUpdated": num_updated})
+    source_info_url = f"{_SOURCE_API_URL}/sources/{input_event['sourceId']}"
+    requests_mock.get(
+        source_info_url,
+        json={
+            "hasStableIdentifiers": False
+        }
+    )
+    mark_pending_url = f"{source_info_url}/markPendingRemoval"
+    remove_pending_url = f"{source_info_url}/removePendingCases"
+    requests_mock.post(
+        mark_pending_url
+    )
+    requests_mock.post(
+        remove_pending_url
+    )
+
+    # Delete the provided upload ID to force parsing_lib to create a new upload.
+    # Mock the create and update upload calls.
+    del input_event[parsing_lib.UPLOAD_ID_FIELD]
+    base_upload_url = f"{_SOURCE_API_URL}/sources/{input_event['sourceId']}/uploads"
+    create_upload_url = base_upload_url
+    upload_id = "123456789012345678901234"
+    requests_mock.post(
+        create_upload_url,
+        json={"_id": upload_id, "status": "IN_PROGRESS",
+              "summary": {}},
+        status_code=201)
+    update_upload_url = f"{base_upload_url}/{upload_id}"
+    requests_mock.put(
+        update_upload_url,
+        json={"_id": upload_id, "status": "SUCCESS",
+              "summary": {"numCreated": num_created, "numUpdated": num_updated}})
+
+    # Mock the excluded case IDs endpoint call.
+    start_date = input_event[parsing_lib.DATE_RANGE_FIELD]["start"]
+    end_date = input_event[parsing_lib.DATE_RANGE_FIELD]["end"]
+    excluded_case_ids_url = f"{_SOURCE_API_URL}/excludedCaseIds?sourceId={_SOURCE_ID}&dateFrom={start_date}&dateTo={end_date}"
+    requests_mock.register_uri(
+                "GET", excluded_case_ids_url,
+                [{"json": {"cases": []},
+                  "status_code": 200}])
+
+    response = parsing_lib.run(input_event, fake_parsing_fn)
+
+    assert requests_mock.request_history[0].url == create_upload_url
+    assert requests_mock.request_history[1].url == source_info_url
+    assert requests_mock.request_history[2].url == mark_pending_url
+    assert requests_mock.request_history[3].url == excluded_case_ids_url
+    assert requests_mock.request_history[4].url == full_source_url
+    assert requests_mock.request_history[5].url == update_upload_url
+    assert requests_mock.request_history[6].url == remove_pending_url
     assert response["count_created"] == num_created
     assert response["count_updated"] == num_updated
 
