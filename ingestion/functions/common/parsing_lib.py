@@ -73,7 +73,8 @@ def retrieve_raw_data_file(s3_bucket: str, s3_key: str, out_file):
     except Exception as e:
         common_lib.complete_with_error(e)
 
-def retrieve_excluded_case_ids(source_id: str, date_filter: Dict, date_range: Dict, env: str):
+def retrieve_excluded_case_ids(source_id: str, date_filter: Dict, date_range: Dict, env: str,
+                               headers=None, cookies=None):
     if date_range:
         start_date = date_range["start"]
         end_date = date_range["end"]
@@ -94,7 +95,7 @@ def retrieve_excluded_case_ids(source_id: str, date_filter: Dict, date_range: Di
         date_limits = f"&dateFrom={start_date}&dateTo={end_date}"
 
     excluded_case_ids_endpoint_url =  f"{common_lib.get_source_api_url(env)}/excludedCaseIds?sourceId={source_id}{date_limits}"
-    res = requests.get(excluded_case_ids_endpoint_url)
+    res = requests.get(excluded_case_ids_endpoint_url, headers=headers, cookies=cookies)
     if res and res.status_code == 200:
         res_json = res.json()
         return res_json["cases"]
@@ -349,7 +350,7 @@ def run(
     # grab the source object
     base_url = common_lib.get_source_api_url(env)
     source_info_url = f"{base_url}/sources/{source_id}"
-    source_info_request = requests.get(source_info_url)
+    source_info_request = requests.get(source_info_url, headers=api_creds, cookies=cookies)
     # if that failed then just bail, we can't ingest the cases
     if source_info_request.status_code > 299: # yes I'm ignoring redirects
         common_lib.complete_with_error(
@@ -367,11 +368,12 @@ def run(
 
         if has_stable_ids is not True:
             mark_pending_url = f"{base_url}/sources/{source_id}/markPendingRemoval"
-            requests.post(mark_pending_url).raise_for_status()
+            requests.post(mark_pending_url, headers=api_creds, cookies=cookies).raise_for_status()
         case_data = parsing_function(
             local_data_file_name, source_id,
             source_url)
-        excluded_case_ids = retrieve_excluded_case_ids(source_id, date_filter, date_range, env)
+        excluded_case_ids = retrieve_excluded_case_ids(source_id, date_filter, date_range, env,
+                                                       headers=api_creds, cookies=cookies)
         final_cases = prepare_cases(case_data, upload_id, excluded_case_ids)
         count_created, count_updated = write_to_server(
             filter_cases_by_date(
@@ -398,12 +400,12 @@ def run(
                 raise RuntimeError(f'Error updating upload record, status={status}, response={text}')
         if has_stable_ids is not True:
             delete_old_cases_url = f"{base_url}/sources/{source_id}/removePendingCases"
-            requests.post(delete_old_cases_url).raise_for_status()
+            requests.post(delete_old_cases_url, headers=api_creds, cookies=cookies).raise_for_status()
         return {"count_created": count_created, "count_updated": count_updated}
     except Exception as e:
         if has_stable_ids is not True:
             clear_pending_marks_url = f"{base_url}/sources/{source_id}/clearPendingRemovalStatus"
-            requests.post(clear_pending_marks_url)
+            requests.post(clear_pending_marks_url, headers=api_creds, cookies=cookies)
         common_lib.complete_with_error(
             e, env, common_lib.UploadError.INTERNAL_ERROR, source_id, upload_id,
             api_creds, cookies)
