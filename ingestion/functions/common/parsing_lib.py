@@ -348,7 +348,7 @@ def run(
             env, source_id, api_creds, cookies)
     # grab the source object
     base_url = common_lib.get_source_api_url(env)
-    source_info_url = f"{base_url}/source/{source_id}"
+    source_info_url = f"{base_url}/sources/{source_id}"
     source_info_request = requests.get(source_info_url)
     # if that failed then just bail, we can't ingest the cases
     if source_info_request.status_code > 299: # yes I'm ignoring redirects
@@ -366,7 +366,7 @@ def run(
         print(f'Raw file retrieved at {local_data_file_name}')
 
         if has_stable_ids is not True:
-            mark_pending_url = f"{base_url}/source/{source_id}/markPendingRemoval"
+            mark_pending_url = f"{base_url}/sources/{source_id}/markPendingRemoval"
             requests.post(mark_pending_url).raise_for_status()
         case_data = parsing_function(
             local_data_file_name, source_id,
@@ -397,12 +397,12 @@ def run(
             else:
                 raise RuntimeError(f'Error updating upload record, status={status}, response={text}')
         if has_stable_ids is not True:
-            delete_old_cases_url = f"{base_url}/source/{source_id}/removePendingCases"
+            delete_old_cases_url = f"{base_url}/sources/{source_id}/removePendingCases"
             requests.post(delete_old_cases_url).raise_for_status()
         return {"count_created": count_created, "count_updated": count_updated}
     except Exception as e:
         if has_stable_ids is not True:
-            clear_pending_marks_url = f"{base_url}/source/{source_id}/clearPendingRemovalStatus"
+            clear_pending_marks_url = f"{base_url}/sources/{source_id}/clearPendingRemovalStatus"
             requests.post(clear_pending_marks_url)
         common_lib.complete_with_error(
             e, env, common_lib.UploadError.INTERNAL_ERROR, source_id, upload_id,
