@@ -7,7 +7,15 @@ _SOURCE_ID = "abc123"
 _SOURCE_URL = "https://mex.ico"
 _PARSED_CASES = [{
     "caseReference": {"sourceId": "abc123", "sourceUrl": "https://mex.ico", "sourceEntryId": "147685"},
-    "location": {'query': 'ATIZAPÁN DE ZARAGOZA, MÉXICO, MÉXICO'},
+    "location": {
+        "administrativeAreaLevel1": "MÉXICO",
+        "administrativeAreaLevel2": 'ATIZAPÁN DE ZARAGOZA',
+        "administrativeAreaLevel3": 'ATIZAPÁN DE ZARAGOZA',
+        "country": "Mexico",
+        "geoResolution": "Admin2",
+        "geometry": {"latitude": 19.56480728, "longitude": -99.27404399},
+        "name": "ATIZAPÁN DE ZARAGOZA, MÉXICO, MÉXICO"
+    },
     "events": [
         {
             "name": "confirmed",
