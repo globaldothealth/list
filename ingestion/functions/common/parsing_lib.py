@@ -347,6 +347,18 @@ def run(
         local_data_file = os.fdopen(fd, "wb")
         retrieve_raw_data_file(s3_bucket, s3_key, local_data_file)
         print(f'Raw file retrieved at {local_data_file_name}')
+        # grab the source object
+        base_url = common_lib.get_source_api_url(env)
+        source_info_url = f"{base_url}/source/{source_id}"
+        source_info_request = requests.get(source_info_url)
+        source_info_request.raise_for_status()
+        source_info = source_info_request.json()
+        # treat absense of evidence as meaning the source _does_ have stable IDs, because we didn't ask before
+        has_stable_ids = source_info.get('hasStableIdentifiers', True)
+
+        if has_stable_ids is not True:
+            mark_pending_url = f"{base_url}/source/{source_id}/markPendingRemoval"
+            requests.post(mark_pending_url).raise_for_status()
         case_data = parsing_function(
             local_data_file_name, source_id,
             source_url)
@@ -375,8 +387,14 @@ def run(
                 continue
             else:
                 raise RuntimeError(f'Error updating upload record, status={status}, response={text}')
+        if has_stable_ids is not True:
+            delete_old_cases_url = f"{base_url}/source/{source_id}/removePendingCases"
+            requests.post(delete_old_cases_url).raise_for_status()
         return {"count_created": count_created, "count_updated": count_updated}
     except Exception as e:
+        if has_stable_ids is not True:
+            clear_pending_marks_url = f"{base_url}/source/{source_id}/clearPendingRemovalStatus"
+            requests.post(clear_pending_marks_url)
         common_lib.complete_with_error(
             e, env, common_lib.UploadError.INTERNAL_ERROR, source_id, upload_id,
             api_creds, cookies)
