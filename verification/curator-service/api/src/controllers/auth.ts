@@ -14,7 +14,9 @@ import { Router } from 'express';
 import axios from 'axios';
 import { logger } from '../util/logger';
 import passport from 'passport';
+import localStrategy from 'passport-local';
 import AwsLambdaClient from '../clients/aws-lambda-client';
+import bcrypt from 'bcrypt';
 
 // Global variable for newsletter acceptance
 let isNewsletterAccepted: boolean;
@@ -111,11 +113,13 @@ interface GoogleProfile extends Profile {
  */
 export class AuthController {
     public router: Router;
+    public LocalStrategy: typeof localStrategy.Strategy;
     constructor(
         private readonly afterLoginRedirURL: string,
         public readonly lambdaClient: AwsLambdaClient,
     ) {
         this.router = Router();
+        this.LocalStrategy = localStrategy.Strategy;
 
         this.router.get(
             '/google/redirect',
@@ -124,6 +128,50 @@ export class AuthController {
             passport.authenticate('google', { prompt: 'select_account' }),
             (req: Request, res: Response): void => {
                 res.redirect(this.afterLoginRedirURL);
+            },
+        );
+
+        this.router.post(
+            '/signup',
+            (req: Request, res: Response, next: NextFunction): void => {
+                passport.authenticate(
+                    'register',
+                    (error: Error, user: UserDocument, info: any) => {
+                        if (error) return next(error);
+                        if (!user)
+                            return res
+                                .status(409)
+                                .json({ message: info.message });
+
+                        req.logIn(user, (err) => {
+                            if (err) return next(err);
+                        });
+
+                        res.status(200).json(user);
+                    },
+                )(req, res, next);
+            },
+        );
+
+        this.router.post(
+            '/signin',
+            (req: Request, res: Response, next: NextFunction): void => {
+                passport.authenticate(
+                    'login',
+                    (error: Error, user: UserDocument, info: any) => {
+                        if (error) return next(error);
+                        if (!user)
+                            return res
+                                .status(403)
+                                .json({ message: info.message });
+
+                        req.logIn(user, (err) => {
+                            if (err) return next(err);
+                        });
+
+                        res.status(200).json(user);
+                    },
+                )(req, res, next);
             },
         );
 
@@ -155,63 +203,6 @@ export class AuthController {
             mustBeAuthenticated,
             (req: Request, res: Response): void => {
                 res.json(req.user);
-            },
-        );
-
-        this.router.post(
-            '/signup',
-            async (req: Request, res: Response): Promise<void> => {
-                let user = await User.findOne({
-                    email: req.body.email,
-                }).exec();
-
-                // Update newsletter preferences
-                if (
-                    user &&
-                    user.newsletterAccepted === false &&
-                    req.body.newsletter
-                ) {
-                    user = await User.findOneAndUpdate(
-                        { email: req.body.email },
-                        { newsletterAccepted: req.body.newsletter },
-                    );
-                }
-
-                if (user) {
-                    req.login(user, (err: Error) => {
-                        if (!err) {
-                            res.json(user);
-                            return;
-                        }
-                        logger.error(err);
-                        res.sendStatus(500);
-                    });
-                } else {
-                    const newUser = await User.create({
-                        name: req.body.name,
-                        email: req.body.email,
-                        googleID: '42',
-                        roles: req.body.roles,
-                        newsletterAccepted: req.body.newsletter || false,
-                    });
-
-                    try {
-                        await this.lambdaClient.sendWelcomeEmail(
-                            req.body.email,
-                        );
-                    } catch (err) {
-                        logger.info('error: ' + JSON.stringify(err, null, 2));
-                    }
-
-                    req.login(newUser, (err: Error) => {
-                        if (!err) {
-                            res.json(newUser);
-                            return;
-                        }
-                        logger.error(err);
-                        res.sendStatus(500);
-                    });
-                }
             },
         );
     }
@@ -272,6 +263,77 @@ export class AuthController {
                     done(e, undefined);
                 });
         });
+
+        // Configure passport to use username and password auth
+        passport.use(
+            'register',
+            new this.LocalStrategy(
+                {
+                    usernameField: 'email',
+                    passwordField: 'password',
+                    passReqToCallback: true,
+                },
+                async (req, email, password, done) => {
+                    try {
+                        const user = await User.findOne({ email });
+
+                        if (user) {
+                            return done(null, false, {
+                                message: 'Email address already exists',
+                            });
+                        }
+
+                        const hashedPassword = await bcrypt.hash(password, 10);
+                        const newUser = await User.create({
+                            email: email,
+                            password: hashedPassword,
+                            name: req.body.name || '',
+                            googleID: '42',
+                            roles: [],
+                            newsletterAccepted:
+                                req.body.newsletterAccepted || false,
+                        });
+
+                        done(null, newUser.publicFields());
+                    } catch (error) {
+                        done(error);
+                    }
+                },
+            ),
+        );
+
+        passport.use(
+            'login',
+            new this.LocalStrategy(
+                {
+                    usernameField: 'email',
+                    passwordField: 'password',
+                },
+                async (email, password, done) => {
+                    try {
+                        const user = await User.findOne({ email });
+                        if (!user) {
+                            return done(null, false, {
+                                message: 'Wrong username or password',
+                            });
+                        }
+
+                        const isValidPassword = await user.isValidPassword(
+                            password,
+                        );
+                        if (!isValidPassword) {
+                            return done(null, false, {
+                                message: 'Wrong username or password',
+                            });
+                        }
+
+                        done(null, user.publicFields());
+                    } catch (error) {
+                        done(error);
+                    }
+                },
+            ),
+        );
 
         // Configure passport to use google OAuth.
         passport.use(
