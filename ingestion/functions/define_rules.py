@@ -33,10 +33,14 @@ SOURCE_RULE = {
 	"rule_name": "", 
 	"target_name": "",
 	"source_name": "", 
-	"job_name": ""
+	"job_name": "",
+	"description": ""
 }
 
 FILE_NAME = "rules.json"
+
+JOB_DEF_ENV = "EPID_INGESTION_ENV"
+JOB_DEF_SOURCE_ID = "EPID_INGESTION_SOURCE_ID"
 
 
 parser = argparse.ArgumentParser(
@@ -66,16 +70,42 @@ if response.status_code != 200:
 
 sources = response.json().get("sources")
 
+batch_client = boto3.client("batch", AWS_REGION)
+resp = batch_client.describe_job_definitions()
+job_definitions = resp.get("jobDefinitions")
+
+if not job_definitions:
+	print(f"No job definitions found in response from Batch: {resp}")
+	sys.exit(1)
+
+source_id_to_job_def_name = {}
+
+for job_def in job_definitions:
+	props = job_def.get("containerProperties", {})
+	job_def_env = props.get("environment", {})
+	for kv in job_def_env:
+		print(f"key-val: {kv}")
+		if kv.get("name", "") == JOB_DEF_SOURCE_ID:
+			val = kv.get("value")
+			if not val:
+				continue
+			source_id_to_job_def_name[val] = job_def.get("jobDefinitionName")
+			break
 rules = []
 
 for source in sources:
 	source_name = source.get("name")
 	source_id = source.get("_id")
 	source_rule = SOURCE_RULE.copy()
-	source_rule["rule_name"] = f"{source_id}-{env}"
-	source_rule["target_name"] = slugify(source_name, separator="_", regex_pattern=r"[^-a-z0-9_]")
+	job_def_name = source_id_to_job_def_name.get(source_id)
+	if not job_def_name:
+		print(f"No job definition found using source ID {source_id}")
+		continue
+	source_rule["rule_name"] = f"{job_def_name}"
+	source_rule["target_name"] = job_def_name
 	source_rule["source_name"] = source_name
-	source_rule["job_name"] = f"{source_id}-{env}"
+	source_rule["job_name"] = job_def_name
+	source_rule["description"] = f"Scheduled Batch ingestion rule for source: {source_name} with ID: {source_id} for environment: {env}"
 	rules.append(source_rule)
 
 print(f"Writing source information to {FILE_NAME}")

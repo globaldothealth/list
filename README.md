@@ -5,7 +5,7 @@ advance the response to infectious diseases.
 
 This repository contains the servers and scripts that support its data curation efforts.
 
-Should you have any questions please feel free to get in touch via: ghdsi.info@gmail.com 
+Should you have any questions please feel free to get in touch via: info@global.health
 
 ## Data
 

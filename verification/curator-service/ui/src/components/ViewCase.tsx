@@ -14,7 +14,6 @@ import {
     VerificationStatus,
 } from './Case';
 import React, { useEffect, useState } from 'react';
-
 import AppModal from './AppModal';
 import EditIcon from '@material-ui/icons/EditOutlined';
 import { Link } from 'react-router-dom';
@@ -28,6 +27,13 @@ import renderDate, { renderDateRange } from './util/date';
 import shortId from 'shortid';
 import useMediaQuery from '@material-ui/core/useMediaQuery';
 import { useTheme } from '@material-ui/core/styles';
+import Highlighter from 'react-highlight-words';
+import { useSelector } from 'react-redux';
+import {
+    selectSearchQuery,
+    selectFilterBreadcrumbs,
+} from './App/redux/selectors';
+import Chip from '@material-ui/core/Chip';
 
 const styles = makeStyles((theme) => ({
     errorMessage: {
@@ -69,8 +75,9 @@ export default function ViewCase(props: Props): JSX.Element {
     }, [props.id]);
 
     const classes = styles();
+
     return (
-        <AppModal title="View case" onModalClose={props.onModalClose}>
+        <AppModal title="Case details" onModalClose={props.onModalClose}>
             {loading && <LinearProgress />}
             {errorMessage && (
                 <MuiAlert
@@ -87,6 +94,9 @@ export default function ViewCase(props: Props): JSX.Element {
     );
 }
 
+interface LocationState {
+    search: string;
+}
 interface CaseDetailsProps {
     c: Case;
     enableEdit?: boolean;
@@ -128,6 +138,10 @@ const useStyles = makeStyles((theme) => ({
         paddingRight: '20px',
         wordBreak: 'break-all',
     },
+    breadcrumbChip: {
+        margin: theme.spacing(0.5),
+        marginRight: '8px',
+    },
 }));
 
 function ageRange(range?: { start: number; end: number }): string {
@@ -143,6 +157,7 @@ function CaseDetails(props: CaseDetailsProps): JSX.Element {
     const theme = useTheme();
     const showNavMenu = useMediaQuery(theme.breakpoints.up('sm'));
     const classes = useStyles();
+
     const scrollTo = (name: string): void => {
         Scroll.scroller.scrollTo(name, {
             duration: 100,
@@ -158,6 +173,9 @@ function CaseDetails(props: CaseDetailsProps): JSX.Element {
             return props.c.caseReference.verificationStatus || 'Unverified';
         }
     };
+
+    const searchedKeywords = useSelector(selectSearchQuery);
+    const filtersBreadcrumb = useSelector(selectFilterBreadcrumbs);
 
     return (
         <>
@@ -233,6 +251,23 @@ function CaseDetails(props: CaseDetailsProps): JSX.Element {
                     marginLeft: showNavMenu ? '10em' : '0',
                 }}
             >
+                {searchedKeywords && (
+                    <>
+                        <Chip
+                            label="Searched query:"
+                            color="primary"
+                            className={classes.breadcrumbChip}
+                        />
+
+                        {filtersBreadcrumb.map((breadcrumb) => (
+                            <Chip
+                                key={breadcrumb.key}
+                                label={`${breadcrumb.key} - ${breadcrumb.value}`}
+                                className={classes.breadcrumbChip}
+                            />
+                        ))}
+                    </>
+                )}
                 <Typography className={classes.caseTitle} variant="h5">
                     Case {props.c._id}{' '}
                     {props.enableEdit && (
@@ -360,7 +395,6 @@ function CaseDetails(props: CaseDetailsProps): JSX.Element {
                         </Grid>
                     </Scroll.Element>
                 </Paper>
-
                 <Paper className={classes.paper} variant="outlined" square>
                     <Scroll.Element
                         name="demographics"
@@ -397,7 +431,6 @@ function CaseDetails(props: CaseDetailsProps): JSX.Element {
                         <RowContent content={props.c.demographics?.ethnicity} />
                     </Grid>
                 </Paper>
-
                 <Paper className={classes.paper} variant="outlined" square>
                     <Scroll.Element name="location" className={classes.casebox}>
                         <Typography
@@ -411,7 +444,6 @@ function CaseDetails(props: CaseDetailsProps): JSX.Element {
                         </Grid>
                     </Scroll.Element>
                 </Paper>
-
                 <Paper className={classes.paper} variant="outlined" square>
                     <Scroll.Element
                         name="event-history"
@@ -518,7 +550,6 @@ function CaseDetails(props: CaseDetailsProps): JSX.Element {
                         </Grid>
                     </Scroll.Element>
                 </Paper>
-
                 <Paper className={classes.paper} variant="outlined" square>
                     <Scroll.Element name="symptoms" className={classes.casebox}>
                         <Typography
@@ -537,7 +568,6 @@ function CaseDetails(props: CaseDetailsProps): JSX.Element {
                         </Grid>
                     </Scroll.Element>
                 </Paper>
-
                 <Paper className={classes.paper} variant="outlined" square>
                     <Typography
                         className={classes.sectionTitle}
@@ -569,7 +599,6 @@ function CaseDetails(props: CaseDetailsProps): JSX.Element {
                         />
                     </Grid>
                 </Paper>
-
                 <Paper className={classes.paper} variant="outlined" square>
                     <Scroll.Element
                         name="transmission"
@@ -610,7 +639,6 @@ function CaseDetails(props: CaseDetailsProps): JSX.Element {
                         </Grid>
                     </Scroll.Element>
                 </Paper>
-
                 <Paper className={classes.paper} variant="outlined" square>
                     <Scroll.Element
                         name="travel-history"
@@ -645,7 +673,6 @@ function CaseDetails(props: CaseDetailsProps): JSX.Element {
                         </Grid>
                     </Scroll.Element>
                 </Paper>
-
                 <Paper className={classes.paper} variant="outlined" square>
                     <Scroll.Element
                         name="pathogens"
@@ -805,6 +832,10 @@ function RowHeader(props: { title: string }): JSX.Element {
 }
 
 function RowContent(props: { content: string; isLink?: boolean }): JSX.Element {
+    const searchQuery = useSelector(selectSearchQuery);
+    const searchQueryArray =
+        searchQuery.match(/(?<=")[^"]+(?=")|\w{3,}/g) ?? [];
+
     return (
         <Grid item xs={8}>
             {props.isLink && props.content ? (
@@ -813,10 +844,22 @@ function RowContent(props: { content: string; isLink?: boolean }): JSX.Element {
                     rel="noopener noreferrer"
                     target="_blank"
                 >
-                    {props.content}
+                    <Highlighter
+                        highlightStyle={{ fontWeight: 'bold' }}
+                        className="highlighted"
+                        searchWords={searchQueryArray}
+                        autoEscape={true}
+                        textToHighlight={props.content}
+                    />
                 </a>
             ) : (
-                props.content
+                <Highlighter
+                    highlightStyle={{ fontWeight: 'bold' }}
+                    className="highlighted"
+                    searchWords={searchQueryArray}
+                    autoEscape={true}
+                    textToHighlight={props.content}
+                />
             )}
         </Grid>
     );

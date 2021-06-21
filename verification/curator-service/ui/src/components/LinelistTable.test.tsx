@@ -1,12 +1,6 @@
 import '@testing-library/jest-dom/extend-expect';
 
-import {
-    fireEvent,
-    render,
-    wait,
-    screen,
-    within,
-} from '@testing-library/react';
+import { render, fireEvent, screen, wait } from './util/test-utils';
 
 import LinelistTable from './LinelistTable';
 import { MemoryRouter } from 'react-router-dom';
@@ -14,7 +8,8 @@ import React from 'react';
 import axios from 'axios';
 import range from 'lodash/range';
 import userEvent from '@testing-library/user-event';
-import { ChipData } from './App';
+import { ChipData } from './App/App';
+import store from '../store';
 
 jest.mock('axios');
 const mockedAxios = axios as jest.Mocked<typeof axios>;
@@ -32,6 +27,8 @@ afterEach(() => {
     mockedAxios.post.mockClear();
     mockedAxios.put.mockClear();
 });
+
+const DATA_LIMIT = 10000;
 
 describe('<LinelistTable />', () => {
     it('loads and displays cases', async () => {
@@ -116,12 +113,12 @@ describe('<LinelistTable />', () => {
             <MemoryRouter>
                 <LinelistTable
                     user={curator}
-                    filterBreadcrumbs={[]}
                     page={0}
                     pageSize={50}
                     onChangePage={jest.fn()}
                     onChangePageSize={jest.fn()}
                     handleBreadcrumbDelete={jest.fn()}
+                    setTotalDataCount={jest.fn()}
                     setFiltersModalOpen={jest.fn()}
                     setActiveFilterInput={jest.fn()}
                     sortBy={0}
@@ -130,11 +127,16 @@ describe('<LinelistTable />', () => {
                     setSortByOrder={jest.fn()}
                 />
             </MemoryRouter>,
+            {
+                initialState: {
+                    app: { filterBreadcrumbs: [], searchQuery: '' },
+                },
+            },
         );
 
         expect(mockedAxios.get).toHaveBeenCalledTimes(1);
         expect(mockedAxios.get).toHaveBeenCalledWith(
-            '/api/cases/?limit=50&page=1&count_limit=10000&sort_by=0&order=1',
+            `/api/cases/?limit=50&page=1&count_limit=${DATA_LIMIT}&sort_by=0&order=1`,
         );
         expect(await findByText('www.example.com')).toBeInTheDocument();
         expect(await findByText('some admin 1')).toBeInTheDocument();
@@ -193,12 +195,12 @@ describe('<LinelistTable />', () => {
             <MemoryRouter>
                 <LinelistTable
                     user={curator}
-                    filterBreadcrumbs={[]}
                     page={0}
                     pageSize={50}
                     onChangePage={jest.fn()}
                     onChangePageSize={jest.fn()}
                     handleBreadcrumbDelete={jest.fn()}
+                    setTotalDataCount={jest.fn()}
                     setFiltersModalOpen={jest.fn()}
                     setActiveFilterInput={jest.fn()}
                     sortBy={0}
@@ -207,6 +209,11 @@ describe('<LinelistTable />', () => {
                     setSortByOrder={jest.fn()}
                 />
             </MemoryRouter>,
+            {
+                initialState: {
+                    app: { filterBreadcrumbs: [], searchQuery: '' },
+                },
+            },
         );
 
         const row = await findByText('www.example.com');
@@ -267,11 +274,11 @@ describe('<LinelistTable />', () => {
             <MemoryRouter>
                 <LinelistTable
                     user={curator}
-                    filterBreadcrumbs={[]}
                     page={0}
                     pageSize={50}
                     onChangePage={jest.fn()}
                     onChangePageSize={jest.fn()}
+                    setTotalDataCount={jest.fn()}
                     handleBreadcrumbDelete={jest.fn()}
                     setFiltersModalOpen={jest.fn()}
                     setActiveFilterInput={jest.fn()}
@@ -281,10 +288,15 @@ describe('<LinelistTable />', () => {
                     setSortByOrder={jest.fn()}
                 />
             </MemoryRouter>,
+            {
+                initialState: {
+                    app: { filterBreadcrumbs: [], searchQuery: '' },
+                },
+            },
         );
         expect(mockedAxios.get).toHaveBeenCalledTimes(1);
         expect(mockedAxios.get).toHaveBeenCalledWith(
-            '/api/cases/?limit=50&page=1&count_limit=10000&sort_by=0&order=1',
+            `/api/cases/?limit=50&page=1&count_limit=${DATA_LIMIT}&sort_by=0&order=1`,
         );
         const row = await findByText('www.example.com');
         expect(row).toBeInTheDocument();
@@ -369,11 +381,11 @@ describe('<LinelistTable />', () => {
             <MemoryRouter>
                 <LinelistTable
                     user={curator}
-                    filterBreadcrumbs={[]}
                     page={0}
                     pageSize={50}
                     onChangePage={jest.fn()}
                     onChangePageSize={jest.fn()}
+                    setTotalDataCount={jest.fn()}
                     handleBreadcrumbDelete={jest.fn()}
                     setFiltersModalOpen={jest.fn()}
                     setActiveFilterInput={jest.fn()}
@@ -383,10 +395,15 @@ describe('<LinelistTable />', () => {
                     setSortByOrder={jest.fn()}
                 />
             </MemoryRouter>,
+            {
+                initialState: {
+                    app: { filterBreadcrumbs: [], searchQuery: '' },
+                },
+            },
         );
         expect(mockedAxios.get).toHaveBeenCalledTimes(1);
         expect(mockedAxios.get).toHaveBeenCalledWith(
-            '/api/cases/?limit=50&page=1&count_limit=10000&sort_by=0&order=1',
+            `/api/cases/?limit=50&page=1&count_limit=${DATA_LIMIT}&sort_by=0&order=1`,
         );
         const row = await findByText('www.example.com');
         expect(row).toBeInTheDocument();
@@ -451,11 +468,11 @@ describe('<LinelistTable />', () => {
                         email: 'foo@bar.com',
                         roles: [],
                     }}
-                    filterBreadcrumbs={[]}
                     page={0}
                     pageSize={50}
                     onChangePage={jest.fn()}
                     onChangePageSize={jest.fn()}
+                    setTotalDataCount={jest.fn()}
                     handleBreadcrumbDelete={jest.fn()}
                     setFiltersModalOpen={jest.fn()}
                     setActiveFilterInput={jest.fn()}
@@ -465,10 +482,15 @@ describe('<LinelistTable />', () => {
                     setSortByOrder={jest.fn()}
                 />
             </MemoryRouter>,
+            {
+                initialState: {
+                    app: { filterBreadcrumbs: [], searchQuery: '' },
+                },
+            },
         );
         expect(mockedAxios.get).toHaveBeenCalledTimes(1);
         expect(mockedAxios.get).toHaveBeenCalledWith(
-            '/api/cases/?limit=50&page=1&count_limit=10000&sort_by=0&order=1',
+            `/api/cases/?limit=50&page=1&count_limit=${DATA_LIMIT}&sort_by=0&order=1`,
         );
         const row = await findByText('www.example.com');
         expect(row).toBeInTheDocument();
@@ -520,11 +542,11 @@ describe('<LinelistTable />', () => {
             <MemoryRouter>
                 <LinelistTable
                     user={curator}
-                    filterBreadcrumbs={[]}
                     page={1}
                     pageSize={10}
                     onChangePage={jest.fn()}
                     onChangePageSize={jest.fn()}
+                    setTotalDataCount={jest.fn()}
                     handleBreadcrumbDelete={jest.fn()}
                     setFiltersModalOpen={jest.fn()}
                     setActiveFilterInput={jest.fn()}
@@ -534,6 +556,11 @@ describe('<LinelistTable />', () => {
                     setSortByOrder={jest.fn()}
                 />
             </MemoryRouter>,
+            {
+                initialState: {
+                    app: { filterBreadcrumbs: [], searchQuery: '' },
+                },
+            },
         );
 
         const rowsCounter = await findAllByText('11-20 of 20');
@@ -590,11 +617,11 @@ describe('<LinelistTable />', () => {
             <MemoryRouter>
                 <LinelistTable
                     user={curator}
-                    filterBreadcrumbs={[]}
                     page={0}
                     pageSize={10}
                     onChangePage={changePage}
                     onChangePageSize={changePageSize}
+                    setTotalDataCount={jest.fn()}
                     handleBreadcrumbDelete={jest.fn()}
                     setFiltersModalOpen={jest.fn()}
                     setActiveFilterInput={jest.fn()}
@@ -604,6 +631,11 @@ describe('<LinelistTable />', () => {
                     setSortByOrder={jest.fn()}
                 />
             </MemoryRouter>,
+            {
+                initialState: {
+                    app: { filterBreadcrumbs: [], searchQuery: '' },
+                },
+            },
         );
 
         expect(await findAllByText('1-10 of 20')).toHaveLength(2);
@@ -641,11 +673,11 @@ describe('<LinelistTable />', () => {
             <MemoryRouter>
                 <LinelistTable
                     user={curator}
-                    filterBreadcrumbs={breadcrumbs}
                     page={0}
                     pageSize={10}
                     onChangePage={jest.fn()}
                     onChangePageSize={jest.fn()}
+                    setTotalDataCount={jest.fn()}
                     handleBreadcrumbDelete={jest.fn()}
                     setFiltersModalOpen={jest.fn()}
                     setActiveFilterInput={jest.fn()}
@@ -655,6 +687,11 @@ describe('<LinelistTable />', () => {
                     setSortByOrder={jest.fn()}
                 />
             </MemoryRouter>,
+            {
+                initialState: {
+                    app: { filterBreadcrumbs: breadcrumbs, searchQuery: '' },
+                },
+            },
         );
 
         expect(screen.getByText(/filters/i)).toBeInTheDocument();
@@ -674,11 +711,11 @@ describe('<LinelistTable />', () => {
             <MemoryRouter>
                 <LinelistTable
                     user={curator}
-                    filterBreadcrumbs={breadcrumbs}
                     page={0}
                     pageSize={10}
                     onChangePage={jest.fn()}
                     onChangePageSize={jest.fn()}
+                    setTotalDataCount={jest.fn()}
                     handleBreadcrumbDelete={jest.fn()}
                     setFiltersModalOpen={setFiltersModalOpen}
                     setActiveFilterInput={jest.fn()}
@@ -688,6 +725,11 @@ describe('<LinelistTable />', () => {
                     setSortByOrder={jest.fn()}
                 />
             </MemoryRouter>,
+            {
+                initialState: {
+                    app: { filterBreadcrumbs: breadcrumbs, searchQuery: '' },
+                },
+            },
         );
 
         const filtersBreadcrumb = screen.getByText(/filters/i);

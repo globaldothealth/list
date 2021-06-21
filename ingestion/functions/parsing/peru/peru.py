@@ -122,7 +122,6 @@ def parse_cases(raw_data_file, source_id, source_url):
                     case = {
                         "caseReference": {
                             "sourceId": source_id,
-                            "sourceEntryId": entry["UUID"],
                             "sourceUrl": source_url},
                         "location": location,
                         "events": [

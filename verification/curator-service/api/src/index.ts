@@ -162,6 +162,7 @@ new EmailClient(env.EMAIL_USER_ADDRESS, env.EMAIL_USER_PASSWORD)
             emailClient,
             awsBatchClient,
             awsEventsClient,
+            env.DATASERVER_URL
         );
         apiRouter.get(
             '/sources',
@@ -197,6 +198,21 @@ new EmailClient(env.EMAIL_USER_ADDRESS, env.EMAIL_USER_PASSWORD)
             '/sources/parsers',
             mustHaveAnyRole(['curator']),
             sourcesController.listParsers,
+        );
+        apiRouter.post(
+            '/sources/:id([a-z0-9]{24})/markPendingRemoval',
+            mustHaveAnyRole(['curator']),
+            sourcesController.markPendingRemoval,
+        );
+        apiRouter.post(
+            '/sources/:id([a-z0-9]{24})/removePendingCases',
+            mustHaveAnyRole(['curator']),
+            sourcesController.removePendingCases,
+        );
+        apiRouter.post(
+            '/sources/:id([a-z0-9]{24})/clearPendingRemovalStatus',
+            mustHaveAnyRole(['curator']),
+            sourcesController.clearPendingRemovalStatus,
         );
 
         // Configure uploads controller.
@@ -243,7 +259,7 @@ new EmailClient(env.EMAIL_USER_ADDRESS, env.EMAIL_USER_PASSWORD)
             mustBeAuthenticated,
             casesController.get,
         );
-        apiRouter.get(
+        apiRouter.post(
             '/cases/getDownloadLink',
             mustBeAuthenticated,
             casesController.getDownloadLink,

@@ -20,6 +20,7 @@ with open(FILE_NAME, "r") as f:
         target_name = rule.get("target_name")
         source_name = rule.get("source_name")
         job_name = rule.get("job_name")
+        description = rule.get("description")
         if not rule_name:
             print(f"Missing rule name in rule {rule}")
             sys.exit(1)
@@ -32,7 +33,7 @@ with open(FILE_NAME, "r") as f:
         if not job_name:
             print(f"Missing job name in rule {rule}")
             sys.exit(1)
-        cmd = f"./aws.py schedule {rule_name} -t {target_name} -s \"{source_name}\" -j {job_name}"
+        cmd = f"./aws.py schedule {rule_name} -t {target_name} -s \"{source_name}\" -j {job_name} -d \"{description}\""
         print(f"Running command {cmd}")
         out = subprocess.check_output(cmd, encoding="UTF-8", shell=True)
         print(f"Output from command:\n{out}")

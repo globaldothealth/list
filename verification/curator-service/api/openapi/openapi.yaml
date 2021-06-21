@@ -361,6 +361,78 @@ paths:
                     $ref: '#/components/responses/200ParsersArray'
                 '500':
                     $ref: '#/components/responses/500'
+    /sources/{sourceId}/markPendingRemoval:
+        parameters:
+            - name: sourceId
+              in: path
+              description: The parent source ID for which to mark cases pending removal.
+              required: true
+              schema:
+                type: string
+                pattern: '^[a-f\d]{24}$'
+        post:
+            tags: [Source, Case]
+            summary: Marks all cases recorded for this source as pending later removal.
+            operationId: markPendingRemoval
+            responses:
+                '201':
+                    $ref: '#/components/responses/200'
+                '400':
+                    $ref: '#/components/responses/400'
+                '403':
+                    $ref: '#/components/responses/403'
+                '404':
+                    $ref: '#/components/responses/404'
+                '500':
+                    $ref: '#/components/responses/500'
+    /sources/{sourceId}/removePendingCases:
+        parameters:
+            - name: sourceId
+              in: path
+              description: The parent source ID for which to remove cases.
+              required: true
+              schema:
+                type: string
+                pattern: '^[a-f\d]{24}$'
+        post:
+            tags: [Source, Case]
+            summary: All cases for this source that have the pending removal mark are deleted.
+            operationId: removePendingCases
+            responses:
+                '201':
+                    $ref: '#/components/responses/200'
+                '400':
+                    $ref: '#/components/responses/400'
+                '403':
+                    $ref: '#/components/responses/403'
+                '404':
+                    $ref: '#/components/responses/404'
+                '500':
+                    $ref: '#/components/responses/500'
+    /sources/{sourceId}/clearPendingRemovalStatus:
+        parameters:
+            - name: sourceId
+              in: path
+              description: The parent source ID for which to mark cases as no longer pending removal.
+              required: true
+              schema:
+                type: string
+                pattern: '^[a-f\d]{24}$'
+        post:
+            tags: [Source, Case]
+            summary: Clears the removal pending status of any case from this source.
+            operationId: clearPendingRemovalStatus
+            responses:
+                '201':
+                    $ref: '#/components/responses/200'
+                '400':
+                    $ref: '#/components/responses/400'
+                '403':
+                    $ref: '#/components/responses/403'
+                '404':
+                    $ref: '#/components/responses/404'
+                '500':
+                    $ref: '#/components/responses/500'
     /cases:
         get:
             tags: [Case]
@@ -546,10 +618,9 @@ paths:
     /cases/download:
         post:
             summary: >
-                Streams a CSV attachment of all cases. If a query is supplied the
-                CSV only contains cases matching the search query. If caseIds are
-                supplied the CSV only contains cases with those ids. You cannot supply
-                both query and caseIds.
+                Streams a CSV, TSV or JSON attachment of cases matching the search query. 
+                If caseIds are supplied the CSV only contains cases with those ids. 
+                You cannot supply both query and caseIds.
             tags: [Case]
             operationId: downloadCases
             requestBody:
@@ -557,10 +628,9 @@ paths:
                     application/x-www-form-urlencoded:
                         schema:
                             type: object
-                            maxProperties: 1
                             properties:
                                 caseIds:
-                                    description: Cases corresponding to these ids will returned
+                                    description: Cases corresponding to these ids will be returned
                                     type: array
                                     items:
                                         type: string
@@ -569,6 +639,13 @@ paths:
                                     description: >
                                         Cases matching this query will be returned. This is ignored
                                         if empty.
+                                    type: string
+                                limit:
+                                    description: >
+                                        Max number of rows that can be downloaded when query is provided
+                                    type: string
+                                format:
+                                    description: Format of data to be downloaded
                                     type: string
             responses:
                 '200':
@@ -597,11 +674,19 @@ paths:
                 '500':
                     $ref: '#/components/responses/500'
     /cases/getDownloadLink:
-        get:
+        post:
             summary: >
                 Generates signed URL to download full data set from AWS S3
             tags: [Case]
             operationId: generateSignedUrl
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            properties:
+                                format:
+                                    description: Format in which data should be downloaded
+                                    type: string
             responses:
                 '200':
                     $ref: '#/components/responses/200FullDataSetDownload'
@@ -1131,6 +1216,7 @@ components:
                         url:
                             type: string
                             example: https://opendata.digilugu.ee/opendata_covid19_test_results.csv
+                            description: Source location, can be http, https, or s3 schemes.
                         license:
                             type: string
                             example: MIT
@@ -1165,6 +1251,10 @@ components:
                 excludeFromLineList:
                     description: >
                         Whether cases from this source should be left out of the line list feed.
+                    type: boolean
+                hasStableIdentifiers:
+                    description: >
+                        Whether the source includes identifiers for individual cases that remain the same over time.
                     type: boolean
                 automation:
                     type: object
@@ -1985,7 +2075,7 @@ components:
 servers:
     - url: http://localhost:3001/api
       description: Local server
-    - url: http://dev-curator.ghdsi.org/api
+    - url: http://dev-data.covid-19.global.health/api
       description: Development server
-    - url: http://curator.ghdsi.org/api
+    - url: http://data.covid-19.global.health/api
       description: Production server

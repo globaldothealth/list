@@ -90,7 +90,7 @@ CONTAINER ID        NAME                CPU %               MEM USAGE / LIMIT   
 To load test dev, do:
 
 ```shell
-python3 -m locust --locustfile locustfile.py --host https://dev-curator.ghdsi.org --users 10 --spawn-rate 1
+python3 -m locust --locustfile locustfile.py --host https://dev-data.covid-19.global.health --users 10 --spawn-rate 1
 ```
 
 Follow the link to the locust UI and start the load test there, you can tune the number of users and spawn-rate from the UI or from the command line (command like only sets the defaults used in the UI).

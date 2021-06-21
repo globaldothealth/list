@@ -3,13 +3,15 @@ import 'typeface-roboto';
 
 import * as serviceWorker from './serviceWorker';
 
-import App from './components/App';
+import App from './components/App/App';
 import { BrowserRouter } from 'react-router-dom';
 import { LastLocationProvider } from 'react-router-last-location';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import Amplify from 'aws-amplify';
 import awsconfig from './aws-exports';
+import store from './store';
+import { Provider } from 'react-redux';
 
 Amplify.configure(awsconfig);
 
@@ -17,7 +19,9 @@ ReactDOM.render(
     <React.StrictMode>
         <BrowserRouter>
             <LastLocationProvider>
-                <App />
+                <Provider store={store}>
+                    <App />
+                </Provider>
             </LastLocationProvider>
         </BrowserRouter>
     </React.StrictMode>,

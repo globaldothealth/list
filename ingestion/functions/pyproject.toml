@@ -1,8 +1,8 @@
 [tool.poetry]
 name = "ingestion functions"
 version = "0.1.0"
-description = ""
-authors = ["Your Name <you@example.com>"]
+description = "Ingestion functions for Global.health"
+authors = ["Global.health: a Data Science Initiative <info@global.health>"]
 
 [tool.poetry.dependencies]
 python = "^3.8"
@@ -12,8 +12,6 @@ google-auth = "1.16.1"
 requests-mock = "1.8.0"
 pycountry = "20.7.3"
 pytest = "^6.2.3"
-
-[tool.poetry.dev-dependencies]
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

@@ -24,9 +24,9 @@
   "author": "",
   "license": "MIT",
   "config": {
-     "mongodbMemoryServer": {
-        "version": "latest"
-      }
+    "mongodbMemoryServer": {
+      "version": "latest"
+    }
   },
   "devDependencies": {
     "@shelf/jest-mongodb": "^1.2.3",

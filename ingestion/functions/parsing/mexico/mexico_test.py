@@ -5,9 +5,17 @@ from mexico import mexico
 
 _SOURCE_ID = "abc123"
 _SOURCE_URL = "https://mex.ico"
-_PARSED_CASE = {
+_PARSED_CASES = [{
     "caseReference": {"sourceId": "abc123", "sourceUrl": "https://mex.ico", "sourceEntryId": "147685"},
-    "location": {'query': 'ATIZAPÁN DE ZARAGOZA, MÉXICO, MÉXICO'},
+    "location": {
+        "administrativeAreaLevel1": "MÉXICO",
+        "administrativeAreaLevel2": 'ATIZAPÁN DE ZARAGOZA',
+        "administrativeAreaLevel3": 'ATIZAPÁN DE ZARAGOZA',
+        "country": "Mexico",
+        "geoResolution": "Admin2",
+        "geometry": {"latitude": 19.56480728, "longitude": -99.27404399},
+        "name": "ATIZAPÁN DE ZARAGOZA, MÉXICO, MÉXICO"
+    },
     "events": [
         {
             "name": "confirmed",
@@ -31,7 +39,7 @@ _PARSED_CASE = {
     },
     "preexistingConditions": {"values": ["obesity"]},
     "notes": "Smoker",
-}
+}]
 
 
 class MexicoTest(unittest.TestCase):
@@ -42,4 +50,4 @@ class MexicoTest(unittest.TestCase):
         sample_data_file = os.path.join(current_dir, "sample_data.csv")
 
         result = mexico.parse_cases(sample_data_file, _SOURCE_ID, _SOURCE_URL)
-        self.assertEqual(next(result), _PARSED_CASE)
+        self.assertEqual(list(result), _PARSED_CASES)

@@ -6,18 +6,14 @@ import MuiAlert from '@material-ui/lab/Alert';
 import axios from 'axios';
 
 interface RetrievalResult {
-    bucket: string;
-    key: string;
-    upload_id: string;
+    jobName: string;
 }
 
 /**
  * SourceRetrievalButton is a button that when clicked triggers a fetch of the
  * content of a given source identified by its ID.
- * When successful, details about the retrieval (and parsing if it occurred) is
- * displayed alongside it.
- * Retrieval is synchronously so during that time, the button is disabled and a
- * loading spinner is shown.
+ * When successful, the Batch job name displays alongside it.
+ * Retrieval happens after Batch service responds with a job name.
  */
 export default function SourceRetrievalButton(props: {
     sourceId: string;
@@ -58,16 +54,7 @@ export default function SourceRetrievalButton(props: {
             >
                 {retrieving ? 'Retrieving...' : 'Trigger retrieval'}
             </Button>
-            {result && (
-                <div>
-                    Key: {result?.key}
-                    <br />
-                    Bucket: {result?.bucket}
-                    <br />
-                    {/* TODO: We could redirect the user to the upload page once we have it */}
-                    Upload ID: {result?.upload_id}
-                </div>
-            )}
+            {result && <div>JobName: {result?.jobName}</div>}
             {error && <MuiAlert severity="error">{error}</MuiAlert>}
         </>
     );
