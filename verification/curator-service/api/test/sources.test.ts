@@ -15,7 +15,11 @@ import { Session, User } from '../src/model/user';
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import { Source } from '../src/model/source';
 import app from '../src/index';
+import axios from 'axios';
 import supertest from 'supertest';
+
+jest.mock('axios');
+const mockedAxios = axios as jest.Mocked<typeof axios>;
 
 jest.mock('../src/clients/aws-events-client', () => {
     return jest.fn().mockImplementation(() => {
@@ -614,5 +618,110 @@ describe('retrieval', () => {
             )
             .expect(200);
         expect(mockDoRetrieval).toHaveBeenCalledWith(sourceId, parseRange);
+    });
+});
+
+describe('marking sources for deletion', async () => {
+    it('requires the source not to have stable IDs', async () => {
+        const source = await new Source({
+            name: 'test-source',
+            origin: { url: 'http://foo.bar', license: 'MIT' },
+            format: 'JSON',
+            notificationRecipients: ['foo@bar.com'],
+            hasStableIdentifiers: true,
+        }).save();
+        await curatorRequest.post(
+            `/api/sources/${source._id}/markPendingRemoval`
+        )
+        .expect(400);
+        expect(mockedAxios.post).not.toHaveBeenCalled();
+    });
+
+    it('forwards request to mark sources to the data service', async () => {
+        mockedAxios.post.mockResolvedValueOnce({
+            status: 201,
+        });
+        const source = await new Source({
+            name: 'test-source',
+            origin: { url: 'http://foo.bar', license: 'MIT' },
+            format: 'JSON',
+            notificationRecipients: ['foo@bar.com'],
+            hasStableIdentifiers: false,
+        }).save();
+        await curatorRequest.post(
+            `/api/sources/${source._id}/markPendingRemoval`
+        )
+        .expect(201);
+        expect(mockedAxios.post).toHaveBeenCalledWith(`http://localhost:3000/api/cases/markPendingRemoval?sourceId=${source._id}&email=${baseUser.email}`);
+    });
+});
+
+describe('clearing pending-deletion flag', async () => {
+    it('requires the source not to have stable IDs', async () => {
+        const source = await new Source({
+            name: 'test-source',
+            origin: { url: 'http://foo.bar', license: 'MIT' },
+            format: 'JSON',
+            notificationRecipients: ['foo@bar.com'],
+            hasStableIdentifiers: true,
+        }).save();
+        await curatorRequest.post(
+            `/api/sources/${source._id}/clearPendingRemovalStatus`
+        )
+        .expect(400);
+        expect(mockedAxios.post).not.toHaveBeenCalled();
+    });
+
+    it('forwards request to clear mark to the data service', async () => {
+        mockedAxios.post.mockResolvedValueOnce({
+            status: 201,
+        });
+        const source = await new Source({
+            name: 'test-source',
+            origin: { url: 'http://foo.bar', license: 'MIT' },
+            format: 'JSON',
+            notificationRecipients: ['foo@bar.com'],
+            hasStableIdentifiers: false,
+        }).save();
+        await curatorRequest.post(
+            `/api/sources/${source._id}/clearPendingRemovalStatus`
+        )
+        .expect(201);
+        expect(mockedAxios.post).toHaveBeenCalledWith(`http://localhost:3000/api/cases/clearPendingRemovalStatus?sourceId=${source._id}&email=${baseUser.email}`);
+    });
+});
+
+describe('deleting pending cases for a source', async () => {
+    it('requires the source not to have stable IDs', async () => {
+        const source = await new Source({
+            name: 'test-source',
+            origin: { url: 'http://foo.bar', license: 'MIT' },
+            format: 'JSON',
+            notificationRecipients: ['foo@bar.com'],
+            hasStableIdentifiers: true,
+        }).save();
+        await curatorRequest.post(
+            `/api/sources/${source._id}/removePendingCases`
+        )
+        .expect(400);
+        expect(mockedAxios.post).not.toHaveBeenCalled();
+    });
+
+    it('forwards request to remove cases to the data service', async () => {
+        mockedAxios.post.mockResolvedValueOnce({
+            status: 201,
+        });
+        const source = await new Source({
+            name: 'test-source',
+            origin: { url: 'http://foo.bar', license: 'MIT' },
+            format: 'JSON',
+            notificationRecipients: ['foo@bar.com'],
+            hasStableIdentifiers: false,
+        }).save();
+        await curatorRequest.post(
+            `/api/sources/${source._id}/removePendingCases`
+        )
+        .expect(201);
+        expect(mockedAxios.post).toHaveBeenCalledWith(`http://localhost:3000/api/cases/removePendingCases?sourceId=${source._id}`);
     });
 });

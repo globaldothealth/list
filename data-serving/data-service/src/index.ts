@@ -9,7 +9,9 @@ import {
     createBatchUpdateCaseRevisions,
     createBatchUpsertCaseRevisions,
     createCaseRevision,
+    findCasesForSource,
     findCasesToUpdate,
+    findPendingCaseIdsForRemovalFromSource,
     setBatchUpdateRevisionMetadata,
     setBatchUpsertFields,
     setRevisionMetadata,
@@ -132,6 +134,28 @@ apiRouter.post(
     setBatchUpdateRevisionMetadata,
     createBatchUpdateCaseRevisions,
     caseController.batchUpdate,
+);
+apiRouter.post(
+    '/cases/markPendingRemoval',
+    findCasesForSource,
+    setBatchUpdateRevisionMetadata,
+    createBatchUpdateCaseRevisions,
+    caseController.markPendingRemoval,
+);
+
+apiRouter.post(
+    '/cases/removePendingCases',
+    findPendingCaseIdsForRemovalFromSource,
+    createBatchDeleteCaseRevisions,
+    caseController.batchDel,
+);
+
+apiRouter.post(
+    '/cases/clearPendingRemovalStatus',
+    findCasesForSource,
+    setBatchUpdateRevisionMetadata,
+    createBatchUpdateCaseRevisions,
+    caseController.clearPendingRemovalStatus,
 );
 apiRouter.put(
     '/cases/:id([a-z0-9]{24})',

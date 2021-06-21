@@ -136,17 +136,20 @@ def convert_travel(entry):
         travel = {}
         travel_countries = []
         country = entry
-        
-        country_ISO2 = _COUNTRY_ISO2_MAP[country.lower()]
 
-        location["country"] = _COUNTRY_LAT_LONG_MAP[country_ISO2]["name_english"]
-        location["geoResolution"] = "Country"
-        location["name"] = _COUNTRY_LAT_LONG_MAP[country_ISO2]["name_english"]
-        geometry["latitude"] = _COUNTRY_LAT_LONG_MAP[country_ISO2]["latitude"]
-        geometry["longitude"] = _COUNTRY_LAT_LONG_MAP[country_ISO2]["longitude"]
-        location["geometry"] = geometry
-        
-        travel_countries.append({"location": location})
+        if country.lower() in _COUNTRY_ISO2_MAP:
+            country_ISO2 = _COUNTRY_ISO2_MAP[country.lower()]
+
+            location["country"] = _COUNTRY_LAT_LONG_MAP[country_ISO2]["name_english"]
+            location["geoResolution"] = "Country"
+            location["name"] = _COUNTRY_LAT_LONG_MAP[country_ISO2]["name_english"]
+            geometry["latitude"] = _COUNTRY_LAT_LONG_MAP[country_ISO2]["latitude"]
+            geometry["longitude"] = _COUNTRY_LAT_LONG_MAP[country_ISO2]["longitude"]
+            location["geometry"] = geometry
+
+            travel_countries.append({"location": location})
+        else:
+            print(f"Country code not found for: {country.lower()}")
         travel["traveledPrior30Days"] = True
         travel["travel"] = travel_countries
         if travel:

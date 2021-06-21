@@ -20,6 +20,7 @@ const sourceSchema = new mongoose.Schema({
     },
     format: String,
     excludeFromLineList: Boolean,
+    hasStableIdentifiers: Boolean,
     automation: {
         type: automationSchema,
         validate: automationParsingValidator,
@@ -50,6 +51,7 @@ export type SourceDocument = mongoose.Document & {
     origin: OriginDocument;
     format: string;
     excludeFromLineList: boolean,
+    hasStableIdentifiers: boolean,
     automation: AutomationDocument;
     uploads: UploadDocument[];
     dateFilter: DateFilterDocument;

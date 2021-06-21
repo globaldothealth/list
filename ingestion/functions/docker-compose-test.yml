@@ -1,14 +1,11 @@
 version: "3.7"
 
 services:
-  retrieval:
+  test:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile-test
     env_file: ./.env
-    environment:
-      - EPID_INGESTION_ENV=local
-      - EPID_INGESTION_EMAIL=legit@real.com
   localstack:
     image: localstack/localstack:latest
     env_file: ./.env

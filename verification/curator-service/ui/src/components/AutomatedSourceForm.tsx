@@ -15,7 +15,7 @@ import FieldTitle from './common-form-fields/FieldTitle';
 import MuiAlert from '@material-ui/lab/Alert';
 import React from 'react';
 import { SelectField } from './common-form-fields/FormikFields';
-import { TextField } from 'formik-material-ui';
+import { TextField, CheckboxWithLabel } from 'formik-material-ui';
 import User from './User';
 import axios from 'axios';
 import { useHistory } from 'react-router-dom';
@@ -84,6 +84,8 @@ export interface AutomatedSourceFormValues {
     name: string;
     format: string;
     notificationRecipients: string[];
+    excludeFromLineList: boolean;
+    hasStableIdentifiers: boolean;
 }
 
 const AutomatedSourceFormSchema = Yup.object().shape({
@@ -92,6 +94,8 @@ const AutomatedSourceFormSchema = Yup.object().shape({
     format: Yup.string().required('Required'),
     license: Yup.string().required('Required'),
     notificationRecipients: Yup.array().of(Yup.string().email()),
+    excludeFromLineList: Yup.boolean().required('Required'),
+    hasStableIdentifiers: Yup.boolean().required('Required'),
 });
 
 export default function AutomatedSourceForm(props: Props): JSX.Element {
@@ -107,6 +111,8 @@ export default function AutomatedSourceForm(props: Props): JSX.Element {
             origin: { url: values.url, license: values.license },
             format: values.format,
             notificationRecipients: values.notificationRecipients,
+            excludeFromLineList: values.excludeFromLineList,
+            hasStableIdentifiers: values.hasStableIdentifiers,
         };
         try {
             await axios.post('/api/sources', newSource);
@@ -135,6 +141,8 @@ export default function AutomatedSourceForm(props: Props): JSX.Element {
                     format: '',
                     license: '',
                     notificationRecipients: [props.user.email],
+                    excludeFromLineList: false,
+                    hasStableIdentifiers: false,
                 }}
                 onSubmit={async (values): Promise<void> => {
                     await createSource(values);
@@ -206,6 +214,33 @@ export default function AutomatedSourceForm(props: Props): JSX.Element {
                                         label="Data Source Format"
                                         values={Object.values(Format)}
                                         required
+                                    />
+                                </div>
+                                <div className={classes.formSection}>
+                                    <FastField
+                                        name="excludeFromLineList"
+                                        component={CheckboxWithLabel}
+                                        type="checkbox"
+                                        helperText="Whether cases from this source can appear in the line list"
+                                        required
+                                        data-testid="excludeFromLineList"
+                                        Label={{
+                                            label: 'Exclude From Line List?',
+                                        }}
+                                    />
+                                </div>
+                                <div className={classes.formSection}>
+                                    <FastField
+                                        name="hasStableIdentifiers"
+                                        component={CheckboxWithLabel}
+                                        type="checkbox"
+                                        helperText="Whether cases from this source have unique, unchanging identifiers"
+                                        required
+                                        data-testid="hasStableIdentifiers"
+                                        Label={{
+                                            label:
+                                                'Source has Stable Identifiers?',
+                                        }}
                                     />
                                 </div>
                                 <div className={classes.formSection}>

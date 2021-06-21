@@ -2,19 +2,14 @@ import App from './App';
 import { MemoryRouter, Router } from 'react-router-dom';
 import React from 'react';
 import axios from 'axios';
-import {
-    fireEvent,
-    render,
-    wait,
-    screen,
-    within,
-} from '@testing-library/react';
+import { wait, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { createMemoryHistory } from 'history';
+import { render, fireEvent, screen } from '../util/test-utils';
 
 jest.mock('axios');
 // Mock charts page so that requests for mongo charts are not sent
-jest.mock('./Charts', () => () => <div>Test charts</div>);
+jest.mock('../Charts', () => () => <div>Test charts</div>);
 const mockedAxios = axios as jest.Mocked<typeof axios>;
 
 beforeEach(() => {
@@ -224,5 +219,37 @@ describe('<App />', () => {
         // expect(searchField.value).toBe('dateconfirmedafter:');
         expect(await screen.findByText(/Apply filters/i)).toBeInTheDocument();
         expect(screen.getByRole('textbox', { name: /country/i })).toHaveFocus();
+    });
+
+    describe('Download dataset', () => {
+        it('Displays download dialog after clicking DownloadButton', async () => {
+            const axiosResponse = {
+                data: {
+                    name: 'Alice Smith',
+                    email: 'foo@bar.com',
+                    roles: ['admin'],
+                },
+                status: 200,
+                statusText: 'OK',
+                config: {},
+                headers: {},
+            };
+            mockedAxios.get.mockResolvedValueOnce(axiosResponse);
+            const history = createMemoryHistory({
+                initialEntries: ['/cases'],
+                initialIndex: 0,
+            });
+
+            render(
+                <Router history={history}>
+                    <App />
+                </Router>,
+            );
+
+            fireEvent.click(await screen.findByText(/download dataset/i));
+            expect(
+                await screen.findByText(/download full dataset/i),
+            ).toBeInTheDocument();
+        });
     });
 });
