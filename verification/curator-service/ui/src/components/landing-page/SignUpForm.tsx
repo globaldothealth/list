@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 
@@ -17,12 +17,6 @@ import Button from '@material-ui/core/Button';
 import FormGroup from '@material-ui/core/FormGroup';
 import Checkbox from '@material-ui/core/Checkbox';
 import Typography from '@material-ui/core/Typography';
-import GoogleButton from 'react-google-button';
-import {    Dialog,
-    DialogContent,
-    DialogContentText,
-    DialogTitle} from '@material-ui/core';
-
 
 const useStyles = makeStyles((theme: Theme) => ({
     checkboxRoot: {
@@ -81,15 +75,16 @@ interface FormValues {
     isNewsletterChecked: boolean;
 }
 
-interface SignInFormProps {
+interface SignUpFormProps {
     setRegistrationScreenOn: any;
 }
 
-export default function SignInForm({setRegistrationScreenOn}:SignInFormProps) {
+export default function SignUpForm({setRegistrationScreenOn}:SignUpFormProps) {
     const classes = useStyles();
-
+console.log(setRegistrationScreenOn)
     const [passwordVisible, setPasswordVisible] = useState(false);
-    const [forgotPasswordScreenOn, setForgotPasswordScreenOn] = useState(false);
+    const [passwordConfirmationVisible, setPasswordConfirmationVisible] = useState(false);
+
 
     const validationSchema = Yup.object().shape({
         email: Yup.string()
@@ -140,10 +135,7 @@ export default function SignInForm({setRegistrationScreenOn}:SignInFormProps) {
         <>
                 <form onSubmit={formik.handleSubmit}>
                     <div className={classes.formFlexContainer}>
-                        <div className="normalSigninFields">
-                            <Typography className={classes.title}>
-                                Sign in with username and password
-                            </Typography>
+                        <div id="leftBox">
                             <TextField
                                 fullWidth
                                 className={classes.inpputField}
@@ -161,6 +153,28 @@ export default function SignInForm({setRegistrationScreenOn}:SignInFormProps) {
                                     formik.touched.email && formik.errors.email
                                 }
                             />
+
+                            <TextField
+                                fullWidth
+                                className={classes.inpputField}
+                                variant="outlined"
+                                id="confirmEmail"
+                                name="confirmEmail"
+                                label="Confirm Email"
+                                value={formik.values.confirmEmail}
+                                onChange={formik.handleChange}
+                                error={
+                                    formik.touched.confirmEmail &&
+                                    Boolean(formik.errors.confirmEmail)
+                                }
+                                helperText={
+                                    formik.touched.confirmEmail &&
+                                    formik.errors.confirmEmail
+                                }
+                            />
+                        </div>
+
+                        <div id="rightBox">
                             <FormControl
                                 className={classes.inpputField}
                                 variant="outlined"
@@ -203,25 +217,51 @@ export default function SignInForm({setRegistrationScreenOn}:SignInFormProps) {
                                     {formik.touched.password &&
                                         formik.errors.password}
                                 </FormHelperText>
-                                <Typography className={classes.title}>
-                                    <span
-                                        className={classes.forgotPassword}
-                                        onClick={() =>
-                                            setForgotPasswordScreenOn(true)
-                                        }
-                                    >
-                                        {' '}
-                                        Forgot your password?
-                                    </span>
-                                </Typography>
                             </FormControl>
-                        </div>
 
-                        <div>
-                            <Typography className={classes.title}>
-                                Or sign in with Google
-                            </Typography>
-                            <GoogleButton className={classes.googleButton} />
+                            <FormControl
+                                className={classes.inpputField}
+                                variant="outlined"
+                                error={
+                                    formik.touched.passwordConfirmation &&
+                                    Boolean(formik.errors.passwordConfirmation)
+                                }
+                            >
+                                <InputLabel htmlFor="passwordConfirmation">
+                                    Repeat password
+                                </InputLabel>
+                                <OutlinedInput
+                                    fullWidth
+                                    id="passwordConfirmation"
+                                    type={passwordConfirmationVisible ? 'text' : 'password'}
+                                    value={formik.values.passwordConfirmation}
+                                    onChange={formik.handleChange}
+                                    endAdornment={
+                                        <InputAdornment position="end">
+                                            <IconButton
+                                                aria-label="toggle password visibility"
+                                                onClick={() =>
+                                                    setPasswordConfirmationVisible(
+                                                        !passwordConfirmationVisible,
+                                                    )
+                                                }
+                                                edge="end"
+                                            >
+                                                {passwordConfirmationVisible ? (
+                                                    <Visibility />
+                                                ) : (
+                                                    <VisibilityOff />
+                                                )}
+                                            </IconButton>
+                                        </InputAdornment>
+                                    }
+                                    label="Repeat password"
+                                />
+                                <FormHelperText>
+                                    {formik.touched.passwordConfirmation &&
+                                        formik.errors.passwordConfirmation}
+                                </FormHelperText>
+                            </FormControl>
                         </div>
                     </div>
 
@@ -293,121 +333,20 @@ export default function SignInForm({setRegistrationScreenOn}:SignInFormProps) {
                         color="primary"
                         className={classes.signInButton}
                     >
-                        Sign in
+                        Sign up
                     </Button>
 
                     <Typography className={classes.title}>
-                        Don't have an account?{' '}
+                        Do you have already an account?{' '}
                         <span
                             className={classes.link}
-                            onClick={() => setRegistrationScreenOn(true)}
-                        >
-                            {' '}
-                            Sign up!
-                        </span>
-                    </Typography>
-                </form>
-
-            {/* {forgotPasswordScreenOn &&  
-            <form onSubmit={formik.handleSubmit}>
-                    <div className={classes.formFlexContainer}>
-                        <div className="normalSigninFields">
-                            <Typography className={classes.title}>
-                                Forgot your Password?
-                            </Typography>
-                            <Typography className={classes.title}>
-                                Don't worry! Just fill in your email address and we'll send you a link to reset your password.
-                            </Typography>
-                            <TextField
-                                fullWidth
-                                className={classes.inpputField}
-                                variant="outlined"
-                                id="email"
-                                name="email"
-                                label="Email"
-                                value={formik.values.email}
-                                onChange={formik.handleChange}
-                                error={
-                                    formik.touched.email &&
-                                    Boolean(formik.errors.email)
-                                }
-                                helperText={
-                                    formik.touched.email && formik.errors.email
-                                }
-                            />
-                        </div>
-                    </div>
-
-                    <Button
-                        type="submit"
-                        variant="contained"
-                        color="primary"
-                        className={classes.signInButton}
-                    >
-                        Reset password
-                    </Button>
-
-                    <Typography className={classes.title}>
-                        Do you remember the password?{' '}
-                        <span
-                            className={classes.link}
-                            onClick={() => setForgotPasswordScreenOn(false)}
+                            onClick={() => setRegistrationScreenOn(false)}
                         >
                             {' '}
                             Sign in!
                         </span>
                     </Typography>
-                </form>} */}
-
-
-                <Dialog
-                open={forgotPasswordScreenOn}
-                onClose={(): void => setForgotPasswordScreenOn(false)}
-                // Stops the click being propagated to the table which
-                // would trigger the onRowClick action.
-                onClick={(e): void => e.stopPropagation()}
-            >
-                <DialogTitle>
-                Forgot your Password?
-                </DialogTitle>
-                <DialogContent>
-                    <DialogContentText>
-                    Don't worry! Just fill in your email address and we'll send you a link to reset your password.
-                    </DialogContentText>
-                    <form onSubmit={formik.handleSubmit}>
-                    <div className={classes.formFlexContainer}>
-                        <div className="normalSigninFields">
-                            <TextField
-                                fullWidth
-                                className={classes.inpputField}
-                                variant="outlined"
-                                id="email"
-                                name="email"
-                                label="Email"
-                                value={formik.values.email}
-                                onChange={formik.handleChange}
-                                error={
-                                    formik.touched.email &&
-                                    Boolean(formik.errors.email)
-                                }
-                                helperText={
-                                    formik.touched.email && formik.errors.email
-                                }
-                            />
-                        </div>
-                    </div>
-
-                    <Button
-                        type="submit"
-                        variant="contained"
-                        color="primary"
-                        className={classes.signInButton}
-                    >
-                        Send reset link
-                    </Button>
                 </form>
-                </DialogContent>
-            </Dialog>
         </>
     );
 }
