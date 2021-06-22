@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Paper, Typography } from '@material-ui/core';
 import { Theme, makeStyles } from '@material-ui/core/styles';
 import { useLastLocation } from 'react-router-last-location';
@@ -6,7 +6,9 @@ import useMediaQuery from '@material-ui/core/useMediaQuery';
 
 import { CognitoUser } from '@aws-amplify/auth';
 import User from '../User';
+
 import SignInForm from './SignInForm';
+import SignUpForm from './SignUpForm';
 
 import PolicyLink from '../PolicyLink';
 import PartnerLogos from './PartnerLogos';
@@ -82,6 +84,7 @@ interface CognitoUserExtended extends CognitoUser {
 
 interface LandingPageProps {
     setUser: (user: User | undefined) => void;
+    setRegistrationScreenOn?: () => void;
 }
 
 export default function LandingPage({
@@ -90,6 +93,8 @@ export default function LandingPage({
     const smallHeight = useMediaQuery('(max-height:1050px)');
     const classes = useStyles({ smallHeight });
     const lastLocation = useLastLocation();
+
+    const [registrationScreenOn, setRegistrationScreenOn] = useState(false);
 
     // Store searchQuery in localStorage to apply filters after going through login process
     useEffect(() => {
@@ -181,8 +186,11 @@ export default function LandingPage({
                 </div>
             </div>
 
-
-            <SignInForm />
+            {registrationScreenOn ? (
+                <SignUpForm setRegistrationScreenOn={setRegistrationScreenOn} />
+            ) : (
+                <SignInForm setRegistrationScreenOn={setRegistrationScreenOn} />
+            )}
 
             <PartnerLogos />
         </Paper>
