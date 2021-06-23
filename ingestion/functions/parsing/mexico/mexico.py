@@ -39,7 +39,7 @@ def convert_location(state_code: str, municipality_code: str):
         try:
             query_list.append(_MUNICIPALITIES[state_code + municipality_code])
         except KeyError:
-            print(f"Municipality code missing: {municipality_code}")
+            print(f"Municipality code missing: {state_code} {municipality_code}")
     if state_code[0] != missing_value_prefix:
         try:
             query_list.append(_STATES[state_code])
@@ -51,7 +51,6 @@ def convert_location(state_code: str, municipality_code: str):
         return {
             "administrativeAreaLevel1": _STATES[state_code],
             "administrativeAreaLevel2": _MUNICIPALITIES[municipality_code],
-            "administrativeAreaLevel3": _MUNICIPALITIES[municipality_code],
             "geoResolution": "Admin2",
             "country": "Mexico",
             "name": query_string,
