@@ -76,7 +76,7 @@ interface FormValues {
 }
 
 interface SignUpFormProps {
-    setRegistrationScreenOn: any;
+    setRegistrationScreenOn:  (active: boolean) => void;
 }
 
 export default function SignUpForm({setRegistrationScreenOn}:SignUpFormProps) {
@@ -129,7 +129,7 @@ console.log(setRegistrationScreenOn)
             formik.resetForm();
         };
         // eslint-disable-next-line
-    }, [setRegistrationScreenOn]);
+    }, []);
 
     return (
         <>
