@@ -84,7 +84,6 @@ interface CognitoUserExtended extends CognitoUser {
 
 interface LandingPageProps {
     setUser: (user: User | undefined) => void;
-    setRegistrationScreenOn?: () => void;
 }
 
 export default function LandingPage({
