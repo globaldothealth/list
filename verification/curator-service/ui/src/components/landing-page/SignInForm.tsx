@@ -74,15 +74,13 @@ const useStyles = makeStyles((theme: Theme) => ({
 
 interface FormValues {
     email: string;
-    confirmEmail: string;
     password: string;
-    passwordConfirmation: string;
     isAgreementChecked: boolean;
     isNewsletterChecked: boolean;
 }
 
 interface SignInFormProps {
-    setRegistrationScreenOn: any;
+    setRegistrationScreenOn:  (active: boolean) => void;
 }
 
 export default function SignInForm({setRegistrationScreenOn}:SignInFormProps) {
@@ -116,16 +114,13 @@ export default function SignInForm({setRegistrationScreenOn}:SignInFormProps) {
     const formik = useFormik<FormValues>({
         initialValues: {
             email: '',
-            confirmEmail: '',
             password: '',
-            passwordConfirmation: '',
             isAgreementChecked: false,
             isNewsletterChecked: false,
         },
         validationSchema,
         onSubmit: (values) => {
             // @TODO: Send reqest to authenticate user using username and password
-            console.log(values);
         },
     });
 
@@ -134,7 +129,7 @@ export default function SignInForm({setRegistrationScreenOn}:SignInFormProps) {
             formik.resetForm();
         };
         // eslint-disable-next-line
-    }, [setRegistrationScreenOn]);
+    }, []);
 
     return (
         <>
@@ -307,58 +302,6 @@ export default function SignInForm({setRegistrationScreenOn}:SignInFormProps) {
                         </span>
                     </Typography>
                 </form>
-
-            {/* {forgotPasswordScreenOn &&  
-            <form onSubmit={formik.handleSubmit}>
-                    <div className={classes.formFlexContainer}>
-                        <div className="normalSigninFields">
-                            <Typography className={classes.title}>
-                                Forgot your Password?
-                            </Typography>
-                            <Typography className={classes.title}>
-                                Don't worry! Just fill in your email address and we'll send you a link to reset your password.
-                            </Typography>
-                            <TextField
-                                fullWidth
-                                className={classes.inpputField}
-                                variant="outlined"
-                                id="email"
-                                name="email"
-                                label="Email"
-                                value={formik.values.email}
-                                onChange={formik.handleChange}
-                                error={
-                                    formik.touched.email &&
-                                    Boolean(formik.errors.email)
-                                }
-                                helperText={
-                                    formik.touched.email && formik.errors.email
-                                }
-                            />
-                        </div>
-                    </div>
-
-                    <Button
-                        type="submit"
-                        variant="contained"
-                        color="primary"
-                        className={classes.signInButton}
-                    >
-                        Reset password
-                    </Button>
-
-                    <Typography className={classes.title}>
-                        Do you remember the password?{' '}
-                        <span
-                            className={classes.link}
-                            onClick={() => setForgotPasswordScreenOn(false)}
-                        >
-                            {' '}
-                            Sign in!
-                        </span>
-                    </Typography>
-                </form>} */}
-
 
                 <Dialog
                 open={forgotPasswordScreenOn}
