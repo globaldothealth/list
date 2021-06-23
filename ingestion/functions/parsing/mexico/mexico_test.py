@@ -10,7 +10,6 @@ _PARSED_CASES = [{
     "location": {
         "administrativeAreaLevel1": "MÉXICO",
         "administrativeAreaLevel2": 'ATIZAPÁN DE ZARAGOZA',
-        "administrativeAreaLevel3": 'ATIZAPÁN DE ZARAGOZA',
         "country": "Mexico",
         "geoResolution": "Admin2",
         "geometry": {"latitude": 19.56480728, "longitude": -99.27404399},
