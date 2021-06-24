@@ -200,8 +200,7 @@ class SourceTable extends React.Component<Props, SourceTableState> {
 
                     if (e.response?.data?.name === 'NotificationSendError') {
                         this.setState({
-                            error:
-                                'Failed to send e-mail notifications to registered addresses',
+                            error: 'Failed to send e-mail notifications to registered addresses',
                         });
                         resolve(undefined);
                     } else {
@@ -597,9 +596,8 @@ class SourceTable extends React.Component<Props, SourceTableState> {
                                 listUrl += '?limit=' + this.state.pageSize;
                                 listUrl += '&page=' + (query.page + 1);
                                 this.setState({ error: '' });
-                                const response = axios.get<ListResponse>(
-                                    listUrl,
-                                );
+                                const response =
+                                    axios.get<ListResponse>(listUrl);
                                 response
                                     .then((result) => {
                                         const flattenedSources: TableRow[] = [];

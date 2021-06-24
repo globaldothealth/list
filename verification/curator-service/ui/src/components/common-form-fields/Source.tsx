@@ -42,7 +42,10 @@ const TooltipText = () => (
     </StyledTooltip>
 );
 
-export default class Source extends React.Component<SourceProps, {}> {
+export default class Source extends React.Component<
+    SourceProps,
+    Record<string, unknown>
+> {
     render(): JSX.Element {
         const freeSolo =
             this.props.freeSolo === undefined ? true : this.props.freeSolo;
@@ -116,7 +119,7 @@ export async function submitSource(opts: {
     return {
         sourceId: resp.data._id,
         sourceUrl: opts.url,
-        additionalSources: ([] as unknown) as [{ sourceUrl: string }],
+        additionalSources: [] as unknown as [{ sourceUrl: string }],
     };
 }
 
@@ -206,7 +209,7 @@ export function SourcesAutocomplete(
                             sourceId: source._id,
                             sourceUrl: source.origin.url,
                             sourceName: source.name,
-                            additionalSources: ([] as unknown) as [
+                            additionalSources: [] as unknown as [
                                 { sourceUrl: string },
                             ],
                         })),
@@ -255,7 +258,7 @@ export function SourcesAutocomplete(
                             sourceUrl: newValue,
                             sourceId: '',
                             sourceName: values.caseReference?.sourceName ?? '',
-                            additionalSources: ([] as unknown) as [
+                            additionalSources: [] as unknown as [
                                 { sourceUrl: string },
                             ],
                         };
@@ -285,7 +288,7 @@ export function SourcesAutocomplete(
                             sourceUrl: params.inputValue,
                             sourceId: '',
                             sourceName: values.caseReference?.sourceName ?? '',
-                            additionalSources: ([] as unknown) as [
+                            additionalSources: [] as unknown as [
                                 { sourceUrl: string },
                             ],
                         });

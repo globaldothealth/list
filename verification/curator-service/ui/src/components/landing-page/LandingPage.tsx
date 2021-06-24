@@ -4,7 +4,6 @@ import { Theme, makeStyles } from '@material-ui/core/styles';
 import { useLastLocation } from 'react-router-last-location';
 import useMediaQuery from '@material-ui/core/useMediaQuery';
 
-import { CognitoUser } from '@aws-amplify/auth';
 import User from '../User';
 
 import SignInForm from './SignInForm';
@@ -71,16 +70,6 @@ const useStyles = makeStyles((theme: Theme) => ({
         marginTop: '15px',
     },
 }));
-
-interface UserAttributes {
-    sub: string;
-    email: string;
-    email_verified: boolean;
-}
-
-interface CognitoUserExtended extends CognitoUser {
-    attributes: UserAttributes;
-}
 
 interface LandingPageProps {
     setUser: (user: User | undefined) => void;

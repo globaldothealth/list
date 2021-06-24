@@ -57,7 +57,6 @@ import clsx from 'clsx';
 import { createMuiTheme } from '@material-ui/core/styles';
 import { useLastLocation } from 'react-router-last-location';
 import PolicyLink from '../PolicyLink';
-import { Auth } from 'aws-amplify';
 import { useCookieBanner } from '../../hooks/useCookieBanner';
 import { SortBy, SortByOrder } from '../../constants/types';
 import { URLToSearchQuery } from '../util/searchQuery';
@@ -303,11 +302,6 @@ function ProfileMenu(props: { user: User }): JSX.Element {
 
                 <MenuItem
                     onClick={() => {
-                        try {
-                            Auth.signOut();
-                        } catch (err) {
-                            console.error(err);
-                        }
                         window.location.href = '/auth/logout';
                     }}
                 >
@@ -380,10 +374,8 @@ export default function App(): JSX.Element {
     const [user, setUser] = useState<User | undefined>();
     const [drawerOpen, setDrawerOpen] = useState<boolean>(false);
     const [isLoadingUser, setIsLoadingUser] = useState<boolean>(true);
-    const [
-        createNewButtonAnchorEl,
-        setCreateNewButtonAnchorEl,
-    ] = useState<Element | null>();
+    const [createNewButtonAnchorEl, setCreateNewButtonAnchorEl] =
+        useState<Element | null>();
     const [selectedMenuIndex, setSelectedMenuIndex] = React.useState<number>();
     const [listPage, setListPage] = React.useState<number>(0);
     const [listPageSize, setListPageSize] = React.useState<number>(50);
@@ -391,12 +383,10 @@ export default function App(): JSX.Element {
     const lastLocation = useLastLocation();
     const history = useHistory();
     const location = useLocation<LocationState>();
-    const [filtersModalOpen, setFiltersModalOpen] = React.useState<boolean>(
-        false,
-    );
-    const [activeFilterInput, setActiveFilterInput] = React.useState<string>(
-        '',
-    );
+    const [filtersModalOpen, setFiltersModalOpen] =
+        React.useState<boolean>(false);
+    const [activeFilterInput, setActiveFilterInput] =
+        React.useState<string>('');
     const [sortBy, setSortBy] = useState<SortBy>(SortBy.Default);
     const [sortByOrder, setSortByOrder] = useState<SortByOrder>(
         SortByOrder.Descending,

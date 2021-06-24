@@ -238,8 +238,7 @@ export default function AutomatedSourceForm(props: Props): JSX.Element {
                                         required
                                         data-testid="hasStableIdentifiers"
                                         Label={{
-                                            label:
-                                                'Source has Stable Identifiers?',
+                                            label: 'Source has Stable Identifiers?',
                                         }}
                                     />
                                 </div>

@@ -20,21 +20,23 @@ module.exports = {
   },
   extends: defaultRules,
   rules: {
-        "no-bitwise": [
-            "error"
+        'no-bitwise': [
+            'error'
         ],
-        "linebreak-style": [
-            "error",
-            "unix"
+        'linebreak-style': [
+            'error',
+            'unix'
         ],
-        "quotes": [
-            "error",
-            "single"
+        'quotes': [
+            'error',
+            'single'
         ],
-        "semi": [
-            "error",
-            "always"
-        ]
+        'semi': [
+            'error',
+            'always'
+        ],        
+        '@typescript-eslint/no-redeclare': 'off',
+        '@typescript-eslint/no-unused-expressions': 'off',        
   },
   overrides: [
     {
@@ -43,9 +45,9 @@ module.exports = {
       extends: [
         ...defaultRules,
         'plugin:@typescript-eslint/recommended',
-        "prettier/@typescript-eslint", // Uses eslint-config-prettier to disable ESLint rules from @typescript-eslint/eslint-plugin that would conflict with prettier
-        "plugin:prettier/recommended", // Enables eslint-plugin-prettier and eslint-config-prettier. This will display prettier errors as ESLint errors. Make sure this is always the last configuration in the extends array.
-        "plugin:cypress/recommended"
+        'prettier/@typescript-eslint', // Uses eslint-config-prettier to disable ESLint rules from @typescript-eslint/eslint-plugin that would conflict with prettier
+        'plugin:prettier/recommended', // Enables eslint-plugin-prettier and eslint-config-prettier. This will display prettier errors as ESLint errors. Make sure this is always the last configuration in the extends array.
+        'plugin:cypress/recommended'
       ],
     },
   ],
