@@ -3,12 +3,14 @@ import { Paper, Typography } from '@material-ui/core';
 import { Theme, makeStyles } from '@material-ui/core/styles';
 import { useLastLocation } from 'react-router-last-location';
 import useMediaQuery from '@material-ui/core/useMediaQuery';
+import { useLocation } from 'react-router-dom';
 
 import { CognitoUser } from '@aws-amplify/auth';
 import User from '../User';
 
 import SignInForm from './SignInForm';
 import SignUpForm from './SignUpForm';
+import ChangePasswordForm from './ChangePasswordForm';
 
 import PolicyLink from '../PolicyLink';
 import PartnerLogos from './PartnerLogos';
@@ -78,6 +80,10 @@ interface UserAttributes {
     email_verified: boolean;
 }
 
+interface LocationState {
+    search: string;
+}
+
 interface CognitoUserExtended extends CognitoUser {
     attributes: UserAttributes;
 }
@@ -92,8 +98,22 @@ export default function LandingPage({
     const smallHeight = useMediaQuery('(max-height:1050px)');
     const classes = useStyles({ smallHeight });
     const lastLocation = useLastLocation();
+    const location = useLocation<LocationState>();
 
     const [registrationScreenOn, setRegistrationScreenOn] = useState(false);
+    const [changePasswordScreenOn, setChangePasswordScreenOn] = useState(false);
+
+    useEffect(() => {
+        // temporary - to be changed while building api.
+        // if a user now goes to http://localhost:3002/?token=verifieduser they will be shown the change pass form
+        console.log(location);
+
+        if (location.search.includes('?token=verifieduser')) {
+            setChangePasswordScreenOn(true);
+            return;
+        }
+        //eslint-disable-next-line
+    }, [location]);
 
     // Store searchQuery in localStorage to apply filters after going through login process
     useEffect(() => {
@@ -185,11 +205,16 @@ export default function LandingPage({
                 </div>
             </div>
 
-            {registrationScreenOn ? (
+            {registrationScreenOn && !changePasswordScreenOn ? (
                 <SignUpForm setRegistrationScreenOn={setRegistrationScreenOn} />
             ) : (
-                <SignInForm setRegistrationScreenOn={setRegistrationScreenOn} />
+                !changePasswordScreenOn && (
+                    <SignInForm
+                        setRegistrationScreenOn={setRegistrationScreenOn}
+                    />
+                )
             )}
+            {changePasswordScreenOn && <ChangePasswordForm />}
 
             <PartnerLogos />
         </Paper>
