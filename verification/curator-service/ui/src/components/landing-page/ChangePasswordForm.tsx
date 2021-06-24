@@ -1,9 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 
 import { makeStyles, Theme } from '@material-ui/core/styles';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
 import FormHelperText from '@material-ui/core/FormHelperText';
 import FormControl from '@material-ui/core/FormControl';
 import InputLabel from '@material-ui/core/InputLabel';
@@ -12,13 +11,8 @@ import InputAdornment from '@material-ui/core/InputAdornment';
 import IconButton from '@material-ui/core/IconButton';
 import Visibility from '@material-ui/icons/Visibility';
 import VisibilityOff from '@material-ui/icons/VisibilityOff';
-import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
-import FormGroup from '@material-ui/core/FormGroup';
-import Checkbox from '@material-ui/core/Checkbox';
 import Typography from '@material-ui/core/Typography';
-import GoogleButton from 'react-google-button';
-import ForgotPasswordForm from './ForgotPasswordForm';
 
 const useStyles = makeStyles((theme: Theme) => ({
     checkboxRoot: {
@@ -69,24 +63,17 @@ const useStyles = makeStyles((theme: Theme) => ({
 }));
 
 interface FormValues {
-    email: string;
     password: string;
-    isAgreementChecked: boolean;
-    isNewsletterChecked: boolean;
+    passwordConfirmation: string;
 }
 
-interface SignInFormProps {
-    setRegistrationScreenOn: (active: boolean) => void;
-}
-
-export default function SignInForm({
-    setRegistrationScreenOn,
-    
-}: SignInFormProps) {
+export default function ChangePasswordForm() {
     const classes = useStyles();
-
     const [passwordVisible, setPasswordVisible] = useState(false);
-    const [forgotPasswordScreenOn, setForgotPasswordScreenOn] = useState(false);
+    const [
+        passwordConfirmationVisible,
+        setPasswordConfirmationVisible,
+    ] = useState(false);
 
     const validationSchema = Yup.object().shape({
         email: Yup.string()
@@ -112,14 +99,13 @@ export default function SignInForm({
 
     const formik = useFormik<FormValues>({
         initialValues: {
-            email: '',
             password: '',
-            isAgreementChecked: false,
-            isNewsletterChecked: false,
+            passwordConfirmation: '',
         },
         validationSchema,
         onSubmit: (values) => {
             // @TODO: Send reqest to authenticate user using username and password
+            console.log(values);
         },
     });
 
@@ -134,27 +120,11 @@ export default function SignInForm({
         <>
             <form onSubmit={formik.handleSubmit}>
                 <div className={classes.formFlexContainer}>
-                    <div className="normalSigninFields">
+
+                    <div id="rightBox">
                         <Typography className={classes.title}>
-                            Sign in with username and password
+                            Choose a new password{' '}
                         </Typography>
-                        <TextField
-                            fullWidth
-                            className={classes.inpputField}
-                            variant="outlined"
-                            id="email"
-                            name="email"
-                            label="Email"
-                            value={formik.values.email}
-                            onChange={formik.handleChange}
-                            error={
-                                formik.touched.email &&
-                                Boolean(formik.errors.email)
-                            }
-                            helperText={
-                                formik.touched.email && formik.errors.email
-                            }
-                        />
                         <FormControl
                             className={classes.inpputField}
                             variant="outlined"
@@ -195,87 +165,57 @@ export default function SignInForm({
                                 {formik.touched.password &&
                                     formik.errors.password}
                             </FormHelperText>
-                            <Typography className={classes.title}>
-                                <span
-                                    className={classes.forgotPassword}
-                                    onClick={() =>
-                                        setForgotPasswordScreenOn(true)
-                                    }
-                                >
-                                    {' '}
-                                    Forgot your password?
-                                </span>
-                            </Typography>
+                        </FormControl>
+
+                        <FormControl
+                            className={classes.inpputField}
+                            variant="outlined"
+                            error={
+                                formik.touched.passwordConfirmation &&
+                                Boolean(formik.errors.passwordConfirmation)
+                            }
+                        >
+                            <InputLabel htmlFor="passwordConfirmation">
+                                Repeat password
+                            </InputLabel>
+                            <OutlinedInput
+                                fullWidth
+                                id="passwordConfirmation"
+                                type={
+                                    passwordConfirmationVisible
+                                        ? 'text'
+                                        : 'password'
+                                }
+                                value={formik.values.passwordConfirmation}
+                                onChange={formik.handleChange}
+                                endAdornment={
+                                    <InputAdornment position="end">
+                                        <IconButton
+                                            aria-label="toggle password visibility"
+                                            onClick={() =>
+                                                setPasswordConfirmationVisible(
+                                                    !passwordConfirmationVisible,
+                                                )
+                                            }
+                                            edge="end"
+                                        >
+                                            {passwordConfirmationVisible ? (
+                                                <Visibility />
+                                            ) : (
+                                                <VisibilityOff />
+                                            )}
+                                        </IconButton>
+                                    </InputAdornment>
+                                }
+                                label="Repeat password"
+                            />
+                            <FormHelperText>
+                                {formik.touched.passwordConfirmation &&
+                                    formik.errors.passwordConfirmation}
+                            </FormHelperText>
                         </FormControl>
                     </div>
-
-                    <div>
-                        <Typography className={classes.title}>
-                            Or sign in with Google
-                        </Typography>
-                        <GoogleButton className={classes.googleButton} />
-                    </div>
                 </div>
-
-                <FormGroup>
-                    <FormControlLabel
-                        control={
-                            <Checkbox
-                                checked={formik.values.isAgreementChecked}
-                                onChange={formik.handleChange}
-                                name="isAgreementChecked"
-                                id="isAgreementChecked"
-                            />
-                        }
-                        label={
-                            <Typography className={classes.checkboxLabel}>
-                                By creating an account, I accept the
-                                Global.health{' '}
-                                <a
-                                    href="https://global.health/terms-of-use/"
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className={classes.link}
-                                >
-                                    Terms of Use
-                                </a>{' '}
-                                and{' '}
-                                <a
-                                    href="https://global.health/privacy/"
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className={classes.link}
-                                >
-                                    Privacy Policy
-                                </a>{' '}
-                                <span className={classes.labelRequired}>*</span>
-                            </Typography>
-                        }
-                    />
-                    {formik.touched.isAgreementChecked &&
-                        formik.errors.isAgreementChecked && (
-                            <FormHelperText error variant="outlined">
-                                {formik.errors.isAgreementChecked}
-                            </FormHelperText>
-                        )}
-
-                    <FormControlLabel
-                        control={
-                            <Checkbox
-                                checked={formik.values.isNewsletterChecked}
-                                onChange={formik.handleChange}
-                                name="isNewsletterChecked"
-                                id="isNewsletterChecked"
-                            />
-                        }
-                        label={
-                            <Typography className={classes.checkboxLabel}>
-                                I agree to be added to the Global.health
-                                newsletter
-                            </Typography>
-                        }
-                    />
-                </FormGroup>
 
                 <Button
                     type="submit"
@@ -283,22 +223,9 @@ export default function SignInForm({
                     color="primary"
                     className={classes.signInButton}
                 >
-                    Sign in
+                    Change password
                 </Button>
-
-                <Typography className={classes.title}>
-                    Don't have an account?{' '}
-                    <span
-                        className={classes.link}
-                        onClick={() => setRegistrationScreenOn(true)}
-                    >
-                        {' '}
-                        Sign up!
-                    </span>
-                </Typography>
             </form>
-
-            <ForgotPasswordForm forgotPasswordScreenOn={forgotPasswordScreenOn} setForgotPasswordScreenOn={setForgotPasswordScreenOn} />
         </>
     );
 }
