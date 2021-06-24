@@ -30,11 +30,8 @@ const appSlice = createSlice({
 });
 
 // actions
-export const {
-    setSearchQuery,
-    setFilterBreadcrumbs,
-    deleteFilterBreadcrumbs,
-} = appSlice.actions;
+export const { setSearchQuery, setFilterBreadcrumbs, deleteFilterBreadcrumbs } =
+    appSlice.actions;
 
 // reducer
 export default appSlice.reducer;

@@ -241,12 +241,14 @@ export class AuthController {
      * @param clientSecret the OAuth client secret as gotten from the Google developer console.
      */
     configurePassport(clientID: string, clientSecret: string): void {
-        passport.serializeUser<UserDocument, string>((user, done) => {
+        // For some reason typescript doesn't accept mongoose User
+        // @ts-ignore
+        passport.serializeUser((user: UserDocument, done: any) => {
             // Serializes the user id in the cookie, no user info should be in there, just the id.
             done(null, user.id);
         });
 
-        passport.deserializeUser<UserDocument, string>((id, done) => {
+        passport.deserializeUser((id: string, done: any) => {
             // Find the user based on its id in the cookie.
             User.findById(id)
                 .then((user) => {
@@ -347,7 +349,7 @@ export class AuthController {
                     unusedAccessToken: string,
                     unusedRefreshToken: string,
                     profile: Profile,
-                    cb: VerifyCallback,
+                    cb: any,
                 ): Promise<void> => {
                     const googleProfile = profile as GoogleProfile;
                     try {

@@ -5,9 +5,8 @@ import SearchBar from './SearchBar';
 
 const AppTestComponent = () => {
     const rootRef = React.useRef<HTMLDivElement>(null);
-    const [filtersModalOpen, setFiltersModalOpen] = React.useState<boolean>(
-        false,
-    );
+    const [filtersModalOpen, setFiltersModalOpen] =
+        React.useState<boolean>(false);
 
     return (
         <div ref={rootRef}>

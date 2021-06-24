@@ -194,7 +194,8 @@ export default function SearchBar({
                                         startIcon={<HelpIcon />}
                                         onClick={toggleDataGuide}
                                         className={clsx({
-                                            [classes.activeButton]: isDataGuideOpen,
+                                            [classes.activeButton]:
+                                                isDataGuideOpen,
                                         })}
                                         ref={guideButtonRef}
                                     >
