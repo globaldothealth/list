@@ -18,12 +18,7 @@ import FormGroup from '@material-ui/core/FormGroup';
 import Checkbox from '@material-ui/core/Checkbox';
 import Typography from '@material-ui/core/Typography';
 import GoogleButton from 'react-google-button';
-import {
-    Dialog,
-    DialogContent,
-    DialogContentText,
-    DialogTitle,
-} from '@material-ui/core';
+import ForgotPasswordForm from './ForgotPasswordForm';
 
 const useStyles = makeStyles((theme: Theme) => ({
     checkboxRoot: {
@@ -86,7 +81,7 @@ interface SignInFormProps {
 
 export default function SignInForm({
     setRegistrationScreenOn,
-}: SignInFormProps) {
+}: SignInFormProps): JSX.Element {
     const classes = useStyles();
 
     const [passwordVisible, setPasswordVisible] = useState(false);
@@ -302,54 +297,10 @@ export default function SignInForm({
                 </Typography>
             </form>
 
-            <Dialog
-                open={forgotPasswordScreenOn}
-                onClose={(): void => setForgotPasswordScreenOn(false)}
-                // Stops the click being propagated to the table which
-                // would trigger the onRowClick action.
-                onClick={(e): void => e.stopPropagation()}
-            >
-                <DialogTitle>Forgot your Password?</DialogTitle>
-                <DialogContent>
-                    <DialogContentText>
-                        Don't worry! Just fill in your email address and we'll
-                        send you a link to reset your password.
-                    </DialogContentText>
-                    <form onSubmit={formik.handleSubmit}>
-                        <div className={classes.formFlexContainer}>
-                            <div className="normalSigninFields">
-                                <TextField
-                                    fullWidth
-                                    className={classes.inpputField}
-                                    variant="outlined"
-                                    id="email"
-                                    name="email"
-                                    label="Email"
-                                    value={formik.values.email}
-                                    onChange={formik.handleChange}
-                                    error={
-                                        formik.touched.email &&
-                                        Boolean(formik.errors.email)
-                                    }
-                                    helperText={
-                                        formik.touched.email &&
-                                        formik.errors.email
-                                    }
-                                />
-                            </div>
-                        </div>
-
-                        <Button
-                            type="submit"
-                            variant="contained"
-                            color="primary"
-                            className={classes.signInButton}
-                        >
-                            Send reset link
-                        </Button>
-                    </form>
-                </DialogContent>
-            </Dialog>
+            <ForgotPasswordForm
+                forgotPasswordScreenOn={forgotPasswordScreenOn}
+                setForgotPasswordScreenOn={setForgotPasswordScreenOn}
+            />
         </>
     );
 }
