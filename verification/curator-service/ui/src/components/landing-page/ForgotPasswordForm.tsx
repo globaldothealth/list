@@ -32,15 +32,6 @@ const useStyles = makeStyles((theme: Theme) => ({
         color: theme.palette.primary.main,
         cursor: 'pointer',
     },
-    forgotPassword: {
-        fontWeight: 'normal',
-        color: theme.palette.primary.main,
-        cursor: 'pointer',
-        fontSize: 'small',
-        marginTop: '-8px',
-        display: 'flex',
-        justifyContent: 'flex-end',
-    },
     title: {
         margin: '10px 0',
     },
@@ -60,7 +51,7 @@ interface SignInFormProps {
     setForgotPasswordScreenOn: (active: boolean) => void;
 }
 
-export default function ChangePasswordForm({
+export default function ForgotPasswordForm({
     forgotPasswordScreenOn, setForgotPasswordScreenOn
 }: SignInFormProps) {
     const classes = useStyles();
@@ -69,21 +60,6 @@ export default function ChangePasswordForm({
         email: Yup.string()
             .email('Invalid email address')
             .required('This field is required'),
-        confirmEmail: Yup.string().test(
-            'emails-match',
-            'Emails must match',
-            function (value) {
-                return this.parent.email === value;
-            },
-        ),
-        password: Yup.string().required('This field is required'),
-        passwordConfirmation: Yup.string().test(
-            'passwords-match',
-            'Passwords must match',
-            function (value) {
-                return this.parent.password === value;
-            },
-        ),
         isAgreementChecked: Yup.bool().oneOf([true], 'This field is required'),
     });
 
