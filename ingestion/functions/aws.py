@@ -11,7 +11,10 @@ import boto3
 import common.common_lib as common_lib
 
 AWS_REGION = "us-east-1"
-AWS_IMAGE = "612888738066.dkr.ecr.us-east-1.amazonaws.com/gdh-ingestor:latest"
+AWS_IMAGE = {
+    'dev': "612888738066.dkr.ecr.us-east-1.amazonaws.com/gdh-ingestor:latest",
+    'prod': "612888738066.dkr.ecr.us-east-1.amazonaws.com/gdh-ingestor:stable"
+}
 AWS_JOB_ROLE_ARN = "arn:aws:iam::612888738066:role/gdh-ingestion-job-role"
 AWS_EVENT_ROLE_ARN = "arn:aws:iam::612888738066:role/service-role/AWS_Events_Invoke_Batch_Job_Queue_1312384119"
 AWS_JOB_QUEUE_ARN = "arn:aws:batch:us-east-1:612888738066:job-queue/ingestion-queue"
@@ -49,7 +52,7 @@ def job_definition(
             "attemptDurationSeconds": timeout * 60
         },
         "containerProperties": {
-            "image": AWS_IMAGE,
+            "image": AWS_IMAGE[env],
             "vcpus": vcpu,
             "jobRoleArn": AWS_JOB_ROLE_ARN,
             "memory": memory,
