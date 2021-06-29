@@ -10,10 +10,16 @@ on:
     # Build whenever a new tag is created.
     tags:
       - "*"
+  pull_request:
+    paths:
+      - ".github/workflows/geocoding-service-package.yml"
 
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
+    permissions:
+      packages: write
+      contents: read
 
     steps:
       - uses: actions/checkout@v2
@@ -21,7 +27,7 @@ jobs:
         name: Prepare
         id: prep
         run: |
-          DOCKER_IMAGE=${{github.repository}}/locationservice
+          DOCKER_IMAGE=ghcr.io/${{github.repository}}/locationservice
           VERSION=edge
           if [[ $GITHUB_REF == refs/tags/* ]]; then
             VERSION=${GITHUB_REF#refs/tags/}
@@ -44,6 +50,6 @@ jobs:
           registry: ghcr.io
       - uses: docker/build-push-action@v2
         with:
-          context: geocoding/location-service
+          file: geocoding/location-service/Dockerfile
           push: true
           tags: ${{ steps.prep.outputs.tags }}
