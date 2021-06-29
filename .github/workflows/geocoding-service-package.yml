@@ -10,7 +10,7 @@ on:
     # Build whenever a new tag is created.
     tags:
       - "*"
-  pull_request
+  pull_request:
 
 jobs:
   build-and-push:
