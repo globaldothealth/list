@@ -32,14 +32,12 @@ export default function validateEnv(): Readonly<{
         AWS_ACCESS_KEY_ID: str({
             desc: 'ID for AWS access key credential',
             devDefault: 'fakeAccessKeyId',
-            docs:
-                'https://docs.aws.amazon.com/sdk-for-javascript/v2/developer-guide/loading-node-credentials-environment.html',
+            docs: 'https://docs.aws.amazon.com/sdk-for-javascript/v2/developer-guide/loading-node-credentials-environment.html',
         }),
         AWS_SECRET_ACCESS_KEY: str({
             desc: 'Secret for AWS access key credential',
             devDefault: 'fakeSecretKey',
-            docs:
-                'https://docs.aws.amazon.com/sdk-for-javascript/v2/developer-guide/loading-node-credentials-environment.html',
+            docs: 'https://docs.aws.amazon.com/sdk-for-javascript/v2/developer-guide/loading-node-credentials-environment.html',
         }),
         AWS_SERVICE_REGION: str({
             desc: 'AWS region in which to interact with services/resources',
@@ -58,8 +56,7 @@ export default function validateEnv(): Readonly<{
             devDefault: '',
         }),
         EMAIL_USER_PASSWORD: str({
-            desc:
-                'Password of the email address account used to send notification emails.',
+            desc: 'Password of the email address account used to send notification emails.',
             devDefault: '',
         }),
         ENABLE_LOCAL_AUTH: bool({

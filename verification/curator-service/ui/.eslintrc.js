@@ -36,7 +36,8 @@ module.exports = {
             'always'
         ],        
         '@typescript-eslint/no-redeclare': 'off',
-        '@typescript-eslint/no-unused-expressions': 'off',        
+        '@typescript-eslint/no-unused-expressions': 'off',
+        '@typescript-eslint/no-explicit-any': 'off'    
   },
   overrides: [
     {

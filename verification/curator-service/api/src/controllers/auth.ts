@@ -2,13 +2,10 @@ import {
     Strategy as BearerStrategy,
     IVerifyOptions,
 } from 'passport-http-bearer';
-import {
-    Strategy as GoogleStrategy,
-    Profile,
-    VerifyCallback,
-} from 'passport-google-oauth20';
+import { Strategy as GoogleStrategy, Profile } from 'passport-google-oauth20';
 import { NextFunction, Request, Response } from 'express';
 import { User, UserDocument } from '../model/user';
+import { Token } from '../model/token';
 
 import { Router } from 'express';
 import axios from 'axios';
@@ -17,6 +14,7 @@ import passport from 'passport';
 import localStrategy from 'passport-local';
 import AwsLambdaClient from '../clients/aws-lambda-client';
 import bcrypt from 'bcrypt';
+import * as crypto from 'crypto';
 
 // Global variable for newsletter acceptance
 let isNewsletterAccepted: boolean;
@@ -203,6 +201,100 @@ export class AuthController {
             mustBeAuthenticated,
             (req: Request, res: Response): void => {
                 res.json(req.user);
+            },
+        );
+
+        /**
+         * Generate reset password link
+         */
+        this.router.post(
+            '/request-password-reset',
+            async (req: Request, res: Response): Promise<void> => {
+                const email = req.body.email as string;
+
+                try {
+                    // Check if user with this email address exists
+                    const user = await User.findOne({ email });
+                    if (!user) {
+                        throw new Error('User does not exist');
+                    }
+
+                    // Check if there is a token in DB already for this user
+                    const token = await Token.findOne({ userId: user._id });
+                    if (token) {
+                        await token.deleteOne();
+                    }
+
+                    const resetToken = crypto.randomBytes(32).toString('hex');
+                    const hash = await bcrypt.hash(resetToken, 10);
+
+                    // Add new reset token to DB
+                    await new Token({
+                        userId: user._id,
+                        token: hash,
+                        createdAt: Date.now(),
+                    }).save();
+
+                    const resetLink = `http://localhost:3002/password-reset?token=${resetToken}&id=${user._id}`;
+
+                    // @TODO: Send email
+                    res.status(200).json({ resetLink });
+                } catch (error) {
+                    res.status(500).json(error);
+                }
+            },
+        );
+
+        /**
+         * Reset user's password
+         */
+        this.router.post(
+            '/reset-password',
+            async (req: Request, res: Response): Promise<void> => {
+                const userId = req.body.userId;
+                const token = req.body.token as string;
+                const newPassword = req.body.newPassword as string;
+
+                try {
+                    // Check if token exists
+                    const passwordResetToken = await Token.findOne({ userId });
+                    if (!passwordResetToken) {
+                        throw new Error(
+                            'Invalid or expired password reset token',
+                        );
+                    }
+
+                    // Check if token is valid
+                    const isValid = await bcrypt.compare(
+                        token,
+                        passwordResetToken.token,
+                    );
+                    if (!isValid) {
+                        throw new Error(
+                            'Invalid or expired password reset token',
+                        );
+                    }
+
+                    // Hash new password and update user document in DB
+                    const hashedPassword = await bcrypt.hash(newPassword, 10);
+                    await User.updateOne(
+                        { _id: userId },
+                        { $set: { password: hashedPassword } },
+                        { new: true },
+                    );
+
+                    // Send confirmation email to the user
+                    const user = await User.findOne({ _id: userId });
+
+                    // @TODO: Send email
+
+                    // Delete used token
+                    await passwordResetToken.deleteOne();
+
+                    res.status(200).json(user);
+                } catch (error) {
+                    res.status(500).json(error);
+                }
             },
         );
     }

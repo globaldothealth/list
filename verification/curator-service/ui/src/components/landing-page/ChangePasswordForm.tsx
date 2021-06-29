@@ -74,16 +74,6 @@ export default function ChangePasswordForm(): JSX.Element {
         useState(false);
 
     const validationSchema = Yup.object().shape({
-        email: Yup.string()
-            .email('Invalid email address')
-            .required('This field is required'),
-        confirmEmail: Yup.string().test(
-            'emails-match',
-            'Emails must match',
-            function (value) {
-                return this.parent.email === value;
-            },
-        ),
         password: Yup.string().required('This field is required'),
         passwordConfirmation: Yup.string().test(
             'passwords-match',
@@ -92,7 +82,6 @@ export default function ChangePasswordForm(): JSX.Element {
                 return this.parent.password === value;
             },
         ),
-        isAgreementChecked: Yup.bool().oneOf([true], 'This field is required'),
     });
 
     const formik = useFormik<FormValues>({
