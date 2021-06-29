@@ -9,6 +9,9 @@
       "__v": {
         "bsonType": "int"
       },
+      "pendingRemoval": {
+        "bsonType": "bool"
+      },
       "caseReference": {
         "bsonType": "object",
         "additionalProperties": false,
