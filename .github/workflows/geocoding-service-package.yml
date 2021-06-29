@@ -44,5 +44,6 @@ jobs:
           registry: ghcr.io
       - uses: docker/build-push-action@v2
         with:
-          dockerfile: geocoding/location-service/Dockerfile
+          context: geocoding/location-service
+          push: true
           tags: ${{ steps.prep.outputs.tags }}
