@@ -3,7 +3,6 @@ import { Paper, Typography } from '@material-ui/core';
 import { Theme, makeStyles } from '@material-ui/core/styles';
 import { useLastLocation } from 'react-router-last-location';
 import useMediaQuery from '@material-ui/core/useMediaQuery';
-import { useLocation } from 'react-router-dom';
 
 import User from '../User';
 
@@ -13,6 +12,9 @@ import ChangePasswordForm from './ChangePasswordForm';
 
 import PolicyLink from '../PolicyLink';
 import PartnerLogos from './PartnerLogos';
+
+import { useParams, withRouter } from 'react-router-dom';
+import { RouteComponentProps } from 'react-router';
 
 interface StylesProps {
     smallHeight: boolean;
@@ -79,133 +81,134 @@ interface LocationState {
 
 interface LandingPageProps {
     setUser: (user: User | undefined) => void;
+    changePassword: boolean;
 }
 
-export default function LandingPage({
-    setUser,
-}: LandingPageProps): JSX.Element {
-    const smallHeight = useMediaQuery('(max-height:1050px)');
-    const classes = useStyles({ smallHeight });
-    const lastLocation = useLastLocation();
-    const location = useLocation<LocationState>();
+const LandingPage = withRouter(
+    ({
+        // setUser,
+        changePassword,
+        history,
+    }: LandingPageProps): JSX.Element => {
+        const smallHeight = useMediaQuery('(max-height:1050px)');
+        const classes = useStyles({ smallHeight });
+        const lastLocation = useLastLocation();
+        const [registrationScreenOn, setRegistrationScreenOn] = useState(false);
 
-    const [registrationScreenOn, setRegistrationScreenOn] = useState(false);
-    const [changePasswordScreenOn, setChangePasswordScreenOn] = useState(false);
-
-    useEffect(() => {
-        // temporary - to be changed while building api.
-        // if a user now goes to http://localhost:3002/?token=verifieduser they will be shown the change pass form
-        console.log(location);
-
-        if (location.search.includes('?token=verifieduser')) {
-            setChangePasswordScreenOn(true);
-            return;
+        interface UrlParams {
+            id: string;
         }
-        //eslint-disable-next-line
-    }, [location]);
 
-    // Store searchQuery in localStorage to apply filters after going through login process
-    useEffect(() => {
-        if (!lastLocation || lastLocation.search === '') return;
+        // the params sent from the url
+        const { id } = useParams<UrlParams>();
 
-        localStorage.setItem('searchQuery', lastLocation.search);
-    }, [lastLocation]);
+        // Store searchQuery in localStorage to apply filters after going through login process
+        useEffect(() => {
+            if (!lastLocation || lastLocation.search === '') return;
 
-    return (
-        <Paper classes={{ root: classes.paper }}>
-            <Typography variant="h4">
-                Detailed line list data to power your research
-            </Typography>
-            <div className={classes.body}>
-                <Typography
-                    classes={{ root: classes.description }}
-                    variant="h5"
-                >
-                    Welcome to G.h Data. The first of its kind, easy to use
-                    global data repository with open access to real-time
-                    epidemiological anonymized line list data.
+            localStorage.setItem('searchQuery', lastLocation.search);
+        }, [lastLocation]);
+
+        return (
+            <Paper classes={{ root: classes.paper }}>
+                <Typography variant="h4">
+                    Detailed line list data to power your research
                 </Typography>
-                <div className={classes.linksContainer}>
-                    <div>
-                        <Typography>More information</Typography>
-                        <div className={classes.link}>
-                            <a
-                                href="https://global.health/"
-                                rel="noopener noreferrer"
-                                target="_blank"
+                <div className={classes.body}>
+                    <Typography
+                        classes={{ root: classes.description }}
+                        variant="h5"
+                    >
+                        Welcome to G.h Data. The first of its kind, easy to use
+                        global data repository with open access to real-time
+                        epidemiological anonymized line list data.
+                    </Typography>
+                    <div className={classes.linksContainer}>
+                        <div>
+                            <Typography>More information</Typography>
+                            <div className={classes.link}>
+                                <a
+                                    href="https://global.health/"
+                                    rel="noopener noreferrer"
+                                    target="_blank"
+                                >
+                                    Global.health website
+                                </a>
+                            </div>
+                            <div className={classes.link}>
+                                <a
+                                    href="https://map.covid-19.global.health/"
+                                    rel="noopener noreferrer"
+                                    target="_blank"
+                                >
+                                    Global.health map
+                                </a>
+                            </div>
+                            <div className={classes.link}>
+                                <a
+                                    href="https://github.com/globaldothealth/list/blob/main/data-serving/scripts/export-data/functions/01-split/fields.txt"
+                                    rel="noopener noreferrer"
+                                    target="_blank"
+                                >
+                                    Data dictionary
+                                </a>
+                            </div>
+                            <div className={classes.link}>
+                                <a
+                                    href="https://global.health/acknowledgement/"
+                                    rel="noopener noreferrer"
+                                    target="_blank"
+                                >
+                                    Data acknowledgments
+                                </a>
+                            </div>
+                            <div className={classes.link}>
+                                <a
+                                    href="https://global.health/terms-of-use/"
+                                    rel="noopener noreferrer"
+                                    target="_blank"
+                                >
+                                    Terms of use
+                                </a>
+                            </div>
+                            <div className={classes.link}>
+                                <a
+                                    href="https://global.health/privacy/"
+                                    rel="noopener noreferrer"
+                                    target="_blank"
+                                >
+                                    Privacy policy
+                                </a>
+                            </div>
+                            <PolicyLink
+                                type="cookie-policy"
+                                classes={{
+                                    root: classes.link,
+                                }}
                             >
-                                Global.health website
-                            </a>
+                                Cookie policy
+                            </PolicyLink>
                         </div>
-                        <div className={classes.link}>
-                            <a
-                                href="https://map.covid-19.global.health/"
-                                rel="noopener noreferrer"
-                                target="_blank"
-                            >
-                                Global.health map
-                            </a>
-                        </div>
-                        <div className={classes.link}>
-                            <a
-                                href="https://github.com/globaldothealth/list/blob/main/data-serving/scripts/export-data/functions/01-split/fields.txt"
-                                rel="noopener noreferrer"
-                                target="_blank"
-                            >
-                                Data dictionary
-                            </a>
-                        </div>
-                        <div className={classes.link}>
-                            <a
-                                href="https://global.health/acknowledgement/"
-                                rel="noopener noreferrer"
-                                target="_blank"
-                            >
-                                Data acknowledgments
-                            </a>
-                        </div>
-                        <div className={classes.link}>
-                            <a
-                                href="https://global.health/terms-of-use/"
-                                rel="noopener noreferrer"
-                                target="_blank"
-                            >
-                                Terms of use
-                            </a>
-                        </div>
-                        <div className={classes.link}>
-                            <a
-                                href="https://global.health/privacy/"
-                                rel="noopener noreferrer"
-                                target="_blank"
-                            >
-                                Privacy policy
-                            </a>
-                        </div>
-                        <PolicyLink
-                            type="cookie-policy"
-                            classes={{
-                                root: classes.link,
-                            }}
-                        >
-                            Cookie policy
-                        </PolicyLink>
                     </div>
                 </div>
-            </div>
 
-            {registrationScreenOn && !changePasswordScreenOn ? (
-                <SignUpForm setRegistrationScreenOn={setRegistrationScreenOn} />
-            ) : (
-                !changePasswordScreenOn && (
-                    <SignInForm
+                {registrationScreenOn && !changePassword ? (
+                    <SignUpForm
                         setRegistrationScreenOn={setRegistrationScreenOn}
                     />
-                )
-            )}
-            {changePasswordScreenOn && <ChangePasswordForm />}
+                ) : (
+                    !changePassword && (
+                        <SignInForm
+                            setRegistrationScreenOn={setRegistrationScreenOn}
+                        />
+                    )
+                )}
+                {changePassword && <ChangePasswordForm />}
 
-            <PartnerLogos />
-        </Paper>
-    );
-}
+                <PartnerLogos />
+            </Paper>
+        );
+    },
+);
+
+export default LandingPage;

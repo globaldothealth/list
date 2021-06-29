@@ -20,7 +20,7 @@ import {
     useHistory,
     useLocation,
 } from 'react-router-dom';
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Theme, makeStyles } from '@material-ui/core/styles';
 
 import AddIcon from '@material-ui/icons/Add';
@@ -395,47 +395,40 @@ export default function App(): JSX.Element {
 
     const savedSearchQuery = localStorage.getItem('searchQuery');
 
-    const menuList = useMemo(
-        () =>
-            user
-                ? [
-                      {
-                          text: 'Charts',
-                          icon: <HomeIcon />,
-                          to: '/',
-                          displayCheck: (): boolean =>
-                              hasAnyRole(['curator', 'admin']),
-                      },
-                      {
-                          text: 'Line list',
-                          icon: <ListIcon />,
-                          to: { pathname: '/cases', search: '' },
-                          displayCheck: (): boolean => true,
-                      },
-                      {
-                          text: 'Sources',
-                          icon: <LinkIcon />,
-                          to: '/sources',
-                          displayCheck: (): boolean => hasAnyRole(['curator']),
-                      },
-                      {
-                          text: 'Uploads',
-                          icon: <PublishIcon />,
-                          to: '/uploads',
-                          displayCheck: (): boolean => hasAnyRole(['curator']),
-                      },
-                      {
-                          text: 'Manage users',
-                          icon: <PeopleIcon />,
-                          to: '/users',
-                          displayCheck: (): boolean => hasAnyRole(['admin']),
-                      },
-                  ]
-                : [],
-
-        // eslint-disable-next-line
-        [user],
-    );
+    const menuList = user
+        ? [
+              {
+                  text: 'Charts',
+                  icon: <HomeIcon />,
+                  to: '/',
+                  displayCheck: (): boolean => hasAnyRole(['curator', 'admin']),
+              },
+              {
+                  text: 'Line list',
+                  icon: <ListIcon />,
+                  to: { pathname: '/cases', search: '' },
+                  displayCheck: (): boolean => true,
+              },
+              {
+                  text: 'Sources',
+                  icon: <LinkIcon />,
+                  to: '/sources',
+                  displayCheck: (): boolean => hasAnyRole(['curator']),
+              },
+              {
+                  text: 'Uploads',
+                  icon: <PublishIcon />,
+                  to: '/uploads',
+                  displayCheck: (): boolean => hasAnyRole(['curator']),
+              },
+              {
+                  text: 'Manage users',
+                  icon: <PeopleIcon />,
+                  to: '/users',
+                  displayCheck: (): boolean => hasAnyRole(['admin']),
+              },
+          ]
+        : [];
 
     // Update filter breadcrumbs
     useEffect(() => {
@@ -886,8 +879,11 @@ export default function App(): JSX.Element {
                             ) : isLoadingUser ? (
                                 <></>
                             ) : (
-                                <LandingPage setUser={setUser} />
+                                <LandingPage setUser={setUser} changePassword={false} />
                             )}
+                        </Route>
+                        <Route path="/changepassword/:id" >
+                            <LandingPage setUser={setUser} changePassword />
                         </Route>
                         {/* Redirect any unavailable URLs to / after the user has loaded. */}
                         {!isLoadingUser && (

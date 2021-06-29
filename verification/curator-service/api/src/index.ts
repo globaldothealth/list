@@ -162,7 +162,7 @@ new EmailClient(env.EMAIL_USER_ADDRESS, env.EMAIL_USER_PASSWORD)
             emailClient,
             awsBatchClient,
             awsEventsClient,
-            env.DATASERVER_URL
+            env.DATASERVER_URL,
         );
         apiRouter.get(
             '/sources',
