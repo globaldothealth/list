@@ -2,7 +2,7 @@ name: Ingestion functions deploy
 
 on:
   push:
-    branches: [main, 1.6-stable]
+    branches: [main, *-stable]
     paths:
     - '.github/workflows/ingestion-functions-python.yml'
     - 'ingestion/functions/**'
@@ -37,7 +37,7 @@ jobs:
         docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
 
     - name: Build, tag, and push image to Amazon ECR
-      if: ${{ github.ref == 'refs/heads/1.6-stable' }}
+      if: ${{ endsWith(github.ref, '-stable') }}
       working-directory: ingestion/functions
       env:
         ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
