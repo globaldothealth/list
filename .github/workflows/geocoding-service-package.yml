@@ -11,6 +11,8 @@ on:
     tags:
       - "*"
   pull_request:
+    paths:
+      - ".github/workflows/geocoding-service-package.yml"
 
 jobs:
   build-and-push:
