@@ -770,6 +770,7 @@ export default function App(): JSX.Element {
                 >
                     <div className={classes.drawerHeader} />
                     <Switch>
+                        <Redirect from="/:url*(/+)" to={location.pathname.slice(0, -1)} />
                         {user && (
                             <Route exact path="/cases">
                                 <LinelistTable
