@@ -1,10 +1,25 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
+import { useAppSelector, useAppDispatch } from '../../hooks/redux';
+import {
+    selectResetPasswordEmailSent,
+    selectForgotPasswordPopupOpen,
+    selectIsLoading,
+    selectError,
+} from '../../redux/auth/selectors';
+import { requestResetPasswordLink } from '../../redux/auth/thunk';
+import {
+    setForgotPasswordPopupOpen,
+    resetError,
+    toggleSnackbar,
+} from '../../redux/auth/slice';
 
 import { makeStyles, Theme } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
+import Alert from '@material-ui/lab/Alert';
+import LinearProgress from '@material-ui/core/LinearProgress';
 import {
     Dialog,
     DialogContent,
@@ -26,6 +41,7 @@ const useStyles = makeStyles((theme: Theme) => ({
     },
     signInButton: {
         marginTop: '10px',
+        marginBottom: '10px',
     },
     link: {
         fontWeight: 'bold',
@@ -43,43 +59,58 @@ const useStyles = makeStyles((theme: Theme) => ({
 
 interface FormValues {
     email: string;
-    password: string;
 }
 
-interface SignInFormProps {
-    forgotPasswordScreenOn: boolean;
-    setForgotPasswordScreenOn: (active: boolean) => void;
-}
-
-export default function ForgotPasswordForm({
-    forgotPasswordScreenOn,
-    setForgotPasswordScreenOn,
-}: SignInFormProps) {
+export default function ForgotPasswordForm(): React.ReactElement {
     const classes = useStyles();
+    const dispatch = useAppDispatch();
+
+    const resetPasswordEmailSent = useAppSelector(selectResetPasswordEmailSent);
+    const forgotPasswordPopupOpen = useAppSelector(
+        selectForgotPasswordPopupOpen,
+    );
+    const isLoading = useAppSelector(selectIsLoading);
+    const error = useAppSelector(selectError);
+
+    // After successfuly sending email show snackbar alert and hide this popup
+    useEffect(() => {
+        if (!resetPasswordEmailSent) return;
+
+        formik.resetForm();
+
+        dispatch(setForgotPasswordPopupOpen(false));
+        dispatch(
+            toggleSnackbar({
+                isOpen: true,
+                message:
+                    'Email containing password reset link was sent. Please check your inbox.',
+            }),
+        );
+
+        // eslint-disable-next-line
+    }, [dispatch, resetPasswordEmailSent]);
 
     const validationSchema = Yup.object().shape({
         email: Yup.string()
             .email('Invalid email address')
             .required('This field is required'),
-        isAgreementChecked: Yup.bool().oneOf([true], 'This field is required'),
     });
 
     const formik = useFormik<FormValues>({
         initialValues: {
             email: '',
-            password: '',
         },
         validationSchema,
         onSubmit: (values) => {
-            // @TODO: Send reqest to authenticate user using username and password
+            dispatch(requestResetPasswordLink(values));
         },
     });
 
     return (
         <>
             <Dialog
-                open={forgotPasswordScreenOn}
-                onClose={(): void => setForgotPasswordScreenOn(false)}
+                open={forgotPasswordPopupOpen}
+                onClose={() => dispatch(setForgotPasswordPopupOpen(false))}
                 // Stops the click being propagated to the table which
                 // would trigger the onRowClick action.
                 onClick={(e): void => e.stopPropagation()}
@@ -94,6 +125,7 @@ export default function ForgotPasswordForm({
                         <div className={classes.formFlexContainer}>
                             <div className="normalSigninFields">
                                 <TextField
+                                    disabled={isLoading}
                                     fullWidth
                                     className={classes.inpputField}
                                     variant="outlined"
@@ -118,10 +150,22 @@ export default function ForgotPasswordForm({
                             type="submit"
                             variant="contained"
                             color="primary"
+                            disabled={isLoading}
                             className={classes.signInButton}
                         >
                             Send reset link
                         </Button>
+
+                        {isLoading && <LinearProgress color="primary" />}
+
+                        {error && (
+                            <Alert
+                                severity="error"
+                                onClose={() => dispatch(resetError())}
+                            >
+                                {error}
+                            </Alert>
+                        )}
                     </form>
                 </DialogContent>
             </Dialog>

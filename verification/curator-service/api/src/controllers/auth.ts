@@ -6,6 +6,7 @@ import { Strategy as GoogleStrategy, Profile } from 'passport-google-oauth20';
 import { NextFunction, Request, Response } from 'express';
 import { User, UserDocument } from '../model/user';
 import { Token } from '../model/token';
+import { isValidObjectId } from 'mongoose';
 
 import { Router } from 'express';
 import axios from 'axios';
@@ -15,6 +16,7 @@ import localStrategy from 'passport-local';
 import AwsLambdaClient from '../clients/aws-lambda-client';
 import bcrypt from 'bcrypt';
 import * as crypto from 'crypto';
+import EmailClient from '../clients/email-client';
 
 // Global variable for newsletter acceptance
 let isNewsletterAccepted: boolean;
@@ -115,6 +117,7 @@ export class AuthController {
     constructor(
         private readonly afterLoginRedirURL: string,
         public readonly lambdaClient: AwsLambdaClient,
+        public readonly emailClient: EmailClient,
     ) {
         this.router = Router();
         this.LocalStrategy = localStrategy.Strategy;
@@ -235,12 +238,17 @@ export class AuthController {
                         createdAt: Date.now(),
                     }).save();
 
-                    const resetLink = `http://localhost:3002/password-reset?token=${resetToken}&id=${user._id}`;
+                    const resetLink = `http://localhost:3002/reset-password/${resetToken}/${user._id}`;
 
-                    // @TODO: Send email
-                    res.status(200).json({ resetLink });
+                    await this.emailClient.send(
+                        [email],
+                        'Password reset link',
+                        `Here is your password reset link: ${resetLink}`,
+                    );
+
+                    res.sendStatus(200);
                 } catch (error) {
-                    res.status(500).json(error);
+                    res.status(500).json({ message: String(error.message) });
                 }
             },
         );
@@ -256,6 +264,12 @@ export class AuthController {
                 const newPassword = req.body.newPassword as string;
 
                 try {
+                    // Validate user id
+                    const isValidId = isValidObjectId(userId);
+                    if (!isValidId) {
+                        throw new Error('Invalid user id');
+                    }
+
                     // Check if token exists
                     const passwordResetToken = await Token.findOne({ userId });
                     if (!passwordResetToken) {
@@ -286,14 +300,24 @@ export class AuthController {
                     // Send confirmation email to the user
                     const user = await User.findOne({ _id: userId });
 
-                    // @TODO: Send email
+                    if (!user) {
+                        throw new Error(
+                            'Something went wrong, please try again later',
+                        );
+                    }
+
+                    await this.emailClient.send(
+                        [user.email],
+                        'Password changed successfully',
+                        'Your password was changed successfully',
+                    );
 
                     // Delete used token
                     await passwordResetToken.deleteOne();
 
-                    res.status(200).json(user);
+                    res.sendStatus(200);
                 } catch (error) {
-                    res.status(500).json(error);
+                    res.status(500).json({ message: String(error.message) });
                 }
             },
         );

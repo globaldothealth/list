@@ -1,7 +1,8 @@
-import { Theme, makeStyles } from '@material-ui/core/styles';
-
 import React from 'react';
-import User from './User';
+import { useAppSelector } from '../hooks/redux';
+import { selectUser } from '../redux/auth/selectors';
+
+import { Theme, makeStyles } from '@material-ui/core/styles';
 import { Chip, Tooltip } from '@material-ui/core';
 
 const styles = makeStyles((theme: Theme) => ({
@@ -23,60 +24,69 @@ const styles = makeStyles((theme: Theme) => ({
     },
 }));
 
-export default function Profile(props: { user: User }): JSX.Element {
+export default function Profile(): JSX.Element {
     const classes = styles();
+
+    const user = useAppSelector(selectUser);
+
     return (
-        <div className={classes.root}>
-            {!props.user.email && (
-                <div className={classes.login}>
-                    Login required to view this page
-                </div>
-            )}
+        <>
+            {user ? (
+                <div className={classes.root}>
+                    {!user.email && (
+                        <div className={classes.login}>
+                            Login required to view this page
+                        </div>
+                    )}
 
-            {props.user.name && (
-                <div className={classes.name}>
-                    <strong>Name:</strong> {props.user.name}
-                </div>
-            )}
+                    {user.name && (
+                        <div className={classes.name}>
+                            <strong>Name:</strong> {user.name}
+                        </div>
+                    )}
 
-            {props.user.email && (
-                <div className={classes.email}>
-                    <strong>Email: </strong>
-                    {props.user.email}
-                </div>
-            )}
+                    {user.email && (
+                        <div className={classes.email}>
+                            <strong>Email: </strong>
+                            {user.email}
+                        </div>
+                    )}
 
-            {props.user.roles &&
-                props.user.roles.map((role) => {
-                    const tooltip = (
-                        text: string,
-                        role: string,
-                    ): JSX.Element => {
-                        return (
-                            <Tooltip
-                                className={classes.role}
-                                key={role}
-                                title={text}
-                            >
-                                <Chip variant="outlined" label={role} />
-                            </Tooltip>
-                        );
-                    };
-                    switch (role) {
-                        case 'curator':
-                            return tooltip(
-                                'curators can submit and verify cases and ingestion sources',
-                                role,
-                            );
-                        case 'admin':
-                            return tooltip(
-                                'admins can administer roles of other users',
-                                role,
-                            );
-                        default:
-                            throw Error(`Unknown role ${role}`);
-                    }
-                })}
-        </div>
+                    {user.roles &&
+                        user.roles.map((role) => {
+                            const tooltip = (
+                                text: string,
+                                role: string,
+                            ): JSX.Element => {
+                                return (
+                                    <Tooltip
+                                        className={classes.role}
+                                        key={role}
+                                        title={text}
+                                    >
+                                        <Chip variant="outlined" label={role} />
+                                    </Tooltip>
+                                );
+                            };
+                            switch (role) {
+                                case 'curator':
+                                    return tooltip(
+                                        'curators can submit and verify cases and ingestion sources',
+                                        role,
+                                    );
+                                case 'admin':
+                                    return tooltip(
+                                        'admins can administer roles of other users',
+                                        role,
+                                    );
+                                default:
+                                    throw Error(`Unknown role ${role}`);
+                            }
+                        })}
+                </div>
+            ) : (
+                <></>
+            )}
+        </>
     );
 }

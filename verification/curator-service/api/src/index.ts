@@ -123,10 +123,19 @@ const awsEventsClient = new AwsEventsClient(
 );
 const s3Client = new S3({ region: 'us-east-1', signatureVersion: 'v4' });
 
+// Configure Email Client
+const emailClient = new EmailClient(
+    env.AWS_ACCESS_KEY_ID,
+    env.AWS_SECRET_ACCESS_KEY,
+    'us-east-2',
+    env.EMAIL_USER_ADDRESS,
+).initialize();
+
 // Configure auth controller
 const authController = new AuthController(
     env.AFTER_LOGIN_REDIRECT_URL,
     awsLambdaClient,
+    emailClient,
 );
 authController.configurePassport(
     env.GOOGLE_OAUTH_CLIENT_ID,
@@ -147,268 +156,241 @@ app.use(
     }),
 );
 
-new EmailClient(env.EMAIL_USER_ADDRESS, env.EMAIL_USER_PASSWORD)
-    .initialize()
-    .catch((e) => {
-        logger.error('Failed to instantiate email client:', e);
-        process.exit(1);
-    })
-    .then((emailClient) => {
-        // Configure curator API routes.
-        const apiRouter = express.Router();
+// Configure curator API routes.
+const apiRouter = express.Router();
 
-        // Configure sources controller.
-        const sourcesController = new SourcesController(
-            emailClient,
-            awsBatchClient,
-            awsEventsClient,
-            env.DATASERVER_URL,
-        );
-        apiRouter.get(
-            '/sources',
-            mustHaveAnyRole(['curator']),
-            sourcesController.list,
-        );
-        apiRouter.get(
-            '/sources/:id([a-z0-9]{24})',
-            mustHaveAnyRole(['curator']),
-            sourcesController.get,
-        );
-        apiRouter.post(
-            '/sources',
-            mustHaveAnyRole(['curator']),
-            sourcesController.create,
-        );
-        apiRouter.put(
-            '/sources/:id([a-z0-9]{24})',
-            mustHaveAnyRole(['curator']),
-            sourcesController.update,
-        );
-        apiRouter.delete(
-            '/sources/:id([a-z0-9]{24})',
-            mustHaveAnyRole(['curator']),
-            sourcesController.del,
-        );
-        apiRouter.post(
-            '/sources/:id([a-z0-9]{24})/retrieve',
-            mustHaveAnyRole(['curator']),
-            sourcesController.retrieve,
-        );
-        apiRouter.get(
-            '/sources/parsers',
-            mustHaveAnyRole(['curator']),
-            sourcesController.listParsers,
-        );
-        apiRouter.post(
-            '/sources/:id([a-z0-9]{24})/markPendingRemoval',
-            mustHaveAnyRole(['curator']),
-            sourcesController.markPendingRemoval,
-        );
-        apiRouter.post(
-            '/sources/:id([a-z0-9]{24})/removePendingCases',
-            mustHaveAnyRole(['curator']),
-            sourcesController.removePendingCases,
-        );
-        apiRouter.post(
-            '/sources/:id([a-z0-9]{24})/clearPendingRemovalStatus',
-            mustHaveAnyRole(['curator']),
-            sourcesController.clearPendingRemovalStatus,
-        );
+// Configure sources controller.
+const sourcesController = new SourcesController(
+    emailClient,
+    awsBatchClient,
+    awsEventsClient,
+    env.DATASERVER_URL,
+);
+apiRouter.get('/sources', mustHaveAnyRole(['curator']), sourcesController.list);
+apiRouter.get(
+    '/sources/:id([a-z0-9]{24})',
+    mustHaveAnyRole(['curator']),
+    sourcesController.get,
+);
+apiRouter.post(
+    '/sources',
+    mustHaveAnyRole(['curator']),
+    sourcesController.create,
+);
+apiRouter.put(
+    '/sources/:id([a-z0-9]{24})',
+    mustHaveAnyRole(['curator']),
+    sourcesController.update,
+);
+apiRouter.delete(
+    '/sources/:id([a-z0-9]{24})',
+    mustHaveAnyRole(['curator']),
+    sourcesController.del,
+);
+apiRouter.post(
+    '/sources/:id([a-z0-9]{24})/retrieve',
+    mustHaveAnyRole(['curator']),
+    sourcesController.retrieve,
+);
+apiRouter.get(
+    '/sources/parsers',
+    mustHaveAnyRole(['curator']),
+    sourcesController.listParsers,
+);
+apiRouter.post(
+    '/sources/:id([a-z0-9]{24})/markPendingRemoval',
+    mustHaveAnyRole(['curator']),
+    sourcesController.markPendingRemoval,
+);
+apiRouter.post(
+    '/sources/:id([a-z0-9]{24})/removePendingCases',
+    mustHaveAnyRole(['curator']),
+    sourcesController.removePendingCases,
+);
+apiRouter.post(
+    '/sources/:id([a-z0-9]{24})/clearPendingRemovalStatus',
+    mustHaveAnyRole(['curator']),
+    sourcesController.clearPendingRemovalStatus,
+);
 
-        // Configure uploads controller.
-        const uploadsController = new UploadsController(emailClient);
-        apiRouter.get(
-            '/sources/uploads',
-            mustHaveAnyRole(['curator']),
-            uploadsController.list,
-        );
-        apiRouter.post(
-            '/sources/:sourceId([a-z0-9]{24})/uploads',
-            mustHaveAnyRole(['curator']),
-            uploadsController.create,
-        );
-        apiRouter.put(
-            '/sources/:sourceId([a-z0-9]{24})/uploads/:id([a-z0-9]{24})',
-            mustHaveAnyRole(['curator']),
-            uploadsController.update,
-        );
+// Configure uploads controller.
+const uploadsController = new UploadsController(emailClient);
+apiRouter.get(
+    '/sources/uploads',
+    mustHaveAnyRole(['curator']),
+    uploadsController.list,
+);
+apiRouter.post(
+    '/sources/:sourceId([a-z0-9]{24})/uploads',
+    mustHaveAnyRole(['curator']),
+    uploadsController.create,
+);
+apiRouter.put(
+    '/sources/:sourceId([a-z0-9]{24})/uploads/:id([a-z0-9]{24})',
+    mustHaveAnyRole(['curator']),
+    uploadsController.update,
+);
 
-        // Configure cases controller proxying to data service.
-        const casesController = new CasesController(
-            env.DATASERVER_URL,
-            s3Client,
-        );
-        apiRouter.get('/cases', mustBeAuthenticated, casesController.list);
-        apiRouter.get(
-            '/cases/symptoms',
-            mustHaveAnyRole(['curator']),
-            casesController.listSymptoms,
-        );
-        apiRouter.get(
-            '/cases/placesOfTransmission',
-            mustHaveAnyRole(['curator']),
-            casesController.listPlacesOfTransmission,
-        );
-        apiRouter.get(
-            '/cases/occupations',
-            mustHaveAnyRole(['curator']),
-            casesController.listOccupations,
-        );
-        apiRouter.get(
-            '/cases/:id([a-z0-9]{24})',
-            mustBeAuthenticated,
-            casesController.get,
-        );
-        apiRouter.post(
-            '/cases/getDownloadLink',
-            mustBeAuthenticated,
-            casesController.getDownloadLink,
-        );
-        apiRouter.post(
-            '/cases',
-            mustHaveAnyRole(['curator']),
-            casesController.create,
-        );
-        apiRouter.post(
-            '/cases/download',
-            mustBeAuthenticated,
-            casesController.download,
-        );
-        apiRouter.post(
-            '/cases/downloadAsync',
-            mustBeAuthenticated,
-            casesController.downloadAsync,
-        );
-        apiRouter.post(
-            '/cases/batchUpsert',
-            mustHaveAnyRole(['curator']),
-            casesController.batchUpsert,
-        );
-        apiRouter.put(
-            '/cases',
-            mustHaveAnyRole(['curator']),
-            casesController.upsert,
-        );
-        apiRouter.post(
-            '/cases/batchUpdate',
-            mustHaveAnyRole(['curator']),
-            casesController.batchUpdate,
-        );
-        apiRouter.post(
-            '/cases/batchUpdateQuery',
-            mustHaveAnyRole(['curator']),
-            casesController.batchUpdateQuery,
-        );
-        apiRouter.post(
-            '/cases/batchStatusChange',
-            mustHaveAnyRole(['curator']),
-            casesController.batchStatusChange,
-        );
-        apiRouter.put(
-            '/cases/:id([a-z0-9]{24})',
-            mustHaveAnyRole(['curator']),
-            casesController.update,
-        );
-        apiRouter.delete(
-            '/cases',
-            mustHaveAnyRole(['curator', 'admin']),
-            casesController.batchDel,
-        );
-        apiRouter.delete(
-            '/cases/:id([a-z0-9]{24})',
-            mustHaveAnyRole(['curator']),
-            casesController.del,
-        );
+// Configure cases controller proxying to data service.
+const casesController = new CasesController(env.DATASERVER_URL, s3Client);
+apiRouter.get('/cases', mustBeAuthenticated, casesController.list);
+apiRouter.get(
+    '/cases/symptoms',
+    mustHaveAnyRole(['curator']),
+    casesController.listSymptoms,
+);
+apiRouter.get(
+    '/cases/placesOfTransmission',
+    mustHaveAnyRole(['curator']),
+    casesController.listPlacesOfTransmission,
+);
+apiRouter.get(
+    '/cases/occupations',
+    mustHaveAnyRole(['curator']),
+    casesController.listOccupations,
+);
+apiRouter.get(
+    '/cases/:id([a-z0-9]{24})',
+    mustBeAuthenticated,
+    casesController.get,
+);
+apiRouter.post(
+    '/cases/getDownloadLink',
+    mustBeAuthenticated,
+    casesController.getDownloadLink,
+);
+apiRouter.post('/cases', mustHaveAnyRole(['curator']), casesController.create);
+apiRouter.post(
+    '/cases/download',
+    mustBeAuthenticated,
+    casesController.download,
+);
+apiRouter.post(
+    '/cases/downloadAsync',
+    mustBeAuthenticated,
+    casesController.downloadAsync,
+);
+apiRouter.post(
+    '/cases/batchUpsert',
+    mustHaveAnyRole(['curator']),
+    casesController.batchUpsert,
+);
+apiRouter.put('/cases', mustHaveAnyRole(['curator']), casesController.upsert);
+apiRouter.post(
+    '/cases/batchUpdate',
+    mustHaveAnyRole(['curator']),
+    casesController.batchUpdate,
+);
+apiRouter.post(
+    '/cases/batchUpdateQuery',
+    mustHaveAnyRole(['curator']),
+    casesController.batchUpdateQuery,
+);
+apiRouter.post(
+    '/cases/batchStatusChange',
+    mustHaveAnyRole(['curator']),
+    casesController.batchStatusChange,
+);
+apiRouter.put(
+    '/cases/:id([a-z0-9]{24})',
+    mustHaveAnyRole(['curator']),
+    casesController.update,
+);
+apiRouter.delete(
+    '/cases',
+    mustHaveAnyRole(['curator', 'admin']),
+    casesController.batchDel,
+);
+apiRouter.delete(
+    '/cases/:id([a-z0-9]{24})',
+    mustHaveAnyRole(['curator']),
+    casesController.del,
+);
 
-        // Configure users controller.
-        apiRouter.get(
-            '/users',
-            mustHaveAnyRole(['admin']),
-            usersController.list,
-        );
-        apiRouter.put(
-            '/users/:id',
-            mustHaveAnyRole(['admin']),
-            usersController.updateRoles,
-        );
-        apiRouter.get(
-            '/users/roles',
-            mustHaveAnyRole(['admin']),
-            usersController.listRoles,
-        );
+// Configure users controller.
+apiRouter.get('/users', mustHaveAnyRole(['admin']), usersController.list);
+apiRouter.put(
+    '/users/:id',
+    mustHaveAnyRole(['admin']),
+    usersController.updateRoles,
+);
+apiRouter.get(
+    '/users/roles',
+    mustHaveAnyRole(['admin']),
+    usersController.listRoles,
+);
 
-        const geocodeProxy = new GeocodeProxy(env.LOCATION_SERVICE_URL);
+const geocodeProxy = new GeocodeProxy(env.LOCATION_SERVICE_URL);
 
-        // Forward geocode requests to location service.
-        apiRouter.get(
-            '/geocode/suggest',
-            mustHaveAnyRole(['curator']),
-            geocodeProxy.suggest,
-        );
-        apiRouter.post('/geocode/seed', geocodeProxy.seed);
-        apiRouter.post('/geocode/clear', geocodeProxy.clear);
+// Forward geocode requests to location service.
+apiRouter.get(
+    '/geocode/suggest',
+    mustHaveAnyRole(['curator']),
+    geocodeProxy.suggest,
+);
+apiRouter.post('/geocode/seed', geocodeProxy.seed);
+apiRouter.post('/geocode/clear', geocodeProxy.clear);
 
-        // Forward excluded case IDs fetching to data service
-        apiRouter.get('/excludedCaseIds', casesController.listExcludedCaseIds);
+// Forward excluded case IDs fetching to data service
+apiRouter.get('/excludedCaseIds', casesController.listExcludedCaseIds);
 
-        app.use('/api', apiRouter);
+app.use('/api', apiRouter);
 
-        // Basic health check handler.
-        app.get('/health', (req: Request, res: Response) => {
-            // 0: disconnected, 1: connected, 2: connecting, 3: disconnecting.
-            // https://mongoosejs.com/docs/api.html#connection_Connection-readyState
-            if (mongoose.connection.readyState == 1) {
-                res.sendStatus(200);
-                return;
-            }
-            // Unavailable, this is wrong as per HTTP RFC, 503 would mean that we
-            // couldn't determine if the backend was healthy or not but honestly
-            // this is simple enough that it makes sense.
-            return res.sendStatus(503);
+// Basic health check handler.
+app.get('/health', (req: Request, res: Response) => {
+    // 0: disconnected, 1: connected, 2: connecting, 3: disconnecting.
+    // https://mongoosejs.com/docs/api.html#connection_Connection-readyState
+    if (mongoose.connection.readyState == 1) {
+        res.sendStatus(200);
+        return;
+    }
+    // Unavailable, this is wrong as per HTTP RFC, 503 would mean that we
+    // couldn't determine if the backend was healthy or not but honestly
+    // this is simple enough that it makes sense.
+    return res.sendStatus(503);
+});
+
+// API documentation.
+const swaggerDocument = YAML.load('./openapi/openapi.yaml');
+app.use(
+    '/api-docs',
+    swaggerUi.serve,
+    swaggerUi.setup(swaggerDocument, {
+        // Hide the useless "SWAGGER" black bar at the top.
+        customCss: '.swagger-ui .topbar { display: none }',
+        // Make it look nicer.
+        customCssUrl:
+            'https://cdn.jsdelivr.net/npm/swagger-ui-themes@3.0.1/themes/3.x/theme-material.css',
+    }),
+);
+
+// Register error handler to format express validator errors otherwise
+// a complete HTML document is sent as the error output.
+app.use(
+    (
+        err: ValidationError,
+        req: Request,
+        res: Response,
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        next: NextFunction,
+    ) => {
+        res.status(err.status || 500).json({
+            message: err.message,
+            errors: err.errors,
         });
+    },
+);
 
-        // API documentation.
-        const swaggerDocument = YAML.load('./openapi/openapi.yaml');
-        app.use(
-            '/api-docs',
-            swaggerUi.serve,
-            swaggerUi.setup(swaggerDocument, {
-                // Hide the useless "SWAGGER" black bar at the top.
-                customCss: '.swagger-ui .topbar { display: none }',
-                // Make it look nicer.
-                customCssUrl:
-                    'https://cdn.jsdelivr.net/npm/swagger-ui-themes@3.0.1/themes/3.x/theme-material.css',
-            }),
-        );
-
-        // Register error handler to format express validator errors otherwise
-        // a complete HTML document is sent as the error output.
-        app.use(
-            (
-                err: ValidationError,
-                req: Request,
-                res: Response,
-                // eslint-disable-next-line @typescript-eslint/no-unused-vars
-                next: NextFunction,
-            ) => {
-                res.status(err.status || 500).json({
-                    message: err.message,
-                    errors: err.errors,
-                });
-            },
-        );
-
-        // Serve static UI content if static directory was specified.
-        if (env.STATIC_DIR) {
-            logger.info('Serving static files from', env.STATIC_DIR);
-            app.use(express.static(env.STATIC_DIR));
-            // Send index to any unmatched route.
-            // This must be the LAST handler installed on the app.
-            // All subsequent handlers will be ignored.
-            app.get('*', (req: Request, res: Response) => {
-                res.sendFile(path.join(env.STATIC_DIR, 'index.html'));
-            });
-        }
+// Serve static UI content if static directory was specified.
+if (env.STATIC_DIR) {
+    logger.info('Serving static files from', env.STATIC_DIR);
+    app.use(express.static(env.STATIC_DIR));
+    // Send index to any unmatched route.
+    // This must be the LAST handler installed on the app.
+    // All subsequent handlers will be ignored.
+    app.get('*', (req: Request, res: Response) => {
+        res.sendFile(path.join(env.STATIC_DIR, 'index.html'));
     });
+}
 
 export default app;

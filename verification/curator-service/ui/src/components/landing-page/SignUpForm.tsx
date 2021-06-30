@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
+import { useAppDispatch } from '../../hooks/redux';
+import { signUpWithEmailAndPassword } from '../../redux/auth/thunk';
 
 import { makeStyles, Theme } from '@material-ui/core/styles';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
@@ -76,14 +78,17 @@ interface FormValues {
 }
 
 interface SignUpFormProps {
+    disabled: boolean;
     setRegistrationScreenOn: (active: boolean) => void;
 }
 
 export default function SignUpForm({
+    disabled,
     setRegistrationScreenOn,
-}: SignUpFormProps) {
+}: SignUpFormProps): React.ReactElement {
     const classes = useStyles();
-    console.log(setRegistrationScreenOn);
+    const dispatch = useAppDispatch();
+
     const [passwordVisible, setPasswordVisible] = useState(false);
     const [passwordConfirmationVisible, setPasswordConfirmationVisible] =
         useState(false);
@@ -121,8 +126,14 @@ export default function SignUpForm({
         },
         validationSchema,
         onSubmit: (values) => {
-            // @TODO: Send reqest to authenticate user using username and password
-            console.log(values);
+            const { email, password, isNewsletterChecked } = values;
+            dispatch(
+                signUpWithEmailAndPassword({
+                    email,
+                    password,
+                    newsletterAccepted: isNewsletterChecked,
+                }),
+            );
         },
     });
 
@@ -139,6 +150,7 @@ export default function SignUpForm({
                 <div className={classes.formFlexContainer}>
                     <div id="leftBox">
                         <TextField
+                            disabled={disabled}
                             fullWidth
                             className={classes.inpputField}
                             variant="outlined"
@@ -157,6 +169,7 @@ export default function SignUpForm({
                         />
 
                         <TextField
+                            disabled={disabled}
                             fullWidth
                             className={classes.inpputField}
                             variant="outlined"
@@ -178,6 +191,7 @@ export default function SignUpForm({
 
                     <div id="rightBox">
                         <FormControl
+                            disabled={disabled}
                             className={classes.inpputField}
                             variant="outlined"
                             error={
@@ -220,6 +234,7 @@ export default function SignUpForm({
                         </FormControl>
 
                         <FormControl
+                            disabled={disabled}
                             className={classes.inpputField}
                             variant="outlined"
                             error={
@@ -271,6 +286,7 @@ export default function SignUpForm({
 
                 <FormGroup>
                     <FormControlLabel
+                        disabled={disabled}
                         control={
                             <Checkbox
                                 checked={formik.values.isAgreementChecked}
@@ -312,6 +328,7 @@ export default function SignUpForm({
                         )}
 
                     <FormControlLabel
+                        disabled={disabled}
                         control={
                             <Checkbox
                                 checked={formik.values.isNewsletterChecked}
@@ -330,6 +347,7 @@ export default function SignUpForm({
                 </FormGroup>
 
                 <Button
+                    disabled={disabled}
                     type="submit"
                     variant="contained"
                     color="primary"

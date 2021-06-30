@@ -4,19 +4,11 @@ import { Case } from './Case';
 import CaseForm from './CaseForm';
 import { LinearProgress } from '@material-ui/core';
 import MuiAlert from '@material-ui/lab/Alert';
-import User from './User';
 import axios from 'axios';
 
 interface Props {
-    user: User;
     id: string;
     onModalClose: () => void;
-}
-
-interface State {
-    case?: Case;
-    errorMessage?: string;
-    loading: boolean;
 }
 
 export default function EditCase(props: Props): JSX.Element {
@@ -48,11 +40,7 @@ export default function EditCase(props: Props): JSX.Element {
                 </MuiAlert>
             )}
             {c && (
-                <CaseForm
-                    user={props.user}
-                    initialCase={c}
-                    onModalClose={props.onModalClose}
-                />
+                <CaseForm initialCase={c} onModalClose={props.onModalClose} />
             )}
         </div>
     );

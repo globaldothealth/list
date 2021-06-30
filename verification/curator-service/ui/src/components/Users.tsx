@@ -1,6 +1,8 @@
 import MaterialTable, { QueryResult } from 'material-table';
 import { Avatar, Paper, TablePagination, Typography } from '@material-ui/core';
 import React, { RefObject } from 'react';
+import { connect, ConnectedProps } from 'react-redux';
+import { RootState } from '../redux/store';
 import {
     Theme,
     WithStyles,
@@ -14,6 +16,12 @@ import MuiAlert from '@material-ui/lab/Alert';
 import Select from '@material-ui/core/Select';
 import User from './User';
 import axios from 'axios';
+
+const mapStateToProps = (state: RootState) => ({
+    user: state.auth.user,
+});
+const connector = connect(mapStateToProps);
+type PropsFromRedux = ConnectedProps<typeof connector>;
 
 interface ListResponse {
     users: User[];
@@ -36,8 +44,7 @@ interface TableRow {
     roles: string[];
 }
 
-interface Props extends WithStyles<typeof styles> {
-    user: User;
+interface Props extends PropsFromRedux, WithStyles<typeof styles> {
     onUserChange: () => void;
 }
 
@@ -221,7 +228,7 @@ class Users extends React.Component<Props, UsersState> {
                 roles: event.target.value,
             })
             .then(() => {
-                if (userId === this.props.user._id) {
+                if (this.props.user && userId === this.props.user.id) {
                     this.props.onUserChange();
                 }
                 if (this.tableRef?.current) {
@@ -271,4 +278,4 @@ class Users extends React.Component<Props, UsersState> {
     }
 }
 
-export default withStyles(styles, { withTheme: true })(Users);
+export default connector(withStyles(styles, { withTheme: true })(Users));

@@ -1,12 +1,15 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { ChipData } from '../App';
+import { ChipData } from '../../components/App/App';
+import { getUserProfile } from '../../redux/auth/thunk';
 
 interface AppState {
+    isLoading: boolean;
     searchQuery: string;
     filterBreadcrumbs: ChipData[];
 }
 
 const initialState: AppState = {
+    isLoading: false,
     searchQuery: '',
     filterBreadcrumbs: [],
 };
@@ -26,6 +29,17 @@ const appSlice = createSlice({
                 (breadcrumb) => breadcrumb.key !== action.payload.key,
             );
         },
+    },
+    extraReducers: (builder) => {
+        builder.addCase(getUserProfile.pending, (state) => {
+            state.isLoading = true;
+        });
+        builder.addCase(getUserProfile.fulfilled, (state) => {
+            state.isLoading = false;
+        });
+        builder.addCase(getUserProfile.rejected, (state) => {
+            state.isLoading = false;
+        });
     },
 });
 

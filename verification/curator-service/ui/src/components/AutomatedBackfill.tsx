@@ -9,7 +9,6 @@ import { DateField } from './common-form-fields/FormikFields';
 import MuiAlert from '@material-ui/lab/Alert';
 import { Paper } from '@material-ui/core';
 import React from 'react';
-import User from './User';
 import axios from 'axios';
 import { makeStyles } from '@material-ui/core/styles';
 import { useInterval } from '../hooks/useInterval';
@@ -104,7 +103,6 @@ interface UploadSummary {
 }
 
 interface Props {
-    user: User;
     onModalClose: () => void;
 }
 
