@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
+import { useAppDispatch } from '../../hooks/redux';
+import { signInWithEmailAndPassword } from '../../redux/auth/thunk';
+import { setForgotPasswordPopupOpen } from '../../redux/auth/slice';
 
 import { makeStyles, Theme } from '@material-ui/core/styles';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
@@ -76,37 +79,26 @@ interface FormValues {
 }
 
 interface SignInFormProps {
+    disabled: boolean;
     setRegistrationScreenOn: (active: boolean) => void;
 }
 
 export default function SignInForm({
+    disabled,
     setRegistrationScreenOn,
 }: SignInFormProps): JSX.Element {
+    const dispatch = useAppDispatch();
     const classes = useStyles();
 
     const [passwordVisible, setPasswordVisible] = useState(false);
-    const [forgotPasswordScreenOn, setForgotPasswordScreenOn] = useState(false);
 
     const validationSchema = Yup.object().shape({
         email: Yup.string()
             .email('Invalid email address')
             .required('This field is required'),
-        confirmEmail: Yup.string().test(
-            'emails-match',
-            'Emails must match',
-            function (value) {
-                return this.parent.email === value;
-            },
-        ),
         password: Yup.string().required('This field is required'),
-        passwordConfirmation: Yup.string().test(
-            'passwords-match',
-            'Passwords must match',
-            function (value) {
-                return this.parent.password === value;
-            },
-        ),
         isAgreementChecked: Yup.bool().oneOf([true], 'This field is required'),
+        isNewsletterChecked: Yup.bool(),
     });
 
     const formik = useFormik<FormValues>({
@@ -116,9 +108,17 @@ export default function SignInForm({
             isAgreementChecked: false,
             isNewsletterChecked: false,
         },
+        initialStatus: {
+            isAgreementChecked: '',
+        },
         validationSchema,
         onSubmit: (values) => {
-            // @TODO: Send reqest to authenticate user using username and password
+            dispatch(
+                signInWithEmailAndPassword({
+                    email: values.email,
+                    password: values.password,
+                }),
+            );
         },
     });
 
@@ -138,6 +138,7 @@ export default function SignInForm({
                             Sign in with username and password
                         </Typography>
                         <TextField
+                            disabled={disabled}
                             fullWidth
                             className={classes.inpputField}
                             variant="outlined"
@@ -155,6 +156,7 @@ export default function SignInForm({
                             }
                         />
                         <FormControl
+                            disabled={disabled}
                             className={classes.inpputField}
                             variant="outlined"
                             error={
@@ -198,7 +200,9 @@ export default function SignInForm({
                                 <span
                                     className={classes.forgotPassword}
                                     onClick={() =>
-                                        setForgotPasswordScreenOn(true)
+                                        dispatch(
+                                            setForgotPasswordPopupOpen(true),
+                                        )
                                     }
                                 >
                                     {' '}
@@ -212,12 +216,29 @@ export default function SignInForm({
                         <Typography className={classes.title}>
                             Or sign in with Google
                         </Typography>
-                        <GoogleButton className={classes.googleButton} />
+                        <GoogleButton
+                            className={classes.googleButton}
+                            disabled={disabled}
+                            onClick={() => {
+                                if (!formik.values.isAgreementChecked) {
+                                    formik.setErrors({
+                                        isAgreementChecked:
+                                            'This field is required',
+                                    });
+                                } else {
+                                    window.location.href = `${process.env
+                                        .REACT_APP_LOGIN_URL!}?newsletterAccepted=${
+                                        formik.values.isNewsletterChecked
+                                    }`;
+                                }
+                            }}
+                        />
                     </div>
                 </div>
 
                 <FormGroup>
                     <FormControlLabel
+                        disabled={disabled}
                         control={
                             <Checkbox
                                 checked={formik.values.isAgreementChecked}
@@ -251,14 +272,14 @@ export default function SignInForm({
                             </Typography>
                         }
                     />
-                    {formik.touched.isAgreementChecked &&
-                        formik.errors.isAgreementChecked && (
-                            <FormHelperText error variant="outlined">
-                                {formik.errors.isAgreementChecked}
-                            </FormHelperText>
-                        )}
+                    {formik.errors.isAgreementChecked && (
+                        <FormHelperText error variant="outlined">
+                            {formik.errors.isAgreementChecked}
+                        </FormHelperText>
+                    )}
 
                     <FormControlLabel
+                        disabled={disabled}
                         control={
                             <Checkbox
                                 checked={formik.values.isNewsletterChecked}
@@ -277,6 +298,7 @@ export default function SignInForm({
                 </FormGroup>
 
                 <Button
+                    disabled={disabled}
                     type="submit"
                     variant="contained"
                     color="primary"
@@ -297,10 +319,7 @@ export default function SignInForm({
                 </Typography>
             </form>
 
-            <ForgotPasswordForm
-                forgotPasswordScreenOn={forgotPasswordScreenOn}
-                setForgotPasswordScreenOn={setForgotPasswordScreenOn}
-            />
+            <ForgotPasswordForm />
         </>
     );
 }

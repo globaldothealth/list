@@ -9,7 +9,7 @@ import axios from 'axios';
 import range from 'lodash/range';
 import userEvent from '@testing-library/user-event';
 import { ChipData } from './App/App';
-import store from '../store';
+import store from '../redux/store';
 
 jest.mock('axios');
 const mockedAxios = axios as jest.Mocked<typeof axios>;

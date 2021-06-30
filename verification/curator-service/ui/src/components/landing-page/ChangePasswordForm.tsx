@@ -1,6 +1,11 @@
 import React, { useEffect, useState } from 'react';
+import { useHistory } from 'react-router-dom';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
+import { useAppSelector, useAppDispatch } from '../../hooks/redux';
+import { selectPasswordReset } from '../../redux/auth/selectors';
+import { resetPassword } from '../../redux/auth/thunk';
+import { toggleSnackbar } from '../../redux/auth/slice';
 
 import { makeStyles, Theme } from '@material-ui/core/styles';
 import FormHelperText from '@material-ui/core/FormHelperText';
@@ -28,6 +33,7 @@ const useStyles = makeStyles((theme: Theme) => ({
     },
     signInButton: {
         marginTop: '10px',
+        marginBottom: '10px',
     },
     checkboxLabel: {
         fontSize: '14px',
@@ -67,11 +73,44 @@ interface FormValues {
     passwordConfirmation: string;
 }
 
-export default function ChangePasswordForm(): JSX.Element {
+interface ChangePasswordFormProps {
+    token: string | undefined;
+    id: string | undefined;
+    disabled: boolean;
+}
+
+export default function ChangePasswordForm({
+    token,
+    id,
+    disabled,
+}: ChangePasswordFormProps): JSX.Element {
     const classes = useStyles();
+    const dispatch = useAppDispatch();
+    const history = useHistory();
+
+    const passwordReset = useAppSelector(selectPasswordReset);
     const [passwordVisible, setPasswordVisible] = useState(false);
     const [passwordConfirmationVisible, setPasswordConfirmationVisible] =
         useState(false);
+
+    // Redirect user to landing page if there is no token or id
+    useEffect(() => {
+        if (!token || !id) history.push('/');
+    }, [history, token, id]);
+
+    // After successful password reset redirect user to landing page and show snackbar alert
+    useEffect(() => {
+        if (!passwordReset) return;
+
+        history.push('/');
+        dispatch(
+            toggleSnackbar({
+                isOpen: true,
+                message:
+                    'Your password was changed successfully. You can now sign in using the new password',
+            }),
+        );
+    }, [dispatch, history, passwordReset]);
 
     const validationSchema = Yup.object().shape({
         password: Yup.string().required('This field is required'),
@@ -91,8 +130,15 @@ export default function ChangePasswordForm(): JSX.Element {
         },
         validationSchema,
         onSubmit: (values) => {
-            // @TODO: Send reqest to authenticate user using username and password
-            console.log(values);
+            if (!token || !id) return;
+
+            dispatch(
+                resetPassword({
+                    token,
+                    userId: id,
+                    newPassword: values.password,
+                }),
+            );
         },
     });
 
@@ -112,6 +158,7 @@ export default function ChangePasswordForm(): JSX.Element {
                             Choose a new password{' '}
                         </Typography>
                         <FormControl
+                            disabled={disabled}
                             className={classes.inpputField}
                             variant="outlined"
                             error={
@@ -154,6 +201,7 @@ export default function ChangePasswordForm(): JSX.Element {
                         </FormControl>
 
                         <FormControl
+                            disabled={disabled}
                             className={classes.inpputField}
                             variant="outlined"
                             error={
@@ -204,6 +252,7 @@ export default function ChangePasswordForm(): JSX.Element {
                 </div>
 
                 <Button
+                    disabled={disabled}
                     type="submit"
                     variant="contained"
                     color="primary"

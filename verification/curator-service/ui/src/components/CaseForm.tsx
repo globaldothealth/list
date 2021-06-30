@@ -28,7 +28,6 @@ import Symptoms from './new-case-form-fields/Symptoms';
 import Transmission from './new-case-form-fields/Transmission';
 import TravelHistory from './new-case-form-fields/TravelHistory';
 import Variant from './new-case-form-fields/Variant';
-import User from './User';
 import axios from 'axios';
 import { cloneDeep } from 'lodash';
 import { hasKey } from './Utils';
@@ -184,7 +183,6 @@ function initialValuesFromCase(c?: Case): CaseFormValues {
 }
 
 interface Props {
-    user: User;
     initialCase?: Case;
     onModalClose: () => void;
 }

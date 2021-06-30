@@ -27,7 +27,6 @@ import CaseValidationError from './bulk-case-form-fields/CaseValidationError';
 import FileUpload from './bulk-case-form-fields/FileUpload';
 import { Paper } from '@material-ui/core';
 import React from 'react';
-import User from './User';
 import ValidationErrorList from './bulk-case-form-fields/ValidationErrorList';
 import { WithStyles } from '@material-ui/core/styles/withStyles';
 import axios from 'axios';
@@ -90,7 +89,6 @@ const styles = (theme: Theme) =>
 interface BulkCaseFormProps
     extends RouteComponentProps,
         WithStyles<typeof styles> {
-    user: User;
     onModalClose: () => void;
 }
 
@@ -579,7 +577,7 @@ class BulkCaseForm extends React.Component<
                                 caseReference,
                                 file.name,
                             );
-                            resolve();
+                            resolve(null);
                         },
                         dynamicTyping: true,
                         header: true,
