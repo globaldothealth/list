@@ -1,5 +1,6 @@
 import React from 'react';
-import { render, screen, wait } from '@testing-library/react';
+import { render, screen, wait } from './util/test-utils';
+
 import userEvent from '@testing-library/user-event';
 import SearchBar from './SearchBar';
 
@@ -34,7 +35,8 @@ jest.mock('react-router-dom', () => ({
 
 describe('<SearchBar />', () => {
     it('Should open filters modal', async () => {
-        render(<AppTestComponent />);
+        render(<AppTestComponent />,
+            {initialState: {app: { filterBreadcrumbs: [], searchQuery: ''}}},);
 
         userEvent.click(screen.getByRole('button', { name: /Filter/i }));
 
