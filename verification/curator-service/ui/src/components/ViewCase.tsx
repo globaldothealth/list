@@ -32,7 +32,7 @@ import { useSelector } from 'react-redux';
 import {
     selectSearchQuery,
     selectFilterBreadcrumbs,
-} from './App/redux/selectors';
+} from '../redux/app/selectors';
 import Chip from '@material-ui/core/Chip';
 
 const styles = makeStyles((theme) => ({
@@ -753,9 +753,7 @@ function VariantRows(props: { variant: Variant }): JSX.Element {
     );
 }
 
-function LocationRows(props: {
-    loc?: Location;
-}): JSX.Element {
+function LocationRows(props: { loc?: Location }): JSX.Element {
     return (
         <>
             <RowHeader title="Location" />

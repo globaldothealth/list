@@ -11,6 +11,8 @@ WORKDIR /usr/src/app/data-serving/data-service
 # where available (npm@5+)
 COPY data-serving/data-service/package*.json ./
 
+# Try to avoid cb not called error in CI
+RUN npm cache clean --force
 # RUN npm clean install
 RUN npm ci
 

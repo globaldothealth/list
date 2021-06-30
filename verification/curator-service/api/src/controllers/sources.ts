@@ -120,9 +120,8 @@ export default class SourcesController {
                 req.body.dateFilter = undefined;
             }
             await source.set(req.body).validate();
-            const emailNotificationType = await this.updateAutomationScheduleAwsResources(
-                source,
-            );
+            const emailNotificationType =
+                await this.updateAutomationScheduleAwsResources(source);
             const result = await source.save();
             await this.sendNotifications(source, emailNotificationType);
             res.json(result);
@@ -289,7 +288,9 @@ export default class SourcesController {
         }
         try {
             const user = req.user as UserDocument;
-            const response = await axios.post(`${this.dataServerURL}/api/cases/markPendingRemoval?sourceId=${req.params.id}&email=${user.email}`);
+            const response = await axios.post(
+                `${this.dataServerURL}/api/cases/markPendingRemoval?sourceId=${req.params.id}&email=${user.email}`,
+            );
             if (response.status == 201) {
                 res.sendStatus(201).end();
             } else {
@@ -299,7 +300,7 @@ export default class SourcesController {
             console.error(err);
             res.status(500).json(err);
         }
-    }
+    };
 
     /** Delete all of the cases for this source that are pending removal. */
     removePendingCases = async (req: Request, res: Response): Promise<void> => {
@@ -313,7 +314,9 @@ export default class SourcesController {
             return;
         }
         try {
-            const response = await axios.post(`${this.dataServerURL}/api/cases/removePendingCases?sourceId=${req.params.id}`);
+            const response = await axios.post(
+                `${this.dataServerURL}/api/cases/removePendingCases?sourceId=${req.params.id}`,
+            );
             if (response.status == 201) {
                 res.sendStatus(201).end();
             } else {
@@ -322,10 +325,13 @@ export default class SourcesController {
         } catch (err) {
             res.status(500).json(err);
         }
-    }
+    };
 
     /** Remove the 'pending removal' flag from all cases for this source. */
-    clearPendingRemovalStatus = async (req: Request, res: Response): Promise<void> => {
+    clearPendingRemovalStatus = async (
+        req: Request,
+        res: Response,
+    ): Promise<void> => {
         const source = await Source.findById(req.params.id);
         if (!source) {
             res.sendStatus(404).end();
@@ -337,7 +343,9 @@ export default class SourcesController {
         }
         try {
             const user = req.user as UserDocument;
-            const response = await axios.post(`${this.dataServerURL}/api/cases/clearPendingRemovalStatus?sourceId=${req.params.id}&email=${user.email}`);
+            const response = await axios.post(
+                `${this.dataServerURL}/api/cases/clearPendingRemovalStatus?sourceId=${req.params.id}&email=${user.email}`,
+            );
             if (response.status == 201) {
                 res.sendStatus(201).end();
             } else {
@@ -346,7 +354,7 @@ export default class SourcesController {
         } catch (err) {
             res.status(500).json(err);
         }
-    }
+    };
 
     /** Trigger retrieval of the source's content in S3. */
     retrieve = async (req: Request, res: Response): Promise<void> => {

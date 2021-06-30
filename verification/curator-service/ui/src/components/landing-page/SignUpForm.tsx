@@ -1,9 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { useAppDispatch } from '../../hooks/redux';
-import { signInWithEmailAndPassword } from '../../redux/auth/thunk';
-import { setForgotPasswordPopupOpen } from '../../redux/auth/slice';
+import { signUpWithEmailAndPassword } from '../../redux/auth/thunk';
 
 import { makeStyles, Theme } from '@material-ui/core/styles';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
@@ -20,8 +19,6 @@ import Button from '@material-ui/core/Button';
 import FormGroup from '@material-ui/core/FormGroup';
 import Checkbox from '@material-ui/core/Checkbox';
 import Typography from '@material-ui/core/Typography';
-import GoogleButton from 'react-google-button';
-import ForgotPasswordForm from './ForgotPasswordForm';
 
 const useStyles = makeStyles((theme: Theme) => ({
     checkboxRoot: {
@@ -73,50 +70,68 @@ const useStyles = makeStyles((theme: Theme) => ({
 
 interface FormValues {
     email: string;
+    confirmEmail: string;
     password: string;
+    passwordConfirmation: string;
     isAgreementChecked: boolean;
     isNewsletterChecked: boolean;
 }
 
-interface SignInFormProps {
+interface SignUpFormProps {
     disabled: boolean;
     setRegistrationScreenOn: (active: boolean) => void;
 }
 
-export default function SignInForm({
+export default function SignUpForm({
     disabled,
     setRegistrationScreenOn,
-}: SignInFormProps): JSX.Element {
-    const dispatch = useAppDispatch();
+}: SignUpFormProps): React.ReactElement {
     const classes = useStyles();
+    const dispatch = useAppDispatch();
 
     const [passwordVisible, setPasswordVisible] = useState(false);
+    const [passwordConfirmationVisible, setPasswordConfirmationVisible] =
+        useState(false);
 
     const validationSchema = Yup.object().shape({
         email: Yup.string()
             .email('Invalid email address')
             .required('This field is required'),
+        confirmEmail: Yup.string().test(
+            'emails-match',
+            'Emails must match',
+            function (value) {
+                return this.parent.email === value;
+            },
+        ),
         password: Yup.string().required('This field is required'),
+        passwordConfirmation: Yup.string().test(
+            'passwords-match',
+            'Passwords must match',
+            function (value) {
+                return this.parent.password === value;
+            },
+        ),
         isAgreementChecked: Yup.bool().oneOf([true], 'This field is required'),
-        isNewsletterChecked: Yup.bool(),
     });
 
     const formik = useFormik<FormValues>({
         initialValues: {
             email: '',
+            confirmEmail: '',
             password: '',
+            passwordConfirmation: '',
             isAgreementChecked: false,
             isNewsletterChecked: false,
         },
-        initialStatus: {
-            isAgreementChecked: '',
-        },
         validationSchema,
         onSubmit: (values) => {
+            const { email, password, isNewsletterChecked } = values;
             dispatch(
-                signInWithEmailAndPassword({
-                    email: values.email,
-                    password: values.password,
+                signUpWithEmailAndPassword({
+                    email,
+                    password,
+                    newsletterAccepted: isNewsletterChecked,
                 }),
             );
         },
@@ -133,10 +148,7 @@ export default function SignInForm({
         <>
             <form onSubmit={formik.handleSubmit}>
                 <div className={classes.formFlexContainer}>
-                    <div className="normalSigninFields">
-                        <Typography className={classes.title}>
-                            Sign in with username and password
-                        </Typography>
+                    <div id="leftBox">
                         <TextField
                             disabled={disabled}
                             fullWidth
@@ -155,6 +167,29 @@ export default function SignInForm({
                                 formik.touched.email && formik.errors.email
                             }
                         />
+
+                        <TextField
+                            disabled={disabled}
+                            fullWidth
+                            className={classes.inpputField}
+                            variant="outlined"
+                            id="confirmEmail"
+                            name="confirmEmail"
+                            label="Confirm Email"
+                            value={formik.values.confirmEmail}
+                            onChange={formik.handleChange}
+                            error={
+                                formik.touched.confirmEmail &&
+                                Boolean(formik.errors.confirmEmail)
+                            }
+                            helperText={
+                                formik.touched.confirmEmail &&
+                                formik.errors.confirmEmail
+                            }
+                        />
+                    </div>
+
+                    <div id="rightBox">
                         <FormControl
                             disabled={disabled}
                             className={classes.inpputField}
@@ -196,43 +231,56 @@ export default function SignInForm({
                                 {formik.touched.password &&
                                     formik.errors.password}
                             </FormHelperText>
-                            <Typography className={classes.title}>
-                                <span
-                                    className={classes.forgotPassword}
-                                    onClick={() =>
-                                        dispatch(
-                                            setForgotPasswordPopupOpen(true),
-                                        )
-                                    }
-                                >
-                                    {' '}
-                                    Forgot your password?
-                                </span>
-                            </Typography>
                         </FormControl>
-                    </div>
 
-                    <div>
-                        <Typography className={classes.title}>
-                            Or sign in with Google
-                        </Typography>
-                        <GoogleButton
-                            className={classes.googleButton}
+                        <FormControl
                             disabled={disabled}
-                            onClick={() => {
-                                if (!formik.values.isAgreementChecked) {
-                                    formik.setErrors({
-                                        isAgreementChecked:
-                                            'This field is required',
-                                    });
-                                } else {
-                                    window.location.href = `${process.env
-                                        .REACT_APP_LOGIN_URL!}?newsletterAccepted=${
-                                        formik.values.isNewsletterChecked
-                                    }`;
+                            className={classes.inpputField}
+                            variant="outlined"
+                            error={
+                                formik.touched.passwordConfirmation &&
+                                Boolean(formik.errors.passwordConfirmation)
+                            }
+                        >
+                            <InputLabel htmlFor="passwordConfirmation">
+                                Repeat password
+                            </InputLabel>
+                            <OutlinedInput
+                                fullWidth
+                                id="passwordConfirmation"
+                                type={
+                                    passwordConfirmationVisible
+                                        ? 'text'
+                                        : 'password'
                                 }
-                            }}
-                        />
+                                value={formik.values.passwordConfirmation}
+                                onChange={formik.handleChange}
+                                endAdornment={
+                                    <InputAdornment position="end">
+                                        <IconButton
+                                            aria-label="toggle password visibility"
+                                            onClick={() =>
+                                                setPasswordConfirmationVisible(
+                                                    !passwordConfirmationVisible,
+                                                )
+                                            }
+                                            edge="end"
+                                        >
+                                            {passwordConfirmationVisible ? (
+                                                <Visibility />
+                                            ) : (
+                                                <VisibilityOff />
+                                            )}
+                                        </IconButton>
+                                    </InputAdornment>
+                                }
+                                label="Repeat password"
+                            />
+                            <FormHelperText>
+                                {formik.touched.passwordConfirmation &&
+                                    formik.errors.passwordConfirmation}
+                            </FormHelperText>
+                        </FormControl>
                     </div>
                 </div>
 
@@ -272,11 +320,12 @@ export default function SignInForm({
                             </Typography>
                         }
                     />
-                    {formik.errors.isAgreementChecked && (
-                        <FormHelperText error variant="outlined">
-                            {formik.errors.isAgreementChecked}
-                        </FormHelperText>
-                    )}
+                    {formik.touched.isAgreementChecked &&
+                        formik.errors.isAgreementChecked && (
+                            <FormHelperText error variant="outlined">
+                                {formik.errors.isAgreementChecked}
+                            </FormHelperText>
+                        )}
 
                     <FormControlLabel
                         disabled={disabled}
@@ -304,22 +353,20 @@ export default function SignInForm({
                     color="primary"
                     className={classes.signInButton}
                 >
-                    Sign in
+                    Sign up
                 </Button>
 
                 <Typography className={classes.title}>
-                    Don't have an account?{' '}
+                    Do you have already an account?{' '}
                     <span
                         className={classes.link}
-                        onClick={() => setRegistrationScreenOn(true)}
+                        onClick={() => setRegistrationScreenOn(false)}
                     >
                         {' '}
-                        Sign up!
+                        Sign in!
                     </span>
                 </Typography>
             </form>
-
-            <ForgotPasswordForm />
         </>
     );
 }

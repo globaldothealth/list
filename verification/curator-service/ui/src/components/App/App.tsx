@@ -20,7 +20,7 @@ import {
     useHistory,
     useLocation,
 } from 'react-router-dom';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { Theme, makeStyles } from '@material-ui/core/styles';
 
 import AddIcon from '@material-ui/icons/Add';
@@ -49,22 +49,25 @@ import SourceTable from '../SourceTable';
 import TermsOfUse from '../TermsOfUse';
 import { ThemeProvider } from '@material-ui/core/styles';
 import UploadsTable from '../UploadsTable';
-import User from '../User';
 import Users from '../Users';
 import ViewCase from '../ViewCase';
-import axios from 'axios';
 import clsx from 'clsx';
 import { createMuiTheme } from '@material-ui/core/styles';
 import { useLastLocation } from 'react-router-last-location';
 import PolicyLink from '../PolicyLink';
-import { Auth } from 'aws-amplify';
 import { useCookieBanner } from '../../hooks/useCookieBanner';
 import { SortBy, SortByOrder } from '../../constants/types';
 import { URLToSearchQuery } from '../util/searchQuery';
-import { useAppDispatch } from '../../hooks/redux';
-import { setSearchQuery, setFilterBreadcrumbs, deleteFilterBreadcrumbs} from './redux/appSlice';
-// import { selectFilterBreadcrumbs} from './redux/selectors';
-// import { useSelector } from 'react-redux';
+import { useAppDispatch, useAppSelector } from '../../hooks/redux';
+import {
+    setSearchQuery,
+    setFilterBreadcrumbs,
+    deleteFilterBreadcrumbs,
+} from '../../redux/app/slice';
+import { selectIsLoading } from '../../redux/app/selectors';
+import { getUserProfile } from '../../redux/auth/thunk';
+import { selectUser } from '../../redux/auth/selectors';
+import { User } from '../../api/models/User';
 
 const theme = createMuiTheme({
     palette: {
@@ -299,11 +302,6 @@ function ProfileMenu(props: { user: User }): JSX.Element {
 
                 <MenuItem
                     onClick={() => {
-                        try {
-                            Auth.signOut();
-                        } catch (err) {
-                            console.error(err);
-                        }
                         window.location.href = '/auth/logout';
                     }}
                 >
@@ -371,15 +369,14 @@ export default function App(): JSX.Element {
         return null;
     };
 
+    const isLoadingUser = useAppSelector(selectIsLoading);
+    const user = useAppSelector(selectUser);
+
     const [totalDataCount, setTotalDataCount] = useState<number>(0);
     const showMenu = useMediaQuery(theme.breakpoints.up('sm'));
-    const [user, setUser] = useState<User | undefined>();
     const [drawerOpen, setDrawerOpen] = useState<boolean>(false);
-    const [isLoadingUser, setIsLoadingUser] = useState<boolean>(true);
-    const [
-        createNewButtonAnchorEl,
-        setCreateNewButtonAnchorEl,
-    ] = useState<Element | null>();
+    const [createNewButtonAnchorEl, setCreateNewButtonAnchorEl] =
+        useState<Element | null>();
     const [selectedMenuIndex, setSelectedMenuIndex] = React.useState<number>();
     const [listPage, setListPage] = React.useState<number>(0);
     const [listPageSize, setListPageSize] = React.useState<number>(50);
@@ -387,12 +384,10 @@ export default function App(): JSX.Element {
     const lastLocation = useLastLocation();
     const history = useHistory();
     const location = useLocation<LocationState>();
-    const [filtersModalOpen, setFiltersModalOpen] = React.useState<boolean>(
-        false,
-    );
-    const [activeFilterInput, setActiveFilterInput] = React.useState<string>(
-        '',
-    );
+    const [filtersModalOpen, setFiltersModalOpen] =
+        React.useState<boolean>(false);
+    const [activeFilterInput, setActiveFilterInput] =
+        React.useState<string>('');
     const [sortBy, setSortBy] = useState<SortBy>(SortBy.Default);
     const [sortByOrder, setSortByOrder] = useState<SortByOrder>(
         SortByOrder.Descending,
@@ -401,40 +396,47 @@ export default function App(): JSX.Element {
 
     const savedSearchQuery = localStorage.getItem('searchQuery');
 
-    const menuList = user
-        ? [
-              {
-                  text: 'Charts',
-                  icon: <HomeIcon />,
-                  to: '/',
-                  displayCheck: (): boolean => hasAnyRole(['curator', 'admin']),
-              },
-              {
-                  text: 'Line list',
-                  icon: <ListIcon />,
-                  to: { pathname: '/cases', search: '' },
-                  displayCheck: (): boolean => true,
-              },
-              {
-                  text: 'Sources',
-                  icon: <LinkIcon />,
-                  to: '/sources',
-                  displayCheck: (): boolean => hasAnyRole(['curator']),
-              },
-              {
-                  text: 'Uploads',
-                  icon: <PublishIcon />,
-                  to: '/uploads',
-                  displayCheck: (): boolean => hasAnyRole(['curator']),
-              },
-              {
-                  text: 'Manage users',
-                  icon: <PeopleIcon />,
-                  to: '/users',
-                  displayCheck: (): boolean => hasAnyRole(['admin']),
-              },
-          ]
-        : [];
+    const menuList = useMemo(
+        () =>
+            user
+                ? [
+                      {
+                          text: 'Charts',
+                          icon: <HomeIcon />,
+                          to: '/',
+                          displayCheck: (): boolean =>
+                              hasAnyRole(['curator', 'admin']),
+                      },
+                      {
+                          text: 'Line list',
+                          icon: <ListIcon />,
+                          to: { pathname: '/cases', search: '' },
+                          displayCheck: (): boolean => true,
+                      },
+                      {
+                          text: 'Sources',
+                          icon: <LinkIcon />,
+                          to: '/sources',
+                          displayCheck: (): boolean => hasAnyRole(['curator']),
+                      },
+                      {
+                          text: 'Uploads',
+                          icon: <PublishIcon />,
+                          to: '/uploads',
+                          displayCheck: (): boolean => hasAnyRole(['curator']),
+                      },
+                      {
+                          text: 'Manage users',
+                          icon: <PeopleIcon />,
+                          to: '/users',
+                          displayCheck: (): boolean => hasAnyRole(['admin']),
+                      },
+                  ]
+                : [],
+
+        // eslint-disable-next-line
+        [user],
+    );
 
     // Update filter breadcrumbs
     useEffect(() => {
@@ -465,22 +467,7 @@ export default function App(): JSX.Element {
     }, [location.pathname, menuList]);
 
     const getUser = (): void => {
-        setIsLoadingUser(true);
-        axios
-            .get<User>('/auth/profile')
-            .then((resp) => {
-                setUser({
-                    _id: resp.data._id,
-                    name: resp.data.name,
-                    email: resp.data.email,
-                    roles: resp.data.roles,
-                    picture: resp.data.picture,
-                });
-            })
-            .catch((e) => {
-                setUser(undefined);
-            })
-            .finally(() => setIsLoadingUser(false));
+        dispatch(getUserProfile());
     };
 
     const hasAnyRole = (requiredRoles: string[]): boolean => {
@@ -530,11 +517,10 @@ export default function App(): JSX.Element {
         // eslint-disable-next-line
     }, [savedSearchQuery]);
 
-
     // Function for deleting filter breadcrumbs
     const handleFilterBreadcrumbDelete = (breadcrumbToDelete: ChipData) => {
         const searchParams = new URLSearchParams(location.search);
-        dispatch(deleteFilterBreadcrumbs(breadcrumbToDelete))
+        dispatch(deleteFilterBreadcrumbs(breadcrumbToDelete));
         searchParams.delete(breadcrumbToDelete.key);
         history.push({
             pathname: '/cases',
@@ -548,8 +534,6 @@ export default function App(): JSX.Element {
 
         //eslint-disable-next-line
     }, [location.search]);
-
-
 
     return (
         <div className={classes.root} ref={rootRef}>
@@ -773,7 +757,6 @@ export default function App(): JSX.Element {
                         {user && (
                             <Route exact path="/cases">
                                 <LinelistTable
-                                    user={user}
                                     page={listPage}
                                     pageSize={listPageSize}
                                     onChangePage={setListPage}
@@ -803,44 +786,36 @@ export default function App(): JSX.Element {
                         )}
                         {user && (
                             <Route path="/profile">
-                                <Profile user={user} />
+                                <Profile />
                             </Route>
                         )}
                         {user && hasAnyRole(['admin']) && (
                             <Route path="/users">
-                                <Users user={user} onUserChange={getUser} />
+                                <Users onUserChange={getUser} />
                             </Route>
                         )}{' '}
                         {user && hasAnyRole(['curator']) && (
                             <Route path="/sources/automated">
                                 <AutomatedSourceForm
-                                    user={user}
                                     onModalClose={onModalClose}
                                 />
                             </Route>
                         )}
                         {user && hasAnyRole(['curator']) && (
                             <Route path="/cases/bulk">
-                                <BulkCaseForm
-                                    user={user}
-                                    onModalClose={onModalClose}
-                                />
+                                <BulkCaseForm onModalClose={onModalClose} />
                             </Route>
                         )}
                         {user && hasAnyRole(['curator']) && (
                             <Route path="/sources/backfill">
                                 <AutomatedBackfill
-                                    user={user}
                                     onModalClose={onModalClose}
                                 />
                             </Route>
                         )}
                         {user && hasAnyRole(['curator']) && (
                             <Route path="/cases/new">
-                                <CaseForm
-                                    user={user}
-                                    onModalClose={onModalClose}
-                                />
+                                <CaseForm onModalClose={onModalClose} />
                             </Route>
                         )}
                         {user && hasAnyRole(['curator']) && (
@@ -850,7 +825,6 @@ export default function App(): JSX.Element {
                                     return (
                                         <EditCase
                                             id={match.params.id}
-                                            user={user}
                                             onModalClose={onModalClose}
                                         />
                                     );
@@ -874,6 +848,11 @@ export default function App(): JSX.Element {
                         <Route exact path="/terms">
                             <TermsOfUse />
                         </Route>
+                        <Route
+                            exact
+                            path="/reset-password/:token/:id"
+                            component={LandingPage}
+                        />
                         <Route exact path="/">
                             {hasAnyRole(['curator', 'admin']) &&
                             location.search === '' ? (
@@ -888,7 +867,7 @@ export default function App(): JSX.Element {
                             ) : isLoadingUser ? (
                                 <></>
                             ) : (
-                                <LandingPage setUser={setUser} />
+                                <LandingPage />
                             )}
                         </Route>
                         {/* Redirect any unavailable URLs to / after the user has loaded. */}

@@ -9,7 +9,25 @@ import { UploadDocument, uploadSchema } from './upload';
 
 import mongoose from 'mongoose';
 
-const sourceSchema = new mongoose.Schema({
+export type SourceDocument = mongoose.Document & {
+    _id: mongoose.Types.ObjectId;
+    name: string;
+    origin: OriginDocument;
+    format: string;
+    excludeFromLineList: boolean;
+    hasStableIdentifiers: boolean;
+    automation: AutomationDocument;
+    uploads: UploadDocument[];
+    dateFilter: DateFilterDocument;
+    notificationRecipients: string[];
+
+    toAwsStatementId(): string;
+    toAwsRuleDescription(): string;
+    toAwsRuleName(): string;
+    toAwsRuleTargetId(): string;
+};
+
+const sourceSchema = new mongoose.Schema<SourceDocument>({
     name: {
         type: String,
         required: 'Enter a name',
@@ -43,24 +61,6 @@ sourceSchema.methods.toAwsRuleName = function (): string {
 
 sourceSchema.methods.toAwsRuleTargetId = function (): string {
     return `${this._id}_Target`;
-};
-
-export type SourceDocument = mongoose.Document & {
-    _id: mongoose.Types.ObjectId;
-    name: string;
-    origin: OriginDocument;
-    format: string;
-    excludeFromLineList: boolean,
-    hasStableIdentifiers: boolean,
-    automation: AutomationDocument;
-    uploads: UploadDocument[];
-    dateFilter: DateFilterDocument;
-    notificationRecipients: string[];
-
-    toAwsStatementId(): string;
-    toAwsRuleDescription(): string;
-    toAwsRuleName(): string;
-    toAwsRuleTargetId(): string;
 };
 
 export const Source = mongoose.model<SourceDocument>('Source', sourceSchema);

@@ -281,12 +281,12 @@ export default function FiltersModal({
                                 value={formik.values.gender || ''}
                                 onChange={formik.handleChange}
                             >
-                                <MenuItem value="">
-                                    None
-                                </MenuItem>
+                                <MenuItem value="">None</MenuItem>
                                 <MenuItem value="male">Male</MenuItem>
                                 <MenuItem value="female">Female</MenuItem>
-                                <MenuItem value="noGender">Not provided</MenuItem>
+                                <MenuItem value="noGender">
+                                    Not provided
+                                </MenuItem>
                             </Select>
                         </FormControl>
                         <FormControl
