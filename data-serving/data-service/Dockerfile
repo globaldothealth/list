@@ -1,7 +1,7 @@
 # Docker file for data service.
 # Follows multi-staged build where "dev" can be used for development
 # and "prod" follows security best-practices and uses a trimmed down image.
-FROM node:14 as dev
+FROM node:14.17.1 as dev
 
 # Create app directory
 WORKDIR /usr/src/app/data-serving/data-service
@@ -33,7 +33,7 @@ EXPOSE 3000
 CMD [ "npm", "start" ]
 
 # Multi-staged build, we don't need a full node image to run the app.
-FROM node:12-alpine as prod
+FROM node:14.17.1-alpine as prod
 
 # No need to run as root.
 USER node
