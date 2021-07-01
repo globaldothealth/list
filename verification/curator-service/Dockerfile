@@ -46,7 +46,7 @@ RUN npm run build
 
 
 # Multi-staged build, use a trimmed down version of node for prod.
-FROM node:alpine as prod
+FROM node:14.17.1-alpine as prod
 
 # No need to run as root.
 USER node
