@@ -36,7 +36,6 @@
     "@types/express-session": "^1.17.0",
     "@types/jest": "^26.0.14",
     "@types/lodash": "^4.14.161",
-    "@types/mongoose": "^5.7.36",
     "@types/node": "^14.11.1",
     "@types/nodemailer": "^6.4.0",
     "@types/passport": "^1.0.4",
