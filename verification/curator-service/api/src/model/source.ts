@@ -8,6 +8,7 @@ import { OriginDocument, originSchema } from './origin';
 import { UploadDocument, uploadSchema } from './upload';
 
 import mongoose from 'mongoose';
+import { SourceSchema } from 'aws-sdk/clients/kinesisanalytics';
 
 const sourceSchema = new mongoose.Schema({
     name: {
@@ -33,7 +34,8 @@ sourceSchema.methods.toAwsStatementId = function (): string {
     return this._id.toString();
 };
 sourceSchema.methods.toAwsRuleDescription = function (): string {
-    return `Scheduled ingestion rule for source: ${this.name}`;
+    const source = this as SourceDocument;
+    return `Scheduled ingestion rule for source: ${source.name}`;
 };
 
 sourceSchema.methods.toAwsRuleName = function (): string {
