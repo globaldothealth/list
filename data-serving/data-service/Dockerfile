@@ -11,8 +11,13 @@ WORKDIR /usr/src/app/data-serving/data-service
 # where available (npm@5+)
 COPY data-serving/data-service/package*.json ./
 
-# RUN npm clean install
-RUN npm ci
+# Run with node env set to production.
+# This also tells yarn not to install dev dependencies
+ENV NODE_ENV production
+
+# clean install
+RUN npm i -g yarn
+RUN yarn install
 
 # Bundle app source
 COPY data-serving/data-service/. .
@@ -21,7 +26,7 @@ COPY data-serving/data-service/. .
 COPY common/* ../../common/
 
 # Build the app
-RUN npm run build
+RUN yarn run build
 
 # Expose service on port 3000.
 EXPOSE 3000
@@ -30,16 +35,13 @@ EXPOSE 3000
 # EXPOSE 9229
 
 # Specify a command for up to this step.
-CMD [ "npm", "start" ]
+CMD [ "yarn", "run", "start" ]
 
 # Multi-staged build, we don't need a full node image to run the app.
 FROM node:12-alpine as prod
 
 # No need to run as root.
 USER node
-
-# Run with node env set to production.
-ENV NODE_ENV production
 
 WORKDIR /usr/src/app/
 
