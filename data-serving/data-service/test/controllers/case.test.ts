@@ -50,7 +50,7 @@ describe('GET', () => {
             .expect('Content-Type', /json/)
             .expect(200);
 
-        expect(res.body._id).toEqual(c._id.toString());
+        expect(res.body[0]._id).toEqual(c._id.toString());
     });
     it('one absent item should return 404 NOT FOUND', () => {
         return request(app)
@@ -75,7 +75,7 @@ describe('GET', () => {
             }
             // Fetch first page.
             let res = await request(app)
-                .get('/api/cases?page=1&limit=10')
+                .get('/api/cases?page=1&limit=10&sort_by=0')
                 .expect(200)
                 .expect('Content-Type', /json/);
             expect(res.body.cases).toHaveLength(10);

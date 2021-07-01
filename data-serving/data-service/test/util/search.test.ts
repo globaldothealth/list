@@ -1,4 +1,5 @@
 import parseSearchQuery from '../../src/util/search';
+import { ObjectId } from 'mongodb';
 
 describe('search query', () => {
     it('is parsed with full text search', () => {
@@ -40,9 +41,11 @@ describe('search query', () => {
         const res = parseSearchQuery(
             'curator:foo@bar.com,baz@meh.com gender:male nationality:swiss ' +
                 'occupation:"clock maker" country:switzerland outcome:recovered ' +
-                'caseid:abc123 uploadid:def456 sourceurl:wsj.com  verificationstatus:verified ' +
-                'admin1:"some admin 1" admin2:"some admin 2" admin3:"some admin 3"',
+                'caseid:605c8f6a7ee6c2d7fd2670cc uploadid:def456 sourceurl:wsj.com  verificationstatus:verified ' +
+                'admin1:"some admin 1" admin2:"some admin 2" admin3:"some admin 3"' +
+                'variant:"B.1.351"',
         );
+
         expect(res).toEqual({
             filters: [
                 {
@@ -66,12 +69,12 @@ describe('search query', () => {
                     values: ['switzerland'],
                 },
                 {
-                    path: 'outcome',
+                    path: 'events.value',
                     values: ['recovered'],
                 },
                 {
                     path: '_id',
-                    values: ['abc123'],
+                    values: [new ObjectId('605c8f6a7ee6c2d7fd2670cc')],
                 },
                 {
                     path: 'caseReference.uploadIds',
@@ -96,6 +99,10 @@ describe('search query', () => {
                 {
                     path: 'location.administrativeAreaLevel3',
                     values: ['some admin 3'],
+                },
+                {
+                    path: 'variant.name',
+                    values: ['B.1.351'],
                 },
             ],
         });

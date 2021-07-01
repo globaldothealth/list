@@ -142,4 +142,5 @@ export interface Case {
     revisionMetadata: RevisionMetadata;
     exclusionData?: ExclusionData;
     variant: Variant;
+    isSourceExcluded?: boolean;
 }

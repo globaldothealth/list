@@ -23,7 +23,7 @@ const curator = {
 
 it('loads and displays case to edit', async () => {
     const axiosCaseResponse = {
-        data: fullCase,
+        data: [fullCase],
         status: 200,
         statusText: 'OK',
         config: {},

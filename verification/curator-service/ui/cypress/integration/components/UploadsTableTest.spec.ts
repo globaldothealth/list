@@ -92,10 +92,13 @@ describe('Uploads table', function () {
             'eq',
             'http://localhost:3002/cases?uploadid=5ef8e943dfe6e00030892d58',
         );
-        cy.get('input[id="search-field"]').should(
+        cy.contains('Filter').click();
+        cy.get('input[id="uploadid"]').should(
             'have.value',
-            'uploadid:5ef8e943dfe6e00030892d58',
+            '5ef8e943dfe6e00030892d58',
         );
+        cy.get('body').trigger('keydown', { key: 'Escape' });
+
         cy.contains('France');
         cy.contains('United States');
         cy.contains('United Kingdom').should('not.exist');
@@ -110,17 +113,23 @@ describe('Uploads table', function () {
             'eq',
             'http://localhost:3002/cases?uploadid=5ef8e943dfe6e00030892d59',
         );
-        cy.get('input[id="search-field"]').should(
+        cy.contains('Filter').click();
+        cy.get('input[id="uploadid"]').should(
             'have.value',
-            'uploadid:5ef8e943dfe6e00030892d59',
+            '5ef8e943dfe6e00030892d59',
         );
+        cy.get('body').trigger('keydown', { key: 'Escape' });
+
         cy.contains('France').should('not.exist');
         cy.contains('United States');
         cy.contains('United Kingdom');
         cy.contains('Germany').should('not.exist');
 
         cy.contains('Line list').click({ force: true });
-        cy.get('input[id="search-field"]').should('have.value', '');
+        cy.contains('Filter').click();
+        cy.get('input[id="uploadid"]').should('have.value', '');
+        cy.get('body').trigger('keydown', { key: 'Escape' });
+
         cy.contains('France');
         cy.contains('United States');
         cy.contains('United Kingdom');

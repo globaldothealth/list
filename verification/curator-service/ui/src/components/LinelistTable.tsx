@@ -19,6 +19,9 @@ import {
     makeStyles,
     withStyles,
     LinearProgress,
+    InputLabel,
+    Select,
+    FormControl,
 } from '@material-ui/core';
 import { createStyles } from '@material-ui/core/styles';
 import { WithStyles } from '@material-ui/core/styles/withStyles';
@@ -45,6 +48,7 @@ import CaseIncludeDialog from './CaseIncludeDialog';
 import renderDate, { renderDateRange } from './util/date';
 import { URLToSearchQuery } from './util/searchQuery';
 import { ChipData } from './App';
+import { SortBy, SortByOrder } from '../constants/types';
 
 interface ListResponse {
     cases: Case[];
@@ -71,6 +75,8 @@ interface LinelistTableState {
 
     selectedVerificationStatus: VerificationStatus;
     searchQuery: string;
+    sortBy: SortBy;
+    sortByOrder: SortByOrder;
 }
 
 // Material table doesn't handle structured fields well, we flatten all fields in this row.
@@ -115,10 +121,10 @@ interface Props
 
     onChangePageSize: (pageSize: number) => void;
 
-    setSearch: (value: string) => void;
-    search: string;
     filterBreadcrumbs: ChipData[];
     handleBreadcrumbDelete: (breadcrumbToDelete: ChipData) => void;
+    setFiltersModalOpen: (value: boolean) => void;
+    setActiveFilterInput: (value: string) => void;
 }
 
 const styles = (theme: Theme) =>
@@ -189,6 +195,13 @@ const downloadDataModalStyles = makeStyles((theme: Theme) => ({
     },
     loader: {
         marginTop: '16px',
+    },
+}));
+
+const sortSelectStyles = makeStyles((theme: Theme) => ({
+    formControl: {
+        minWidth: 120,
+        margin: '0 20px 0 0',
     },
 }));
 
@@ -376,6 +389,87 @@ function RowMenu(props: {
     );
 }
 
+interface SortSelectProps {
+    sortBy: SortBy;
+    sortByOrder: SortByOrder;
+    handleSortByChange: (sortBy: SortBy) => void;
+    handleSortByOrderChange: (sortByOrder: SortByOrder) => void;
+}
+
+export function SortSelect({
+    sortBy,
+    sortByOrder,
+    handleSortByChange,
+    handleSortByOrderChange,
+}: SortSelectProps): JSX.Element {
+    const classes = sortSelectStyles();
+
+    const sortKeywords = [
+        { name: 'None', value: SortBy.Default },
+        { name: 'Confirmed date', value: SortBy.ConfirmedDate },
+        { name: 'Country', value: SortBy.Country },
+        { name: 'Location admin 1', value: SortBy.Admin1 },
+        { name: 'Location admin 2', value: SortBy.Admin2 },
+        { name: 'Location admin 3', value: SortBy.Admin3 },
+        { name: 'Age', value: SortBy.Age },
+    ];
+
+    const handleChange = (
+        event: React.ChangeEvent<{ value: unknown; name?: string | undefined }>,
+    ) => {
+        const { value, name } = event.target;
+
+        if (name === 'sortBy') {
+            handleSortByChange(value as SortBy);
+        } else {
+            handleSortByOrderChange(value as SortByOrder);
+        }
+    };
+
+    return (
+        <>
+            <FormControl className={classes.formControl}>
+                <InputLabel id="sort-by-label">Sort by</InputLabel>
+                <Select
+                    labelId="sort-by-label"
+                    name="sortBy"
+                    value={sortBy}
+                    onChange={handleChange}
+                >
+                    {sortKeywords.map((keyword) => (
+                        <MenuItem
+                            value={keyword.value}
+                            key={keyword.value}
+                            data-testid="sortby-option"
+                        >
+                            {keyword.name}
+                        </MenuItem>
+                    ))}
+                </Select>
+            </FormControl>
+
+            {sortBy !== SortBy.Default && (
+                <FormControl className={classes.formControl}>
+                    <InputLabel id="sort-by-order-label">Order</InputLabel>
+                    <Select
+                        labelId="sort-by-order-label"
+                        name="sortByOrder"
+                        value={sortByOrder}
+                        onChange={handleChange}
+                    >
+                        <MenuItem value={SortByOrder.Ascending}>
+                            Ascending
+                        </MenuItem>
+                        <MenuItem value={SortByOrder.Descending}>
+                            Descending
+                        </MenuItem>
+                    </Select>
+                </FormControl>
+            )}
+        </>
+    );
+}
+
 export function DownloadButton(): JSX.Element {
     const [isDownloadModalOpen, setIsDownloadModalOpen] = useState<boolean>(
         false,
@@ -440,6 +534,7 @@ export function DownloadButton(): JSX.Element {
         </>
     );
 }
+
 interface ColumnHeaderProps {
     theClass: any;
     columnTitle: string;
@@ -489,6 +584,8 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                 encodeURIComponent(
                     URLToSearchQuery(this.props.location.search),
                 ) ?? '',
+            sortBy: SortBy.Default,
+            sortByOrder: SortByOrder.Descending,
         };
         this.deleteCases = this.deleteCases.bind(this);
         this.setCaseVerification = this.setCaseVerification.bind(this);
@@ -501,6 +598,8 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
             this,
         );
         this.getExcludedCaseIds = this.getExcludedCaseIds.bind(this);
+        this.handleSortByChange = this.handleSortByChange.bind(this);
+        this.handleSortByOrderChange = this.handleSortByOrderChange.bind(this);
     }
 
     componentDidMount() {
@@ -525,6 +624,20 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
     }
     componentWillUnmount(): void {
         this.unlisten();
+    }
+
+    handleSortByChange(sortBy: SortBy): void {
+        this.setState(
+            { page: 0, sortBy },
+            this.tableRef.current?.onQueryChange(),
+        );
+    }
+
+    handleSortByOrderChange(sortByOrder: SortByOrder): void {
+        this.setState(
+            { page: 0, sortByOrder },
+            this.tableRef.current?.onQueryChange(),
+        );
     }
 
     async deleteCases(): Promise<void> {
@@ -649,13 +762,9 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
 
     handleAddFilterClick(e: React.MouseEvent<HTMLDivElement>, filter: string) {
         e.preventDefault();
-        // Avoids duplicated search parameters
-        if (this.props.search.includes(filter)) return;
 
-        this.props.setSearch(
-            this.props.search +
-                (this.props.search ? ` ${filter}:` : `${filter}:`),
-        );
+        this.props.setFiltersModalOpen(true);
+        this.props.setActiveFilterInput(filter);
     }
 
     render(): JSX.Element {
@@ -1028,9 +1137,11 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                             let listUrl = this.state.url;
                             listUrl += '?limit=' + query.pageSize;
                             listUrl += '&page=' + (this.state.page + 1);
+                            // Limit the maximum number of documents that are being counted in mongoDB in order to make queries faster
                             listUrl += '&count_limit=10000';
+                            listUrl += '&sort_by=' + this.state.sortBy;
+                            listUrl += '&order=' + this.state.sortByOrder;
                             if (this.state.searchQuery !== '') {
-                                // Limit the maximum number of documents that are being counted in mongoDB in order to make queries faster
                                 listUrl += '&q=' + this.state.searchQuery;
                             }
                             this.setState({ isLoading: true, error: '' });
@@ -1135,6 +1246,17 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                     <Typography className={classes.tableTitle}>
                                         COVID-19 Linelist
                                     </Typography>
+
+                                    <SortSelect
+                                        sortBy={this.state.sortBy}
+                                        sortByOrder={this.state.sortByOrder}
+                                        handleSortByChange={
+                                            this.handleSortByChange
+                                        }
+                                        handleSortByOrderChange={
+                                            this.handleSortByOrderChange
+                                        }
+                                    />
 
                                     {this.props.filterBreadcrumbs.length >
                                         0 && (

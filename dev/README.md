@@ -109,6 +109,18 @@ Once you've done all of the prereqs above, go ahead and:
 1. Navigate to `localhost:3002`
 1. Experience success
 
+### Test all the things!
+
+1. Install nodeJS
+1. Run the test script
+1. Experience even more success
+
+```shell
+brew install npm
+
+./dev/test_all.sh
+```
+
 ## Understanding the setup
 
 ### Environment variables

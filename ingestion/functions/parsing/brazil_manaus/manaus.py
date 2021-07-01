@@ -64,7 +64,7 @@ _TRAVEL_YN = "HISTO_VGM"
 _TRAVEL_COUNTRY = "PAIS_VGM"
 _TRAVEL_OUT = "DT_VGM"
 _TRAVEL_RETURN = "DT_RT_VGM"
- 
+
 _COMORBIDITIES_MAP = {
     "DIABETES": "diabetes mellitus",
     "CS_GESTANT": "pregnancy",
@@ -114,13 +114,13 @@ _COUNTRY_LAT_LONG_MAP = dictionaries['country_translate_lat_long']
 def convert_date(raw_date: str, reference_date=None, dataserver=True, adi = True):
     """ 
     Convert raw date field into a value interpretable by the dataserver.
-    
+
     Removing timestamp as always midnight.
-    
+
     Set dataserver to False in order to return version appropriate for notes.
 
     Set adi to True to return version compatible with automated data ingestion
-    
+
     Can supply a reference_date, so that any case with a date after this reference returns None
     A reference date of midnight on Feb 21st would only return cases up to the end of Feb 20th
 
@@ -131,7 +131,7 @@ def convert_date(raw_date: str, reference_date=None, dataserver=True, adi = True
         if raw_date and datetime.strptime(raw_date, "%d/%m/%Y") < datetime.strptime(str(today), "%Y-%m-%d"):
             date = datetime.strptime(raw_date, "%d/%m/%Y")
             return {"$date": f"{date.isoformat()}Z"}
-        if not dataserver:         
+        if not dataserver:
             return date.strftime("%m/%d/%Y")
     else:
         if raw_date and datetime.strptime(raw_date, "%d/%m/%Y") < datetime.strptime(str(today), "%Y-%m-%d"):
@@ -284,7 +284,7 @@ def convert_symptoms(taste, smell, throat, dyspnea, fever, cough, diff_breathing
             values.append(_SYMPTOMS_MAP["DOR_ABD"])
         if fatigue == "1":
             values.append(_SYMPTOMS_MAP["FADIGA"])
-        
+
         if values:
             #Remove possible duplicate dyspnea entry
             symptoms["values"] = list(dict.fromkeys(values))
@@ -294,8 +294,8 @@ def convert_symptoms(taste, smell, throat, dyspnea, fever, cough, diff_breathing
 
 def convert_preexisting_conditions(diabetes, pregnancy, kidney, heart, obesity, down, liver, asthma, nervous, respiratory, other):
     preexistingConditions = {}
-    values = []            
-                            
+    values = []
+
     if diabetes == "1":
         values.append(_COMORBIDITIES_MAP["DIABETES"])
     if any([pregnancy == i for i in ["1", "2", "3", "4"]]):
@@ -373,7 +373,7 @@ def convert_travel(travel_yn, travel_country, travel_out, travel_in):
         geometry["latitude"] = _COUNTRY_LAT_LONG_MAP[country_ISO2]["latitude"]
         geometry["longitude"] = _COUNTRY_LAT_LONG_MAP[country_ISO2]["longitude"]
         location["geometry"] = geometry
-        
+
         travel_countries.append({"location": location})
         travel["traveledPrior30Days"] = True
         travel["travel"] = travel_countries
@@ -465,5 +465,5 @@ def parse_cases(raw_data_file: str, source_id: str, source_url: str):
                     raise ValueError(f"error converting case: {ve}")
 
 
-def lambda_handler(event, context):
-    return parsing_lib.run_lambda(event, context, parse_cases)
+def event_handler(event):
+    return parsing_lib.run(event, parse_cases)
