@@ -20,7 +20,8 @@ _AGE = "NU_IDADE_N"
 _AGE_TYPE = "TP_IDADE"
 _GENDER = "CS_SEXO"
 _ETHNICITY = "CS_RACA"
-_MUNICIPALITY = "ID_MUNICIP"
+_STATE = "SG_UF_NOT"
+_MUNICIPALITY = "CO_MUN_NOT"
 _DATE_CONFIRMED = "DT_NOTIFIC"
 _COVID_CONFIRMED = "CLASSI_FIN"
 _SEROLOGICAL_TEST_IGG = "RES_IGG"
@@ -51,6 +52,7 @@ _NEUROLOGIC = "NEUROLOGIC"
 _LUNG = "PNEUMOPATI"
 _KIDNEY = "RENAL"
 _OBESITY = "OBESIDADE"
+_OTHER_COMORB = "MORB_DESC"
 _HOSPITALIZED = "HOSPITAL"
 _DATE_HOSP = "DT_INTERNA"
 _ICU = "UTI"
@@ -92,23 +94,16 @@ _SYMPTOMS_MAP = {
     "FADIGA": "fatigue"
 }
 
-# Fixed location, we are only interested in cases from Manaus. Lat/long obtained from https://www.latlong.net/place/manaus-amazonas-brazil-645.html.
-_LOCATION = {
-    "country": "Brazil",
-    "administrativeAreaLevel1": "Amazonas",
-    "administrativeAreaLevel2": "Manaus",
-    "geoResolution": "Admin2",
-    "name": "Manaus, Amazonas, Brazil",
-    "geometry": {
-        "longitude": -60.025780,
-        "latitude": -3.117034
-    }
-}
-
-# "country_iso2" maps Spanish country names to their ISO-2 codes, and also includes common alternative spellings of country names as observed in data (e.g. lack of accents, common typos)
+# 'UF_name' maps the UF (Unidade Federativa, admin level 1) codes to their respective names
+# 'code_name_latlong' maps the municipality codes obtained from https://www.ibge.gov.br/en/geosciences/territorial-organization/territorial-meshes/2786-np-municipal-mesh/18890-municipal-mesh.html?=&t=acesso-ao-produto to respective name and lat/longs.The final digit is omitted as it is not included in the data.
+# 'country_iso2' maps Spanish country names to their ISO-2 codes, and also includes common alternative spellings of country names as observed in data (e.g. lack of accents, common typos)
 # 'country_translate_lat_long' maps country ISO-2 codes to longitude/latitude of country centroids, obtained from https://raw.githubusercontent.com/google/dspl/master/samples/google/canonical/countries.csv, as well as the corresponding country name in English
 with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "dictionaries.json"), encoding='utf-8') as json_file:
     dictionaries = json.load(json_file)
+
+_UF_NAME_MAP = dictionaries["UF_name"]
+
+_CODE_NAME_LATLONG = dictionaries["code_name_latlong"]
 
 _COUNTRY_ISO2_MAP = dictionaries["country_iso2"]
 
@@ -116,7 +111,7 @@ _COUNTRY_LAT_LONG_MAP = dictionaries['country_translate_lat_long']
 
 
 # Date function for ADI and mongoimport format
-def convert_date(raw_date: str, reference_date=None, dataserver=True, adi=True):
+def convert_date(raw_date: str, reference_date=None, dataserver=True, adi = True):
     """ 
     Convert raw date field into a value interpretable by the dataserver.
     
@@ -142,6 +137,21 @@ def convert_date(raw_date: str, reference_date=None, dataserver=True, adi=True):
         if raw_date and datetime.strptime(raw_date, "%d/%m/%Y") < datetime.strptime(str(today), "%Y-%m-%d"):
             date = datetime.strptime(raw_date, "%d/%m/%Y")
             return date.strftime("%m/%d/%YZ")
+
+
+def convert_location(state, municipality):
+    location = {}
+    geometry = {}
+    location["country"] = "Brazil"
+    location["administrativeAreaLevel1"] = _UF_NAME_MAP[state]
+    location["administrativeAreaLevel2"] = _CODE_NAME_LATLONG[municipality]["name"]
+    location["geoResolution"] = "Admin2"
+    location["name"] = ", ".join([_CODE_NAME_LATLONG[municipality]["name"], _UF_NAME_MAP[state], "Brazil"])
+
+    geometry["latitude"] = _CODE_NAME_LATLONG[municipality]["latitude"]
+    geometry["longitude"] = _CODE_NAME_LATLONG[municipality]["longitude"]
+    location["geometry"] = geometry
+    return location
 
 
 def convert_gender(raw_gender: str):
@@ -282,7 +292,7 @@ def convert_symptoms(taste, smell, throat, dyspnea, fever, cough, diff_breathing
     return symptoms
 
 
-def convert_preexisting_conditions(diabetes, pregnancy, kidney, heart, obesity, down, liver, asthma, nervous, respiratory):
+def convert_preexisting_conditions(diabetes, pregnancy, kidney, heart, obesity, down, liver, asthma, nervous, respiratory, other):
     preexistingConditions = {}
     values = []            
                             
@@ -306,6 +316,8 @@ def convert_preexisting_conditions(diabetes, pregnancy, kidney, heart, obesity, 
         values.append(_COMORBIDITIES_MAP["NEUROLOGIC"])
     if respiratory == "1":
         values.append(_COMORBIDITIES_MAP["PNEUMOPATI"])
+    if other:
+        values.append(str('other comorbidity listed as: ' + other))
 
     if values:
         preexistingConditions["hasPreexistingConditions"] = True
@@ -386,11 +398,11 @@ def parse_cases(raw_data_file: str, source_id: str, source_url: str):
         reader = csv.DictReader(f, delimiter=";")
         for row in reader:
             confirmation_date = convert_date(row[_DATE_CONFIRMED])
-            if confirmation_date is not None and row[_COVID_CONFIRMED] == "5" and row[_MUNICIPALITY] == "MANAUS":
+            if confirmation_date is not None and row[_COVID_CONFIRMED] == "5":
                 try:
                     case = {
                         "caseReference": {"sourceId": source_id, "sourceUrl": source_url},
-                        "location": _LOCATION,
+                        "location": convert_location(row[_STATE], row[_MUNICIPALITY]),
                         "events": convert_events(
                             row[_DATE_CONFIRMED],
                             row[_DATE_SYMPTOMS],
@@ -433,7 +445,8 @@ def parse_cases(raw_data_file: str, source_id: str, source_url: str):
                             row[_LIVER],
                             row[_ASTHMA],
                             row[_NEUROLOGIC],
-                            row[_LUNG]
+                            row[_LUNG],
+                            row[_OTHER_COMORB]
                         ),
                         "travelHistory": convert_travel(
                             row[_TRAVEL_YN],

@@ -27,39 +27,39 @@ class ManausTest(unittest.TestCase):
                     "geoResolution": "Admin2",
                     "name": "Manaus, Amazonas, Brazil",
                     "geometry": {
-                        "longitude": -60.025780,
-                        "latitude": -3.117034
+                        "longitude": -60.25962801,
+                        "latitude": -2.625919383
                     }
                 },
                 "events": [
                     {
                         "name": "confirmed",
                         "dateRange": {
-                            "start": {'$date': '2021-01-26T00:00:00Z'},
-                            "end": {'$date': '2021-01-26T00:00:00Z'}
+                            "start": '01/26/2021Z',
+                            "end": '01/26/2021Z'
                         },
                         "value": "PCR test"
                     },
                     {
                         "name": "onsetSymptoms",
                         "dateRange": {
-                            "start": {'$date': '2021-01-23T00:00:00Z'},
-                            "end": {'$date': '2021-01-23T00:00:00Z'}
+                            "start": '01/23/2021Z',
+                            "end": '01/23/2021Z'
                         }
                     },
                     {
                         "name": "hospitalAdmission",
                         "value": "Yes",
                         "dateRange": {
-                            "start": {'$date': '2021-01-26T00:00:00Z'},
-                            "end": {'$date': '2021-01-26T00:00:00Z'}
+                            "start": '01/26/2021Z',
+                            "end": '01/26/2021Z'
                         }
                     },
                     {
                         "name": "icuAdmission",
                         "value": "Yes",
                         "dateRange": {
-                            "start": {'$date': '2021-01-28T00:00:00Z'},
+                            "start": '01/28/2021Z',
                             "end": None
                         }
                     },
@@ -99,36 +99,36 @@ class ManausTest(unittest.TestCase):
                 "location": {
                     "country": "Brazil",
                     "administrativeAreaLevel1": "Amazonas",
-                    "administrativeAreaLevel2": "Manaus",
+                    "administrativeAreaLevel2": "Manacapuru",
                     "geoResolution": "Admin2",
-                    "name": "Manaus, Amazonas, Brazil",
+                    "name": "Manacapuru, Amazonas, Brazil",
                     "geometry": {
-                        "longitude": -60.025780,
-                        "latitude": -3.117034
+                        "longitude": -60.9587578,
+                        "latitude": -3.291538169
                     }
                 },
                 "events": [
                     {
                         "name": "confirmed",
                         "dateRange": {
-                            "start": {'$date': '2021-03-10T00:00:00Z'},
-                            "end": {'$date': '2021-03-10T00:00:00Z'}
+                            "start": '03/10/2021Z',
+                            "end": '03/10/2021Z'
                         },
                         "value": "Serological test"
                     },
                     {
                         "name": "onsetSymptoms",
                         "dateRange": {
-                            "start": {'$date': '2021-02-27T00:00:00Z'},
-                            "end": {'$date': '2021-02-27T00:00:00Z'}
+                            "start": '02/27/2021Z',
+                            "end": '02/27/2021Z'
                         }
                     },
                     {
                         "name": "hospitalAdmission",
                         "value": "Yes",
                         "dateRange": {
-                            "start": {'$date': '2021-03-09T00:00:00Z'},
-                            "end": {'$date': '2021-03-09T00:00:00Z'}
+                            "start": '03/09/2021Z',
+                            "end": '03/09/2021Z'
                         }
                     },
                     {
@@ -139,8 +139,8 @@ class ManausTest(unittest.TestCase):
                         "name": "outcome",
                         "value": "Death",
                         "dateRange": {
-                            "start": {'$date': '2021-03-17T00:00:00Z'},
-                            "end": {'$date': '2021-03-17T00:00:00Z'}
+                            "start": '03/17/2021Z',
+                            "end": '03/17/2021Z'
                         }
                     }
                 ],
@@ -180,5 +180,77 @@ class ManausTest(unittest.TestCase):
                     }
                 },
                 "notes": "Patient died from other causes"
-            }
+            },
+            {
+                "caseReference": {"sourceId": _SOURCE_ID, "sourceUrl": _SOURCE_URL},
+                "location": {
+                    "country": "Brazil",
+                    "administrativeAreaLevel1": "Minas Gerais",
+                    "administrativeAreaLevel2": "Montes Claros",
+                    "geoResolution": "Admin2",
+                    "name": "Montes Claros, Minas Gerais, Brazil",
+                    "geometry": {
+                        "latitude": -16.62071806,
+                        "longitude": -43.92881683
+                    }
+                },
+                "events": [
+                    {
+                        "name": "confirmed",
+                        "dateRange": {
+                            "start": '04/07/2021Z',
+                            "end": '04/07/2021Z'
+                        },
+                        "value": "PCR test"
+                    },
+                    {
+                        "name": "onsetSymptoms",
+                        "dateRange": {
+                            "start": '04/01/2021Z',
+                            "end": '04/01/2021Z'
+                        }
+                    },
+                    {
+                        "name": "hospitalAdmission",
+                        "value": "Yes",
+                        "dateRange": {
+                            "start": '04/07/2021Z',
+                            "end": '04/07/2021Z'
+                        }
+                    },
+                    {
+                        "name": "icuAdmission",
+                        "value": "No",
+                    },
+                    {
+                        "name": "outcome",
+                        "value": "Death",
+                        "dateRange": {
+                            "start": '04/13/2021Z',
+                            "end": '04/13/2021Z'
+                        }
+                    }
+                ],
+                "symptoms": {
+                    "status": "Symptomatic",
+                    "values": [
+                        "dyspnea", "cough", "hypoxemia"
+                    ]
+                },
+                "demographics": {
+                    "gender": "Female",
+                    "ageRange": {
+                        "start": 74.0,
+                        "end": 74.0
+                    },
+                    "ethnicity": "White"
+                },
+                "preexistingConditions": {
+                    "hasPreexistingConditions": True,
+                    "values": [
+                        'other comorbidity listed as: HAS'
+                    ]
+                },
+                "travelHistory": None
+            },
         ])
