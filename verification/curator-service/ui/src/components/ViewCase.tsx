@@ -753,9 +753,7 @@ function VariantRows(props: { variant: Variant }): JSX.Element {
     );
 }
 
-function LocationRows(props: {
-    loc?: Location;
-}): JSX.Element {
+function LocationRows(props: { loc?: Location }): JSX.Element {
     return (
         <>
             <RowHeader title="Location" />

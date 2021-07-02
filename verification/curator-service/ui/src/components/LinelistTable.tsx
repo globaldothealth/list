@@ -52,8 +52,8 @@ import renderDate, { renderDateRange } from './util/date';
 import { URLToSearchQuery } from './util/searchQuery';
 import { ChipData } from './App/App';
 import { SortBy, SortByOrder } from '../constants/types';
-import {connect, ConnectedProps} from 'react-redux';
-import {RootState} from '../store';
+import { connect, ConnectedProps } from 'react-redux';
+import { RootState } from '../store';
 import { SnackbarAlert } from './SnackbarAlert';
 
 // Limit number of data that can be displayed or downloaded to avoid long execution times of mongo queries
@@ -65,7 +65,9 @@ interface ListResponse {
     total: number;
 }
 
-const mapStateToProps = (state:RootState) => ({ filterBreadcrumbs: state.app.filterBreadcrumbs });
+const mapStateToProps = (state: RootState) => ({
+    filterBreadcrumbs: state.app.filterBreadcrumbs,
+});
 const connector = connect(mapStateToProps);
 type PropsFromRedux = ConnectedProps<typeof connector>;
 
@@ -122,8 +124,9 @@ interface LocationState {
     pageSize: number;
 }
 
-interface Props 
-    extends PropsFromRedux, RouteComponentProps<never, never, LocationState>,
+interface Props
+    extends PropsFromRedux,
+        RouteComponentProps<never, never, LocationState>,
         WithStyles<typeof styles> {
     user: User;
     page: number;
@@ -1419,10 +1422,7 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                     ) => {
                                         if (nationalities) {
                                             nationalities.sort();
-                                            const nationalitiesString = nationalities.join(
-                                                ', ',
-                                            );
-                                            return nationalitiesString;
+                                            return nationalities.join(', ');
                                         } else {
                                             return null;
                                         }
