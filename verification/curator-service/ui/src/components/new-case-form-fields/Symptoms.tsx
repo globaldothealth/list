@@ -78,11 +78,9 @@ const TooltipText = () => (
 );
 
 export default function Symptoms(): JSX.Element {
-    const {
-        values,
-        initialValues,
-        setFieldValue,
-    } = useFormikContext<CaseFormValues>();
+    const { values, initialValues, setFieldValue } = useFormikContext<
+        CaseFormValues
+    >();
     const [commonSymptoms, setCommonSymptoms] = React.useState([]);
 
     React.useEffect(

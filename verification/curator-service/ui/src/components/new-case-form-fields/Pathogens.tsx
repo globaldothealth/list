@@ -45,11 +45,9 @@ export function PathogensAutocomplete(): JSX.Element {
         new Map(),
     );
     const loading = open && options.keys.length === 0;
-    const {
-        setFieldValue,
-        setTouched,
-        initialValues,
-    } = useFormikContext<CaseFormValues>();
+    const { setFieldValue, setTouched, initialValues } = useFormikContext<
+        CaseFormValues
+    >();
 
     React.useEffect(() => {
         let active = true;
