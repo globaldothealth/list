@@ -62,7 +62,11 @@ import { useCookieBanner } from '../../hooks/useCookieBanner';
 import { SortBy, SortByOrder } from '../../constants/types';
 import { URLToSearchQuery } from '../util/searchQuery';
 import { useAppDispatch } from '../../hooks/redux';
-import { setSearchQuery, setFilterBreadcrumbs, deleteFilterBreadcrumbs} from './redux/appSlice';
+import {
+    setSearchQuery,
+    setFilterBreadcrumbs,
+    deleteFilterBreadcrumbs,
+} from './redux/appSlice';
 // import { selectFilterBreadcrumbs} from './redux/selectors';
 // import { useSelector } from 'react-redux';
 
@@ -526,15 +530,13 @@ export default function App(): JSX.Element {
         if (savedSearchQuery === null || savedSearchQuery === '') return;
 
         history.push({ pathname: '/cases', search: savedSearchQuery });
-
         // eslint-disable-next-line
     }, [savedSearchQuery]);
-
 
     // Function for deleting filter breadcrumbs
     const handleFilterBreadcrumbDelete = (breadcrumbToDelete: ChipData) => {
         const searchParams = new URLSearchParams(location.search);
-        dispatch(deleteFilterBreadcrumbs(breadcrumbToDelete))
+        dispatch(deleteFilterBreadcrumbs(breadcrumbToDelete));
         searchParams.delete(breadcrumbToDelete.key);
         history.push({
             pathname: '/cases',
@@ -548,8 +550,6 @@ export default function App(): JSX.Element {
 
         //eslint-disable-next-line
     }, [location.search]);
-
-
 
     return (
         <div className={classes.root} ref={rootRef}>
