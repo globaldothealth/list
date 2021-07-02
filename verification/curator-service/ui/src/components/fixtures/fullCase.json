@@ -85,7 +85,11 @@
         }
     ],
     "symptoms": {
-        "values": ["Severe pneumonia", "Dyspnea", "Weakness"],
+        "values": [
+            "Severe pneumonia",
+            "Dyspnea",
+            "Weakness"
+        ],
         "status": "Symptomatic"
     },
     "preexistingConditions": {
@@ -117,7 +121,7 @@
                         "longitude": -73.9740028
                     }
                 },
-                "methods": ["Plane"],
+                "methods": [ "Plane" ],
                 "purpose": "Family"
             }
         ],
@@ -148,12 +152,9 @@
         }
     },
     "transmission": {
-        "routes": ["Vector borne"],
-        "places": ["Gym"],
-        "linkedCaseIds": [
-            "bbf8e943dfe6e00030892dcc",
-            "aaf8e943dfe6e00030892dee"
-        ]
+        "routes": [ "Vector borne" ],
+        "places": [ "Gym" ],
+        "linkedCaseIds": [ "bbf8e943dfe6e00030892dcc", "aaf8e943dfe6e00030892dee" ]
     },
     "importedCase": {}
 }
