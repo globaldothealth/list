@@ -35,8 +35,9 @@ jest.mock('react-router-dom', () => ({
 
 describe('<SearchBar />', () => {
     it('Should open filters modal', async () => {
-        render(<AppTestComponent />,
-            {initialState: {app: { filterBreadcrumbs: [], searchQuery: ''}}},);
+        render(<AppTestComponent />, {
+            initialState: { app: { filterBreadcrumbs: [], searchQuery: '' } },
+        });
 
         userEvent.click(screen.getByRole('button', { name: /Filter/i }));
 
