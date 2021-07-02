@@ -12,9 +12,10 @@ try:
 except ImportError:
     sys.path.append(
         os.path.join(
-            os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
-            "common/python"))
+            os.path.dirname(os.path.abspath(__file__)),
+            os.pardir, os.pardir, 'common'))
     import parsing_lib
+
 
 _AGE = "NU_IDADE_N"
 _AGE_TYPE = "TP_IDADE"
