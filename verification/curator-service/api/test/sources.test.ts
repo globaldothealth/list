@@ -621,7 +621,7 @@ describe('retrieval', () => {
     });
 });
 
-describe('marking sources for deletion', async () => {
+describe('marking sources for deletion', () => {
     it('requires the source not to have stable IDs', async () => {
         const source = await new Source({
             name: 'test-source',
@@ -656,7 +656,7 @@ describe('marking sources for deletion', async () => {
     });
 });
 
-describe('clearing pending-deletion flag', async () => {
+describe('clearing pending-deletion flag', () => {
     it('requires the source not to have stable IDs', async () => {
         const source = await new Source({
             name: 'test-source',
@@ -691,7 +691,7 @@ describe('clearing pending-deletion flag', async () => {
     });
 });
 
-describe('deleting pending cases for a source', async () => {
+describe('deleting pending cases for a source', () => {
     it('requires the source not to have stable IDs', async () => {
         const source = await new Source({
             name: 'test-source',
