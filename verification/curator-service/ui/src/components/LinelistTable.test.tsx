@@ -1,6 +1,8 @@
 import '@testing-library/jest-dom/extend-expect';
 
+
 import { render, fireEvent, screen, wait } from './util/test-utils';
+
 
 import LinelistTable from './LinelistTable';
 import { MemoryRouter } from 'react-router-dom';
@@ -127,11 +129,7 @@ describe('<LinelistTable />', () => {
                     setSortByOrder={jest.fn()}
                 />
             </MemoryRouter>,
-            {
-                initialState: {
-                    app: { filterBreadcrumbs: [], searchQuery: '' },
-                },
-            },
+            {initialState: {app: { filterBreadcrumbs: [], searchQuery: ''}}},
         );
 
         expect(mockedAxios.get).toHaveBeenCalledTimes(1);
@@ -209,11 +207,7 @@ describe('<LinelistTable />', () => {
                     setSortByOrder={jest.fn()}
                 />
             </MemoryRouter>,
-            {
-                initialState: {
-                    app: { filterBreadcrumbs: [], searchQuery: '' },
-                },
-            },
+            {initialState: {app: { filterBreadcrumbs: [], searchQuery: ''}}},
         );
 
         const row = await findByText('www.example.com');
@@ -288,11 +282,7 @@ describe('<LinelistTable />', () => {
                     setSortByOrder={jest.fn()}
                 />
             </MemoryRouter>,
-            {
-                initialState: {
-                    app: { filterBreadcrumbs: [], searchQuery: '' },
-                },
-            },
+             {initialState: {app: { filterBreadcrumbs: [], searchQuery: ''}}},
         );
         expect(mockedAxios.get).toHaveBeenCalledTimes(1);
         expect(mockedAxios.get).toHaveBeenCalledWith(
@@ -395,11 +385,7 @@ describe('<LinelistTable />', () => {
                     setSortByOrder={jest.fn()}
                 />
             </MemoryRouter>,
-            {
-                initialState: {
-                    app: { filterBreadcrumbs: [], searchQuery: '' },
-                },
-            },
+             {initialState: {app: { filterBreadcrumbs: [], searchQuery: ''}}},
         );
         expect(mockedAxios.get).toHaveBeenCalledTimes(1);
         expect(mockedAxios.get).toHaveBeenCalledWith(
@@ -482,11 +468,7 @@ describe('<LinelistTable />', () => {
                     setSortByOrder={jest.fn()}
                 />
             </MemoryRouter>,
-            {
-                initialState: {
-                    app: { filterBreadcrumbs: [], searchQuery: '' },
-                },
-            },
+            {initialState: {app: { filterBreadcrumbs: [], searchQuery: ''}}},
         );
         expect(mockedAxios.get).toHaveBeenCalledTimes(1);
         expect(mockedAxios.get).toHaveBeenCalledWith(
@@ -556,11 +538,7 @@ describe('<LinelistTable />', () => {
                     setSortByOrder={jest.fn()}
                 />
             </MemoryRouter>,
-            {
-                initialState: {
-                    app: { filterBreadcrumbs: [], searchQuery: '' },
-                },
-            },
+            {initialState: {app: { filterBreadcrumbs: [], searchQuery: ''}}},
         );
 
         const rowsCounter = await findAllByText('11-20 of 20');
@@ -631,11 +609,7 @@ describe('<LinelistTable />', () => {
                     setSortByOrder={jest.fn()}
                 />
             </MemoryRouter>,
-            {
-                initialState: {
-                    app: { filterBreadcrumbs: [], searchQuery: '' },
-                },
-            },
+            {initialState: {app: { filterBreadcrumbs: [], searchQuery: ''}}},
         );
 
         expect(await findAllByText('1-10 of 20')).toHaveLength(2);
@@ -687,11 +661,7 @@ describe('<LinelistTable />', () => {
                     setSortByOrder={jest.fn()}
                 />
             </MemoryRouter>,
-            {
-                initialState: {
-                    app: { filterBreadcrumbs: breadcrumbs, searchQuery: '' },
-                },
-            },
+            {initialState: {app: { filterBreadcrumbs: breadcrumbs, searchQuery: ''}}},
         );
 
         expect(screen.getByText(/filters/i)).toBeInTheDocument();
@@ -725,11 +695,7 @@ describe('<LinelistTable />', () => {
                     setSortByOrder={jest.fn()}
                 />
             </MemoryRouter>,
-            {
-                initialState: {
-                    app: { filterBreadcrumbs: breadcrumbs, searchQuery: '' },
-                },
-            },
+            {initialState: {app: { filterBreadcrumbs: breadcrumbs, searchQuery: ''}}},
         );
 
         const filtersBreadcrumb = screen.getByText(/filters/i);

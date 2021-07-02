@@ -18,7 +18,7 @@ interface SourceProps {
     initialValue?: CaseReference;
     hasSourceEntryId?: boolean;
     freeSolo?: boolean;
-    sourcesWithStableIdentifiers?: boolean;
+    sourcesWithStableIdentifiers?: boolean,
 }
 
 const TooltipText = () => (
@@ -42,7 +42,7 @@ const TooltipText = () => (
     </StyledTooltip>
 );
 
-export default class Source extends React.Component<SourceProps, unknown> {
+export default class Source extends React.Component<SourceProps, {}> {
     render(): JSX.Element {
         const freeSolo =
             this.props.freeSolo === undefined ? true : this.props.freeSolo;
@@ -55,9 +55,7 @@ export default class Source extends React.Component<SourceProps, unknown> {
                 <SourcesAutocomplete
                     initialValue={this.props.initialValue}
                     freeSolo={freeSolo}
-                    sourcesWithStableIdentifiers={
-                        this.props.sourcesWithStableIdentifiers
-                    }
+                    sourcesWithStableIdentifiers={this.props.sourcesWithStableIdentifiers}
                 />
                 {this.props.hasSourceEntryId && (
                     <FastField
@@ -157,16 +155,14 @@ export function SourcesAutocomplete(
                         },
                     );
                     // this filtering could also be done server-side but there isn't a big number of sources
-                    if (props.sourcesWithStableIdentifiers) {
-                        callback(
-                            resp.data.sources.filter((s) => {
-                                return (
-                                    s.hasStableIdentifiers === undefined ||
-                                    s.hasStableIdentifiers === true
-                                );
-                            }),
-                        );
-                    } else {
+                    if (props.sourcesWithStableIdentifiers)
+                    {
+                        callback(resp.data.sources.filter(s => {
+                            return s.hasStableIdentifiers === undefined || s.hasStableIdentifiers === true;
+                        }));
+                    }
+                    else
+                    {
                         callback(resp.data.sources);
                     }
                 },

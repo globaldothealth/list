@@ -226,14 +226,14 @@ export function RequiredHelperText(
     const { values, touched } = useFormikContext<
         CaseFormValues | BulkCaseFormValues | AutomatedSourceFormValues
     >();
-
-    let finalHelperText = 'Required';
+    
+    let finalHelperText = "Required";
     if (props.wrongUrl === false) {
-        finalHelperText = 'Please enter a valid URL';
+        finalHelperText = "Please enter a valid URL"
     } else if (props.locationRequiredText) {
         finalHelperText = props.locationRequiredText;
     }
-
+    
     return (
         <div>
             <FormHelperText
@@ -242,8 +242,8 @@ export function RequiredHelperText(
                     touched[props.name] &&
                     hasKey(values, props.name) &&
                     (values[props.name] === undefined ||
-                        values[props.name] === null ||
-                        props.wrongUrl === false)
+                        values[props.name] === null || 
+                        props.wrongUrl === false) 
                 }
             >
                 {finalHelperText}
