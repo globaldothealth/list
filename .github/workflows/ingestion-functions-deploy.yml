@@ -4,7 +4,7 @@ on:
   push:
     branches: [main, '*-stable']
     paths:
-    - '.github/workflows/ingestion-functions-python.yml'
+    - '.github/workflows/ingestion-functions-deploy.yml'
     - 'ingestion/functions/**'
     - '!ingestion/functions/README.md'
 
