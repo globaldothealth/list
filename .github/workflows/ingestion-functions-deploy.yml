@@ -24,7 +24,7 @@ jobs:
       id: login-ecr
       uses: aws-actions/amazon-ecr-login@v1
 
-    - name: Build, tag, and push image to Amazon ECR
+    - name: Build, tag, and push image to Amazon ECR (latest)
       if: ${{ github.ref == 'refs/heads/main' }}
       working-directory: ingestion/functions
       env:
@@ -36,7 +36,7 @@ jobs:
         docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
         docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
 
-    - name: Build, tag, and push image to Amazon ECR
+    - name: Build, tag, and push image to Amazon ECR (stable)
       if: ${{ endsWith(github.ref, '-stable') }}
       working-directory: ingestion/functions
       env:
