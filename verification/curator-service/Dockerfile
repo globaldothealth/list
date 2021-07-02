@@ -62,6 +62,8 @@ COPY --from=builder /usr/src/app/verification/curator-service/api/node_modules .
 COPY --from=builder /usr/src/app/verification/curator-service/api/openapi ./openapi
 COPY --from=builder /usr/src/app/verification/curator-service/api/dist ./dist
 COPY --from=builder /usr/src/app/verification/curator-service/ui/build ./fe
+# and copy the non-compiled worker process back in!
+COPY verification/curator-service/api/src/workers/downloadAsync.js /usr/src/app/src/workers/downloadAsync.js
 # Set environment variable to serve static files from built UI.
 ENV STATIC_DIR /usr/src/app/fe
 ENV AFTER_LOGIN_REDIRECT_URL /
