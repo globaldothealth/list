@@ -1,0 +1,7 @@
+{
+    "env": "local",
+    "s3Bucket": "epid-sources-raw",
+    "s3Key": "manaus_test/content.csv",
+    "sourceUrl": "https://opendatasus.saude.gov.br/dataset/bd-srag-2021",
+    "sourceId": "607ea271a3dd860053555ff4"
+}
