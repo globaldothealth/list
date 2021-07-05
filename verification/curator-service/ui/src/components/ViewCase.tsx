@@ -753,9 +753,7 @@ function VariantRows(props: { variant: Variant }): JSX.Element {
     );
 }
 
-function LocationRows(props: {
-    loc?: Location;
-}): JSX.Element {
+function LocationRows(props: { loc?: Location }): JSX.Element {
     return (
         <>
             <RowHeader title="Location" />
@@ -835,8 +833,7 @@ function RowHeader(props: { title: string }): JSX.Element {
 
 function RowContent(props: { content: string; isLink?: boolean }): JSX.Element {
     const searchQuery = useSelector(selectSearchQuery);
-    const searchQueryArray =
-        searchQuery.match(/(?<=")[^"]+(?=")|\w{3,}/g) ?? [];
+    const searchQueryArray = searchQuery.match(/"([^"]+)"|\w{3,}/g) ?? [];
 
     return (
         <Grid item xs={8}>
