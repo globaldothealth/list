@@ -2,7 +2,7 @@ name: Geocoding location-service Python CI
 
 on:
   push:
-    branches: [main]
+    branches: [main, '*-stable']
     paths:
     - '.github/workflows/geocoding-service-python.yml'
     - 'geocoding/location-service/**'
