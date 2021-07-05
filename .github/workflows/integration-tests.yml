@@ -2,7 +2,7 @@ name: Integration Tests CI
 
 on:
   push:
-    branches: [main]
+    branches: [main, '*-stable']
     paths:
       - ".github/workflows/integration-tests.yml"
       - "dev/docker-compose.yml"
