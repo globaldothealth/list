@@ -21,6 +21,7 @@ OUTPUT_BUCKET = "epid-sources-raw"
 SOURCE_ID_FIELD = "sourceId"
 PARSING_DATE_RANGE_FIELD = "parsingDateRange"
 TIME_FILEPART_FORMAT = "/%Y/%m/%d/%H%M/"
+DEFAULT_ENCODING = 'utf-8'
 READ_CHUNK_BYTES = 2048
 HEADER_CHUNK_BYTES = 1024 * 1024
 CSV_CHUNK_BYTES = 2 * 1024 * 1024
@@ -145,7 +146,11 @@ def retrieve_content(
         # Read 2MB to be quite sure about the encoding.
         detected_enc = detect(bytesio.read(2 << 20))
         bytesio.seek(0)
-        print(f'Source encoding is presumably {detected_enc}')
+        if detected_enc['encoding']:
+            print(f'Source encoding is presumably {detected_enc}')
+        else:
+            detected_enc['encoding'] = DEFAULT_ENCODING
+            print(f'Source encoding detection failed, setting to {DEFAULT_ENCODING}')
         fd, outfile_name = tempfile.mkstemp(dir=tempdir)
         with os.fdopen(fd, "w", encoding='utf-8') as outfile:
             text_stream = codecs.getreader(detected_enc['encoding'])(bytesio)
