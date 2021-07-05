@@ -200,8 +200,7 @@ class SourceTable extends React.Component<Props, SourceTableState> {
 
                     if (e.response?.data?.name === 'NotificationSendError') {
                         this.setState({
-                            error:
-                                'Failed to send e-mail notifications to registered addresses',
+                            error: 'Failed to send e-mail notifications to registered addresses',
                         });
                         resolve(undefined);
                     } else {
@@ -549,27 +548,45 @@ class SourceTable extends React.Component<Props, SourceTableState> {
                                 title: 'Exclude from line list?',
                                 field: 'excludeFromLineList',
                                 render: (row): JSX.Element => (
-                                    <Switch disabled checked={row.excludeFromLineList ?? false}/>
+                                    <Switch
+                                        disabled
+                                        checked={
+                                            row.excludeFromLineList ?? false
+                                        }
+                                    />
                                 ),
                                 editComponent: (props): JSX.Element => (
-                                    <Switch checked={props.value ?? false} 
-                                    onChange={(event):void => {
-                                        props.onChange(event.target.checked)
-                                    }}/>
+                                    <Switch
+                                        checked={props.value ?? false}
+                                        onChange={(event): void => {
+                                            props.onChange(
+                                                event.target.checked,
+                                            );
+                                        }}
+                                    />
                                 ),
                             },
                             {
                                 title: 'Source has stable case identifiers?',
                                 field: 'hasStableIdentifiers',
                                 render: (row): JSX.Element => (
-                                    <Switch disabled checked={row.hasStableIdentifiers ?? false}/>
+                                    <Switch
+                                        disabled
+                                        checked={
+                                            row.hasStableIdentifiers ?? false
+                                        }
+                                    />
                                 ),
                                 editComponent: (props): JSX.Element => (
                                     // assume false because that's the more likely case
-                                    <Switch checked={props.value ?? false} 
-                                    onChange={(event):void => {
-                                        props.onChange(event.target.checked)
-                                    }}/>
+                                    <Switch
+                                        checked={props.value ?? false}
+                                        onChange={(event): void => {
+                                            props.onChange(
+                                                event.target.checked,
+                                            );
+                                        }}
+                                    />
                                 ),
                             },
                         ]}
@@ -579,9 +596,8 @@ class SourceTable extends React.Component<Props, SourceTableState> {
                                 listUrl += '?limit=' + this.state.pageSize;
                                 listUrl += '&page=' + (query.page + 1);
                                 this.setState({ error: '' });
-                                const response = axios.get<ListResponse>(
-                                    listUrl,
-                                );
+                                const response =
+                                    axios.get<ListResponse>(listUrl);
                                 response
                                     .then((result) => {
                                         const flattenedSources: TableRow[] = [];

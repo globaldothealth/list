@@ -52,8 +52,8 @@ import renderDate, { renderDateRange } from './util/date';
 import { URLToSearchQuery } from './util/searchQuery';
 import { ChipData } from './App/App';
 import { SortBy, SortByOrder } from '../constants/types';
-import {connect, ConnectedProps} from 'react-redux';
-import {RootState} from '../store';
+import { connect, ConnectedProps } from 'react-redux';
+import { RootState } from '../store';
 import { SnackbarAlert } from './SnackbarAlert';
 
 // Limit number of data that can be displayed or downloaded to avoid long execution times of mongo queries
@@ -65,7 +65,9 @@ interface ListResponse {
     total: number;
 }
 
-const mapStateToProps = (state:RootState) => ({ filterBreadcrumbs: state.app.filterBreadcrumbs });
+const mapStateToProps = (state: RootState) => ({
+    filterBreadcrumbs: state.app.filterBreadcrumbs,
+});
 const connector = connect(mapStateToProps);
 type PropsFromRedux = ConnectedProps<typeof connector>;
 
@@ -122,8 +124,9 @@ interface LocationState {
     pageSize: number;
 }
 
-interface Props 
-    extends PropsFromRedux, RouteComponentProps<never, never, LocationState>,
+interface Props
+    extends PropsFromRedux,
+        RouteComponentProps<never, never, LocationState>,
         WithStyles<typeof styles> {
     user: User;
     page: number;
@@ -243,15 +246,12 @@ function RowMenu(props: {
     refreshData: () => void;
 }): JSX.Element {
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
-    const [deleteDialogOpen, setDeleteDialogOpen] = React.useState<boolean>(
-        false,
-    );
-    const [excludeDialogOpen, setExcludeDialogOpen] = React.useState<boolean>(
-        false,
-    );
-    const [includeDialogOpen, setIncludeDialogOpen] = React.useState<boolean>(
-        false,
-    );
+    const [deleteDialogOpen, setDeleteDialogOpen] =
+        React.useState<boolean>(false);
+    const [excludeDialogOpen, setExcludeDialogOpen] =
+        React.useState<boolean>(false);
+    const [includeDialogOpen, setIncludeDialogOpen] =
+        React.useState<boolean>(false);
     const [isDeleting, setIsDeleting] = React.useState(false);
     const classes = rowMenuStyles();
 
@@ -511,9 +511,8 @@ export function DownloadButton({
     totalCasesCount,
 }: DownloadButtonProps): JSX.Element {
     const location = useLocation<LocationState>();
-    const [isDownloadModalOpen, setIsDownloadModalOpen] = useState<boolean>(
-        false,
-    );
+    const [isDownloadModalOpen, setIsDownloadModalOpen] =
+        useState<boolean>(false);
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [fileFormat, setFileFormat] = useState('');
     const [showFullDatasetButton, setShowFullDatasetButton] = useState(true);
@@ -831,12 +830,10 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
         this.setCaseVerification = this.setCaseVerification.bind(this);
         this.confirmationDialogTitle = this.confirmationDialogTitle.bind(this);
         this.confirmationDialogBody = this.confirmationDialogBody.bind(this);
-        this.showConfirmationDialogError = this.showConfirmationDialogError.bind(
-            this,
-        );
-        this.changeVerificationStatus = this.changeVerificationStatus.bind(
-            this,
-        );
+        this.showConfirmationDialogError =
+            this.showConfirmationDialogError.bind(this);
+        this.changeVerificationStatus =
+            this.changeVerificationStatus.bind(this);
         this.getExcludedCaseIds = this.getExcludedCaseIds.bind(this);
         this.handleSortByChange = this.handleSortByChange.bind(this);
         this.handleSortByOrderChange = this.handleSortByOrderChange.bind(this);
@@ -1419,9 +1416,8 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                     ) => {
                                         if (nationalities) {
                                             nationalities.sort();
-                                            const nationalitiesString = nationalities.join(
-                                                ', ',
-                                            );
+                                            const nationalitiesString =
+                                                nationalities.join(', ');
                                             return nationalitiesString;
                                         } else {
                                             return null;
@@ -1474,13 +1470,14 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                                 (event) =>
                                                     event.name === 'outcome',
                                             )?.value,
-                                            hospitalizationDateRange: renderDateRange(
-                                                c.events.find(
-                                                    (event) =>
-                                                        event.name ===
-                                                        'hospitalAdmission',
-                                                )?.dateRange,
-                                            ),
+                                            hospitalizationDateRange:
+                                                renderDateRange(
+                                                    c.events.find(
+                                                        (event) =>
+                                                            event.name ===
+                                                            'hospitalAdmission',
+                                                    )?.dateRange,
+                                                ),
                                             symptomsOnsetDate: renderDateRange(
                                                 c.events.find(
                                                     (event) =>
@@ -1712,8 +1709,7 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                                 icon: (): JSX.Element => (
                                                     <Button
                                                         classes={{
-                                                            root:
-                                                                classes.toolbarItems,
+                                                            root: classes.toolbarItems,
                                                         }}
                                                     >
                                                         {this.state
@@ -1752,10 +1748,11 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                                         shouldSelectAll,
                                                     );
                                                     this.setState({
-                                                        numSelectedRows: shouldSelectAll
-                                                            ? this.state
-                                                                  .totalNumRows
-                                                            : 0,
+                                                        numSelectedRows:
+                                                            shouldSelectAll
+                                                                ? this.state
+                                                                      .totalNumRows
+                                                                : 0,
                                                     });
                                                 },
                                             },
@@ -1834,8 +1831,7 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                               </form>
                                               <SaveAltIcon
                                                   classes={{
-                                                      root:
-                                                          classes.toolbarItems,
+                                                      root: classes.toolbarItems,
                                                   }}
                                               />
                                           </span>
@@ -1853,8 +1849,7 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                           <span aria-label="delete all">
                                               <DeleteIcon
                                                   classes={{
-                                                      root:
-                                                          classes.toolbarItems,
+                                                      root: classes.toolbarItems,
                                                   }}
                                               />
                                           </span>
