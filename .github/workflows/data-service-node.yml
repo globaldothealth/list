@@ -5,7 +5,7 @@ name: Data service Node.js CI
 
 on:
   push:
-    branches: [main]
+    branches: [main, '*-stable']
     paths:
       - ".github/workflows/data-service-node.yml"
       - "data-serving/data-service/**"
