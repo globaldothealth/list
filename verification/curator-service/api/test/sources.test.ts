@@ -14,6 +14,7 @@ import { Session, User } from '../src/model/user';
 
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import { Source } from '../src/model/source';
+import qs from 'qs';
 import app from '../src/index';
 import axios from 'axios';
 import supertest from 'supertest';
@@ -652,7 +653,8 @@ describe('marking sources for deletion', () => {
             `/api/sources/${source._id}/markPendingRemoval`
         )
         .expect(201);
-        expect(mockedAxios.post).toHaveBeenCalledWith(`http://localhost:3000/api/cases/markPendingRemoval?sourceId=${source._id}&email=${baseUser.email}`);
+        expect(mockedAxios.post).toHaveBeenCalledWith('http://localhost:3000/api/cases/markPendingRemoval',
+            qs.stringify({sourceId: `${source._id}`, email: baseUser.email}));
     });
 });
 
@@ -687,7 +689,8 @@ describe('clearing pending-deletion flag', () => {
             `/api/sources/${source._id}/clearPendingRemovalStatus`
         )
         .expect(201);
-        expect(mockedAxios.post).toHaveBeenCalledWith(`http://localhost:3000/api/cases/clearPendingRemovalStatus?sourceId=${source._id}&email=${baseUser.email}`);
+        expect(mockedAxios.post).toHaveBeenCalledWith('http://localhost:3000/api/cases/clearPendingRemovalStatus',
+            qs.stringify({sourceId: `${source._id}`, email: baseUser.email}));
     });
 });
 
@@ -722,6 +725,6 @@ describe('deleting pending cases for a source', () => {
             `/api/sources/${source._id}/removePendingCases`
         )
         .expect(201);
-        expect(mockedAxios.post).toHaveBeenCalledWith(`http://localhost:3000/api/cases/removePendingCases?sourceId=${source._id}`);
+        expect(mockedAxios.post).toHaveBeenCalledWith(`http://localhost:3000/api/cases/removePendingCases`, `sourceId=${source._id}`);
     });
 });

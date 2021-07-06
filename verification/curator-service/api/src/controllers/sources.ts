@@ -1,4 +1,5 @@
 import axios from 'axios';
+import qs from 'qs';
 import { Request, Response } from 'express';
 import { Source, SourceDocument } from '../model/source';
 import { UserDocument } from '../model/user';
@@ -289,7 +290,8 @@ export default class SourcesController {
         }
         try {
             const user = req.user as UserDocument;
-            const response = await axios.post(`${this.dataServerURL}/api/cases/markPendingRemoval?sourceId=${req.params.id}&email=${user.email}`);
+            const response = await axios.post(`${this.dataServerURL}/api/cases/markPendingRemoval`,
+                qs.stringify({sourceId: req.params.id, email: user.email}));
             if (response.status == 201) {
                 res.sendStatus(201).end();
             } else {
@@ -313,7 +315,8 @@ export default class SourcesController {
             return;
         }
         try {
-            const response = await axios.post(`${this.dataServerURL}/api/cases/removePendingCases?sourceId=${req.params.id}`);
+            const response = await axios.post(`${this.dataServerURL}/api/cases/removePendingCases`,
+                qs.stringify({sourceId: req.params.id}));
             if (response.status == 201) {
                 res.sendStatus(201).end();
             } else {
@@ -337,7 +340,8 @@ export default class SourcesController {
         }
         try {
             const user = req.user as UserDocument;
-            const response = await axios.post(`${this.dataServerURL}/api/cases/clearPendingRemovalStatus?sourceId=${req.params.id}&email=${user.email}`);
+            const response = await axios.post(`${this.dataServerURL}/api/cases/clearPendingRemovalStatus`,
+                qs.stringify({sourceId: req.params.id, email: user.email}));
             if (response.status == 201) {
                 res.sendStatus(201).end();
             } else {
