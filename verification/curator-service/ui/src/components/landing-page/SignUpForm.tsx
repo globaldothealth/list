@@ -65,6 +65,7 @@ const useStyles = makeStyles((theme: Theme) => ({
     formFlexContainer: {
         display: 'flex',
         gap: '80px',
+        marginTop: '20px',
     },
 }));
 
@@ -147,6 +148,7 @@ export default function SignUpForm({
     return (
         <>
             <form onSubmit={formik.handleSubmit}>
+                <Typography variant="h5">SignUp form</Typography>
                 <div className={classes.formFlexContainer}>
                     <div id="leftBox">
                         <TextField
@@ -345,13 +347,16 @@ export default function SignUpForm({
                         }
                     />
                 </FormGroup>
-
+                <Typography className={classes.checkboxLabel}>
+                    this is the signup form
+                </Typography>
                 <Button
                     disabled={disabled}
                     type="submit"
                     variant="contained"
                     color="primary"
                     className={classes.signInButton}
+                    data-testid="sign-up-button"
                 >
                     Sign up
                 </Button>
