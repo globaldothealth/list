@@ -14,6 +14,7 @@ import { Session, User } from '../src/model/user';
 
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import { Source } from '../src/model/source';
+import qs from 'qs';
 import app from '../src/index';
 import axios from 'axios';
 import supertest from 'supertest';
@@ -621,7 +622,7 @@ describe('retrieval', () => {
     });
 });
 
-describe('marking sources for deletion', async () => {
+describe('marking sources for deletion', () => {
     it('requires the source not to have stable IDs', async () => {
         const source = await new Source({
             name: 'test-source',
@@ -652,11 +653,12 @@ describe('marking sources for deletion', async () => {
             `/api/sources/${source._id}/markPendingRemoval`
         )
         .expect(201);
-        expect(mockedAxios.post).toHaveBeenCalledWith(`http://localhost:3000/api/cases/markPendingRemoval?sourceId=${source._id}&email=${baseUser.email}`);
+        expect(mockedAxios.post).toHaveBeenCalledWith('http://localhost:3000/api/cases/markPendingRemoval',
+            qs.stringify({sourceId: `${source._id}`, email: baseUser.email}));
     });
 });
 
-describe('clearing pending-deletion flag', async () => {
+describe('clearing pending-deletion flag', () => {
     it('requires the source not to have stable IDs', async () => {
         const source = await new Source({
             name: 'test-source',
@@ -687,11 +689,12 @@ describe('clearing pending-deletion flag', async () => {
             `/api/sources/${source._id}/clearPendingRemovalStatus`
         )
         .expect(201);
-        expect(mockedAxios.post).toHaveBeenCalledWith(`http://localhost:3000/api/cases/clearPendingRemovalStatus?sourceId=${source._id}&email=${baseUser.email}`);
+        expect(mockedAxios.post).toHaveBeenCalledWith('http://localhost:3000/api/cases/clearPendingRemovalStatus',
+            qs.stringify({sourceId: `${source._id}`, email: baseUser.email}));
     });
 });
 
-describe('deleting pending cases for a source', async () => {
+describe('deleting pending cases for a source', () => {
     it('requires the source not to have stable IDs', async () => {
         const source = await new Source({
             name: 'test-source',
@@ -722,6 +725,6 @@ describe('deleting pending cases for a source', async () => {
             `/api/sources/${source._id}/removePendingCases`
         )
         .expect(201);
-        expect(mockedAxios.post).toHaveBeenCalledWith(`http://localhost:3000/api/cases/removePendingCases?sourceId=${source._id}`);
+        expect(mockedAxios.post).toHaveBeenCalledWith(`http://localhost:3000/api/cases/removePendingCases`, `sourceId=${source._id}`);
     });
 });

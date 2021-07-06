@@ -58,7 +58,7 @@
     "react-redux": "^7.2.4",
     "react-router-dom": "^5.1.2",
     "react-router-last-location": "^2.0.1",
-    "react-scripts": "^3.4.3",
+    "react-scripts": "^3.4.4",
     "react-scroll": "^1.8.0",
     "shortid": "^2.2.15",
     "typeface-roboto": "0.0.75",
@@ -116,6 +116,6 @@
     ]
   },
   "engines": {
-    "node": "14.17.0"
+    "node": "14.17.1"
   }
 }

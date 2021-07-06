@@ -4,7 +4,7 @@ on:
   push:
     branches: [main, '*-stable']
     paths:
-    - '.github/workflows/ingestion-functions-python.yml'
+    - '.github/workflows/ingestion-functions-deploy.yml'
     - 'ingestion/functions/**'
     - '!ingestion/functions/README.md'
 
@@ -24,7 +24,7 @@ jobs:
       id: login-ecr
       uses: aws-actions/amazon-ecr-login@v1
 
-    - name: Build, tag, and push image to Amazon ECR
+    - name: Build, tag, and push image to Amazon ECR (latest)
       if: ${{ github.ref == 'refs/heads/main' }}
       working-directory: ingestion/functions
       env:
@@ -36,7 +36,7 @@ jobs:
         docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
         docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
 
-    - name: Build, tag, and push image to Amazon ECR
+    - name: Build, tag, and push image to Amazon ECR (stable)
       if: ${{ endsWith(github.ref, '-stable') }}
       working-directory: ingestion/functions
       env:
@@ -44,6 +44,6 @@ jobs:
         ECR_REPOSITORY: gdh-ingestor
         IMAGE_TAG: ${{ github.sha }}
       run: |
-        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG -t $ECR_REGISTRY/$ECR_REPOSITORY .
+        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG -t $ECR_REGISTRY/$ECR_REPOSITORY:stable .
         docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
         docker push $ECR_REGISTRY/$ECR_REPOSITORY:stable
