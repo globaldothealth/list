@@ -350,8 +350,10 @@ export default function LandingPage({
                         if (!isAgreementChecked) {
                             setIsAgreementMessage(true);
                         } else {
-                            window.location.href = `${process.env
-                                .REACT_APP_LOGIN_URL!}?newsletterAccepted=${isNewsletterChecked}`;
+                            const loginUrl = process.env.REACT_APP_LOGIN_URL;
+                            if (loginUrl) {
+                                window.location.href = `${loginUrl}?newsletterAccepted=${isNewsletterChecked}`;
+                            }
                         }
                     }}
                 />

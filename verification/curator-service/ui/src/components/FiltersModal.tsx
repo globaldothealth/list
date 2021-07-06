@@ -71,7 +71,7 @@ interface FiltersModalProps {
     handleClose: () => void;
     setActiveFilterInput: (value: string) => void;
     showModalAlert: boolean;
-    closeAlert: any;
+    closeAlert: (flag: boolean) => void;
 }
 
 export interface FilterFormValues {
@@ -91,6 +91,7 @@ export interface FilterFormValues {
     caseid?: string;
     sourceurl?: string;
     uploadid?: string;
+    [name: string]: string | undefined;
 }
 
 interface FilterFormErrors {
@@ -105,7 +106,7 @@ export default function FiltersModal({
     setActiveFilterInput,
     showModalAlert,
     closeAlert,
-}: FiltersModalProps) {
+}: FiltersModalProps): JSX.Element {
     const classes = useStyles();
     const location = useLocation();
     const history = useHistory();
@@ -148,12 +149,12 @@ export default function FiltersModal({
         initialValues: formValues,
         validate: validateForm,
         validateOnChange: true,
-        onSubmit: (values: any) => {
+        onSubmit: (values: FilterFormValues) => {
             Object.keys(values).map(
                 (k) =>
                     (values[k] =
                         typeof values[k] == 'string'
-                            ? values[k].trim()
+                            ? (values[k] as string).trim()
                             : values[k]),
             );
             handleSetModalAlert();

@@ -174,7 +174,7 @@ export function PlacesAutocomplete(
             getOptionLabel={(option: Loc): string => option.name}
             options={options}
             value={value}
-            onChange={(event: any, newValue: Loc | null): void => {
+            onChange={(event: unknown, newValue: Loc | null): void => {
                 setOptions(newValue ? [newValue, ...options] : options);
                 setValue(newValue);
                 setFieldValue(props.name, newValue);

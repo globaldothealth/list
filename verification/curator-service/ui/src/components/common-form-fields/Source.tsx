@@ -241,7 +241,7 @@ export function SourcesAutocomplete(
                     );
                 }}
                 onChange={(
-                    _: any,
+                    _: unknown,
                     newValue: CaseReferenceForm | string | null,
                 ): void => {
                     // newValue is a string if the user typed a URL and did not

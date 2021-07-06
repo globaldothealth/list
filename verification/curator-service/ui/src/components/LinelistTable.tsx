@@ -113,7 +113,7 @@ interface TableRow {
         date: string;
         note: string;
     };
-    nationalities?: any;
+    nationalities?: string;
 }
 
 interface LocationState {
@@ -260,27 +260,36 @@ function RowMenu(props: {
         setAnchorEl(event.currentTarget);
     };
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const handleClose = (event?: any): void => {
         event?.stopPropagation();
         setAnchorEl(null);
     };
 
-    const openDeleteDialog = async (event?: any): Promise<void> => {
+    const openDeleteDialog = async (
+        event?: React.BaseSyntheticEvent,
+    ): Promise<void> => {
         event?.stopPropagation();
         setDeleteDialogOpen(true);
     };
 
-    const openExcludeDialog = async (event?: any): Promise<void> => {
+    const openExcludeDialog = async (
+        event?: React.BaseSyntheticEvent,
+    ): Promise<void> => {
         event?.stopPropagation();
         setExcludeDialogOpen(true);
     };
 
-    const openIncludeDialog = async (event?: any): Promise<void> => {
+    const openIncludeDialog = async (
+        event?: React.BaseSyntheticEvent,
+    ): Promise<void> => {
         event?.stopPropagation();
         setIncludeDialogOpen(true);
     };
 
-    const handleDelete = async (event?: any): Promise<void> => {
+    const handleDelete = async (
+        event?: React.BaseSyntheticEvent,
+    ): Promise<void> => {
         event?.stopPropagation();
         try {
             setIsDeleting(true);
@@ -777,7 +786,7 @@ export function DownloadButton({
 }
 
 interface ColumnHeaderProps {
-    theClass: any;
+    theClass: string;
     columnTitle: string;
     onClickAction: (e: React.MouseEvent<HTMLDivElement>) => void;
 }
@@ -800,7 +809,9 @@ const ColumnHeaderTitle: React.FC<ColumnHeaderProps> = ({
 
 class LinelistTable extends React.Component<Props, LinelistTableState> {
     maxDeletionThreshold = 10000;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     tableRef: RefObject<any> = React.createRef();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     formRef: RefObject<any> = React.createRef();
     // eslint-disable-next-line @typescript-eslint/no-empty-function
     unlisten: () => void = () => {};
@@ -1412,15 +1423,15 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                     const flattenedCases: TableRow[] = [];
                                     const cases = result.data.cases;
                                     const nationalitiesRender = (
-                                        nationalities: any,
-                                    ) => {
+                                        nationalities: string[],
+                                    ): string | undefined => {
                                         if (nationalities) {
                                             nationalities.sort();
                                             const nationalitiesString =
                                                 nationalities.join(', ');
                                             return nationalitiesString;
                                         } else {
-                                            return null;
+                                            return undefined;
                                         }
                                     };
                                     for (const c of cases) {
@@ -1733,9 +1744,10 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                               ? 'Unselect'
                                               : 'Select'
                                       } all rows across pages`,
-                                                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                                                 onClick: async (
+                                                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
                                                     _: any,
+                                                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
                                                     rows: any,
                                                 ): Promise<void> => {
                                                     const shouldSelectAll =
@@ -1766,9 +1778,10 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                           'curator',
                                       ),
                                       tooltip: 'Verify selected rows',
-                                      // eslint-disable-next-line @typescript-eslint/no-explicit-any
                                       onClick: async (
+                                          // eslint-disable-next-line @typescript-eslint/no-explicit-any
                                           _: any,
+                                          // eslint-disable-next-line @typescript-eslint/no-explicit-any
                                           rows: any,
                                       ): Promise<void> => {
                                           this.changeVerificationStatus(
@@ -1785,9 +1798,10 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                           'curator',
                                       ),
                                       tooltip: 'Unverify selected rows',
-                                      // eslint-disable-next-line @typescript-eslint/no-explicit-any
                                       onClick: async (
+                                          // eslint-disable-next-line @typescript-eslint/no-explicit-any
                                           _: any,
+                                          // eslint-disable-next-line @typescript-eslint/no-explicit-any
                                           rows: any,
                                       ): Promise<void> => {
                                           this.changeVerificationStatus(

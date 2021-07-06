@@ -132,6 +132,7 @@ const styles = (theme: Theme) =>
 type Props = WithStyles<typeof styles>;
 
 class SourceTable extends React.Component<Props, SourceTableState> {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     tableRef: RefObject<any> = React.createRef();
 
     constructor(props: Props) {
