@@ -115,7 +115,9 @@ export default function ForgotPasswordForm(): React.ReactElement {
                 // would trigger the onRowClick action.
                 onClick={(e): void => e.stopPropagation()}
             >
-                <DialogTitle>Forgot your Password?</DialogTitle>
+                <DialogTitle data-testid="forgot-password-dialog">
+                    Forgot your Password?
+                </DialogTitle>
                 <DialogContent>
                     <DialogContentText>
                         Don't worry! Just fill in your email address and we'll
@@ -152,6 +154,7 @@ export default function ForgotPasswordForm(): React.ReactElement {
                             color="primary"
                             disabled={isLoading}
                             className={classes.signInButton}
+                            data-testid="send-reset-link"
                         >
                             Send reset link
                         </Button>

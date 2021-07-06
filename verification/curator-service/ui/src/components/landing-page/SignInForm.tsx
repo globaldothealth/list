@@ -79,7 +79,7 @@ interface FormValues {
 }
 
 interface SignInFormProps {
-    disabled: boolean;
+    disabled?: boolean;
     setRegistrationScreenOn: (active: boolean) => void;
 }
 
@@ -154,6 +154,7 @@ export default function SignInForm({
                             helperText={
                                 formik.touched.email && formik.errors.email
                             }
+                            data-testid="email-textbox"
                         />
                         <FormControl
                             disabled={disabled}
@@ -191,6 +192,7 @@ export default function SignInForm({
                                     </InputAdornment>
                                 }
                                 label="Password"
+                                data-testid="password-textbox"
                             />
                             <FormHelperText>
                                 {formik.touched.password &&
@@ -199,6 +201,7 @@ export default function SignInForm({
                             <Typography className={classes.title}>
                                 <span
                                     className={classes.forgotPassword}
+                                    data-testid="forgot-password-link"
                                     onClick={() =>
                                         dispatch(
                                             setForgotPasswordPopupOpen(true),
@@ -303,6 +306,7 @@ export default function SignInForm({
                     variant="contained"
                     color="primary"
                     className={classes.signInButton}
+                    data-testid="sign-in-button"
                 >
                     Sign in
                 </Button>

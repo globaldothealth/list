@@ -78,9 +78,6 @@ const useStyles = makeStyles((theme: Theme) => ({
     authFormTitle: {
         margin: '15px 0',
     },
-    loader: {
-        marginTop: '15px',
-    },
 }));
 
 interface UrlParams {
