@@ -361,7 +361,7 @@ paths:
                     $ref: '#/components/responses/200ParsersArray'
                 '500':
                     $ref: '#/components/responses/500'
-    /sources/{sourceId}/markPendingRemoval:
+    /api/sources/{sourceId}/markPendingRemoval:
         parameters:
             - name: sourceId
               in: path
@@ -385,7 +385,7 @@ paths:
                     $ref: '#/components/responses/404'
                 '500':
                     $ref: '#/components/responses/500'
-    /sources/{sourceId}/removePendingCases:
+    /api/sources/{sourceId}/removePendingCases:
         parameters:
             - name: sourceId
               in: path
@@ -409,7 +409,7 @@ paths:
                     $ref: '#/components/responses/404'
                 '500':
                     $ref: '#/components/responses/500'
-    /sources/{sourceId}/clearPendingRemovalStatus:
+    /api/sources/{sourceId}/clearPendingRemovalStatus:
         parameters:
             - name: sourceId
               in: path
