@@ -639,7 +639,7 @@ describe('marking sources for deletion', () => {
 
     it('forwards request to mark sources to the data service', async () => {
         mockedAxios.post.mockResolvedValueOnce({
-            status: 201,
+            status: 204,
         });
         const source = await new Source({
             name: 'test-source',
@@ -650,7 +650,7 @@ describe('marking sources for deletion', () => {
         }).save();
         await curatorRequest
             .post(`/api/sources/${source._id}/markPendingRemoval`)
-            .expect(201);
+            .expect(204);
         const expectedEmail = encodeURIComponent(baseUser.email);
         expect(mockedAxios.post).toHaveBeenCalledWith(
             `http://localhost:3000/api/cases/markPendingRemoval?sourceId=${source._id}&email=${expectedEmail}`,
@@ -675,7 +675,7 @@ describe('clearing pending-deletion flag', () => {
 
     it('forwards request to clear mark to the data service', async () => {
         mockedAxios.post.mockResolvedValueOnce({
-            status: 201,
+            status: 204,
         });
         const source = await new Source({
             name: 'test-source',
@@ -686,7 +686,7 @@ describe('clearing pending-deletion flag', () => {
         }).save();
         await curatorRequest
             .post(`/api/sources/${source._id}/clearPendingRemovalStatus`)
-            .expect(201);
+            .expect(204);
         const expectedEmail = encodeURIComponent(baseUser.email);
         expect(mockedAxios.post).toHaveBeenCalledWith(
             `http://localhost:3000/api/cases/clearPendingRemovalStatus?sourceId=${source._id}&email=${expectedEmail}`,
@@ -711,7 +711,7 @@ describe('deleting pending cases for a source', () => {
 
     it('forwards request to remove cases to the data service', async () => {
         mockedAxios.post.mockResolvedValueOnce({
-            status: 201,
+            status: 204,
         });
         const source = await new Source({
             name: 'test-source',
@@ -722,7 +722,7 @@ describe('deleting pending cases for a source', () => {
         }).save();
         await curatorRequest
             .post(`/api/sources/${source._id}/removePendingCases`)
-            .expect(201);
+            .expect(204);
         expect(mockedAxios.post).toHaveBeenCalledWith(
             `http://localhost:3000/api/cases/removePendingCases?sourceId=${source._id}`,
         );
