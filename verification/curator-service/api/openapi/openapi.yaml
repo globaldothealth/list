@@ -375,8 +375,8 @@ paths:
             summary: Marks all cases recorded for this source as pending later removal.
             operationId: markPendingRemoval
             responses:
-                '201':
-                    $ref: '#/components/responses/200'
+                '204':
+                    description: Cases were marked.
                 '400':
                     $ref: '#/components/responses/400'
                 '403':
@@ -399,8 +399,8 @@ paths:
             summary: All cases for this source that have the pending removal mark are deleted.
             operationId: removePendingCases
             responses:
-                '201':
-                    $ref: '#/components/responses/200'
+                '204':
+                    description: Cases were deleted.
                 '400':
                     $ref: '#/components/responses/400'
                 '403':
@@ -423,8 +423,8 @@ paths:
             summary: Clears the removal pending status of any case from this source.
             operationId: clearPendingRemovalStatus
             responses:
-                '201':
-                    $ref: '#/components/responses/200'
+                '204':
+                    description: Marks were cleared.
                 '400':
                     $ref: '#/components/responses/400'
                 '403':

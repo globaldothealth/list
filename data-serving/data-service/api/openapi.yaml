@@ -371,7 +371,7 @@ paths:
                         type: string
             responses:
                 '204':
-                    $ref: '#/components/responses/204'
+                    description: Cases were marked for removal.
                 '500':
                     $ref: '#/components/responses/500'
     /cases/removePendingCases:
@@ -389,7 +389,7 @@ paths:
                         pattern: '^[a-f\d]{24}$'
             responses:
                 '204':
-                    $ref: '#/components/responses/204'
+                    description: Cases were removed.
                 '500':
                     $ref: '#/components/responses/500'
     /cases/clearPendingRemovalStatus:
@@ -413,7 +413,7 @@ paths:
                         type: string
             responses:
                 '204':
-                    $ref: '#/components/responses/204'
+                    description: Marks were cleared.
                 '500':
                     $ref: '#/components/responses/500'
     /cases/symptoms:
