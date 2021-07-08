@@ -1,8 +1,6 @@
 import LandingPage from './LandingPage';
-import { MemoryRouter } from 'react-router-dom';
 import React from 'react';
 import { render, screen, waitFor } from '../util/test-utils';
-import { ThemeProvider, createMuiTheme } from '@material-ui/core/styles';
 import SignInForm from './SignInForm';
 import SignUpForm from './SignUpForm';
 // import ChangePasswordForm from './ChangePasswordForm';
@@ -17,19 +15,9 @@ beforeAll(() => server.listen());
 afterEach(() => server.resetHandlers());
 afterAll(() => server.close());
 
-const theme = createMuiTheme({
-    custom: { palette: { landingPage: { descriptionTextColor: '#838D89' } } },
-});
-
 describe('LandingPage', () => {
     test('shows all content', async () => {
-        render(
-            <MemoryRouter>
-                <ThemeProvider theme={theme}>
-                    <LandingPage />
-                </ThemeProvider>
-            </MemoryRouter>,
-        );
+        render(<LandingPage />);
 
         expect(screen.getByText(/Detailed line list data/)).toBeInTheDocument();
         expect(screen.getByText(/Welcome to G.h Data/)).toBeInTheDocument();
@@ -97,13 +85,7 @@ describe('SignInForm', () => {
             }),
         );
 
-        render(
-            <MemoryRouter>
-                <ThemeProvider theme={theme}>
-                    <LandingPage />
-                </ThemeProvider>
-            </MemoryRouter>,
-        );
+        render(<LandingPage />);
         // render(<SignInForm setRegistrationScreenOn={() => false} />);
 
         userEvent.type(screen.getByLabelText(/Email/i), 'test@email.com');
@@ -373,13 +355,7 @@ describe('ForgotPasswordForm', () => {
 
 describe('ChangePasswordForm', () => {
     test('displays the change password form', async () => {
-        render(
-            <MemoryRouter>
-                <ThemeProvider theme={theme}>
-                    <LandingPage />
-                </ThemeProvider>
-            </MemoryRouter>,
-        );
+        render(<LandingPage />);
 
         expect(screen.getByText(/Forgot your password?/i)).toBeInTheDocument();
     });

@@ -69,7 +69,7 @@ import { getUserProfile } from '../../redux/auth/thunk';
 import { selectUser } from '../../redux/auth/selectors';
 import { User } from '../../api/models/User';
 
-const theme = createMuiTheme({
+export const theme = createMuiTheme({
     palette: {
         background: {
             default: '#ecf3f0',
@@ -467,6 +467,8 @@ export default function App(): JSX.Element {
     }, [location.pathname, menuList]);
 
     const getUser = (): void => {
+        if (user) return;
+
         dispatch(getUserProfile());
     };
 
