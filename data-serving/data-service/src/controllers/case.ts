@@ -144,9 +144,14 @@ export class CasesController {
             res.setHeader('Cache-Control', 'no-cache');
             res.setHeader('Pragma', 'no-cache');
 
-            logger.info('format: ' + req.body.format);
+            if (!req.body.format) {
+                logger.warn('no format explicitly requested, you will get CSV data');
+            }
+            const format = req.body.format ?? 'csv';
 
-            switch (req.body.format) {
+            logger.info('format: ' + format);
+
+            switch (format) {
                 case 'csv':
                     res.setHeader('Content-Type', 'text/csv');
                     res.setHeader(
@@ -207,6 +212,7 @@ export class CasesController {
                     break;
 
                 default:
+                    logger.error(`unknown format requested: ${format}, download abandoned`);
                     break;
             }
         } catch (e) {
