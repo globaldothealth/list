@@ -631,10 +631,9 @@ describe('marking sources for deletion', () => {
             notificationRecipients: ['foo@bar.com'],
             hasStableIdentifiers: true,
         }).save();
-        await curatorRequest.post(
-            `/api/sources/${source._id}/markPendingRemoval`
-        )
-        .expect(400);
+        await curatorRequest
+            .post(`/api/sources/${source._id}/markPendingRemoval`)
+            .expect(400);
         expect(mockedAxios.post).not.toHaveBeenCalled();
     });
 
@@ -649,12 +648,13 @@ describe('marking sources for deletion', () => {
             notificationRecipients: ['foo@bar.com'],
             hasStableIdentifiers: false,
         }).save();
-        await curatorRequest.post(
-            `/api/sources/${source._id}/markPendingRemoval`
-        )
-        .expect(201);
-        expect(mockedAxios.post).toHaveBeenCalledWith('http://localhost:3000/api/cases/markPendingRemoval',
-            qs.stringify({sourceId: `${source._id}`, email: baseUser.email}));
+        await curatorRequest
+            .post(`/api/sources/${source._id}/markPendingRemoval`)
+            .expect(201);
+        const expectedEmail = encodeURIComponent(baseUser.email);
+        expect(mockedAxios.post).toHaveBeenCalledWith(
+            `http://localhost:3000/api/cases/markPendingRemoval?sourceId=${source._id}&email=${expectedEmail}`,
+        );
     });
 });
 
@@ -667,10 +667,9 @@ describe('clearing pending-deletion flag', () => {
             notificationRecipients: ['foo@bar.com'],
             hasStableIdentifiers: true,
         }).save();
-        await curatorRequest.post(
-            `/api/sources/${source._id}/clearPendingRemovalStatus`
-        )
-        .expect(400);
+        await curatorRequest
+            .post(`/api/sources/${source._id}/clearPendingRemovalStatus`)
+            .expect(400);
         expect(mockedAxios.post).not.toHaveBeenCalled();
     });
 
@@ -685,12 +684,13 @@ describe('clearing pending-deletion flag', () => {
             notificationRecipients: ['foo@bar.com'],
             hasStableIdentifiers: false,
         }).save();
-        await curatorRequest.post(
-            `/api/sources/${source._id}/clearPendingRemovalStatus`
-        )
-        .expect(201);
-        expect(mockedAxios.post).toHaveBeenCalledWith('http://localhost:3000/api/cases/clearPendingRemovalStatus',
-            qs.stringify({sourceId: `${source._id}`, email: baseUser.email}));
+        await curatorRequest
+            .post(`/api/sources/${source._id}/clearPendingRemovalStatus`)
+            .expect(201);
+        const expectedEmail = encodeURIComponent(baseUser.email);
+        expect(mockedAxios.post).toHaveBeenCalledWith(
+            `http://localhost:3000/api/cases/clearPendingRemovalStatus?sourceId=${source._id}&email=${expectedEmail}`,
+        );
     });
 });
 
@@ -703,10 +703,9 @@ describe('deleting pending cases for a source', () => {
             notificationRecipients: ['foo@bar.com'],
             hasStableIdentifiers: true,
         }).save();
-        await curatorRequest.post(
-            `/api/sources/${source._id}/removePendingCases`
-        )
-        .expect(400);
+        await curatorRequest
+            .post(`/api/sources/${source._id}/removePendingCases`)
+            .expect(400);
         expect(mockedAxios.post).not.toHaveBeenCalled();
     });
 
@@ -721,10 +720,11 @@ describe('deleting pending cases for a source', () => {
             notificationRecipients: ['foo@bar.com'],
             hasStableIdentifiers: false,
         }).save();
-        await curatorRequest.post(
-            `/api/sources/${source._id}/removePendingCases`
-        )
-        .expect(201);
-        expect(mockedAxios.post).toHaveBeenCalledWith(`http://localhost:3000/api/cases/removePendingCases`, `sourceId=${source._id}`);
+        await curatorRequest
+            .post(`/api/sources/${source._id}/removePendingCases`)
+            .expect(201);
+        expect(mockedAxios.post).toHaveBeenCalledWith(
+            `http://localhost:3000/api/cases/removePendingCases?sourceId=${source._id}`,
+        );
     });
 });
