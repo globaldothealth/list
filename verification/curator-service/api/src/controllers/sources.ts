@@ -295,8 +295,8 @@ export default class SourcesController {
                     req.params.id
                 }&email=${encodeURIComponent(user.email)}`,
             );
-            if (response.status == 201) {
-                res.sendStatus(201).end();
+            if (response.status == 204) {
+                res.sendStatus(204).end();
             } else {
                 res.status(response.status).json(response.data);
             }
@@ -321,8 +321,8 @@ export default class SourcesController {
             const response = await axios.post(
                 `${this.dataServerURL}/api/cases/removePendingCases?sourceId=${req.params.id}`,
             );
-            if (response.status == 201) {
-                res.sendStatus(201).end();
+            if (response.status == 204) {
+                res.sendStatus(204).end();
             } else {
                 res.status(response.status).json(response.data);
             }
@@ -354,8 +354,8 @@ export default class SourcesController {
                     req.params.id
                 }&email=${encodeURIComponent(user.email)}`,
             );
-            if (response.status == 201) {
-                res.sendStatus(201).end();
+            if (response.status == 204) {
+                res.sendStatus(204).end();
             } else {
                 res.status(response.status).json(response.data);
             }
