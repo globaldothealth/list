@@ -256,6 +256,7 @@ export default function ChangePasswordForm({
                     type="submit"
                     variant="contained"
                     color="primary"
+                    data-testid="change-password-button"
                     className={classes.signInButton}
                 >
                     Change password

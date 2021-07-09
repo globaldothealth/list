@@ -110,7 +110,6 @@ const LandingPage = (): JSX.Element => {
         } else {
             setChangePasswordScreenOn(true);
         }
-
         // eslint-disable-next-line
     }, [token, id]);
 

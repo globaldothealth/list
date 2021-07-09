@@ -8,6 +8,7 @@ import userEvent from '@testing-library/user-event';
 import { rest } from 'msw';
 import { setupServer } from 'msw/node';
 import '@testing-library/jest-dom/extend-expect';
+import { Route } from 'react-router-dom';
 
 const server = setupServer();
 
@@ -355,8 +356,48 @@ describe('ForgotPasswordForm', () => {
 
 describe('ChangePasswordForm', () => {
     test('displays the change password form', async () => {
-        render(<LandingPage />);
+        render(
+            <Route exact path="/reset-password/:token/:id">
+                <LandingPage />
+            </Route>,
+            { initialRoute: '/reset-password/token/id' },
+        );
 
-        expect(screen.getByText(/Forgot your password?/i)).toBeInTheDocument();
+        expect(screen.getByText('Choose a new password')).toBeInTheDocument();
+    });
+
+    test('displays verification errors when password is empty', async () => {
+        render(
+            <Route exact path="/reset-password/:token/:id">
+                <LandingPage />
+            </Route>,
+            { initialRoute: '/reset-password/token/id' },
+        );
+
+        userEvent.click(screen.getByTestId('change-password-button'));
+
+        await waitFor(() => {
+            expect(
+                screen.getByText('This field is required'),
+            ).toBeInTheDocument();
+        });
+    });
+
+    test('displays verification errors when confirm password is empty', async () => {
+        render(
+            <Route exact path="/reset-password/:token/:id">
+                <LandingPage />
+            </Route>,
+            { initialRoute: '/reset-password/token/id' },
+        );
+
+        userEvent.type(screen.getByLabelText('Password'), '12345');
+        userEvent.click(screen.getByTestId('change-password-button'));
+
+        await waitFor(() => {
+            expect(
+                screen.getByText('Passwords must match'),
+            ).toBeInTheDocument();
+        });
     });
 });
