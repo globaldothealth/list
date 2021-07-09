@@ -150,63 +150,6 @@ describe('App', function () {
         cy.contains('Profile');
     });
 
-    it('Homepage with logged out user', function () {
-        cy.visit('/');
-
-        cy.contains('Create new').should('not.exist');
-        cy.contains('Charts').should('not.exist');
-        cy.contains('Line list').should('not.exist');
-        cy.contains('Sources').should('not.exist');
-        cy.contains('Uploads').should('not.exist');
-        cy.contains('Manage users').should('not.exist');
-
-        cy.contains('Detailed line list data');
-        cy.contains('Terms of use');
-        cy.contains('Or sign in with email');
-    });
-
-    it('Homepage with logged in user with no roles', function () {
-        cy.login({ roles: [] });
-        cy.visit('/');
-
-        // Readers-only are redirected to the line list.
-        cy.url().should('eq', 'http://localhost:3002/cases');
-
-        cy.contains('Create new').should('not.exist');
-        cy.contains('Charts').should('not.exist');
-        cy.contains('Line list');
-        cy.contains('Sources').should('not.exist');
-        cy.contains('Uploads').should('not.exist');
-        cy.contains('Manage users').should('not.exist');
-        cy.contains('Terms of use');
-    });
-
-    it('Homepage with logged in admin', function () {
-        cy.login({ roles: ['admin'] });
-        cy.visit('/');
-
-        cy.contains('Create new').should('not.exist');
-        cy.contains('Charts');
-        cy.contains('Line list');
-        cy.contains('Sources').should('not.exist');
-        cy.contains('Uploads').should('not.exist');
-        cy.contains('Manage users');
-        cy.contains('Terms of use');
-    });
-
-    it('Homepage with logged in curator', function () {
-        cy.login({ roles: ['curator'] });
-        cy.visit('/');
-
-        cy.contains('Create new');
-        cy.contains('Charts');
-        cy.contains('Line list');
-        cy.contains('Sources');
-        cy.contains('Uploads');
-        cy.contains('Manage users').should('not.exist');
-        cy.contains('Terms of use');
-    });
-
     it('Can open new case modal from create new button', function () {
         cy.login({ roles: ['curator'] });
         cy.visit('/');
