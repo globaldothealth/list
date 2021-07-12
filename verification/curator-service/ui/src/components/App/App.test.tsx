@@ -11,8 +11,6 @@ import { createMemoryHistory } from 'history';
 import { render, fireEvent, screen } from '../util/test-utils'
 
 jest.mock('axios');
-// Mock charts page so that requests for mongo charts are not sent
-jest.mock('../Charts', () => () => <div>Test charts</div>);
 const mockedAxios = axios as jest.Mocked<typeof axios>;
 
 beforeEach(() => {
@@ -101,41 +99,6 @@ describe('<App />', () => {
             'href',
             'https://global.health/privacy/',
         );
-    });
-
-    it('navigates to the home screen (charts) after clicking on home button', async () => {
-        const axiosResponse = {
-            data: {
-                name: 'Alice Smith',
-                email: 'foo@bar.com',
-                roles: ['admin'],
-            },
-            status: 200,
-            statusText: 'OK',
-            config: {},
-            headers: {},
-        };
-        mockedAxios.get.mockResolvedValueOnce(axiosResponse);
-        const history = createMemoryHistory({
-            initialEntries: ['/cases'],
-            initialIndex: 0,
-        });
-
-        const { getByText, findByText, findByTestId } = render(
-            <Router history={history}>
-                <App />
-            </Router>,
-        );
-
-        expect(await findByText('COVID-19 Linelist')).toBeInTheDocument();
-
-        fireEvent.click(await findByTestId('home-button-data'));
-
-        wait(() => {
-            expect(getByText('Cumulative')).toBeInTheDocument();
-            expect(getByText('Completeness')).toBeInTheDocument();
-            expect(getByText('Freshness')).toBeInTheDocument();
-        });
     });
 
     it('opens profile menu and contains all the links', async () => {

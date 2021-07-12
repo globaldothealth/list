@@ -113,33 +113,6 @@ describe('App', function () {
         cy.contains('Germany').should('not.exist');
     });
 
-    it('takes user to home page when home button is clicked', function () {
-        cy.login();
-        cy.visit('/cases');
-        cy.url().should('eq', 'http://localhost:3002/cases');
-
-        cy.contains('Charts');
-        cy.contains('span', 'Charts').click();
-        cy.url().should('eq', 'http://localhost:3002/');
-    });
-
-    it('Shows charts on home page', function () {
-        cy.login();
-        cy.visit('/');
-
-        cy.contains('Completeness');
-        cy.contains('Cumulative');
-        cy.contains('Freshness');
-    });
-
-    it('Does not show charts on home page when logged-out', function () {
-        cy.visit('/');
-
-        cy.contains('Completeness').should('not.exist');
-        cy.contains('Cumulative').should('not.exist');
-        cy.contains('Freshness').should('not.exist');
-    });
-
     it('shows logout button when logged in', function () {
         cy.login({ name: 'Alice Smith', email: 'alice@test.com', roles: [] });
         cy.visit('/');
@@ -186,7 +159,6 @@ describe('App', function () {
         cy.visit('/');
 
         cy.contains('Create new').should('not.exist');
-        cy.contains('Charts');
         cy.contains('Line list');
         cy.contains('Sources').should('not.exist');
         cy.contains('Uploads').should('not.exist');
@@ -199,7 +171,6 @@ describe('App', function () {
         cy.visit('/');
 
         cy.contains('Create new');
-        cy.contains('Charts');
         cy.contains('Line list');
         cy.contains('Sources');
         cy.contains('Uploads');
@@ -217,7 +188,7 @@ describe('App', function () {
         cy.contains('Create new COVID-19 line list case');
         cy.url().should('eq', 'http://localhost:3002/cases/new');
         cy.get('button[aria-label="close overlay"').click();
-        cy.url().should('eq', 'http://localhost:3002/');
+        cy.url().should('eq', 'http://localhost:3002/cases');
     });
 
     it('Can open bulk upload modal from create new button', function () {
@@ -229,7 +200,7 @@ describe('App', function () {
         cy.contains('New bulk upload');
         cy.url().should('eq', 'http://localhost:3002/cases/bulk');
         cy.get('button[aria-label="close overlay"').click();
-        cy.url().should('eq', 'http://localhost:3002/');
+        cy.url().should('eq', 'http://localhost:3002/cases');
     });
 
     it('Can open new automated source modal from create new button', function () {
@@ -241,7 +212,7 @@ describe('App', function () {
         cy.contains('New automated data source');
         cy.url().should('eq', 'http://localhost:3002/sources/automated');
         cy.get('button[aria-label="close overlay"').click();
-        cy.url().should('eq', 'http://localhost:3002/');
+        cy.url().should('eq', 'http://localhost:3002/cases');
     });
 
     it('Can open new automated backfill modal from create new button', function () {
@@ -253,7 +224,7 @@ describe('App', function () {
         cy.contains('New automated source backfill');
         cy.url().should('eq', 'http://localhost:3002/sources/backfill');
         cy.get('button[aria-label="close overlay"').click();
-        cy.url().should('eq', 'http://localhost:3002/');
+        cy.url().should('eq', 'http://localhost:3002/cases');
     });
 
     it('Closing modal shows previous page', function () {

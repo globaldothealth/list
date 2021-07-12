@@ -28,11 +28,9 @@ import AutomatedBackfill from '../AutomatedBackfill';
 import AutomatedSourceForm from '../AutomatedSourceForm';
 import BulkCaseForm from '../BulkCaseForm';
 import CaseForm from '../CaseForm';
-import Charts from '../Charts';
 import Drawer from '@material-ui/core/Drawer';
 import EditCase from '../EditCase';
 import GHListLogo from '../GHListLogo';
-import HomeIcon from '@material-ui/icons/Home';
 import LandingPage from '../landing-page/LandingPage';
 import LinkIcon from '@material-ui/icons/Link';
 import List from '@material-ui/core/List';
@@ -403,12 +401,6 @@ export default function App(): JSX.Element {
 
     const menuList = user
         ? [
-              {
-                  text: 'Charts',
-                  icon: <HomeIcon />,
-                  to: '/',
-                  displayCheck: (): boolean => hasAnyRole(['curator', 'admin']),
-              },
               {
                   text: 'Line list',
                   icon: <ListIcon />,
@@ -876,10 +868,7 @@ export default function App(): JSX.Element {
                             <TermsOfUse />
                         </Route>
                         <Route exact path="/">
-                            {hasAnyRole(['curator', 'admin']) &&
-                            location.search === '' ? (
-                                <Charts />
-                            ) : user ? (
+                            {user ? (
                                 <Redirect
                                     to={{
                                         pathname: '/cases',
