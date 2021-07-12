@@ -125,7 +125,7 @@ try {
                         Data: 'Here is your Global.health download' 
                     }
                 },
-                Source: 'ghdsi.info@gmail.com'
+                Source: 'info@global.health'
             };
 
             ses.sendEmail(emailParams).promise().then((data) => {
