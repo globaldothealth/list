@@ -1,4 +1,6 @@
+import urllib.parse
 import datetime
+import csv
 import io
 import json
 import os
@@ -69,6 +71,29 @@ client = pymongo.MongoClient(
 db = client.covid19
 cases = db.cases
 print("And we're in!")
+
+
+def _quote_country(c):
+    "Returns quoted country name used in query string of data url"
+    cq = urllib.parse.quote_plus(c)
+    return cq if len(c.split()) == 1 else f'"{cq}"'
+
+
+def _coverage(gh, jhu):
+    "Coverage expressed in percentage"
+    return f"{gh/jhu:.0%}" if jhu > 0 else None
+
+
+def _country_data_csv(d):
+    "Convert from latest.json attributes to those used in latest.csv"
+    return {
+        'country': d['_id'],
+        'data': f"https://data.covid-19.global.health/cases?country={_quote_country(d['_id'])}",
+        'map': f"https://map.covid-19.global.health/#country/{d['code']}",
+        'casecount_gh': d['casecount'],
+        'casecount_jhu': d['jhu'],
+        'coverage': _coverage(d['casecount'], d['jhu'])
+    }
 
 
 def get_jhu_counts():
@@ -202,6 +227,28 @@ def generate_country_json():
         Bucket="covid-19-aggregates",
         Key=f"country/{now}.json",
     )
+
+    # generate CSV data
+    _csv = records[now]
+
+    csvstr = None
+    with io.StringIO() as csvbuf:
+        fieldnames = ['country', 'data', 'map', 'casecount_gh',
+                      'casecount_jhu', 'coverage']
+        writer = csv.DictWriter(csvbuf, fieldnames=fieldnames)
+        writer.writeheader()
+        for i in _csv:
+            if i['_id']:
+                writer.writerow(_country_data_csv(i))
+        csvstr = csvbuf.getvalue()
+
+    if csvstr:
+        s3.put_object(
+            ACL="public-read",
+            Body=csvstr,
+            Bucket="covid-19-aggregates",
+            Key="country/latest.csv",
+        )
 
 
 def generate_region_json():
