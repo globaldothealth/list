@@ -555,6 +555,7 @@ export default function App(): JSX.Element {
                                 onClick={toggleDrawer}
                                 edge="start"
                                 className={classes.menuButton}
+                                data-testid="toggle-sidebar"
                             >
                                 <MenuIcon />
                             </IconButton>
@@ -606,6 +607,7 @@ export default function App(): JSX.Element {
                         variant="persistent"
                         anchor="left"
                         open={drawerOpen}
+                        data-testid="sidebar"
                         classes={{
                             paper: classes.drawerPaper,
                         }}

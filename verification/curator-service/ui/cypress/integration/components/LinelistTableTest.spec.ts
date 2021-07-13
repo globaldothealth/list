@@ -18,16 +18,19 @@ describe('Linelist table', function () {
             country: 'France',
             sourceUrl: 'www.example.com',
         });
+        cy.visit('/')
         cy.visit('/cases');
         cy.contains('France');
         cy.contains('www.example.com');
     });
 
     it('Can open and close the edit modal', function () {
+        cy.login({ roles: ['curator'], name: "testName", email:'test@example.com'  });
         cy.addCase({
             country: 'France',
             sourceUrl: 'www.example.com',
         });
+        cy.visit('/');
         cy.visit('/cases');
         cy.contains('France');
         cy.contains('Edit case').should('not.exist');
@@ -43,6 +46,7 @@ describe('Linelist table', function () {
             country: 'France',
             sourceUrl: 'www.example.com',
         });
+        cy.visit('/')
         cy.visit('/cases');
         cy.contains('France');
         cy.contains(/Case details\b/).should('not.exist');
@@ -56,6 +60,7 @@ describe('Linelist table', function () {
         cy.addCase({
             country: 'France',
         });
+        cy.visit('/')
         cy.visit('/cases');
         cy.contains('France');
 
@@ -71,6 +76,7 @@ describe('Linelist table', function () {
         cy.addCase({
             country: 'France',
         });
+        cy.visit('/')
         cy.visit('/cases');
         cy.contains('France');
 
@@ -87,6 +93,7 @@ describe('Linelist table', function () {
         cy.addCase({
             country: 'France',
         });
+        cy.visit('/')
         cy.visit('/cases');
         cy.contains('France');
 
@@ -118,6 +125,7 @@ describe('Linelist table', function () {
         cy.addCase({
             country: 'United Kingdom',
         });
+        cy.visit('/')
         cy.visit('/cases');
         cy.contains('France');
         cy.contains('Germany');
@@ -149,6 +157,7 @@ describe('Linelist table', function () {
         cy.addCase({
             country: 'United Kingdom',
         });
+        cy.visit('/')
         cy.visit('/cases');
         cy.contains('France');
         cy.contains('Germany');
@@ -182,6 +191,7 @@ describe('Linelist table', function () {
         cy.addCase({
             country: 'United Kingdom',
         });
+        cy.visit('/')
         cy.visit('/cases');
         cy.contains('France');
         cy.contains('Germany');
@@ -231,6 +241,7 @@ describe('Linelist table', function () {
         cy.addCase({
             country: 'France',
         });
+        cy.visit('/')
         cy.visit('/cases');
         cy.get('svg[data-testid="unverified-svg"]').should('have.length', 3);
         cy.server();
@@ -270,6 +281,7 @@ describe('Linelist table', function () {
         });
         cy.server();
         cy.route('GET', '/api/cases/*').as('getCases');
+        cy.visit('/')
         cy.visit('/cases');
         cy.wait('@getCases');
         cy.get('svg[data-testid="unverified-svg"]').should('have.length', 9);
@@ -325,6 +337,7 @@ describe('Linelist table', function () {
     });
 
     it('displays search errors', function () {
+        cy.visit('/')
         cy.visit('/cases');
         cy.contains('Filter').click();
         cy.get('input[id="country"]').type('!{enter}');
@@ -338,6 +351,7 @@ describe('Linelist table', function () {
         cy.addCase({
             country: 'Germany',
         });
+        cy.visit('/')
         cy.visit('/cases');
         cy.contains('France');
         cy.contains('Germany');
@@ -366,6 +380,7 @@ describe('Linelist table', function () {
         cy.addCase({
             country: 'United Kingdom',
         });
+        cy.visit('/')
         cy.visit('/cases');
         cy.contains('France');
         cy.contains('United Kingdom');
@@ -396,6 +411,7 @@ describe('Linelist table', function () {
         }
         cy.server();
         cy.route('GET', '/api/cases/*').as('getCases');
+        cy.visit('/')
         cy.visit('/cases');
         cy.wait('@getCases');
         cy.contains('rows').click();
@@ -441,6 +457,7 @@ describe('Linelist table', function () {
         });
         cy.server();
         cy.route('GET', '/api/cases/*').as('getCases');
+        cy.visit('/')
         cy.visit('/cases');
         cy.wait('@getCases');
         cy.contains('rows').click();
@@ -475,6 +492,7 @@ describe('Linelist table', function () {
         }
         cy.server();
         cy.route('GET', '/api/cases/*').as('getCases');
+        cy.visit('/')
         cy.visit('/cases');
         cy.wait('@getCases');
         cy.contains('rows').click();
@@ -503,6 +521,7 @@ describe('Linelist table', function () {
         }
         cy.server();
         cy.route('GET', '/api/cases/*').as('getCases');
+        cy.visit('/')
         cy.visit('/cases');
         cy.wait('@getCases');
         cy.contains('rows').click();
@@ -538,6 +557,7 @@ describe('Linelist table', function () {
         });
         cy.server();
         cy.route('GET', '/api/cases/*').as('getCases');
+        cy.visit('/')
         cy.visit('/cases');
         cy.wait('@getCases');
 

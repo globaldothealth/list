@@ -25,7 +25,10 @@ interface AuthState {
 
 const initialState: AuthState = {
     isLoading: false,
-    user: undefined,
+    user:
+        (localStorage.getItem('user')
+            ? (JSON.parse(localStorage.getItem('user')!) as User)
+            : undefined) || undefined,
     error: undefined,
     resetPasswordEmailSent: false,
     passwordReset: false,
@@ -100,9 +103,11 @@ const authSlice = createSlice({
         // GET USER PROFILE
         builder.addCase(getUserProfile.fulfilled, (state, action) => {
             state.user = action.payload;
+            localStorage.setItem('user', JSON.stringify(action.payload));
         });
         builder.addCase(getUserProfile.rejected, (state) => {
             state.user = undefined;
+            localStorage.removeItem('user');
         });
 
         // REQUEST PASSWORD RESET

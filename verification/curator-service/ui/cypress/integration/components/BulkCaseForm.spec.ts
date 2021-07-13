@@ -26,10 +26,12 @@ describe('Bulk upload form', function () {
     it('Can upload all fields', function () {
         cy.addSource('Bulk source', 'www.bulksource.com');
 
+        cy.visit('/');
         cy.visit('/cases');
         cy.contains('No records to display');
 
         cy.visit('/');
+        cy.get('button[data-testid="toggle-sidebar"]').click();
         cy.get('button[data-testid="create-new-button"]').click();
         cy.contains('li', 'New bulk upload').click();
         cy.get('div[data-testid="caseReference"]').type('www.bulksource.com');
@@ -99,10 +101,12 @@ describe('Bulk upload form', function () {
     it('Can upload CSV with existing source', function () {
         cy.addSource('Bulk source', 'www.bulksource.com');
 
+        cy.visit('/');
         cy.visit('/cases');
         cy.contains('No records to display');
 
         cy.visit('/');
+        cy.get('button[data-testid="toggle-sidebar"]').click();
         cy.get('button[data-testid="create-new-button"]').click();
         cy.contains('li', 'New bulk upload').click();
         cy.get('div[data-testid="caseReference"]').type('www.bulksource.com');
@@ -127,10 +131,12 @@ describe('Bulk upload form', function () {
     });
 
     it('Can upload CSV with new source', function () {
+        cy.visit('/');
         cy.visit('/cases');
         cy.contains('No records to display');
 
         cy.visit('/');
+        cy.get('button[data-testid="toggle-sidebar"]').click();
         cy.get('button[data-testid="create-new-button"]').click();
         cy.contains('li', 'New bulk upload').click();
         cy.get('div[data-testid="caseReference"]').type('www.new-source.com');
@@ -164,10 +170,12 @@ describe('Bulk upload form', function () {
     it('Upserts data', function () {
         cy.addSource('Bulk source', 'www.bulksource.com');
 
+        cy.visit('/');
         cy.visit('/cases');
         cy.contains('No records to display');
 
         cy.visit('/');
+        cy.get('button[data-testid="toggle-sidebar"]').click();
         cy.get('button[data-testid="create-new-button"]').click();
         cy.contains('li', 'New bulk upload').click();
         cy.get('div[data-testid="caseReference"]').type('www.bulksource.com');
@@ -185,6 +193,14 @@ describe('Bulk upload form', function () {
         cy.contains('Male');
         cy.contains('Female').should('not.exist');
 
+        const sidebar = cy.get('div[data-testid="sidebar"] .MuiDrawer-paperAnchorDockedLeft');
+        sidebar.then((sidebar) => {
+            if (sidebar.css('visibility') == 'hidden') {
+            cy.get('button[aria-label="toggle drawer"]').click();
+            }
+          });
+
+          cy.get('button[data-testid="toggle-sidebar"]').click();
         cy.get('button[data-testid="create-new-button"]').click();
         cy.contains('li', 'New bulk upload').click();
         cy.get('div[data-testid="caseReference"]').type('www.bulksource.com');
@@ -215,10 +231,12 @@ describe('Bulk upload form', function () {
     it('Upserts multiple cases if dictated by caseCount CSV field', function () {
         cy.addSource('Bulk source', 'www.bulksource.com');
 
+        cy.visit('/');
         cy.visit('/cases');
         cy.contains('No records to display');
 
         cy.visit('/');
+        cy.get('button[data-testid="toggle-sidebar"]').click();
         cy.get('button[data-testid="create-new-button"]').click();
         cy.contains('li', 'New bulk upload').click();
         cy.get('div[data-testid="caseReference"]').type('www.bulksource.com');
@@ -239,10 +257,12 @@ describe('Bulk upload form', function () {
     it('Does not upload bad data and displays validation errors', function () {
         cy.addSource('Bulk source', 'www.bulksource.com');
 
+        cy.visit('/');
         cy.visit('/cases');
         cy.contains('No records to display');
 
         cy.visit('/');
+        cy.get('button[data-testid="toggle-sidebar"]').click();
         cy.get('button[data-testid="create-new-button"]').click();
         cy.contains('li', 'New bulk upload').click();
         cy.get('div[data-testid="caseReference"]').type('www.bulksource.com');
@@ -271,6 +291,7 @@ describe('Bulk upload form', function () {
             );
         cy.get('button[aria-label="close overlay"').click();
 
+        cy.visit('/');
         cy.visit('/cases');
         cy.contains('No records to display');
     });
@@ -278,10 +299,12 @@ describe('Bulk upload form', function () {
     it('Fails gracefully when no header in CSV', function () {
         cy.addSource('Bulk source', 'www.bulksource.com');
 
+        cy.visit('/');
         cy.visit('/cases');
         cy.contains('No records to display');
 
         cy.visit('/');
+        cy.get('button[data-testid="toggle-sidebar"]').click();
         cy.get('button[data-testid="create-new-button"]').click();
         cy.contains('li', 'New bulk upload').click();
         cy.get('div[data-testid="caseReference"]').type('www.bulksource.com');
@@ -298,6 +321,7 @@ describe('Bulk upload form', function () {
         );
         cy.get('button[aria-label="close overlay"').click();
 
+        cy.visit('/');
         cy.visit('/cases');
         cy.contains('No records to display');
     });

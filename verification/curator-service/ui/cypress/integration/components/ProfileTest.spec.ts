@@ -6,6 +6,7 @@ describe('Profile', function () {
             email: 'alice@test.com',
             roles: ['curator'],
         });
+        cy.visit('/')
         cy.visit('/profile');
 
         cy.contains('Alice Smith');
