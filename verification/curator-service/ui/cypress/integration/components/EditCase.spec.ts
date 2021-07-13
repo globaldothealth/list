@@ -16,8 +16,12 @@ describe('Edit case', function () {
             sourceUrl: 'www.example.com',
         });
         cy.addSource('Test source', 'www.example.com');
+        cy.visit('/cases');
         cy.request({ method: 'GET', url: '/api/cases' }).then((resp) => {
             expect(resp.body.cases).to.have.lengthOf(1);
+            // cy.contains('Line list').click();
+            // cy.get('button[data-testid="row menu"]').click();
+            // cy.contains('Edit').click();
             cy.visit(`cases/edit/${resp.body.cases[0]._id}`);
             // Check that we have something from the original case.
             cy.contains('France');

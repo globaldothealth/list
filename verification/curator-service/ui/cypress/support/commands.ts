@@ -1,4 +1,5 @@
 import 'cypress-file-upload';
+import { any } from 'cypress/types/bluebird';
 
 declare global {
     // One-off Cypress setup.

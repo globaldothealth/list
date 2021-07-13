@@ -10,6 +10,7 @@ describe('Curator', function () {
     });
 
     it('Can Create, edit and view a full case', function () {
+        cy.visit('/');
         cy.visit('/cases');
         cy.contains('No records to display');
         cy.seedLocation({
@@ -30,6 +31,13 @@ describe('Curator', function () {
             name: 'United Kingdom',
             geoResolution: 'Country',
         });
+
+        const sidebar = cy.get('div[data-testid="sidebar"] .MuiDrawer-paperAnchorDockedLeft');
+        sidebar.then((sidebar) => {
+            if (sidebar.css('visibility') == 'hidden') {
+            cy.get('button[aria-label="toggle drawer"]').click();
+            }
+          });
 
         // Input full case.
         cy.get('button[data-testid="create-new-button"]').click();
