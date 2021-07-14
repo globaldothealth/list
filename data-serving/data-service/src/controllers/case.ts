@@ -475,15 +475,25 @@ export class CasesController {
      */
     update = async (req: Request, res: Response): Promise<void> => {
         try {
-            const c = await Case.findByIdAndUpdate(req.params.id, req.body, {
+            let c = await Case.findByIdAndUpdate(req.params.id, req.body, {
                 new: true,
                 runValidators: true,
             });
             if (!c) {
-                res.status(404).send({
-                    message: `Case with ID ${req.params.id} not found.`,
-                });
-                return;
+                c = await RestrictedCase.findByIdAndUpdate(
+                    req.params.id,
+                    req.body,
+                    {
+                        new: true,
+                        runValidators: true,
+                    },
+                );
+                if (!c) {
+                    res.status(404).send({
+                        message: `Case with ID ${req.params.id} not found.`,
+                    });
+                    return;
+                }
             }
             res.json(c);
         } catch (err) {
