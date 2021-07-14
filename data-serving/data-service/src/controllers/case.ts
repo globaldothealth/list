@@ -230,7 +230,9 @@ export class CasesController {
                 countQuery,
             ]);
             logger.info('got results');
-
+            // total is actually stored in a count index in mongo, so the query is fast.
+            // however to maintain existing behaviour, only return the count limit
+            const reportedTotal = Math.min(total, countLimit);
             // If we have more items than limit, add a response param
             // indicating that there is more to fetch on the next page.
             if (docs.length == limit + 1) {
@@ -238,14 +240,14 @@ export class CasesController {
                 res.json({
                     cases: docs,
                     nextPage: page + 1,
-                    total: total,
+                    total: reportedTotal,
                 });
                 logger.info('Got multiple pages of results');
                 return;
             }
             // If we fetched all available data, just return it.
             logger.info('Got one page of results');
-            res.json({ cases: docs, total: total });
+            res.json({ cases: docs, total: reportedTotal });
         } catch (e) {
             if (e instanceof ParsingError) {
                 res.status(422).json({ message: e.message });
