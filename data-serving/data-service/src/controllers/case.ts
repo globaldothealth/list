@@ -1,6 +1,7 @@
 import { Case, CaseDocument, RestrictedCase } from '../model/case';
 import { EventDocument } from '../model/event';
-import { Aggregate, DocumentQuery, Error, Query } from 'mongoose';
+import { Source } from '../model/source';
+import { DocumentQuery, Error, Query } from 'mongoose';
 import { ObjectId, QuerySelector } from 'mongodb';
 import { GeocodeOptions, Geocoder, Resolution } from '../geocoding/geocoder';
 import { NextFunction, Request, Response } from 'express';
@@ -268,7 +269,15 @@ export class CasesController {
         const numCases = Number(req.query.num_cases) || 1;
         try {
             await this.geocode(req);
-            const c = new Case(req.body);
+            let c = new Case(req.body);
+            let restrictedCases = false;
+            if (c.caseReference.sourceId) {
+                const s = await Source.find({ _id: c.caseReference.sourceId });
+                if (s.length > 0 && s[0].excludeFromLineList === true) {
+                    c = new RestrictedCase(req.body);
+                    restrictedCases = true;
+                }
+            }
 
             let result;
             if (req.query.validate_only) {
@@ -278,11 +287,12 @@ export class CasesController {
                 if (numCases === 1) {
                     result = await c.save();
                 } else {
+                    const ctor = restrictedCases ? RestrictedCase : Case;
                     const cases = Array.from(
                         { length: numCases },
-                        () => new Case(req.body),
+                        () => new ctor(req.body),
                     );
-                    result = { cases: await Case.insertMany(cases) };
+                    result = { cases: await ctor.insertMany(cases) };
                 }
             }
             res.status(201).json(result);
