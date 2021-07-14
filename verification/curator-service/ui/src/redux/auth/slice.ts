@@ -6,6 +6,7 @@ import {
     getUserProfile,
     requestResetPasswordLink,
     resetPassword,
+    logout,
 } from './thunk';
 
 interface SnackbarProps {
@@ -137,6 +138,11 @@ const authSlice = createSlice({
             state.error = action.payload
                 ? action.payload
                 : action.error.message;
+        });
+
+        // LOGOUT
+        builder.addCase(logout.fulfilled, (state) => {
+            state.user = undefined;
         });
     },
 });

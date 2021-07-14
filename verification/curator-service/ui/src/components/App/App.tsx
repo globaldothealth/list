@@ -1,3 +1,4 @@
+import React, { useEffect, useState, useMemo, useCallback } from 'react';
 import {
     AppBar,
     Avatar,
@@ -20,7 +21,6 @@ import {
     useHistory,
     useLocation,
 } from 'react-router-dom';
-import React, { useEffect, useState, useMemo } from 'react';
 import { Theme, makeStyles } from '@material-ui/core/styles';
 
 import AddIcon from '@material-ui/icons/Add';
@@ -65,7 +65,7 @@ import {
     deleteFilterBreadcrumbs,
 } from '../../redux/app/slice';
 import { selectIsLoading } from '../../redux/app/selectors';
-import { getUserProfile } from '../../redux/auth/thunk';
+import { getUserProfile, logout } from '../../redux/auth/thunk';
 import { selectUser } from '../../redux/auth/selectors';
 import { User } from '../../api/models/User';
 
@@ -267,6 +267,8 @@ const useStyles = makeStyles((theme: Theme) => ({
 }));
 
 function ProfileMenu(props: { user: User }): JSX.Element {
+    const dispatch = useAppDispatch();
+
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
 
     const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -302,7 +304,7 @@ function ProfileMenu(props: { user: User }): JSX.Element {
 
                 <MenuItem
                     onClick={() => {
-                        window.location.href = '/auth/logout';
+                        dispatch(logout());
                     }}
                 >
                     Logout
@@ -466,11 +468,9 @@ export default function App(): JSX.Element {
         setSelectedMenuIndex(menuIndex);
     }, [location.pathname, menuList]);
 
-    const getUser = (): void => {
-        if (user) return;
-
+    const getUser = useCallback((): void => {
         dispatch(getUserProfile());
-    };
+    }, [dispatch]);
 
     const hasAnyRole = (requiredRoles: string[]): boolean => {
         if (!user) {

@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { ChipData } from '../../components/App/App';
-import { getUserProfile } from '../../redux/auth/thunk';
+import { getUserProfile, logout } from '../../redux/auth/thunk';
 
 interface AppState {
     isLoading: boolean;
@@ -38,6 +38,13 @@ const appSlice = createSlice({
             state.isLoading = false;
         });
         builder.addCase(getUserProfile.rejected, (state) => {
+            state.isLoading = false;
+        });
+
+        builder.addCase(logout.pending, (state) => {
+            state.isLoading = true;
+        });
+        builder.addCase(logout.fulfilled, (state) => {
             state.isLoading = false;
         });
     },

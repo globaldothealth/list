@@ -224,10 +224,13 @@ export default function SignInForm({
                             disabled={disabled}
                             onClick={() => {
                                 if (!formik.values.isAgreementChecked) {
-                                    formik.setErrors({
-                                        isAgreementChecked:
-                                            'This field is required',
-                                    });
+                                    formik.setFieldError(
+                                        'isAgreementChecked',
+                                        'This field is required',
+                                    );
+                                    formik.setFieldTouched(
+                                        'isAgreementChecked',
+                                    );
                                 } else {
                                     window.location.href = `${process.env
                                         .REACT_APP_LOGIN_URL!}?newsletterAccepted=${
@@ -275,11 +278,12 @@ export default function SignInForm({
                             </Typography>
                         }
                     />
-                    {formik.errors.isAgreementChecked && (
-                        <FormHelperText error variant="outlined">
-                            {formik.errors.isAgreementChecked}
-                        </FormHelperText>
-                    )}
+                    {formik.errors.isAgreementChecked &&
+                        formik.touched.isAgreementChecked && (
+                            <FormHelperText error variant="outlined">
+                                {formik.errors.isAgreementChecked}
+                            </FormHelperText>
+                        )}
 
                     <FormControlLabel
                         disabled={disabled}

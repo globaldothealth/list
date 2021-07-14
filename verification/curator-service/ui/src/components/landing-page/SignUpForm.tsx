@@ -347,9 +347,6 @@ export default function SignUpForm({
                         }
                     />
                 </FormGroup>
-                <Typography className={classes.checkboxLabel}>
-                    this is the signup form
-                </Typography>
                 <Button
                     disabled={disabled}
                     type="submit"
@@ -362,7 +359,7 @@ export default function SignUpForm({
                 </Button>
 
                 <Typography className={classes.title}>
-                    Do you have already an account?{' '}
+                    Already have an account?{' '}
                     <span
                         className={classes.link}
                         onClick={() => setRegistrationScreenOn(false)}
