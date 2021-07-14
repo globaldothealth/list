@@ -1,5 +1,5 @@
 /* eslint-disable no-undef */
-describe.only('LandingPage', function () {
+describe('LandingPage', function () {
     it('The landing page shows two ways of login', function () {
         cy.visit('/');
         cy.contains('Welcome to G.h Data.');
@@ -10,6 +10,82 @@ describe.only('LandingPage', function () {
         cy.get('button[data-testid="sign-in-button"]')
             .should('have.attr', 'type')
             .and('equal', 'submit');
+    });
+
+    it('The forgot password modal appears and validates email address', function () {
+        cy.visit('/');
+        cy.contains('Welcome to G.h Data.');
+        cy.contains('Forgot your password?').click();
+        cy.contains("Don't worry! Just fill in your email address and we'll send you a link to reset your password");
+        cy.get('#forgotEmailField').type('asdgsagdsa');
+
+        cy.get('button[data-testid="send-reset-link"]').click();
+
+        cy.contains('Invalid email address').click();
+    });
+
+    it('Opens the SignUp page', function () {
+        cy.visit('/');
+        cy.contains('Welcome to G.h Data.');
+        cy.contains('Sign up!').click();
+        cy.contains("SignUp form");
+        cy.get('input').should('have.length', 6)
+    });
+
+    it('Validates emails', function () {
+        cy.visit('/');
+        cy.contains('Welcome to G.h Data.');
+        cy.contains('Sign up!').click();
+        cy.get('#email').type('test@example.com');
+        cy.get('#confirmEmail').type('xxx@example.com');
+
+        cy.get('button[data-testid="sign-up-button"]').click();
+
+        cy.contains('Emails must match').click();
+    });
+
+    it('Validates passwords', function () {
+        cy.visit('/');
+        cy.contains('Welcome to G.h Data.');
+        cy.contains('Sign up!').click();
+        cy.get('#password').type('tsgasdgasd');
+        cy.get('#passwordConfirmation').type('uuuuu');
+
+        cy.get('button[data-testid="sign-up-button"]').click();
+        cy.contains('Passwords must match').click();
+    });
+
+    it('Show validation error if checkbox is not selected', function () {
+        cy.visit('/');
+        cy.contains('Welcome to G.h Data.');
+        cy.contains('Sign up!').click();
+        cy.get('#email').type('test@example.com');
+        cy.get('#confirmEmail').type('test@example.com');
+        cy.get('#password').type('tsgasdgasd');
+        cy.get('#passwordConfirmation').type('tsgasdgasd');
+
+        cy.get('button[data-testid="sign-up-button"]').click();
+        cy.contains('This field is required').should('have.length', 1)
+    });
+
+    it('Opens the change password page', function () {
+        cy.visit('/');
+        cy.visit('/reset-password/sampletoken/tokenid');
+        cy.contains('Choose a new password');
+        cy.get('input').should('have.length', 2)
+
+        cy.get('button[data-testid="change-password-button"]');
+    });
+
+    it('Validates passwords in the change password page', function () {
+        cy.visit('/');
+        cy.visit('/reset-password/sampletoken/tokenid');
+        cy.get('#password').type('tsgasdgasd');
+        cy.get('#passwordConfirmation').type('uu');
+        
+        cy.get('button[data-testid="change-password-button"]').click();
+
+        cy.contains('Passwords must match');
     });
 
     it('Homepage with logged out user', function () {
@@ -43,7 +119,7 @@ describe.only('LandingPage', function () {
     });
 
     it('Homepage with logged in admin', function () {
-        cy.login({ roles: ['admin'] ,name: "testName", email:'test@example.com' });
+        cy.login({ roles: ['admin'], name: "testName", email:'test@example.com' });
         cy.visit('/');
 
         cy.contains('Create new').should('not.exist');
