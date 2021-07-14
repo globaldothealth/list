@@ -44,6 +44,7 @@ export class CasesController {
 
     /**
      * Streams a CSV attachment of all cases.
+     * Doesn't return cases from the restricted collection.
      *
      * Handles HTTP POST /api/cases/download.
      */
@@ -57,50 +58,28 @@ export class CasesController {
 
         // Goofy Mongoose types require this.
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        let casesQuery: any[];
+        let casesQuery: any;
         try {
             if (req.body.query) {
-                casesQuery = this.caseAggregationFromQuery(
-                    req.body.query as string,
-                );
+                casesQuery = casesMatchingSearchQuery({
+                    searchQuery: req.body.query as string,
+                    count: false,
+                });
             } else if (req.body.caseIds) {
-                casesQuery = [
-                    {
-                        $match: {
-                            $expr: {
-                                $in: [
-                                    '$_id',
-                                    _.map(
-                                        req.body.caseIds,
-                                        (anID: string) => new ObjectId(anID),
-                                    ),
-                                ],
-                            },
-                        },
-                    },
-                ];
+                casesQuery = Case.find({
+                    _id: { $in: req.body.caseIds },
+                }).lean();
             } else {
-                casesQuery = [];
+                casesQuery = Case.find({}).lean();
             }
-
-            const casesIgnoringExcluded = this.excludeRestrictedSourcesFromCaseAggregation(
-                casesQuery,
-            );
 
             // Limit number of results if present
             // eslint-disable-next-line
-            let limitedQuery: any[] = [];
             if (queryLimit) {
-                limitedQuery = _.concat(casesIgnoringExcluded, [
-                    { $limit: queryLimit },
-                ]);
+                casesQuery = casesQuery.limit(queryLimit);
             }
 
-            const matchingCases = await Case.aggregate(
-                limitedQuery.length !== 0
-                    ? limitedQuery
-                    : casesIgnoringExcluded,
-            ).collation({
+            const matchingCases = await casesQuery.collation({
                 locale: 'en_US',
                 strength: 2,
             });
