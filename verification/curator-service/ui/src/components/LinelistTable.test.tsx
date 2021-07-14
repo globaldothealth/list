@@ -39,7 +39,7 @@ const initialState: RootState = {
         isLoading: false,
         error: undefined,
         user: {
-            id: '1',
+            _id: '1',
             googleID: '42',
             name: 'Alice Smith',
             email: 'foo@bar.com',
@@ -505,7 +505,7 @@ describe('<LinelistTable />', () => {
                     auth: {
                         ...initialState.auth,
                         user: {
-                            id: 'testUser',
+                            _id: 'testUser',
                             googleID: '42',
                             name: 'Alice Smith',
                             email: 'foo@bar.com',

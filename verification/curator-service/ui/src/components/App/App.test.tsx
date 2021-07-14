@@ -24,7 +24,7 @@ const initialLoggedInState: RootState = {
         isLoading: false,
         error: undefined,
         user: {
-            id: '1',
+            _id: '1',
             googleID: '42',
             name: 'Alice Smith',
             email: 'foo@bar.com',
@@ -44,7 +44,7 @@ describe('<App />', () => {
     it('renders without crashing when logged in', async () => {
         const axiosResponse = {
             data: {
-                id: '1',
+                _id: '1',
                 googleID: '42',
                 name: 'Alice Smith',
                 email: 'foo@bar.com',
@@ -80,7 +80,7 @@ describe('<App />', () => {
     it('has drawer links', async () => {
         const axiosResponse = {
             data: {
-                id: '1',
+                _id: '1',
                 googleID: '42',
                 name: 'Alice Smith',
                 email: 'foo@bar.com',
@@ -115,6 +115,21 @@ describe('<App />', () => {
     });
 
     it('navigates to the home screen (charts) after clicking on home button', async () => {
+        const axiosResponse = {
+            data: {
+                _id: '1',
+                googleID: '42',
+                name: 'Alice Smith',
+                email: 'foo@bar.com',
+                roles: ['admin'],
+            },
+            status: 200,
+            statusText: 'OK',
+            config: {},
+            headers: {},
+        };
+        mockedAxios.get.mockResolvedValueOnce(axiosResponse);
+
         render(<App />, {
             initialState: initialLoggedInState,
             initialRoute: '/cases',
@@ -136,7 +151,7 @@ describe('<App />', () => {
     it('opens profile menu and contains all the links', async () => {
         const axiosResponse = {
             data: {
-                id: '1',
+                _id: '1',
                 googleID: '42',
                 name: 'Alice Smith',
                 email: 'foo@bar.com',
@@ -178,6 +193,20 @@ describe('<App />', () => {
     });
 
     it('it opens filters modal and focuses appropriate input by clicking on column header', async () => {
+        const axiosResponse = {
+            data: {
+                _id: '1',
+                googleID: '42',
+                name: 'Alice Smith',
+                email: 'foo@bar.com',
+                roles: ['admin'],
+            },
+            status: 200,
+            statusText: 'OK',
+            config: {},
+            headers: {},
+        };
+        mockedAxios.get.mockResolvedValueOnce(axiosResponse);
         render(<App />, {
             initialState: initialLoggedInState,
             initialRoute: '/cases',
@@ -198,17 +227,58 @@ describe('<App />', () => {
         });
     });
 
-    describe('Download dataset', () => {
-        it('Displays download dialog after clicking DownloadButton', async () => {
-            render(<App />, {
-                initialState: initialLoggedInState,
-                initialRoute: '/cases',
-            });
-
-            fireEvent.click(await screen.findByText(/download dataset/i));
-            expect(
-                await screen.findByText(/download full dataset/i),
-            ).toBeInTheDocument();
+    it('Should open filters modal', async () => {
+        const axiosResponse = {
+            data: {
+                _id: '1',
+                googleID: '42',
+                name: 'Alice Smith',
+                email: 'foo@bar.com',
+                roles: ['admin'],
+            },
+            status: 200,
+            statusText: 'OK',
+            config: {},
+            headers: {},
+        };
+        mockedAxios.get.mockResolvedValueOnce(axiosResponse);
+        render(<App />, {
+            initialState: initialLoggedInState,
+            initialRoute: '/cases',
         });
+
+        userEvent.click(screen.getByRole('button', { name: /Filter/i }));
+
+        await waitFor(() => {
+            expect(screen.getByText(/Apply filters/i)).toBeInTheDocument();
+        });
+    });
+});
+
+describe('Download dataset', () => {
+    it('Displays download dialog after clicking DownloadButton', async () => {
+        const axiosResponse = {
+            data: {
+                _id: '1',
+                googleID: '42',
+                name: 'Alice Smith',
+                email: 'foo@bar.com',
+                roles: ['admin'],
+            },
+            status: 200,
+            statusText: 'OK',
+            config: {},
+            headers: {},
+        };
+        mockedAxios.get.mockResolvedValueOnce(axiosResponse);
+        render(<App />, {
+            initialState: initialLoggedInState,
+            initialRoute: '/cases',
+        });
+
+        fireEvent.click(await screen.findByText(/download dataset/i));
+        expect(
+            await screen.findByText(/download full dataset/i),
+        ).toBeInTheDocument();
     });
 });

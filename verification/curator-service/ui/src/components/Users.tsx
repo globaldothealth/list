@@ -228,7 +228,7 @@ class Users extends React.Component<Props, UsersState> {
                 roles: event.target.value,
             })
             .then(() => {
-                if (this.props.user && userId === this.props.user.id) {
+                if (this.props.user && userId === this.props.user._id) {
                     this.props.onUserChange();
                 }
                 if (this.tableRef?.current) {

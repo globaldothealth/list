@@ -16,7 +16,7 @@ beforeAll(() => server.listen());
 afterEach(() => server.resetHandlers());
 afterAll(() => server.close());
 
-describe('LandingPage', () => {
+describe('<LandingPage />', () => {
     test('shows all content', async () => {
         render(<LandingPage />);
 
@@ -75,8 +75,8 @@ describe('LandingPage', () => {
     });
 });
 
-describe('SignInForm', () => {
-    test('renders and submits form', async () => {
+describe('<SignInForm />', () => {
+    it('renders and submits form', async () => {
         server.use(
             rest.post('/auth/signin', (req, res, ctx) => {
                 return res(
@@ -87,21 +87,20 @@ describe('SignInForm', () => {
         );
 
         render(<LandingPage />);
-        // render(<SignInForm setRegistrationScreenOn={() => false} />);
 
         userEvent.type(screen.getByLabelText(/Email/i), 'test@email.com');
         userEvent.click(screen.getAllByRole('checkbox')[0]);
-        userEvent.type(screen.getByLabelText(/Password/), '1234567');
-        userEvent.click(screen.getByTestId('sign-in-button'));
+        userEvent.type(screen.getByLabelText('Password'), '1234567');
+        userEvent.click(screen.getByRole('button', { name: 'Sign in' }));
 
-        await waitFor(() => {
-            expect(
-                screen.getByText(/Don't have an account/i),
-            ).toBeInTheDocument();
-            expect(
-                screen.getByText(/Wrong username or password/i),
-            ).toBeInTheDocument();
-        });
+        await waitFor(
+            () => {
+                expect(
+                    screen.getByText(/Wrong username or password/i),
+                ).toBeInTheDocument();
+            },
+            { timeout: 15000 },
+        );
     });
 
     test('displays verification errors when checkbox is not checked', async () => {
@@ -153,7 +152,7 @@ describe('SignInForm', () => {
     });
 });
 
-describe('SignUpForm', () => {
+describe('<SignUpForm />', () => {
     test('checks if the signup form is displayed', async () => {
         render(
             <SignUpForm
@@ -309,7 +308,7 @@ describe('SignUpForm', () => {
     });
 });
 
-describe('ForgotPasswordForm', () => {
+describe('<ForgotPasswordForm />', () => {
     test('displays the forgot password link', async () => {
         render(<SignInForm setRegistrationScreenOn={() => false} />);
 
@@ -354,7 +353,7 @@ describe('ForgotPasswordForm', () => {
     });
 });
 
-describe('ChangePasswordForm', () => {
+describe('<ChangePasswordForm />', () => {
     test('displays the change password form', async () => {
         render(
             <Route exact path="/reset-password/:token/:id">
