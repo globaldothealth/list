@@ -131,7 +131,7 @@ export default function ForgotPasswordForm(): React.ReactElement {
                                     fullWidth
                                     className={classes.inpputField}
                                     variant="outlined"
-                                    id="email"
+                                    id="forgotEmailField"
                                     name="email"
                                     label="Email"
                                     value={formik.values.email}
