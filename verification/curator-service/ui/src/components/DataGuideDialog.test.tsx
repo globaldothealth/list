@@ -1,5 +1,5 @@
 import React from 'react';
-import { fireEvent, render, wait } from '@testing-library/react';
+import { screen, fireEvent, render, waitFor } from './util/test-utils';
 import { Button } from '@material-ui/core';
 import DataGuideDialog from './DataGuideDialog';
 
@@ -25,35 +25,33 @@ const SearchGuideTestCase = ({ defaultOpen = false }): JSX.Element => {
 };
 
 it('opens properly after clicking on button', async () => {
-    const { getByText, queryByText } = render(<SearchGuideTestCase />);
+    render(<SearchGuideTestCase />);
 
     expect(
-        queryByText(/Welcome to Global.health Data!/i),
+        screen.queryByText(/Welcome to Global.health Data!/i),
     ).not.toBeInTheDocument();
 
-    fireEvent.click(getByText('Open'));
+    fireEvent.click(screen.getByText('Open'));
 
-    wait(() => {
+    waitFor(() => {
         expect(
-            queryByText(/Welcome to Global.health Data!/i),
+            screen.queryByText(/Welcome to Global.health Data!/i),
         ).toBeInTheDocument();
     });
 });
 
 it('closes properly after clicking on close button', async () => {
-    const { getByTestId, findByText, queryByText } = render(
-        <SearchGuideTestCase defaultOpen={true} />,
-    );
+    render(<SearchGuideTestCase defaultOpen={true} />);
 
     expect(
-        await findByText(/Welcome to Global.health Data!/i),
+        await screen.findByText(/Welcome to Global.health Data!/i),
     ).toBeInTheDocument();
 
-    fireEvent.click(getByTestId('close-search-guide-button'));
+    fireEvent.click(screen.getByTestId('close-search-guide-button'));
 
-    wait(() => {
+    waitFor(() => {
         expect(
-            queryByText(/Welcome to Global.health Data!/i),
+            screen.queryByText(/Welcome to Global.health Data!/i),
         ).not.toBeInTheDocument();
     });
 });

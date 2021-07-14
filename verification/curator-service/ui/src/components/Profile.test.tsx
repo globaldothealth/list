@@ -13,7 +13,7 @@ const initialLoggedInState: RootState = {
         isLoading: false,
         error: undefined,
         user: {
-            id: '1',
+            _id: '1',
             googleID: '42',
             name: 'Alice Smith',
             email: 'foo@bar.com',
@@ -39,7 +39,7 @@ const noUserInfoState: RootState = {
         isLoading: false,
         error: undefined,
         user: {
-            id: '',
+            _id: '',
             googleID: '',
             name: '',
             email: '',
