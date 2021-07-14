@@ -178,7 +178,7 @@ export class AuthController {
 
         this.router.get('/logout', (req: Request, res: Response): void => {
             req.logout();
-            res.redirect('/');
+            res.sendStatus(200);
         });
 
         // Starts the authentication flow with Google OAuth.
@@ -412,6 +412,7 @@ export class AuthController {
                                 req.body.newsletterAccepted || false,
                         });
 
+                        await this.lambdaClient.sendWelcomeEmail(newUser.email);
                         done(null, newUser.publicFields());
                     } catch (error) {
                         done(error);

@@ -10,13 +10,22 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import store from './redux/store';
 import { Provider } from 'react-redux';
+import { PersistGate } from 'redux-persist/integration/react';
+import { persistStore } from 'redux-persist';
+
+const persistor = persistStore(store);
 
 ReactDOM.render(
     <React.StrictMode>
         <BrowserRouter>
             <LastLocationProvider>
                 <Provider store={store}>
-                    <App />
+                    <PersistGate
+                        loading={<h1>Loading...</h1>}
+                        persistor={persistor}
+                    >
+                        <App />
+                    </PersistGate>
                 </Provider>
             </LastLocationProvider>
         </BrowserRouter>

@@ -84,3 +84,7 @@ export const resetPassword = createAsyncThunk<
         return rejectWithValue(error.response.data.message);
     }
 });
+
+export const logout = createAsyncThunk('auth/logout', async () => {
+    await axios.get('/auth/logout');
+});
