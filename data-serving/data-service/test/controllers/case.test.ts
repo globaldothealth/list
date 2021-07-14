@@ -776,38 +776,6 @@ describe('POST', () => {
             expect(res.text).toContain(matchedCase._id);
             expect(res.text).not.toContain(unmatchedCase._id);
         });
-        it('should exclude results with excluded sources', async () => {
-            const excludedSource = {
-                name: 'Excluded',
-                origin: {
-                    url: 'https://notshared.example.com/',
-                    license: 'Proprietary',
-                },
-                format: 'csv',
-                excludeFromLineList: true,
-            };
-            await mongoose.connection
-                .collection('sources')
-                .insertOne(excludedSource);
-            const source = await mongoose.connection
-                .collection('sources')
-                .findOne({});
-            const excludedCase = new Case({
-                ...minimalCase,
-                caseReference: {
-                    ...minimalCase.caseReference,
-                    sourceId: source._id.valueOf(),
-                    sourceUrl: excludedSource.origin.url,
-                },
-            });
-            await excludedCase.save();
-            const res = await request(app)
-                .post('/api/cases/download')
-                .send({ format: 'csv' })
-                .expect('Content-Type', 'text/csv')
-                .expect(200);
-            expect(res.text).not.toContain('notshared.example.com');
-        });
     });
     it('should return results in proper format', async () => {
         const matchedCase = new Case(minimalCase);
