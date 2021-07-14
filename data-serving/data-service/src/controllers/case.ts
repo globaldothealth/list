@@ -1,4 +1,4 @@
-import { Case, CaseDocument } from '../model/case';
+import { Case, CaseDocument, RestrictedCase } from '../model/case';
 import { EventDocument } from '../model/event';
 import { Aggregate, DocumentQuery, Error, Query } from 'mongoose';
 import { ObjectId, QuerySelector } from 'mongodb';
@@ -28,36 +28,10 @@ export class CasesController {
      * Handles HTTP GET /api/cases/:id.
      */
     get = async (req: Request, res: Response): Promise<void> => {
-        // Check if this case's source is excluded
-        const c = await Case.aggregate([
-            {
-                $match: {
-                    _id: new ObjectId(req.params.id),
-                },
-            },
-            {
-                $addFields: {
-                    sourceID: {
-                        $toObjectId: '$caseReference.sourceId',
-                    },
-                },
-            },
-            {
-                $lookup: {
-                    localField: 'sourceID',
-                    foreignField: '_id',
-                    from: 'sources',
-                    as: 'source',
-                },
-            },
-            {
-                $addFields: {
-                    isSourceExcluded: {
-                        $anyElementTrue: '$source.excludeFromLineList',
-                    },
-                },
-            },
-        ]);
+        // Don't look in the restricted collection
+        const c = await Case.find({
+            _id: new ObjectId(req.params.id),
+        });
 
         if (c.length === 0) {
             res.status(404).send({
