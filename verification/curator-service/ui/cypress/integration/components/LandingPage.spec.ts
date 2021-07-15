@@ -1,4 +1,3 @@
-/* eslint-disable no-undef */
 describe('LandingPage', function () {
     it('The landing page shows two ways of login', function () {
         cy.visit('/');
@@ -16,7 +15,9 @@ describe('LandingPage', function () {
         cy.visit('/');
         cy.contains('Welcome to G.h Data.');
         cy.contains('Forgot your password?').click();
-        cy.contains("Don't worry! Just fill in your email address and we'll send you a link to reset your password");
+        cy.contains(
+            "Don't worry! Just fill in your email address and we'll send you a link to reset your password",
+        );
         cy.get('#forgotEmailField').type('asdgsagdsa');
 
         cy.get('button[data-testid="send-reset-link"]').click();
@@ -28,8 +29,8 @@ describe('LandingPage', function () {
         cy.visit('/');
         cy.contains('Welcome to G.h Data.');
         cy.contains('Sign up!').click();
-        cy.contains("SignUp form");
-        cy.get('input').should('have.length', 6)
+        cy.contains('SignUp form');
+        cy.get('input').should('have.length', 6);
     });
 
     it('Validates emails', function () {
@@ -65,14 +66,14 @@ describe('LandingPage', function () {
         cy.get('#passwordConfirmation').type('tsgasdgasd');
 
         cy.get('button[data-testid="sign-up-button"]').click();
-        cy.contains('This field is required').should('have.length', 1)
+        cy.contains('This field is required').should('have.length', 1);
     });
 
     it('Opens the change password page', function () {
         cy.visit('/');
         cy.visit('/reset-password/sampletoken/tokenid');
         cy.contains('Choose a new password');
-        cy.get('input').should('have.length', 2)
+        cy.get('input').should('have.length', 2);
 
         cy.get('button[data-testid="change-password-button"]');
     });
@@ -82,7 +83,7 @@ describe('LandingPage', function () {
         cy.visit('/reset-password/sampletoken/tokenid');
         cy.get('#password').type('tsgasdgasd');
         cy.get('#passwordConfirmation').type('uu');
-        
+
         cy.get('button[data-testid="change-password-button"]').click();
 
         cy.contains('Passwords must match');
@@ -103,7 +104,7 @@ describe('LandingPage', function () {
     });
 
     it('Homepage with logged in user with no roles', function () {
-        cy.login({ roles: [], name: "xyz", email:'test@test.com' });
+        cy.login({ roles: [], name: 'xyz', email: 'test@test.com' });
         cy.visit('/');
 
         // Readers-only are redirected to the line list.
@@ -119,7 +120,11 @@ describe('LandingPage', function () {
     });
 
     it('Homepage with logged in admin', function () {
-        cy.login({ roles: ['admin'], name: "testName", email:'test@example.com' });
+        cy.login({
+            roles: ['admin'],
+            name: 'testName',
+            email: 'test@example.com',
+        });
         cy.visit('/');
 
         cy.contains('Create new').should('not.exist');
@@ -132,7 +137,11 @@ describe('LandingPage', function () {
     });
 
     it('Homepage with logged in curator', function () {
-        cy.login({ roles: ['curator'], name: "testName", email:'test@example.com' });
+        cy.login({
+            roles: ['curator'],
+            name: 'testName',
+            email: 'test@example.com',
+        });
         cy.visit('/');
 
         cy.contains('Create new');
@@ -143,5 +152,4 @@ describe('LandingPage', function () {
         cy.contains('Manage users').should('not.exist');
         cy.contains('Terms of use');
     });
-
 });
