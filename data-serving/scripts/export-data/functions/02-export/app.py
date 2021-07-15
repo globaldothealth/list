@@ -2,6 +2,7 @@
 
 import datetime
 import os
+import json
 import subprocess
 
 import boto3
@@ -35,6 +36,7 @@ def export_chunk(skip, limit, num_cases, num_chunk, num_chunks, field_names, exc
     z_num_chunk = str(num_chunk).zfill(4)
     z_num_chunks = str(num_chunks).zfill(4)
     chunk_fn = f"cases_{z_num_chunk}-of-{z_num_chunks}.csv"
+    query = {'list': True}
     mongoexport = [
             "./mongoexport",
             f'--uri="{uri}"',
@@ -47,8 +49,8 @@ def export_chunk(skip, limit, num_cases, num_chunk, num_chunks, field_names, exc
             f"--limit={limit}"
     ]
     if exclude_sources:
-        query = json.dumps({"caseReference.sourceId": {"$nin": exclude_sources}})
-        mongoexport.append(f"--query='{query}'")
+        query['caseReference.sourceId'] = {"$nin": exclude_sources}
+    mongoexport.append(f"--query='{json.dumps(query)}'")
     subprocess.run(mongoexport)
     return chunk_fn
 
