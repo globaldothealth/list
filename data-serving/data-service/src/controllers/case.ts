@@ -734,7 +734,10 @@ export class CasesController {
                     _id: { $in: caseIds },
                 };
                 const validIdsCount = await Case.countDocuments(updateQuery);
-                if (validIdsCount != caseIds.length) {
+                const validRestrictedIdsCount = await RestrictedCase.countDocuments(
+                    updateQuery,
+                );
+                if (validIdsCount + validRestrictedIdsCount != caseIds.length) {
                     res.status(422)
                         .send({
                             message:
@@ -779,6 +782,7 @@ export class CasesController {
                 };
             }
             await Case.updateMany(updateQuery, updateDocument);
+            await RestrictedCase.updateMany(updateQuery, updateDocument);
 
             res.status(200).end();
         } catch (err) {
