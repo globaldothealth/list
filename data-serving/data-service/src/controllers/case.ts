@@ -685,10 +685,16 @@ export class CasesController {
     del = async (req: Request, res: Response): Promise<void> => {
         const c = await Case.findByIdAndDelete(req.params.id, req.body);
         if (!c) {
-            res.status(404).send({
-                message: `Case with ID ${req.params.id} not found.`,
-            });
-            return;
+            const r = await RestrictedCase.findByIdAndDelete(
+                req.params.id,
+                req.body,
+            );
+            if (!r) {
+                res.status(404).send({
+                    message: `Case with ID ${req.params.id} not found.`,
+                });
+                return;
+            }
         }
         res.status(204).end();
     };
