@@ -415,35 +415,51 @@ export class CasesController {
                     `batchUpsert: dropped ${errors.length} invalid cases`,
                 );
             }
+            logger.info('batchUpsert: splitting cases by sourceID');
+            const unrestrictedCases = _.filter(cases, async (c) => {
+                const source = await Source.findOne({
+                    _id: c.caseReference.sourceId,
+                });
+                return source?.excludeFromLineList !== true;
+            });
+            const restrictedCases = _.filter(
+                cases,
+                (c) => !unrestrictedCases.includes(c),
+            );
             logger.info('batchUpsert: preparing bulk write');
-            const bulkWriteResult = await Case.bulkWrite(
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                cases.map((c: any) => {
-                    delete c.caseCount;
-                    if (
-                        c.caseReference?.sourceId &&
-                        c.caseReference?.sourceEntryId
-                    ) {
-                        return {
-                            updateOne: {
-                                filter: {
-                                    'caseReference.sourceId':
-                                        c.caseReference.sourceId,
-                                    'caseReference.sourceEntryId':
-                                        c.caseReference.sourceEntryId,
-                                },
-                                update: c,
-                                upsert: true,
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const upsertLambda = (c: any) => {
+                delete c.caseCount;
+                if (
+                    c.caseReference?.sourceId &&
+                    c.caseReference?.sourceEntryId
+                ) {
+                    return {
+                        updateOne: {
+                            filter: {
+                                'caseReference.sourceId':
+                                    c.caseReference.sourceId,
+                                'caseReference.sourceEntryId':
+                                    c.caseReference.sourceEntryId,
                             },
-                        };
-                    } else {
-                        return {
-                            insertOne: {
-                                document: c,
-                            },
-                        };
-                    }
-                }),
+                            update: c,
+                            upsert: true,
+                        },
+                    };
+                } else {
+                    return {
+                        insertOne: {
+                            document: c,
+                        },
+                    };
+                }
+            };
+            const unrestrictedBulkWriteResult = await Case.bulkWrite(
+                unrestrictedCases.map(upsertLambda),
+                { ordered: false },
+            );
+            const restrictedBulkWriteResult = await RestrictedCase.bulkWrite(
+                restrictedCases.map(upsertLambda),
                 { ordered: false },
             );
             logger.info('batchUpsert: finished bulk write');
@@ -451,9 +467,13 @@ export class CasesController {
             res.status(status).json({
                 phase: 'UPSERT',
                 numCreated:
-                    (bulkWriteResult.insertedCount || 0) +
-                    (bulkWriteResult.upsertedCount || 0),
-                numUpdated: bulkWriteResult.modifiedCount,
+                    (unrestrictedBulkWriteResult.insertedCount || 0) +
+                    (restrictedBulkWriteResult.insertedCount || 0) +
+                    (unrestrictedBulkWriteResult.upsertedCount || 0) +
+                    (restrictedBulkWriteResult.upsertedCount || 0),
+                numUpdated:
+                    (unrestrictedBulkWriteResult.modifiedCount || 0) +
+                    (restrictedBulkWriteResult.modifiedCount || 0),
                 errors,
             });
             return;
