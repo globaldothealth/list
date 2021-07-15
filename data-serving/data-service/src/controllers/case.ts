@@ -554,11 +554,18 @@ export class CasesController {
      */
     upsert = async (req: Request, res: Response): Promise<void> => {
         try {
-            const c = await Case.findOne({
+            let c = await Case.findOne({
                 'caseReference.sourceId': req.body.caseReference?.sourceId,
                 'caseReference.sourceEntryId':
                     req.body.caseReference?.sourceEntryId,
             });
+            if (!c) {
+                c = await RestrictedCase.findOne({
+                    'caseReference.sourceId': req.body.caseReference?.sourceId,
+                    'caseReference.sourceEntryId':
+                        req.body.caseReference?.sourceEntryId,
+                });
+            }
             if (
                 req.body.caseReference?.sourceId &&
                 req.body.caseReference?.sourceEntryId &&
