@@ -1577,6 +1577,9 @@ describe('DELETE', () => {
         await mongoose.connection.collection('cases').createIndex({
             notes: 'text',
         });
+        await mongoose.connection.collection('restrictedcases').createIndex({
+            notes: 'text',
+        });
 
         const c = new Case(minimalCase);
         c.notes = 'got it at work';
