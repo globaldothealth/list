@@ -5,6 +5,9 @@ import AwsBatchClient, {
 
 import AWS from 'aws-sdk';
 import AWSMock from 'aws-sdk-mock';
+import validateEnv from '../../src/util/validate-env';
+
+const env = validateEnv();
 
 let client: AwsBatchClient;
 const submitJobSpy = jest.fn();
@@ -43,7 +46,7 @@ beforeEach(() => {
     submitJobSpy.mockClear();
     AWSMock.mock('Batch', 'submitJob', submitJobSpy);
     AWSMock.mock('Batch', 'describeJobDefinitions', describeJobDefinitionsSpy);
-    client = new AwsBatchClient('test', 'test-arn', 'us-east-1');
+    client = new AwsBatchClient(env.SERVICE_ENV, env.LOCALSTACK_URL, 'test-arn', 'us-east-1');
 });
 
 afterEach(() => {

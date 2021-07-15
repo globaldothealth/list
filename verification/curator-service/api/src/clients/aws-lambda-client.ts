@@ -15,12 +15,22 @@ export default class AwsLambdaClient {
     private readonly lambdaClient: AWS.Lambda;
     constructor(
         private readonly serviceEnv: string,
+        private readonly localstackURL: string,
         awsRegion: string,
     ) {
         AWS.config.update({ region: awsRegion });
-        this.lambdaClient = new AWS.Lambda({
-            apiVersion: '2015-03-31',
-        });
+        if (serviceEnv == 'locale2e') {
+            logger.info("using localstack");
+            this.lambdaClient = new AWS.Lambda({
+                apiVersion: '2015-03-31',
+                endpoint: localstackURL,
+            });
+        }
+        else {
+            this.lambdaClient = new AWS.Lambda({
+                apiVersion: '2015-03-31',
+            });
+        }
     }
 
     /**

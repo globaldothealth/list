@@ -58,11 +58,26 @@ try {
             secretAccessKey: workerData.secretKey,
             region: workerData.region,
         });
-        const ses = new AWS.SES({ apiVersion: '2010-12-01' });
+
+        // If in locale2e env, use localstack
+        const serviceEnv = process.env.SERVICE_ENV;
+
+        let s3;
+        let ses;
+
+        if (serviceEnv == 'locale2e') {
+            const localstackURL = process.env.LOCALSTACK_URL;
+            ses = new AWS.SES({
+                apiVersion: '2010-12-01',
+                endpoint: localstackURL
+            });
+            s3 = new AWS.S3({ endpoint: localstackURL });
+        } else {
+            ses = new AWS.SES({ apiVersion: '2010-12-01' });
+            s3 = new AWS.S3();
+        }
 
         // Upload file to S3
-        const s3 = new AWS.S3();
-
         const fileKey = `${dateObj.getTime()}/${filename}.zip`;
         const params = {
             Bucket: 'covid19-filtered-downloads',

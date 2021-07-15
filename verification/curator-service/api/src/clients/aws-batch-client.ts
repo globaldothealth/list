@@ -36,13 +36,22 @@ export default class AwsBatchClient {
     private readonly batchClient: AWS.Batch;
     constructor(
         private readonly serviceEnv: string,
+        private readonly localstackURL: string,
         readonly jobQueueArn: string,
         awsRegion: string,
     ) {
         AWS.config.update({ region: awsRegion });
-        this.batchClient = new AWS.Batch({
-            apiVersion: '2016-08-10',
-        });
+        if (serviceEnv == 'locale2e') {
+            this.batchClient = new AWS.Batch({
+                apiVersion: '2016-08-10',
+                endpoint: localstackURL,
+            });
+        }
+        else {
+            this.batchClient = new AWS.Batch({
+                apiVersion: '2016-08-10',
+            });
+        }
     }
 
     /**
