@@ -647,20 +647,21 @@ export class CasesController {
      */
     batchDel = async (req: Request, res: Response): Promise<void> => {
         if (req.body.caseIds !== undefined) {
-            Case.deleteMany(
-                {
-                    _id: {
-                        $in: req.body.caseIds,
-                    },
-                },
-                (err) => {
-                    if (err) {
-                        res.status(500).json(err);
+            for (const i in req.body.caseIds) {
+                let deleted = await Case.findByIdAndDelete(req.body.caseIds[i]);
+                if (!deleted) {
+                    deleted = await RestrictedCase.findByIdAndDelete(
+                        req.body.caseIds[i],
+                    );
+                    if (!deleted) {
+                        res.status(404).send({
+                            message: `Case with ID ${req.body.caseIds[i]} not found.`,
+                        });
                         return;
                     }
-                    res.status(204).end();
-                },
-            );
+                }
+            }
+            res.status(204).end();
             return;
         }
 
@@ -668,13 +669,14 @@ export class CasesController {
             searchQuery: req.body.query,
             count: false,
         });
-        Case.deleteMany(casesQuery, (err: any) => {
-            if (err) {
-                res.status(500).json(err);
-                return;
-            }
+        try {
+            await Case.deleteMany(casesQuery);
+            await RestrictedCase.deleteMany(casesQuery);
             res.status(204).end();
-        });
+        } catch (err) {
+            console.error(err);
+            res.status(500).json(err);
+        }
     };
 
     /**
