@@ -31,7 +31,6 @@ describe('Bulk upload form', function () {
         cy.contains('No records to display');
 
         cy.visit('/');
-        cy.get('button[data-testid="toggle-sidebar"]').click();
         cy.get('button[data-testid="create-new-button"]').click();
         cy.contains('li', 'New bulk upload').click();
         cy.get('div[data-testid="caseReference"]').type('www.bulksource.com');
@@ -106,7 +105,6 @@ describe('Bulk upload form', function () {
         cy.contains('No records to display');
 
         cy.visit('/');
-        cy.get('button[data-testid="toggle-sidebar"]').click();
         cy.get('button[data-testid="create-new-button"]').click();
         cy.contains('li', 'New bulk upload').click();
         cy.get('div[data-testid="caseReference"]').type('www.bulksource.com');
@@ -136,7 +134,6 @@ describe('Bulk upload form', function () {
         cy.contains('No records to display');
 
         cy.visit('/');
-        cy.get('button[data-testid="toggle-sidebar"]').click();
         cy.get('button[data-testid="create-new-button"]').click();
         cy.contains('li', 'New bulk upload').click();
         cy.get('div[data-testid="caseReference"]').type('www.new-source.com');
@@ -175,7 +172,6 @@ describe('Bulk upload form', function () {
         cy.contains('No records to display');
 
         cy.visit('/');
-        cy.get('button[data-testid="toggle-sidebar"]').click();
         cy.get('button[data-testid="create-new-button"]').click();
         cy.contains('li', 'New bulk upload').click();
         cy.get('div[data-testid="caseReference"]').type('www.bulksource.com');
@@ -193,14 +189,6 @@ describe('Bulk upload form', function () {
         cy.contains('Male');
         cy.contains('Female').should('not.exist');
 
-        const sidebar = cy.get('div[data-testid="sidebar"] .MuiDrawer-paperAnchorDockedLeft');
-        sidebar.then((sidebar) => {
-            if (sidebar.css('visibility') == 'hidden') {
-            cy.get('button[aria-label="toggle drawer"]').click();
-            }
-          });
-
-          cy.get('button[data-testid="toggle-sidebar"]').click();
         cy.get('button[data-testid="create-new-button"]').click();
         cy.contains('li', 'New bulk upload').click();
         cy.get('div[data-testid="caseReference"]').type('www.bulksource.com');
@@ -236,7 +224,6 @@ describe('Bulk upload form', function () {
         cy.contains('No records to display');
 
         cy.visit('/');
-        cy.get('button[data-testid="toggle-sidebar"]').click();
         cy.get('button[data-testid="create-new-button"]').click();
         cy.contains('li', 'New bulk upload').click();
         cy.get('div[data-testid="caseReference"]').type('www.bulksource.com');
@@ -262,7 +249,6 @@ describe('Bulk upload form', function () {
         cy.contains('No records to display');
 
         cy.visit('/');
-        cy.get('button[data-testid="toggle-sidebar"]').click();
         cy.get('button[data-testid="create-new-button"]').click();
         cy.contains('li', 'New bulk upload').click();
         cy.get('div[data-testid="caseReference"]').type('www.bulksource.com');
@@ -304,7 +290,6 @@ describe('Bulk upload form', function () {
         cy.contains('No records to display');
 
         cy.visit('/');
-        cy.get('button[data-testid="toggle-sidebar"]').click();
         cy.get('button[data-testid="create-new-button"]').click();
         cy.contains('li', 'New bulk upload').click();
         cy.get('div[data-testid="caseReference"]').type('www.bulksource.com');
