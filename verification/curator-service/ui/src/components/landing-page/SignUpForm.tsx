@@ -19,6 +19,7 @@ import Button from '@material-ui/core/Button';
 import FormGroup from '@material-ui/core/FormGroup';
 import Checkbox from '@material-ui/core/Checkbox';
 import Typography from '@material-ui/core/Typography';
+import GoogleButton from 'react-google-button';
 
 const useStyles = makeStyles((theme: Theme) => ({
     checkboxRoot: {
@@ -150,7 +151,7 @@ export default function SignUpForm({
             <form onSubmit={formik.handleSubmit}>
                 <Typography variant="h5">SignUp form</Typography>
                 <div className={classes.formFlexContainer}>
-                    <div id="leftBox">
+                    <div>
                         <TextField
                             disabled={disabled}
                             fullWidth
@@ -191,7 +192,7 @@ export default function SignUpForm({
                         />
                     </div>
 
-                    <div id="rightBox">
+                    <div>
                         <FormControl
                             disabled={disabled}
                             className={classes.inpputField}
@@ -283,6 +284,33 @@ export default function SignUpForm({
                                     formik.errors.passwordConfirmation}
                             </FormHelperText>
                         </FormControl>
+                    </div>
+                    <div>
+                        <div>
+                            <Typography className={classes.title}>
+                                Or sign up with Google
+                            </Typography>
+                            <GoogleButton
+                                className={classes.googleButton}
+                                disabled={disabled}
+                                onClick={() => {
+                                    if (!formik.values.isAgreementChecked) {
+                                        formik.setFieldError(
+                                            'isAgreementChecked',
+                                            'This field is required',
+                                        );
+                                        formik.setFieldTouched(
+                                            'isAgreementChecked',
+                                        );
+                                    } else {
+                                        window.location.href = `${process.env
+                                            .REACT_APP_LOGIN_URL!}?newsletterAccepted=${
+                                            formik.values.isNewsletterChecked
+                                        }`;
+                                    }
+                                }}
+                            />
+                        </div>
                     </div>
                 </div>
 
