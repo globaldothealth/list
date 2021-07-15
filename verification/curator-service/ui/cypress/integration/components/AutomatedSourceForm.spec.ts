@@ -6,7 +6,11 @@ describe('Automated source form', function () {
     });
 
     it('Creates source given proper data', function () {
-        cy.login({ roles: ['curator'], name: "testName", email:'test@example.com' });
+        cy.login({
+            roles: ['curator'],
+            name: 'testName',
+            email: 'test@example.com',
+        });
         cy.visit('/');
         cy.visit('/sources');
         cy.contains('No records to display');
@@ -18,12 +22,6 @@ describe('Automated source form', function () {
         const otherEmail = 'other.curator9001@gmail.com';
 
         cy.visit('/');
-        const sidebar = cy.get('div[data-testid="sidebar"] .MuiDrawer-paperAnchorDockedLeft');
-        sidebar.then((sidebar) => {
-            if (sidebar.css('visibility') == 'hidden') {
-            cy.get('button[aria-label="toggle drawer"]').click();
-            }
-          });
         cy.get('button[data-testid="create-new-button"]').click();
         cy.contains('li', 'New automated source').click();
         cy.get('div[data-testid="url"]').type(url);
@@ -44,7 +42,7 @@ describe('Automated source form', function () {
         cy.contains(name);
         cy.contains(format);
         cy.contains(license);
-        cy.contains('superuser@test.com');
+        cy.contains('test@example.com');
         cy.contains(otherEmail);
     });
 
