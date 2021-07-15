@@ -34,7 +34,7 @@ def lambda_handler(event, context):
           https://docs.aws.amazon.com/lambda/latest/dg/python-context-object.html
     """
 
-    num_cases = cases.count_documents({})
+    num_cases = cases.count_documents({'list': True})
     print(f"There are {num_cases} total cases.")
     exclude_sources = [str(s['_id']) for s in db.sources.find({"excludeFromLineList": True})]
     print(f"Excluding sources {exclude_sources}")
