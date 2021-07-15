@@ -416,16 +416,10 @@ export class CasesController {
                 );
             }
             logger.info('batchUpsert: splitting cases by sourceID');
-            const unrestrictedCases = _.filter(cases, async (c) => {
-                const source = await Source.findOne({
-                    _id: c.caseReference.sourceId,
-                });
-                return source?.excludeFromLineList !== true;
-            });
-            const restrictedCases = _.filter(
-                cases,
-                (c) => !unrestrictedCases.includes(c),
-            );
+            const {
+                unrestrictedCases,
+                restrictedCases,
+            } = this.filterCasesBySourceRestricted(cases);
             logger.info('batchUpsert: preparing bulk write');
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const upsertLambda = (c: any) => {
@@ -541,22 +535,49 @@ export class CasesController {
             return;
         }
         try {
-            const bulkWriteResult = await Case.bulkWrite(
+            const unrestrictedCases: CaseDocument[] = [];
+            const restrictedCases: CaseDocument[] = [];
+
+            for (const c in req.body.cases) {
+                const caseDoc = req.body.cases[c] as CaseDocument;
+                let aCase = await Case.findOne({ _id: caseDoc._id });
+                if (aCase) {
+                    unrestrictedCases.push(caseDoc);
+                } else {
+                    aCase = await RestrictedCase.findOne({ _id: caseDoc._id });
+                    if (aCase) {
+                        restrictedCases.push(caseDoc);
+                    } else {
+                        res.status(400).json({
+                            error: `case with id ${caseDoc._id} not present to update`,
+                        });
+                        return;
+                    }
+                }
+            }
+            const caseLambda = (c: any) => ({
+                updateOne: {
+                    filter: {
+                        _id: c._id,
+                    },
+                    update: c,
+                },
+            });
+            const unrestrictedBulkWriteResult = await Case.bulkWrite(
                 // Consider defining a type for the request-format cases.
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                req.body.cases.map((c: any) => {
-                    return {
-                        updateOne: {
-                            filter: {
-                                _id: c._id,
-                            },
-                            update: c,
-                        },
-                    };
-                }),
+                unrestrictedCases.map(caseLambda),
                 { ordered: false },
             );
-            res.json({ numModified: bulkWriteResult.modifiedCount });
+            const restrictedBulkWriteResult = await RestrictedCase.bulkWrite(
+                restrictedCases.map(caseLambda),
+                { ordered: false },
+            );
+            res.json({
+                numModified:
+                    (unrestrictedBulkWriteResult.modifiedCount || 0) +
+                    (restrictedBulkWriteResult.modifiedCount || 0),
+            });
         } catch (err) {
             res.status(500).json(err);
             return;
@@ -843,6 +864,20 @@ export class CasesController {
             res.status(500).json(err).end();
         }
     };
+
+    private filterCasesBySourceRestricted(cases: any) {
+        const unrestrictedCases = _.filter(cases, async (c) => {
+            const source = await Source.findOne({
+                _id: c.caseReference.sourceId,
+            });
+            return source?.excludeFromLineList !== true;
+        });
+        const restrictedCases = _.filter(
+            cases,
+            (c) => !unrestrictedCases.includes(c),
+        );
+        return { unrestrictedCases, restrictedCases };
+    }
 
     /**
      * Geocodes a single location.
