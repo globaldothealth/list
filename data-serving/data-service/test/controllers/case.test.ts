@@ -132,6 +132,30 @@ describe('GET', () => {
             // No continuation expected.
             expect(res.body.nextPage).toBeUndefined();
         });
+        it('should search by date—less than', async () => {
+            const c = new Case(fullCase);
+            await c.save();
+            const res = await request(app)
+                .get(
+                    `/api/cases?page=1&limit=10&q=${encodeURIComponent(
+                        'dateconfirmedbefore:',
+                    )}${fullCase.events[0].dateRange.start}`,
+                )
+                .expect(200);
+            expect(res.body.cases).toHaveLength(0);
+        });
+        it('should search by date—greater than', async () => {
+            const c = new Case(fullCase);
+            await c.save();
+            const res = await request(app)
+                .get(
+                    `/api/cases?page=1&limit=10&q=${encodeURIComponent(
+                        'dateconfirmedafter:',
+                    )}${fullCase.events[0].dateRange.start}`,
+                )
+                .expect(200);
+            expect(res.body.cases).toHaveLength(1);
+        });
         it('should query results', async () => {
             // Simulate index creation used in unit tests, in production they are
             // setup by the setup-db script and such indexes are not present by
