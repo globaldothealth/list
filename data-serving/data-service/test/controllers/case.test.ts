@@ -1,7 +1,8 @@
-import { Case } from '../../src/model/case';
+import { Case, RestrictedCase } from '../../src/model/case';
 import { CaseRevision } from '../../src/model/case-revision';
 import { Demographics } from '../../src/model/demographics';
 import { MongoMemoryServer } from 'mongodb-memory-server';
+import { Source } from '../../src/model/source';
 import app from './../../src/index';
 import fullCase from './../model/data/case.full.json';
 import minimalCase from './../model/data/case.minimal.json';
@@ -41,6 +42,7 @@ beforeAll(async () => {
 beforeEach(async () => {
     clearFakeGeocodes();
     await Case.deleteMany({});
+    await RestrictedCase.deleteMany({});
     return CaseRevision.deleteMany({});
 });
 
@@ -70,6 +72,12 @@ describe('GET', () => {
         return request(app)
             .get('/api/cases/53cb6b9b4f4ddef1ad47f943')
             .expect(404);
+    });
+    it('should not return an item from the restricted collection', async () => {
+        const r = new RestrictedCase(minimalCase);
+        await r.save();
+
+        return request(app).get(`/api/cases/${r._id}`).expect(404);
     });
     describe('list', () => {
         it('should return 200 OK', () => {
@@ -147,6 +155,16 @@ describe('GET', () => {
                 .get(`/api/cases?page=1&limit=10&q=${encodeURI('at work')}`)
                 .expect(200, /got it at work/)
                 .expect('Content-Type', /json/);
+        });
+        it('should ignore the restricted collection', async () => {
+            const r = new RestrictedCase(minimalCase);
+            await r.save();
+            const res = await request(app)
+                .get('/api/cases')
+                .expect(200)
+                .expect('Content-Type', /json/);
+            expect(res.body.cases).toHaveLength(0);
+            expect(res.body.total).toEqual(0);
         });
         describe('keywords', () => {
             beforeEach(async () => {
@@ -408,6 +426,20 @@ describe('POST', () => {
             .expect(201);
         expect(await CaseRevision.collection.countDocuments()).toEqual(0);
     });
+    it('create with valid input and source excluded from line list ends up in restricted collection', async () => {
+        const s = new Source();
+        s.excludeFromLineList = true;
+        await s.save();
+        const minimalRestricted = Object.assign({}, minimalRequest);
+        minimalRestricted.caseReference.sourceId = s._id;
+        await request(app)
+            .post('/api/cases')
+            .send(minimalRestricted)
+            .expect('Content-Type', /json/)
+            .expect(201);
+        expect(await Case.collection.countDocuments()).toEqual(0);
+        expect(await RestrictedCase.collection.countDocuments()).toEqual(1);
+    });
     it('create with input missing required properties and validate_only should return 400', async () => {
         return request(app)
             .post('/api/cases?validate_only=true')
@@ -530,6 +562,24 @@ describe('POST', () => {
         expect(changedDbCase?.caseReference?.uploadIds[2]).toEqual(
             unchangedCaseUploadIds[1],
         );
+    });
+    it('batch upsert with restricted case should return 200 with counts', async () => {
+        const source = new Source({ excludeFromLineList: true });
+        await source.save();
+        const newCaseWithEntryId = new RestrictedCase(fullCase);
+        newCaseWithEntryId.caseReference.sourceEntryId = 'newId';
+        newCaseWithEntryId.caseReference.sourceId = source._id;
+
+        const res = await request(app)
+            .post('/api/cases/batchUpsert')
+            .send({
+                cases: [newCaseWithEntryId],
+                ...curatorMetadata,
+            })
+            .expect(200);
+
+        expect(res.body.numCreated).toBe(1); // Case was created.
+        expect(res.body.numUpdated).toBe(0); // No case was updated.
     });
     it('geocodes everything that is necessary', async () => {
         seedFakeGeocodes('Canada', {
@@ -669,6 +719,19 @@ describe('POST', () => {
             expect(res.text).toContain(c2._id);
             expect(res.text).toContain(c2.caseReference.verificationStatus);
             expect(res.text).toContain(c2.caseReference.sourceId);
+        });
+        it('should exclude restricted cases', async () => {
+            const c = new Case(minimalCase);
+            await c.save();
+            const c2 = new RestrictedCase(fullCase);
+            await c2.save();
+            const res = await request(app)
+                .post('/api/cases/download')
+                .send({ format: 'csv' })
+                .expect('Content-Type', 'text/csv')
+                .expect(200);
+            expect(res.text).toContain(c._id);
+            expect(res.text).not.toContain(c2._id);
         });
         it('rejects invalid searches', (done) => {
             request(app)
@@ -838,6 +901,21 @@ describe('POST', () => {
 
         it('should return 200 OK when excluding cases with note', async () => {
             const existingCase = new Case(fullCase);
+            await existingCase.save();
+
+            await request(app)
+                .post('/api/cases/batchStatusChange')
+                .send({
+                    caseIds: [existingCase._id],
+                    status: 'EXCLUDED',
+                    note: 'Duplicate',
+                    ...curatorMetadata,
+                })
+                .expect(200);
+        });
+
+        it('should return 200 OK when excluding restricted cases with note', async () => {
+            const existingCase = new RestrictedCase(fullCase);
             await existingCase.save();
 
             await request(app)
