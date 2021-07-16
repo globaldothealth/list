@@ -1057,6 +1057,13 @@ export const casesMatchingSearchQuery = (opts: {
             if (searchTerm === '*') {
                 casesQuery.where(f.path).exists(true);
                 countQuery.where(f.path).exists(true);
+            } else if (f.dateOperator) {
+                casesQuery.find({
+                    [f.path]: { [f.dateOperator]: { $date: f.values[0] } },
+                });
+                countQuery.find({
+                    [f.path]: { [f.dateOperator]: { $date: f.values[0] } },
+                });
             } else {
                 casesQuery.where(f.path).equals(f.values[0]);
                 countQuery.where(f.path).equals(f.values[0]);
