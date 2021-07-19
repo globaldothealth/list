@@ -43,6 +43,11 @@ export interface PreexistingConditions {
     values: string[];
 }
 
+export interface Geometry {
+    latitude: number;
+    longitude: number;
+}
+
 export interface Location {
     country: string;
     administrativeAreaLevel1: string;
@@ -58,11 +63,6 @@ export interface Location {
     limitToResolution?: string;
 }
 
-export interface Geometry {
-    latitude: number;
-    longitude: number;
-}
-
 export interface Symptoms {
     status: string;
     values: string[];
@@ -74,11 +74,6 @@ export interface Transmission {
     linkedCaseIds: string[];
 }
 
-export interface TravelHistory {
-    traveledPrior30Days?: boolean;
-    travel: Travel[];
-}
-
 export interface Travel {
     location: Location;
     dateRange: {
@@ -87,6 +82,11 @@ export interface Travel {
     };
     purpose?: string;
     methods: string[];
+}
+
+export interface TravelHistory {
+    traveledPrior30Days?: boolean;
+    travel: Travel[];
 }
 
 export interface GenomeSequence {

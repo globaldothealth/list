@@ -280,11 +280,12 @@ export default function CaseForm(props: Props): JSX.Element {
 
     const filterTravel = (travel: Travel[]): Travel[] => {
         const filteredTravel = cloneDeep(travel);
-        filteredTravel?.forEach((travel) => {
+        filteredTravel.forEach((travel) => {
             delete travel.reactId;
             if (
-                travel.dateRange.start === null &&
-                travel.dateRange.end === null
+                !travel.dateRange ||
+                (travel.dateRange.start === null &&
+                    travel.dateRange.end === null)
             ) {
                 delete travel.dateRange;
             } else {
@@ -312,7 +313,7 @@ export default function CaseForm(props: Props): JSX.Element {
         genomeSequences: GenomeSequence[],
     ): GenomeSequence[] => {
         const filteredGenomeSequences = cloneDeep(genomeSequences);
-        filteredGenomeSequences?.forEach((genomeSequence) => {
+        filteredGenomeSequences.forEach((genomeSequence) => {
             delete genomeSequence.reactId;
             if (genomeSequence.sampleCollectionDate) {
                 genomeSequence.sampleCollectionDate = toUTCDate(

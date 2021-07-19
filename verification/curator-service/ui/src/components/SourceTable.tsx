@@ -1,3 +1,4 @@
+import React, { RefObject } from 'react';
 import {
     Button,
     Divider,
@@ -11,7 +12,6 @@ import {
     Switch,
 } from '@material-ui/core';
 import MaterialTable, { QueryResult } from 'material-table';
-import React, { RefObject } from 'react';
 
 import MuiAlert from '@material-ui/lab/Alert';
 import Paper from '@material-ui/core/Paper';
@@ -20,12 +20,6 @@ import SourceRetrievalButton from './SourceRetrievalButton';
 import TextField from '@material-ui/core/TextField';
 import axios from 'axios';
 import ChipInput from 'material-ui-chip-input';
-
-interface ListResponse {
-    sources: Source[];
-    nextPage: number;
-    total: number;
-}
 
 interface Origin {
     url: string;
@@ -71,6 +65,12 @@ interface Source {
     notificationRecipients?: string[];
     excludeFromLineList?: boolean;
     hasStableIdentifiers?: boolean;
+}
+
+interface ListResponse {
+    sources: Source[];
+    nextPage: number;
+    total: number;
 }
 
 interface SourceTableState {

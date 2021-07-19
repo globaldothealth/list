@@ -1,3 +1,4 @@
+import React from 'react';
 import { Field, useFormikContext } from 'formik';
 import { Typography, makeStyles } from '@material-ui/core';
 
@@ -9,7 +10,6 @@ import FieldTitle from '../common-form-fields/FieldTitle';
 import { Location as Loc } from '../Case';
 import Location from './Location';
 import LocationOnIcon from '@material-ui/icons/LocationOn';
-import React from 'react';
 import { RequiredHelperText } from '../common-form-fields/FormikFields';
 import Scroll from 'react-scroll';
 import { TextField } from 'formik-material-ui';

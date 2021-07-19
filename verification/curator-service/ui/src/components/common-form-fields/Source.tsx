@@ -92,15 +92,15 @@ interface ListSourcesResponse {
     sources: SourceData[];
 }
 
+export interface CaseReferenceForm extends CaseReference {
+    inputValue?: string;
+    sourceName?: string;
+}
+
 interface SourceAutocompleteProps {
     initialValue?: CaseReferenceForm;
     freeSolo: boolean;
     sourcesWithStableIdentifiers?: boolean;
-}
-
-export interface CaseReferenceForm extends CaseReference {
-    inputValue?: string;
-    sourceName?: string;
 }
 
 export async function submitSource(opts: {

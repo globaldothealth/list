@@ -1,9 +1,10 @@
 import {
     fireEvent,
     render,
-    wait,
+    waitFor,
+    screen,
     waitForElementToBeRemoved,
-} from '@testing-library/react';
+} from './util/test-utils';
 
 import AutomatedBackfill from './AutomatedBackfill';
 import { MemoryRouter } from 'react-router-dom';
@@ -36,50 +37,48 @@ afterEach(() => {
 });
 
 it('renders form', async () => {
-    const { getByTestId, getByText, getByRole } = render(
-        <MemoryRouter>
-            <AutomatedBackfill
-                user={user}
-                onModalClose={(): void => {
-                    return;
-                }}
-            />
-        </MemoryRouter>,
+    render(
+        <AutomatedBackfill
+            onModalClose={(): void => {
+                return;
+            }}
+        />,
     );
-    await wait(() => expect(mockedAxios.get).toHaveBeenCalledTimes(1));
+    await waitFor(() => expect(mockedAxios.get).toHaveBeenCalledTimes(1));
 
     // Header text
-    expect(getByTestId('header-title')).toBeInTheDocument();
-    expect(getByTestId('header-blurb')).toBeInTheDocument();
+    expect(screen.getByTestId('header-title')).toBeInTheDocument();
+    expect(screen.getByTestId('header-blurb')).toBeInTheDocument();
 
     // Source selection
-    const sourceComponent = getByTestId('caseReference');
-    expect(getByRole('combobox')).toContainElement(sourceComponent);
+    const sourceComponent = screen.getByTestId('caseReference');
+    expect(screen.getByRole('combobox')).toContainElement(sourceComponent);
 
     // Date fields
-    expect(getByText('First date to backfill (inclusive)')).toBeInTheDocument();
-    expect(getByText('Last date to backfill (inclusive)')).toBeInTheDocument();
+    expect(
+        screen.getByText('First date to backfill (inclusive)'),
+    ).toBeInTheDocument();
+    expect(
+        screen.getByText('Last date to backfill (inclusive)'),
+    ).toBeInTheDocument();
 
     // Buttons
-    expect(getByText(/backfill source/i)).toBeEnabled();
-    expect(getByText(/cancel/i)).toBeEnabled();
+    expect(screen.getByText(/backfill source/i)).toBeEnabled();
+    expect(screen.getByText(/cancel/i)).toBeEnabled();
 });
 
 it('displays spinner and status post backfill', async () => {
-    const { getByTestId, getByText } = render(
-        <MemoryRouter>
-            <AutomatedBackfill
-                user={user}
-                onModalClose={(): void => {
-                    return;
-                }}
-            />
-        </MemoryRouter>,
+    render(
+        <AutomatedBackfill
+            onModalClose={(): void => {
+                return;
+            }}
+        />,
     );
-    await wait(() => expect(mockedAxios.get).toHaveBeenCalledTimes(1));
+    await waitFor(() => expect(mockedAxios.get).toHaveBeenCalledTimes(1));
 
-    const startDate = getByTestId('startDate').querySelector('input');
-    const endDate = getByTestId('endDate').querySelector('input');
+    const startDate = screen.getByTestId('startDate').querySelector('input');
+    const endDate = screen.getByTestId('endDate').querySelector('input');
     if (startDate === null || endDate === null) {
         throw Error('Unable to find date selector');
     }
@@ -98,12 +97,12 @@ it('displays spinner and status post backfill', async () => {
         headers: {},
     };
     mockedAxios.post.mockResolvedValueOnce(axiosResponse);
-    fireEvent.click(getByText(/backfill source/i));
+    fireEvent.click(screen.getByText(/backfill source/i));
 
-    expect(getByText(/backfill source/i)).toBeDisabled();
-    expect(getByText(/cancel/i)).toBeDisabled();
-    expect(getByTestId('progress')).toBeInTheDocument();
-    expect(getByTestId('progressDetails')).toBeInTheDocument();
-    expect(getByText(/processing backfill/i)).toBeInTheDocument();
-    waitForElementToBeRemoved(() => getByTestId('progress'));
+    expect(screen.getByText(/backfill source/i)).toBeDisabled();
+    expect(screen.getByText(/cancel/i)).toBeDisabled();
+    expect(screen.getByTestId('progress')).toBeInTheDocument();
+    expect(screen.getByTestId('progressDetails')).toBeInTheDocument();
+    expect(screen.getByText(/processing backfill/i)).toBeInTheDocument();
+    waitForElementToBeRemoved(() => screen.getByTestId('progress'));
 });
