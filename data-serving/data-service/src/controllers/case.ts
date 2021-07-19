@@ -227,7 +227,7 @@ export class CasesController {
             // Do a fetch of documents and another fetch in parallel for total documents
             // count used in pagination.
             const [docs, total] = await Promise.all([
-                sortedQuery.skip(limit * (page - 1)).limit(limit + 1),
+                sortedQuery.skip(limit * (page - 1)).limit(limit),
                 countQuery,
             ]);
             logger.info('got results');
@@ -236,8 +236,7 @@ export class CasesController {
             const reportedTotal = Math.min(total, countLimit);
             // If we have more items than limit, add a response param
             // indicating that there is more to fetch on the next page.
-            if (docs.length == limit + 1) {
-                docs.splice(limit);
+            if (total > limit * page) {
                 res.json({
                     cases: docs,
                     nextPage: page + 1,
