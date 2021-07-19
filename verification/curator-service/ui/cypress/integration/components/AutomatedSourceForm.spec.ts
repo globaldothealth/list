@@ -18,6 +18,7 @@ describe('Automated source form', function () {
         cy.visit('/');
         cy.get('button[data-testid="create-new-button"]').click();
         cy.contains('li', 'New automated source').click();
+        cy.wait(100);
         cy.get('div[data-testid="url"]').type(url);
         cy.get('div[data-testid="name"]').type(name);
         cy.get('div[data-testid="license"]').type(license);
