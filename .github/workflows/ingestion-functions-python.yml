@@ -2,7 +2,7 @@ name: Ingestion functions Python CI
 
 on:
   push:
-    branches: [main]
+    branches: [main, '*-stable']
     paths:
     - '.github/workflows/ingestion-functions-python.yml'
     - 'ingestion/functions/**'

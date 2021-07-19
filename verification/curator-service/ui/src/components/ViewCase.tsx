@@ -48,12 +48,6 @@ interface Props {
     onModalClose: () => void;
 }
 
-interface State {
-    case?: Case;
-    errorMessage?: string;
-    loading: boolean;
-}
-
 export default function ViewCase(props: Props): JSX.Element {
     const [c, setCase] = useState<Case>();
     const [loading, setLoading] = useState<boolean>(false);
@@ -92,10 +86,6 @@ export default function ViewCase(props: Props): JSX.Element {
             {c && <CaseDetails enableEdit={props.enableEdit} c={c} />}
         </AppModal>
     );
-}
-
-interface LocationState {
-    search: string;
 }
 interface CaseDetailsProps {
     c: Case;
@@ -833,8 +823,17 @@ function RowHeader(props: { title: string }): JSX.Element {
 
 function RowContent(props: { content: string; isLink?: boolean }): JSX.Element {
     const searchQuery = useSelector(selectSearchQuery);
-    const searchQueryArray =
-        searchQuery.match(/(?<=")[^"]+(?=")|\w{3,}/g) ?? [];
+    const searchQueryArray: any[] = [];
+
+    function words(s: string) {
+        const regex = /"([^"]+)"|(\w{3,})/g;
+        let match;
+        while ((match = regex.exec(s))) {
+            searchQueryArray.push(match[match[1] ? 1 : 2]);
+        }
+        return searchQueryArray;
+    }
+    words(searchQuery);
 
     return (
         <Grid item xs={8}>

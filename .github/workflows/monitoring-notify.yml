@@ -2,8 +2,8 @@ name: Data monitoring notifications
 
 on:
   schedule:
-    # Every day at 8AM UTC
-    - cron: "0 8 * * *"
+    # Every day at 11:30 PM UTC
+    - cron: "30 23 * * *"
 
 jobs:
   monitoring-notify:

@@ -18,7 +18,11 @@ import { useDebounce } from '../hooks/useDebounce';
 import FiltersModal from './FiltersModal';
 import { searchQueryToURL, URLToSearchQuery } from './util/searchQuery';
 import { useLocation, useHistory } from 'react-router-dom';
-import { KeyboardEvent } from 'react';
+import { KeyboardEvent, ChangeEvent } from 'react';
+import { useSelector } from 'react-redux';
+import {
+    selectFilterBreadcrumbs,
+} from './App/redux/selectors';
 
 const searchBarStyles = makeStyles((theme: Theme) => ({
     searchRoot: {
@@ -37,6 +41,9 @@ const searchBarStyles = makeStyles((theme: Theme) => ({
     },
     activeButton: {
         fontWeight: 'bold',
+    },
+    multilineColor: {
+        color: 'red',
     },
 }));
 
@@ -94,6 +101,18 @@ export default function SearchBar({
     const [modalAlert, setModalAlert] = useState<boolean>(false);
     const guideButtonRef = React.useRef<HTMLButtonElement>(null);
 
+    const [searchError, setSearchError] = useState<boolean>(false);
+
+    const filtersBreadcrumb = useSelector(selectFilterBreadcrumbs);
+
+    useEffect(() => {
+        if (filtersBreadcrumb.length > 0) {
+            setSearchError(false) 
+            return;
+        }
+
+    }, [filtersBreadcrumb]);
+
     // Set search query debounce to 1000ms
     const debouncedSearch = useDebounce(searchInput, 2000);
 
@@ -135,7 +154,9 @@ export default function SearchBar({
     };
 
     const disallowFilteringInSearchBar = (
-        e: KeyboardEvent<HTMLInputElement>,
+        e:
+            | ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+            | KeyboardEvent<HTMLInputElement>,
     ) => {
         e.preventDefault();
         setIsUserTyping(false);
@@ -147,17 +168,43 @@ export default function SearchBar({
         setModalAlert(shouldTheAlertStillBeOpen);
     }
 
+    function checkIfThereIsColon(
+        event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+        eventTargetValue: string,
+    ) {
+        let searchStringStrippedOutColon = eventTargetValue;
+        if (eventTargetValue.includes(':')) {
+            searchStringStrippedOutColon = eventTargetValue.replace(
+                /:/g,
+                '',
+            );
+            setSearchError(true);
+            disallowFilteringInSearchBar(event);
+        } else {
+            setSearchError(false);
+        }
+
+        return searchStringStrippedOutColon;
+    }
+
     return (
         <>
             <div className={classes.searchRoot}>
                 <StyledSearchTextField
+                    error={searchError}
+                    helperText={
+                        searchError &&
+                        'Incorrect entry. ":" characters have been removed. Please use filters instead.'
+                    }
                     id="search-field"
                     data-testid="searchbar"
                     name="searchbar"
                     onKeyPress={handleKeyPress}
                     autoComplete="off"
                     onChange={(event): void => {
-                        setSearchInput(event.target.value);
+                        setSearchInput(
+                            checkIfThereIsColon(event, event.target.value),
+                        );
                     }}
                     onKeyDown={(e: KeyboardEvent<HTMLInputElement>) => {
                         if (!isUserTyping) {
@@ -173,6 +220,7 @@ export default function SearchBar({
                     fullWidth
                     InputProps={{
                         margin: 'dense',
+                        className:clsx(searchError && classes.multilineColor),
                         startAdornment: (
                             <>
                                 <StyledInputAdornment position="start">

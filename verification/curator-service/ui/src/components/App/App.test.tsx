@@ -6,8 +6,6 @@ import { render, fireEvent, screen, waitFor, within } from '../util/test-utils';
 import { RootState } from '../../redux/store';
 
 jest.mock('axios');
-// Mock charts page so that requests for mongo charts are not sent
-jest.mock('../Charts', () => () => <div>Test charts</div>);
 const mockedAxios = axios as jest.Mocked<typeof axios>;
 
 beforeEach(() => {
@@ -112,40 +110,6 @@ describe('<App />', () => {
         expect(
             await screen.findByTestId('privacypolicybutton'),
         ).toHaveAttribute('href', 'https://global.health/privacy/');
-    });
-
-    it('navigates to the home screen (charts) after clicking on home button', async () => {
-        const axiosResponse = {
-            data: {
-                _id: '1',
-                googleID: '42',
-                name: 'Alice Smith',
-                email: 'foo@bar.com',
-                roles: ['admin'],
-            },
-            status: 200,
-            statusText: 'OK',
-            config: {},
-            headers: {},
-        };
-        mockedAxios.get.mockResolvedValueOnce(axiosResponse);
-
-        render(<App />, {
-            initialState: initialLoggedInState,
-            initialRoute: '/cases',
-        });
-
-        await waitFor(() => {
-            expect(screen.getByText('COVID-19 Linelist')).toBeInTheDocument();
-        });
-
-        const homeButton = await screen.findByTestId('home-button-data');
-        expect(homeButton).toBeInTheDocument();
-        userEvent.click(homeButton);
-
-        await waitFor(() => {
-            expect(screen.getByText(/test charts/i)).toBeInTheDocument();
-        });
     });
 
     it('opens profile menu and contains all the links', async () => {
