@@ -38,17 +38,17 @@ interface UploadsTableState {
     pageSize: number;
 }
 
+interface UploadSummary {
+    numCreated?: number;
+    numUpdated?: number;
+    error?: string;
+}
+
 interface Upload {
     _id: string;
     status: string;
     summary: UploadSummary;
     created: Date;
-}
-
-interface UploadSummary {
-    numCreated?: number;
-    numUpdated?: number;
-    error?: string;
 }
 
 interface UploadData {

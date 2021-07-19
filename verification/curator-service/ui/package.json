@@ -25,8 +25,8 @@
     "@types/react-scroll": "^1.8.2",
     "@types/shortid": "0.0.29",
     "@types/yup": "^0.29.11",
-    "@typescript-eslint/eslint-plugin": "^4.17.0",
-    "@typescript-eslint/parser": "^4.9.0",
+    "@typescript-eslint/eslint-plugin": "^4.0.1",
+    "@typescript-eslint/parser": "^4.0.1",
     "aws-lambda": "^1.0.6",
     "axios": "^0.21.1",
     "clsx": "^1.1.1",
@@ -73,7 +73,7 @@
     "init-sources-db": "cd ../../../data-serving/scripts/setup-db && npm run setup-sources",
     "import-case-data": "cd ../../../data-serving/data-service && npm run import-data",
     "lint": "tsc --noEmit && eslint '*/**/*.{js,ts,tsx}' --quiet --fix",
-    "test": "react-scripts test",
+    "test": "react-scripts test --env=jest-environment-jsdom-fifteen",
     "test-and-coverage": "react-scripts test --coverage --watchAll=false",
     "test-silent": "react-scripts test --watchAll=false",
     "eject": "react-scripts eject",
@@ -102,7 +102,8 @@
     "csvtojson": "^2.0.10",
     "cypress": "^5.6.0",
     "cypress-file-upload": "^4.1.1",
-    "jest-canvas-mock": "^2.3.1"
+    "jest-canvas-mock": "^2.3.1",
+    "jest-environment-jsdom-fifteen": "^1.0.2"
   },
   "husky": {
     "hooks": {

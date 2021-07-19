@@ -1,3 +1,4 @@
+import React from 'react';
 import {
     FormikAutocomplete,
     SelectField,
@@ -7,7 +8,6 @@ import CaseFormValues from './CaseFormValues';
 import { Chip } from '@material-ui/core';
 import FieldTitle from '../common-form-fields/FieldTitle';
 import { StyledTooltip } from './StyledTooltip';
-import React from 'react';
 import Scroll from 'react-scroll';
 import axios from 'axios';
 import { makeStyles } from '@material-ui/core';

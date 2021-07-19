@@ -2,6 +2,10 @@ import Tooltip from '@material-ui/core/Tooltip';
 import { withStyles } from '@material-ui/core';
 import { Theme } from '@material-ui/core/styles';
 
+interface Widetooltip {
+    maxwidth: 'auto' | '40vw';
+}
+
 export const AppTooltip = withStyles((theme: Theme) => ({
     arrow: {
         color: theme.palette.primary.main,
@@ -28,7 +32,3 @@ export const AppTooltip = withStyles((theme: Theme) => ({
         },
     },
 }))(Tooltip);
-
-interface Widetooltip {
-    maxwidth: 'auto' | '40vw';
-}

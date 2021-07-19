@@ -1,3 +1,4 @@
+import React from 'react';
 import { FastField, FieldArray, useFormikContext } from 'formik';
 
 import AddCircleIcon from '@material-ui/icons/AddCircle';
@@ -7,7 +8,6 @@ import CaseFormValues from './CaseFormValues';
 import { DateField } from '../common-form-fields/FormikFields';
 import FieldTitle from '../common-form-fields/FieldTitle';
 import { StyledTooltip } from './StyledTooltip';
-import React from 'react';
 import Scroll from 'react-scroll';
 import { TextField } from 'formik-material-ui';
 import { makeStyles } from '@material-ui/core';

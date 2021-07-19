@@ -21,6 +21,7 @@ import { TextField, CheckboxWithLabel } from 'formik-material-ui';
 import axios from 'axios';
 import { useHistory } from 'react-router-dom';
 
+// eslint-disable-next-line
 enum Format {
     Csv = 'CSV',
     Json = 'JSON',

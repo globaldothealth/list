@@ -71,27 +71,6 @@ const mapStateToProps = (state: RootState) => ({
 const connector = connect(mapStateToProps);
 type PropsFromRedux = ConnectedProps<typeof connector>;
 
-interface LinelistTableState {
-    url: string;
-    error: string;
-    page: number;
-    pageSize: number;
-    // The rows which are selected on the current page.
-    selectedRowsCurrentPage: TableRow[];
-    // The total number of rows selected. This can be larger than
-    // selectedRowsCurrentPage.length if rows across all pages are selected.
-    numSelectedRows: number;
-    totalNumRows: number;
-    deleteDialogOpen: boolean;
-    excludeDialogOpen: boolean;
-    includeDialogOpen: boolean;
-    isLoading: boolean;
-    isDeleting: boolean;
-
-    selectedVerificationStatus: VerificationStatus;
-    searchQuery: string;
-}
-
 // Material table doesn't handle structured fields well, we flatten all fields in this row.
 interface TableRow {
     id: string;
@@ -114,6 +93,27 @@ interface TableRow {
         note: string;
     };
     nationalities?: any;
+}
+
+interface LinelistTableState {
+    url: string;
+    error: string;
+    page: number;
+    pageSize: number;
+    // The rows which are selected on the current page.
+    selectedRowsCurrentPage: TableRow[];
+    // The total number of rows selected. This can be larger than
+    // selectedRowsCurrentPage.length if rows across all pages are selected.
+    numSelectedRows: number;
+    totalNumRows: number;
+    deleteDialogOpen: boolean;
+    excludeDialogOpen: boolean;
+    includeDialogOpen: boolean;
+    isLoading: boolean;
+    isDeleting: boolean;
+
+    selectedVerificationStatus: VerificationStatus;
+    searchQuery: string;
 }
 
 interface LocationState {
@@ -260,27 +260,37 @@ function RowMenu(props: {
     };
 
     const handleClose = (event?: any): void => {
-        event?.stopPropagation();
+        if (event) {
+            event.stopPropagation();
+        }
         setAnchorEl(null);
     };
 
-    const openDeleteDialog = async (event?: any): Promise<void> => {
-        event?.stopPropagation();
+    const openDeleteDialog = (event?: any): void => {
+        if (event) {
+            event.stopPropagation();
+        }
         setDeleteDialogOpen(true);
     };
 
-    const openExcludeDialog = async (event?: any): Promise<void> => {
-        event?.stopPropagation();
+    const openExcludeDialog = (event?: any): void => {
+        if (event) {
+            event.stopPropagation();
+        }
         setExcludeDialogOpen(true);
     };
 
-    const openIncludeDialog = async (event?: any): Promise<void> => {
-        event?.stopPropagation();
+    const openIncludeDialog = (event?: any): void => {
+        if (event) {
+            event.stopPropagation();
+        }
         setIncludeDialogOpen(true);
     };
 
     const handleDelete = async (event?: any): Promise<void> => {
-        event?.stopPropagation();
+        if (event) {
+            event.stopPropagation();
+        }
         try {
             setIsDeleting(true);
             props.setError('');
@@ -864,12 +874,12 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
 
     handleSortByChange(sortBy: SortBy): void {
         this.props.setSortBy(sortBy);
-        this.tableRef.current?.onQueryChange();
+        this.tableRef.current.onQueryChange();
     }
 
     handleSortByOrderChange(sortByOrder: SortByOrder): void {
         this.props.setSortByOrder(sortByOrder);
-        this.tableRef.current?.onQueryChange();
+        this.tableRef.current.onQueryChange();
     }
 
     async deleteCases(): Promise<void> {
