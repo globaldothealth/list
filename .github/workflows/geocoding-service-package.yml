@@ -3,29 +3,53 @@ name: Geocoding Service Github Packages Push
 on:
   # Build whenever a PR is merged into the main branch.
   push:
-    branches: [main]
+    branches: [main, '*-stable']
     paths:
       - ".github/workflows/geocoding-service-package.yml"
       - "geocoding/location-service/**"
     # Build whenever a new tag is created.
     tags:
       - "*"
+  pull_request:
+    paths:
+      - ".github/workflows/geocoding-service-package.yml"
 
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
+    permissions:
+      packages: write
+      contents: read
 
     steps:
       - uses: actions/checkout@v2
-      - uses: docker/build-push-action@v1
+      -
+        name: Prepare
+        id: prep
+        run: |
+          DOCKER_IMAGE=ghcr.io/${{github.repository}}/locationservice
+          VERSION=edge
+          if [[ $GITHUB_REF == refs/tags/* ]]; then
+            VERSION=${GITHUB_REF#refs/tags/}
+          elif [[ $GITHUB_REF == refs/heads/* ]]; then
+            VERSION=$(echo ${GITHUB_REF#refs/heads/} | sed -r 's#/+#-#g')
+          elif [[ $GITHUB_REF == refs/pull/* ]]; then
+            VERSION=pr-${{ github.event.number }}
+          fi
+          TAGS="${DOCKER_IMAGE}:${VERSION}"
+          if [ "${{ github.event_name }}" = "push" ]; then
+            TAGS="$TAGS,${DOCKER_IMAGE}:sha-${GITHUB_SHA::8}"
+          fi
+          echo ::set-output name=tags::${TAGS}
+      - uses: docker/login-action@v1
         with:
           username: ${{ github.actor }}
           # https://github.com/globaldothealth/list/settings/secrets
           # https://docs.github.com/en/packages/getting-started-with-github-container-registry/migrating-to-github-container-registry-for-docker-images#authenticating-with-the-container-registry
-          password: ${{ secrets.CR_PAT }}
+          password: ${{ secrets.GITHUB_TOKEN }}
           registry: ghcr.io
-          repository: ${{github.repository}}/locationservice
-          dockerfile: geocoding/location-service/Dockerfile
-          add_git_labels: true
-          tag_with_ref: true
-          tag_with_sha: true
+      - uses: docker/build-push-action@v2
+        with:
+          file: geocoding/location-service/Dockerfile
+          push: true
+          tags: ${{ steps.prep.outputs.tags }}

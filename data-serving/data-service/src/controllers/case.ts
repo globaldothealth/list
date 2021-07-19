@@ -1124,7 +1124,7 @@ export const casesMatchingSearchQuery = (opts: {
         : {};
 
     let casesQuery: DocumentQuery<CaseDocument[], CaseDocument>;
-    let countQuery: Query<number>;
+    let countQuery: Query<number, CaseDocument>;
 
     if (opts.searchQuery === '') {
         // Always search with case-insensitivity.
@@ -1155,8 +1155,8 @@ export const casesMatchingSearchQuery = (opts: {
         if (f.values.length == 1) {
             const searchTerm = f.values[0];
             if (searchTerm === '*') {
-                casesQuery.where(f.path).exists();
-                countQuery.where(f.path).exists();
+                casesQuery.where(f.path).exists(true);
+                countQuery.where(f.path).exists(true);
             } else {
                 casesQuery.where(f.path).equals(f.values[0]);
                 countQuery.where(f.path).equals(f.values[0]);

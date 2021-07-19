@@ -28,11 +28,9 @@ import AutomatedBackfill from '../AutomatedBackfill';
 import AutomatedSourceForm from '../AutomatedSourceForm';
 import BulkCaseForm from '../BulkCaseForm';
 import CaseForm from '../CaseForm';
-import Charts from '../Charts';
 import Drawer from '@material-ui/core/Drawer';
 import EditCase from '../EditCase';
 import GHListLogo from '../GHListLogo';
-import HomeIcon from '@material-ui/icons/Home';
 import LandingPage from '../landing-page/LandingPage';
 import LinkIcon from '@material-ui/icons/Link';
 import List from '@material-ui/core/List';
@@ -398,47 +396,34 @@ export default function App(): JSX.Element {
 
     const savedSearchQuery = localStorage.getItem('searchQuery');
 
-    const menuList = useMemo(
-        () =>
-            user
-                ? [
-                      {
-                          text: 'Charts',
-                          icon: <HomeIcon />,
-                          to: '/',
-                          displayCheck: (): boolean =>
-                              hasAnyRole(['curator', 'admin']),
-                      },
-                      {
-                          text: 'Line list',
-                          icon: <ListIcon />,
-                          to: { pathname: '/cases', search: '' },
-                          displayCheck: (): boolean => true,
-                      },
-                      {
-                          text: 'Sources',
-                          icon: <LinkIcon />,
-                          to: '/sources',
-                          displayCheck: (): boolean => hasAnyRole(['curator']),
-                      },
-                      {
-                          text: 'Uploads',
-                          icon: <PublishIcon />,
-                          to: '/uploads',
-                          displayCheck: (): boolean => hasAnyRole(['curator']),
-                      },
-                      {
-                          text: 'Manage users',
-                          icon: <PeopleIcon />,
-                          to: '/users',
-                          displayCheck: (): boolean => hasAnyRole(['admin']),
-                      },
-                  ]
-                : [],
-
-        // eslint-disable-next-line
-        [user],
-    );
+    const menuList = user
+        ? [
+              {
+                  text: 'Line list',
+                  icon: <ListIcon />,
+                  to: { pathname: '/cases', search: '' },
+                  displayCheck: (): boolean => true,
+              },
+              {
+                  text: 'Sources',
+                  icon: <LinkIcon />,
+                  to: '/sources',
+                  displayCheck: (): boolean => hasAnyRole(['curator']),
+              },
+              {
+                  text: 'Uploads',
+                  icon: <PublishIcon />,
+                  to: '/uploads',
+                  displayCheck: (): boolean => hasAnyRole(['curator']),
+              },
+              {
+                  text: 'Manage users',
+                  icon: <PeopleIcon />,
+                  to: '/users',
+                  displayCheck: (): boolean => hasAnyRole(['admin']),
+              },
+          ]
+        : [];
 
     // Update filter breadcrumbs
     useEffect(() => {
@@ -758,6 +743,7 @@ export default function App(): JSX.Element {
                 >
                     <div className={classes.drawerHeader} />
                     <Switch>
+                        <Redirect from="/:url*(/+)" to={location.pathname.slice(0, -1)} />
                         {user && (
                             <Route exact path="/cases">
                                 <LinelistTable
@@ -858,10 +844,7 @@ export default function App(): JSX.Element {
                             component={LandingPage}
                         />
                         <Route exact path="/">
-                            {hasAnyRole(['curator', 'admin']) &&
-                            location.search === '' ? (
-                                <Charts />
-                            ) : user ? (
+                            {user ? (
                                 <Redirect
                                     to={{
                                         pathname: '/cases',

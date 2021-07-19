@@ -104,5 +104,8 @@
     "*/**/*.{js,ts,tsx}": [
       "eslint --fix"
     ]
+  },
+  "engines": {
+    "node": "14.17.1"
   }
 }

@@ -1,5 +1,5 @@
 # Dev docker file for curator service.
-FROM node:14
+FROM node:14.17.1
 
 # Build the curator service.
 WORKDIR /usr/src/app/verification/curator-service/api

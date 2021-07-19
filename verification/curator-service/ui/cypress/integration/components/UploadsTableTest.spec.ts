@@ -35,7 +35,7 @@ describe('Uploads table', function () {
         cy.visit('/');
         cy.visit('/uploads');
         cy.contains('www.example.com');
-        cy.get('td[value="New source"]').should('have.length', 3);
+        cy.get('td[value="New source"]').should('have.length', 4);
         cy.contains('5ef8e943dfe6e00030892d58');
         cy.contains('2020-01-01');
         cy.contains('IN_PROGRESS');
@@ -43,14 +43,14 @@ describe('Uploads table', function () {
         cy.contains('3');
         cy.contains('5ef8e943dfe6e00030892d59');
         cy.contains('2020-01-02');
-        cy.get('td[value="SUCCESS"]').should('have.length', 2);
+        cy.get('td[value="SUCCESS"]').should('have.length', 3);
         cy.contains('2');
-        cy.get('td[value=0]').should('have.length', 2);
+        cy.get('td[value=0]').should('have.length', 4);
         cy.contains('5ef8e943dfe6e00030892d60');
         cy.contains('2020-01-03');
         cy.contains('4');
-        cy.contains('5ef8e943dfe6e00030892d61').should('not.exist');
-        cy.contains('2020-01-04').should('not.exist');
+        cy.contains('5ef8e943dfe6e00030892d61');
+        cy.contains('2020-01-04');
     });
 
     it('can navigate to filtered linelist', function () {
