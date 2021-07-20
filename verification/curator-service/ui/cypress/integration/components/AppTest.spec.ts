@@ -141,7 +141,7 @@ describe('App', function () {
 
         cy.contains('Detailed line list data');
         cy.contains('Terms of use');
-        cy.contains('Or sign in with email');
+        cy.contains('Or sign in with Google');
     });
 
     it('Homepage with logged in user with no roles', function () {
@@ -156,30 +156,6 @@ describe('App', function () {
         cy.contains('Line list');
         cy.contains('Sources').should('not.exist');
         cy.contains('Uploads').should('not.exist');
-        cy.contains('Manage users').should('not.exist');
-        cy.contains('Terms of use');
-    });
-
-    it('Homepage with logged in admin', function () {
-        cy.login({ name: 'Alice Smith', email: 'alice@test.com', roles: [] });
-        cy.visit('/');
-
-        cy.contains('Create new').should('not.exist');
-        cy.contains('Line list');
-        cy.contains('Sources').should('not.exist');
-        cy.contains('Uploads').should('not.exist');
-        cy.contains('Manage users');
-        cy.contains('Terms of use');
-    });
-
-    it('Homepage with logged in curator', function () {
-        cy.login({ name: 'Alice Smith', email: 'alice@test.com', roles: [] });
-        cy.visit('/');
-
-        cy.contains('Create new');
-        cy.contains('Line list');
-        cy.contains('Sources');
-        cy.contains('Uploads');
         cy.contains('Manage users').should('not.exist');
         cy.contains('Terms of use');
     });
