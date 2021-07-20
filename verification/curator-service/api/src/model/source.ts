@@ -9,7 +9,7 @@ import { UploadDocument, uploadSchema } from './upload';
 
 import mongoose from 'mongoose';
 
-export type SourceDocument = mongoose.Document & {
+interface ISource {
     _id: mongoose.Types.ObjectId;
     name: string;
     origin: OriginDocument;
@@ -25,16 +25,22 @@ export type SourceDocument = mongoose.Document & {
     toAwsRuleDescription(): string;
     toAwsRuleName(): string;
     toAwsRuleTargetId(): string;
-};
+}
 
-const sourceSchema = new mongoose.Schema<SourceDocument>({
+type ISourceInstanceCreation = mongoose.Model<ISource>;
+
+const sourceSchema = new mongoose.Schema<
+    ISource,
+    ISourceInstanceCreation,
+    ISource
+>({
     name: {
         type: String,
-        required: 'Enter a name',
+        required: [true, 'Enter a name'],
     },
     origin: {
         type: originSchema,
-        required: 'Enter an origin',
+        required: [true, 'Enter an origin'],
     },
     format: String,
     excludeFromLineList: Boolean,
@@ -62,5 +68,7 @@ sourceSchema.methods.toAwsRuleName = function (): string {
 sourceSchema.methods.toAwsRuleTargetId = function (): string {
     return `${this._id}_Target`;
 };
+
+export type SourceDocument = mongoose.Document & ISource;
 
 export const Source = mongoose.model<SourceDocument>('Source', sourceSchema);
