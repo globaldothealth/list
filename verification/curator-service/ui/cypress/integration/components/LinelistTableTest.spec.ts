@@ -307,7 +307,7 @@ describe('Linelist table', function () {
         cy.contains('Filter').click();
         cy.contains('Clear filters').click();
         cy.get('button[data-test-id="search-by-filter-button"]').click();
-        cy.wait(50);
+        cy.wait(550);
         cy.wait('@getCases');
         cy.contains('rows').click();
 
