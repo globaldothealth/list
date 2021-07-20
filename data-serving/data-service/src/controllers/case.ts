@@ -1,6 +1,7 @@
-import { Case, CaseDocument } from '../model/case';
+import { Case, CaseDocument, RestrictedCase } from '../model/case';
 import { EventDocument } from '../model/event';
-import { Aggregate, DocumentQuery, Error, Query } from 'mongoose';
+import { Source } from '../model/source';
+import { DocumentQuery, Error, Query } from 'mongoose';
 import { ObjectId, QuerySelector } from 'mongodb';
 import { GeocodeOptions, Geocoder, Resolution } from '../geocoding/geocoder';
 import { NextFunction, Request, Response } from 'express';
@@ -28,36 +29,10 @@ export class CasesController {
      * Handles HTTP GET /api/cases/:id.
      */
     get = async (req: Request, res: Response): Promise<void> => {
-        // Check if this case's source is excluded
-        const c = await Case.aggregate([
-            {
-                $match: {
-                    _id: new ObjectId(req.params.id),
-                },
-            },
-            {
-                $addFields: {
-                    sourceID: {
-                        $toObjectId: '$caseReference.sourceId',
-                    },
-                },
-            },
-            {
-                $lookup: {
-                    localField: 'sourceID',
-                    foreignField: '_id',
-                    from: 'sources',
-                    as: 'source',
-                },
-            },
-            {
-                $addFields: {
-                    isSourceExcluded: {
-                        $anyElementTrue: '$source.excludeFromLineList',
-                    },
-                },
-            },
-        ]);
+        // Don't look in the restricted collection
+        const c = await Case.find({
+            _id: new ObjectId(req.params.id),
+        });
 
         if (c.length === 0) {
             res.status(404).send({
@@ -70,6 +45,7 @@ export class CasesController {
 
     /**
      * Streams a CSV attachment of all cases.
+     * Doesn't return cases from the restricted collection.
      *
      * Handles HTTP POST /api/cases/download.
      */
@@ -83,50 +59,28 @@ export class CasesController {
 
         // Goofy Mongoose types require this.
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        let casesQuery: any[];
+        let casesQuery: any;
         try {
             if (req.body.query) {
-                casesQuery = this.caseAggregationFromQuery(
-                    req.body.query as string,
-                );
+                casesQuery = casesMatchingSearchQuery({
+                    searchQuery: req.body.query as string,
+                    count: false,
+                });
             } else if (req.body.caseIds) {
-                casesQuery = [
-                    {
-                        $match: {
-                            $expr: {
-                                $in: [
-                                    '$_id',
-                                    _.map(
-                                        req.body.caseIds,
-                                        (anID: string) => new ObjectId(anID),
-                                    ),
-                                ],
-                            },
-                        },
-                    },
-                ];
+                casesQuery = Case.find({
+                    _id: { $in: req.body.caseIds },
+                }).lean();
             } else {
-                casesQuery = [];
+                casesQuery = Case.find({}).lean();
             }
-
-            const casesIgnoringExcluded = this.excludeRestrictedSourcesFromCaseAggregation(
-                casesQuery,
-            );
 
             // Limit number of results if present
             // eslint-disable-next-line
-            let limitedQuery: any[] = [];
             if (queryLimit) {
-                limitedQuery = _.concat(casesIgnoringExcluded, [
-                    { $limit: queryLimit },
-                ]);
+                casesQuery = casesQuery.limit(queryLimit);
             }
 
-            const matchingCases = await Case.aggregate(
-                limitedQuery.length !== 0
-                    ? limitedQuery
-                    : casesIgnoringExcluded,
-            ).collation({
+            const matchingCases = await casesQuery.collation({
                 locale: 'en_US',
                 strength: 2,
             });
@@ -255,85 +209,45 @@ export class CasesController {
 
         logger.info('Got past 422s');
         try {
-            const caseAggregation = this.caseAggregationFromQuery(
-                req.query.q ?? '',
-            );
-            logger.info('Got case aggregation from query');
+            const casesQuery = casesMatchingSearchQuery({
+                searchQuery: req.query.q || '',
+                count: false,
+            }) as DocumentQuery<CaseDocument[], CaseDocument, unknown>;
+            const countQuery = casesMatchingSearchQuery({
+                searchQuery: req.query.q || '',
+                count: true,
+            });
 
             const sortByKeyword = getSortByKeyword(sortBy);
-            const sortedQuery = _.concat(caseAggregation, [
-                {
-                    $sort: {
-                        [sortByKeyword]:
-                            sortByOrder === SortByOrder.Ascending ? 1 : -1,
-                    },
-                },
-            ]);
-            logger.info('Sorted by keyword');
 
-            const excludingRestrictedSources = this.excludeRestrictedSourcesFromCaseAggregation(
-                sortedQuery,
-            );
-            logger.info('Excluded restricted sources');
-            const addingCount = _.concat(excludingRestrictedSources, [
-                {
-                    $facet: {
-                        metadata: [
-                            {
-                                $limit: countLimit,
-                            },
-                            {
-                                $group: {
-                                    _id: null,
-                                    total: { $sum: 1 },
-                                },
-                            },
-                        ],
-                        docs: [
-                            {
-                                $skip: limit * (page - 1),
-                            },
-                            {
-                                $limit: limit + 1,
-                            },
-                        ],
-                    },
-                },
-                {
-                    $project: {
-                        docs: 1,
-                        // Get total from the first element of the metadata array
-                        total: { $arrayElemAt: ['$metadata.total', 0] },
-                    },
-                },
-            ]);
-            logger.info('Added count');
+            const sortedQuery = casesQuery.sort({
+                [sortByKeyword]: sortByOrder === SortByOrder.Ascending ? 1 : -1,
+                'revisionMetadata.creationMetadata.date': -1,
+            });
             // Do a fetch of documents and another fetch in parallel for total documents
             // count used in pagination.
-            const results = await Case.aggregate(addingCount)
-                .allowDiskUse(true)
-                .collation({
-                    locale: 'en_US',
-                    strength: 2,
-                });
-            logger.info('Got results');
-            const docs = results[0].docs;
-            const total = results[0].total ?? 0;
+            const [docs, total] = await Promise.all([
+                sortedQuery.skip(limit * (page - 1)).limit(limit),
+                countQuery,
+            ]);
+            logger.info('got results');
+            // total is actually stored in a count index in mongo, so the query is fast.
+            // however to maintain existing behaviour, only return the count limit
+            const reportedTotal = Math.min(total, countLimit);
             // If we have more items than limit, add a response param
             // indicating that there is more to fetch on the next page.
-            if (docs.length == limit + 1) {
-                docs.splice(limit);
+            if (total > limit * page) {
                 res.json({
                     cases: docs,
                     nextPage: page + 1,
-                    total: total,
+                    total: reportedTotal,
                 });
                 logger.info('Got multiple pages of results');
                 return;
             }
             // If we fetched all available data, just return it.
             logger.info('Got one page of results');
-            res.json({ cases: docs, total: total });
+            res.json({ cases: docs, total: reportedTotal });
         } catch (e) {
             if (e instanceof ParsingError) {
                 res.status(422).json({ message: e.message });
@@ -354,7 +268,15 @@ export class CasesController {
         const numCases = Number(req.query.num_cases) || 1;
         try {
             await this.geocode(req);
-            const c = new Case(req.body);
+            let c = new Case(req.body);
+            let restrictedCases = false;
+            if (c.caseReference.sourceId) {
+                const s = await Source.find({ _id: c.caseReference.sourceId });
+                if (s.length > 0 && s[0].excludeFromLineList === true) {
+                    c = new RestrictedCase(req.body);
+                    restrictedCases = true;
+                }
+            }
 
             let result;
             if (req.query.validate_only) {
@@ -364,11 +286,12 @@ export class CasesController {
                 if (numCases === 1) {
                     result = await c.save();
                 } else {
+                    const ctor = restrictedCases ? RestrictedCase : Case;
                     const cases = Array.from(
                         { length: numCases },
-                        () => new Case(req.body),
+                        () => new ctor(req.body),
                     );
-                    result = { cases: await Case.insertMany(cases) };
+                    result = { cases: await ctor.insertMany(cases) };
                 }
             }
             res.status(201).json(result);
@@ -491,35 +414,45 @@ export class CasesController {
                     `batchUpsert: dropped ${errors.length} invalid cases`,
                 );
             }
+            logger.info('batchUpsert: splitting cases by sourceID');
+            const {
+                unrestrictedCases,
+                restrictedCases,
+            } = this.filterCasesBySourceRestricted(cases);
             logger.info('batchUpsert: preparing bulk write');
-            const bulkWriteResult = await Case.bulkWrite(
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                cases.map((c: any) => {
-                    delete c.caseCount;
-                    if (
-                        c.caseReference?.sourceId &&
-                        c.caseReference?.sourceEntryId
-                    ) {
-                        return {
-                            updateOne: {
-                                filter: {
-                                    'caseReference.sourceId':
-                                        c.caseReference.sourceId,
-                                    'caseReference.sourceEntryId':
-                                        c.caseReference.sourceEntryId,
-                                },
-                                update: c,
-                                upsert: true,
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const upsertLambda = (c: any) => {
+                delete c.caseCount;
+                if (
+                    c.caseReference?.sourceId &&
+                    c.caseReference?.sourceEntryId
+                ) {
+                    return {
+                        updateOne: {
+                            filter: {
+                                'caseReference.sourceId':
+                                    c.caseReference.sourceId,
+                                'caseReference.sourceEntryId':
+                                    c.caseReference.sourceEntryId,
                             },
-                        };
-                    } else {
-                        return {
-                            insertOne: {
-                                document: c,
-                            },
-                        };
-                    }
-                }),
+                            update: c,
+                            upsert: true,
+                        },
+                    };
+                } else {
+                    return {
+                        insertOne: {
+                            document: c,
+                        },
+                    };
+                }
+            };
+            const unrestrictedBulkWriteResult = await Case.bulkWrite(
+                unrestrictedCases.map(upsertLambda),
+                { ordered: false },
+            );
+            const restrictedBulkWriteResult = await RestrictedCase.bulkWrite(
+                restrictedCases.map(upsertLambda),
                 { ordered: false },
             );
             logger.info('batchUpsert: finished bulk write');
@@ -527,9 +460,13 @@ export class CasesController {
             res.status(status).json({
                 phase: 'UPSERT',
                 numCreated:
-                    (bulkWriteResult.insertedCount || 0) +
-                    (bulkWriteResult.upsertedCount || 0),
-                numUpdated: bulkWriteResult.modifiedCount,
+                    (unrestrictedBulkWriteResult.insertedCount || 0) +
+                    (restrictedBulkWriteResult.insertedCount || 0) +
+                    (unrestrictedBulkWriteResult.upsertedCount || 0) +
+                    (restrictedBulkWriteResult.upsertedCount || 0),
+                numUpdated:
+                    (unrestrictedBulkWriteResult.modifiedCount || 0) +
+                    (restrictedBulkWriteResult.modifiedCount || 0),
                 errors,
             });
             return;
@@ -551,15 +488,25 @@ export class CasesController {
      */
     update = async (req: Request, res: Response): Promise<void> => {
         try {
-            const c = await Case.findByIdAndUpdate(req.params.id, req.body, {
+            let c = await Case.findByIdAndUpdate(req.params.id, req.body, {
                 new: true,
                 runValidators: true,
             });
             if (!c) {
-                res.status(404).send({
-                    message: `Case with ID ${req.params.id} not found.`,
-                });
-                return;
+                c = await RestrictedCase.findByIdAndUpdate(
+                    req.params.id,
+                    req.body,
+                    {
+                        new: true,
+                        runValidators: true,
+                    },
+                );
+                if (!c) {
+                    res.status(404).send({
+                        message: `Case with ID ${req.params.id} not found.`,
+                    });
+                    return;
+                }
             }
             res.json(c);
         } catch (err) {
@@ -587,22 +534,49 @@ export class CasesController {
             return;
         }
         try {
-            const bulkWriteResult = await Case.bulkWrite(
+            const unrestrictedCases: CaseDocument[] = [];
+            const restrictedCases: CaseDocument[] = [];
+
+            for (const c in req.body.cases) {
+                const caseDoc = req.body.cases[c] as CaseDocument;
+                let aCase = await Case.findOne({ _id: caseDoc._id });
+                if (aCase) {
+                    unrestrictedCases.push(caseDoc);
+                } else {
+                    aCase = await RestrictedCase.findOne({ _id: caseDoc._id });
+                    if (aCase) {
+                        restrictedCases.push(caseDoc);
+                    } else {
+                        res.status(400).json({
+                            error: `case with id ${caseDoc._id} not present to update`,
+                        });
+                        return;
+                    }
+                }
+            }
+            const caseLambda = (c: any) => ({
+                updateOne: {
+                    filter: {
+                        _id: c._id,
+                    },
+                    update: c,
+                },
+            });
+            const unrestrictedBulkWriteResult = await Case.bulkWrite(
                 // Consider defining a type for the request-format cases.
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                req.body.cases.map((c: any) => {
-                    return {
-                        updateOne: {
-                            filter: {
-                                _id: c._id,
-                            },
-                            update: c,
-                        },
-                    };
-                }),
+                unrestrictedCases.map(caseLambda),
                 { ordered: false },
             );
-            res.json({ numModified: bulkWriteResult.modifiedCount });
+            const restrictedBulkWriteResult = await RestrictedCase.bulkWrite(
+                restrictedCases.map(caseLambda),
+                { ordered: false },
+            );
+            res.json({
+                numModified:
+                    (unrestrictedBulkWriteResult.modifiedCount || 0) +
+                    (restrictedBulkWriteResult.modifiedCount || 0),
+            });
         } catch (err) {
             res.status(500).json(err);
             return;
@@ -620,11 +594,18 @@ export class CasesController {
      */
     upsert = async (req: Request, res: Response): Promise<void> => {
         try {
-            const c = await Case.findOne({
+            let c = await Case.findOne({
                 'caseReference.sourceId': req.body.caseReference?.sourceId,
                 'caseReference.sourceEntryId':
                     req.body.caseReference?.sourceEntryId,
             });
+            if (!c) {
+                c = await RestrictedCase.findOne({
+                    'caseReference.sourceId': req.body.caseReference?.sourceId,
+                    'caseReference.sourceEntryId':
+                        req.body.caseReference?.sourceEntryId,
+                });
+            }
             if (
                 req.body.caseReference?.sourceId &&
                 req.body.caseReference?.sourceEntryId &&
@@ -665,20 +646,21 @@ export class CasesController {
      */
     batchDel = async (req: Request, res: Response): Promise<void> => {
         if (req.body.caseIds !== undefined) {
-            Case.deleteMany(
-                {
-                    _id: {
-                        $in: req.body.caseIds,
-                    },
-                },
-                (err) => {
-                    if (err) {
-                        res.status(500).json(err);
+            for (const i in req.body.caseIds) {
+                let deleted = await Case.findByIdAndDelete(req.body.caseIds[i]);
+                if (!deleted) {
+                    deleted = await RestrictedCase.findByIdAndDelete(
+                        req.body.caseIds[i],
+                    );
+                    if (!deleted) {
+                        res.status(404).send({
+                            message: `Case with ID ${req.body.caseIds[i]} not found.`,
+                        });
                         return;
                     }
-                    res.status(204).end();
-                },
-            );
+                }
+            }
+            res.status(204).end();
             return;
         }
 
@@ -686,13 +668,14 @@ export class CasesController {
             searchQuery: req.body.query,
             count: false,
         });
-        Case.deleteMany(casesQuery, (err: any) => {
-            if (err) {
-                res.status(500).json(err);
-                return;
-            }
+        try {
+            await Case.deleteMany(casesQuery);
+            await RestrictedCase.deleteMany(casesQuery);
             res.status(204).end();
-        });
+        } catch (err) {
+            console.error(err);
+            res.status(500).json(err);
+        }
     };
 
     /**
@@ -703,10 +686,16 @@ export class CasesController {
     del = async (req: Request, res: Response): Promise<void> => {
         const c = await Case.findByIdAndDelete(req.params.id, req.body);
         if (!c) {
-            res.status(404).send({
-                message: `Case with ID ${req.params.id} not found.`,
-            });
-            return;
+            const r = await RestrictedCase.findByIdAndDelete(
+                req.params.id,
+                req.body,
+            );
+            if (!r) {
+                res.status(404).send({
+                    message: `Case with ID ${req.params.id} not found.`,
+                });
+                return;
+            }
         }
         res.status(204).end();
     };
@@ -744,7 +733,10 @@ export class CasesController {
                     _id: { $in: caseIds },
                 };
                 const validIdsCount = await Case.countDocuments(updateQuery);
-                if (validIdsCount != caseIds.length) {
+                const validRestrictedIdsCount = await RestrictedCase.countDocuments(
+                    updateQuery,
+                );
+                if (validIdsCount + validRestrictedIdsCount != caseIds.length) {
                     res.status(422)
                         .send({
                             message:
@@ -789,6 +781,7 @@ export class CasesController {
                 };
             }
             await Case.updateMany(updateQuery, updateDocument);
+            await RestrictedCase.updateMany(updateQuery, updateDocument);
 
             res.status(200).end();
         } catch (err) {
@@ -883,112 +876,18 @@ export class CasesController {
         }
     };
 
-    private excludeRestrictedSourcesFromCaseAggregation(casesQuery: any[]) {
-        return _.concat(casesQuery, [
-            {
-                $addFields: {
-                    sourceID: {
-                        $toObjectId: '$caseReference.sourceId',
-                    },
-                },
-            },
-            {
-                $lookup: {
-                    localField: 'sourceID',
-                    foreignField: '_id',
-                    from: 'sources',
-                    as: 'source',
-                },
-            },
-            {
-                $addFields: {
-                    isExcluded: {
-                        $anyElementTrue: '$source.excludeFromLineList',
-                    },
-                },
-            },
-            {
-                $match: {
-                    isExcluded: false,
-                },
-            },
-        ]);
-    }
-
-    private caseAggregationFromQuery(queryText: string) {
-        let casesQuery: any[] = [];
-        const parsedSearch = parseSearchQuery(queryText);
-
-        const query = parsedSearch.fullTextSearch
-            ? {
-                  $text: { $search: parsedSearch.fullTextSearch },
-              }
-            : {};
-
-        casesQuery = [{ $match: query }];
-        const filters = parsedSearch.filters.map((f) => {
-            if (f.values.length == 1) {
-                const searchTerm = f.values[0];
-                if (searchTerm === '*') {
-                    return {
-                        $match: {
-                            [f.path]: {
-                                $exists: true,
-                            },
-                        },
-                    };
-                } else {
-                    if (
-                        f.path === 'demographics.gender' &&
-                        f.values[0] === 'noGender'
-                    ) {
-                        return {
-                            $match: {
-                                [f.path]: {
-                                    $exists: false,
-                                },
-                            },
-                        };
-                    }
-                    if (f.dateOperator) {
-                        const dateRangeType =
-                            f.dateOperator === '$gt'
-                                ? 'dateRange.start'
-                                : 'dateRange.end';
-                        return {
-                            $match: {
-                                [f.path]: {
-                                    $elemMatch: {
-                                        name: 'confirmed',
-                                        [dateRangeType]: {
-                                            [f.dateOperator]: new Date(
-                                                f.values[0].toString(),
-                                            ),
-                                        },
-                                    },
-                                },
-                            },
-                        };
-                    } else {
-                        return {
-                            $match: {
-                                [f.path]: f.values[0],
-                            },
-                        };
-                    }
-                }
-            } else {
-                return {
-                    $match: {
-                        $expr: {
-                            $in: [`$${f.path}`, f.values],
-                        },
-                    },
-                };
-            }
+    private filterCasesBySourceRestricted(cases: any) {
+        const unrestrictedCases = _.filter(cases, async (c) => {
+            const source = await Source.findOne({
+                _id: c.caseReference.sourceId,
+            });
+            return source?.excludeFromLineList !== true;
         });
-        casesQuery = _.concat(casesQuery, filters);
-        return casesQuery;
+        const restrictedCases = _.filter(
+            cases,
+            (c) => !unrestrictedCases.includes(c),
+        );
+        return { unrestrictedCases, restrictedCases };
     }
 
     /**
@@ -1157,6 +1056,27 @@ export const casesMatchingSearchQuery = (opts: {
             if (searchTerm === '*') {
                 casesQuery.where(f.path).exists(true);
                 countQuery.where(f.path).exists(true);
+            } else if (f.dateOperator) {
+                casesQuery.and([
+                    {
+                        'events.name': 'confirmed',
+                    },
+                    {
+                        'events.dateRange.start': {
+                            [f.dateOperator]: f.values[0],
+                        },
+                    },
+                ]);
+                countQuery.and([
+                    {
+                        'events.name': 'confirmed',
+                    },
+                    {
+                        'events.dateRange.start': {
+                            [f.dateOperator]: f.values[0],
+                        },
+                    },
+                ]);
             } else {
                 casesQuery.where(f.path).equals(f.values[0]);
                 countQuery.where(f.path).equals(f.values[0]);
