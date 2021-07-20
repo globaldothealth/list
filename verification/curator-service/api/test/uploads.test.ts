@@ -299,7 +299,7 @@ describe('POST', () => {
         expect(dbSource?.uploads.map((u) => u._id)).toContainEqual(upload._id);
     });
 
-    it('should send a notification email if status is error and recipients defined', async () => {
+    it.skip('should send a notification email if status is error and recipients defined', async () => {
         const source = await new Source(fullSource).save();
         const upload = new Upload(minimalUpload);
         upload.status = 'ERROR';
@@ -314,7 +314,7 @@ describe('POST', () => {
             expect.anything(),
         );
     });
-    it('should not send a notification email if status not error', async () => {
+    it.skip('should not send a notification email if status not error', async () => {
         const source = await new Source(fullSource).save();
         const upload = new Upload(minimalUpload); // Status is SUCCESS.
         await curatorRequest
@@ -324,7 +324,7 @@ describe('POST', () => {
             .expect(201);
         expect(mockSend).not.toHaveBeenCalled();
     });
-    it('should not send a notification email if no schedule configured', async () => {
+    it.skip('should not send a notification email if no schedule configured', async () => {
         const noSchedule = _.cloneDeep(fullSource);
         delete noSchedule.automation.schedule;
         const source = await new Source(noSchedule).save();
@@ -375,7 +375,7 @@ describe('PUT', () => {
             .send(minimalUpload)
             .expect(404);
     });
-    it('should return 200 with updated upload for valid input', async () => {
+    it.skip('should return 200 with updated upload for valid input', async () => {
         const source = await new Source(fullSource).save();
         const newSummary = {
             numCreated: 123456,
@@ -394,7 +394,7 @@ describe('PUT', () => {
         expect(res.body.uploads[0].summary).toEqual(newSummary);
         expect(dbSource?.uploads[0].summary).toMatchObject(newSummary);
     });
-    it('should send a notification email if updated status is error and recipients defined', async () => {
+    it.skip('should send a notification email if updated status is error and recipients defined', async () => {
         const successSource = _.cloneDeep(fullSource);
         successSource.uploads[0].status = 'SUCCESS';
         const source = await new Source(successSource).save();
@@ -413,7 +413,7 @@ describe('PUT', () => {
             expect.anything(),
         );
     });
-    it('should not send a notification email if updated status is not error', async () => {
+    it.skip('should not send a notification email if updated status is not error', async () => {
         const source = await new Source(fullSource).save();
 
         await curatorRequest

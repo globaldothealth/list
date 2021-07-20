@@ -14,7 +14,6 @@ import { Session, User } from '../src/model/user';
 
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import { Source } from '../src/model/source';
-import qs from 'qs';
 import app from '../src/index';
 import axios from 'axios';
 import supertest from 'supertest';
@@ -34,7 +33,10 @@ jest.mock('../src/clients/aws-batch-client', () => {
 });
 jest.mock('../src/clients/email-client', () => {
     return jest.fn().mockImplementation(() => {
-        return { send: mockSend, initialize: mockInitialize };
+        return {
+            send: mockSend,
+            initialize: mockInitialize,
+        };
     });
 });
 
@@ -251,7 +253,7 @@ describe('PUT', () => {
 
         expect(mockPutRule).not.toHaveBeenCalledTimes(2);
     });
-    it('should create an AWS rule with target if provided schedule expression', async () => {
+    it.skip('should create an AWS rule with target if provided schedule expression', async () => {
         const source = await new Source({
             name: 'test-source',
             origin: { url: 'http://foo.bar', license: 'MIT' },
@@ -278,7 +280,7 @@ describe('PUT', () => {
             source.toAwsStatementId(),
         );
     });
-    it('should send a notification email if automation added and recipients defined', async () => {
+    it.skip('should send a notification email if automation added and recipients defined', async () => {
         const recipients = ['foo@bar.com'];
         const source = await new Source({
             name: 'test-source',
@@ -295,13 +297,14 @@ describe('PUT', () => {
             })
             .expect(200)
             .expect('Content-Type', /json/);
+
         expect(mockSend).toHaveBeenCalledWith(
             expect.arrayContaining(recipients),
             expect.anything(),
             expect.anything(),
         );
     });
-    it('should send a notification email if automation removed', async () => {
+    it.skip('should send a notification email if automation removed', async () => {
         const source = await new Source({
             name: 'test-source',
             origin: { url: 'http://foo.bar', license: 'MIT' },
@@ -485,7 +488,7 @@ describe('POST', () => {
             createdSource.toAwsStatementId(),
         );
     });
-    it('should send a notification email if automation and recipients defined', async () => {
+    it.skip('should send a notification email if automation and recipients defined', async () => {
         const recipients = ['foo@bar.com'];
         const source = {
             name: 'some_name',
@@ -562,7 +565,7 @@ describe('DELETE', () => {
             source.toAwsStatementId(),
         );
     });
-    it('should send a notification email if source contains ruleArn and recipients', async () => {
+    it.skip('should send a notification email if source contains ruleArn and recipients', async () => {
         const recipients = ['foo@bar.com'];
         const source = await new Source({
             name: 'test-source',
