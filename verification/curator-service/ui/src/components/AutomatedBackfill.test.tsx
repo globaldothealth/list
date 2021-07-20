@@ -7,7 +7,6 @@ import {
 } from './util/test-utils';
 
 import AutomatedBackfill from './AutomatedBackfill';
-import { MemoryRouter } from 'react-router-dom';
 import React from 'react';
 import axios from 'axios';
 
