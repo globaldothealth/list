@@ -1,0 +1,9 @@
+{
+    "Effect": "Allow",
+    "Action": [
+        "iam:AttachRolePolicy",
+        "iam:CreateRole",
+        "iam:PutRolePolicy"
+    ],
+    "Resource": "*"
+}
