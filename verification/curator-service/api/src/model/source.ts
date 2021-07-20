@@ -9,14 +9,34 @@ import { UploadDocument, uploadSchema } from './upload';
 
 import mongoose from 'mongoose';
 
-const sourceSchema = new mongoose.Schema({
+interface ISource {
+    _id: mongoose.Types.ObjectId;
+    name: string;
+    origin: OriginDocument;
+    format: string;
+    excludeFromLineList: boolean,
+    hasStableIdentifiers: boolean,
+    automation: AutomationDocument;
+    uploads: UploadDocument[];
+    dateFilter: DateFilterDocument;
+    notificationRecipients: string[];
+
+    toAwsStatementId(): string;
+    toAwsRuleDescription(): string;
+    toAwsRuleName(): string;
+    toAwsRuleTargetId(): string;
+};
+
+interface ISourceInstanceCreation extends mongoose.Model<ISource> {};
+
+const sourceSchema = new mongoose.Schema<ISource, ISourceInstanceCreation, ISource>({
     name: {
         type: String,
-        required: 'Enter a name',
+        required: [true, 'Enter a name'],
     },
     origin: {
         type: originSchema,
-        required: 'Enter an origin',
+        required: [true, 'Enter an origin'],
     },
     format: String,
     excludeFromLineList: Boolean,
@@ -45,22 +65,6 @@ sourceSchema.methods.toAwsRuleTargetId = function (): string {
     return `${this._id}_Target`;
 };
 
-export type SourceDocument = mongoose.Document & {
-    _id: mongoose.Types.ObjectId;
-    name: string;
-    origin: OriginDocument;
-    format: string;
-    excludeFromLineList: boolean,
-    hasStableIdentifiers: boolean,
-    automation: AutomationDocument;
-    uploads: UploadDocument[];
-    dateFilter: DateFilterDocument;
-    notificationRecipients: string[];
-
-    toAwsStatementId(): string;
-    toAwsRuleDescription(): string;
-    toAwsRuleName(): string;
-    toAwsRuleTargetId(): string;
-};
+export type SourceDocument = mongoose.Document & ISource;
 
 export const Source = mongoose.model<SourceDocument>('Source', sourceSchema);
