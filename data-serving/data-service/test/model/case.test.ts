@@ -1,4 +1,4 @@
-import { Case } from '../../src/model/case';
+import { Case, RestrictedCase } from '../../src/model/case';
 import { Error } from 'mongoose';
 import fullModel from './data/case.full.json';
 import minimalEvent from './data/event.minimal.json';
@@ -39,6 +39,12 @@ describe('validate', () => {
 
     it('fully-specified model is valid', async () => {
         return new Case(fullModel).validate();
+    });
+});
+
+describe('restricted case collection', () => {
+    it('supports the same schema as the case collection', async () => {
+        return new RestrictedCase(minimalModel).validate();
     });
 });
 

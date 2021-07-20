@@ -134,3 +134,7 @@ export type CaseDocument = mongoose.Document & {
 };
 
 export const Case = mongoose.model<CaseDocument>('Case', caseSchema);
+export const RestrictedCase = mongoose.model<CaseDocument>(
+    'RestrictedCase',
+    caseSchema,
+);

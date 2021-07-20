@@ -1,5 +1,4 @@
 import axios from 'axios';
-import qs from 'qs';
 import { Request, Response } from 'express';
 import { Source, SourceDocument } from '../model/source';
 import { UserDocument } from '../model/user';

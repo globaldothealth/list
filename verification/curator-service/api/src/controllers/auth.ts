@@ -178,7 +178,7 @@ export class AuthController {
 
         this.router.get('/logout', (req: Request, res: Response): void => {
             req.logout();
-            res.sendStatus(200);
+            res.redirect('/');
         });
 
         // Starts the authentication flow with Google OAuth.
