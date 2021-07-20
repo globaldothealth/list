@@ -847,35 +847,6 @@ export class CasesController {
         res.status(200).json({ cases: caseIds }).end();
     };
 
-    /** Indicate that each case for the given source is pending deletion. */
-    markPendingRemoval = async (req: Request, res: Response): Promise<void> => {
-        try {
-            req.body.cases.forEach((c: CaseDocument) => {
-                c.pendingRemoval = true;
-                c.save();
-            });
-            res.status(204).end();
-        } catch (err) {
-            res.status(500).json(err).end();
-        }
-    };
-
-    /** Unset the pending deletion flag for cases from this source. */
-    clearPendingRemovalStatus = async (
-        req: Request,
-        res: Response,
-    ): Promise<void> => {
-        try {
-            req.body.cases.forEach((c: CaseDocument) => {
-                c.pendingRemoval = false;
-                c.save();
-            });
-            res.status(204).end();
-        } catch (err) {
-            res.status(500).json(err).end();
-        }
-    };
-
     private filterCasesBySourceRestricted(cases: any) {
         const unrestrictedCases = _.filter(cases, async (c) => {
             const source = await Source.findOne({
