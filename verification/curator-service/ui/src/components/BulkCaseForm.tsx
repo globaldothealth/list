@@ -385,6 +385,7 @@ class BulkCaseForm extends React.Component<
                 uploadIds: [uploadId],
                 verificationStatus: VerificationStatus.Verified,
             },
+            list: true,
             demographics: {
                 gender: c.gender,
                 ageRange: ageRange,
