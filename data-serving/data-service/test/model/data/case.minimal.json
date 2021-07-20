@@ -3,6 +3,7 @@
         "sourceId": "5ea86423bae6982635d2e1f8",
         "sourceUrl": "cdc.gov"
     },
+    "list": true,
     "events": [
         {
             "name": "confirmed",

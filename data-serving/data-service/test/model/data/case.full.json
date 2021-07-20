@@ -14,6 +14,7 @@
             }
         ]
     },
+    "list": true,
     "demographics": {
         "ageRange": {
             "start": 50.0,
