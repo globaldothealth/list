@@ -78,22 +78,13 @@ ls -l /usr/bin/python*
 ```
 
 #### Setup
-1. Setup and enter a virtual environment in `ingestion/functions`
+1. Setup a virtual environment in `ingestion/functions`
 
-       python3.8 -m venv venv
-       source venv/bin/activate
+    poetry install
   
-1. For each function you're planning to work with, be sure you have required
-modules installed, e.g. via:
+*NB:* Be sure you're using Python 3.8, which corresponds to the runtime of the job definitions run using Batch:
 
-```shell
-# In each parsing's subdir:
-python3.8 -m pip install -r requirements.txt
-# In the /ingestion/functions (necessary to run unit tests).
-python3.8 -m pip install -r requirements.txt
-```
-
-*NB:* Be sure you're using Python 3.8, which corresponds to the runtime of the job definitions run using Batch.
+    poetry env use 3.8
 
 #### Manual ingestion
 
@@ -101,11 +92,9 @@ You should be able to run ingestion using the curator UI. This exists as
 a fallback if the UI triggers for ingestion are not working.
 
 1. You'll need AWS access, follow the steps in the previous section.
-2. Once you've got AWS setup, run the following in `ingestion/functions` after switching
-   to the virtualenv:
+2. Once you've got AWS setup, run the following in `ingestion/functions` after setting up the virtual env:
 
-       source venv/bin/activate
-       python aws.py jobdefs
+       poetry run python aws.py jobdefs
 
    This should show existing **job definitions**. Job definitions are templates that
    tell AWS Batch which parser to run and in which environment (dev or prod). If this
@@ -113,16 +102,16 @@ a fallback if the UI triggers for ingestion are not working.
 
 3. Check if the ingestion you want to run already has an associated job definition
    corresponding to the environment you want to run in:
-   `python aws.py jobdefs | grep colombia.*prod` to search for Colombia ingestion
+   `poetry run python aws.py jobdefs | grep colombia.*prod` to search for Colombia ingestion
    in prod, which gives
 
        ACTIVE colombia-colombia-ingestor-prod
 
 4. If step 3 shows that a job definition is available, you can **submit** a job:
 
-       python aws.py submit colombia-colombia-ingestor-prod
+       poetry run python aws.py submit colombia-colombia-ingestor-prod
 
-   Check the submit help options `python aws.py submit --help`. The most common
+   Check the submit help options `poetry run python aws.py submit --help`. The most common
    options to use are `-t` (or `--timeout)` to specify the maximum number of *minutes*
    the ingestion is allowed to run. The default is 60 minutes, which is fine for
    daily ingestion, but might not be enough time to run a backfill.
@@ -163,7 +152,11 @@ if __name__ == "__main__":
         event_handler(event)
 ```
 
-You are free to write the parsers however you like. Use the existing functions as a template to get started.
+You are free to write the parsers however you like. Use the existing functions as a template to get started. If you find you need a dependency that isn't supplied in the virtual environment, you can add it like this:
+
+```shell
+poetry install packagename
+```
 
 ### Writing a parser
 
@@ -253,10 +246,10 @@ Fields and nested structs should be preferably not set (or set to `None`) rather
 #### Unit tests
 
 Unit testing is mostly standard `pytest`, with a caveat to be sure that tests
-are run with the correct Python version. E.g.,
+are run inside the poetry environment. E.g.,
 
 ```shell
-python3.8 -m pytest test/my_test.py
+poetry run pytest test/my_test.py
 ```
 
 #### Integration and End-to-end tests
