@@ -20,6 +20,11 @@ the default database (`covid19`) and collection (`cases`), run:
 
 `npm run setup-cases`
 
+You also need to set up the `restrictedcases` collection, for storing data that
+cannot appear in the line list:
+
+`npm run setup-restricted-cases`
+
 To run it with configurable options, e.g. a different connection string, or the
 option to delete all documents, run:
 
