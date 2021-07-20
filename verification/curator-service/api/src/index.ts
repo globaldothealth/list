@@ -203,21 +203,6 @@ new EmailClient(env.EMAIL_USER_ADDRESS, env.EMAIL_USER_PASSWORD)
             mustHaveAnyRole(['curator']),
             sourcesController.listParsers,
         );
-        apiRouter.post(
-            '/sources/:id([a-z0-9]{24})/markPendingRemoval',
-            mustHaveAnyRole(['curator']),
-            sourcesController.markPendingRemoval,
-        );
-        apiRouter.post(
-            '/sources/:id([a-z0-9]{24})/removePendingCases',
-            mustHaveAnyRole(['curator']),
-            sourcesController.removePendingCases,
-        );
-        apiRouter.post(
-            '/sources/:id([a-z0-9]{24})/clearPendingRemovalStatus',
-            mustHaveAnyRole(['curator']),
-            sourcesController.clearPendingRemovalStatus,
-        );
 
         // Configure uploads controller.
         const uploadsController = new UploadsController(emailClient);
