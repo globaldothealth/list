@@ -128,7 +128,6 @@ describe('LandingPage', function () {
         cy.visit('/');
 
         cy.contains('Create new').should('not.exist');
-        cy.contains('Charts');
         cy.contains('Line list');
         cy.contains('Sources').should('not.exist');
         cy.contains('Uploads').should('not.exist');
@@ -145,7 +144,6 @@ describe('LandingPage', function () {
         cy.visit('/');
 
         cy.contains('Create new');
-        cy.contains('Charts');
         cy.contains('Line list');
         cy.contains('Sources');
         cy.contains('Uploads');
