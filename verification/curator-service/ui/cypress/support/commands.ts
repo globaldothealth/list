@@ -56,6 +56,7 @@ export function addCase(opts: {
                 sourceUrl: opts.sourceUrl || 'www.example.com',
                 uploadIds: opts.uploadIds,
             },
+            list: true,
             demographics: {
                 nationalities: opts.nationalities,
                 occupation: opts.occupation,
