@@ -71,7 +71,7 @@ export class CasesController {
                     _id: { $in: req.body.caseIds },
                 }).lean();
             } else {
-                casesQuery = Case.find({}).lean();
+                casesQuery = Case.find({ list: true }).lean();
             }
 
             // Limit number of results if present
@@ -990,35 +990,25 @@ export const casesMatchingSearchQuery = (opts: {
     const queryOpts = parsedSearch.fullTextSearch
         ? {
               $text: { $search: parsedSearch.fullTextSearch },
+              list: true,
           }
-        : {};
+        : { list: true };
 
-    let casesQuery: DocumentQuery<CaseDocument[], CaseDocument>;
-    let countQuery: Query<number, CaseDocument>;
-
-    if (opts.searchQuery === '') {
-        // Always search with case-insensitivity.
-        casesQuery = Case.find(queryOpts).collation({
+    // Always search with case-insensitivity.
+    const casesQuery: DocumentQuery<CaseDocument[], CaseDocument> = Case.find(
+        queryOpts,
+    ).collation({
+        locale: 'en_US',
+        strength: 2,
+    });
+    const countQuery: Query<number, CaseDocument> = Case.countDocuments(
+        queryOpts,
+    )
+        .limit(countLimit)
+        .collation({
             locale: 'en_US',
             strength: 2,
         });
-        countQuery = Case.estimatedDocumentCount().collation({
-            locale: 'en_US',
-            strength: 2,
-        });
-    } else {
-        // Always search with case-insensitivity.
-        casesQuery = Case.find(queryOpts).collation({
-            locale: 'en_US',
-            strength: 2,
-        });
-        countQuery = Case.countDocuments(queryOpts)
-            .limit(countLimit)
-            .collation({
-                locale: 'en_US',
-                strength: 2,
-            });
-    }
 
     // Fill in keyword filters.
     parsedSearch.filters.forEach((f) => {
