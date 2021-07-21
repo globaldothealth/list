@@ -23,11 +23,10 @@ def extract_event_fields(event: dict):
         event["num_chunk"],
         event["num_chunks"],
         event["field_names"],
-        event["exclude_sources"],
     )
 
 
-def export_chunk(skip, limit, num_cases, num_chunk, num_chunks, field_names, exclude_sources):
+def export_chunk(skip, limit, num_cases, num_chunk, num_chunks, field_names):
     print(field_names)
     end_range = skip + limit - 1
     if end_range > num_cases:
@@ -42,15 +41,13 @@ def export_chunk(skip, limit, num_cases, num_chunk, num_chunks, field_names, exc
             f'--uri="{uri}"',
             '--collection="cases"',
             f'--fields="{field_names}"',
+            f"--query='{json.dumps(query)}'",
             '--type="csv"',
             f'--out="/tmp/{chunk_fn}"',
             "--jsonArray",
             f"--skip={skip}",
             f"--limit={limit}"
     ]
-    if exclude_sources:
-        query['caseReference.sourceId'] = {"$nin": exclude_sources}
-    mongoexport.append(f"--query='{json.dumps(query)}'")
     subprocess.run(mongoexport)
     return chunk_fn
 
@@ -71,10 +68,10 @@ def lambda_handler(event, context):
     """
     print("Let's export some data")
     now = datetime.datetime.now().strftime("%Y-%m-%d")
-    skip, limit, num_cases, num_chunk, num_chunks, field_names, exclude_sources = extract_event_fields(
+    skip, limit, num_cases, num_chunk, num_chunks, field_names = extract_event_fields(
         event
     )
-    chunk = export_chunk(skip, limit, num_cases, num_chunk, num_chunks, field_names, exclude_sources)
+    chunk = export_chunk(skip, limit, num_cases, num_chunk, num_chunks, field_names)
     s3_fn = f"processing/parse/{now}/{chunk}"
     response = s3.upload_file("/tmp/" + chunk, bucket, s3_fn)
     print(response)
