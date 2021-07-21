@@ -190,6 +190,17 @@ describe('GET', () => {
             expect(res.body.cases).toHaveLength(0);
             expect(res.body.total).toEqual(0);
         });
+        it('should ignore the cases with list=false', async () => {
+            const c = new Case(minimalCase);
+            c.list = false;
+            await c.save();
+            const res = await request(app)
+                .get('/api/cases')
+                .expect(200)
+                .expect('Content-Type', /json/);
+            expect(res.body.cases).toHaveLength(0);
+            expect(res.body.total).toEqual(0);
+        });
         describe('keywords', () => {
             beforeEach(async () => {
                 const c = new Case(minimalCase);
