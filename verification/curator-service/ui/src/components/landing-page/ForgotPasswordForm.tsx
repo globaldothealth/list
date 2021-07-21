@@ -13,6 +13,7 @@ import {
     setForgotPasswordPopupOpen,
     resetError,
     toggleSnackbar,
+    setResetPasswordEmailSent,
 } from '../../redux/auth/slice';
 
 import { makeStyles, Theme } from '@material-ui/core/styles';
@@ -83,9 +84,11 @@ export default function ForgotPasswordForm(): React.ReactElement {
             toggleSnackbar({
                 isOpen: true,
                 message:
-                    'Email containing password reset link was sent. Please check your inbox.',
+                    'If you have an account with us, check your email for reset instructions.',
             }),
         );
+
+        dispatch(setResetPasswordEmailSent(false));
 
         // eslint-disable-next-line
     }, [dispatch, resetPasswordEmailSent]);

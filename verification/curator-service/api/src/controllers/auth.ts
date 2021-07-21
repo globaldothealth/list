@@ -212,14 +212,14 @@ export class AuthController {
          */
         this.router.post(
             '/request-password-reset',
-            async (req: Request, res: Response): Promise<void> => {
+            async (req: Request, res: Response): Promise<Response<any>> => {
                 const email = req.body.email as string;
 
                 try {
                     // Check if user with this email address exists
                     const user = await User.findOne({ email });
                     if (!user) {
-                        throw new Error('User does not exist');
+                        return res.sendStatus(200);
                     }
 
                     // Check if there is a token in DB already for this user
@@ -243,12 +243,14 @@ export class AuthController {
                     await this.emailClient.send(
                         [email],
                         'Password reset link',
-                        `Here is your password reset link: ${resetLink}`,
+                        `To reset your password click <a href="${resetLink}">here</a>`,
                     );
 
-                    res.sendStatus(200);
+                    return res.sendStatus(200);
                 } catch (error) {
-                    res.status(500).json({ message: String(error.message) });
+                    return res
+                        .status(500)
+                        .json({ message: String(error.message) });
                 }
             },
         );
