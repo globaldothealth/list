@@ -470,6 +470,7 @@ describe('Linelist table', function () {
         cy.visit('/');
         cy.visit('/cases');
         cy.wait('@getCases');
+        cy.wait(550);
         cy.contains('rows').click();
         cy.get('li').contains('5').click();
         cy.contains('Filter').click();
