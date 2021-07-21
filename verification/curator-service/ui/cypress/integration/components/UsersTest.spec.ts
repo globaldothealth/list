@@ -25,7 +25,7 @@ describe('Manage users page', function () {
             .should('not.exist');
     });
 
-    it.only('Can change a users roles', function () {
+    it('Can change a users roles', function () {
         cy.login({
             name: 'Bob',
             email: 'bob@test.com',
