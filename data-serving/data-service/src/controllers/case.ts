@@ -1,7 +1,7 @@
 import { Case, CaseDocument, RestrictedCase } from '../model/case';
 import { EventDocument } from '../model/event';
 import { Source } from '../model/source';
-import { DocumentQuery, Error, Query } from 'mongoose';
+import { DocumentQuery, Error, LeanDocument, Query } from 'mongoose';
 import { ObjectId, QuerySelector } from 'mongodb';
 import { GeocodeOptions, Geocoder, Resolution } from '../geocoding/geocoder';
 import { NextFunction, Request, Response } from 'express';
@@ -32,7 +32,7 @@ export class CasesController {
         // Don't look in the restricted collection
         const c = await Case.find({
             _id: new ObjectId(req.params.id),
-        });
+        }).lean();
 
         if (c.length === 0) {
             res.status(404).send({
@@ -40,6 +40,12 @@ export class CasesController {
             });
             return;
         }
+
+        // don't export restricted notes
+        c.forEach((aCase: LeanDocument<CaseDocument>) => {
+            delete aCase.restrictedNotes;
+        });
+
         res.json(c);
     };
 
