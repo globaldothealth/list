@@ -54,6 +54,9 @@ const authSlice = createSlice({
         toggleSnackbar: (state, action: PayloadAction<SnackbarProps>) => {
             state.snackbar = action.payload;
         },
+        setResetPasswordEmailSent: (state, action: PayloadAction<boolean>) => {
+            state.resetPasswordEmailSent = action.payload;
+        }
     },
     extraReducers: (builder) => {
         // SIGN IN
@@ -153,7 +156,7 @@ const authSlice = createSlice({
 });
 
 // Actions
-export const { resetError, setForgotPasswordPopupOpen, toggleSnackbar } =
+export const { resetError, setForgotPasswordPopupOpen, toggleSnackbar, setResetPasswordEmailSent } =
     authSlice.actions;
 
 export default authSlice.reducer;
