@@ -818,6 +818,8 @@ components:
                                 minimum: 0
                 notes:
                     type: string
+                restrictedNotes:
+                    type: string
                 revisionMetadata:
                     type: object
                     properties:
