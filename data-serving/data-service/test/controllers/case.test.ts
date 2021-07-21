@@ -79,6 +79,13 @@ describe('GET', () => {
 
         return request(app).get(`/api/cases/${r._id}`).expect(404);
     });
+    it('should not show the restricted notes for a case', async () => {
+        const c = new Case(minimalCase);
+        c.restrictedNotes = 'I want to tell you a secret';
+        await c.save();
+        const res = await request(app).get(`/api/cases/${c._id}`).expect(200);
+        expect(res.body[0].restrictedNotes).toBeUndefined();
+    });
     describe('list', () => {
         it('should return 200 OK', () => {
             return request(app)
