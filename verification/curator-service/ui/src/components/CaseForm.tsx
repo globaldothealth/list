@@ -347,6 +347,7 @@ export default function CaseForm(props: Props): JSX.Element {
                 ...values.caseReference,
                 verificationStatus: VerificationStatus.Verified,
             },
+            list: true,
             demographics: {
                 gender: unknownOrEmptyToUndefined(values.gender),
                 ageRange: ageRange,

@@ -50,7 +50,7 @@ export const caseSchema = new mongoose.Schema(
         revisionMetadata: revisionMetadataSchema,
         notes: String,
         pathogens: [pathogenSchema],
-        pendingRemoval: Boolean,
+        list: Boolean,
         preexistingConditions: preexistingConditionsSchema,
         symptoms: symptomsSchema,
         transmission: transmissionSchema,
@@ -121,7 +121,7 @@ export type CaseDocument = mongoose.Document & {
     revisionMetadata: RevisionMetadataDocument;
     notes: string;
     pathogens: [PathogenDocument];
-    pendingRemoval: boolean;
+    list: boolean;
     preexistingConditions: PreexistingConditionsDocument;
     symptoms: SymptomsDocument;
     transmission: TransmissionDocument;
