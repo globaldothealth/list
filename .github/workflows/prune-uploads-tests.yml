@@ -1,0 +1,31 @@
+name: Prune uploads script tests
+
+on:
+  push:
+    branches: [main]
+    paths:
+    - '.github/workflows/prune-uploads-tests.yml'
+    - 'data-serving/data-service/scripts/prune-uploads/**'
+  pull_request:
+    paths:
+    - '.github/workflows/prune-uploads-tests.yml'
+    - 'data-serving/data-service/scripts/prune-uploads/**'
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: data-serving/scripts/prune-uploads
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python 3.8
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.8
+    - name: Install dependencies
+      run: |
+        pip install -r requirements.txt
+        pip install pytest
+    - name: Run tests
+      run: pytest

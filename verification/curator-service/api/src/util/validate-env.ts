@@ -80,6 +80,7 @@ export default function validateEnv(): Readonly<{
         LOCALSTACK_URL: str({
             desc: 'Mock AWS address',
             devDefault: 'http://localstack:4566',
+            default: '',
         }),
         LOCATION_SERVICE_URL: str({
             desc: 'Base location for the geocoding service',
