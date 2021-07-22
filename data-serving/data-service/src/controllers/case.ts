@@ -91,6 +91,10 @@ export class CasesController {
                 strength: 2,
             });
 
+            matchingCases.forEach((aCase: LeanDocument<CaseDocument>) => {
+                delete aCase.restrictedNotes;
+            });
+
             //Get current date
             const dateObj = new Date();
 
@@ -233,9 +237,16 @@ export class CasesController {
             // Do a fetch of documents and another fetch in parallel for total documents
             // count used in pagination.
             const [docs, total] = await Promise.all([
-                sortedQuery.skip(limit * (page - 1)).limit(limit),
+                sortedQuery
+                    .skip(limit * (page - 1))
+                    .limit(limit)
+                    .lean(),
                 countQuery,
             ]);
+
+            docs.forEach((aDoc: LeanDocument<CaseDocument>) => {
+                delete aDoc.restrictedNotes;
+            });
             logger.info('got results');
             // total is actually stored in a count index in mongo, so the query is fast.
             // however to maintain existing behaviour, only return the count limit
