@@ -63,6 +63,6 @@ class CearaTest(unittest.TestCase):
                         "chronic kidney disease"
                     ]
                 },
-                "notes": "Primary immunodeficiency disease or chromosomal disease, Other symptoms reported"
+                "restrictedNotes": "Primary immunodeficiency disease or chromosomal disease, Other symptoms reported"
             }
         ])

@@ -53,7 +53,7 @@ class AmapaTest(unittest.TestCase):
                 "hasPreexistingConditions": True,
                 "values": ["diabetes mellitus"]
             },
-            "notes": "Patient with immunosupression, Neighbourhood: FERREIRA GOMES"
+            "restrictedNotes": "Patient with immunosupression, Neighbourhood: FERREIRA GOMES"
         }
 
         result = amapa.parse_cases(sample_data_file, _SOURCE_ID, _SOURCE_URL)
