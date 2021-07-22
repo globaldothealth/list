@@ -258,7 +258,7 @@ export class AuthController {
                             url = 'http://localhost:3002';
                             break;
                         case 'dev':
-                            url = 'https://dev-curator.ghdsi.org';
+                            url = 'https://dev-data.covid-19.global.health';
                             break;
                         case 'prod':
                             url = 'https://data.covid-19.global.health';
