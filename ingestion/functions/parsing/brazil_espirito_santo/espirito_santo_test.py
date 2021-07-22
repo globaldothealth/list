@@ -57,7 +57,7 @@ class EspiritoSantoTest(unittest.TestCase):
                         "lung disease"
                     ]
                 },
-                "notes": "Neighbourhood: JARDIM CARAPINA, First four years of elementary school not completed"
+                "restrictedNotes": "Neighbourhood: JARDIM CARAPINA, First four years of elementary school not completed"
             },
             {
                 "caseReference": {"sourceId": _SOURCE_ID, "sourceUrl": _SOURCE_URL},
@@ -85,6 +85,6 @@ class EspiritoSantoTest(unittest.TestCase):
                     "ethnicity": "White"
                 },
                 "preexistingConditions": None,
-                "notes": "Neighbourhood: CENTRO, Elementary school completed"
+                "restrictedNotes": "Neighbourhood: CENTRO, Elementary school completed"
             }
         ])

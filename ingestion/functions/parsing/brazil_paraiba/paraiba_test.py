@@ -61,6 +61,6 @@ class ParaibaTest(unittest.TestCase):
                         "diabetes mellitus"
                     ]
                 },
-                "notes": "Other symptoms reported"
+                "restrictedNotes": "Other symptoms reported"
             }
         ])
