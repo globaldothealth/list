@@ -115,6 +115,7 @@ export class AuthController {
     public router: Router;
     public LocalStrategy: typeof localStrategy.Strategy;
     constructor(
+        private readonly env: string,
         private readonly afterLoginRedirURL: string,
         public readonly lambdaClient: AwsLambdaClient,
         public readonly emailClient: EmailClient,
@@ -222,6 +223,19 @@ export class AuthController {
                         return res.sendStatus(200);
                     }
 
+                    // Check if user is a Gmail user and send appropriate email message in that case
+                    if (user.googleID !== '42') {
+                        await this.emailClient.send(
+                            [email],
+                            'Password reset requested',
+                            `We were asked to reset your password on Global.health, but you are registered with your Google account. 
+                            If you requested the password reset, then please try again, this time using the "Sign in with Google" button on the global.health portal. 
+                            Otherwise, no further action is needed.`,
+                        );
+
+                        return res.sendStatus(200);
+                    }
+
                     // Check if there is a token in DB already for this user
                     const token = await Token.findOne({ userId: user._id });
                     if (token) {
@@ -238,7 +252,23 @@ export class AuthController {
                         createdAt: Date.now(),
                     }).save();
 
-                    const resetLink = `http://localhost:3002/reset-password/${resetToken}/${user._id}`;
+                    let url = '';
+                    switch (env) {
+                        case 'local':
+                            url = 'http://localhost:3002';
+                            break;
+                        case 'dev':
+                            url = 'https://dev-curator.ghdsi.org';
+                            break;
+                        case 'prod':
+                            url = 'https://data.covid-19.global.health';
+                            break;
+                        default:
+                            url = 'http://localhost:3002';
+                            break;
+                    }
+
+                    const resetLink = `${url}/reset-password/${resetToken}/${user._id}`;
 
                     await this.emailClient.send(
                         [email],

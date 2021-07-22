@@ -136,6 +136,7 @@ const emailClient = new EmailClient(
 
 // Configure auth controller
 const authController = new AuthController(
+    env.SERVICE_ENV,
     env.AFTER_LOGIN_REDIRECT_URL,
     awsLambdaClient,
     emailClient,
