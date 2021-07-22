@@ -224,7 +224,7 @@ export class AuthController {
                     }
 
                     // Check if user is a Gmail user and send appropriate email message in that case
-                    if (user.googleID !== '42') {
+                    if (user.googleID) {
                         await this.emailClient.send(
                             [email],
                             'Password reset requested',
@@ -438,7 +438,6 @@ export class AuthController {
                             email: email,
                             password: hashedPassword,
                             name: req.body.name || '',
-                            googleID: '42',
                             roles: [],
                             newsletterAccepted:
                                 req.body.newsletterAccepted || false,
