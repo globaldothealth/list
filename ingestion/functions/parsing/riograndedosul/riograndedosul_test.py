@@ -47,7 +47,7 @@ _PARSED_CASE = ({
         "values": ["Fever", "Cough", "Sore Throat", "Shortness of Breath", "Other"],
     },
     "preexistingConditions": {"hasPreexistingConditions": True, "values": []},
-    "notes": "Patient with immunodeficiency, Unspecified pre-existing condition, Neighbourhood: Centro Historico",
+    "restrictedNotes": "Patient with immunodeficiency, Unspecified pre-existing condition, Neighbourhood: Centro Historico",
 })
 
 
