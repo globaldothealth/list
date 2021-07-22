@@ -8,6 +8,7 @@
 import os
 import sys
 from typing import Optional, List, Tuple, Dict, Any
+from datetime import datetime
 
 import pymongo
 
@@ -17,11 +18,26 @@ def _ids(xs):
 
 
 def find_successful_upload(
-    source: Dict[str, Any],
+    source: Dict[str, Any], epoch: datetime = None
 ) -> Optional[Tuple[str, List[str]]]:
+    """Finds last successful upload.
+
+    :param source: Source data
+    :param epoch: Epoch date after which successful uploads will be considered
+
+    epoch is the initial datetime after which we should consider non-UUID
+    sources to have data only corresponding to a single upload. Prior to
+    this date, data does not correspond to a single upload.
+
+    If not specified, considers the last successful upload to be
+    contain the entire dataset.
+
+    :return: A tuple of
+      (last successful upload, list of uploads to mark for deletion).
+      If no successful upload is found, returns None
+    """
     # mark uploads is only for sources without stable identifiers
-    hasStableIdentifiers = source.get("hasStableIdentifiers", False)
-    if hasStableIdentifiers:
+    if source.get("hasStableIdentifiers", False):
         return None
     uploads = source["uploads"]
     # sort uploads, with most recent being the first
@@ -33,10 +49,14 @@ def find_successful_upload(
     except ValueError:
         # no uploads were successful
         success_upload_idx = -1
-    if success_upload_idx > -1:
+    if success_upload_idx > -1 and (
+        not epoch or uploads[success_upload_idx]["created"] > epoch
+    ):
         # Return uploads older than last successful upload
         return str(uploads[success_upload_idx]["_id"]), _ids(
             uploads[success_upload_idx + 1 :]
+            # Also mark for deletion error uploads after successful upload
+            + _ids(u for u in uploads[:success_upload_idx] if u["status"] == "ERROR")
         )
 
 
@@ -64,6 +84,10 @@ def mark_all(cases: pymongo.collection.Collection, source_id):
 
 if __name__ == "__main__":
 
+    # PRUNE_EPOCH is in YYYY-MM-DD format
+    if epoch := os.environ.get("PRUNE_EPOCH", None):
+        epoch = datetime.fromisoformat(epoch)
+
     # CONN is https://docs.mongodb.com/manual/reference/connection-string/
     try:
         print("Connecting to database...")
@@ -80,7 +104,7 @@ if __name__ == "__main__":
         _n = s["name"]
         print(f"Processing source {_id}: {_n}")
         if not s.get("hasStableIdentifiers", False):
-            if (m := find_successful_upload(s)) is None:
+            if (m := find_successful_upload(s, epoch)) is None:
                 print(f"[{_n}] No successful upload found")
                 continue
             success, older = m

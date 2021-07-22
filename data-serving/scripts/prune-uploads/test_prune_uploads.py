@@ -27,7 +27,8 @@ S2 = {
         _u("60f7343a6e50eb2592992fb1", Status.ERROR, "2020-12-25"),
         _u("60f7343a6e50eb2592992fb2", Status.SUCCESS, "2021-02-11"),
         _u("60f7343a6e50eb2592992fb3", Status.ERROR, "2020-05-05"),
-        _u("60f7343a6e50eb2592992fb2", Status.IN_PROGRESS, "2021-02-12"),
+        _u("60f7343a6e50eb2592992fb4", Status.ERROR, "2020-02-12"),
+        _u("60f7343a6e50eb2592992fb5", Status.IN_PROGRESS, "2021-02-14"),
     ],
 }
 
@@ -38,6 +39,7 @@ S2_expected = (
         "60f734296e50eb2592992fb0",
         "60f7343a6e50eb2592992fb1",
         "60f7343a6e50eb2592992fb3",
+        "60f7343a6e50eb2592992fb4",
     ],
 )
 
@@ -58,3 +60,8 @@ T = [(S1, None), (S2, S2_expected), (S3, None)]
 @pytest.mark.parametrize("source,expected", T)
 def test_find_successful_upload(source, expected):
     assert find_successful_upload(source) == expected
+
+
+@pytest.mark.parametrize("source,expected", [(x, None) for x in [S1, S2, S3]])
+def test_find_successful_upload_with_epoch(source, expected):
+    assert find_successful_upload(source, datetime(2021, 3, 1)) == expected
