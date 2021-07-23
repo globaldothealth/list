@@ -12,8 +12,7 @@ def database(connection_string, db_name):
 
 def move_notes(db, collection, source_id, source, dest, dry_run):
     """Move the values in the 'source' key to the 'dest' key for cases in the 'collection'
-    collection in the 'db' where their caseReference.source_id matches 'source_id'.
-    If 'remove_source' is set, then additionally remove values from the source key.
+    collection in the 'db' where their caseReference.sourceId matches 'source_id'.
     If 'dry_run' is set, then don't actually change anything, but do report on which cases
     would be modified."""
     query = { "caseReference.sourceId": source_id }
