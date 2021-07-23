@@ -13,6 +13,7 @@ import passport from 'passport';
 import request from 'supertest';
 import supertest from 'supertest';
 import MockLambdaClient from '../src/clients/aws-lambda-client';
+import MockEmailClient from '../src/clients/email-client';
 
 jest.mock('../src/clients/email-client', () => {
     return jest.fn().mockImplementation(() => {
@@ -147,9 +148,12 @@ describe('mustHaveAnyRole', () => {
         localApp = express();
         localApp.use(bodyParser.json());
         const mLambdaClient = new MockLambdaClient('', '', '');
+        const mEmailClient = new MockEmailClient('', '', '', '');
         const authController = new AuthController(
+            'local',
             '/redirect-after-login',
             mLambdaClient,
+            mEmailClient,
         );
         authController.configurePassport('foo', 'bar');
         authController.configureLocalAuth();

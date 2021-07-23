@@ -43,11 +43,11 @@ export default interface CaseFormValues {
 
 export interface Travel {
     // Used to key react elements in the UI
-    reactId: string;
+    reactId?: string;
     location: Loc;
-    dateRange: {
-        start: string | null;
-        end: string | null;
+    dateRange?: {
+        start?: string | null;
+        end?: string | null;
     };
     purpose?: string;
     methods: string[];
@@ -55,7 +55,7 @@ export interface Travel {
 
 export interface GenomeSequence {
     // Used to key react elements in the UI
-    reactId: string;
+    reactId?: string;
     sampleCollectionDate: string | null;
     repositoryUrl?: string;
     sequenceId?: string;

@@ -20,6 +20,7 @@ describe('View case', function () {
 
         cy.server();
         cy.route('GET', '/api/cases/*').as('getCases');
+        cy.visit('/');
         cy.visit('/cases');
         cy.wait('@getCases');
 
@@ -49,6 +50,7 @@ describe('View case', function () {
         });
         cy.request({ method: 'GET', url: '/api/cases' }).then((resp) => {
             expect(resp.body.cases).to.have.lengthOf(1);
+            cy.visit('/');
             cy.visit(`cases/view/${resp.body.cases[0]._id}`);
             cy.contains('France');
             cy.contains('some notes');

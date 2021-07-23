@@ -5,7 +5,7 @@ describe('App', function () {
     });
 
     it('allows the user to search by date', function () {
-        cy.login();
+        cy.login({ roles: ['curator'], name: "testName", email:'test@example.com' });
 
         cy.task('clearCasesDB', {});
 
@@ -25,7 +25,8 @@ describe('App', function () {
             });
         }
 
-        cy.visit('/cases');
+        cy.visit('/');
+        cy.contains('Line list').click();
 
         cy.get('.filter-button').click();
         cy.get('#dateconfirmedafter').type('2020-04-30');
@@ -44,8 +45,9 @@ describe('App', function () {
     });
 
     it('allows the user to search by nationality', function () {
-        cy.login();
-        cy.visit('/cases');
+        cy.login({ roles: ['curator'], name: "testName", email:'test@example.com' });
+        cy.visit('/');
+        cy.contains('Line list').click();
 
         cy.addCase({
             country: 'Russia',
@@ -60,7 +62,9 @@ describe('App', function () {
     });
 
     it('allows the user to search by variant', function () {
-        cy.login();
+        cy.login({ roles: ['curator'], name: "testName", email:'test@example.com' });
+        cy.visit('/');
+        cy.contains('Line list').click();
 
         cy.addCase({
             country: 'Peru',
@@ -68,7 +72,7 @@ describe('App', function () {
             sourceUrl: 'www.variantb1351.com',
         });
 
-        cy.visit('/cases');
+        cy.contains('Line list').click();
 
         cy.get('.filter-button').click();
         cy.get('#variant').type('B.1.351{Enter}');
@@ -77,7 +81,9 @@ describe('App', function () {
     });
 
     it('allows the user to search by date and an additional filter', function () {
-        cy.login();
+        cy.login({ roles: ['curator'], name: "testName", email:'test@example.com' });
+        cy.visit('/');
+        cy.contains('Line list').click();
 
         const countries: any = ['Germany', 'France', 'India', 'Italy'];
         const confirmedDate: any = [
@@ -95,7 +101,7 @@ describe('App', function () {
             });
         }
 
-        cy.visit('/cases');
+        cy.contains('Line list').click();
 
         cy.get('body').then(($body) => {
             if ($body.find('.iubenda-cs-accept-btn').length) {
@@ -135,11 +141,11 @@ describe('App', function () {
 
         cy.contains('Detailed line list data');
         cy.contains('Terms of use');
-        cy.contains('Or sign in with email');
+        cy.contains('Or sign in with Google');
     });
 
     it('Homepage with logged in user with no roles', function () {
-        cy.login({ roles: [] });
+        cy.login({ name: 'Alice Smith', email: 'alice@test.com', roles: [] });
         cy.visit('/');
 
         // Readers-only are redirected to the line list.
@@ -154,32 +160,8 @@ describe('App', function () {
         cy.contains('Terms of use');
     });
 
-    it('Homepage with logged in admin', function () {
-        cy.login({ roles: ['admin'] });
-        cy.visit('/');
-
-        cy.contains('Create new').should('not.exist');
-        cy.contains('Line list');
-        cy.contains('Sources').should('not.exist');
-        cy.contains('Uploads').should('not.exist');
-        cy.contains('Manage users');
-        cy.contains('Terms of use');
-    });
-
-    it('Homepage with logged in curator', function () {
-        cy.login({ roles: ['curator'] });
-        cy.visit('/');
-
-        cy.contains('Create new');
-        cy.contains('Line list');
-        cy.contains('Sources');
-        cy.contains('Uploads');
-        cy.contains('Manage users').should('not.exist');
-        cy.contains('Terms of use');
-    });
-
     it('Can open new case modal from create new button', function () {
-        cy.login({ roles: ['curator'] });
+        cy.login({ roles: ['curator'], name: "testName", email:'test@example.com'  });
         cy.visit('/');
 
         cy.contains('Create new COVID-19 line list case').should('not.exist');
@@ -192,7 +174,7 @@ describe('App', function () {
     });
 
     it('Can open bulk upload modal from create new button', function () {
-        cy.login({ roles: ['curator'] });
+        cy.login({ roles: ['curator'], name: "testName", email:'test@example.com'  });
         cy.visit('/');
 
         cy.get('button[data-testid="create-new-button"]').click();
@@ -204,7 +186,7 @@ describe('App', function () {
     });
 
     it('Can open new automated source modal from create new button', function () {
-        cy.login({ roles: ['curator'] });
+        cy.login({ roles: ['curator'], name: "testName", email:'test@example.com'  });
         cy.visit('/');
 
         cy.get('button[data-testid="create-new-button"]').click();
@@ -216,7 +198,7 @@ describe('App', function () {
     });
 
     it('Can open new automated backfill modal from create new button', function () {
-        cy.login({ roles: ['curator'] });
+        cy.login({ roles: ['curator'], name: "testName", email:'test@example.com'  });
         cy.visit('/');
 
         cy.get('button[data-testid="create-new-button"]').click();
@@ -228,8 +210,11 @@ describe('App', function () {
     });
 
     it('Closing modal shows previous page', function () {
-        cy.login({ roles: ['curator'] });
-        cy.visit('/sources');
+        cy.login({ roles: ['curator'], name: "testName", email:'test@example.com'  });
+        cy.visit('/');
+        cy.contains('Sources').click();
+        cy.url().should('eq', 'http://localhost:3002/sources');
+
         cy.get('button[data-testid="create-new-button"]').click();
         cy.contains('li', 'New line list case').click();
         cy.url().should('eq', 'http://localhost:3002/cases/new');
@@ -238,8 +223,13 @@ describe('App', function () {
     });
 
     it('Closing modal navigates to /cases if there is no previous location', function () {
-        cy.login({ roles: ['curator'] });
-        cy.visit('/cases/new');
+        cy.login({ roles: ['curator'], name: "testName", email:'test@example.com'  });
+        cy.visit('/');
+        cy.contains('Line list').click();
+        cy.url().should('eq', 'http://localhost:3002/cases');
+
+        cy.contains(/create new/i).click();
+        cy.contains(/new line list case/i).click();
         cy.get('button[aria-label="close overlay"').click();
         cy.url().should('eq', 'http://localhost:3002/cases');
     });

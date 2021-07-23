@@ -22,20 +22,19 @@ const mockJobDefinitions = {
             jobDefinitionName: ingestorName,
             containerProperties: {
                 environment: [
-                    { 
-                        name: 'EPID_INGESTION_SOURCE_ID', 
-                        value: sourceID
+                    {
+                        name: 'EPID_INGESTION_SOURCE_ID',
+                        value: sourceID,
                     },
-                    { 
-                        name: 'EPID_INGESTION_ENV', 
-                        value: 'test'
-                    }
-                ]
-            }
-        }
-    ]
-}
-
+                    {
+                        name: 'EPID_INGESTION_ENV',
+                        value: 'test',
+                    },
+                ],
+            },
+        },
+    ],
+};
 
 beforeAll(() => {
     AWSMock.setSDKInstance(AWS);
@@ -46,7 +45,12 @@ beforeEach(() => {
     submitJobSpy.mockClear();
     AWSMock.mock('Batch', 'submitJob', submitJobSpy);
     AWSMock.mock('Batch', 'describeJobDefinitions', describeJobDefinitionsSpy);
-    client = new AwsBatchClient(env.SERVICE_ENV, env.LOCALSTACK_URL, 'test-arn', 'us-east-1');
+    client = new AwsBatchClient(
+        env.SERVICE_ENV,
+        env.LOCALSTACK_URL,
+        'test-arn',
+        'us-east-1',
+    );
 });
 
 afterEach(() => {
@@ -60,7 +64,7 @@ describe('doRetrieval', () => {
         };
         submitJobSpy.mockResolvedValueOnce({
             jobName: ingestorName,
-            jobId: ingestorName
+            jobId: ingestorName,
         });
         describeJobDefinitionsSpy.mockResolvedValueOnce(mockJobDefinitions);
         const res = await client.doRetrieval(sourceID, {
@@ -70,11 +74,10 @@ describe('doRetrieval', () => {
         expect(submitJobSpy).toHaveBeenCalledTimes(1);
         expect(res).toEqual(payload);
     });
-    it('throws when a parser for the input source does not exist', async() => {
+    it('throws when a parser for the input source does not exist', async () => {
         describeJobDefinitionsSpy.mockResolvedValueOnce(mockJobDefinitions);
         const badSourceID = 'not-a-source-id';
-        return expect(client.doRetrieval(badSourceID)).rejects.toThrowError(
-        );
+        return expect(client.doRetrieval(badSourceID)).rejects.toThrowError();
     });
     it('throws when the aws api returns an error from the describe job definitions call', async () => {
         const expectedError = new Error('AWS error');
@@ -86,8 +89,7 @@ describe('doRetrieval', () => {
     it('throws when the aws api does not return a jobID from the submit job call', async () => {
         describeJobDefinitionsSpy.mockResolvedValueOnce(mockJobDefinitions);
         submitJobSpy.mockResolvedValueOnce({});
-        return expect(client.doRetrieval(sourceID)).rejects.toThrowError(
-        );
+        return expect(client.doRetrieval(sourceID)).rejects.toThrowError();
     });
 });
 

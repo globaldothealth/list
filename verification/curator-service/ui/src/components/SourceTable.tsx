@@ -1,3 +1,4 @@
+import React, { RefObject } from 'react';
 import {
     Button,
     Divider,
@@ -11,7 +12,6 @@ import {
     Switch,
 } from '@material-ui/core';
 import MaterialTable, { QueryResult } from 'material-table';
-import React, { RefObject } from 'react';
 
 import MuiAlert from '@material-ui/lab/Alert';
 import Paper from '@material-ui/core/Paper';
@@ -20,12 +20,6 @@ import SourceRetrievalButton from './SourceRetrievalButton';
 import TextField from '@material-ui/core/TextField';
 import axios from 'axios';
 import ChipInput from 'material-ui-chip-input';
-
-interface ListResponse {
-    sources: Source[];
-    nextPage: number;
-    total: number;
-}
 
 interface Origin {
     url: string;
@@ -71,6 +65,12 @@ interface Source {
     notificationRecipients?: string[];
     excludeFromLineList?: boolean;
     hasStableIdentifiers?: boolean;
+}
+
+interface ListResponse {
+    sources: Source[];
+    nextPage: number;
+    total: number;
 }
 
 interface SourceTableState {
@@ -200,8 +200,7 @@ class SourceTable extends React.Component<Props, SourceTableState> {
 
                     if (e.response?.data?.name === 'NotificationSendError') {
                         this.setState({
-                            error:
-                                'Failed to send e-mail notifications to registered addresses',
+                            error: 'Failed to send e-mail notifications to registered addresses',
                         });
                         resolve(undefined);
                     } else {
@@ -549,27 +548,45 @@ class SourceTable extends React.Component<Props, SourceTableState> {
                                 title: 'Exclude from line list?',
                                 field: 'excludeFromLineList',
                                 render: (row): JSX.Element => (
-                                    <Switch disabled checked={row.excludeFromLineList ?? false}/>
+                                    <Switch
+                                        disabled
+                                        checked={
+                                            row.excludeFromLineList ?? false
+                                        }
+                                    />
                                 ),
                                 editComponent: (props): JSX.Element => (
-                                    <Switch checked={props.value ?? false} 
-                                    onChange={(event):void => {
-                                        props.onChange(event.target.checked)
-                                    }}/>
+                                    <Switch
+                                        checked={props.value ?? false}
+                                        onChange={(event): void => {
+                                            props.onChange(
+                                                event.target.checked,
+                                            );
+                                        }}
+                                    />
                                 ),
                             },
                             {
                                 title: 'Source has stable case identifiers?',
                                 field: 'hasStableIdentifiers',
                                 render: (row): JSX.Element => (
-                                    <Switch disabled checked={row.hasStableIdentifiers ?? false}/>
+                                    <Switch
+                                        disabled
+                                        checked={
+                                            row.hasStableIdentifiers ?? false
+                                        }
+                                    />
                                 ),
                                 editComponent: (props): JSX.Element => (
                                     // assume false because that's the more likely case
-                                    <Switch checked={props.value ?? false} 
-                                    onChange={(event):void => {
-                                        props.onChange(event.target.checked)
-                                    }}/>
+                                    <Switch
+                                        checked={props.value ?? false}
+                                        onChange={(event): void => {
+                                            props.onChange(
+                                                event.target.checked,
+                                            );
+                                        }}
+                                    />
                                 ),
                             },
                         ]}
@@ -579,9 +596,8 @@ class SourceTable extends React.Component<Props, SourceTableState> {
                                 listUrl += '?limit=' + this.state.pageSize;
                                 listUrl += '&page=' + (query.page + 1);
                                 this.setState({ error: '' });
-                                const response = axios.get<ListResponse>(
-                                    listUrl,
-                                );
+                                const response =
+                                    axios.get<ListResponse>(listUrl);
                                 response
                                     .then((result) => {
                                         const flattenedSources: TableRow[] = [];

@@ -1,3 +1,4 @@
+import React from 'react';
 import * as Yup from 'yup';
 
 import { Button, CircularProgress, Typography } from '@material-ui/core';
@@ -8,8 +9,6 @@ import AppModal from './AppModal';
 import { DateField } from './common-form-fields/FormikFields';
 import MuiAlert from '@material-ui/lab/Alert';
 import { Paper } from '@material-ui/core';
-import React from 'react';
-import User from './User';
 import axios from 'axios';
 import { makeStyles } from '@material-ui/core/styles';
 import { useInterval } from '../hooks/useInterval';
@@ -86,8 +85,10 @@ const useStyles = makeStyles(() => ({
     },
 }));
 
-interface SourceResponse {
-    uploads: Upload[];
+interface UploadSummary {
+    numCreated?: number;
+    numUpdated?: number;
+    error?: string;
 }
 
 interface Upload {
@@ -97,14 +98,11 @@ interface Upload {
     created: Date;
 }
 
-interface UploadSummary {
-    numCreated?: number;
-    numUpdated?: number;
-    error?: string;
+interface SourceResponse {
+    uploads: Upload[];
 }
 
 interface Props {
-    user: User;
     onModalClose: () => void;
 }
 
@@ -277,7 +275,10 @@ export default function AutomatedBackfill(props: Props): JSX.Element {
                         <Form>
                             <Paper className={classes.allFormSections}>
                                 <div className={classes.formSection}>
-                                    <Source freeSolo={false} sourcesWithStableIdentifiers/>
+                                    <Source
+                                        freeSolo={false}
+                                        sourcesWithStableIdentifiers
+                                    />
                                 </div>
                                 <DateField
                                     name="startDate"

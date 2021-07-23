@@ -1,3 +1,4 @@
+import React from 'react';
 import { FastField, useFormikContext } from 'formik';
 import {
     FormikAutocomplete,
@@ -7,7 +8,6 @@ import {
 import CaseFormValues from './CaseFormValues';
 import { Chip } from '@material-ui/core';
 import FieldTitle from '../common-form-fields/FieldTitle';
-import React from 'react';
 import Scroll from 'react-scroll';
 import { TextField } from 'formik-material-ui';
 import { StyledTooltip } from './StyledTooltip';

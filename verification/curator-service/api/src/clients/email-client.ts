@@ -1,23 +1,28 @@
-import nodemailer, { SentMessageInfo } from 'nodemailer';
-
-import Mail from 'nodemailer/lib/mailer';
-
-/**
- * The SMTP service to use for email.
- */
-export enum EmailService {
-    Gmail = 'Gmail',
-    Ethereal = 'Ethereal',
-}
+import AWS from 'aws-sdk';
+import { logger } from '../util/logger';
 
 /**
- * SMTP client that sends email via nodemailer.
+ * Client that sends emails via AWS SES
  */
 export default class EmailClient {
-    private service?: EmailService;
-    private transport?: Mail;
+    private accessKeyId: string;
+    private secretAccessKey: string;
+    private region: string;
+    private sourceEmail: string;
+    private ses?: AWS.SES;
     private initialized = false;
-    constructor(private user?: string, private password?: string) {}
+
+    constructor(
+        accessKeyId: string,
+        secretAccessKey: string,
+        region: string,
+        sourceEmail: string,
+    ) {
+        this.accessKeyId = accessKeyId;
+        this.secretAccessKey = secretAccessKey;
+        this.region = region;
+        this.sourceEmail = sourceEmail;
+    }
 
     /**
      * Initializes a client based on the stored user and password fields.
@@ -25,69 +30,63 @@ export default class EmailClient {
      * Both fields must be present to establish a real (Gmail-based)
      * connection. If either is absent, a testing service (Ethereal) is used.
      */
-    async initialize(): Promise<EmailClient> {
+    initialize(): EmailClient {
         if (this.initialized) {
             return this;
         }
 
-        if (!this.user || !this.password) {
-            this.service = EmailService.Ethereal;
-            const testAccount = await nodemailer.createTestAccount();
-            this.transport = nodemailer.createTransport({
-                host: 'smtp.ethereal.email',
-                port: 587,
-                secure: false, // true for 465, false for other ports
-                auth: {
-                    user: testAccount.user, // generated ethereal user
-                    pass: testAccount.pass, // generated ethereal password
-                },
-            });
-        } else {
-            this.service = EmailService.Gmail;
-            this.transport = nodemailer.createTransport({
-                service: 'Gmail',
-                auth: {
-                    user: this.user,
-                    pass: this.password,
-                },
-            });
-        }
+        AWS.config.update({
+            credentials: {
+                accessKeyId: this.accessKeyId,
+                secretAccessKey: this.secretAccessKey,
+            },
+            region: this.region,
+        });
 
+        this.ses = new AWS.SES({ apiVersion: '2010-12-01' });
         this.initialized = true;
+
         return this;
     }
 
     /**
-     * Sends an email via the configured transport.
-     *
-     * TODO: Add support for HTML email content.
+     * Sends an email via the configured AWS SES.
      *
      * @param addressees - Addressees to whom the email is sent.
      * @param subject - Subject of the email.
      * @param text - Body/content of the email.
      */
-    send(
-        addressees: string[],
+    async send(
+        addresses: string[],
         subject: string,
-        text: string,
-    ): Promise<SentMessageInfo> {
-        // These are synonymous, but Typescript-strictness requires the second
-        // condition to operate on this.transport, below.
-        if (!this.initialized || this.transport === undefined) {
-            throw new Error('Must call initialize() prior to use.');
-        }
-        const mailOptions = {
-            to: addressees,
-            subject: subject,
-            text: text,
+        message: string,
+    ): Promise<unknown> {
+        const emailParams = {
+            Destination: {
+                ToAddresses: addresses,
+            },
+            Message: {
+                Body: {
+                    Html: {
+                        Charset: 'UTF-8',
+                        Data: message,
+                    },
+                },
+                Subject: {
+                    Charset: 'UTF-8',
+                    Data: subject,
+                },
+            },
+            Source: this.sourceEmail,
         };
-        return this.transport.sendMail(mailOptions);
-    }
 
-    /**
-     * Getter returning the configured SMTP service.
-     */
-    getService(): EmailService | undefined {
-        return this.service;
+        try {
+            if (!this.ses) throw new Error('Email client not initialized');
+
+            return await this.ses.sendEmail(emailParams).promise();
+        } catch (error) {
+            logger.info('Error while sending mail: ' + error);
+            throw error;
+        }
     }
 }

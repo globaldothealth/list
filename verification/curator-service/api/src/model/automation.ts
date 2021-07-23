@@ -5,7 +5,9 @@ import { ScheduleDocument, scheduleSchema } from './schedule';
 import mongoose from 'mongoose';
 
 export const automationParsingValidator = {
-    validator: (automation: mongoose.LeanDocument<AutomationDocument>): boolean => {
+    validator: (
+        automation: mongoose.LeanDocument<AutomationDocument>,
+    ): boolean => {
         return !(automation.parser != null && automation.regexParsing != null);
     },
     message: 'At most one of parser or regexParsing may be supplied.',

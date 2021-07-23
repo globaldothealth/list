@@ -1,5 +1,4 @@
 import axios from 'axios';
-import qs from 'qs';
 import { Request, Response } from 'express';
 import { Source, SourceDocument } from '../model/source';
 import { UserDocument } from '../model/user';
@@ -121,9 +120,8 @@ export default class SourcesController {
                 req.body.dateFilter = undefined;
             }
             await source.set(req.body).validate();
-            const emailNotificationType = await this.updateAutomationScheduleAwsResources(
-                source,
-            );
+            const emailNotificationType =
+                await this.updateAutomationScheduleAwsResources(source);
             const result = await source.save();
             await this.sendNotifications(source, emailNotificationType);
             res.json(result);
