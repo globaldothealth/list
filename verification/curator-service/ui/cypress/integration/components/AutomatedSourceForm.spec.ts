@@ -6,6 +6,12 @@ describe('Automated source form', function () {
     });
 
     it('Creates source given proper data', function () {
+        cy.login({
+            roles: ['curator'],
+            name: 'testName',
+            email: 'test@example.com',
+        });
+        cy.visit('/');
         cy.visit('/sources');
         cy.contains('No records to display');
 
@@ -37,15 +43,17 @@ describe('Automated source form', function () {
         cy.contains(name);
         cy.contains(format);
         cy.contains(license);
-        cy.contains('superuser@test.com');
+        cy.contains('test@example.com');
         cy.contains(otherEmail);
     });
 
     it('Does not add source on submission error', function () {
-        cy.visit('/sources');
+        cy.visit('/');
+        cy.contains('Sources').click();
         cy.contains('No records to display');
 
-        cy.visit('/sources/automated');
+        cy.contains('Create new').click();
+        cy.contains('New automated source').click();
         cy.get('div[data-testid="url"]').type('www.newsource.com');
         cy.get('div[data-testid="name"]').type('New source name');
         cy.get('div[data-testid="license"]').type('WTFPL');
@@ -64,7 +72,8 @@ describe('Automated source form', function () {
         cy.wait('@createSource');
         cy.contains('nope');
 
-        cy.visit('/sources');
+        cy.get('header button[aria-label="close overlay"]').click();
+        cy.contains('Sources').click();
         cy.contains('No records to display');
     });
 });

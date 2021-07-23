@@ -7,4 +7,4 @@ coverage/*
 **/*.d.ts
 # public assets
 public/*
-amplify/*
+cypress/*

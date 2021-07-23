@@ -2,19 +2,21 @@ import {
     Strategy as BearerStrategy,
     IVerifyOptions,
 } from 'passport-http-bearer';
-import {
-    Strategy as GoogleStrategy,
-    Profile,
-    VerifyCallback,
-} from 'passport-google-oauth20';
+import { Strategy as GoogleStrategy, Profile } from 'passport-google-oauth20';
 import { NextFunction, Request, Response } from 'express';
 import { User, UserDocument } from '../model/user';
+import { Token } from '../model/token';
+import { isValidObjectId } from 'mongoose';
 
 import { Router } from 'express';
 import axios from 'axios';
 import { logger } from '../util/logger';
 import passport from 'passport';
+import localStrategy from 'passport-local';
 import AwsLambdaClient from '../clients/aws-lambda-client';
+import bcrypt from 'bcrypt';
+import * as crypto from 'crypto';
+import EmailClient from '../clients/email-client';
 
 // Global variable for newsletter acceptance
 let isNewsletterAccepted: boolean;
@@ -111,11 +113,15 @@ interface GoogleProfile extends Profile {
  */
 export class AuthController {
     public router: Router;
+    public LocalStrategy: typeof localStrategy.Strategy;
     constructor(
+        private readonly env: string,
         private readonly afterLoginRedirURL: string,
         public readonly lambdaClient: AwsLambdaClient,
+        public readonly emailClient: EmailClient,
     ) {
         this.router = Router();
+        this.LocalStrategy = localStrategy.Strategy;
 
         this.router.get(
             '/google/redirect',
@@ -124,6 +130,50 @@ export class AuthController {
             passport.authenticate('google', { prompt: 'select_account' }),
             (req: Request, res: Response): void => {
                 res.redirect(this.afterLoginRedirURL);
+            },
+        );
+
+        this.router.post(
+            '/signup',
+            (req: Request, res: Response, next: NextFunction): void => {
+                passport.authenticate(
+                    'register',
+                    (error: Error, user: UserDocument, info: any) => {
+                        if (error) return next(error);
+                        if (!user)
+                            return res
+                                .status(409)
+                                .json({ message: info.message });
+
+                        req.logIn(user, (err) => {
+                            if (err) return next(err);
+                        });
+
+                        res.status(200).json(user);
+                    },
+                )(req, res, next);
+            },
+        );
+
+        this.router.post(
+            '/signin',
+            (req: Request, res: Response, next: NextFunction): void => {
+                passport.authenticate(
+                    'login',
+                    (error: Error, user: UserDocument, info: any) => {
+                        if (error) return next(error);
+                        if (!user)
+                            return res
+                                .status(403)
+                                .json({ message: info.message });
+
+                        req.logIn(user, (err) => {
+                            if (err) return next(err);
+                        });
+
+                        res.status(200).json(user);
+                    },
+                )(req, res, next);
             },
         );
 
@@ -158,59 +208,148 @@ export class AuthController {
             },
         );
 
+        /**
+         * Generate reset password link
+         */
         this.router.post(
-            '/signup',
-            async (req: Request, res: Response): Promise<void> => {
-                let user = await User.findOne({
-                    email: req.body.email,
-                }).exec();
+            '/request-password-reset',
+            async (req: Request, res: Response): Promise<Response<any>> => {
+                const email = req.body.email as string;
 
-                // Update newsletter preferences
-                if (
-                    user &&
-                    user.newsletterAccepted === false &&
-                    req.body.newsletter
-                ) {
-                    user = await User.findOneAndUpdate(
-                        { email: req.body.email },
-                        { newsletterAccepted: req.body.newsletter },
-                    );
-                }
-
-                if (user) {
-                    req.login(user, (err: Error) => {
-                        if (!err) {
-                            res.json(user);
-                            return;
-                        }
-                        logger.error(err);
-                        res.sendStatus(500);
-                    });
-                } else {
-                    const newUser = await User.create({
-                        name: req.body.name,
-                        email: req.body.email,
-                        googleID: '42',
-                        roles: req.body.roles,
-                        newsletterAccepted: req.body.newsletter || false,
-                    });
-
-                    try {
-                        await this.lambdaClient.sendWelcomeEmail(
-                            req.body.email,
-                        );
-                    } catch (err) {
-                        logger.info('error: ' + JSON.stringify(err, null, 2));
+                try {
+                    // Check if user with this email address exists
+                    const user = await User.findOne({ email });
+                    if (!user) {
+                        return res.sendStatus(200);
                     }
 
-                    req.login(newUser, (err: Error) => {
-                        if (!err) {
-                            res.json(newUser);
-                            return;
-                        }
-                        logger.error(err);
-                        res.sendStatus(500);
-                    });
+                    // Check if user is a Gmail user and send appropriate email message in that case
+                    if (user.googleID) {
+                        await this.emailClient.send(
+                            [email],
+                            'Password reset requested',
+                            `We were asked to reset your password on Global.health, but you are registered with your Google account. 
+                            If you requested the password reset, then please try again, this time using the "Sign in with Google" button on the global.health portal. 
+                            Otherwise, no further action is needed.`,
+                        );
+
+                        return res.sendStatus(200);
+                    }
+
+                    // Check if there is a token in DB already for this user
+                    const token = await Token.findOne({ userId: user._id });
+                    if (token) {
+                        await token.deleteOne();
+                    }
+
+                    const resetToken = crypto.randomBytes(32).toString('hex');
+                    const hash = await bcrypt.hash(resetToken, 10);
+
+                    // Add new reset token to DB
+                    await new Token({
+                        userId: user._id,
+                        token: hash,
+                        createdAt: Date.now(),
+                    }).save();
+
+                    let url = '';
+                    switch (env) {
+                        case 'local':
+                            url = 'http://localhost:3002';
+                            break;
+                        case 'dev':
+                            url = 'https://dev-data.covid-19.global.health';
+                            break;
+                        case 'prod':
+                            url = 'https://data.covid-19.global.health';
+                            break;
+                        default:
+                            url = 'http://localhost:3002';
+                            break;
+                    }
+
+                    const resetLink = `${url}/reset-password/${resetToken}/${user._id}`;
+
+                    await this.emailClient.send(
+                        [email],
+                        'Password reset link',
+                        `To reset your password click <a href="${resetLink}">here</a>`,
+                    );
+
+                    return res.sendStatus(200);
+                } catch (error) {
+                    return res
+                        .status(500)
+                        .json({ message: String(error.message) });
+                }
+            },
+        );
+
+        /**
+         * Reset user's password
+         */
+        this.router.post(
+            '/reset-password',
+            async (req: Request, res: Response): Promise<void> => {
+                const userId = req.body.userId;
+                const token = req.body.token as string;
+                const newPassword = req.body.newPassword as string;
+
+                try {
+                    // Validate user id
+                    const isValidId = isValidObjectId(userId);
+                    if (!isValidId) {
+                        throw new Error('Invalid user id');
+                    }
+
+                    // Check if token exists
+                    const passwordResetToken = await Token.findOne({ userId });
+                    if (!passwordResetToken) {
+                        throw new Error(
+                            'Invalid or expired password reset token',
+                        );
+                    }
+
+                    // Check if token is valid
+                    const isValid = await bcrypt.compare(
+                        token,
+                        passwordResetToken.token,
+                    );
+                    if (!isValid) {
+                        throw new Error(
+                            'Invalid or expired password reset token',
+                        );
+                    }
+
+                    // Hash new password and update user document in DB
+                    const hashedPassword = await bcrypt.hash(newPassword, 10);
+                    await User.updateOne(
+                        { _id: userId },
+                        { $set: { password: hashedPassword } },
+                        { new: true },
+                    );
+
+                    // Send confirmation email to the user
+                    const user = await User.findOne({ _id: userId });
+
+                    if (!user) {
+                        throw new Error(
+                            'Something went wrong, please try again later',
+                        );
+                    }
+
+                    await this.emailClient.send(
+                        [user.email],
+                        'Password changed successfully',
+                        'Your password was changed successfully',
+                    );
+
+                    // Delete used token
+                    await passwordResetToken.deleteOne();
+
+                    res.sendStatus(200);
+                } catch (error) {
+                    res.status(500).json({ message: String(error.message) });
                 }
             },
         );
@@ -250,12 +389,14 @@ export class AuthController {
      * @param clientSecret the OAuth client secret as gotten from the Google developer console.
      */
     configurePassport(clientID: string, clientSecret: string): void {
-        passport.serializeUser<UserDocument, string>((user, done) => {
+        // For some reason typescript doesn't accept mongoose User
+        // @ts-ignore
+        passport.serializeUser((user: UserDocument, done: any) => {
             // Serializes the user id in the cookie, no user info should be in there, just the id.
             done(null, user.id);
         });
 
-        passport.deserializeUser<UserDocument, string>((id, done) => {
+        passport.deserializeUser((id: string, done: any) => {
             // Find the user based on its id in the cookie.
             User.findById(id)
                 .then((user) => {
@@ -273,6 +414,77 @@ export class AuthController {
                 });
         });
 
+        // Configure passport to use username and password auth
+        passport.use(
+            'register',
+            new this.LocalStrategy(
+                {
+                    usernameField: 'email',
+                    passwordField: 'password',
+                    passReqToCallback: true,
+                },
+                async (req, email, password, done) => {
+                    try {
+                        const user = await User.findOne({ email });
+
+                        if (user) {
+                            return done(null, false, {
+                                message: 'Email address already exists',
+                            });
+                        }
+
+                        const hashedPassword = await bcrypt.hash(password, 10);
+                        const newUser = await User.create({
+                            email: email,
+                            password: hashedPassword,
+                            name: req.body.name || '',
+                            roles: [],
+                            newsletterAccepted:
+                                req.body.newsletterAccepted || false,
+                        });
+
+                        await this.lambdaClient.sendWelcomeEmail(newUser.email);
+                        done(null, newUser.publicFields());
+                    } catch (error) {
+                        done(error);
+                    }
+                },
+            ),
+        );
+
+        passport.use(
+            'login',
+            new this.LocalStrategy(
+                {
+                    usernameField: 'email',
+                    passwordField: 'password',
+                },
+                async (email, password, done) => {
+                    try {
+                        const user = await User.findOne({ email });
+                        if (!user) {
+                            return done(null, false, {
+                                message: 'Wrong username or password',
+                            });
+                        }
+
+                        const isValidPassword = await user.isValidPassword(
+                            password,
+                        );
+                        if (!isValidPassword) {
+                            return done(null, false, {
+                                message: 'Wrong username or password',
+                            });
+                        }
+
+                        done(null, user.publicFields());
+                    } catch (error) {
+                        done(error);
+                    }
+                },
+            ),
+        );
+
         // Configure passport to use google OAuth.
         passport.use(
             new GoogleStrategy(
@@ -285,7 +497,7 @@ export class AuthController {
                     unusedAccessToken: string,
                     unusedRefreshToken: string,
                     profile: Profile,
-                    cb: VerifyCallback,
+                    cb: any,
                 ): Promise<void> => {
                     const googleProfile = profile as GoogleProfile;
                     try {

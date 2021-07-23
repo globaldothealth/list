@@ -1,3 +1,4 @@
+import React from 'react';
 import { Field, useFormikContext } from 'formik';
 import { Typography, makeStyles } from '@material-ui/core';
 
@@ -9,7 +10,6 @@ import FieldTitle from '../common-form-fields/FieldTitle';
 import { Location as Loc } from '../Case';
 import Location from './Location';
 import LocationOnIcon from '@material-ui/icons/LocationOn';
-import React from 'react';
 import { RequiredHelperText } from '../common-form-fields/FormikFields';
 import Scroll from 'react-scroll';
 import { TextField } from 'formik-material-ui';
@@ -58,9 +58,8 @@ const TooltipText = () => (
 );
 
 function LocationForm(): JSX.Element {
-    const { values, initialValues, setFieldValue } = useFormikContext<
-        CaseFormValues
-    >();
+    const { values, initialValues, setFieldValue } =
+        useFormikContext<CaseFormValues>();
     return (
         <Scroll.Element name="location">
             <FieldTitle title="Location" tooltip={<TooltipText />}></FieldTitle>
@@ -118,9 +117,8 @@ export function PlacesAutocomplete(
     const [value, setValue] = React.useState<Loc | null>(null);
     const [inputValue, setInputValue] = React.useState('');
     const [options, setOptions] = React.useState<Loc[]>([]);
-    const { setFieldValue, setTouched, touched } = useFormikContext<
-        CaseFormValues
-    >();
+    const { setFieldValue, setTouched, touched } =
+        useFormikContext<CaseFormValues>();
 
     const fetch = React.useMemo(
         () =>

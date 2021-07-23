@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 
 export default function GHListLogo(props: any) {
     const enableBackground = {
@@ -74,8 +75,8 @@ export default function GHListLogo(props: any) {
                     x2="1279.9"
                     y2="1051.7"
                 />
-                <a
-                    href="/"
+                <Link
+                    to="/"
                     data-testid="home-button-data"
                     rel="noopener noreferrer"
                 >
@@ -124,7 +125,7 @@ export default function GHListLogo(props: any) {
                             />
                         </g>
                     </g>
-                </a>
+                </Link>
             </svg>
         </>
     );

@@ -1,11 +1,8 @@
-import {
-    JobDefinition,
-} from 'aws-sdk/clients/batch';
+import { JobDefinition } from 'aws-sdk/clients/batch';
 
 import AWS from 'aws-sdk';
 import assertString from '../util/assert-string';
 import { logger } from '../util/logger';
-
 
 export interface BatchJobDefinition {
     name: string;
@@ -46,8 +43,7 @@ export default class AwsBatchClient {
                 apiVersion: '2016-08-10',
                 endpoint: localstackURL,
             });
-        }
-        else {
+        } else {
             this.batchClient = new AWS.Batch({
                 apiVersion: '2016-08-10',
             });
@@ -65,55 +61,59 @@ export default class AwsBatchClient {
         parseDateRange?: ParseDateRange,
     ): Promise<RetrievalPayload> => {
         try {
-        	const r = await this.batchClient
+            const r = await this.batchClient
                 .describeJobDefinitions({ maxResults: 10000 })
                 .promise();
 
             let jobName;
-            jobDefsLoop:
-	          	for (var jd of r.jobDefinitions || []) {
-                    if (jd.containerProperties){
-                        if (jd.containerProperties.environment) {
-                            for (var env_var of jd.containerProperties.environment) {
-                                if (env_var.name == 'EPID_INGESTION_SOURCE_ID' && env_var.value == sourceId) {
-                                    jobName = jd.jobDefinitionName;
-                                    break jobDefsLoop;
-                                }
+            jobDefsLoop: for (const jd of r.jobDefinitions || []) {
+                if (jd.containerProperties) {
+                    if (jd.containerProperties.environment) {
+                        for (const env_var of jd.containerProperties
+                            .environment) {
+                            if (
+                                env_var.name == 'EPID_INGESTION_SOURCE_ID' &&
+                                env_var.value == sourceId
+                            ) {
+                                jobName = jd.jobDefinitionName;
+                                break jobDefsLoop;
                             }
                         }
                     }
-	          	}
+                }
+            }
 
-	        if (!jobName) {
-	        	throw Error(
-	        		`Could not find jobDefinition for sourceId ${sourceId}`
-	        	);
-	        }
-
-            const res = await this.batchClient
-        		.submitJob({
-        			jobDefinition: jobName,
-        			jobName: jobName,
-        			jobQueue: this.jobQueueArn,
-        			containerOverrides: parseDateRange
-            			? {
-            				environment: [
-            					{
-            						name: 'EPID_INGESTION_PARSING_DATE_RANGE',
-            						value: parseDateRange.start.concat(',', parseDateRange.end)
-            					}
-            				]
-            			  }
-            			: undefined
-        		})
-                .promise();
-            if (!res.jobId) {
-            	logger.error(res);
-            	throw Error(
-                    `Retrieving source "${sourceId}" content: ${res}`,
+            if (!jobName) {
+                throw Error(
+                    `Could not find jobDefinition for sourceId ${sourceId}`,
                 );
             }
-            let ret = {jobName: res.jobName};
+
+            const res = await this.batchClient
+                .submitJob({
+                    jobDefinition: jobName,
+                    jobName: jobName,
+                    jobQueue: this.jobQueueArn,
+                    containerOverrides: parseDateRange
+                        ? {
+                              environment: [
+                                  {
+                                      name: 'EPID_INGESTION_PARSING_DATE_RANGE',
+                                      value: parseDateRange.start.concat(
+                                          ',',
+                                          parseDateRange.end,
+                                      ),
+                                  },
+                              ],
+                          }
+                        : undefined,
+                })
+                .promise();
+            if (!res.jobId) {
+                logger.error(res);
+                throw Error(`Retrieving source "${sourceId}" content: ${res}`);
+            }
+            const ret = { jobName: res.jobName };
             return ret;
         } catch (e) {
             logger.error(e);
@@ -128,16 +128,15 @@ export default class AwsBatchClient {
                 .describeJobDefinitions({ maxResults: 10000 })
                 .promise();
             return (
-                res.jobDefinitions?.filter((j) =>
-                    j.jobDefinitionName?.includes('ingestor'),
-                )?.map<BatchJobDefinition>((j) => {
-                    return { name: j.jobDefinitionName || '' };
-                }) || []
+                res.jobDefinitions
+                    ?.filter((j) => j.jobDefinitionName?.includes('ingestor'))
+                    ?.map<BatchJobDefinition>((j) => {
+                        return { name: j.jobDefinitionName || '' };
+                    }) || []
             );
         } catch (e) {
             logger.error(e);
             throw e;
         }
     };
-
 }

@@ -28,7 +28,6 @@ import Symptoms from './new-case-form-fields/Symptoms';
 import Transmission from './new-case-form-fields/Transmission';
 import TravelHistory from './new-case-form-fields/TravelHistory';
 import Variant from './new-case-form-fields/Variant';
-import User from './User';
 import axios from 'axios';
 import { cloneDeep } from 'lodash';
 import { hasKey } from './Utils';
@@ -184,7 +183,6 @@ function initialValuesFromCase(c?: Case): CaseFormValues {
 }
 
 interface Props {
-    user: User;
     initialCase?: Case;
     onModalClose: () => void;
 }
@@ -282,11 +280,12 @@ export default function CaseForm(props: Props): JSX.Element {
 
     const filterTravel = (travel: Travel[]): Travel[] => {
         const filteredTravel = cloneDeep(travel);
-        filteredTravel?.forEach((travel) => {
+        filteredTravel.forEach((travel) => {
             delete travel.reactId;
             if (
-                travel.dateRange.start === null &&
-                travel.dateRange.end === null
+                !travel.dateRange ||
+                (travel.dateRange.start === null &&
+                    travel.dateRange.end === null)
             ) {
                 delete travel.dateRange;
             } else {
@@ -314,7 +313,7 @@ export default function CaseForm(props: Props): JSX.Element {
         genomeSequences: GenomeSequence[],
     ): GenomeSequence[] => {
         const filteredGenomeSequences = cloneDeep(genomeSequences);
-        filteredGenomeSequences?.forEach((genomeSequence) => {
+        filteredGenomeSequences.forEach((genomeSequence) => {
             delete genomeSequence.reactId;
             if (genomeSequence.sampleCollectionDate) {
                 genomeSequence.sampleCollectionDate = toUTCDate(

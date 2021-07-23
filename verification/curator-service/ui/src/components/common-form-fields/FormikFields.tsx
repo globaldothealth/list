@@ -1,3 +1,4 @@
+import React from 'react';
 import { Autocomplete, createFilterOptions } from '@material-ui/lab';
 import { FastField, Field, useFormikContext } from 'formik';
 
@@ -11,7 +12,6 @@ import InputLabel from '@material-ui/core/InputLabel';
 import { KeyboardDatePicker } from 'formik-material-ui-pickers';
 import MenuItem from '@material-ui/core/MenuItem';
 import { MuiPickersUtilsProvider } from '@material-ui/pickers';
-import React from 'react';
 import { Select } from 'formik-material-ui';
 import { TextField } from 'formik-material-ui';
 import axios from 'axios';
@@ -49,12 +49,8 @@ export function FormikAutocomplete(
     const [open, setOpen] = React.useState(false);
     const [options, setOptions] = React.useState<string[]>([]);
     const loading = open && options.length === 0;
-    const {
-        setFieldValue,
-        setTouched,
-        initialValues,
-        values,
-    } = useFormikContext<CaseFormValues>();
+    const { setFieldValue, setTouched, initialValues, values } =
+        useFormikContext<CaseFormValues>();
 
     React.useEffect(() => {
         let active = true;
@@ -226,14 +222,14 @@ export function RequiredHelperText(
     const { values, touched } = useFormikContext<
         CaseFormValues | BulkCaseFormValues | AutomatedSourceFormValues
     >();
-    
-    let finalHelperText = "Required";
+
+    let finalHelperText = 'Required';
     if (props.wrongUrl === false) {
-        finalHelperText = "Please enter a valid URL"
+        finalHelperText = 'Please enter a valid URL';
     } else if (props.locationRequiredText) {
         finalHelperText = props.locationRequiredText;
     }
-    
+
     return (
         <div>
             <FormHelperText
@@ -242,8 +238,8 @@ export function RequiredHelperText(
                     touched[props.name] &&
                     hasKey(values, props.name) &&
                     (values[props.name] === undefined ||
-                        values[props.name] === null || 
-                        props.wrongUrl === false) 
+                        values[props.name] === null ||
+                        props.wrongUrl === false)
                 }
             >
                 {finalHelperText}

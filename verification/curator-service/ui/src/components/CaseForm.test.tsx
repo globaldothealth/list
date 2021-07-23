@@ -58,7 +58,6 @@ it('renders form', async () => {
     const { getAllByText, getByTestId, getByText } = render(
         <MemoryRouter>
             <CaseForm
-                user={user}
                 onModalClose={(): void => {
                     return;
                 }}
@@ -80,7 +79,6 @@ test('Check location error message to become red on submit', () => {
     const { getByText } = render(
         <MemoryRouter>
             <CaseForm
-                user={user}
                 onModalClose={(): void => {
                     return;
                 }}
@@ -98,7 +96,6 @@ it('can add and remove genome sequencing sections', async () => {
     const { queryByTestId, getByTestId, getByText } = render(
         <MemoryRouter>
             <CaseForm
-                user={user}
                 onModalClose={(): void => {
                     return;
                 }}

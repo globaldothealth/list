@@ -14,8 +14,8 @@ interface ISource {
     name: string;
     origin: OriginDocument;
     format: string;
-    excludeFromLineList: boolean,
-    hasStableIdentifiers: boolean,
+    excludeFromLineList: boolean;
+    hasStableIdentifiers: boolean;
     automation: AutomationDocument;
     uploads: UploadDocument[];
     dateFilter: DateFilterDocument;
@@ -25,11 +25,15 @@ interface ISource {
     toAwsRuleDescription(): string;
     toAwsRuleName(): string;
     toAwsRuleTargetId(): string;
-};
+}
 
-interface ISourceInstanceCreation extends mongoose.Model<ISource> {};
+type ISourceInstanceCreation = mongoose.Model<ISource>;
 
-const sourceSchema = new mongoose.Schema<ISource, ISourceInstanceCreation, ISource>({
+const sourceSchema = new mongoose.Schema<
+    ISource,
+    ISourceInstanceCreation,
+    ISource
+>({
     name: {
         type: String,
         required: [true, 'Enter a name'],

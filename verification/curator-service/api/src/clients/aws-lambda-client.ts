@@ -20,13 +20,12 @@ export default class AwsLambdaClient {
     ) {
         AWS.config.update({ region: awsRegion });
         if (serviceEnv == 'locale2e') {
-            logger.info("using localstack");
+            logger.info('using localstack');
             this.lambdaClient = new AWS.Lambda({
                 apiVersion: '2015-03-31',
                 endpoint: localstackURL,
             });
-        }
-        else {
+        } else {
             this.lambdaClient = new AWS.Lambda({
                 apiVersion: '2015-03-31',
             });

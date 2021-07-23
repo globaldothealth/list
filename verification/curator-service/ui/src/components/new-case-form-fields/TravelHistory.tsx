@@ -1,3 +1,4 @@
+import React from 'react';
 import {
     DateField,
     FormikAutocomplete,
@@ -13,7 +14,6 @@ import FieldTitle from '../common-form-fields/FieldTitle';
 import Location from './Location';
 import { PlacesAutocomplete } from './LocationForm';
 import { StyledTooltip } from './StyledTooltip';
-import React from 'react';
 import Scroll from 'react-scroll';
 import { makeStyles } from '@material-ui/core';
 import shortId from 'shortid';

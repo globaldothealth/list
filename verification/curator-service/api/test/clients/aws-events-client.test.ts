@@ -36,7 +36,12 @@ beforeEach(() => {
         env.SERVICE_ENV,
         env.LOCALSTACK_URL,
         'us-east-1',
-        new AwsBatchClient(env.SERVICE_ENV, env.LOCALSTACK_URL, 'test-arn', 'us-east-1'),
+        new AwsBatchClient(
+            env.SERVICE_ENV,
+            env.LOCALSTACK_URL,
+            'test-arn',
+            'us-east-1',
+        ),
         'test-arn',
     );
 });
@@ -82,8 +87,8 @@ describe('putRule', () => {
                         Id: targetId,
                         RoleArn: client.eventRoleArn,
                         BatchParameters: {
-                                JobDefinition: targetArn,
-                                JobName: ruleName,
+                            JobDefinition: targetArn,
+                            JobName: ruleName,
                         },
                     },
                 ],

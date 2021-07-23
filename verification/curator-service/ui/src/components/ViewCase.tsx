@@ -1,3 +1,4 @@
+import React, { useEffect, useState } from 'react';
 import {
     Button,
     Grid,
@@ -13,7 +14,6 @@ import {
     Variant,
     VerificationStatus,
 } from './Case';
-import React, { useEffect, useState } from 'react';
 import AppModal from './AppModal';
 import EditIcon from '@material-ui/icons/EditOutlined';
 import { Link } from 'react-router-dom';
@@ -32,7 +32,7 @@ import { useSelector } from 'react-redux';
 import {
     selectSearchQuery,
     selectFilterBreadcrumbs,
-} from './App/redux/selectors';
+} from '../redux/app/selectors';
 import Chip from '@material-ui/core/Chip';
 
 const styles = makeStyles((theme) => ({
