@@ -143,8 +143,6 @@ def write_to_server(
     counter = collections.defaultdict(int)
     counter['batch_num'] = 0
     start_time = time.time()
-    encountered_207 = False
-    validation_messages = {}
     while True:
         batch_num = counter['batch_num']
         counter['batch_num'] += 1
@@ -183,7 +181,7 @@ def write_to_server(
                 # We can consider separating geocoding issues, but for now classifying it
                 # as a validation problem is pretty reasonable.
                 # The motivation for continuing past 207 errors is https://github.com/globaldothealth/list/issues/1849
-                encountered_207 = True
+
                 # The errors from the backend tell us which cases failed and for what reason. Make it
                 # easier to diagnose by extracting the failing case and attaching it to the error message.
                 res_json = res.json()
@@ -195,9 +193,10 @@ def write_to_server(
                     augmented_errors = [add_input_to_error(e) for e in res_json['errors']]
                     reported_error = dict(res_json)
                     reported_error['errors'] = augmented_errors
-                    validation_messages[f"batch_{batch_num}"] = json.dumps(reported_error)
+                    print(f"Validation error in batch {batch_num}:", json.dumps(reported_error))
+                    counter['numError'] += len(res_json['errors'])
                 else:
-                    validation_messages[f"batch_{batch_num}"] = res.text
+                    print(f"Validation error in batch {batch_num}: {res.text}")
             continue
 
         # Response can contain an 'error' field which describe each error that
@@ -212,15 +211,7 @@ def write_to_server(
             count_updated=counter['numUpdated'])
         return
     print(f'sent {counter["total"]} cases in {time.time() - start_time} seconds')
-    if encountered_207 == True:
-        e = RuntimeError(f'Validation errors encountered, details:\n{json.dumps(validation_messages)}')
-        common_lib.complete_with_error(
-            e, env, common_lib.UploadError.VALIDATION_ERROR,
-            source_id, upload_id, headers, cookies,
-            count_created=counter['numCreated'],
-            count_updated=counter['numUpdated'])
-        return
-    return counter['numCreated'], counter['numUpdated']
+    return counter['numCreated'], counter['numUpdated'], counter['numError']
 
 
 def get_today() -> datetime.datetime:
@@ -369,7 +360,7 @@ def run(
         excluded_case_ids = retrieve_excluded_case_ids(source_id, date_filter, date_range, env,
                                                        headers=api_creds, cookies=cookies)
         final_cases = prepare_cases(case_data, upload_id, excluded_case_ids)
-        count_created, count_updated = write_to_server(
+        count_created, count_updated, count_error = write_to_server(
             filter_cases_by_date(
                 final_cases,
                 date_filter,
@@ -382,7 +373,7 @@ def run(
         for _ in range(5):  # Maximum number of attempts to finalize upload
             status, text = common_lib.finalize_upload(
                 env, source_id, upload_id, api_creds, cookies, count_created,
-                count_updated
+                count_updated, count_error
             )
             if status == 200:
                 break
