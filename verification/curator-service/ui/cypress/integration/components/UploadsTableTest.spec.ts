@@ -22,7 +22,7 @@ describe('Uploads table', function () {
             {
                 _id: '5ef8e943dfe6e00030892d60',
                 status: 'SUCCESS',
-                summary: { numUpdated: 4 },
+                summary: { numUpdated: 4, numError: 1 },
                 created: '2020-01-03',
             },
             {
@@ -49,6 +49,7 @@ describe('Uploads table', function () {
         cy.contains('5ef8e943dfe6e00030892d60');
         cy.contains('2020-01-03');
         cy.contains('4');
+        cy.contains('1');
         cy.contains('5ef8e943dfe6e00030892d61');
         cy.contains('2020-01-04');
     });
