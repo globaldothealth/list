@@ -227,7 +227,7 @@ export class AuthController {
                     if (user.googleID) {
                         await this.emailClient.send(
                             [email],
-                            'Password reset requested',
+                            'Password Reset Request',
                             `We were asked to reset your password on Global.health, but you are registered with your Google account. 
                             If you requested the password reset, then please try again, this time using the "Sign in with Google" button on the global.health portal. 
                             Otherwise, no further action is needed.`,
@@ -272,8 +272,11 @@ export class AuthController {
 
                     await this.emailClient.send(
                         [email],
-                        'Password reset link',
-                        `To reset your password click <a href="${resetLink}">here</a>`,
+                        'Password Reset Request',
+                        `<p>Hello ${email},</p>
+                        <p>Here is a <a href="${resetLink}">link</a> to reset your password on Global.health. If you did not initiate this request, please disregard this message.</p>
+                        <p>Thanks,</p>
+                        <p>The G.h Team</p>`,
                     );
 
                     return res.sendStatus(200);
@@ -340,8 +343,11 @@ export class AuthController {
 
                     await this.emailClient.send(
                         [user.email],
-                        'Password changed successfully',
-                        'Your password was changed successfully',
+                        'Password Change Confirmation',
+                        `<p>Hello ${user.email},</p>
+                        <p>Your Global.health password has been changed. If you did not initiate this request or are unable to access your account, please respond to this email and we'll be happy to assist.</p>
+                        <p>Thanks,</p>
+                        <p>The G.h Team</p>`,
                     );
 
                     // Delete used token
