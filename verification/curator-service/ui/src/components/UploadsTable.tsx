@@ -41,6 +41,7 @@ interface UploadsTableState {
 interface UploadSummary {
     numCreated?: number;
     numUpdated?: number;
+    numError?: number;
     error?: string;
 }
 
@@ -71,6 +72,7 @@ interface TableRow {
     sourceName: string;
     numCreated: number;
     numUpdated: number;
+    numError: number;
 }
 
 class UploadsTable extends React.Component<Props, UploadsTableState> {
@@ -145,6 +147,20 @@ class UploadsTable extends React.Component<Props, UploadsTableState> {
                                 ),
                             },
                             {
+                                title: '# errors',
+                                field: 'numError',
+                                render: (rowData): JSX.Element => (
+                                    <Link
+                                        to={{
+                                            pathname: '/cases',
+                                            search: `?uploadid=${rowData.id}`,
+                                        }}
+                                    >
+                                        {rowData.numError}
+                                    </Link>
+                                ),
+                            },
+                            {
                                 title: 'Source name',
                                 field: 'sourceName',
                             },
@@ -178,6 +194,9 @@ class UploadsTable extends React.Component<Props, UploadsTableState> {
                                                     numUpdated:
                                                         u.upload.summary
                                                             .numUpdated ?? 0,
+                                                    numError:
+                                                        u.upload.summary
+                                                            .numError ?? 0,
                                                 };
                                             });
                                         resolve({
