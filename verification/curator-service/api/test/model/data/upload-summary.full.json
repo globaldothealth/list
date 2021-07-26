@@ -1,5 +1,6 @@
 {
     "numCreated": 0,
     "numUpdated": 0,
+    "numError": 0,
     "error": "Error summary here."
 }

@@ -20,6 +20,7 @@ it('loads and displays uploads', async () => {
     const status = 'IN_PROGRESS';
     const numCreated = 4;
     const numUpdated = 6;
+    const numError = 1;
     const uploads = [
         {
             sourceUrl: sourceUrl,
@@ -27,7 +28,7 @@ it('loads and displays uploads', async () => {
             upload: {
                 _id: uploadId,
                 status: status,
-                summary: { numCreated: numCreated, numUpdated: numUpdated },
+                summary: { numCreated, numUpdated, numError },
             },
         },
     ];
@@ -62,6 +63,7 @@ it('loads and displays uploads', async () => {
     expect(await findByText(new RegExp(status))).toBeInTheDocument();
     expect(await findByText(`${numCreated}`)).toBeInTheDocument();
     expect(await findByText(`${numUpdated}`)).toBeInTheDocument();
+    expect(await findByText(`${numError}`)).toBeInTheDocument();
 });
 
 it('API errors are displayed', async () => {

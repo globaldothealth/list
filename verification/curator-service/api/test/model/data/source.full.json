@@ -20,6 +20,7 @@
             "summary": {
                 "numCreated": 0,
                 "numUpdated": 0,
+                "numError": 0,
                 "error": "INTERNAL_ERROR"
             },
             "created": "2020-01-13"
