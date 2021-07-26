@@ -77,7 +77,7 @@ export default class EmailClient {
                     Data: subject,
                 },
             },
-            Source: this.sourceEmail,
+            Source: `Global.health Team <${this.sourceEmail}>`,
         };
 
         try {
