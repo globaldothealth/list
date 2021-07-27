@@ -2,7 +2,7 @@
 # If you come from a unittest background and wonder at how requests_mock
 # arrives by magic here, check out
 # https://requests-mock.readthedocs.io/en/latest/pytest.html?highlight=pytest#pytest
-import boto3
+import io
 import copy
 import json
 import os
@@ -10,6 +10,7 @@ import pytest
 import sys
 import tempfile
 import datetime
+from contextlib import redirect_stdout
 
 from unittest.mock import MagicMock, patch
 
@@ -365,7 +366,7 @@ def test_prepare_cases_removes_empty_strings():
     assert "notes" not in next(result).keys()
 
 
-def test_write_to_server_returns_created_and_updated_count(
+def test_write_to_server_returns_created_updated_error_count(
         requests_mock, mock_source_api_url_fixture):
     import parsing_lib  # Import locally to avoid superseding mock
     full_source_url = f"{_SOURCE_API_URL}/cases/batchUpsert"
@@ -376,7 +377,7 @@ def test_write_to_server_returns_created_and_updated_count(
         json={"numCreated": num_created,
               "numUpdated": num_updated})
 
-    count_created, count_updated = parsing_lib.write_to_server(
+    count_created, count_updated, count_error = parsing_lib.write_to_server(
         iter([_PARSED_CASE]),
         "env", _SOURCE_ID, "upload_id", {},
         {},
@@ -384,6 +385,7 @@ def test_write_to_server_returns_created_and_updated_count(
     assert requests_mock.request_history[0].url == full_source_url
     assert count_created == num_created
     assert count_updated == num_updated
+    assert count_error == 0
 
 
 def test_write_to_server_raises_error_for_failed_batch_upsert(
@@ -417,14 +419,14 @@ def test_write_to_server_raises_error_for_failed_batch_upsert(
     assert False
 
 
-def test_write_to_server_raises_error_for_failed_batch_upsert_with_validation_errors(
+def test_write_to_server_success_for_batch_upsert_with_validation_errors(
         requests_mock, mock_source_api_url_fixture):
     import parsing_lib  # Import locally to avoid superseding mock
     # TODO: Complete removal of URL env var.
     os.environ["SOURCE_API_URL"] = _SOURCE_API_URL
     full_source_url = f"{_SOURCE_API_URL}/cases/batchUpsert"
     requests_mock.register_uri(
-        "POST", full_source_url, json={ 
+        "POST", full_source_url, json={
             'numCreated': 0,
             'numUpdated': 0,
         }, status_code=207),
@@ -432,20 +434,15 @@ def test_write_to_server_raises_error_for_failed_batch_upsert_with_validation_er
     update_upload_url = f"{_SOURCE_API_URL}/sources/{_SOURCE_ID}/uploads/{upload_id}"
     requests_mock.register_uri("PUT", update_upload_url, json={})
 
-    try:
-        parsing_lib.write_to_server(
-            iter([_PARSED_CASE]),
-            "env", _SOURCE_ID, upload_id, {},
-            {},
-            parsing_lib.CASES_BATCH_SIZE)
-    except RuntimeError:
-        assert requests_mock.request_history[0].url == full_source_url
-        assert requests_mock.request_history[1].url == update_upload_url
-        assert requests_mock.request_history[-1].json(
-        ) == {"status": "ERROR", "summary": {"error": common_lib.UploadError.VALIDATION_ERROR.name}}
-        return
-    # We got the wrong exception or no exception, fail the test.
-    assert False
+    numCreated, numUpdated, numError = parsing_lib.write_to_server(
+        iter([_PARSED_CASE]),
+        "env", _SOURCE_ID, upload_id, {},
+        {},
+        parsing_lib.CASES_BATCH_SIZE)
+    assert numCreated == 0
+    assert numUpdated == 0
+    assert numError == 0
+    assert requests_mock.request_history[0].url == full_source_url
 
 
 def test_write_to_server_records_input_for_failed_batch_upsert_with_validation_errors(
@@ -466,24 +463,19 @@ def test_write_to_server_records_input_for_failed_batch_upsert_with_validation_e
             'numUpdated': 0,
         }, status_code=207),
     upload_id = "123456789012345678901234"
-    update_upload_url = f"{_SOURCE_API_URL}/sources/{_SOURCE_ID}/uploads/{upload_id}"
-    requests_mock.register_uri("PUT", update_upload_url, json={})
 
-    try:
-        parsing_lib.write_to_server(
+    with redirect_stdout(io.StringIO()) as f:
+        numCreated, numUpdated, numError = parsing_lib.write_to_server(
             iter([_PARSED_CASE]),
             "env", _SOURCE_ID, upload_id, {},
             {},
             parsing_lib.CASES_BATCH_SIZE)
-    except RuntimeError as e:
-        assert requests_mock.request_history[0].url == full_source_url
-        assert requests_mock.request_history[1].url == update_upload_url
-        assert requests_mock.request_history[-1].json(
-        ) == {"status": "ERROR", "summary": {"error": common_lib.UploadError.VALIDATION_ERROR.name}}
-        assert e.args[0].find('Hanuman Nagar, Darbhanga, Bihar, India') != -1
-        return
-    # We got the wrong exception or no exception, fail the test.
-    assert False
+    parsing_output = f.getvalue()
+    assert numCreated == 0
+    assert numUpdated == 0
+    assert numError == 1
+    assert requests_mock.request_history[0].url == full_source_url
+    assert parsing_output.find('Hanuman Nagar, Darbhanga, Bihar, India') != -1
 
 
 @patch('parsing_lib.get_today')

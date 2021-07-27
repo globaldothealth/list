@@ -61,7 +61,7 @@ class ParaTest(unittest.TestCase):
                         "heart disease"
                     ]
                 },
-                "notes": "Other symptoms reported"
+                "restrictedNotes": "Other symptoms reported"
             },
             {
                 "caseReference": {"sourceId": _SOURCE_ID, "sourceEntryId": "1BbNtddcVG", "sourceUrl": _SOURCE_URL},

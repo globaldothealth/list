@@ -57,7 +57,7 @@ class SantaCatarinaTest(unittest.TestCase):
                     "ethnicity": None
                 },
                 "preexistingConditions": None,
-                "notes": "Neighbourhood: ESCOLA AGRICOLA"
+                "restrictedNotes": "Neighbourhood: ESCOLA AGRICOLA"
             },
             {
                 "caseReference": {"sourceId": _SOURCE_ID, "sourceUrl": _SOURCE_URL},
@@ -121,6 +121,6 @@ class SantaCatarinaTest(unittest.TestCase):
                     "hasPreexistingConditions": True,
                     "values": ["cardiovascular system disease"]
                 },
-                "notes": "Neighbourhood: JARDIM ATLANTICO"
+                "restrictedNotes": "Neighbourhood: JARDIM ATLANTICO"
             }          
         ])

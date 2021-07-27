@@ -179,7 +179,7 @@ class ManausTest(unittest.TestCase):
                         "end": None
                     }
                 },
-                "notes": "Patient died from other causes"
+                "restrictedNotes": "Patient died from other causes"
             },
             {
                 "caseReference": {"sourceId": _SOURCE_ID, "sourceUrl": _SOURCE_URL},

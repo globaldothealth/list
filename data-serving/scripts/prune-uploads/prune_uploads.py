@@ -1,13 +1,14 @@
 # prune_uploads.py -- Mark new uploads as ingested and delete failed uploads
 
 # This is a script that should be run periodically that sets every upload
-# older than the last successful upload to list = false (for non-UUID
+# older than the last acceptable upload to list = false (for non-UUID
 # sources). For UUID sources, set everything to list = true. After marking,
 # this deletes everything with list = false.
 
 import os
 import sys
 from typing import Optional, List, Tuple, Dict, Any
+from datetime import datetime
 
 import pymongo
 
@@ -16,27 +17,67 @@ def _ids(xs):
     return [str(x["_id"]) for x in xs]
 
 
-def find_successful_upload(
-    source: Dict[str, Any],
+def accept_upload(upload: Dict[str, Any], threshold: float) -> bool:
+    """Whether to accept upload
+
+    :param upload: Upload data as a dictionary
+    :param threshold: Threshold ratio of errors above which an upload
+    is not accepted
+
+    :return: Whether the upload is acceptable
+    """
+    created = upload['summary'].get('numCreated', 0)
+    updated = upload['summary'].get('numUpdated', 0)
+    errors = upload['summary'].get('numError', 0)
+    return (
+        upload['status'] == "SUCCESS"
+        and created > 0
+        and updated == 0  # non-UUID sources should never update a case
+        and errors / (errors + created) <= threshold
+    )
+
+
+def find_acceptable_upload(
+    source: Dict[str, Any], threshold: float, epoch: datetime = None
 ) -> Optional[Tuple[str, List[str]]]:
+    """Finds last upload that can be accepted for inclusion in line list
+
+    :param source: Source data
+    :param threshold: Threshold ratio of errors above which
+      an upload is not accepted.
+    :param epoch: Epoch date after which acceptable uploads will be considered
+
+    epoch is the initial datetime after which we should consider non-UUID
+    sources to have data only corresponding to a single upload. Prior to
+    this date, data does not correspond to a single upload.
+
+    If not specified, considers the last acceptable upload to be
+    contain the entire dataset.
+
+    :return: A tuple of
+      (last acceptable upload, list of uploads to mark for deletion).
+      If no acceptable upload is found, returns None
+    """
     # mark uploads is only for sources without stable identifiers
-    hasStableIdentifiers = source.get("hasStableIdentifiers", False)
-    if hasStableIdentifiers:
+    if source.get("hasStableIdentifiers", False):
         return None
     uploads = source["uploads"]
     # sort uploads, with most recent being the first
     uploads.sort(key=lambda x: x["created"], reverse=True)
-    # find first successful upload
-    upload_statuses = [u["status"] for u in uploads]
+    accept_uploads = [accept_upload(u, threshold) for u in uploads]
     try:
-        success_upload_idx = upload_statuses.index("SUCCESS")
+        accept_idx = accept_uploads.index(True)
     except ValueError:
-        # no uploads were successful
-        success_upload_idx = -1
-    if success_upload_idx > -1:
+        accept_idx = -1  # no acceptable upload found
+    if accept_idx > -1 and (
+        not epoch or uploads[accept_idx]["created"] > epoch
+    ):
         # Return uploads older than last successful upload
-        return str(uploads[success_upload_idx]["_id"]), _ids(
-            uploads[success_upload_idx + 1 :]
+        return str(uploads[accept_idx]["_id"]), _ids(
+            uploads[accept_idx + 1 :]
+            # Also mark for deletion uploads after accepted upload
+            # that are not IN_PROGRESS
+            + [u for u in uploads[:accept_idx] if u["status"] != "IN_PROGRESS"]
         )
 
 
@@ -64,6 +105,12 @@ def mark_all(cases: pymongo.collection.Collection, source_id):
 
 if __name__ == "__main__":
 
+    # PRUNE_EPOCH is in YYYY-MM-DD format
+    if epoch := os.environ.get("PRUNE_EPOCH", None):
+        epoch = datetime.fromisoformat(epoch)
+
+    threshold = os.environ.get("PRUNE_ERROR_THRESHOLD_PERCENT", 10) / 100
+
     # CONN is https://docs.mongodb.com/manual/reference/connection-string/
     try:
         print("Connecting to database...")
@@ -80,8 +127,8 @@ if __name__ == "__main__":
         _n = s["name"]
         print(f"Processing source {_id}: {_n}")
         if not s.get("hasStableIdentifiers", False):
-            if (m := find_successful_upload(s)) is None:
-                print(f"[{_n}] No successful upload found")
+            if (m := find_acceptable_upload(s, threshold, epoch)) is None:
+                print(f"[{_n}] No acceptable upload found")
                 continue
             success, older = m
             delete = True

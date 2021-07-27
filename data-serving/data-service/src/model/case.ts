@@ -49,6 +49,7 @@ export const caseSchema = new mongoose.Schema(
         location: locationSchema,
         revisionMetadata: revisionMetadataSchema,
         notes: String,
+        restrictedNotes: String,
         pathogens: [pathogenSchema],
         list: Boolean,
         preexistingConditions: preexistingConditionsSchema,
@@ -97,6 +98,7 @@ caseSchema.methods.equalsJSON = function (jsonCase: any): boolean {
         _.isEqual(thisJson.genomeSequences, other.genomeSequences) &&
         _.isEqual(thisJson.location, other.location) &&
         _.isEqual(thisJson.notes, other.notes) &&
+        _.isEqual(thisJson.restrictedNotes, other.restrictedNotes) &&
         _.isEqual(thisJson.pathogens, other.pathogens) &&
         _.isEqual(
             thisJson.preexistingConditions,
@@ -120,6 +122,7 @@ export type CaseDocument = mongoose.Document & {
     location: LocationDocument;
     revisionMetadata: RevisionMetadataDocument;
     notes: string;
+    restrictedNotes?: string;
     pathogens: [PathogenDocument];
     list: boolean;
     preexistingConditions: PreexistingConditionsDocument;
