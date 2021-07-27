@@ -227,10 +227,13 @@ export class AuthController {
                     if (user.googleID) {
                         await this.emailClient.send(
                             [email],
-                            'Password Reset Request',
-                            `We were asked to reset your password on Global.health, but you are registered with your Google account. 
-                            If you requested the password reset, then please try again, this time using the "Sign in with Google" button on the global.health portal. 
-                            Otherwise, no further action is needed.`,
+                            'Password Change Request',
+                            `<p>Hello ${email},</p>
+                            <p>You requested to reset your password on Global.health, but you are registered with your Google account. 
+                            If you requested the password reset, please try logging in using the "Sign in with Google" button and 
+                            resetting your password via your Google account if necessary. If not, no further action is needed.</p>
+                            <p>Thanks,</p>
+                            <p>The G.h Team</p>`,
                         );
 
                         return res.sendStatus(200);
