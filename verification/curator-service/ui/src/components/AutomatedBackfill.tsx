@@ -88,6 +88,7 @@ const useStyles = makeStyles(() => ({
 interface UploadSummary {
     numCreated?: number;
     numUpdated?: number;
+    numError?: number;
     error?: string;
 }
 
@@ -156,8 +157,15 @@ export default function AutomatedBackfill(props: Props): JSX.Element {
                 const updateMessage = upload.summary?.numUpdated
                     ? ` Updated ${upload.summary.numUpdated} case(s).`
                     : '';
+                const errorMessage = upload.summary?.numError
+                    ? `Validation error in ${upload.summary.numError} case(s).`
+                    : '';
                 setSuccessMessage(
-                    baseMessage.concat(createMessage, updateMessage),
+                    baseMessage.concat(
+                        createMessage,
+                        updateMessage,
+                        errorMessage,
+                    ),
                 );
             } else if (uploadStart && outOfTime(uploadStart)) {
                 setUploadStatus('ERROR');

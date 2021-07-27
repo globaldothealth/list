@@ -150,6 +150,7 @@ describe('mustHaveAnyRole', () => {
         const mLambdaClient = new MockLambdaClient('', '', '');
         const mEmailClient = new MockEmailClient('', '', '', '');
         const authController = new AuthController(
+            'local',
             '/redirect-after-login',
             mLambdaClient,
             mEmailClient,

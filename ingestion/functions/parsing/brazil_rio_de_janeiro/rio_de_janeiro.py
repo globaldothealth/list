@@ -141,7 +141,7 @@ def parse_cases(raw_data_file, source_id, source_url):
                 notes.append(f'Date case was reported was {convert_date(entry["dt_coleta_dt_notif"],dataserver=False)}')
 
 
-            case["notes"] = "\n".join(notes)
+            case["restrictedNotes"] = "\n".join(notes)
             cases.append(case)
 
             yield case

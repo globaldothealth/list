@@ -126,6 +126,7 @@ interface ExclusionData {
 export interface Case {
     _id: string;
     caseReference: CaseReference;
+    list: boolean;
     importedCase?: {
         outcome?: string;
     };

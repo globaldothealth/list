@@ -34,10 +34,8 @@ def lambda_handler(event, context):
           https://docs.aws.amazon.com/lambda/latest/dg/python-context-object.html
     """
 
-    num_cases = cases.count_documents({})
+    num_cases = cases.count_documents({'list': True})
     print(f"There are {num_cases} total cases.")
-    exclude_sources = [str(s['_id']) for s in db.sources.find({"excludeFromLineList": True})]
-    print(f"Excluding sources {exclude_sources}")
     with open("fields.txt", "r") as f:
         field_names = ",".join(f.read().split("\n"))
     num_chunks = num_cases // limit
@@ -53,7 +51,6 @@ def lambda_handler(event, context):
             "num_chunk": num_chunk,
             "num_chunks": num_chunks,
             "field_names": field_names,
-            "exclude_sources": exclude_sources,
         }
         print(f"Invoking export #{num_chunk} of {num_chunks}")
         response = lambda_client.invoke(

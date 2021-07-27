@@ -9,7 +9,7 @@
       "__v": {
         "bsonType": "int"
       },
-      "pendingRemoval": {
+      "list": {
         "bsonType": "bool"
       },
       "caseReference": {
@@ -378,6 +378,9 @@
         }
       },
       "notes": {
+        "bsonType": "string"
+      },
+      "restrictedNotes": {
         "bsonType": "string"
       },
       "revisionMetadata": {

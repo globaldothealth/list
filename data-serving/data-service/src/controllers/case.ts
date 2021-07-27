@@ -1,7 +1,7 @@
 import { Case, CaseDocument, RestrictedCase } from '../model/case';
 import { EventDocument } from '../model/event';
 import { Source } from '../model/source';
-import { DocumentQuery, Error, Query } from 'mongoose';
+import { DocumentQuery, Error, LeanDocument, Query } from 'mongoose';
 import { ObjectId, QuerySelector } from 'mongodb';
 import { GeocodeOptions, Geocoder, Resolution } from '../geocoding/geocoder';
 import { NextFunction, Request, Response } from 'express';
@@ -32,7 +32,7 @@ export class CasesController {
         // Don't look in the restricted collection
         const c = await Case.find({
             _id: new ObjectId(req.params.id),
-        });
+        }).lean();
 
         if (c.length === 0) {
             res.status(404).send({
@@ -40,6 +40,12 @@ export class CasesController {
             });
             return;
         }
+
+        // don't export restricted notes
+        c.forEach((aCase: LeanDocument<CaseDocument>) => {
+            delete aCase.restrictedNotes;
+        });
+
         res.json(c);
     };
 
@@ -71,7 +77,7 @@ export class CasesController {
                     _id: { $in: req.body.caseIds },
                 }).lean();
             } else {
-                casesQuery = Case.find({}).lean();
+                casesQuery = Case.find({ list: true }).lean();
             }
 
             // Limit number of results if present
@@ -83,6 +89,10 @@ export class CasesController {
             const matchingCases = await casesQuery.collation({
                 locale: 'en_US',
                 strength: 2,
+            });
+
+            matchingCases.forEach((aCase: LeanDocument<CaseDocument>) => {
+                delete aCase.restrictedNotes;
             });
 
             //Get current date
@@ -227,9 +237,16 @@ export class CasesController {
             // Do a fetch of documents and another fetch in parallel for total documents
             // count used in pagination.
             const [docs, total] = await Promise.all([
-                sortedQuery.skip(limit * (page - 1)).limit(limit),
+                sortedQuery
+                    .skip(limit * (page - 1))
+                    .limit(limit)
+                    .lean(),
                 countQuery,
             ]);
+
+            docs.forEach((aDoc: LeanDocument<CaseDocument>) => {
+                delete aDoc.restrictedNotes;
+            });
             logger.info('got results');
             // total is actually stored in a count index in mongo, so the query is fast.
             // however to maintain existing behaviour, only return the count limit
@@ -847,35 +864,6 @@ export class CasesController {
         res.status(200).json({ cases: caseIds }).end();
     };
 
-    /** Indicate that each case for the given source is pending deletion. */
-    markPendingRemoval = async (req: Request, res: Response): Promise<void> => {
-        try {
-            req.body.cases.forEach((c: CaseDocument) => {
-                c.pendingRemoval = true;
-                c.save();
-            });
-            res.status(204).end();
-        } catch (err) {
-            res.status(500).json(err).end();
-        }
-    };
-
-    /** Unset the pending deletion flag for cases from this source. */
-    clearPendingRemovalStatus = async (
-        req: Request,
-        res: Response,
-    ): Promise<void> => {
-        try {
-            req.body.cases.forEach((c: CaseDocument) => {
-                c.pendingRemoval = false;
-                c.save();
-            });
-            res.status(204).end();
-        } catch (err) {
-            res.status(500).json(err).end();
-        }
-    };
-
     private filterCasesBySourceRestricted(cases: any) {
         const unrestrictedCases = _.filter(cases, async (c) => {
             const source = await Source.findOne({
@@ -1019,35 +1007,25 @@ export const casesMatchingSearchQuery = (opts: {
     const queryOpts = parsedSearch.fullTextSearch
         ? {
               $text: { $search: parsedSearch.fullTextSearch },
+              list: true,
           }
-        : {};
+        : { list: true };
 
-    let casesQuery: DocumentQuery<CaseDocument[], CaseDocument>;
-    let countQuery: Query<number, CaseDocument>;
-
-    if (opts.searchQuery === '') {
-        // Always search with case-insensitivity.
-        casesQuery = Case.find(queryOpts).collation({
+    // Always search with case-insensitivity.
+    const casesQuery: DocumentQuery<CaseDocument[], CaseDocument> = Case.find(
+        queryOpts,
+    ).collation({
+        locale: 'en_US',
+        strength: 2,
+    });
+    const countQuery: Query<number, CaseDocument> = Case.countDocuments(
+        queryOpts,
+    )
+        .limit(countLimit)
+        .collation({
             locale: 'en_US',
             strength: 2,
         });
-        countQuery = Case.estimatedDocumentCount().collation({
-            locale: 'en_US',
-            strength: 2,
-        });
-    } else {
-        // Always search with case-insensitivity.
-        casesQuery = Case.find(queryOpts).collation({
-            locale: 'en_US',
-            strength: 2,
-        });
-        countQuery = Case.countDocuments(queryOpts)
-            .limit(countLimit)
-            .collation({
-                locale: 'en_US',
-                strength: 2,
-            });
-    }
 
     // Fill in keyword filters.
     parsedSearch.filters.forEach((f) => {

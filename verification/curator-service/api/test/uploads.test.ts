@@ -185,7 +185,7 @@ describe('GET', () => {
             }),
             new Upload({
                 status: 'SUCCESS',
-                summary: new UploadSummary({ numCreated: 3 }),
+                summary: new UploadSummary({ numCreated: 3, numError: 1 }),
                 created: new Date(2020, 2, 6),
             }),
         ];

@@ -35,7 +35,7 @@ _PARSED_CASE = ({
         "ageRange": {"start": 50.0, "end": 59.0}
     },
     "preexistingConditions": {"hasPreexistingConditions": True, "values": ["disease of metabolism", "obesity"]},
-    "notes": "Patient with immunosuppression",
+    "restrictedNotes": "Patient with immunosuppression",
 })
 
 
