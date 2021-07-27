@@ -45,7 +45,7 @@ describe('Uploads table', function () {
         cy.contains('2020-01-02');
         cy.get('td[value="SUCCESS"]').should('have.length', 3);
         cy.contains('2');
-        cy.get('td[value=0]').should('have.length', 4);
+        cy.get('td[value=0]').should('have.length', 7);
         cy.contains('5ef8e943dfe6e00030892d60');
         cy.contains('2020-01-03');
         cy.contains('4');
