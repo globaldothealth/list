@@ -344,6 +344,8 @@ export default function Profile(): JSX.Element {
 
     const user = useAppSelector(selectUser);
 
+    console.log(user)
+
     return (
         <>
             {user ? (
@@ -398,7 +400,7 @@ export default function Profile(): JSX.Element {
                                     throw Error(`Unknown role ${role}`);
                             }
                         })}
-                    <ChangePasswordFormInProfile />
+                        {user.googleID && <ChangePasswordFormInProfile />}
                 </div>
             ) : (
                 <></>

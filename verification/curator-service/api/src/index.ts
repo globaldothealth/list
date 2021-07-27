@@ -136,6 +136,7 @@ const emailClient = new EmailClient(
 
 // Configure auth controller
 const authController = new AuthController(
+    env.SERVICE_ENV,
     env.AFTER_LOGIN_REDIRECT_URL,
     awsLambdaClient,
     emailClient,
@@ -200,21 +201,6 @@ apiRouter.get(
     '/sources/parsers',
     mustHaveAnyRole(['curator']),
     sourcesController.listParsers,
-);
-apiRouter.post(
-    '/sources/:id([a-z0-9]{24})/markPendingRemoval',
-    mustHaveAnyRole(['curator']),
-    sourcesController.markPendingRemoval,
-);
-apiRouter.post(
-    '/sources/:id([a-z0-9]{24})/removePendingCases',
-    mustHaveAnyRole(['curator']),
-    sourcesController.removePendingCases,
-);
-apiRouter.post(
-    '/sources/:id([a-z0-9]{24})/clearPendingRemovalStatus',
-    mustHaveAnyRole(['curator']),
-    sourcesController.clearPendingRemovalStatus,
 );
 
 // Configure uploads controller.

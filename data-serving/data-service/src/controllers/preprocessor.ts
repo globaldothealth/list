@@ -225,21 +225,6 @@ export const findCasesForSource = async (
     next();
 };
 
-export const findPendingCaseIdsForRemovalFromSource = async (
-    request: Request,
-    response: Response,
-    next: NextFunction,
-): Promise<void> => {
-    const caseIds = await Case.find({
-        'caseReference.sourceId': {
-            $eq: request.query.sourceId?.toString(),
-        },
-        pendingRemoval: true,
-    });
-    request.body.caseIds = caseIds.map((c: CaseDocument) => c._id);
-    next();
-};
-
 export const setBatchUpdateRevisionMetadata = async (
     request: Request,
     response: Response,

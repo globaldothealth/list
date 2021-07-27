@@ -197,7 +197,7 @@ def parse_cases(raw_data_file: str, source_id: str, source_url: str):
                         convert_outcome(row[_OUTCOME])
                     ],
                     "preexistingConditions": convert_preexisting_conditions(row[_PREEXISTING_CONDITIONS]),
-                    "notes": convert_notes(
+                    "restrictedNotes": convert_notes(
                         row[_PREEXISTING_CONDITIONS],
                         row[_NOTES_BAIRRO])
                 }

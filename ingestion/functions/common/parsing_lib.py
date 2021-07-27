@@ -143,8 +143,6 @@ def write_to_server(
     counter = collections.defaultdict(int)
     counter['batch_num'] = 0
     start_time = time.time()
-    encountered_207 = False
-    validation_messages = {}
     while True:
         batch_num = counter['batch_num']
         counter['batch_num'] += 1
@@ -183,7 +181,7 @@ def write_to_server(
                 # We can consider separating geocoding issues, but for now classifying it
                 # as a validation problem is pretty reasonable.
                 # The motivation for continuing past 207 errors is https://github.com/globaldothealth/list/issues/1849
-                encountered_207 = True
+
                 # The errors from the backend tell us which cases failed and for what reason. Make it
                 # easier to diagnose by extracting the failing case and attaching it to the error message.
                 res_json = res.json()
@@ -195,9 +193,10 @@ def write_to_server(
                     augmented_errors = [add_input_to_error(e) for e in res_json['errors']]
                     reported_error = dict(res_json)
                     reported_error['errors'] = augmented_errors
-                    validation_messages[f"batch_{batch_num}"] = json.dumps(reported_error)
+                    print(f"Validation error in batch {batch_num}:", json.dumps(reported_error))
+                    counter['numError'] += len(res_json['errors'])
                 else:
-                    validation_messages[f"batch_{batch_num}"] = res.text
+                    print(f"Validation error in batch {batch_num}: {res.text}")
             continue
 
         # Response can contain an 'error' field which describe each error that
@@ -212,15 +211,7 @@ def write_to_server(
             count_updated=counter['numUpdated'])
         return
     print(f'sent {counter["total"]} cases in {time.time() - start_time} seconds')
-    if encountered_207 == True:
-        e = RuntimeError(f'Validation errors encountered, details:\n{json.dumps(validation_messages)}')
-        common_lib.complete_with_error(
-            e, env, common_lib.UploadError.VALIDATION_ERROR,
-            source_id, upload_id, headers, cookies,
-            count_created=counter['numCreated'],
-            count_updated=counter['numUpdated'])
-        return
-    return counter['numCreated'], counter['numUpdated']
+    return counter['numCreated'], counter['numUpdated'], counter['numError']
 
 
 def get_today() -> datetime.datetime:
@@ -357,27 +348,19 @@ def run(
             ParserError(f"Retrieving source info for source {source_id} yielded HTTP status {source_info_request.status_code}"),
             env, common_lib.UploadError.INTERNAL_ERROR, source_id, upload_id,
             api_creds, cookies)
-    source_info = source_info_request.json()
-    # treat absence of evidence as meaning the source _does not_ have stable IDs, as that's more likely
-    # ^^ correct behaviour, but switching to True before #1954
-    #    is fixed, as new curator API endpoints are not in -stable.
-    has_stable_ids = source_info.get('hasStableIdentifiers', True)
     try:
         fd, local_data_file_name = tempfile.mkstemp()
         local_data_file = os.fdopen(fd, "wb")
         retrieve_raw_data_file(s3_bucket, s3_key, local_data_file)
         print(f'Raw file retrieved at {local_data_file_name}')
 
-        if has_stable_ids is not True:
-            mark_pending_url = f"{base_url}/sources/{source_id}/markPendingRemoval"
-            requests.post(mark_pending_url, headers=api_creds, cookies=cookies).raise_for_status()
         case_data = parsing_function(
             local_data_file_name, source_id,
             source_url)
         excluded_case_ids = retrieve_excluded_case_ids(source_id, date_filter, date_range, env,
                                                        headers=api_creds, cookies=cookies)
         final_cases = prepare_cases(case_data, upload_id, excluded_case_ids)
-        count_created, count_updated = write_to_server(
+        count_created, count_updated, count_error = write_to_server(
             filter_cases_by_date(
                 final_cases,
                 date_filter,
@@ -390,7 +373,7 @@ def run(
         for _ in range(5):  # Maximum number of attempts to finalize upload
             status, text = common_lib.finalize_upload(
                 env, source_id, upload_id, api_creds, cookies, count_created,
-                count_updated
+                count_updated, count_error
             )
             if status == 200:
                 break
@@ -400,14 +383,8 @@ def run(
                 continue
             else:
                 raise RuntimeError(f'Error updating upload record, status={status}, response={text}')
-        if has_stable_ids is not True:
-            delete_old_cases_url = f"{base_url}/sources/{source_id}/removePendingCases"
-            requests.post(delete_old_cases_url, headers=api_creds, cookies=cookies).raise_for_status()
         return {"count_created": count_created, "count_updated": count_updated}
     except Exception as e:
-        if has_stable_ids is not True:
-            clear_pending_marks_url = f"{base_url}/sources/{source_id}/clearPendingRemovalStatus"
-            requests.post(clear_pending_marks_url, headers=api_creds, cookies=cookies)
         common_lib.complete_with_error(
             e, env, common_lib.UploadError.INTERNAL_ERROR, source_id, upload_id,
             api_creds, cookies)

@@ -79,6 +79,13 @@ describe('GET', () => {
 
         return request(app).get(`/api/cases/${r._id}`).expect(404);
     });
+    it('should not show the restricted notes for a case', async () => {
+        const c = new Case(minimalCase);
+        c.restrictedNotes = 'I want to tell you a secret';
+        await c.save();
+        const res = await request(app).get(`/api/cases/${c._id}`).expect(200);
+        expect(res.body[0].restrictedNotes).toBeUndefined();
+    });
     describe('list', () => {
         it('should return 200 OK', () => {
             return request(app)
@@ -189,6 +196,25 @@ describe('GET', () => {
                 .expect('Content-Type', /json/);
             expect(res.body.cases).toHaveLength(0);
             expect(res.body.total).toEqual(0);
+        });
+        it('should ignore the cases with list=false', async () => {
+            const c = new Case(minimalCase);
+            c.list = false;
+            await c.save();
+            const res = await request(app)
+                .get('/api/cases')
+                .expect(200)
+                .expect('Content-Type', /json/);
+            expect(res.body.cases).toHaveLength(0);
+            expect(res.body.total).toEqual(0);
+        });
+        it('should strip out restricted notes', async () => {
+            const c = new Case(minimalCase);
+            c.restrictedNotes = 'Can you keep a secret?';
+            await c.save();
+            const res = await request(app).get('/api/cases').expect(200);
+            expect(res.body.cases).toHaveLength(1);
+            expect(res.body.cases[0].restrictedNotes).toBeUndefined();
         });
         describe('keywords', () => {
             beforeEach(async () => {
@@ -756,6 +782,18 @@ describe('POST', () => {
                 .expect(200);
             expect(res.text).toContain(c._id);
             expect(res.text).not.toContain(c2._id);
+        });
+        it('strips the restricted notes from the download', async () => {
+            const note = 'A saucerful of secrets';
+            const c = new Case(minimalCase);
+            c.restrictedNotes = note;
+            await c.save();
+            const res = await request(app)
+                .post('/api/cases/download')
+                .send({ format: 'csv' })
+                .expect('Content-Type', 'text/csv')
+                .expect(200);
+            expect(res.text).not.toContain(note);
         });
         it('rejects invalid searches', (done) => {
             request(app)
@@ -1757,116 +1795,5 @@ describe('DELETE', () => {
             .expect(422, /more than the maximum allowed/);
         expect(await Case.collection.countDocuments()).toEqual(3);
         expect(await CaseRevision.collection.countDocuments()).toEqual(0);
-    });
-});
-
-describe('pending removal markers', async () => {
-    it('marks cases from a given source ID for deletion', async () => {
-        const c1 = new Case(minimalCase);
-        const sourceId1 = '5ea86423bae6982635d2e1f8';
-        const entryId1 = 'def456';
-        c1.set('caseReference.sourceId', sourceId1);
-        c1.set('caseReference.sourceEntryId', entryId1);
-        await c1.save();
-
-        const c2 = new Case(minimalCase);
-        const sourceId2 = '5ea86423bae6982635d2e1f9';
-        const entryId2 = 'abc123';
-        c2.set('caseReference.sourceId', sourceId2);
-        c2.set('caseReference.sourceEntryId', entryId2);
-        await c2.save();
-
-        await request(app)
-            .post(
-                `/api/cases/markPendingRemoval?sourceId=${sourceId1}&email=curator%40example.com`,
-            )
-            .expect(204);
-
-        const pendingCases = await Case.find({
-            pendingRemoval: true,
-        });
-        expect(pendingCases.length).toEqual(1);
-        expect(pendingCases[0].caseReference.sourceEntryId).toEqual(entryId1);
-    });
-
-    it('removes deletion-pending markers from cases with a given source ID', async () => {
-        const c1 = new Case(minimalCase);
-        const sourceId1 = '5ea86423bae6982635d2e1f8';
-        const entryId1 = 'def456';
-        c1.set('caseReference.sourceId', sourceId1);
-        c1.set('caseReference.sourceEntryId', entryId1);
-        c1.pendingRemoval = true;
-        await c1.save();
-
-        const c2 = new Case(minimalCase);
-        const sourceId2 = '5ea86423bae6982635d2e1f9';
-        const entryId2 = 'abc123';
-        c2.set('caseReference.sourceId', sourceId2);
-        c2.set('caseReference.sourceEntryId', entryId2);
-        c2.pendingRemoval = true;
-        await c2.save();
-
-        await request(app)
-            .post(
-                `/api/cases/clearPendingRemovalStatus?sourceId=${sourceId1}&email=curator%40example.com`,
-            )
-            .expect(204);
-
-        const pendingCases = await Case.find({
-            pendingRemoval: true,
-        });
-        expect(pendingCases.length).toEqual(1);
-        expect(pendingCases[0].caseReference.sourceEntryId).toEqual(entryId2);
-    });
-
-    it('deletes pending cases with a given source ID', async () => {
-        const c1 = new Case(minimalCase);
-        const sourceId1 = '5ea86423bae6982635d2e1f8';
-        const entryId1 = 'def456';
-        c1.set('caseReference.sourceId', sourceId1);
-        c1.set('caseReference.sourceEntryId', entryId1);
-        c1.pendingRemoval = true;
-        await c1.save();
-
-        const c2 = new Case(minimalCase);
-        const sourceId2 = '5ea86423bae6982635d2e1f9';
-        const entryId2 = 'abc123';
-        c2.set('caseReference.sourceId', sourceId2);
-        c2.set('caseReference.sourceEntryId', entryId2);
-        c2.pendingRemoval = true;
-        await c2.save();
-
-        await request(app)
-            .post(`/api/cases/removePendingCases?sourceId=${sourceId1}`)
-            .expect(204);
-
-        const allCases = await Case.find({});
-        expect(allCases.length).toEqual(1);
-        expect(allCases[0].caseReference.sourceEntryId).toEqual(entryId2);
-    });
-
-    it('deletes only the pending cases from the source', async () => {
-        const c1 = new Case(minimalCase);
-        const sourceId1 = '5ea86423bae6982635d2e1f8';
-        const entryId1 = 'def456';
-        c1.set('caseReference.sourceId', sourceId1);
-        c1.set('caseReference.sourceEntryId', entryId1);
-        c1.pendingRemoval = true;
-        await c1.save();
-
-        const c2 = new Case(minimalCase);
-        const entryId2 = 'abc123';
-        c2.set('caseReference.sourceId', sourceId1);
-        c2.set('caseReference.sourceEntryId', entryId2);
-        c2.pendingRemoval = false;
-        await c2.save();
-
-        await request(app)
-            .post(`/api/cases/removePendingCases?sourceId=${sourceId1}`)
-            .expect(204);
-
-        const allCases = await Case.find({});
-        expect(allCases.length).toEqual(1);
-        expect(allCases[0].caseReference.sourceEntryId).toEqual(entryId2);
     });
 });
