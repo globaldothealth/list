@@ -380,6 +380,9 @@
       "notes": {
         "bsonType": "string"
       },
+      "restrictedNotes": {
+        "bsonType": "string"
+      },
       "revisionMetadata": {
         "bsonType": "object",
         "additionalProperties": false,

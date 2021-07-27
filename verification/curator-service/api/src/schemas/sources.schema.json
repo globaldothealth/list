@@ -111,6 +111,9 @@
                             "numUpdated": {
                                 "bsonType": "int"
                             },
+                            "numError": {
+                                "bsonType": "int"
+                            },
                             "error": {
                                 "bsonType": "string"
                             }

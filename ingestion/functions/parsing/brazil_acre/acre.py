@@ -255,7 +255,7 @@ def parse_cases(raw_data_file: str, source_id: str, source_url: str):
                         row[_COMORBIDITIES], row[_SYMPTOMS], row[_INDIGENOUS_GROUP], row[_OTHER_SYMPTOMS]
                     )
                     if notes:
-                        case["notes"] = notes
+                        case["restrictedNotes"] = notes
                     yield case
                 except ValueError as ve:
                     raise ValueError(f"error converting case: {ve}")

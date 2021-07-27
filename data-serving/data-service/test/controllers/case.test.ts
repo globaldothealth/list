@@ -79,6 +79,13 @@ describe('GET', () => {
 
         return request(app).get(`/api/cases/${r._id}`).expect(404);
     });
+    it('should not show the restricted notes for a case', async () => {
+        const c = new Case(minimalCase);
+        c.restrictedNotes = 'I want to tell you a secret';
+        await c.save();
+        const res = await request(app).get(`/api/cases/${c._id}`).expect(200);
+        expect(res.body[0].restrictedNotes).toBeUndefined();
+    });
     describe('list', () => {
         it('should return 200 OK', () => {
             return request(app)
@@ -200,6 +207,14 @@ describe('GET', () => {
                 .expect('Content-Type', /json/);
             expect(res.body.cases).toHaveLength(0);
             expect(res.body.total).toEqual(0);
+        });
+        it('should strip out restricted notes', async () => {
+            const c = new Case(minimalCase);
+            c.restrictedNotes = 'Can you keep a secret?';
+            await c.save();
+            const res = await request(app).get('/api/cases').expect(200);
+            expect(res.body.cases).toHaveLength(1);
+            expect(res.body.cases[0].restrictedNotes).toBeUndefined();
         });
         describe('keywords', () => {
             beforeEach(async () => {
@@ -767,6 +782,18 @@ describe('POST', () => {
                 .expect(200);
             expect(res.text).toContain(c._id);
             expect(res.text).not.toContain(c2._id);
+        });
+        it('strips the restricted notes from the download', async () => {
+            const note = 'A saucerful of secrets';
+            const c = new Case(minimalCase);
+            c.restrictedNotes = note;
+            await c.save();
+            const res = await request(app)
+                .post('/api/cases/download')
+                .send({ format: 'csv' })
+                .expect('Content-Type', 'text/csv')
+                .expect(200);
+            expect(res.text).not.toContain(note);
         });
         it('rejects invalid searches', (done) => {
             request(app)
