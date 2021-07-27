@@ -28,6 +28,25 @@ s3_client = boto3.client("s3",
 
 _SOURCE_API_URL = "http://foo.bar"
 
+date_filter = {"numDaysBeforeToday": 2, "op": "EQ"}
+origin_url = "http://bar.baz/"
+upload_id = "012345678901234567890123"
+example_source = {
+    "format": "JSON",
+    "origin": {"url": origin_url, "license": "MIT"},
+    "automation": {"parser": {"awsLambdaArn": "example.example"}},
+    "dateFilter": date_filter
+}
+example_source_stable_ids = {
+    **example_source,
+    "hasStableIdentifiers": True
+}
+
+
+def create_upload_url(source_id):
+    return f"{_SOURCE_API_URL}/sources/{source_id}/uploads"
+
+
 @pytest.fixture()
 def mock_source_api_url_fixture():
     """
@@ -40,6 +59,36 @@ def mock_source_api_url_fixture():
     with patch('common_lib.get_source_api_url') as mock:
         mock.return_value = _SOURCE_API_URL
         yield common_lib
+
+
+@pytest.fixture()
+def setup_e2e(mock_source_api_url_fixture, valid_event, requests_mock):
+    source_id = valid_event['sourceId']
+
+    # Mock the request to create the upload.
+    requests_mock.post(
+        create_upload_url(source_id), json={"_id": upload_id},
+        status_code=201)
+
+    # Mock the request to retrieve source content.
+    requests_mock.get(origin_url, json={"data": "yes"})
+
+    # Mock/stub retrieving credentials, invoking the parser, and S3.
+    common_lib = mock_source_api_url_fixture
+    common_lib.obtain_api_credentials = MagicMock(
+        name="obtain_api_credentials", return_value={})
+
+    # Set up mock request values used in multiple requests.
+    # TODO: Complete removal of URL env var.
+    os.environ["EPID_INGESTION_ENV"] = valid_event['env']
+    os.environ["EPID_INGESTION_SOURCE_ID"] = valid_event['sourceId']
+    os.environ["EPID_INGESTION_PARSING_DATE_RANGE"] = (
+        valid_event['parsingDateRange']['start']
+        + ","
+        + valid_event['parsingDateRange']['end']
+    )
+    os.environ["SOURCE_API_URL"] = _SOURCE_API_URL
+    yield requests_mock, common_lib
 
 
 @pytest.fixture()
@@ -65,49 +114,21 @@ def test_format_url(mock_today):
     assert retrieval.format_source_url(
         url) == "http://foo.bar/2020-06-08/6/8.json"
 
+
 @pytest.mark.skipif(not os.environ.get("DOCKERIZED", False),
                     reason="Running integration tests outside of mock environment disabled")
-def test_e2e(valid_event, requests_mock, mock_source_api_url_fixture, tempdir="/tmp"):
-    from retrieval import retrieval  # Import locally to avoid superseding mock
+@pytest.mark.parametrize("source", [example_source_stable_ids, example_source])
+def test_e2e(source, valid_event, mock_source_api_url_fixture, setup_e2e, tempdir="/tmp"):
+    from retrieval import retrieval
+    requests_mock, common_lib = setup_e2e
     print(valid_event)
-
-    # Mock/stub retrieving credentials, invoking the parser, and S3.
-    common_lib = mock_source_api_url_fixture
-    common_lib.obtain_api_credentials = MagicMock(
-        name="obtain_api_credentials", return_value={})
+    source_id = valid_event['sourceId']
     retrieval.invoke_parser = MagicMock(name="invoke_parser")
 
-    # Set up mock request values used in multiple requests.
-    # TODO: Complete removal of URL env var.
-    os.environ["EPID_INGESTION_ENV"] = valid_event['env']
-    os.environ["EPID_INGESTION_SOURCE_ID"] = valid_event['sourceId']
-    os.environ["EPID_INGESTION_PARSING_DATE_RANGE"] = (
-        valid_event['parsingDateRange']['start']
-        + ","
-        + valid_event['parsingDateRange']['end']
-    )
-    os.environ["SOURCE_API_URL"] = _SOURCE_API_URL
-    source_id = valid_event['sourceId']
-    upload_id = "012345678901234567890123"
-    origin_url = "http://bar.baz/"
-
-    # Mock the request to create the upload.
-    create_upload_url = f"{_SOURCE_API_URL}/sources/{source_id}/uploads"
-    requests_mock.post(
-        create_upload_url, json={"_id": upload_id},
-        status_code=201)
-
     # Mock the request to retrieval source details (e.g. format).
-    date_filter = {"numDaysBeforeToday": 2, "op": "EQ"}
     full_source_url = f"{_SOURCE_API_URL}/sources/{source_id}"
-    requests_mock.get(
-        full_source_url,
-        json={"origin": {"url": origin_url, "license": "MIT"}, "format": "JSON",
-              "automation": {"parser": {"awsLambdaArn": "example.example"}},
-              "dateFilter": date_filter})
-
-    # Mock the request to retrieve source content.
-    requests_mock.get(origin_url, json={"data": "yes"})
+    requests_mock.get(full_source_url, json=source)
+    has_stable_ids = source.get("hasStableIdentifiers", False)
 
     response = retrieval.run_retrieval(tempdir=tempdir)
 
@@ -117,8 +138,10 @@ def test_e2e(valid_event, requests_mock, mock_source_api_url_fixture, tempdir="/
         "parsing.example.example",
         source_id, upload_id, {}, None,
         response["key"],
-        origin_url, date_filter, valid_event["parsingDateRange"])
-    assert requests_mock.request_history[0].url == create_upload_url
+        origin_url,
+        date_filter if has_stable_ids else {},
+        valid_event["parsingDateRange"] if has_stable_ids else {})
+    assert requests_mock.request_history[0].url == create_upload_url(source_id)
     assert requests_mock.request_history[1].url == full_source_url
     assert requests_mock.request_history[2].url == origin_url
     assert response["bucket"] == retrieval.OUTPUT_BUCKET
