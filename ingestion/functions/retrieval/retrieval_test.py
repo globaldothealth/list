@@ -146,19 +146,23 @@ def test_extract_event_fields_raises_error_if_event_lacks_source_id():
         retrieval.extract_event_fields({"env": "env"})
 
 
-def test_get_source_details_returns_url_and_format(
+def test_get_source_details_returns_url_format_stable_identifiers(
         requests_mock, mock_source_api_url_fixture):
     from retrieval import retrieval  # Import locally to avoid superseding mock
     source_id = "id"
     content_url = "http://bar.baz"
     requests_mock.get(f"{_SOURCE_API_URL}/sources/{source_id}",
                       json={"format": "CSV",
-                            "origin": {"url": content_url, "license": "MIT"}})
+                            "origin": {"url": content_url, "license": "MIT"},
+                            "hasStableIdentifiers": True
+                            })
     result = retrieval.get_source_details(
         "env", source_id, "upload_id", {}, {})
     assert result[0] == content_url
     assert result[1] == "CSV"
     assert result[2] == ""
+    assert result[3] == {}
+    assert result[4] is True
 
 
 def test_get_source_details_returns_parser_arn_if_present(
