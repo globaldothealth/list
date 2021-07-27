@@ -80,7 +80,7 @@ const useStyles = makeStyles((theme: Theme) => ({
     },
     title: {
         margin: '10px 0',
-        fontWeight:700,
+        fontWeight: 700,
     },
     googleButton: {
         // margin: '35px 0 0 0',
@@ -89,8 +89,8 @@ const useStyles = makeStyles((theme: Theme) => ({
     formFlexContainer: {
         display: 'flex',
         gap: '80px',
-        justifyContent:'center',
-        marginTop:'30px',
+        justifyContent: 'center',
+        marginTop: '30px',
     },
 }));
 
@@ -132,9 +132,18 @@ export function ChangePasswordFormInProfile({
         );
     }, [dispatch, history, passwordReset]);
 
+    const lowercaseRegex = /(?=.*[a-z])/;
+    const uppercaseRegex = /(?=.*[A-Z])/;
+    const numericRegex = /(?=.*[0-9])/;
+
     const validationSchema = Yup.object().shape({
         oldpassword: Yup.string().required('This field is required'),
-        password: Yup.string().required('This field is required'),
+        password: Yup.string()
+            .matches(lowercaseRegex, 'one lowercase required!')
+            .matches(uppercaseRegex, 'one uppercase required!')
+            .matches(numericRegex, 'one number required!')
+            .min(8, 'Minimum 8 characters required!')
+            .required('Required!'),
         passwordConfirmation: Yup.string().test(
             'passwords-match',
             'Passwords must match',
@@ -152,7 +161,7 @@ export function ChangePasswordFormInProfile({
         },
         validationSchema,
         onSubmit: (values) => {
-            console.log(values)
+            console.log(values);
             // dispatch(
             //     resetPassword({
             //         newPassword: values.password,
@@ -185,7 +194,9 @@ export function ChangePasswordFormInProfile({
                                 Boolean(formik.errors.oldpassword)
                             }
                         >
-                            <InputLabel htmlFor="oldpassword">Old Password</InputLabel>
+                            <InputLabel htmlFor="oldpassword">
+                                Old Password
+                            </InputLabel>
                             <OutlinedInput
                                 fullWidth
                                 id="oldpassword"
