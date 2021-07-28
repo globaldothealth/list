@@ -50,6 +50,7 @@ interface Upload {
     status: string;
     summary: UploadSummary;
     created: Date;
+    accepted: boolean;
 }
 
 interface UploadData {
@@ -73,6 +74,7 @@ interface TableRow {
     numCreated: number;
     numUpdated: number;
     numError: number;
+    accepted: boolean;
 }
 
 class UploadsTable extends React.Component<Props, UploadsTableState> {
@@ -161,6 +163,10 @@ class UploadsTable extends React.Component<Props, UploadsTableState> {
                                 ),
                             },
                             {
+                                title: 'Accepted?',
+                                field: 'accepted',
+                            },
+                            {
                                 title: 'Source name',
                                 field: 'sourceName',
                             },
@@ -197,6 +203,8 @@ class UploadsTable extends React.Component<Props, UploadsTableState> {
                                                     numError:
                                                         u.upload.summary
                                                             .numError ?? 0,
+                                                    accepted:
+                                                        u.upload.accepted ?? '',
                                                 };
                                             });
                                         resolve({
