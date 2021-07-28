@@ -26,6 +26,16 @@ def _ids(xs):
     return [str(x["_id"]) for x in xs]
 
 
+def accept_reject_msg(accept, reject, success=True):
+    m = []
+    ok = "ok" if success else "fail"
+    if accept:
+        m.extend([f"accept {a} {ok}" for a in accept])
+    if reject:
+        m.extend([f"reject {r} {ok}" for r in reject])
+    return m
+
+
 def is_acceptable(upload: Dict[str, Any], threshold: float) -> bool:
     """Whether an upload is acceptable
 
@@ -49,7 +59,7 @@ def is_acceptable(upload: Dict[str, Any], threshold: float) -> bool:
 def find_acceptable_upload(
     source: Dict[str, Any], threshold: float, epoch: datetime = None
 ) -> Optional[Tuple[str, List[str]]]:
-    """Finds last upload that can be accepted for inclusion in line list
+    """Finds uploads that can be accepted for inclusion in line list
 
     :param source: Source data
     :param threshold: Threshold ratio of errors above which
@@ -67,12 +77,15 @@ def find_acceptable_upload(
       (last acceptable upload, list of uploads to mark for deletion).
       If no acceptable upload is found, returns None
     """
-    # mark uploads is only for sources without stable identifiers
-    if source.get("hasStableIdentifiers", False):
-        return None
     uploads = source.get("uploads", [])
+    # skip accepted or rejected uploads
+    uploads = [u for u in uploads if "accepted" not in u]
     if not uploads:
         return None
+
+    if source.get("hasStableIdentifiers", False):
+        return _ids(u for u in uploads if u['status'] != "IN_PROGRESS"), []
+
     # sort uploads, with most recent being the first
     uploads.sort(key=lambda x: x["created"], reverse=True)
     accept_uploads = [is_acceptable(u, threshold) for u in uploads]
@@ -80,11 +93,9 @@ def find_acceptable_upload(
         accept_idx = accept_uploads.index(True)
     except ValueError:
         accept_idx = -1  # no acceptable upload found
-    if accept_idx > -1 and (
-        not epoch or uploads[accept_idx]["created"] > epoch
-    ):
+    if accept_idx > -1 and (not epoch or uploads[accept_idx]["created"] > epoch):
         # Return uploads older than last successful upload
-        return str(uploads[accept_idx]["_id"]), _ids(
+        return [str(uploads[accept_idx]["_id"])], _ids(
             uploads[accept_idx + 1 :]
             # Also mark for deletion uploads after accepted upload
             # that are not IN_PROGRESS
@@ -92,47 +103,85 @@ def find_acceptable_upload(
         )
 
 
-def mark_uploads(
-    cases: pymongo.collection.Collection, source_id: str, success: str, older: List[str]
+def mark_cases_non_uuid(
+    cases: pymongo.collection.Collection,
+    sources: pymongo.collection.Collection,
+    source_id: str,
+    accept: List[str],
+    reject: List[str],
 ):
+    assert len(accept) == 1
+    if reject:
+        cases.update_many(
+            {
+                "caseReference.sourceId": source_id,
+                "caseReference.uploadIds": {"$in": reject},
+            },
+            {"$set": {"list": False}},
+        )
+    cases.update_many(
+        {"caseReference.sourceId": source_id, "caseReference.uploadIds": accept},
+        {"$set": {"list": True}},
+    )
+    mark_upload(sources, source_id, accept, accept=True)
+    if reject:
+        mark_upload(sources, source_id, reject, accept=False)
+
+
+def mark_upload(
+    sources: pymongo.collection.Collection,
+    source_id: str,
+    upload_ids: List[str],
+    accept: bool,
+):
+    "Marks upload acceptance status in the sources collection"
+    upload_ids = [ObjectId(u) for u in upload_ids]
+    sources.update_one(
+        {"_id": ObjectId(source_id)},
+        {"$set": {"uploads.$[u].accepted": accept}},
+        array_filters=[{"u._id": {"$in": upload_ids}}],
+    )
+
+
+def mark_cases_uuid(
+    cases: pymongo.collection.Collection,
+    sources: pymongo.collection.Collection,
+    source_id,
+    accept: List[str],
+):
+    "Marks cases for UUID sources"
     cases.update_many(
         {
             "caseReference.sourceId": source_id,
-            "caseReference.uploadIds": {"$in": older},
+            "caseReference.uploadIds": {"$in": accept},
         },
-        {"$set": {"list": False}},
-    )
-    cases.update_many(
-        {"caseReference.sourceId": source_id, "caseReference.uploadIds": [success]},
         {"$set": {"list": True}},
     )
-
-
-def mark_all(cases: pymongo.collection.Collection, source_id):
-    cases.update_many(
-        {"caseReference.sourceId": source_id}, {"$set": {"list": True}}
-    )
+    mark_upload(sources, source_id, accept, accept=True)
 
 
 def prune_uploads(
-    cases: pymongo.collection.Collection, source: Dict[str, Any],
-    threshold: float, epoch: str = None, dry_run: bool = False
+    cases: pymongo.collection.Collection,
+    source: Dict[str, Any],
+    threshold: float,
+    epoch: datetime = None,
+    dry_run: bool = False,
 ) -> List[str]:
     "Prune uploads for a source"
     _id = str(s["_id"])
     msgs = []
+    if (m := find_acceptable_upload(s, threshold, epoch)) is None:
+        return None
+    accept, reject = m
     if not s.get("hasStableIdentifiers", False):
-        if (m := find_acceptable_upload(s, threshold, epoch)) is None:
-            return None
-        accept, reject = m
         try:
             if not dry_run:
-                mark_uploads(cases, _id, accept, reject)
-            msgs.append(f"accept {accept} ok")
+                mark_cases_non_uuid(cases, _id, accept, reject)
+            msgs.extend(accept_reject_msg(accept, reject, True))
         except pymongo.errors.PyMongoError:
-            return [f"accept {accept} fail"]
+            msgs.extend(accept_reject_msg(accept, reject, True))
         try:
-            if not dry_run:
+            if reject and not dry_run:
                 cases.delete_many({"caseReference.sourceId": _id, "list": False})
             msgs.append("prune ok")
         except pymongo.errors.PyMongoError:
@@ -141,9 +190,10 @@ def prune_uploads(
     else:
         try:
             if not dry_run:
-                mark_all(cases, _id)
+                mark_cases_uuid(cases, _id, accept)
+            return accept_reject_msg(accept, [], True)
         except pymongo.errors.PyMongoError:
-            return ["uuid mark fail"]
+            return accept_reject_msg(accept, [], False)
     return msgs
 
 
@@ -155,8 +205,10 @@ if __name__ == "__main__":
     parser.add_argument("-e", "--epoch", help="Epoch date for accepting uploads")
     parser.add_argument("-s", "--source", help="Source ID to prune")
     parser.add_argument(
-        "-t", "--threshold", type=int,
-        help="Error threshold percentage below which uploads are accepted"
+        "-t",
+        "--threshold",
+        type=int,
+        help="Error threshold percentage below which uploads are accepted",
     )
     parser.add_argument("-n", "--dry-run", help="Dry run", action="store_true")
     args = parser.parse_args()
@@ -186,11 +238,13 @@ if __name__ == "__main__":
 
     sources = (
         [db.sources.find_one({"_id": ObjectId(args.source)})]
-        if args.source else
-        db.sources.find({"automation.parser.awsLambdaArn": {"$regex": ingestor_re}})
+        if args.source
+        else db.sources.find(
+            {"automation.parser.awsLambdaArn": {"$regex": ingestor_re}}
+        )
     )
     m = []
     for s in sources:
         if result := prune_uploads(db.cases, s, threshold, epoch, args.dry_run):
-            msg(m, f"*{s['name']}* ({str(s['_id'])}):\n- {'; '.join(result)}")
-
+            list_msgs = "\n- ".join(result)
+            msg(m, f"*{s['name']}* ({str(s['_id'])}):\n- {list_msgs}")
