@@ -264,7 +264,7 @@ describe('<SignUpForm />', () => {
         });
     });
 
-    test('displays verification errors when password is empty', async () => {
+    test('displays verification errors when password in SignUp form is empty', async () => {
         render(
             <SignUpForm
                 setRegistrationScreenOn={() => true}
@@ -283,7 +283,7 @@ describe('<SignUpForm />', () => {
 
         await waitFor(() => {
             expect(
-                screen.getByText(/This field is required/i),
+                screen.getByText(/Required!/i),
             ).toBeInTheDocument();
             expect(
                 screen.getByText(/Passwords must match/i),
@@ -365,7 +365,7 @@ describe('<ChangePasswordForm />', () => {
         expect(screen.getByText('Choose a new password')).toBeInTheDocument();
     });
 
-    test('displays verification errors when password is empty', async () => {
+    test('displays verification errors when password in ChangePassword form is empty', async () => {
         render(
             <Route exact path="/reset-password/:token/:id">
                 <LandingPage />
@@ -377,7 +377,7 @@ describe('<ChangePasswordForm />', () => {
 
         await waitFor(() => {
             expect(
-                screen.getByText('This field is required'),
+                screen.getByText('Required!'),
             ).toBeInTheDocument();
         });
     });
