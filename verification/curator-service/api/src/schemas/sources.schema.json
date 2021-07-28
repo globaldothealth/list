@@ -102,6 +102,9 @@
                     "status": {
                         "bsonType": "string"
                     },
+                    "accepted": {
+                        "bsonType": "boolean"
+                    },
                     "summary": {
                         "bsonType": "object",
                         "properties": {
