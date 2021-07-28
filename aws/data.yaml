@@ -49,10 +49,10 @@ spec:
           resources:
             requests:
               memory: "3Gi"
-              cpu: "768m"
+              cpu: "1024m"
             limits:
               memory: "3Gi"
-              cpu: "1024m"
+              cpu: "2048m"
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -99,10 +99,10 @@ spec:
           resources:
             requests:
               memory: "3Gi"
-              cpu: "768m"
+              cpu: "1024m"
             limits:
               memory: "3Gi"
-              cpu: "1024m"
+              cpu: "2048m"
 ---
 apiVersion: v1
 kind: Service
