@@ -1,10 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useHistory } from 'react-router-dom';
 
-import { useAppSelector, useAppDispatch } from '../hooks/redux';
-import { selectPasswordReset } from '../redux/auth/selectors';
-import { toggleSnackbar } from '../redux/auth/slice';
-import { resetPassword } from '../redux/auth/thunk';
+import { useAppSelector } from '../hooks/redux';
+
 
 import { selectUser } from '../redux/auth/selectors';
 import { useFormik } from 'formik';
@@ -43,12 +41,6 @@ const styles = makeStyles((theme: Theme) => ({
 }));
 
 const useStyles = makeStyles((theme: Theme) => ({
-    checkboxRoot: {
-        display: 'block',
-    },
-    required: {
-        color: theme.palette.error.main,
-    },
     inpputField: {
         display: 'block',
         width: '240px',
@@ -58,33 +50,9 @@ const useStyles = makeStyles((theme: Theme) => ({
         marginTop: '10px',
         marginBottom: '10px',
     },
-    checkboxLabel: {
-        fontSize: '14px',
-    },
-    link: {
-        fontWeight: 'bold',
-        color: theme.palette.primary.main,
-        cursor: 'pointer',
-    },
-    forgotPassword: {
-        fontWeight: 'normal',
-        color: theme.palette.primary.main,
-        cursor: 'pointer',
-        fontSize: 'small',
-        marginTop: '-8px',
-        display: 'flex',
-        justifyContent: 'flex-end',
-    },
-    labelRequired: {
-        color: theme.palette.error.main,
-    },
     title: {
         margin: '10px 0',
         fontWeight: 700,
-    },
-    googleButton: {
-        // margin: '35px 0 0 0',
-        fontWeight: 400,
     },
     formFlexContainer: {
         display: 'flex',
@@ -108,29 +76,13 @@ export function ChangePasswordFormInProfile({
     disabled,
 }: ChangePasswordFormInProfileProps): JSX.Element {
     const classes = useStyles();
-    const dispatch = useAppDispatch();
-    const history = useHistory();
 
-    const passwordReset = useAppSelector(selectPasswordReset);
+    const [oldPasswordVisible, setOldPasswordVisible] = useState(false);
     const [passwordVisible, setPasswordVisible] = useState(false);
     const [
         passwordConfirmationVisible,
         setPasswordConfirmationVisible,
     ] = useState(false);
-
-    // After successful password reset redirect user to landing page and show snackbar alert
-    useEffect(() => {
-        if (!passwordReset) return;
-
-        history.push('/');
-        dispatch(
-            toggleSnackbar({
-                isOpen: true,
-                message:
-                    'Your password was changed successfully. You can now sign in using the new password',
-            }),
-        );
-    }, [dispatch, history, passwordReset]);
 
     const lowercaseRegex = /(?=.*[a-z])/;
     const uppercaseRegex = /(?=.*[A-Z])/;
@@ -200,7 +152,7 @@ export function ChangePasswordFormInProfile({
                             <OutlinedInput
                                 fullWidth
                                 id="oldpassword"
-                                type={passwordVisible ? 'text' : 'password'}
+                                type={oldPasswordVisible ? 'text' : 'password'}
                                 value={formik.values.oldpassword}
                                 onChange={formik.handleChange}
                                 endAdornment={
@@ -208,8 +160,8 @@ export function ChangePasswordFormInProfile({
                                         <IconButton
                                             aria-label="toggle password visibility"
                                             onClick={() =>
-                                                setPasswordVisible(
-                                                    !passwordVisible,
+                                                setOldPasswordVisible(
+                                                    !oldPasswordVisible,
                                                 )
                                             }
                                             edge="end"
@@ -344,8 +296,6 @@ export default function Profile(): JSX.Element {
 
     const user = useAppSelector(selectUser);
 
-    console.log(user)
-
     return (
         <>
             {user ? (
@@ -400,7 +350,7 @@ export default function Profile(): JSX.Element {
                                     throw Error(`Unknown role ${role}`);
                             }
                         })}
-                        {user.googleID === "" && <ChangePasswordFormInProfile />}
+                        {user.googleID && <ChangePasswordFormInProfile />}
                 </div>
             ) : (
                 <></>
