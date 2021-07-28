@@ -350,7 +350,7 @@ export default function Profile(): JSX.Element {
                                     throw Error(`Unknown role ${role}`);
                             }
                         })}
-                        {user.googleID && <ChangePasswordFormInProfile />}
+                        {!user.googleID && <ChangePasswordFormInProfile />}
                 </div>
             ) : (
                 <></>
