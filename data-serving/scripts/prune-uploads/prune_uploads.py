@@ -6,19 +6,28 @@
 # this deletes everything with list = false.
 
 import os
+import re
 import sys
+import argparse
 from typing import Optional, List, Tuple, Dict, Any
 from datetime import datetime
 
 import pymongo
+from bson.objectid import ObjectId
+
+
+def msg(m, string):
+    "Prints string and appends to m"
+    print(string)
+    m.append(string)
 
 
 def _ids(xs):
     return [str(x["_id"]) for x in xs]
 
 
-def accept_upload(upload: Dict[str, Any], threshold: float) -> bool:
-    """Whether to accept upload
+def is_acceptable(upload: Dict[str, Any], threshold: float) -> bool:
+    """Whether an upload is acceptable
 
     :param upload: Upload data as a dictionary
     :param threshold: Threshold ratio of errors above which an upload
@@ -61,10 +70,12 @@ def find_acceptable_upload(
     # mark uploads is only for sources without stable identifiers
     if source.get("hasStableIdentifiers", False):
         return None
-    uploads = source["uploads"]
+    uploads = source.get("uploads", [])
+    if not uploads:
+        return None
     # sort uploads, with most recent being the first
     uploads.sort(key=lambda x: x["created"], reverse=True)
-    accept_uploads = [accept_upload(u, threshold) for u in uploads]
+    accept_uploads = [is_acceptable(u, threshold) for u in uploads]
     try:
         accept_idx = accept_uploads.index(True)
     except ValueError:
@@ -98,62 +109,88 @@ def mark_uploads(
 
 
 def mark_all(cases: pymongo.collection.Collection, source_id):
-    db.cases.update_many(
+    cases.update_many(
         {"caseReference.sourceId": source_id}, {"$set": {"list": True}}
     )
 
 
+def prune_uploads(
+    cases: pymongo.collection.Collection, source: Dict[str, Any],
+    threshold: float, epoch: str = None, dry_run: bool = False
+) -> List[str]:
+    "Prune uploads for a source"
+    _id = str(s["_id"])
+    msgs = []
+    if not s.get("hasStableIdentifiers", False):
+        if (m := find_acceptable_upload(s, threshold, epoch)) is None:
+            return None
+        accept, reject = m
+        try:
+            if not dry_run:
+                mark_uploads(cases, _id, accept, reject)
+            msgs.append(f"accept {accept} ok")
+        except pymongo.errors.PyMongoError:
+            return [f"accept {accept} fail"]
+        try:
+            if not dry_run:
+                cases.delete_many({"caseReference.sourceId": _id, "list": False})
+            msgs.append("prune ok")
+        except pymongo.errors.PyMongoError:
+            msgs.append("prune fail")
+            return msgs
+    else:
+        try:
+            if not dry_run:
+                mark_all(cases, _id)
+        except pymongo.errors.PyMongoError:
+            return ["uuid mark fail"]
+    return msgs
+
+
 if __name__ == "__main__":
 
-    # PRUNE_EPOCH is in YYYY-MM-DD format
-    if epoch := os.environ.get("PRUNE_EPOCH", None):
-        epoch = datetime.fromisoformat(epoch)
+    parser = argparse.ArgumentParser(
+        description="Mark new uploads as ingested and delete failed uploads"
+    )
+    parser.add_argument("-e", "--epoch", help="Epoch date for accepting uploads")
+    parser.add_argument("-s", "--source", help="Source ID to prune")
+    parser.add_argument(
+        "-t", "--threshold", type=int,
+        help="Error threshold percentage below which uploads are accepted"
+    )
+    parser.add_argument("-n", "--dry-run", help="Dry run", action="store_true")
+    args = parser.parse_args()
 
-    threshold = os.environ.get("PRUNE_ERROR_THRESHOLD_PERCENT", 10) / 100
+    # Prefer command line arguments to environment variables
+    if epoch := (args.epoch or os.environ.get("PRUNE_EPOCH", None)):
+        epoch = datetime.fromisoformat(epoch)  # YYYY-MM-DD format
 
+    threshold = args.threshold or os.environ.get("PRUNE_ERROR_THRESHOLD_PERCENT", 10)
+    threshold /= 100
+
+    if args.dry_run:
+        print("dry run, no changes will be made")
     # CONN is https://docs.mongodb.com/manual/reference/connection-string/
     try:
-        print("Connecting to database...")
-        client = pymongo.MongoClient(os.environ.get("CONN"))
-        db = client.covid19
+        if (CONN := os.environ.get("CONN")) is None:
+            print("Specify MongoDB connection_string in CONN")
+            sys.exit(1)
+        client = pymongo.MongoClient(CONN)
+        db = client[os.environ.get("DB", "covid19")]
+        print("database connection ok\n")
     except pymongo.errors.ConnectionFailure:
-        print("Connection to database failed, aborting")
+        print("database connection fail")
         sys.exit(1)
 
-    errors = []
+    ingestor_re = re.compile(r'.*-ingestor-(dev|qa|prod)')
 
-    for s in db.sources.find():
-        _id = str(s["_id"])
-        _n = s["name"]
-        print(f"Processing source {_id}: {_n}")
-        if not s.get("hasStableIdentifiers", False):
-            if (m := find_acceptable_upload(s, threshold, epoch)) is None:
-                print(f"[{_n}] No acceptable upload found")
-                continue
-            success, older = m
-            delete = True
-            try:
-                print(f"[{_n}] Marking upload {success} to be in list for UUID source")
-                mark_uploads(db.cases, _id, success, older)
-            except pymongo.errors.PyMongoError:
-                print(f"[{_n}] Error occurred, not deleting cases")
-                delete = False  # Do not delete on error
-                errors.append((_id, _n))
-            if delete:
-                try:
-                    db.cases.delete_many({"caseReference.sourceId": _id, "list": False})
-                    print(f"[{_n}] Deleted cases")
-                except pymongo.errors.PyMongoError:
-                    errors.append((_id, _n))
-        else:
-            try:
-                print(f"[{_n}] Marking all cases to be in list for UUID source")
-                mark_all(db.cases, _id)
-            except pymongo.errors.PyMongoError:
-                print(f"[{_n}] Marking cases failed")
-                errors.append((_id, _n))
-    if errors:
-        print("Errors occurred while processing these sources:")
-        for i, n in errors:
-            print(i, n)
-        sys.exit(1)
+    sources = (
+        [db.sources.find_one({"_id": ObjectId(args.source)})]
+        if args.source else
+        db.sources.find({"automation.parser.awsLambdaArn": {"$regex": ingestor_re}})
+    )
+    m = []
+    for s in sources:
+        if result := prune_uploads(db.cases, s, threshold, epoch, args.dry_run):
+            msg(m, f"*{s['name']}* ({str(s['_id'])}):\n- {'; '.join(result)}")
+
