@@ -6,10 +6,12 @@ on:
     paths:
     - '.github/workflows/prune-uploads-tests.yml'
     - 'data-serving/scripts/prune-uploads/**'
+    - '!data-serving/scripts/prune-uploads/README.md'
   pull_request:
     paths:
     - '.github/workflows/prune-uploads-tests.yml'
     - 'data-serving/scripts/prune-uploads/**'
+    - '!data-serving/scripts/prune-uploads/README.md'
 
 jobs:
   tests:
