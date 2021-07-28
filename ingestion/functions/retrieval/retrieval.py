@@ -80,7 +80,8 @@ def get_source_details(env, source_id, upload_id, api_headers, cookies):
                 "automation", {}).get(
                 "parser", {}).get(
                 "awsLambdaArn", ""), api_json.get(
-                'dateFilter', {})
+                'dateFilter', {}), api_json.get(
+                'hasStableIdentifiers', False)
         upload_error = (
             common_lib.UploadError.SOURCE_CONFIGURATION_NOT_FOUND
             if r.status_code == 404 else common_lib.UploadError.INTERNAL_ERROR)
@@ -287,8 +288,13 @@ def run_retrieval(tempdir=TEMP_PATH):
         auth_headers = common_lib.obtain_api_credentials(s3_client)
     upload_id = common_lib.create_upload_record(
         env, source_id, auth_headers, cookies)
-    url, source_format, parser, date_filter = get_source_details(
+    url, source_format, parser, date_filter, stable_identifiers = get_source_details(
         env, source_id, upload_id, auth_headers, cookies)
+    if not stable_identifiers:
+        print(f"Source {source_id} does not have stable identifiers\n"
+              "Ingesting entire dataset and ignoring date filter and date ranges")
+        date_filter = {}
+        parsing_date_range = {}
     url = format_source_url(url)
     file_names_s3_object_keys = retrieve_content(
         env, source_id, upload_id, url, source_format, auth_headers, cookies, tempdir=tempdir)
