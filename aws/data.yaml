@@ -53,6 +53,7 @@ spec:
             limits:
               memory: "3Gi"
               cpu: "2048m"
+
 ---
 apiVersion: apps/v1
 kind: Deployment
