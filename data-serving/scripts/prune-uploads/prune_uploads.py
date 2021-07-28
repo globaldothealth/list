@@ -13,6 +13,7 @@ from typing import Optional, List, Tuple, Dict, Any
 from datetime import datetime
 
 import pymongo
+import requests
 from bson.objectid import ObjectId
 
 
@@ -24,6 +25,12 @@ def msg(m, string):
 
 def _ids(xs):
     return [str(x["_id"]) for x in xs]
+
+
+def notify(string, webhook_url):
+    if string:
+        response = requests.post(webhook_url, json={"text": string})
+        return response.status_code == 200
 
 
 def accept_reject_msg(accept, reject, success=True):
@@ -248,3 +255,6 @@ if __name__ == "__main__":
         if result := prune_uploads(db.cases, s, threshold, epoch, args.dry_run):
             list_msgs = "\n- ".join(result)
             msg(m, f"*{s['name']}* ({str(s['_id'])}):\n- {list_msgs}")
+
+    if webhook_url := os.environ.get("PRUNE_UPLOADS_WEBHOOK_URL"):
+        notify("\n".join(m), webhook_url)
