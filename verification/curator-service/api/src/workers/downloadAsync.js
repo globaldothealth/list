@@ -7,8 +7,12 @@ const JSZip = require('jszip');
 const fs = require('fs');
 
 const logger = pino({
+    name: 'downloadAsyncWorker',
     prettyPrint: { colorize: false },
 });
+
+logger.info('Starting asynchronous download worker');
+logger.info(`Requesting download for query ${workerData.query}`);
 
 // make the request to the data service
 try {
@@ -42,6 +46,7 @@ try {
         const filename = `gh_${year}-${month}-${day}`;
 
         // Compress file
+        logger.info('Compressing results into a zip file');
         const buffer = Buffer.from(responseData, 'utf-8');
         const zip = new JSZip();
         zip.file(`${filename}.${workerData.format}`, buffer);
@@ -78,6 +83,7 @@ try {
         }
 
         // Upload file to S3
+        logger.info(`Uploading file ${filename} to S3`);
         const fileKey = `${dateObj.getTime()}/${filename}.zip`;
         const params = {
             Bucket: 'covid19-filtered-downloads',
@@ -113,6 +119,7 @@ try {
             });
 
             // Send signed url via email to user
+            logger.info(`Sending presigned URL ${signedUrl} to user`);
             const mailMessage = `
             <p>Please visit the link below to download list of cases in response to your query <strong>${workerData.query}</strong>.</p>
 
@@ -159,3 +166,5 @@ try {
 } catch (err) {
     logger.error(err);
 }
+
+logger.info('Asynchronous download worker finished');
