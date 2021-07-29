@@ -7,6 +7,7 @@ import {
     requestResetPasswordLink,
     resetPassword,
     logout,
+    changePassword,
 } from './thunk';
 
 interface SnackbarProps {
@@ -20,6 +21,7 @@ interface AuthState {
     error: string | undefined;
     resetPasswordEmailSent: boolean;
     passwordReset: boolean;
+    changePasswordResponse: string | undefined;
     forgotPasswordPopupOpen: boolean;
     snackbar: SnackbarProps;
 }
@@ -33,6 +35,7 @@ const initialState: AuthState = {
     error: undefined,
     resetPasswordEmailSent: false,
     passwordReset: false,
+    changePasswordResponse: undefined,
     forgotPasswordPopupOpen: false,
     snackbar: {
         isOpen: false,
@@ -56,7 +59,10 @@ const authSlice = createSlice({
         },
         setResetPasswordEmailSent: (state, action: PayloadAction<boolean>) => {
             state.resetPasswordEmailSent = action.payload;
-        }
+        },
+        resetChangePasswordResponse: (state) => {
+            state.changePasswordResponse = undefined;
+        },
     },
     extraReducers: (builder) => {
         // SIGN IN
@@ -136,7 +142,7 @@ const authSlice = createSlice({
             state.isLoading = true;
             state.error = undefined;
         });
-        builder.addCase(resetPassword.fulfilled, (state, action) => {
+        builder.addCase(resetPassword.fulfilled, (state) => {
             state.isLoading = false;
             state.passwordReset = true;
         });
@@ -152,11 +158,34 @@ const authSlice = createSlice({
         builder.addCase(logout.fulfilled, (state) => {
             state.user = undefined;
         });
+
+        // CHANGE PASSWORD
+        builder.addCase(changePassword.pending, (state) => {
+            state.isLoading = true;
+            state.changePasswordResponse = undefined;
+            state.error = undefined;
+        });
+        builder.addCase(changePassword.fulfilled, (state, action) => {
+            state.isLoading = false;
+            state.changePasswordResponse = action.payload;
+        });
+        builder.addCase(changePassword.rejected, (state, action) => {
+            state.isLoading = false;
+            state.changePasswordResponse = undefined;
+            state.error = action.payload
+                ? action.payload
+                : action.error.message;
+        });
     },
 });
 
 // Actions
-export const { resetError, setForgotPasswordPopupOpen, toggleSnackbar, setResetPasswordEmailSent } =
-    authSlice.actions;
+export const {
+    resetError,
+    setForgotPasswordPopupOpen,
+    toggleSnackbar,
+    setResetPasswordEmailSent,
+    resetChangePasswordResponse,
+} = authSlice.actions;
 
 export default authSlice.reducer;
