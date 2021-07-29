@@ -108,6 +108,7 @@
                 }
             }
         ],
+        "list": true,
         "symptoms": {
             "values": [
                 "Severe pneumonia",
@@ -215,7 +216,7 @@
             "lives_in_Wuhan": "false",
             "reported_market_exposure": "true"
         }
-    }, 
+    },
     {
        "caseReference": {
            "sourceId": "5ea86423bae6982635d2a116",
@@ -275,7 +276,7 @@
            "admin_id": "15077.0",
            "travel_history_binary": "False"
        }
-   },
+    },
     {
         "demographics": {
             "gender": "Male"
@@ -3668,6 +3669,7 @@
             "name": "Ile-de-France, Seine-Saint-Denis",
             "geoResolution": "Admin2"
         },
+        "list": true,
         "events": [
             {
                 "name": "confirmed",
