@@ -4,6 +4,20 @@
 
 Users are currently authenticated using [passport.js's Google OAuth strategy](http://www.passportjs.org/packages/passport-google-oauth20/).
 
+To authenticate from the command line, you can use [curl(1)](https://manpages.debian.org/stable/curl/curl.1.en.html).
+You'll need the session cookie after logging in, which is described in
+the [geocoding](geocoding/location-service/README.md) documentation. Then:
+
+```bash
+curl --data '{"format": "csv", "query": "country:Antarctica"}' \
+  -H "Content-Type: application/json" \
+  -b 'connect.sid=<session cookie>' \
+  https://data.covid-19.global.health/api/cases/downloadAsync
+```
+for example, to send the cases in Antarctica via email using the
+`downloadAsync` endpoint. You should replace the content type
+according to the type requested by the endpoint.
+
 ## Authorization
 
 Users can be given roles by admins, admin itself being a role.

@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 
 import { useAppSelector, useAppDispatch } from '../hooks/redux';
 import { changePassword } from '../redux/auth/thunk';
-
 import {
     selectUser,
     selectError,
