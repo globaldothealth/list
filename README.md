@@ -58,6 +58,12 @@ this [data dictionary](data-serving/scripts/export-data/functions/01-split/field
 
    ![Data monitoring notifications](https://github.com/globaldothealth/list/actions/workflows/monitoring-notify.yml/badge.svg)
 
+* **Data ingestion**
+
+   ![Prune uploads](https://github.com/globaldothealth/list/actions/workflows/prune-uploads-prod.yml/badge.svg)
+
+   ![Prune uploads (dev)](https://github.com/globaldothealth/list/actions/workflows/prune-uploads-dev.yml/badge.svg)
+
 
 ## Components
 
