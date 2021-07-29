@@ -24,6 +24,7 @@ declare global {
                 name: string;
                 email: string;
                 roles: string[];
+                removeGoogleID?: boolean;
             }) => void;
             addSource: (name: string, url: string, uploads?: []) => void;
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -99,6 +100,7 @@ export function login(opts?: {
     name: string;
     email: string;
     roles: string[];
+    removeGoogleID: boolean;
 }): void {
     cy.request({
         method: 'POST',
@@ -107,6 +109,7 @@ export function login(opts?: {
             name: opts?.name ?? 'superuser',
             email: opts?.email ?? 'superuser@test.com',
             roles: opts?.roles ?? ['admin', 'curator'],
+            removeGoogleID: opts?.removeGoogleID ?? undefined,
         },
     });
 }
