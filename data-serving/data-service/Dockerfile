@@ -18,6 +18,7 @@ RUN npm ci
 
 # Bundle app source
 COPY data-serving/data-service/. .
+COPY data-serving/scripts/export-data/functions/01-split/fields.txt .
 
 # Bundle common files
 COPY common/* ../../common/
@@ -49,6 +50,7 @@ WORKDIR /usr/src/app/
 COPY --from=dev /usr/src/app/data-serving/data-service/node_modules ./node_modules
 COPY --from=dev /usr/src/app/data-serving/data-service/api ./api
 COPY --from=dev /usr/src/app/data-serving/data-service/dist ./dist
+COPY --from=dev /usr/src/app/data-serving/data-service/fields.txt ./dist/src
 
 # Start service, do not use npm start instead invoke node directly
 # to avoid wrapping the process uselessly and correctly catch SIGTERM and SIGINT.
