@@ -33,6 +33,29 @@ describe('LandingPage', function () {
         cy.get('input').should('have.length', 6);
     });
 
+    it('Checks if the password validation works well in the SignUp page', function () {
+        cy.visit('/');
+        cy.contains('Welcome to G.h Data.');
+        cy.contains('Sign up!').click();
+        cy.contains('SignUp form');
+        
+        cy.get('#password').type('tsgasdgasd');
+        cy.get('button[data-testid="sign-up-button"]').click();
+        cy.contains('one uppercase required!');
+        cy.contains('Passwords must match');
+
+        cy.get('#password').focus().clear();
+        cy.get('#password').type('tsgasdgGasd');
+        cy.get('button[data-testid="sign-up-button"]').click();
+        cy.contains('one number required!');
+
+        cy.get('#password').focus().clear();
+        cy.get('#password').type('tT$5');
+        cy.get('button[data-testid="sign-up-button"]').click();
+        cy.contains('Minimum 8 characters required!');
+
+    });
+
     it('Validates emails', function () {
         cy.visit('/');
         cy.contains('Welcome to G.h Data.');
@@ -78,15 +101,30 @@ describe('LandingPage', function () {
         cy.get('button[data-testid="change-password-button"]');
     });
 
-    it('Validates passwords in the change password page', function () {
+    it.only('Validates passwords in the change password page', function () {
         cy.visit('/');
         cy.visit('/reset-password/sampletoken/tokenid');
         cy.get('#password').type('tsgasdgasd');
         cy.get('#passwordConfirmation').type('uu');
 
         cy.get('button[data-testid="change-password-button"]').click();
-
         cy.contains('Passwords must match');
+
+        cy.get('#password').type('tsgasdgasd');
+        cy.get('button[data-testid="change-password-button"]').click();
+        cy.contains('one uppercase required!');
+        cy.contains('Passwords must match');
+
+        cy.get('#password').focus().clear();
+        cy.get('#password').type('tsgasdgGasd');
+        cy.get('button[data-testid="change-password-button"]').click();
+        cy.contains('one number required!');
+
+        cy.get('#password').focus().clear();
+        cy.get('#password').type('tT$5');
+        cy.get('button[data-testid="change-password-button"]').click();
+        cy.contains('Minimum 8 characters required!');
+
     });
 
     it('Homepage with logged out user', function () {

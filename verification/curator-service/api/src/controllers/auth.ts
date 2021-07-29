@@ -373,12 +373,12 @@ export class AuthController {
         this.router.post(
             '/register',
             async (req: Request, res: Response): Promise<void> => {
+                const removeGoogleID = req.body.removeGoogleID as boolean;
                 const user = await User.create({
                     name: req.body.name,
                     email: req.body.email,
-                    // Necessary to pass mongoose validation.
-                    googleID: '42',
                     roles: req.body.roles,
+                    ...(removeGoogleID !== true && { googleID: '42' }),
                 });
                 req.login(user, (err: Error) => {
                     if (!err) {
