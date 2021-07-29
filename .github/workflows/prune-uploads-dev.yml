@@ -20,6 +20,6 @@ jobs:
       run: pip install -r requirements.txt
     - name: Prune uploads
       env:
-        EPOCH: 2021-07-30
+        PRUNE_EPOCH: 2021-07-30
         CONN: ${{ secrets.DB_CONNECTION_URL_DEV }}
       run: python prune_uploads.py
