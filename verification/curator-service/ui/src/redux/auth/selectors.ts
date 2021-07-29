@@ -9,5 +9,7 @@ export const selectForgotPasswordPopupOpen = (state: RootState) =>
     state.auth.forgotPasswordPopupOpen;
 export const selectPasswordReset = (state: RootState) =>
     state.auth.passwordReset;
+export const selectChangePasswordResponse = (state: RootState) =>
+    state.auth.changePasswordResponse;
 
 export const selectSnackbar = (state: RootState) => state.auth.snackbar;

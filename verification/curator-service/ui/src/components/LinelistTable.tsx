@@ -649,7 +649,7 @@ export function DownloadButton({
         <>
             <SnackbarAlert
                 isOpen={snackbarOpen}
-                setIsOpen={setSnackbarOpen}
+                onClose={setSnackbarOpen}
                 message="Email sent successfully. Please check your inbox."
                 type="success"
             />

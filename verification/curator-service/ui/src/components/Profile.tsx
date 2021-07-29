@@ -1,10 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import { useHistory } from 'react-router-dom';
 
-import { useAppSelector } from '../hooks/redux';
+import { useAppSelector, useAppDispatch } from '../hooks/redux';
+import { changePassword } from '../redux/auth/thunk';
 
+import {
+    selectUser,
+    selectError,
+    selectChangePasswordResponse,
+    selectIsLoading,
+} from '../redux/auth/selectors';
+import { resetError, resetChangePasswordResponse } from '../redux/auth/slice';
 
-import { selectUser } from '../redux/auth/selectors';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 
@@ -20,6 +26,9 @@ import VisibilityOff from '@material-ui/icons/VisibilityOff';
 import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
 import { Chip, Tooltip } from '@material-ui/core';
+import Alert from '@material-ui/lab/Alert';
+import LinearProgress from '@material-ui/core/LinearProgress';
+import { SnackbarAlert } from './SnackbarAlert';
 
 const styles = makeStyles((theme: Theme) => ({
     root: {
@@ -48,7 +57,7 @@ const useStyles = makeStyles((theme: Theme) => ({
     },
     signInButton: {
         marginTop: '10px',
-        marginBottom: '10px',
+        marginBottom: '20px',
     },
     title: {
         margin: '10px 0',
@@ -56,45 +65,51 @@ const useStyles = makeStyles((theme: Theme) => ({
     },
     formFlexContainer: {
         display: 'flex',
-        gap: '80px',
-        justifyContent: 'center',
+        flexDirection: 'column',
+        alignItems: 'center',
         marginTop: '30px',
+    },
+    linearProgress: {
+        width: '240px',
     },
 }));
 
 interface FormValues {
-    oldpassword: string;
+    oldPassword: string;
     password: string;
     passwordConfirmation: string;
 }
 
-interface ChangePasswordFormInProfileProps {
-    disabled?: boolean;
-}
-
-export function ChangePasswordFormInProfile({
-    disabled,
-}: ChangePasswordFormInProfileProps): JSX.Element {
+export function ChangePasswordFormInProfile(): JSX.Element {
     const classes = useStyles();
+    const dispatch = useAppDispatch();
 
     const [oldPasswordVisible, setOldPasswordVisible] = useState(false);
     const [passwordVisible, setPasswordVisible] = useState(false);
-    const [
-        passwordConfirmationVisible,
-        setPasswordConfirmationVisible,
-    ] = useState(false);
+    const [passwordConfirmationVisible, setPasswordConfirmationVisible] =
+        useState(false);
+    const error = useAppSelector(selectError);
+    const changePasswordResponse = useAppSelector(selectChangePasswordResponse);
+    const isLoading = useAppSelector(selectIsLoading);
 
     const lowercaseRegex = /(?=.*[a-z])/;
     const uppercaseRegex = /(?=.*[A-Z])/;
     const numericRegex = /(?=.*[0-9])/;
 
     const validationSchema = Yup.object().shape({
-        oldpassword: Yup.string().required('This field is required'),
+        oldPassword: Yup.string().required('This field is required'),
         password: Yup.string()
             .matches(lowercaseRegex, 'one lowercase required!')
             .matches(uppercaseRegex, 'one uppercase required!')
             .matches(numericRegex, 'one number required!')
             .min(8, 'Minimum 8 characters required!')
+            .test(
+                'passwords-different',
+                "New password can't be the same as old password",
+                function (value) {
+                    return this.parent.oldPassword !== value;
+                },
+            )
             .required('Required!'),
         passwordConfirmation: Yup.string().test(
             'passwords-match',
@@ -107,18 +122,14 @@ export function ChangePasswordFormInProfile({
 
     const formik = useFormik<FormValues>({
         initialValues: {
-            oldpassword: '',
+            oldPassword: '',
             password: '',
             passwordConfirmation: '',
         },
         validationSchema,
         onSubmit: (values) => {
-            console.log(values);
-            // dispatch(
-            //     resetPassword({
-            //         newPassword: values.password,
-            //     }),
-            // );
+            const { oldPassword, password } = values;
+            dispatch(changePassword({ oldPassword, newPassword: password }));
         },
     });
 
@@ -129,155 +140,160 @@ export function ChangePasswordFormInProfile({
         // eslint-disable-next-line
     }, []);
 
+    useEffect(() => {
+        if (!changePasswordResponse) return;
+
+        formik.resetForm();
+        //eslint-disable-next-line
+    }, [changePasswordResponse]);
+
     return (
         <>
-            <form onSubmit={formik.handleSubmit}>
-                <div className={classes.formFlexContainer}>
-                    <div id="rightBox">
-                        <Typography className={classes.title}>
-                            Change your password
-                        </Typography>
-                        <FormControl
-                            disabled={disabled}
-                            className={classes.inpputField}
-                            variant="outlined"
-                            error={
-                                formik.touched.oldpassword &&
-                                Boolean(formik.errors.oldpassword)
-                            }
-                        >
-                            <InputLabel htmlFor="oldpassword">
-                                Old Password
-                            </InputLabel>
-                            <OutlinedInput
-                                fullWidth
-                                id="oldpassword"
-                                type={oldPasswordVisible ? 'text' : 'password'}
-                                value={formik.values.oldpassword}
-                                onChange={formik.handleChange}
-                                endAdornment={
-                                    <InputAdornment position="end">
-                                        <IconButton
-                                            aria-label="toggle password visibility"
-                                            onClick={() =>
-                                                setOldPasswordVisible(
-                                                    !oldPasswordVisible,
-                                                )
-                                            }
-                                            edge="end"
-                                        >
-                                            {passwordVisible ? (
-                                                <Visibility />
-                                            ) : (
-                                                <VisibilityOff />
-                                            )}
-                                        </IconButton>
-                                    </InputAdornment>
-                                }
-                                label="Old password"
-                            />
-                            <FormHelperText>
-                                {formik.touched.oldpassword &&
-                                    formik.errors.oldpassword}
-                            </FormHelperText>
-                        </FormControl>
+            <SnackbarAlert
+                isOpen={Boolean(changePasswordResponse)}
+                onClose={() => dispatch(resetChangePasswordResponse())}
+                type="success"
+                message={changePasswordResponse || ''}
+            />
 
-                        <FormControl
-                            disabled={disabled}
-                            className={classes.inpputField}
-                            variant="outlined"
-                            error={
-                                formik.touched.password &&
-                                Boolean(formik.errors.password)
-                            }
-                        >
-                            <InputLabel htmlFor="password">Password</InputLabel>
-                            <OutlinedInput
-                                fullWidth
-                                id="password"
-                                type={passwordVisible ? 'text' : 'password'}
-                                value={formik.values.password}
-                                onChange={formik.handleChange}
-                                endAdornment={
-                                    <InputAdornment position="end">
-                                        <IconButton
-                                            aria-label="toggle password visibility"
-                                            onClick={() =>
-                                                setPasswordVisible(
-                                                    !passwordVisible,
-                                                )
-                                            }
-                                            edge="end"
-                                        >
-                                            {passwordVisible ? (
-                                                <Visibility />
-                                            ) : (
-                                                <VisibilityOff />
-                                            )}
-                                        </IconButton>
-                                    </InputAdornment>
-                                }
-                                label="New password"
-                            />
-                            <FormHelperText>
-                                {formik.touched.password &&
-                                    formik.errors.password}
-                            </FormHelperText>
-                        </FormControl>
+            <form
+                onSubmit={formik.handleSubmit}
+                className={classes.formFlexContainer}
+            >
+                <Typography className={classes.title}>
+                    Change your password
+                </Typography>
+                <FormControl
+                    disabled={isLoading}
+                    className={classes.inpputField}
+                    variant="outlined"
+                    error={
+                        formik.touched.oldPassword &&
+                        Boolean(formik.errors.oldPassword)
+                    }
+                >
+                    <InputLabel htmlFor="oldPassword">Old Password</InputLabel>
+                    <OutlinedInput
+                        fullWidth
+                        id="oldPassword"
+                        type={oldPasswordVisible ? 'text' : 'password'}
+                        value={formik.values.oldPassword}
+                        onChange={formik.handleChange}
+                        endAdornment={
+                            <InputAdornment position="end">
+                                <IconButton
+                                    aria-label="toggle password visibility"
+                                    onClick={() =>
+                                        setOldPasswordVisible(
+                                            !oldPasswordVisible,
+                                        )
+                                    }
+                                    edge="end"
+                                >
+                                    {passwordVisible ? (
+                                        <Visibility />
+                                    ) : (
+                                        <VisibilityOff />
+                                    )}
+                                </IconButton>
+                            </InputAdornment>
+                        }
+                        label="Old password"
+                    />
+                    <FormHelperText>
+                        {formik.touched.oldPassword &&
+                            formik.errors.oldPassword}
+                    </FormHelperText>
+                </FormControl>
 
-                        <FormControl
-                            disabled={disabled}
-                            className={classes.inpputField}
-                            variant="outlined"
-                            error={
-                                formik.touched.passwordConfirmation &&
-                                Boolean(formik.errors.passwordConfirmation)
-                            }
-                        >
-                            <InputLabel htmlFor="passwordConfirmation">
-                                Repeat password
-                            </InputLabel>
-                            <OutlinedInput
-                                fullWidth
-                                id="passwordConfirmation"
-                                type={
-                                    passwordConfirmationVisible
-                                        ? 'text'
-                                        : 'password'
-                                }
-                                value={formik.values.passwordConfirmation}
-                                onChange={formik.handleChange}
-                                endAdornment={
-                                    <InputAdornment position="end">
-                                        <IconButton
-                                            aria-label="toggle password visibility"
-                                            onClick={() =>
-                                                setPasswordConfirmationVisible(
-                                                    !passwordConfirmationVisible,
-                                                )
-                                            }
-                                            edge="end"
-                                        >
-                                            {passwordConfirmationVisible ? (
-                                                <Visibility />
-                                            ) : (
-                                                <VisibilityOff />
-                                            )}
-                                        </IconButton>
-                                    </InputAdornment>
-                                }
-                                label="Repeat new password"
-                            />
-                            <FormHelperText>
-                                {formik.touched.passwordConfirmation &&
-                                    formik.errors.passwordConfirmation}
-                            </FormHelperText>
-                        </FormControl>
-                    </div>
-                </div>
+                <FormControl
+                    disabled={isLoading}
+                    className={classes.inpputField}
+                    variant="outlined"
+                    error={
+                        formik.touched.password &&
+                        Boolean(formik.errors.password)
+                    }
+                >
+                    <InputLabel htmlFor="password">New password</InputLabel>
+                    <OutlinedInput
+                        fullWidth
+                        id="password"
+                        name="password"
+                        type={passwordVisible ? 'text' : 'password'}
+                        value={formik.values.password}
+                        onChange={formik.handleChange}
+                        endAdornment={
+                            <InputAdornment position="end">
+                                <IconButton
+                                    aria-label="toggle password visibility"
+                                    onClick={() =>
+                                        setPasswordVisible(!passwordVisible)
+                                    }
+                                    edge="end"
+                                >
+                                    {passwordVisible ? (
+                                        <Visibility />
+                                    ) : (
+                                        <VisibilityOff />
+                                    )}
+                                </IconButton>
+                            </InputAdornment>
+                        }
+                        label="New password"
+                    />
+                    <FormHelperText>
+                        {formik.touched.password && formik.errors.password}
+                    </FormHelperText>
+                </FormControl>
+
+                <FormControl
+                    disabled={isLoading}
+                    className={classes.inpputField}
+                    variant="outlined"
+                    error={
+                        formik.touched.passwordConfirmation &&
+                        Boolean(formik.errors.passwordConfirmation)
+                    }
+                >
+                    <InputLabel htmlFor="passwordConfirmation">
+                        Repeat new password
+                    </InputLabel>
+                    <OutlinedInput
+                        fullWidth
+                        id="passwordConfirmation"
+                        type={passwordConfirmationVisible ? 'text' : 'password'}
+                        value={formik.values.passwordConfirmation}
+                        onChange={formik.handleChange}
+                        endAdornment={
+                            <InputAdornment position="end">
+                                <IconButton
+                                    aria-label="toggle password visibility"
+                                    onClick={() =>
+                                        setPasswordConfirmationVisible(
+                                            !passwordConfirmationVisible,
+                                        )
+                                    }
+                                    edge="end"
+                                >
+                                    {passwordConfirmationVisible ? (
+                                        <Visibility />
+                                    ) : (
+                                        <VisibilityOff />
+                                    )}
+                                </IconButton>
+                            </InputAdornment>
+                        }
+                        label="Repeat new password"
+                    />
+                    <FormHelperText>
+                        {formik.touched.passwordConfirmation &&
+                            formik.errors.passwordConfirmation}
+                    </FormHelperText>
+                </FormControl>
 
                 <Button
-                    disabled={disabled}
+                    disabled={isLoading}
                     type="submit"
                     variant="contained"
                     color="primary"
@@ -286,6 +302,22 @@ export function ChangePasswordFormInProfile({
                 >
                     Change password
                 </Button>
+
+                {isLoading && (
+                    <LinearProgress
+                        color="primary"
+                        className={classes.linearProgress}
+                    />
+                )}
+
+                {error && (
+                    <Alert
+                        severity="error"
+                        onClose={() => dispatch(resetError())}
+                    >
+                        {error}
+                    </Alert>
+                )}
             </form>
         </>
     );
@@ -350,7 +382,7 @@ export default function Profile(): JSX.Element {
                                     throw Error(`Unknown role ${role}`);
                             }
                         })}
-                        {!user.googleID && <ChangePasswordFormInProfile />}
+                    {!user.googleID && <ChangePasswordFormInProfile />}
                 </div>
             ) : (
                 <></>
