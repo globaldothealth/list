@@ -209,6 +209,51 @@ export class AuthController {
         );
 
         /**
+         * Update user's password
+         */
+        this.router.post(
+            '/change-password',
+            mustBeAuthenticated,
+            async (req: Request, res: Response) => {
+                const oldPassword = req.body.oldPassword as string;
+                const newPassword = req.body.newPassword as string;
+                const user = req.user as UserDocument;
+
+                if (!user) {
+                    return res.sendStatus(403);
+                }
+
+                try {
+                    const currentUser = await User.findById(user.id);
+                    if (!currentUser) {
+                        return res.sendStatus(403);
+                    }
+
+                    const isValidPassword = await currentUser.isValidPassword(
+                        oldPassword,
+                    );
+
+                    if (!isValidPassword) {
+                        return res
+                            .status(403)
+                            .json({ message: 'Old password is incorrect' });
+                    }
+
+                    const hashedPassword = await bcrypt.hash(newPassword, 10);
+                    await User.findByIdAndUpdate(user.id, {
+                        password: hashedPassword,
+                    });
+
+                    return res
+                        .status(200)
+                        .json({ message: 'Password changed successfully' });
+                } catch (error) {
+                    return res.status(500).json(error);
+                }
+            },
+        );
+
+        /**
          * Generate reset password link
          */
         this.router.post(
@@ -414,7 +459,7 @@ export class AuthController {
                     // Cf. https://github.com/jaredhanson/passport/issues/6#issuecomment-4857287
                     // This doesn't work however for now as per, if you hit this bug, you have to manually clear the cookies.
                     // Cf https://github.com/jaredhanson/passport/issues/776
-                    done(null, user || undefined);
+                    done(null, user?.publicFields() || undefined);
                     return;
                 })
                 .catch((e) => {
