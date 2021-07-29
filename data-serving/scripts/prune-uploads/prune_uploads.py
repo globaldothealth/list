@@ -17,12 +17,6 @@ import requests
 from bson.objectid import ObjectId
 
 
-def msg(m, string):
-    "Prints string and appends to m"
-    print(string)
-    m.append(string)
-
-
 def _ids(xs):
     return [str(x["_id"]) for x in xs]
 
@@ -33,13 +27,13 @@ def notify(string, webhook_url):
         return response.status_code == 200
 
 
-def accept_reject_msg(accept, reject, success=True):
+def accept_reject_msg(accept, reject, success=True, prefix=' '):
     m = []
     ok = "ok" if success else "fail"
     if accept:
-        m.extend([f"accept {a} {ok}" for a in accept])
+        m.extend([f"{prefix} accept {a} {ok}" for a in accept])
     if reject:
-        m.extend([f"reject {r} {ok}" for r in reject])
+        m.extend([f"{prefix} reject {r} {ok}" for r in reject])
     return m
 
 
@@ -65,7 +59,7 @@ def is_acceptable(upload: Dict[str, Any], threshold: float) -> bool:
 
 def find_acceptable_upload(
     source: Dict[str, Any], threshold: float, epoch: datetime = None
-) -> Optional[Tuple[str, List[str]]]:
+) -> Optional[Tuple[List[str], List[str]]]:
     """Finds uploads that can be accepted for inclusion in line list
 
     :param source: Source data
@@ -108,6 +102,7 @@ def find_acceptable_upload(
             # that are not IN_PROGRESS
             + [u for u in uploads[:accept_idx] if u["status"] != "IN_PROGRESS"]
         )
+    return None
 
 
 def mark_cases_non_uuid(
@@ -119,6 +114,7 @@ def mark_cases_non_uuid(
 ):
     assert len(accept) == 1
     if reject:
+        print("  ... reject")
         cases.update_many(
             {
                 "caseReference.sourceId": source_id,
@@ -126,10 +122,13 @@ def mark_cases_non_uuid(
             },
             {"$set": {"list": False}},
         )
+        print("\n".join(accept_reject_msg([], reject)))
+    print("  ... accept")
     cases.update_many(
         {"caseReference.sourceId": source_id, "caseReference.uploadIds": accept},
         {"$set": {"list": True}},
     )
+    print("\n".join(accept_reject_msg(accept, [])))
     mark_upload(sources, source_id, accept, accept=True)
     if reject:
         mark_upload(sources, source_id, reject, accept=False)
@@ -148,6 +147,8 @@ def mark_upload(
         {"$set": {"uploads.$[u].accepted": accept}},
         array_filters=[{"u._id": {"$in": upload_ids}}],
     )
+    print("\n".join([f"  mark-upload {u} {accept}" for u in upload_ids]))
+
 
 
 def mark_cases_uuid(
@@ -157,6 +158,7 @@ def mark_cases_uuid(
     accept: List[str],
 ):
     "Marks cases for UUID sources"
+    print("  ... accept")
     cases.update_many(
         {
             "caseReference.sourceId": source_id,
@@ -164,43 +166,51 @@ def mark_cases_uuid(
         },
         {"$set": {"list": True}},
     )
+    print("\n".join(accept_reject_msg(accept, [])))
     mark_upload(sources, source_id, accept, accept=True)
 
 
 def prune_uploads(
     cases: pymongo.collection.Collection,
+    sources: pymongo.collection.Collection,
     source: Dict[str, Any],
     threshold: float,
     epoch: datetime = None,
     dry_run: bool = False,
 ) -> List[str]:
     "Prune uploads for a source"
-    _id = str(s["_id"])
+    _id = str(source["_id"])
     msgs = []
-    if (m := find_acceptable_upload(s, threshold, epoch)) is None:
-        return None
+    if (m := find_acceptable_upload(source, threshold, epoch)) is None:
+        return []
     accept, reject = m
+    print(f"source {_id} {source['name']}")
     if not s.get("hasStableIdentifiers", False):
         try:
             if not dry_run:
-                mark_cases_non_uuid(cases, _id, accept, reject)
-            msgs.extend(accept_reject_msg(accept, reject, True))
+                mark_cases_non_uuid(cases, sources, _id, accept, reject)
+            msgs.extend(accept_reject_msg(accept, reject, True, prefix='-'))
         except pymongo.errors.PyMongoError:
-            msgs.extend(accept_reject_msg(accept, reject, True))
+            print(accept_reject_msg(accept, reject, False))
+            msgs.extend(accept_reject_msg(accept, reject, False, prefix='-'))
         try:
             if reject and not dry_run:
+                print("  ... prune")
                 cases.delete_many({"caseReference.sourceId": _id, "list": False})
-            msgs.append("prune ok")
+            print("  prune ok")
+            msgs.append("- prune ok")
         except pymongo.errors.PyMongoError:
-            msgs.append("prune fail")
+            print("  prune fail")
+            msgs.append("- prune fail")
             return msgs
     else:
         try:
             if not dry_run:
-                mark_cases_uuid(cases, _id, accept)
-            return accept_reject_msg(accept, [], True)
+                mark_cases_uuid(cases, sources, _id, accept)
+            return accept_reject_msg(accept, [], True, prefix='-')
         except pymongo.errors.PyMongoError:
-            return accept_reject_msg(accept, [], False)
+            print(accept_reject_msg(accept, [], False))
+            return accept_reject_msg(accept, [], False, prefix='-')
     return msgs
 
 
@@ -223,9 +233,11 @@ if __name__ == "__main__":
     # Prefer command line arguments to environment variables
     if epoch := (args.epoch or os.environ.get("PRUNE_EPOCH", None)):
         epoch = datetime.fromisoformat(epoch)  # YYYY-MM-DD format
+    else:
+        epoch = None
 
     threshold = args.threshold or os.environ.get("PRUNE_ERROR_THRESHOLD_PERCENT", 10)
-    threshold /= 100
+    threshold = int(threshold) / 100
 
     if args.dry_run:
         print("dry run, no changes will be made")
@@ -252,9 +264,9 @@ if __name__ == "__main__":
     )
     m = []
     for s in sources:
-        if result := prune_uploads(db.cases, s, threshold, epoch, args.dry_run):
-            list_msgs = "\n- ".join(result)
-            msg(m, f"*{s['name']}* ({str(s['_id'])}):\n- {list_msgs}")
+        if result := prune_uploads(db.cases, db.sources, s, threshold, epoch, args.dry_run):
+            list_msgs = "\n".join(result)
+            m.append(f"*{s['name']}* ({str(s['_id'])}):\n{list_msgs}")
 
     if webhook_url := os.environ.get("PRUNE_UPLOADS_WEBHOOK_URL"):
         notify("\n".join(m), webhook_url)
