@@ -88,3 +88,23 @@ export const resetPassword = createAsyncThunk<
 export const logout = createAsyncThunk('auth/logout', async () => {
     await axios.get('/auth/logout');
 });
+
+export const changePassword = createAsyncThunk<
+    string,
+    { oldPassword: string; newPassword: string },
+    { rejectValue: string }
+>('auth/updatePassword', async (data, { rejectWithValue }) => {
+    try {
+        const response = await axios.post('/auth/change-password', data);
+
+        if (response.status !== 200) {
+            throw new Error('Something went wrong, please try again');
+        }
+
+        return response.data.message;
+    } catch (error) {
+        if (!error.response.data.message) throw error;
+
+        return rejectWithValue(error.response.data.message);
+    }
+});
