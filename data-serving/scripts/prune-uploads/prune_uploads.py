@@ -184,7 +184,8 @@ def prune_uploads(
     if (m := find_acceptable_upload(source, threshold, epoch)) is None:
         return []
     accept, reject = m
-    print(f"source {_id} {source['name']}")
+    if not dry_run:
+        print(f"source {_id} {source['name']}")
     if not s.get("hasStableIdentifiers", False):
         try:
             if not dry_run:
@@ -197,7 +198,8 @@ def prune_uploads(
             if reject and not dry_run:
                 print("  ... prune")
                 cases.delete_many({"caseReference.sourceId": _id, "list": False})
-            print("  prune ok")
+            if not dry_run:
+                print("  prune ok")
             msgs.append("- prune ok")
         except pymongo.errors.PyMongoError:
             print("  prune fail")
@@ -267,6 +269,9 @@ if __name__ == "__main__":
         if result := prune_uploads(db.cases, db.sources, s, threshold, epoch, args.dry_run):
             list_msgs = "\n".join(result)
             m.append(f"*{s['name']}* ({str(s['_id'])}):\n{list_msgs}")
+
+    if args.dry_run:
+        print("\n".join(m))
 
     if webhook_url := os.environ.get("PRUNE_UPLOADS_WEBHOOK_URL"):
         notify("\n".join(m), webhook_url)
