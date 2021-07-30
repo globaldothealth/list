@@ -144,7 +144,7 @@ export function ChangePasswordFormInProfile(): JSX.Element {
 
         formik.resetForm();
         //eslint-disable-next-line
-    }, [changePasswordResponse]);
+    }, [changePasswordResponse]);    
 
     return (
         <>
@@ -159,7 +159,7 @@ export function ChangePasswordFormInProfile(): JSX.Element {
                 onSubmit={formik.handleSubmit}
                 className={classes.formFlexContainer}
             >
-                <Typography className={classes.title}>
+                <Typography className={classes.title} data-testid="change-your-password-title">
                     Change your password
                 </Typography>
                 <FormControl
@@ -386,7 +386,6 @@ export default function Profile(): JSX.Element {
             ) : (
                 <></>
             )}
-                        <p>{user?.googleID}</p>
         </>
     );
 }
