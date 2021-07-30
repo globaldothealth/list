@@ -71,7 +71,7 @@ Resources:
       CodeUri: functions/03-parse/
       Handler: app.lambda_handler
       Description: Parse .csv chunk
-      MemorySize: 1024
+      MemorySize: 1769
       Events:
         ChunkEvent:
           Type: S3
