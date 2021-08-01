@@ -258,6 +258,7 @@ def generate_region_json():
     """
     now = datetime.datetime.now().strftime("%m-%d-%Y")
     pipeline = [
+        {"$match": {"list": True}},
         {
             "$project": {
                 "_id": 0,
