@@ -308,6 +308,12 @@ def run_retrieval(tempdir=TEMP_PATH):
                 env, parser_module,
                 source_id, upload_id, auth_headers, cookies,
                 s3_object_key, url, date_filter, parsing_date_range)
+    else:
+        common_lib.complete_with_error(
+            ValueError(f"No parser set for {source_id}"),
+            env, common_lib.UploadError.SOURCE_CONFIGURATION_ERROR, source_id, upload_id,
+            auth_headers, cookies)
+
     return {
         "bucket": OUTPUT_BUCKET,
         "key": s3_object_key,
