@@ -157,6 +157,7 @@ def generate_country_json():
     """
     now = datetime.datetime.now().strftime("%m-%d-%Y")
     pipeline = [
+        {"$match": {"list": True}},
         {
             "$group": {
                 "_id": "$location.country",
