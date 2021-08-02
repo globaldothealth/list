@@ -160,7 +160,7 @@ describe('<SignUpForm />', () => {
                 disabled={false}
             />,
         );
-        expect(screen.getByText(/SignUp form/)).toBeInTheDocument();
+        expect(screen.getByText(/Sign up form/)).toBeInTheDocument();
         expect(screen.getByLabelText('Email')).toBeInTheDocument();
         expect(screen.getByLabelText('Confirm Email')).toBeInTheDocument();
         expect(screen.getByLabelText('Password')).toBeInTheDocument();
