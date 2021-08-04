@@ -109,7 +109,11 @@ export default function SignUpForm({
             'emails-match',
             'Emails must match',
             function (value) {
-                return this.parent.email === value;
+                if (value) {
+                    return this.parent.email.toLowerCase() === value.toLowerCase();
+                } else {
+                    return false
+                }
             },
         ),
         password: Yup.string()
