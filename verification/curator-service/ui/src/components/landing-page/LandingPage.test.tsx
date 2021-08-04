@@ -24,9 +24,9 @@ describe('<LandingPage />', () => {
         expect(screen.getByText(/Welcome to G.h Data/)).toBeInTheDocument();
         expect(screen.getByText(/Sign in with Google/)).toBeInTheDocument();
         expect(
-            screen.getByText(/Sign in with username and password/),
+            screen.getByText(/Sign up form/),
         ).toBeInTheDocument();
-        expect(screen.getByText(/Don't have an account?/)).toBeInTheDocument();
+        expect(screen.getByText(/Already have an account?/)).toBeInTheDocument();
         expect(
             screen.getByText(
                 /I agree to be added to the Global.health newsletter/i,
@@ -86,10 +86,9 @@ describe('<SignInForm />', () => {
             }),
         );
 
-        render(<LandingPage />);
+        render(<SignInForm setRegistrationScreenOn={() => false} />);
 
         userEvent.type(screen.getByLabelText(/Email/i), 'test@email.com');
-        userEvent.click(screen.getAllByRole('checkbox')[0]);
         userEvent.type(screen.getByLabelText('Password'), '1234567');
         userEvent.click(screen.getByRole('button', { name: 'Sign in' }));
 
@@ -111,7 +110,7 @@ describe('<SignInForm />', () => {
 
         await waitFor(() => {
             expect(screen.getAllByText(/This field is required/i)).toHaveLength(
-                2,
+                1,
             );
         });
     });
@@ -119,11 +118,10 @@ describe('<SignInForm />', () => {
     test('displays verification errors when email input is empty', async () => {
         render(<SignInForm setRegistrationScreenOn={() => false} />);
 
-        userEvent.click(screen.getAllByRole('checkbox')[0]);
         userEvent.click(screen.getByTestId('sign-in-button'));
 
         await waitFor(() => {
-            expect(screen.getAllByText(/Required/i)).toHaveLength(2);
+            expect(screen.getAllByText(/This field is required/i)).toHaveLength(2);
         });
     });
 
@@ -147,7 +145,7 @@ describe('<SignInForm />', () => {
 
         await waitFor(() => {
             const errorMessages = screen.getAllByText(/required/i);
-            expect(errorMessages).toHaveLength(3);
+            expect(errorMessages).toHaveLength(2);
         });
     });
 });
@@ -160,7 +158,7 @@ describe('<SignUpForm />', () => {
                 disabled={false}
             />,
         );
-        expect(screen.getByText(/SignUp form/)).toBeInTheDocument();
+        expect(screen.getByText(/Sign up form/)).toBeInTheDocument();
         expect(screen.getByLabelText('Email')).toBeInTheDocument();
         expect(screen.getByLabelText('Confirm Email')).toBeInTheDocument();
         expect(screen.getByLabelText('Password')).toBeInTheDocument();

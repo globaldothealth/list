@@ -149,7 +149,7 @@ export default function SignUpForm({
     return (
         <>
             <form onSubmit={formik.handleSubmit}>
-                <Typography variant="h5">SignUp form</Typography>
+                <Typography variant="h5">Sign up form</Typography>
                 <div className={classes.formFlexContainer}>
                     <div>
                         <TextField

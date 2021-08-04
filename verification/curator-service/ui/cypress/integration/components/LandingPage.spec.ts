@@ -29,7 +29,7 @@ describe('LandingPage', function () {
         cy.visit('/');
         cy.contains('Welcome to G.h Data.');
         cy.contains('Sign up!').click();
-        cy.contains('SignUp form');
+        cy.contains('Sign up form');
         cy.get('input').should('have.length', 6);
     });
 
