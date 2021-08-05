@@ -38,7 +38,7 @@ describe('LandingPage', function () {
         cy.visit('/');
         cy.contains('Welcome to G.h Data.');
         cy.contains('Sign up!').click();
-        cy.contains('SignUp form');
+        cy.contains('Sign up form');
         
         cy.get('#password').type('tsgasdgasd');
         cy.get('button[data-testid="sign-up-button"]').click();
@@ -102,7 +102,7 @@ describe('LandingPage', function () {
         cy.get('button[data-testid="change-password-button"]');
     });
 
-    it.only('Validates passwords in the change password page', function () {
+    it('Validates passwords in the change password page', function () {
         cy.visit('/');
         cy.visit('/reset-password/sampletoken/tokenid');
         cy.get('#password').type('tsgasdgasd');
