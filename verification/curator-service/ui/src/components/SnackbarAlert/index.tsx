@@ -4,7 +4,7 @@ import MuiAlert, { AlertProps } from '@material-ui/lab/Alert';
 
 interface SnackbarAlertProps {
     isOpen: boolean;
-    setIsOpen: (value: boolean) => void;
+    onClose: (value: boolean) => void;
     message: string;
     type: 'success' | 'warning' | 'info' | 'error';
     durationMs?: number;
@@ -16,7 +16,7 @@ const Alert = (props: AlertProps) => {
 
 export const SnackbarAlert: React.FC<SnackbarAlertProps> = ({
     isOpen,
-    setIsOpen,
+    onClose,
     message,
     type,
     durationMs = 5000,
@@ -25,7 +25,7 @@ export const SnackbarAlert: React.FC<SnackbarAlertProps> = ({
         <Snackbar
             open={isOpen}
             autoHideDuration={durationMs}
-            onClose={() => setIsOpen(false)}
+            onClose={() => onClose(false)}
         >
             <Alert severity={type}>{message}</Alert>
         </Snackbar>

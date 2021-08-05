@@ -248,7 +248,7 @@ const LandingPage = (): JSX.Element => {
                 type="success"
                 message={message}
                 durationMs={5000}
-                setIsOpen={(open: boolean) =>
+                onClose={(open: boolean) =>
                     dispatch(toggleSnackbar({ isOpen: open, message: '' }))
                 }
             />
