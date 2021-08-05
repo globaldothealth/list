@@ -37,7 +37,6 @@ describe('LandingPage', function () {
     it('Checks if the password validation works well in the SignUp page', function () {
         cy.visit('/');
         cy.contains('Welcome to G.h Data.');
-        cy.contains('Sign up!').click();
         cy.contains('Sign up form');
         
         cy.get('#password').type('tsgasdgasd');
