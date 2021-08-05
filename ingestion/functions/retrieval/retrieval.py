@@ -2,7 +2,6 @@ import codecs
 import io
 import mimetypes
 import os
-import re
 import sys
 import tempfile
 import zipfile
@@ -145,6 +144,11 @@ def retrieve_content(
         print('Download finished')
 
         key_filename_part = f"content.{source_format.lower()}"
+        s3_object_key = (
+            f"{source_id}"
+            f"{datetime.now(timezone.utc).strftime(TIME_FILEPART_FORMAT)}"
+            f"{key_filename_part}"
+        )
         # Lambda limitations: 512MB ephemeral disk space.
         # Memory range is from 128 to 3008 MB so we could switch to
         # https://docs.python.org/3/library/io.html#io.StringIO for bigger
@@ -152,7 +156,16 @@ def retrieve_content(
         # Make the encoding of retrieved content consistent (UTF-8) for all
         # parsers as per https://github.com/globaldothealth/list/issues/867.
         bytesio = raw_content(url, content, tempdir)
-        print('detecting encoding of retrieved content.')
+        if source_format == "XLSX":
+            # do not convert XLSX into another encoding, leave for parsers
+            print("Skipping encoding detection for XLSX")
+            fd, outfile_name = tempfile.mkstemp(dir=tempdir)
+            with os.fdopen(fd, "wb") as outfile:
+                while content := bytesio.read(READ_CHUNK_BYTES):
+                    outfile.write(content)
+            return [(outfile_name, s3_object_key)]
+
+        print('Detecting encoding of retrieved content')
         # Read 2MB to be quite sure about the encoding.
         detected_enc = detect(bytesio.read(2 << 20))
         bytesio.seek(0)
@@ -170,10 +183,6 @@ def retrieve_content(
             while content:
                 outfile.write(content)
                 content = text_stream.read(READ_CHUNK_BYTES)
-            s3_object_key = (
-                f"{source_id}"
-                f"{datetime.now(timezone.utc).strftime(TIME_FILEPART_FORMAT)}"
-                f"{key_filename_part}")
             return [(outfile_name, s3_object_key)]
     except requests.exceptions.RequestException as e:
         upload_error = (
