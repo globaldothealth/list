@@ -11,7 +11,7 @@ username = os.environ.get("MONGO_USERNAME")
 password = os.environ.get("MONGO_PASSWORD")
 bucket = os.environ.get("EXPORT_BUCKET")
 
-uri = f"mongodb+srv://{username}:{password}@covid19-map-cluster01.sc7u9.mongodb.net/covid19?retryWrites=true&w=majority"
+uri = f"mongodb+srv://{username}:{password}@covid19-map-cluster01.sc7u9.mongodb.net/covid19"
 s3 = boto3.client("s3")
 
 
@@ -35,16 +35,14 @@ def export_chunk(skip, limit, num_cases, num_chunk, num_chunks, field_names):
     z_num_chunk = str(num_chunk).zfill(4)
     z_num_chunks = str(num_chunks).zfill(4)
     chunk_fn = f"cases_{z_num_chunk}-of-{z_num_chunks}.csv"
-    query = {'list': True}
     mongoexport = [
             "./mongoexport",
+            '--query={"list": true}',
             f'--uri="{uri}"',
-            '--collection="cases"',
-            f'--fields="{field_names}"',
-            f"--query='{json.dumps(query)}'",
-            '--type="csv"',
+            '--collection=cases',
+            f'--fields={field_names}',
+            '--type=csv',
             f'--out="/tmp/{chunk_fn}"',
-            "--jsonArray",
             f"--skip={skip}",
             f"--limit={limit}"
     ]
