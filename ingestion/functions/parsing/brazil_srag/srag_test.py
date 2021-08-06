@@ -1,13 +1,13 @@
 import os
 import unittest
 
-from brazil_manaus import manaus
+from brazil_srag import srag
 
 _SOURCE_ID = "abc123"
 _SOURCE_URL = "foo.bar"
 
 
-class ManausTest(unittest.TestCase):
+class BrazilSRAGTest(unittest.TestCase):
     def setUp(self):
         # Default of 1500 is not enough to show diffs when there is one.
         self.maxDiff = 10000
@@ -16,7 +16,7 @@ class ManausTest(unittest.TestCase):
         current_dir = os.path.dirname(__file__)
         sample_data_file = os.path.join(current_dir, "sample_data.csv")
 
-        result = manaus.parse_cases(sample_data_file, _SOURCE_ID, _SOURCE_URL)
+        result = srag.parse_cases(sample_data_file, _SOURCE_ID, _SOURCE_URL)
         self.assertCountEqual(list(result), [
             {
                 "caseReference": {"sourceId": _SOURCE_ID, "sourceUrl": _SOURCE_URL},
