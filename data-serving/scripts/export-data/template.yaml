@@ -84,9 +84,18 @@ Resources:
                 Rules:
                 - Name: prefix
                   Value: processing/parse/
+      VpcConfig:
+        SecurityGroupIds: !Ref SecurityGroupIds
+        SubnetIds: !Ref SubnetIDs
+      FileSystemConfigs:
+        - Arn: arn:aws:elasticfilesystem:us-east-1:612888738066:access-point/fsap-047be197871c040c2
+          LocalMountPath: !Ref EFSpath
       Policies:
         - S3CrudPolicy:
             BucketName: global-dot-health-data-export-bucket-2
+        - AWSLambda_FullAccess
+        - AWSLambdaVPCAccessExecutionRole
+        - AmazonElasticFileSystemClientReadWriteAccess
       Environment:
         Variables:
           EXPORT_BUCKET: global-dot-health-data-export-bucket-2
