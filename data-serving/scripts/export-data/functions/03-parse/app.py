@@ -217,7 +217,7 @@ def process_chunk(infile, outfile=None):
     """
     fields = get_fields(infile)
     if not outfile:
-        outfile = "/tmp/out/" + infile[8:-4] + "_processed.csv"
+        outfile = "/mnt/efs/out/" + infile[8:-4] + "_processed.csv"
     os.makedirs("/".join(outfile.split("/")[:-1]), exist_ok=True)
     with open(outfile, "w+") as g:
         with open(infile, "r") as f:
@@ -251,12 +251,12 @@ def process_chunk(infile, outfile=None):
 
 def get_chunk(event):
     """
-    Retrieves single chunk and stores in /tmp/
+    Retrieves single chunk and stores in /mnt/efs/in
     """
     s3 = boto3.resource("s3")
     src_bucket = event["Records"][0]["s3"]["bucket"]["name"]
     src_key = event["Records"][0]["s3"]["object"]["key"]
-    target = f"/tmp/in/{src_key}"
+    target = f"/mnt/efs/in/{src_key}"
     os.makedirs("/".join(target.split("/")[:-1]), exist_ok=True)
 
     s3.Object(src_bucket, src_key).download_file(target)
