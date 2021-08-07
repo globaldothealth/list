@@ -4,8 +4,12 @@ import gzip
 import os
 import tempfile
 from functools import reduce
+from time import sleep
 
 import boto3
+from botocore.exceptions import EndpointConnectionError
+
+EXPONENTIAL_WAIT_TIMES = [4, 8, 16, 32, 64, 128, 256]
 
 __ARRAYS = [
     "caseReference.uploadIds",
@@ -259,8 +263,12 @@ def get_chunk(event):
     target = f"/mnt/efs/in/{src_key}"
     os.makedirs("/".join(target.split("/")[:-1]), exist_ok=True)
 
-    s3.Object(src_bucket, src_key).download_file(target)
-    return target
+    for i in EXPONENTIAL_WAIT_TIMES:
+        try:
+            s3.Object(src_bucket, src_key).download_file(target)
+            return target
+        except EndpointConnectionError:
+            sleep(i)
 
 
 def upload_processed_chunk(processed_file):
@@ -272,9 +280,14 @@ def upload_processed_chunk(processed_file):
     with open(processed_file, "rb") as fin, gzip.open(compressed_file, "wb") as fout:
         fout.writelines(fin)
     s3 = boto3.resource("s3")
-    s3.Object(bucket, f"processing/combine/{filename}").upload_file(compressed_file)
-    if os.path.exists(compressed_file):
-        os.remove(compressed_file)
+    for i in EXPONENTIAL_WAIT_TIMES:
+        try:
+            s3.Object(bucket, f"processing/combine/{filename}").upload_file(compressed_file)
+            if os.path.exists(compressed_file):
+                os.remove(compressed_file)
+            return
+        except EndpointConnectionError:
+            sleep(i)
 
 
 def lambda_handler(event, context):
