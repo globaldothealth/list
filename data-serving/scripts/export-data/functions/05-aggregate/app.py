@@ -337,7 +337,7 @@ def generate_total_json():
     """
     now = datetime.datetime.now().strftime("%m-%d-%Y")
 
-    count = cases.count_documents({})
+    count = cases.count_documents({"list": True})
 
     with open("variants.json") as v:
         variant_counts = json.load(v)
