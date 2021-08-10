@@ -157,6 +157,7 @@ def generate_country_json():
     """
     now = datetime.datetime.now().strftime("%m-%d-%Y")
     pipeline = [
+        {"$match": {"list": True}},
         {
             "$group": {
                 "_id": "$location.country",
@@ -257,6 +258,7 @@ def generate_region_json():
     """
     now = datetime.datetime.now().strftime("%m-%d-%Y")
     pipeline = [
+        {"$match": {"list": True}},
         {
             "$project": {
                 "_id": 0,
@@ -335,7 +337,7 @@ def generate_total_json():
     """
     now = datetime.datetime.now().strftime("%m-%d-%Y")
 
-    count = cases.count_documents({})
+    count = cases.count_documents({"list": True})
 
     with open("variants.json") as v:
         variant_counts = json.load(v)

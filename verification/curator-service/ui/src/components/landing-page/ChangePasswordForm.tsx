@@ -112,8 +112,17 @@ export default function ChangePasswordForm({
         );
     }, [dispatch, history, passwordReset]);
 
+    const lowercaseRegex = /(?=.*[a-z])/;
+    const uppercaseRegex = /(?=.*[A-Z])/;
+    const numericRegex = /(?=.*[0-9])/;
+
     const validationSchema = Yup.object().shape({
-        password: Yup.string().required('This field is required'),
+        password: Yup.string()
+        .matches(lowercaseRegex, 'one lowercase required!')
+        .matches(uppercaseRegex, 'one uppercase required!')
+        .matches(numericRegex, 'one number required!')
+        .min(8, 'Minimum 8 characters required!')
+        .required('Required!'),
         passwordConfirmation: Yup.string().test(
             'passwords-match',
             'Passwords must match',

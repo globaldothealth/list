@@ -1,7 +1,8 @@
 {
     "caseReference": {
         "sourceId": "5ea86423bae6982635d2e1f8",
-        "sourceUrl": "cdc.gov"
+        "sourceUrl": "cdc.gov",
+        "uploadIds": ["5fabc12344aa09130affce91"]
     },
     "list": true,
     "events": [

@@ -141,7 +141,7 @@ describe('App', function () {
 
         cy.contains('Detailed line list data');
         cy.contains('Terms of use');
-        cy.contains('Or sign in with Google');
+        cy.contains('Or sign up with Google');
     });
 
     it('Homepage with logged in user with no roles', function () {

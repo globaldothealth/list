@@ -1,0 +1,26 @@
+name: Prune uploads
+
+on:
+  schedule:
+    - cron: "9 5,17 * * *"
+
+jobs:
+  prune:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: data-serving/scripts/prune-uploads
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python 3.8
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.8
+    - name: Install dependencies
+      run: pip install -r requirements.txt
+    - name: Prune uploads
+      env:
+        PRUNE_EPOCH: 2021-07-30
+        CONN: ${{ secrets.DB_CONNECTION_URL_PROD }}
+        PRUNE_UPLOADS_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_METRICS_URL }}
+      run: python prune_uploads.py

@@ -2,11 +2,11 @@ describe('LandingPage', function () {
     it('The landing page shows two ways of login', function () {
         cy.visit('/');
         cy.contains('Welcome to G.h Data.');
-        cy.contains('Sign in with username and password');
-        cy.contains('Or sign in with Google');
+        cy.contains('Sign up form');
+        cy.contains('Already have an account?');
 
-        cy.get('button[data-testid="sign-in-button"]').should('be.visible');
-        cy.get('button[data-testid="sign-in-button"]')
+        cy.get('button[data-testid="sign-up-button"]').should('be.visible');
+        cy.get('button[data-testid="sign-up-button"]')
             .should('have.attr', 'type')
             .and('equal', 'submit');
     });
@@ -14,6 +14,8 @@ describe('LandingPage', function () {
     it('The forgot password modal appears and validates email address', function () {
         cy.visit('/');
         cy.contains('Welcome to G.h Data.');
+        cy.contains('Sign in!').click();
+
         cy.contains('Forgot your password?').click();
         cy.contains(
             "Don't worry! Just fill in your email address and we'll send you a link to reset your password",
@@ -25,41 +27,62 @@ describe('LandingPage', function () {
         cy.contains('Invalid email address').click();
     });
 
-    it('Opens the SignUp page', function () {
+    it('Opens the Sign in page', function () {
         cy.visit('/');
         cy.contains('Welcome to G.h Data.');
-        cy.contains('Sign up!').click();
-        cy.contains('SignUp form');
-        cy.get('input').should('have.length', 6);
+        cy.contains('Sign in!').click();
+        cy.get('input').should('have.length', 2);
+    });
+
+    it('Checks if the password validation works well in the SignUp page', function () {
+        cy.visit('/');
+        cy.contains('Welcome to G.h Data.');
+        cy.contains('Sign up form');
+        
+        cy.get('#password').type('tsgasdgasd');
+        cy.get('button[data-testid="sign-up-button"]').click();
+        cy.contains('one uppercase required!');
+        cy.contains('Passwords must match');
+
+        cy.get('#password').focus().clear();
+        cy.get('#password').type('tsgasdgGasd');
+        cy.get('button[data-testid="sign-up-button"]').click();
+        cy.contains('one number required!');
+
+        cy.get('#password').focus().clear();
+        cy.get('#password').type('tT$5');
+        cy.get('button[data-testid="sign-up-button"]').click();
+        cy.contains('Minimum 8 characters required!');
+
     });
 
     it('Validates emails', function () {
         cy.visit('/');
         cy.contains('Welcome to G.h Data.');
-        cy.contains('Sign up!').click();
+        cy.contains('Sign in!');
         cy.get('#email').type('test@example.com');
         cy.get('#confirmEmail').type('xxx@example.com');
 
         cy.get('button[data-testid="sign-up-button"]').click();
 
-        cy.contains('Emails must match').click();
+        cy.contains('Emails must match');
     });
 
     it('Validates passwords', function () {
         cy.visit('/');
         cy.contains('Welcome to G.h Data.');
-        cy.contains('Sign up!').click();
+        cy.contains('Sign in!');
         cy.get('#password').type('tsgasdgasd');
         cy.get('#passwordConfirmation').type('uuuuu');
 
         cy.get('button[data-testid="sign-up-button"]').click();
-        cy.contains('Passwords must match').click();
+        cy.contains('Passwords must match');
     });
 
     it('Show validation error if checkbox is not selected', function () {
         cy.visit('/');
         cy.contains('Welcome to G.h Data.');
-        cy.contains('Sign up!').click();
+        cy.contains('Sign in!');
         cy.get('#email').type('test@example.com');
         cy.get('#confirmEmail').type('test@example.com');
         cy.get('#password').type('tsgasdgasd');
@@ -85,8 +108,23 @@ describe('LandingPage', function () {
         cy.get('#passwordConfirmation').type('uu');
 
         cy.get('button[data-testid="change-password-button"]').click();
-
         cy.contains('Passwords must match');
+
+        cy.get('#password').type('tsgasdgasd');
+        cy.get('button[data-testid="change-password-button"]').click();
+        cy.contains('one uppercase required!');
+        cy.contains('Passwords must match');
+
+        cy.get('#password').focus().clear();
+        cy.get('#password').type('tsgasdgGasd');
+        cy.get('button[data-testid="change-password-button"]').click();
+        cy.contains('one number required!');
+
+        cy.get('#password').focus().clear();
+        cy.get('#password').type('tT$5');
+        cy.get('button[data-testid="change-password-button"]').click();
+        cy.contains('Minimum 8 characters required!');
+
     });
 
     it('Homepage with logged out user', function () {

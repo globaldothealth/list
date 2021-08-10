@@ -31,7 +31,7 @@ def get_parser_name_source(source_id, env):
 
     auth_headers = common_lib.obtain_api_credentials(s3_client)
     try:
-        url, source_format, parser, date_filter = retrieval.get_source_details(
+        url, source_format, parser, date_filter, _ = retrieval.get_source_details(
             env, source_id, "", auth_headers, None
         )
     except RuntimeError:

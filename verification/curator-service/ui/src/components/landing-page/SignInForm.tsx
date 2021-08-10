@@ -6,7 +6,6 @@ import { signInWithEmailAndPassword } from '../../redux/auth/thunk';
 import { setForgotPasswordPopupOpen } from '../../redux/auth/slice';
 
 import { makeStyles, Theme } from '@material-ui/core/styles';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
 import FormHelperText from '@material-ui/core/FormHelperText';
 import FormControl from '@material-ui/core/FormControl';
 import InputLabel from '@material-ui/core/InputLabel';
@@ -17,16 +16,11 @@ import Visibility from '@material-ui/icons/Visibility';
 import VisibilityOff from '@material-ui/icons/VisibilityOff';
 import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
-import FormGroup from '@material-ui/core/FormGroup';
-import Checkbox from '@material-ui/core/Checkbox';
 import Typography from '@material-ui/core/Typography';
 import GoogleButton from 'react-google-button';
 import ForgotPasswordForm from './ForgotPasswordForm';
 
 const useStyles = makeStyles((theme: Theme) => ({
-    checkboxRoot: {
-        display: 'block',
-    },
     required: {
         color: theme.palette.error.main,
     },
@@ -37,9 +31,6 @@ const useStyles = makeStyles((theme: Theme) => ({
     },
     signInButton: {
         marginTop: '10px',
-    },
-    checkboxLabel: {
-        fontSize: '14px',
     },
     link: {
         fontWeight: 'bold',
@@ -54,9 +45,6 @@ const useStyles = makeStyles((theme: Theme) => ({
         marginTop: '-8px',
         display: 'flex',
         justifyContent: 'flex-end',
-    },
-    labelRequired: {
-        color: theme.palette.error.main,
     },
     title: {
         margin: '10px 0',
@@ -74,8 +62,6 @@ const useStyles = makeStyles((theme: Theme) => ({
 interface FormValues {
     email: string;
     password: string;
-    isAgreementChecked: boolean;
-    isNewsletterChecked: boolean;
 }
 
 interface SignInFormProps {
@@ -97,19 +83,12 @@ export default function SignInForm({
             .email('Invalid email address')
             .required('This field is required'),
         password: Yup.string().required('This field is required'),
-        isAgreementChecked: Yup.bool().oneOf([true], 'This field is required'),
-        isNewsletterChecked: Yup.bool(),
     });
 
     const formik = useFormik<FormValues>({
         initialValues: {
             email: '',
             password: '',
-            isAgreementChecked: false,
-            isNewsletterChecked: false,
-        },
-        initialStatus: {
-            isAgreementChecked: '',
         },
         validationSchema,
         onSubmit: (values) => {
@@ -223,87 +202,13 @@ export default function SignInForm({
                             className={classes.googleButton}
                             disabled={disabled}
                             onClick={() => {
-                                if (!formik.values.isAgreementChecked) {
-                                    formik.setFieldError(
-                                        'isAgreementChecked',
-                                        'This field is required',
-                                    );
-                                    formik.setFieldTouched(
-                                        'isAgreementChecked',
-                                    );
-                                } else {
                                     window.location.href = `${process.env
-                                        .REACT_APP_LOGIN_URL!}?newsletterAccepted=${
-                                        formik.values.isNewsletterChecked
-                                    }`;
+                                        .REACT_APP_LOGIN_URL!}`
+                                    }
                                 }
-                            }}
                         />
                     </div>
                 </div>
-
-                <FormGroup>
-                    <FormControlLabel
-                        disabled={disabled}
-                        control={
-                            <Checkbox
-                                checked={formik.values.isAgreementChecked}
-                                onChange={formik.handleChange}
-                                name="isAgreementChecked"
-                                id="isAgreementChecked"
-                            />
-                        }
-                        label={
-                            <Typography className={classes.checkboxLabel}>
-                                By creating an account, I accept the
-                                Global.health{' '}
-                                <a
-                                    href="https://global.health/terms-of-use/"
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className={classes.link}
-                                >
-                                    Terms of Use
-                                </a>{' '}
-                                and{' '}
-                                <a
-                                    href="https://global.health/privacy/"
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className={classes.link}
-                                >
-                                    Privacy Policy
-                                </a>{' '}
-                                <span className={classes.labelRequired}>*</span>
-                            </Typography>
-                        }
-                    />
-                    {formik.errors.isAgreementChecked &&
-                        formik.touched.isAgreementChecked && (
-                            <FormHelperText error variant="outlined">
-                                {formik.errors.isAgreementChecked}
-                            </FormHelperText>
-                        )}
-
-                    <FormControlLabel
-                        disabled={disabled}
-                        control={
-                            <Checkbox
-                                checked={formik.values.isNewsletterChecked}
-                                onChange={formik.handleChange}
-                                name="isNewsletterChecked"
-                                id="isNewsletterChecked"
-                            />
-                        }
-                        label={
-                            <Typography className={classes.checkboxLabel}>
-                                I agree to be added to the Global.health
-                                newsletter
-                            </Typography>
-                        }
-                    />
-                </FormGroup>
-
                 <Button
                     disabled={disabled}
                     type="submit"

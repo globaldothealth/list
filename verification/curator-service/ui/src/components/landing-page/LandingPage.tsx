@@ -91,7 +91,7 @@ const LandingPage = (): JSX.Element => {
     const smallHeight = useMediaQuery('(max-height:1050px)');
     const classes = useStyles({ smallHeight });
     const lastLocation = useLastLocation();
-    const [registrationScreenOn, setRegistrationScreenOn] = useState(false);
+    const [registrationScreenOn, setRegistrationScreenOn] = useState(true);
     const [changePasswordScreenOn, setChangePasswordScreenOn] = useState(false);
 
     const isLoading = useAppSelector(selectIsLoading);
@@ -248,7 +248,7 @@ const LandingPage = (): JSX.Element => {
                 type="success"
                 message={message}
                 durationMs={5000}
-                setIsOpen={(open: boolean) =>
+                onClose={(open: boolean) =>
                     dispatch(toggleSnackbar({ isOpen: open, message: '' }))
                 }
             />

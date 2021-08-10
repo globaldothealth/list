@@ -65,7 +65,7 @@ const useStyles = makeStyles((theme: Theme) => ({
     },
     formFlexContainer: {
         display: 'flex',
-        gap: '80px',
+        gap: '79px',
         marginTop: '20px',
     },
 }));
@@ -92,8 +92,14 @@ export default function SignUpForm({
     const dispatch = useAppDispatch();
 
     const [passwordVisible, setPasswordVisible] = useState(false);
-    const [passwordConfirmationVisible, setPasswordConfirmationVisible] =
-        useState(false);
+    const [
+        passwordConfirmationVisible,
+        setPasswordConfirmationVisible,
+    ] = useState(false);
+
+    const lowercaseRegex = /(?=.*[a-z])/;
+    const uppercaseRegex = /(?=.*[A-Z])/;
+    const numericRegex = /(?=.*[0-9])/;
 
     const validationSchema = Yup.object().shape({
         email: Yup.string()
@@ -106,7 +112,12 @@ export default function SignUpForm({
                 return this.parent.email === value;
             },
         ),
-        password: Yup.string().required('This field is required'),
+        password: Yup.string()
+            .matches(lowercaseRegex, 'one lowercase required!')
+            .matches(uppercaseRegex, 'one uppercase required!')
+            .matches(numericRegex, 'one number required!')
+            .min(8, 'Minimum 8 characters required!')
+            .required('Required!'),
         passwordConfirmation: Yup.string().test(
             'passwords-match',
             'Passwords must match',
@@ -149,7 +160,7 @@ export default function SignUpForm({
     return (
         <>
             <form onSubmit={formik.handleSubmit}>
-                <Typography variant="h5">SignUp form</Typography>
+                <Typography variant="h5">Sign up form</Typography>
                 <div className={classes.formFlexContainer}>
                     <div>
                         <TextField

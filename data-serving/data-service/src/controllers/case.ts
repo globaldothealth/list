@@ -1082,7 +1082,7 @@ export const casesMatchingSearchQuery = (opts: {
  */
 export const findCasesWithCaseReferenceData = async (
     req: Request,
-    fieldsToSelect = {},
+    fieldsToSelect: any = undefined,
 ): Promise<CaseDocument[]> => {
     const providedCaseReferenceData = req.body.cases
         .filter(
@@ -1100,12 +1100,17 @@ export const findCasesWithCaseReferenceData = async (
             };
         });
 
-    return providedCaseReferenceData.length > 0
-        ? Case.find()
-              .or(providedCaseReferenceData)
-              .select(fieldsToSelect)
-              .exec()
-        : [];
+    if (providedCaseReferenceData.length > 0) {
+        if(fieldsToSelect === undefined)
+            return Case.find().or(providedCaseReferenceData).exec();
+        else
+            return Case.find()
+                       .or(providedCaseReferenceData)
+                       .select(fieldsToSelect)
+                       .exec();
+    } else {
+        return [];
+    }
 };
 
 /**

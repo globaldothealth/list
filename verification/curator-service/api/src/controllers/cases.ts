@@ -87,7 +87,9 @@ export default class CasesController {
             const sourceAddress = process.env.AWS_SES_SENDER;
             const correlationId = crypto.randomBytes(16).toString('hex');
 
-            logger.info(`Starting worker for asynchronous download with id ${correlationId}`);
+            logger.info(
+                `Starting worker for asynchronous download with id ${correlationId}`,
+            );
             const worker = new Worker('./src/workers/downloadAsync.js', {
                 workerData: {
                     query: req.body.query as string,
