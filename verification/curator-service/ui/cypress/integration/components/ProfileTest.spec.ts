@@ -54,7 +54,7 @@ describe('Profile', function () {
         cy.contains('Minimum 8 characters required!');
     });
 
-    it.only('Checks if the validates the repeated password', function () {
+    it('Checks if the validates the repeated password', function () {
         cy.login({
             name: 'Alice Smith',
             email: 'alice@test.com',
