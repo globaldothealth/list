@@ -70,7 +70,8 @@ S2_expected = (
     ],
 )
 
-S2_accepted_expected = ["60f7343a6e50eb2592992fb2"], ["60f7343a6e50eb2592992fc2"]
+# acceptance status doesn't matter for whether to prune an upload
+S2_accepted_expected = S2_expected
 
 S3 = {
     "_id": ObjectId("123456789012345678901233"),
