@@ -70,8 +70,15 @@ S2_expected = (
     ],
 )
 
-# acceptance status doesn't matter for whether to prune an upload
-S2_accepted_expected = S2_expected
+# skip rejected uploads, but reject older accepted
+S2_accepted_expected = (
+    ["60f7343a6e50eb2592992fb2"],
+    [
+        "60f733dcfae8bf76717d598e",
+        "60f7343a6e50eb2592992fc2",
+    ],
+)
+
 
 S3 = {
     "_id": ObjectId("123456789012345678901233"),
