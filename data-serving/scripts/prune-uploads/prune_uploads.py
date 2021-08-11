@@ -88,6 +88,9 @@ def find_acceptable_upload(
             and "accepted" not in u
         ), []
 
+    # skip rejected uploads
+    uploads = [u for u in uploads if "accepted" not in u or u['accepted']]
+
     # sort uploads, with most recent being the first
     uploads.sort(key=lambda x: x["created"], reverse=True)
     accept_uploads = [is_acceptable(u, threshold) for u in uploads]
