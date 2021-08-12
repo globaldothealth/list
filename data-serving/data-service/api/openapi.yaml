@@ -85,7 +85,7 @@ paths:
                               country:Germany. The special character '*' matches any value, e.g. 
                               variant:* returns any case where the variant is not empty.
                               Supported keywords are: curator, gender, nationality, occupation,
-                              country, outcome, caseid, uploadid, sourceurl, verificationstatus, 
+                              country, outcome, caseid, uploadid, sourceid, sourceurl, verificationstatus,
                               admin1, admin2, admin3, variant
             responses:
                 '200':

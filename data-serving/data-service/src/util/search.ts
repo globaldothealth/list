@@ -25,6 +25,7 @@ const keywords = new Map<string, string>([
     ['outcome', 'events.value'],
     ['caseid', '_id'],
     ['uploadid', 'caseReference.uploadIds'],
+    ['sourceid', 'caseReference.sourceId'],
     ['sourceurl', 'caseReference.sourceUrl'],
     ['verificationstatus', 'caseReference.verificationStatus'],
     ['admin1', 'location.administrativeAreaLevel1'],

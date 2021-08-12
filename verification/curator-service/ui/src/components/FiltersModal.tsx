@@ -89,6 +89,7 @@ export interface FilterFormValues {
     dateconfirmedbefore?: string;
     curatoremail?: string;
     caseid?: string;
+    sourceid?: string;
     sourceurl?: string;
     uploadid?: string;
 }
@@ -572,6 +573,24 @@ export default function FiltersModal({
                             helperText={
                                 formik.touched.uploadid &&
                                 formik.errors.uploadid
+                            }
+                        />
+                        <TextField
+                            autoFocus={activeFilterInput === 'sourceid'}
+                            id="sourceid"
+                            label="Source ID"
+                            name="sourceid"
+                            type="text"
+                            variant="outlined"
+                            value={formik.values.sourceid || ''}
+                            onChange={formik.handleChange}
+                            error={
+                                formik.touched.sourceid &&
+                                Boolean(formik.errors.sourceid)
+                            }
+                            helperText={
+                                formik.touched.sourceid &&
+                                formik.errors.sourceid
                             }
                         />
                     </div>
