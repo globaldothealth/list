@@ -54,6 +54,7 @@ def is_acceptable(upload: Dict[str, Any], threshold: float) -> bool:
         and created > 0
         and updated == 0  # non-UUID sources should never update a case
         and errors / (errors + created) <= threshold
+        and "accepted" not in upload  # skip already accepted cases
     )
 
 
