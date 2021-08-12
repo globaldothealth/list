@@ -1,4 +1,5 @@
 import codecs
+import re
 import io
 import mimetypes
 import os
@@ -12,7 +13,7 @@ from pathlib import Path
 import boto3
 import requests
 
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 
 TEMP_PATH = "/tmp"
 ENV_FIELD = "env"
@@ -240,8 +241,15 @@ def format_source_url(url: str) -> str:
     - $FULLDAY is replaced with the 2 digits current day of the month.
     - $MONTH is replaced with the 1 or 2 digits current month.
     - $DAY is replaced with the 1 or 2 digits current day of the month.
+
+    A suffix of ::daysbefore=N can be used to offset the current date by N days
+    in the past before substitution
     """
-    today = get_today()
+    urlmatch = re.match(r'(.*)::daysbefore=(.*)', url)
+    if urlmatch and len(urlmatch.groups()) == 2 and urlmatch.groups()[1].isdigit():
+        today = get_today() - timedelta(days=int(urlmatch.groups()[1]))
+    else:
+        today = get_today()
     mappings = {
         "$FULLYEAR": str(today.year),
         "$FULLMONTH": str(today.month).zfill(2),
@@ -252,7 +260,7 @@ def format_source_url(url: str) -> str:
     for key in mappings:
         if key in url:
             url = url.replace(key, mappings[key], -1)
-    return url
+    return re.sub(r'(.*)::daysbefore=.*', r'\1', url)
 
 
 def run_retrieval(tempdir=TEMP_PATH):
