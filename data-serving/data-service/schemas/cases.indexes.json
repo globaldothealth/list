@@ -18,6 +18,12 @@
         }
     },
     {
+        "name": "sourceIdIdx",
+        "key": {
+            "caseReference.sourceId": -1
+        }
+    },
+    {
         "name": "casesCaseRefIdx",
         "key": {
             "caseReference.sourceId": -1,
