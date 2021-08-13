@@ -92,10 +92,8 @@ export default function SignUpForm({
     const dispatch = useAppDispatch();
 
     const [passwordVisible, setPasswordVisible] = useState(false);
-    const [
-        passwordConfirmationVisible,
-        setPasswordConfirmationVisible,
-    ] = useState(false);
+    const [passwordConfirmationVisible, setPasswordConfirmationVisible] =
+        useState(false);
 
     const lowercaseRegex = /(?=.*[a-z])/;
     const uppercaseRegex = /(?=.*[A-Z])/;
@@ -109,7 +107,13 @@ export default function SignUpForm({
             'emails-match',
             'Emails must match',
             function (value) {
-                return this.parent.email === value;
+                if (value) {
+                    return (
+                        this.parent.email.toLowerCase() === value.toLowerCase()
+                    );
+                } else {
+                    return false;
+                }
             },
         ),
         password: Yup.string()

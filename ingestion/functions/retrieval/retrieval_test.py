@@ -114,6 +114,14 @@ def test_format_url(mock_today):
     assert retrieval.format_source_url(
         url) == "http://foo.bar/2020-06-08/6/8.json"
 
+@patch('retrieval.retrieval.get_today')
+def test_format_url_daysbefore(mock_today):
+    from retrieval import retrieval  # Import locally to avoid superseding mock
+    mock_today.return_value = datetime.datetime(2020, 6, 8)
+    url = "http://foo.bar/$FULLYEAR-$FULLMONTH-$FULLDAY/$MONTH/$DAY.json::daysbefore=3"
+    assert retrieval.format_source_url(
+        url) == "http://foo.bar/2020-06-05/6/5.json"
+
 
 @pytest.mark.skipif(not os.environ.get("DOCKERIZED", False),
                     reason="Running integration tests outside of mock environment disabled")

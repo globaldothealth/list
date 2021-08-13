@@ -1,18 +1,22 @@
 import { Case, CaseDocument, RestrictedCase } from '../model/case';
 import { EventDocument } from '../model/event';
 import { Source } from '../model/source';
-import { DocumentQuery, Error, LeanDocument, Query } from 'mongoose';
+import { DocumentQuery, Error, LeanDocument, Query, QueryCursor } from 'mongoose';
 import { ObjectId, QuerySelector } from 'mongodb';
 import { GeocodeOptions, Geocoder, Resolution } from '../geocoding/geocoder';
 import { NextFunction, Request, Response } from 'express';
 import parseSearchQuery, { ParsingError } from '../util/search';
 import { SortByOrder, getSortByKeyword } from '../util/case';
 import { parseDownloadedCase } from '../util/case';
+import fs from 'fs';
 
 import axios from 'axios';
 import { logger } from '../util/logger';
 import stringify from 'csv-stringify/lib/sync';
 import _ from 'lodash';
+
+const CaseFieldTextFile = './fields.txt';
+const CaseFieldFileURL = 'https://raw.githubusercontent.com/globaldothealth/list/main/data-serving/scripts/export-data/functions/01-split/fields.txt';
 
 class GeocodeNotFoundError extends Error {}
 
@@ -20,8 +24,25 @@ class InvalidParamError extends Error {}
 
 type BatchValidationErrors = { index: number; message: string }[];
 
+
+async function getFields(): Promise<string> {
+    let txtRes = await axios.get<string>(CaseFieldFileURL);
+    return txtRes.data;
+}
+
 export class CasesController {
-    constructor(private readonly geocoders: Geocoder[]) {}
+    private readonly caseFields: string[];
+    constructor(private readonly geocoders: Geocoder[]) {
+        let text: string = '';
+        try {
+            text = fs.readFileSync(CaseFieldTextFile).toString('utf-8');
+        } catch {
+            getFields().then(data => {
+                text = data;
+            });
+        }
+        this.caseFields = text.split('\n');
+    }
 
     /**
      * Get a specific case.
@@ -50,7 +71,7 @@ export class CasesController {
     };
 
     /**
-     * Streams a CSV attachment of all cases.
+     * Streams requested cases to client (curator service).
      * Doesn't return cases from the restricted collection.
      *
      * Handles HTTP POST /api/cases/download.
@@ -61,128 +82,119 @@ export class CasesController {
             return;
         }
 
+        logger.info(`Streaming case data in format ${req.body.format} matching query ${req.body.query} for correlation ID ${req.body.correlationId}`);
+
         const queryLimit = Number(req.body.limit);
 
         // Goofy Mongoose types require this.
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        let casesQuery: any;
+        let cursor: QueryCursor<CaseDocument>;
         try {
+            // Stream from mongoose directly into response
+            // Use provided query and limit, if provided
             if (req.body.query) {
-                casesQuery = casesMatchingSearchQuery({
+                logger.info('Request body with query');
+                cursor = casesMatchingSearchQuery({
                     searchQuery: req.body.query as string,
                     count: false,
-                });
-            } else if (req.body.caseIds) {
-                casesQuery = Case.find({
+                    limit: queryLimit,
+                })
+                .cursor();
+            } else if (req.body.caseIds && queryLimit) {
+                logger.info('Request body with case IDs and limit');
+                cursor = Case.find({
                     _id: { $in: req.body.caseIds },
-                }).lean();
+                })
+                .lean()
+                .limit(queryLimit)
+                .collation({
+                    locale: 'en_US',
+                    strength: 2,
+                })
+                .cursor();
+            } else if (req.body.caseIds) {
+                logger.info('Request body with case IDs and no limit');
+                cursor = Case.find({
+                    _id: { $in: req.body.caseIds },
+                })
+                .lean()
+                .collation({
+                    locale: 'en_US',
+                    strength: 2,
+                })
+                .cursor();
+            } else if (queryLimit) {
+                logger.info('Request body with limit and no case IDs');
+                cursor = Case.find({ list: true })
+                .lean()
+                .limit(queryLimit)
+                .collation({
+                    locale: 'en_US',
+                    strength: 2,
+                })
+                .cursor();
             } else {
-                casesQuery = Case.find({ list: true }).lean();
+                logger.info('Request body with no query, limit, or case IDs');
+                cursor = Case.find({ list: true })
+                .lean()
+                .collation({
+                    locale: 'en_US',
+                    strength: 2,
+                })
+                .cursor();
             }
 
-            // Limit number of results if present
-            // eslint-disable-next-line
-            if (queryLimit) {
-                casesQuery = casesQuery.limit(queryLimit);
-            }
+            let doc: CaseDocument;
 
-            const matchingCases = await casesQuery.collation({
-                locale: 'en_US',
-                strength: 2,
-            });
-
-            matchingCases.forEach((aCase: LeanDocument<CaseDocument>) => {
-                delete aCase.restrictedNotes;
-            });
-
-            //Get current date
-            const dateObj = new Date();
-
-            // adjust 0 before single digit date
-            const day = ('0' + dateObj.getDate()).slice(-2);
-            const month = ('0' + (dateObj.getMonth() + 1)).slice(-2);
-            const year = dateObj.getFullYear();
-
-            const filename = `gh_${year}-${month}-${day}`;
-
-            res.setHeader('Cache-Control', 'no-cache');
-            res.setHeader('Pragma', 'no-cache');
-
-            logger.info('format: ' + req.body.format);
-
-            switch (req.body.format) {
-                case 'csv':
-                    res.setHeader('Content-Type', 'text/csv');
-                    res.setHeader(
-                        'Content-Disposition',
-                        `attachment; filename="${filename}.csv"`,
-                    );
-                    axios
-                        .get<string>(
-                            'https://raw.githubusercontent.com/globaldothealth/list/main/data-serving/scripts/export-data/functions/01-split/fields.txt',
-                        )
-                        .then((txtRes) => {
-                            const columns = txtRes.data.split('\n');
-                            const parsedCases = _.map(
-                                matchingCases,
-                                parseDownloadedCase,
-                            );
-                            const stringifiedCases = stringify(parsedCases, {
-                                header: true,
-                                columns: columns,
-                            });
-                            res.end(stringifiedCases);
-                        });
-                    break;
-
-                case 'tsv':
-                    res.setHeader('Content-Type', 'text/tsv');
-                    res.setHeader(
-                        'Content-Disposition',
-                        `attachment; filename="${filename}.tsv"`,
-                    );
-                    axios
-                        .get<string>(
-                            'https://raw.githubusercontent.com/globaldothealth/list/main/data-serving/scripts/export-data/functions/01-split/fields.txt',
-                        )
-                        .then((txtRes) => {
-                            const columns = txtRes.data.split('\n');
-                            const parsedCases = _.map(
-                                matchingCases,
-                                parseDownloadedCase,
-                            );
-                            const stringifiedCases = stringify(parsedCases, {
-                                header: true,
-                                columns: columns,
-                                delimiter: '\t',
-                            });
-                            res.end(stringifiedCases);
-                        });
-                    break;
-
-                case 'json':
-                    const data = JSON.stringify(matchingCases);
-                    res.setHeader('Content-Type', 'application/json');
-                    res.setHeader(
-                        'Content-Disposition',
-                        `attachment; filename="${filename}.json"`,
-                    );
-                    res.end(data);
-                    break;
-
-                default:
-                    break;
-            }
-        } catch (e) {
-            if (e instanceof ParsingError) {
-                logger.info('Error: ' + e);
-                res.status(422).json({ message: e.message });
+            if (req.body.format == 'csv' || req.body.format == 'tsv') {
+                res.setHeader('Content-Type', `text/${req.body.format}`);
+                let delimiter: string = (req.body.format == 'tsv') ? '\t' : ',';
+                const columnsString = this.caseFields.join(delimiter);
+                res.write(columnsString);
+                res.write('\n');
+                doc = await cursor.next();
+                while (doc != null) {
+                    delete doc.restrictedNotes;
+                    const parsedCase = parseDownloadedCase(doc);
+                    const stringifiedCase = stringify([parsedCase], {
+                        header: false,
+                        columns: this.caseFields,
+                        delimiter: delimiter,
+                    });
+                    res.write((stringifiedCase));
+                    doc = await cursor.next();
+                }
+                res.end();
+            } else if (req.body.format == 'json') {
+                res.setHeader('Content-Type', 'application/json');
+                res.write('[');
+                doc = await cursor.next();
+                while (doc != null) {
+                    delete doc.restrictedNotes;
+                    res.write(JSON.stringify(doc));
+                    doc = await cursor.next();
+                    if (doc != null) {
+                        res.write(',');
+                    }
+                }
+                res.write(']');
+                res.end();
+            } else {
+                logger.error(`Invalid format requested ${req.body.format}`);
+                res.status(400).json(`Invalid format requested ${req.body.format}`);
                 return;
             }
-            logger.error(e);
-            res.status(500).json(e);
+        } catch(err) {
+            if (err instanceof ParsingError) {
+                logger.error(`ParsingError: ${err}`);
+                res.status(422).json({ message: err.message });
+                return;
+            }
+            logger.error(`Error streaming case data: ${err}`);
+            res.status(500).json('A server error occurred while streaming case data');
             return;
         }
+        logger.info(`Request with correlation ID ${req.body.correlationId} succeeded`);
     };
 
     /**
@@ -1012,20 +1024,22 @@ export const casesMatchingSearchQuery = (opts: {
         : { list: true };
 
     // Always search with case-insensitivity.
-    const casesQuery: DocumentQuery<CaseDocument[], CaseDocument> = Case.find(
+    const casesQuery: Query<CaseDocument[], CaseDocument> = Case.find(
         queryOpts,
-    ).collation({
+    )
+    .collation({
         locale: 'en_US',
         strength: 2,
     });
+
     const countQuery: Query<number, CaseDocument> = Case.countDocuments(
         queryOpts,
     )
-        .limit(countLimit)
-        .collation({
-            locale: 'en_US',
-            strength: 2,
-        });
+    .limit(countLimit)
+    .collation({
+        locale: 'en_US',
+        strength: 2,
+    });
 
     // Fill in keyword filters.
     parsedSearch.filters.forEach((f) => {
