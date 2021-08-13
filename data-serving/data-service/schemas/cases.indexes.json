@@ -21,6 +21,10 @@
         "name": "sourceIdIdx",
         "key": {
             "caseReference.sourceId": -1
+        },
+        "collation": {
+            "locale": "en_US",
+            "strength": 2
         }
     },
     {
