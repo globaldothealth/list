@@ -29,6 +29,7 @@ except ImportError:
 _SOURCE_API_URL = "http://bar.baz"
 _SOURCE_ID = "5f0b9a7ead3a2b003edc0e7f"
 _SOURCE_URL = "https://foo.bar"
+_UPLOAD_ID = "123456789012345678901234"
 _PARSED_CASE = (
     {
         "caseReference": {
@@ -167,16 +168,15 @@ def test_e2e(
     del input_event[parsing_lib.UPLOAD_ID_FIELD]
     base_upload_url = f"{_SOURCE_API_URL}/sources/{input_event['sourceId']}/uploads"
     create_upload_url = base_upload_url
-    upload_id = "123456789012345678901234"
     requests_mock.post(
         create_upload_url,
-        json={"_id": upload_id, "status": "IN_PROGRESS",
+        json={"_id": _UPLOAD_ID, "status": "IN_PROGRESS",
               "summary": {}},
         status_code=201)
-    update_upload_url = f"{base_upload_url}/{upload_id}"
+    update_upload_url = f"{base_upload_url}/{_UPLOAD_ID}"
     requests_mock.put(
         update_upload_url,
-        json={"_id": upload_id, "status": "SUCCESS",
+        json={"_id": _UPLOAD_ID, "status": "SUCCESS",
               "summary": {"numCreated": num_created, "numUpdated": num_updated}})
 
     # Mock the excluded case IDs endpoint call.
@@ -239,10 +239,10 @@ def test_e2e_with_unstable_case_ids(
     upload_id = "123456789012345678901234"
     requests_mock.post(
         create_upload_url,
-        json={"_id": upload_id, "status": "IN_PROGRESS",
+        json={"_id": _UPLOAD_ID, "status": "IN_PROGRESS",
               "summary": {}},
         status_code=201)
-    update_upload_url = f"{base_upload_url}/{upload_id}"
+    update_upload_url = f"{base_upload_url}/{_UPLOAD_ID}"
     requests_mock.put(
         update_upload_url,
         json={"_id": upload_id, "status": "SUCCESS",
@@ -336,22 +336,18 @@ def test_extract_event_fields_errors_if_missing_env_field(input_event):
 def test_prepare_cases_adds_upload_id():
     import parsing_lib  # Import locally to avoid superseding mock
     case = copy.deepcopy(_PARSED_CASE)
-    upload_id = "123456789012345678901234"
     result = parsing_lib.prepare_cases(
         [case],
-        upload_id,
+        _UPLOAD_ID,
         [])
-    assert next(result)["caseReference"]["uploadIds"] == [upload_id]
+    assert next(result)["caseReference"]["uploadIds"] == [_UPLOAD_ID]
 
 
 def test_prepare_cases_removes_nones():
     import parsing_lib  # Import locally to avoid superseding mock
     case = copy.deepcopy(_PARSED_CASE)
     case["demographics"] = None
-    result = parsing_lib.prepare_cases(
-        [case],
-        "123456789012345678901234",
-        [])
+    result = parsing_lib.prepare_cases([case], _UPLOAD_ID, [])
     assert "demographics" not in next(result).keys()
 
 
@@ -359,10 +355,7 @@ def test_prepare_cases_removes_empty_strings():
     import parsing_lib  # Import locally to avoid superseding mock
     case = copy.deepcopy(_PARSED_CASE)
     case["notes"] = ""
-    result = parsing_lib.prepare_cases(
-        [case],
-        "123456789012345678901234",
-        [])
+    result = parsing_lib.prepare_cases([case], _UPLOAD_ID, [])
     assert "notes" not in next(result).keys()
 
 
@@ -370,19 +363,33 @@ def test_write_to_server_returns_created_updated_error_count(
         requests_mock, mock_source_api_url_fixture):
     import parsing_lib  # Import locally to avoid superseding mock
     full_source_url = f"{_SOURCE_API_URL}/cases/batchUpsert"
+    base_upload_url = f"{_SOURCE_API_URL}/sources/{_SOURCE_ID}/uploads"
+    update_upload_url = f"{base_upload_url}/{_UPLOAD_ID}"
     num_created = 10
     num_updated = 5
     requests_mock.post(
+        base_upload_url,
+        json={"_id": _UPLOAD_ID, "status": "IN_PROGRESS",
+              "summary": {}},
+        status_code=201)
+    requests_mock.post(
         full_source_url,
         json={"numCreated": num_created,
-              "numUpdated": num_updated})
+              "numUpdated": num_updated,
+              })
+    requests_mock.put(
+        update_upload_url,
+        json={"numCreated": num_created,
+              "numUpdated": num_updated,
+              })
 
     count_created, count_updated, count_error = parsing_lib.write_to_server(
         iter([_PARSED_CASE]),
-        "env", _SOURCE_ID, "upload_id", {},
+        "env", _SOURCE_ID, _UPLOAD_ID, {},
         {},
         parsing_lib.CASES_BATCH_SIZE)
     assert requests_mock.request_history[0].url == full_source_url
+    assert requests_mock.request_history[1].url == update_upload_url
     assert count_created == num_created
     assert count_updated == num_updated
     assert count_error == 0
@@ -400,17 +407,15 @@ def test_write_to_server_raises_error_for_failed_batch_upsert(
           "status_code": 200},
          {"json": {},
           "status_code": 500}])
-    upload_id = "123456789012345678901234"
-    update_upload_url = f"{_SOURCE_API_URL}/sources/{_SOURCE_ID}/uploads/{upload_id}"
+    update_upload_url = f"{_SOURCE_API_URL}/sources/{_SOURCE_ID}/uploads/{_UPLOAD_ID}"
     requests_mock.register_uri("PUT", update_upload_url, json={})
 
     try:
         parsing_lib.write_to_server(
             iter([_PARSED_CASE, _PARSED_CASE]),
-            "env", _SOURCE_ID, upload_id, {}, {}, 1)
+            "env", _SOURCE_ID, _UPLOAD_ID, {}, {}, 1)
     except RuntimeError:
         assert requests_mock.request_history[0].url == full_source_url
-        assert requests_mock.request_history[1].url == full_source_url
         assert requests_mock.request_history[-1].url == update_upload_url
         assert requests_mock.request_history[-1].json(
         ) == {"status": "ERROR", "summary": {"error": common_lib.UploadError.DATA_UPLOAD_ERROR.name, 'numCreated': 1}}
@@ -430,13 +435,12 @@ def test_write_to_server_success_for_batch_upsert_with_validation_errors(
             'numCreated': 0,
             'numUpdated': 0,
         }, status_code=207),
-    upload_id = "123456789012345678901234"
-    update_upload_url = f"{_SOURCE_API_URL}/sources/{_SOURCE_ID}/uploads/{upload_id}"
+    update_upload_url = f"{_SOURCE_API_URL}/sources/{_SOURCE_ID}/uploads/{_UPLOAD_ID}"
     requests_mock.register_uri("PUT", update_upload_url, json={})
 
     numCreated, numUpdated, numError = parsing_lib.write_to_server(
         iter([_PARSED_CASE]),
-        "env", _SOURCE_ID, upload_id, {},
+        "env", _SOURCE_ID, _UPLOAD_ID, {},
         {},
         parsing_lib.CASES_BATCH_SIZE)
     assert numCreated == 0
@@ -451,6 +455,7 @@ def test_write_to_server_records_input_for_failed_batch_upsert_with_validation_e
     # TODO: Complete removal of URL env var.
     os.environ["SOURCE_API_URL"] = _SOURCE_API_URL
     full_source_url = f"{_SOURCE_API_URL}/cases/batchUpsert"
+    update_upload_url = f"{_SOURCE_API_URL}/sources/{_SOURCE_ID}/uploads/{_UPLOAD_ID}"
     requests_mock.register_uri(
         "POST", full_source_url, json={
             'errors': [
@@ -462,12 +467,16 @@ def test_write_to_server_records_input_for_failed_batch_upsert_with_validation_e
             'numCreated': 0,
             'numUpdated': 0,
         }, status_code=207),
-    upload_id = "123456789012345678901234"
+    requests_mock.put(
+        update_upload_url,
+        json={"_id": _UPLOAD_ID, "status": "SUCCESS",
+              "summary": {"numCreated": 0, "numUpdated": 0}})
+
 
     with redirect_stdout(io.StringIO()) as f:
         numCreated, numUpdated, numError = parsing_lib.write_to_server(
             iter([_PARSED_CASE]),
-            "env", _SOURCE_ID, upload_id, {},
+            "env", _SOURCE_ID, _UPLOAD_ID, {},
             {},
             parsing_lib.CASES_BATCH_SIZE)
     parsing_output = f.getvalue()
@@ -553,11 +562,10 @@ def test_filter_cases_by_date_keeps_after_GT(mock_today):
 def test_filter_cases_by_date_unsupported_op(
         requests_mock, mock_source_api_url_fixture):
     import parsing_lib  # Import locally to avoid superseding mock
-    upload_id = "123456789012345678901234"
-    update_upload_url = f"{_SOURCE_API_URL}/sources/{_SOURCE_ID}/uploads/{upload_id}"
+    update_upload_url = f"{_SOURCE_API_URL}/sources/{_SOURCE_ID}/uploads/{_UPLOAD_ID}"
     requests_mock.put(
         update_upload_url,
-        json={"_id": upload_id, "status": "ERROR",
+        json={"_id": _UPLOAD_ID, "status": "ERROR",
               "summary": {"error": "SOURCE_CONFIGURATION_ERROR"}})
 
     try:
@@ -565,7 +573,7 @@ def test_filter_cases_by_date_unsupported_op(
             [CASE_JUNE_FIFTH],
             {"numDaysBeforeToday": 3, "op": "NOPE"},
             None,
-            "env", _SOURCE_ID, upload_id, {}, {}))  # api_creds
+            "env", _SOURCE_ID, _UPLOAD_ID, {}, {}))  # api_creds
     except ValueError as ve:
         assert "NOPE" in str(ve)
         assert requests_mock.request_history[0].url == update_upload_url
