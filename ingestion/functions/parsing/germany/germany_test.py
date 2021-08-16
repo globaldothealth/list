@@ -31,6 +31,10 @@ _PARSED_CASE = [
                 }
             },
             {
+                "name": "outcome", 
+                "value": "Recovered"
+            },
+            {
                 "name": "onsetSymptoms",
                 "dateRange": {
                     "start": "08/15/2020Z",
