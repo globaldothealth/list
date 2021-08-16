@@ -4,11 +4,13 @@ import os
 import sys
 import tempfile
 import collections
+import contextlib
 import time
 from typing import Callable, Dict, Generator, Any, List
 
 import boto3
 import requests
+from requests.exceptions import RequestException
 
 import common_lib
 
@@ -138,7 +140,9 @@ def write_to_server(
         env: str, source_id: str, upload_id: str, headers, cookies,
         cases_batch_size: int):
     """Upserts the provided cases via the G.h Case API."""
-    put_api_url = f"{common_lib.get_source_api_url(env)}/cases/batchUpsert"
+    source_api_url = common_lib.get_source_api_url(env)
+    put_api_url = f"{source_api_url}/cases/batchUpsert"
+    upload_status_url = f"{source_api_url}/sources/{source_id}/uploads/{upload_id}"
     print(f'Prod URL: {put_api_url}')
     counter = collections.defaultdict(int)
     counter['batch_num'] = 0
@@ -197,6 +201,16 @@ def write_to_server(
                     counter['numError'] += len(res_json['errors'])
                 else:
                     print(f"Validation error in batch {batch_num}: {res.text}")
+            update_status = {
+                'status': 'IN_PROGRESS',
+                'summary': {
+                    'numCreated': counter['numCreated'],
+                    'numUpdated': counter['numUpdated'],
+                    'numError': counter['numError']
+                }
+            }
+            with contextlib.suppress(RequestException):
+                requests.put(upload_status_url, json=update_status, headers=headers, cookies=cookies)
             continue
 
         # Response can contain an 'error' field which describe each error that
