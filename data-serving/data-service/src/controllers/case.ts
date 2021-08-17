@@ -15,7 +15,6 @@ import { logger } from '../util/logger';
 import stringify from 'csv-stringify/lib/sync';
 import _ from 'lodash';
 
-const CaseFieldTextFile = './fields.txt';
 const CaseFieldFileURL = 'https://raw.githubusercontent.com/globaldothealth/list/main/data-serving/scripts/export-data/functions/01-split/fields.txt';
 
 class GeocodeNotFoundError extends Error {}
@@ -34,13 +33,9 @@ export class CasesController {
     private readonly caseFields: string[];
     constructor(private readonly geocoders: Geocoder[]) {
         let text: string = '';
-        try {
-            text = fs.readFileSync(CaseFieldTextFile).toString('utf-8');
-        } catch {
-            getFields().then(data => {
+        getFields().then(data => {
                 text = data;
-            });
-        }
+        });
         this.caseFields = text.split('\n');
     }
 
