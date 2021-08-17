@@ -147,23 +147,29 @@ export class CasesController {
             let doc: CaseDocument;
 
             if (req.body.format == 'csv' || req.body.format == 'tsv') {
+                logger.info(`Request body format: ${req.body.format}`);
                 res.setHeader('Content-Type', `text/${req.body.format}`);
                 let delimiter: string = (req.body.format == 'tsv') ? '\t' : ',';
                 const columnsString = this.caseFields.join(delimiter);
+                logger.info(`Columns string: ${columnsString}`);
                 res.write(columnsString);
                 res.write('\n');
                 doc = await cursor.next();
                 while (doc != null) {
+                    logger.info('Doc not null');
                     delete doc.restrictedNotes;
                     const parsedCase = parseDownloadedCase(doc);
+                    logger.info(`Parsed case: ${parsedCase}`);
                     const stringifiedCase = stringify([parsedCase], {
                         header: false,
                         columns: this.caseFields,
                         delimiter: delimiter,
                     });
+                    logger.info(`Stringified case: ${stringifiedCase}`);
                     res.write((stringifiedCase));
                     doc = await cursor.next();
                 }
+                logger.info('End of data stream');
                 res.end();
             } else if (req.body.format == 'json') {
                 res.setHeader('Content-Type', 'application/json');
