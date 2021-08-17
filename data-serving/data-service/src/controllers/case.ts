@@ -24,19 +24,20 @@ class InvalidParamError extends Error {}
 type BatchValidationErrors = { index: number; message: string }[];
 
 
-async function getFields(): Promise<string> {
-    let txtRes = await axios.get<string>(CaseFieldFileURL);
-    return txtRes.data;
-}
-
 export class CasesController {
-    private readonly caseFields: string[];
+    private caseFields: string[];
     constructor(private readonly geocoders: Geocoder[]) {
         let text: string = '';
-        getFields().then(data => {
-                text = data;
-        });
-        this.caseFields = text.split('\n');
+        this.caseFields = [];
+        this.init()
+        .then(() => logger.info('Initialized'));
+    }
+
+    // TODO: this belongs in a database, and then passed into the constructor
+    async init() {
+        let txtRes = await axios.get<string>(CaseFieldFileURL);
+        this.caseFields = txtRes.data.split('\n');
+        return this;
     }
 
     /**
