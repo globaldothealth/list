@@ -10,7 +10,7 @@ from typing import Callable, Dict, Generator, Any, List
 
 import boto3
 import requests
-from requests.exceptions import RequestException
+import requests.exceptions
 
 import common_lib
 
@@ -24,7 +24,10 @@ DATE_FILTER_FIELD = "dateFilter"
 DATE_RANGE_FIELD = "dateRange"
 AUTH_FIELD = "auth"
 
-MAX_WAIT_TIME = 600  # 10 minutes maximum wait for response
+# Maximum exponential backoff times
+MAX_WAIT_TIME = 600  # 5xx errors from data service
+MAX_CONN_WAIT_TIME = 900  # connection errors from data service
+
 # Expected date fields format.
 DATE_FORMATS = ["%m/%d/%YZ", "%m/%d/%Y"]
 
@@ -154,13 +157,28 @@ def write_to_server(
         # End of batch.
         if not batch:
             break
+        # There are two exponential backoffs:
+        # * wait, total_wait keeps track of the backoff from 5xx errors
+        # * conn_wait, total_conn_wait tracks backoff for connection errors
         total_wait = 0
+        total_conn_wait = 0
         wait = 10  # initial wait time in seconds
+        conn_wait = 30
         print(f"Sending {len(batch)} cases, total so far: {counter['total']}")
         # Exponential backoff in dev and prod, but not for local testing
-        while total_wait <= (MAX_WAIT_TIME if env in ["dev", "prod"] else 0):
-            res = requests.post(put_api_url, json={"cases": batch},
-                                headers=headers, cookies=cookies)
+        while (
+            total_wait <= (MAX_WAIT_TIME if env in ["dev", "prod"] else 0)
+            and total_conn_wait < MAX_CONN_WAIT_TIME
+        ):
+            try:
+                res = requests.post(put_api_url, json={"cases": batch},
+                                    headers=headers, cookies=cookies)
+            except requests.exceptions.ConnectionError:
+                print(f"Failed to connect to data service, waiting {conn_wait}s")
+                time.sleep(conn_wait)
+                total_conn_wait += conn_wait
+                conn_wait *= 2
+                continue
             if res.status_code in [200, 207]:  # 207 is used for validation error
                 break
             if res.status_code == 500 and "401" in res.text:
@@ -171,6 +189,23 @@ def write_to_server(
             time.sleep(wait)
             total_wait += wait
             wait *= 2
+
+        if total_conn_wait >= MAX_CONN_WAIT_TIME:
+            # data service has failed, raise alert
+            notifymsg = f"[!] *Failed to connect to data-{env}* during {source_id} ingestion"
+            if webhook_url := os.getenv('NOTIFY_WEBHOOK_URL'):
+                with contextlib.suppress(requests.exceptions.RequestException):
+                    requests.post(webhook_url, json={"text": notifymsg})
+            common_lib.complete_with_error(
+                ConnectionError("Could not connect to data service"),
+                env,
+                common_lib.UploadError.INTERNAL_ERROR,
+                source_id, upload_id, headers, cookies,
+                count_created=counter['numCreated'],
+                count_updated=counter['numUpdated'],
+                count_error=counter['numError']
+            )
+            return
 
         if res and res.status_code in [200, 207]:
             counter['total'] += len(batch)
@@ -209,7 +244,7 @@ def write_to_server(
                     'numError': counter['numError']
                 }
             }
-            with contextlib.suppress(RequestException):
+            with contextlib.suppress(requests.exceptions.RequestException):
                 requests.put(upload_status_url, json=update_status, headers=headers, cookies=cookies)
             continue
 
@@ -222,7 +257,9 @@ def write_to_server(
             e, env, upload_error,
             source_id, upload_id, headers, cookies,
             count_created=counter['numCreated'],
-            count_updated=counter['numUpdated'])
+            count_updated=counter['numUpdated'],
+            count_error=counter['numError']
+        )
         return
     print(f'sent {counter["total"]} cases in {time.time() - start_time} seconds')
     return counter['numCreated'], counter['numUpdated'], counter['numError']
