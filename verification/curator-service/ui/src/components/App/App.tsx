@@ -309,7 +309,7 @@ function ProfileMenu(props: { user: User }): JSX.Element {
                 </MenuItem>
                 <Divider className={classes.divider} />
                 <a
-                    href={process.env.REACT_APP_ABOUT_US + "/about"}
+                    href={process.env.REACT_APP_LINK + "/about"}
                     onClick={handleClose}
                     target="_blank"
                     rel="noopener noreferrer"
