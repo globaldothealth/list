@@ -309,7 +309,7 @@ function ProfileMenu(props: { user: User }): JSX.Element {
                 </MenuItem>
                 <Divider className={classes.divider} />
                 <a
-                    href={process.env.REACT_APP_LINK + "/about"}
+                    href="https://global.health/about/"
                     onClick={handleClose}
                     target="_blank"
                     rel="noopener noreferrer"
@@ -571,15 +571,24 @@ export default function App(): JSX.Element {
                         {user && (
                             <>
                                 <Typography>
-                                    <a
+                                {process.env.REACT_APP_LINK === "https://dev-data.covid-19.global.healt" ? 
+                                <a
                                         className={classes.mapLink}
                                         data-testid="mapLink"
-                                        href="https://map.covid-19.global.health/"
+                                        href="http://dev-map.covid-19.global.health/"
                                         rel="noopener noreferrer"
                                         target="_blank"
                                     >
                                         G.h Map
-                                    </a>
+                                    </a> : <a
+                                    className={classes.mapLink}
+                                    data-testid="mapLink"
+                                    href="https://map.covid-19.global.health/"
+                                    rel="noopener noreferrer"
+                                    target="_blank"
+                                >
+                                    G.h Map
+                                </a>}
                                 </Typography>
                                 <ProfileMenu user={user} />{' '}
                             </>
