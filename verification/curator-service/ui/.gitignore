@@ -1,3 +1,6 @@
+.env
+.env.staging
+
 # Don't include CSVs, except for Cypress fixtures.
 *.csv
 !cypress/fixtures/*.csv
