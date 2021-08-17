@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { Request, Response } from 'express';
+import { Case, CaseDocument, RestrictedCase } from '../model/case';
 import { Source, SourceDocument } from '../model/source';
-import { UserDocument } from '../model/user';
 
 import AwsBatchClient from '../clients/aws-batch-client';
 import AwsEventsClient from '../clients/aws-events-client';
@@ -261,6 +261,15 @@ export default class SourcesController {
             res.sendStatus(404);
             return;
         }
+
+        const query = { 'caseReference.sourceId' : source._id };
+        const count = await Case.count(query);
+        const restrictedCount = await RestrictedCase.count(query);
+        if (count + restrictedCount !== 0) {
+            res.status(403).json({ message: 'Source still has cases and cannot be deleted.' });
+            return;
+        }
+
         if (source.automation?.schedule?.awsRuleArn) {
             await this.awsEventsClient.deleteRule(
                 source.toAwsRuleName(),
