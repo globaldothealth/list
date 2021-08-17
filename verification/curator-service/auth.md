@@ -18,6 +18,8 @@ for example, to send the cases in Antarctica via email using the
 `downloadAsync` endpoint. You should replace the content type
 according to the type requested by the endpoint.
 
+You can also use the `dev/run_session.py` script as a jumping off point; just copy/paste the contents into a new file and modify it to do what you want.
+
 ## Authorization
 
 Users can be given roles by admins, admin itself being a role.

@@ -139,10 +139,17 @@ export class CasesController {
                 .cursor();
             }
 
+            const date = (new Date()).toISOString().slice(0, 10);
+            const filename = `gh_${date}`;
+
             let doc: CaseDocument;
 
             if (req.body.format == 'csv' || req.body.format == 'tsv') {
                 res.setHeader('Content-Type', `text/${req.body.format}`);
+                res.setHeader(
+                    'Content-Disposition',
+                    `attachment; filename="${filename}.${req.body.format}"`,
+                );
                 let delimiter: string = (req.body.format == 'tsv') ? '\t' : ',';
                 const columnsString = this.caseFields.join(delimiter);
                 res.write(columnsString);
@@ -162,6 +169,10 @@ export class CasesController {
                 res.end();
             } else if (req.body.format == 'json') {
                 res.setHeader('Content-Type', 'application/json');
+                res.setHeader(
+                    'Content-Disposition',
+                    `attachment; filename="${filename}.json"`,
+                );
                 res.write('[');
                 doc = await cursor.next();
                 while (doc != null) {
