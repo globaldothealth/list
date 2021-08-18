@@ -153,24 +153,29 @@ export function SourcesAutocomplete(
                     request: { url: string },
                     callback: (results?: SourceData[]) => void,
                 ) => {
-                    const resp = await axios.get<ListSourcesResponse>(
-                        '/api/sources',
-                        {
-                            params: request,
-                        },
-                    );
-                    // this filtering could also be done server-side but there isn't a big number of sources
-                    if (props.sourcesWithStableIdentifiers) {
-                        callback(
-                            resp.data.sources.filter((s) => {
-                                return (
-                                    s.hasStableIdentifiers === undefined ||
-                                    s.hasStableIdentifiers === true
-                                );
-                            }),
+                    try {
+                        const resp = await axios.get<ListSourcesResponse>(
+                            '/api/sources',
+                            {
+                                params: request,
+                            },
                         );
-                    } else {
-                        callback(resp.data.sources);
+                        // this filtering could also be done server-side but there isn't a big number of sources
+                        if (props.sourcesWithStableIdentifiers) {
+                            callback(
+                                resp.data.sources.filter((s) => {
+                                    return (
+                                        s.hasStableIdentifiers === undefined ||
+                                        s.hasStableIdentifiers === true
+                                    );
+                                }),
+                            );
+                        } else {
+                            callback(resp.data.sources);
+                        }
+                    }
+                    catch (e) {
+                        callback([]);
                     }
                 },
                 250,
