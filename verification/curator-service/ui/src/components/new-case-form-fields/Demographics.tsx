@@ -99,7 +99,11 @@ export default function Demographics(): JSX.Element {
                 .get('/api/cases/occupations?limit=10')
                 .then((response) =>
                     setCommonOccupations(response.data.occupations ?? []),
-                );
+                )
+                .catch((err) => {
+                    console.error(`Error ${err} fetching common occupations`);
+                    setCommonOccupations([]);
+                });
         },
         // Using [] here means this will only be called once at the beginning of the lifecycle
         [],
