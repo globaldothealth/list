@@ -88,6 +88,12 @@ export default class CasesController {
                 responseType: 'stream',
             }).then((response) => {
                 res.setHeader('Content-Type', response.headers['content-type']);
+                res.setHeader(
+                    'Content-Disposition',
+                    response.headers['content-disposition'],
+                );
+                res.setHeader('Cache-Control', 'no-cache');
+                res.setHeader('Pragma', 'no-cache');
                 response.data.pipe(res);
             });
         } catch (err) {
@@ -96,6 +102,7 @@ export default class CasesController {
                 res.status(err.response.status).send(err.response.data);
                 return;
             }
+            res.status(500).send(err);
         }
     };
 
