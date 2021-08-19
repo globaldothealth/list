@@ -571,7 +571,7 @@ export default function App(): JSX.Element {
                         {user && (
                             <>
                                 <Typography>
-                                {process.env.REACT_APP_LINK === "https://dev-data.covid-19.global.health" ? 
+                                {process.env.REACT_ENV_TYPE === "staging" ? 
                                 <a
                                         className={classes.mapLink}
                                         data-testid="mapLink"
