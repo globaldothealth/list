@@ -264,11 +264,13 @@ export default class SourcesController {
             return;
         }
 
-        const query = { 'caseReference.sourceId' : source._id };
+        const query = { 'caseReference.sourceId': source._id };
         const count = await Case.count(query);
         const restrictedCount = await RestrictedCase.count(query);
         if (count + restrictedCount !== 0) {
-            res.status(403).json({ message: 'Source still has cases and cannot be deleted.' });
+            res.status(403).json({
+                message: 'Source still has cases and cannot be deleted.',
+            });
             return;
         }
 

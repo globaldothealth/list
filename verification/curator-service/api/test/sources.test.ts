@@ -573,7 +573,7 @@ describe('DELETE', () => {
         }).save();
         await curatorRequest.delete(`/api/sources/${source.id}`).expect(403);
         expect(mockDeleteRule).not.toHaveBeenCalled();
-    })
+    });
     it('should delete corresponding AWS rule (et al.) if source contains ruleArn', async () => {
         const source = await new Source({
             name: 'test-source',
