@@ -123,6 +123,7 @@ export default class SourcesController {
             const emailNotificationType =
                 await this.updateAutomationScheduleAwsResources(source);
             const result = await source.save();
+
             await this.sendNotifications(source, emailNotificationType);
             res.json(result);
         } catch (err) {
@@ -130,6 +131,7 @@ export default class SourcesController {
                 res.status(422).json(err);
                 return;
             }
+
             res.status(500).json(err);
             return;
         }
@@ -346,6 +348,7 @@ export default class SourcesController {
                     `Invalid notification type trigger for source event: ${type}`,
                 );
         }
+
         try {
             await this.emailClient.send(
                 source.notificationRecipients,
