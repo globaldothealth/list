@@ -1,8 +1,8 @@
 import codecs
+import re
 import io
 import mimetypes
 import os
-import re
 import sys
 import tempfile
 import zipfile
@@ -13,7 +13,7 @@ from pathlib import Path
 import boto3
 import requests
 
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 
 TEMP_PATH = "/tmp"
 ENV_FIELD = "env"
@@ -145,6 +145,11 @@ def retrieve_content(
         print('Download finished')
 
         key_filename_part = f"content.{source_format.lower()}"
+        s3_object_key = (
+            f"{source_id}"
+            f"{datetime.now(timezone.utc).strftime(TIME_FILEPART_FORMAT)}"
+            f"{key_filename_part}"
+        )
         # Lambda limitations: 512MB ephemeral disk space.
         # Memory range is from 128 to 3008 MB so we could switch to
         # https://docs.python.org/3/library/io.html#io.StringIO for bigger
@@ -152,7 +157,16 @@ def retrieve_content(
         # Make the encoding of retrieved content consistent (UTF-8) for all
         # parsers as per https://github.com/globaldothealth/list/issues/867.
         bytesio = raw_content(url, content, tempdir)
-        print('detecting encoding of retrieved content.')
+        if source_format == "XLSX":
+            # do not convert XLSX into another encoding, leave for parsers
+            print("Skipping encoding detection for XLSX")
+            fd, outfile_name = tempfile.mkstemp(dir=tempdir)
+            with os.fdopen(fd, "wb") as outfile:
+                while content := bytesio.read(READ_CHUNK_BYTES):
+                    outfile.write(content)
+            return [(outfile_name, s3_object_key)]
+
+        print('Detecting encoding of retrieved content')
         # Read 2MB to be quite sure about the encoding.
         detected_enc = detect(bytesio.read(2 << 20))
         bytesio.seek(0)
@@ -170,10 +184,6 @@ def retrieve_content(
             while content:
                 outfile.write(content)
                 content = text_stream.read(READ_CHUNK_BYTES)
-            s3_object_key = (
-                f"{source_id}"
-                f"{datetime.now(timezone.utc).strftime(TIME_FILEPART_FORMAT)}"
-                f"{key_filename_part}")
             return [(outfile_name, s3_object_key)]
     except requests.exceptions.RequestException as e:
         upload_error = (
@@ -231,8 +241,15 @@ def format_source_url(url: str) -> str:
     - $FULLDAY is replaced with the 2 digits current day of the month.
     - $MONTH is replaced with the 1 or 2 digits current month.
     - $DAY is replaced with the 1 or 2 digits current day of the month.
+
+    A suffix of ::daysbefore=N can be used to offset the current date by N days
+    in the past before substitution
     """
-    today = get_today()
+    urlmatch = re.match(r'(.*)::daysbefore=(.*)', url)
+    if urlmatch and len(urlmatch.groups()) == 2 and urlmatch.groups()[1].isdigit():
+        today = get_today() - timedelta(days=int(urlmatch.groups()[1]))
+    else:
+        today = get_today()
     mappings = {
         "$FULLYEAR": str(today.year),
         "$FULLMONTH": str(today.month).zfill(2),
@@ -243,7 +260,7 @@ def format_source_url(url: str) -> str:
     for key in mappings:
         if key in url:
             url = url.replace(key, mappings[key], -1)
-    return url
+    return re.sub(r'(.*)::daysbefore=.*', r'\1', url)
 
 
 def run_retrieval(tempdir=TEMP_PATH):

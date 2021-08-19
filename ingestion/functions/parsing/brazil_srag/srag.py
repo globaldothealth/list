@@ -161,7 +161,7 @@ def convert_gender(raw_gender: str):
     elif raw_gender == "F":
         return "Female"
     elif raw_gender == "I":
-        return "Unknown"
+        return "Other"
 
 
 def convert_test(serological_igg, serological_igm, serological_iga, pcr):

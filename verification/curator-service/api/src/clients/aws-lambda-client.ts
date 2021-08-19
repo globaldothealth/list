@@ -45,6 +45,11 @@ export default class AwsLambdaClient {
             }),
         };
 
+        if (this.serviceEnv == 'locale2e') {
+            logger.info('Not yet implemented');
+            return;
+        }
+
         await this.lambdaClient
             .invoke(params)
             .promise()

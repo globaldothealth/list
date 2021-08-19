@@ -83,7 +83,7 @@ spec:
     spec:
       containers:
         - name: data
-          image: ghcr.io/globaldothealth/list/locationservice:1.7.0
+          image: ghcr.io/globaldothealth/list/locationservice:1.7.1
           ports:
             - containerPort: 8080
           livenessProbe:

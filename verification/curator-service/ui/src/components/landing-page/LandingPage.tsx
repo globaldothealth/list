@@ -91,7 +91,7 @@ const LandingPage = (): JSX.Element => {
     const smallHeight = useMediaQuery('(max-height:1050px)');
     const classes = useStyles({ smallHeight });
     const lastLocation = useLastLocation();
-    const [registrationScreenOn, setRegistrationScreenOn] = useState(false);
+    const [registrationScreenOn, setRegistrationScreenOn] = useState(true);
     const [changePasswordScreenOn, setChangePasswordScreenOn] = useState(false);
 
     const isLoading = useAppSelector(selectIsLoading);

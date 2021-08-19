@@ -70,7 +70,15 @@ S2_expected = (
     ],
 )
 
-S2_accepted_expected = ["60f7343a6e50eb2592992fb2"], ["60f7343a6e50eb2592992fc2"]
+# skip rejected uploads, but reject older accepted
+S2_accepted_expected = (
+    ["60f7343a6e50eb2592992fb2"],
+    [
+        "60f733dcfae8bf76717d598e",
+        "60f7343a6e50eb2592992fc2",
+    ],
+)
+
 
 S3 = {
     "_id": ObjectId("123456789012345678901233"),
@@ -84,7 +92,22 @@ S3 = {
     ],
 }
 
-T = [(S1, None), (S2, S2_expected), (S2_accepted, S2_accepted_expected), (S3, None)]
+# Skip accepted uploads
+S4 = {
+    "_id": ObjectId("123456789012345678901233"),
+    "hasStableIdentifiers": False,
+    "uploads": [
+        _u("60f734296e50eb2592992fb0", Status.SUCCESS, "2020-12-31", 20, 1, accepted=True),
+    ],
+}
+
+T = [
+    (S1, None),
+    (S2, S2_expected),
+    (S2_accepted, S2_accepted_expected),
+    (S3, None),
+    (S4, None),
+]
 
 
 @pytest.mark.parametrize("source,expected", T)

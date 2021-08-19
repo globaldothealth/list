@@ -622,7 +622,11 @@ export function DownloadButton({
         : '';
 
     useEffect(() => {
-        setShowFullDatasetButton(true);
+        if (location.search !== '') {
+            setShowFullDatasetButton(false);
+        } else {
+            setShowFullDatasetButton(true);
+        }
     }, [location.search]);
 
     const handleFileFormatChange = (

@@ -13,6 +13,7 @@ import * as baseUser from './users/base.json';
 import { Session, User } from '../src/model/user';
 
 import { MongoMemoryServer } from 'mongodb-memory-server';
+import { Case, RestrictedCase } from '../src/model/case';
 import { Source } from '../src/model/source';
 import app from '../src/index';
 import axios from 'axios';
@@ -545,6 +546,34 @@ describe('DELETE', () => {
         await curatorRequest.delete(`/api/sources/${source.id}`).expect(204);
         expect(mockDeleteRule).not.toHaveBeenCalled();
     });
+    it('should not delete a source where a case exists', async () => {
+        const source = await new Source({
+            name: 'test-source',
+            origin: { url: 'http://foo.bar', license: 'MIT' },
+            format: 'JSON',
+        }).save();
+        const aCase = await new Case({
+            caseReference: {
+                sourceId: source._id,
+            },
+        }).save();
+        await curatorRequest.delete(`/api/sources/${source.id}`).expect(403);
+        expect(mockDeleteRule).not.toHaveBeenCalled();
+    });
+    it('should not delete a source where a restricted case exists', async () => {
+        const source = await new Source({
+            name: 'test-source',
+            origin: { url: 'http://foo.bar', license: 'MIT' },
+            format: 'JSON',
+        }).save();
+        const aCase = await new RestrictedCase({
+            caseReference: {
+                sourceId: source._id,
+            },
+        }).save();
+        await curatorRequest.delete(`/api/sources/${source.id}`).expect(403);
+        expect(mockDeleteRule).not.toHaveBeenCalled();
+    })
     it('should delete corresponding AWS rule (et al.) if source contains ruleArn', async () => {
         const source = await new Source({
             name: 'test-source',
