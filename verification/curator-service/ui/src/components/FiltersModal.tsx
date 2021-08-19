@@ -21,6 +21,9 @@ import {
 import { Alert } from '@material-ui/lab';
 // import { HelpOutline } from '@material-ui/icons';
 // import { AppTooltip } from './common-form-fields/AppTooltip';
+import { useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
+import { getCountries } from '../redux/countryList/CountryList'
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -231,6 +234,21 @@ export default function FiltersModal({
     //         </p>
     //     </>
     // );
+
+ 
+    const dispatch = useDispatch();
+
+    // const { countryList } = useSelector((state) => state.countryListReducer);
+    // console.log(countryList);
+
+useSelector((state) => console.log(state));
+
+
+    useEffect(() => {
+        console.log(getCountries());
+        
+        dispatch(getCountries())
+      }, [dispatch])
 
     return (
         <Dialog open={isOpen} maxWidth={'xl'} onClose={closeAndResetAlert}>
