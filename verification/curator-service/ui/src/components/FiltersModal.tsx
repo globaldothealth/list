@@ -250,6 +250,8 @@ useSelector((state) => console.log(state));
         dispatch(getCountries())
       }, [dispatch])
 
+      const tempArray = ["sadfsadfgdsa","sadgfas", "kjhgre"];
+
     return (
         <Dialog open={isOpen} maxWidth={'xl'} onClose={closeAndResetAlert}>
             <DialogTitle>Apply filters</DialogTitle>
@@ -269,7 +271,7 @@ useSelector((state) => console.log(state));
                 <form className={classes.root} onSubmit={formik.handleSubmit}>
                     {/* GENERAL */}
                     <div>
-                        <TextField
+                        {/* <TextField
                             autoFocus={activeFilterInput === 'country'}
                             id="country"
                             name="country"
@@ -285,7 +287,32 @@ useSelector((state) => console.log(state));
                             helperText={
                                 formik.touched.country && formik.errors.country
                             }
-                        />
+                        /> */}
+              
+                        <FormControl
+                            variant="outlined"
+                            className={classes.formControl}
+                        >
+                            <InputLabel id="country-label">
+                                Country
+                            </InputLabel>
+                            <Select
+                                autoFocus={
+                                    activeFilterInput === 'country'
+                                }
+                                labelId="country-label"
+                                id="country"
+                                name="country"
+                                label="Country"
+                                value={formik.values.country || ''}
+                                onChange={formik.handleChange}
+                            >
+                                <MenuItem value="" disabled>
+                                    None
+                                </MenuItem>
+                                {tempArray.map((country, i) => <MenuItem value={country}>{country}</MenuItem>)}
+                            </Select>
+                        </FormControl>
                         <FormControl
                             variant="outlined"
                             className={classes.formControl}
