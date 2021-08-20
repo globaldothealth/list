@@ -8,7 +8,7 @@
     "viewportHeight": 1024,
     "defaultCommandTimeout":60000,
     "execTimeout": 60000,
-    "requestTimeout": 60000,
-    "responseTimeout": 60000,
+    "requestTimeout": 30000,
+    "responseTimeout": 40000,
     "numTestsKeptInMemory": 5
 }
