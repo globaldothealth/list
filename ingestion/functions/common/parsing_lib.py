@@ -6,7 +6,8 @@ import tempfile
 import collections
 import contextlib
 import time
-from typing import Callable, Dict, Generator, Any, List
+from pathlib import Path
+from typing import Callable, Dict, Generator, List
 
 import boto3
 import requests
@@ -36,6 +37,14 @@ DATE_FORMATS = ["%m/%d/%YZ", "%m/%d/%Y"]
 # usage on the server-side and is known to cause OOMs so increase with caution.
 CASES_BATCH_SIZE = 250
 
+try:
+    with (Path(__file__).parent / 'geocoding_countries.json').open() as g:
+        GEOCODING_COUNTRIES = json.load(g)
+        COUNTRY_ISO2 = sorted(GEOCODING_COUNTRIES.keys())
+except json.decoder.JSONDecodeError as e:
+    print("geocoding_countries.json JSONDecodeError:", e)
+    sys.exit(1)
+
 s3_client = boto3.client("s3")
 
 if os.environ.get("DOCKERIZED"):
@@ -51,6 +60,20 @@ def safe_int(x):
     try:
         return int(x)
     except (ValueError, TypeError):
+        return None
+
+
+def geocode_country(two_letter_iso_code):
+    try:
+        lat, lon, country = GEOCODING_COUNTRIES[two_letter_iso_code]
+        return {
+            "country": country,
+            "geoResolution": "Country",
+            "name": country,
+            "geometry": {"latitude": lat, "longitude": lon}
+        }
+    except KeyError:
+        print("Code not found in country geocoding DB:", two_letter_iso_code)
         return None
 
 
