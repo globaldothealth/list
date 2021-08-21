@@ -99,7 +99,16 @@ def parse_cases(raw_data_file, source_id, source_url):
                         }
                     ],
                     "demographics": convert_demographics(entry),
-                    "location": {"query": 'Scotland'}
+                    "location": {
+                        "name": "Scotland",
+                        "administrativeAreaLevel1": "Scotland",
+                        "country": "United Kingdom",
+                        "geoResolution": "Admin1",
+                        "geometry": {
+                            "latitude": 56.7863,
+                            "longitude": -4.1140
+                        }
+                    }
                 }
                 for _ in range(int(entry['DailyPositive'])):
                     yield case
