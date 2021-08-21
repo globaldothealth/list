@@ -64,6 +64,7 @@ def safe_int(x):
 
 
 def geocode_country(two_letter_iso_code):
+    two_letter_iso_code = two_letter_iso_code.upper()
     try:
         lat, lon, country = GEOCODING_COUNTRIES[two_letter_iso_code]
         return {
