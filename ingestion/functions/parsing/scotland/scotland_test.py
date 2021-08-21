@@ -4,6 +4,16 @@ from scotland import scotland
 
 _SOURCE_ID = "placeholder_ID"
 _SOURCE_URL = "placeholder_URL"
+_LOCATION = {
+    "name": "Scotland",
+    "administrativeAreaLevel1": "Scotland",
+    "country": "United Kingdom",
+    "geoResolution": "Admin1",
+    "geometry": {
+        "latitude": 56.7863,
+        "longitude": -4.1140
+    }
+}
 
 
 class ScotlandTest(unittest.TestCase):
@@ -24,10 +34,10 @@ class ScotlandTest(unittest.TestCase):
                                             'dateRange': {'start': '03/01/2020Z', 'end': '03/01/2020Z'}}],
                                   'demographics': {'ageRange': {'start': 65.0, 'end': 74.0},
                                                    'gender': 'Female'},
-                                'location': {'query': 'Scotland'}},
+                                'location': _LOCATION},
                                {'caseReference': {'sourceId': 'placeholder_ID',
                                                   'sourceUrl': 'placeholder_URL'},
                                   'events': [{'name': 'confirmed',
                                               'dateRange': {'start': '03/01/2020Z', 'end': '03/01/2020Z'}}],
                                   'demographics': {'ageRange': {'start': 45.0, 'end': 64.0}, 'gender': 'Male'},
-                                  'location': {'query': 'Scotland'}}])
+                                  'location': _LOCATION}])
