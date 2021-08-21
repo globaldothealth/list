@@ -1,7 +1,6 @@
 import React, { RefObject, useState, useEffect } from 'react';
 import { RouteComponentProps, withRouter, useLocation } from 'react-router-dom';
 import axios from 'axios';
-import qs from 'qs';
 import { round } from 'lodash';
 import {
     Button,
@@ -53,7 +52,6 @@ import { ChipData } from './App/App';
 import { SortBy, SortByOrder } from '../constants/types';
 import { connect, ConnectedProps } from 'react-redux';
 import { RootState } from '../redux/store';
-import { SnackbarAlert } from './SnackbarAlert';
 
 // Limit number of data that can be displayed or downloaded to avoid long execution times of mongo queries
 const DATA_LIMIT = 10000;
@@ -526,7 +524,6 @@ export function DownloadButton({
     const [fileFormat, setFileFormat] = useState('');
     const [showFullDatasetButton, setShowFullDatasetButton] = useState(true);
     const [downloadButtonDisabled, setDownloadButtonDisable] = useState(true);
-    const [snackbarOpen, setSnackbarOpen] = useState(false);
 
     const classes = downloadDataModalStyles();
 
