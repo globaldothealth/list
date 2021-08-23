@@ -124,16 +124,10 @@ export function seedLocation(loc: any): void {
 }
 
 export function clearSeededLocations(): void {
-    try {
-        cy.request({
-            method: 'POST',
-            url: '/api/geocode/clear',
-        });
-    }
-    catch (err) {
-        console.error(`Error clearing seeded geocodes: ${err}`);
-        console.error('Your test passed but this may still indicate problems with the integration setup!');
-    }
+    cy.request({
+        method: 'POST',
+        url: '/api/geocode/clear',
+    });
 }
 
 export function addSource(name: string, url: string, uploads?: []): void {
