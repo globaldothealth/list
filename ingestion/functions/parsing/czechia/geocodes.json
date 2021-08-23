@@ -1,0 +1,1220 @@
+{
+  "CZ-10": {
+    "administrativeAreaLevel1": "Praha, Hlavní mešto",
+    "country": "Czech Republic",
+    "geoResolution": "Admin1",
+    "geometry": {
+      "latitude": 50.0596288,
+      "longitude": 14.446459273258009
+    },
+    "name": "Praha"
+  },
+  "CZ-101": {
+    "administrativeAreaLevel1": "Praha, Hlavní mešto",
+    "administrativeAreaLevel2": "Praha 1",
+    "country": "Czech Republic",
+    "geoResolution": "Admin2",
+    "geometry": {
+      "latitude": 50.0596288,
+      "longitude": 14.446459273258009
+    },
+    "name": "Praha"
+  },
+  "CZ-102": {
+    "administrativeAreaLevel1": "Praha, Hlavní mešto",
+    "administrativeAreaLevel2": "Praha 2",
+    "country": "Czech Republic",
+    "geoResolution": "Admin2",
+    "geometry": {
+      "latitude": 50.0596288,
+      "longitude": 14.446459273258009
+    },
+    "name": "Praha"
+  },
+  "CZ-103": {
+    "administrativeAreaLevel1": "Praha, Hlavní mešto",
+    "administrativeAreaLevel2": "Praha 3",
+    "country": "Czech Republic",
+    "geoResolution": "Admin2",
+    "geometry": {
+      "latitude": 50.0596288,
+      "longitude": 14.446459273258009
+    },
+    "name": "Praha"
+  },
+  "CZ-104": {
+    "administrativeAreaLevel1": "Praha, Hlavní mešto",
+    "administrativeAreaLevel2": "Praha 4",
+    "country": "Czech Republic",
+    "geoResolution": "Admin2",
+    "geometry": {
+      "latitude": 50.0596288,
+      "longitude": 14.446459273258009
+    },
+    "name": "Praha"
+  },
+  "CZ-105": {
+    "administrativeAreaLevel1": "Praha, Hlavní mešto",
+    "administrativeAreaLevel2": "Praha 5",
+    "country": "Czech Republic",
+    "geoResolution": "Admin2",
+    "geometry": {
+      "latitude": 50.0596288,
+      "longitude": 14.446459273258009
+    },
+    "name": "Praha"
+  },
+  "CZ-106": {
+    "administrativeAreaLevel1": "Praha, Hlavní mešto",
+    "administrativeAreaLevel2": "Praha 6",
+    "country": "Czech Republic",
+    "geoResolution": "Admin2",
+    "geometry": {
+      "latitude": 50.0596288,
+      "longitude": 14.446459273258009
+    },
+    "name": "Praha"
+  },
+  "CZ-107": {
+    "administrativeAreaLevel1": "Praha, Hlavní mešto",
+    "administrativeAreaLevel2": "Praha 7",
+    "country": "Czech Republic",
+    "geoResolution": "Admin2",
+    "geometry": {
+      "latitude": 50.0596288,
+      "longitude": 14.446459273258009
+    },
+    "name": "Praha"
+  },
+  "CZ-108": {
+    "administrativeAreaLevel1": "Praha, Hlavní mešto",
+    "administrativeAreaLevel2": "Praha 8",
+    "country": "Czech Republic",
+    "geoResolution": "Admin2",
+    "geometry": {
+      "latitude": 50.0596288,
+      "longitude": 14.446459273258009
+    },
+    "name": "Praha"
+  },
+  "CZ-109": {
+    "administrativeAreaLevel1": "Praha, Hlavní mešto",
+    "administrativeAreaLevel2": "Praha 9",
+    "country": "Czech Republic",
+    "geoResolution": "Admin2",
+    "geometry": {
+      "latitude": 50.0596288,
+      "longitude": 14.446459273258009
+    },
+    "name": "Praha"
+  },
+  "CZ-110": {
+    "administrativeAreaLevel1": "Praha, Hlavní mešto",
+    "administrativeAreaLevel2": "Praha 10",
+    "country": "Czech Republic",
+    "geoResolution": "Admin2",
+    "geometry": {
+      "latitude": 50.0596288,
+      "longitude": 14.446459273258009
+    },
+    "name": "Praha"
+  },
+  "CZ-111": {
+    "administrativeAreaLevel1": "Praha, Hlavní mešto",
+    "administrativeAreaLevel2": "Praha 11",
+    "country": "Czech Republic",
+    "geoResolution": "Admin2",
+    "geometry": {
+      "latitude": 50.0596288,
+      "longitude": 14.446459273258009
+    },
+    "name": "Praha"
+  },
+  "CZ-112": {
+    "administrativeAreaLevel1": "Praha, Hlavní mešto",
+    "administrativeAreaLevel2": "Praha 12",
+    "country": "Czech Republic",
+    "geoResolution": "Admin2",
+    "geometry": {
+      "latitude": 49.970095549999996,
+      "longitude": 14.362816733188176
+    },
+    "name": "Praha"
+  },
+  "CZ-113": {
+    "administrativeAreaLevel1": "Praha, Hlavní mešto",
+    "administrativeAreaLevel2": "Praha 13",
+    "country": "Czech Republic",
+    "geoResolution": "Admin2",
+    "geometry": {
+      "latitude": 50.0596288,
+      "longitude": 14.446459273258009
+    },
+    "name": "Praha"
+  },
+  "CZ-114": {
+    "administrativeAreaLevel1": "Praha, Hlavní mešto",
+    "administrativeAreaLevel2": "Praha 14",
+    "country": "Czech Republic",
+    "geoResolution": "Admin2",
+    "geometry": {
+      "latitude": 49.96834385,
+      "longitude": 14.357606169512195
+    },
+    "name": "Praha"
+  },
+  "CZ-115": {
+    "administrativeAreaLevel1": "Praha, Hlavní mešto",
+    "administrativeAreaLevel2": "Praha 15",
+    "country": "Czech Republic",
+    "geoResolution": "Admin2",
+    "geometry": {
+      "latitude": 50.095166899999995,
+      "longitude": 14.391605402358492
+    },
+    "name": "Praha"
+  },
+  "CZ-116": {
+    "administrativeAreaLevel1": "Praha, Hlavní mešto",
+    "administrativeAreaLevel2": "Praha 16",
+    "country": "Czech Republic",
+    "geoResolution": "Admin2",
+    "geometry": {
+      "latitude": 49.97172105,
+      "longitude": 14.366313220196087
+    },
+    "name": "Praha"
+  },
+  "CZ-117": {
+    "administrativeAreaLevel1": "Praha, Hlavní mešto",
+    "administrativeAreaLevel2": "Praha 17",
+    "country": "Czech Republic",
+    "geoResolution": "Admin2",
+    "geometry": {
+      "latitude": 49.971766849999995,
+      "longitude": 14.370643217050015
+    },
+    "name": "Praha"
+  },
+  "CZ-118": {
+    "administrativeAreaLevel1": "Praha, Hlavní mešto",
+    "administrativeAreaLevel2": "Praha 18",
+    "country": "Czech Republic",
+    "geoResolution": "Admin2",
+    "geometry": {
+      "latitude": 49.969911100000004,
+      "longitude": 14.372591294072043
+    },
+    "name": "Praha"
+  },
+  "CZ-119": {
+    "administrativeAreaLevel1": "Praha, Hlavní mešto",
+    "administrativeAreaLevel2": "Praha 19",
+    "country": "Czech Republic",
+    "geoResolution": "Admin2",
+    "geometry": {
+      "latitude": 50.1019412,
+      "longitude": 14.3584619
+    },
+    "name": "Praha"
+  },
+  "CZ-120": {
+    "administrativeAreaLevel1": "Praha, Hlavní mešto",
+    "administrativeAreaLevel2": "Praha 20",
+    "country": "Czech Republic",
+    "geoResolution": "Admin2",
+    "geometry": {
+      "latitude": 50.1021063,
+      "longitude": 14.358431
+    },
+    "name": "Praha"
+  },
+  "CZ-121": {
+    "administrativeAreaLevel1": "Praha, Hlavní mešto",
+    "administrativeAreaLevel2": "Praha 21",
+    "country": "Czech Republic",
+    "geoResolution": "Admin2",
+    "geometry": {
+      "latitude": 50.0596288,
+      "longitude": 14.446459273258009
+    },
+    "name": "Praha"
+  },
+  "CZ-122": {
+    "administrativeAreaLevel1": "Praha, Hlavní mešto",
+    "administrativeAreaLevel2": "Praha 22",
+    "country": "Czech Republic",
+    "geoResolution": "Admin2",
+    "geometry": {
+      "latitude": 50.1064312,
+      "longitude": 14.2621914
+    },
+    "name": "Praha"
+  },
+  "CZ-20": {
+    "administrativeAreaLevel1": "Středočeský kraj",
+    "country": "Czech Republic",
+    "geoResolution": "Admin1",
+    "geometry": {
+      "latitude": 50.0601579,
+      "longitude": 13.83074794209991
+    },
+    "name": "Středočeský kraj"
+  },
+  "CZ-201": {
+    "administrativeAreaLevel1": "Středočeský kraj",
+    "administrativeAreaLevel2": "Benešov",
+    "country": "Czech Republic",
+    "geoResolution": "Admin2",
+    "geometry": {
+      "latitude": 49.7818921,
+      "longitude": 14.6869121
+    },
+    "name": "Benešov"
+  },
+  "CZ-202": {
+    "administrativeAreaLevel1": "Středočeský kraj",
+    "administrativeAreaLevel2": "Beroun",
+    "country": "Czech Republic",
+    "geoResolution": "Admin2",
+    "geometry": {
+      "latitude": 49.9640292,
+      "longitude": 14.0733907
+    },
+    "name": "Beroun"
+  },
+  "CZ-203": {
+    "administrativeAreaLevel1": "Středočeský kraj",
+    "administrativeAreaLevel2": "Kladno",
+    "country": "Czech Republic",
+    "geoResolution": "Admin2",
+    "geometry": {
+      "latitude": 50.1478497,
+      "longitude": 14.1025379
+    },
+    "name": "Kladno"
+  },
+  "CZ-204": {
+    "administrativeAreaLevel1": "Středočeský kraj",
+    "administrativeAreaLevel2": "Kolín",
+    "country": "Czech Republic",
+    "geoResolution": "Admin2",
+    "geometry": {
+      "latitude": 50.0288894,
+      "longitude": 15.2011571
+    },
+    "name": "Kolín"
+  },
+  "CZ-205": {
+    "administrativeAreaLevel1": "Středočeský kraj",
+    "administrativeAreaLevel2": "Kutná Hora",
+    "country": "Czech Republic",
+    "geoResolution": "Admin2",
+    "geometry": {
+      "latitude": 49.9486561,
+      "longitude": 15.2681123
+    },
+    "name": "Kutná Hora"
+  },
+  "CZ-206": {
+    "administrativeAreaLevel1": "Středočeský kraj",
+    "administrativeAreaLevel2": "Mělník",
+    "country": "Czech Republic",
+    "geoResolution": "Admin2",
+    "geometry": {
+      "latitude": 50.3520785,
+      "longitude": 14.4748281
+    },
+    "name": "Mělník"
+  },
+  "CZ-207": {
+    "administrativeAreaLevel1": "Středočeský kraj",
+    "administrativeAreaLevel2": "Mladá Boleslav",
+    "country": "Czech Republic",
+    "geoResolution": "Admin2",
+    "geometry": {
+      "latitude": 50.4116187,
+      "longitude": 14.9031301
+    },
+    "name": "Mladá Boleslav"
+  },
+  "CZ-208": {
+    "administrativeAreaLevel1": "Středočeský kraj",
+    "administrativeAreaLevel2": "Nymburk",
+    "country": "Czech Republic",
+    "geoResolution": "Admin2",
+    "geometry": {
+      "latitude": 50.186331,
+      "longitude": 15.0417306
+    },
+    "name": "Nymburk"
+  },
+  "CZ-209": {
+    "administrativeAreaLevel1": "Středočeský kraj",
+    "administrativeAreaLevel2": "Praha-východ",
+    "country": "Czech Republic",
+    "geoResolution": "Admin2",
+    "geometry": {
+      "latitude": 50.0828112,
+      "longitude": 14.71921794867766
+    },
+    "name": "Praha-východ"
+  },
+  "CZ-20A": {
+    "administrativeAreaLevel1": "Středočeský kraj",
+    "administrativeAreaLevel2": "Praha-západ",
+    "country": "Czech Republic",
+    "geoResolution": "Admin2",
+    "geometry": {
+      "latitude": 50.0557651,
+      "longitude": 14.4356643
+    },
+    "name": "Praha-západ"
+  },
+  "CZ-20B": {
+    "administrativeAreaLevel1": "Středočeský kraj",
+    "administrativeAreaLevel2": "Příbram",
+    "country": "Czech Republic",
+    "geoResolution": "Admin2",
+    "geometry": {
+      "latitude": 49.6901444,
+      "longitude": 14.0103663
+    },
+    "name": "Příbram"
+  },
+  "CZ-20C": {
+    "administrativeAreaLevel1": "Středočeský kraj",
+    "administrativeAreaLevel2": "Rakovník",
+    "country": "Czech Republic",
+    "geoResolution": "Admin2",
+    "geometry": {
+      "latitude": 50.10407415,
+      "longitude": 13.722328073788379
+    },
+    "name": "Rakovník"
+  },
+  "CZ-31": {
+    "administrativeAreaLevel1": "Jihočeský kraj",
+    "country": "Czech Republic",
+    "geoResolution": "Admin1",
+    "geometry": {
+      "latitude": 49.0864548,
+      "longitude": 14.600172741470452
+    },
+    "name": "Jihočeský kraj"
+  },
+  "CZ-311": {
+    "administrativeAreaLevel1": "Jihočeský kraj",
+    "administrativeAreaLevel2": "České Budějovice",
+    "country": "Czech Republic",
+    "geoResolution": "Admin2",
+    "geometry": {
+      "latitude": 48.9747357,
+      "longitude": 14.474285
+    },
+    "name": "České Budějovice"
+  },
+  "CZ-312": {
+    "administrativeAreaLevel1": "Jihočeský kraj",
+    "administrativeAreaLevel2": "Český Krumlov",
+    "country": "Czech Republic",
+    "geoResolution": "Admin2",
+    "geometry": {
+      "latitude": 48.8106526,
+      "longitude": 14.3150586
+    },
+    "name": "Český Krumlov"
+  },
+  "CZ-313": {
+    "administrativeAreaLevel1": "Jihočeský kraj",
+    "administrativeAreaLevel2": "Jindřichův Hradec",
+    "country": "Czech Republic",
+    "geoResolution": "Admin2",
+    "geometry": {
+      "latitude": 49.1443265,
+      "longitude": 15.003354
+    },
+    "name": "Jindřichův Hradec"
+  },
+  "CZ-314": {
+    "administrativeAreaLevel1": "Jihočeský kraj",
+    "administrativeAreaLevel2": "Písek",
+    "country": "Czech Republic",
+    "geoResolution": "Admin2",
+    "geometry": {
+      "latitude": 49.3089887,
+      "longitude": 14.147769
+    },
+    "name": "Písek"
+  },
+  "CZ-315": {
+    "administrativeAreaLevel1": "Jihočeský kraj",
+    "administrativeAreaLevel2": "Prachatice",
+    "country": "Czech Republic",
+    "geoResolution": "Admin2",
+    "geometry": {
+      "latitude": 49.0131123,
+      "longitude": 13.9977479
+    },
+    "name": "Prachatice"
+  },
+  "CZ-316": {
+    "administrativeAreaLevel1": "Jihočeský kraj",
+    "administrativeAreaLevel2": "Strakonice",
+    "country": "Czech Republic",
+    "geoResolution": "Admin2",
+    "geometry": {
+      "latitude": 49.261277,
+      "longitude": 13.9025043
+    },
+    "name": "Strakonice"
+  },
+  "CZ-317": {
+    "administrativeAreaLevel1": "Jihočeský kraj",
+    "administrativeAreaLevel2": "Tábor",
+    "country": "Czech Republic",
+    "geoResolution": "Admin2",
+    "geometry": {
+      "latitude": 49.4141533,
+      "longitude": 14.6587234
+    },
+    "name": "Tábor"
+  },
+  "CZ-32": {
+    "administrativeAreaLevel1": "Plzeňský kraj",
+    "country": "Czech Republic",
+    "geoResolution": "Admin1",
+    "geometry": {
+      "latitude": 49.522810199999995,
+      "longitude": 13.206311785137638
+    },
+    "name": "Plzeňský kraj"
+  },
+  "CZ-321": {
+    "administrativeAreaLevel1": "Plzeňský kraj",
+    "administrativeAreaLevel2": "Domažlice",
+    "country": "Czech Republic",
+    "geoResolution": "Admin2",
+    "geometry": {
+      "latitude": 49.4407069,
+      "longitude": 12.9298338
+    },
+    "name": "Domažlice"
+  },
+  "CZ-322": {
+    "administrativeAreaLevel1": "Plzeňský kraj",
+    "administrativeAreaLevel2": "Klatovy",
+    "country": "Czech Republic",
+    "geoResolution": "Admin2",
+    "geometry": {
+      "latitude": 49.3951183,
+      "longitude": 13.2935954
+    },
+    "name": "Klatovy"
+  },
+  "CZ-323": {
+    "administrativeAreaLevel1": "Plzeňský kraj",
+    "administrativeAreaLevel2": "Plzeň-město",
+    "country": "Czech Republic",
+    "geoResolution": "Admin2",
+    "geometry": {
+      "latitude": 49.7477415,
+      "longitude": 13.3775249
+    },
+    "name": "Plzeň-město"
+  },
+  "CZ-324": {
+    "administrativeAreaLevel1": "Plzeňský kraj",
+    "administrativeAreaLevel2": "Plzeň-jih",
+    "country": "Czech Republic",
+    "geoResolution": "Admin2",
+    "geometry": {
+      "latitude": 49.5604755,
+      "longitude": 13.6679349
+    },
+    "name": "Plzeň-jih"
+  },
+  "CZ-325": {
+    "administrativeAreaLevel1": "Plzeňský kraj",
+    "administrativeAreaLevel2": "Plzeň-sever",
+    "country": "Czech Republic",
+    "geoResolution": "Admin2",
+    "geometry": {
+      "latitude": 49.8814234,
+      "longitude": 13.28128812312578
+    },
+    "name": "Plzeň-sever"
+  },
+  "CZ-326": {
+    "administrativeAreaLevel1": "Plzeňský kraj",
+    "administrativeAreaLevel2": "Rokycany",
+    "country": "Czech Republic",
+    "geoResolution": "Admin2",
+    "geometry": {
+      "latitude": 49.7429636,
+      "longitude": 13.5945245
+    },
+    "name": "Rokycany"
+  },
+  "CZ-327": {
+    "administrativeAreaLevel1": "Plzeňský kraj",
+    "administrativeAreaLevel2": "Tachov",
+    "country": "Czech Republic",
+    "geoResolution": "Admin2",
+    "geometry": {
+      "latitude": 49.7955449,
+      "longitude": 12.6329861
+    },
+    "name": "Tachov"
+  },
+  "CZ-41": {
+    "administrativeAreaLevel1": "Karlovarský kraj",
+    "country": "Czech Republic",
+    "geoResolution": "Admin1",
+    "geometry": {
+      "latitude": 50.1753532,
+      "longitude": 12.806086309968043
+    },
+    "name": "Karlovarský kraj"
+  },
+  "CZ-411": {
+    "administrativeAreaLevel1": "Karlovarský kraj",
+    "administrativeAreaLevel2": "Cheb",
+    "country": "Czech Republic",
+    "geoResolution": "Admin2",
+    "geometry": {
+      "latitude": 50.0793511,
+      "longitude": 12.3703526
+    },
+    "name": "Cheb"
+  },
+  "CZ-412": {
+    "administrativeAreaLevel1": "Karlovarský kraj",
+    "administrativeAreaLevel2": "Karlovy Vary",
+    "country": "Czech Republic",
+    "geoResolution": "Admin2",
+    "geometry": {
+      "latitude": 50.2304694,
+      "longitude": 12.8710769
+    },
+    "name": "Karlovy Vary"
+  },
+  "CZ-413": {
+    "administrativeAreaLevel1": "Karlovarský kraj",
+    "administrativeAreaLevel2": "Sokolov",
+    "country": "Czech Republic",
+    "geoResolution": "Admin2",
+    "geometry": {
+      "latitude": 50.1815641,
+      "longitude": 12.640035
+    },
+    "name": "Sokolov"
+  },
+  "CZ-42": {
+    "administrativeAreaLevel1": "Ústecký kraj",
+    "country": "Czech Republic",
+    "geoResolution": "Admin1",
+    "geometry": {
+      "latitude": 50.5663266,
+      "longitude": 13.820670539566608
+    },
+    "name": "Ústecký kraj"
+  },
+  "CZ-421": {
+    "administrativeAreaLevel1": "Ústecký kraj",
+    "administrativeAreaLevel2": "Děčín",
+    "country": "Czech Republic",
+    "geoResolution": "Admin2",
+    "geometry": {
+      "latitude": 50.7824196,
+      "longitude": 14.2147221
+    },
+    "name": "Děčín"
+  },
+  "CZ-422": {
+    "administrativeAreaLevel1": "Ústecký kraj",
+    "administrativeAreaLevel2": "Chomutov",
+    "country": "Czech Republic",
+    "geoResolution": "Admin2",
+    "geometry": {
+      "latitude": 50.4606456,
+      "longitude": 13.4178324
+    },
+    "name": "Chomutov"
+  },
+  "CZ-423": {
+    "administrativeAreaLevel1": "Ústecký kraj",
+    "administrativeAreaLevel2": "Litoměřice",
+    "country": "Czech Republic",
+    "geoResolution": "Admin2",
+    "geometry": {
+      "latitude": 50.5340795,
+      "longitude": 14.1317985
+    },
+    "name": "Litoměřice"
+  },
+  "CZ-424": {
+    "administrativeAreaLevel1": "Ústecký kraj",
+    "administrativeAreaLevel2": "Louny",
+    "country": "Czech Republic",
+    "geoResolution": "Admin2",
+    "geometry": {
+      "latitude": 50.3572914,
+      "longitude": 13.7969195
+    },
+    "name": "Louny"
+  },
+  "CZ-425": {
+    "administrativeAreaLevel1": "Ústecký kraj",
+    "administrativeAreaLevel2": "Most",
+    "country": "Czech Republic",
+    "geoResolution": "Admin2",
+    "geometry": {
+      "latitude": 50.5032737,
+      "longitude": 13.636112
+    },
+    "name": "Most"
+  },
+  "CZ-426": {
+    "administrativeAreaLevel1": "Ústecký kraj",
+    "administrativeAreaLevel2": "Teplice",
+    "country": "Czech Republic",
+    "geoResolution": "Admin2",
+    "geometry": {
+      "latitude": 50.6406644,
+      "longitude": 13.8244461
+    },
+    "name": "Teplice"
+  },
+  "CZ-427": {
+    "administrativeAreaLevel1": "Ústecký kraj",
+    "administrativeAreaLevel2": "Ústí nad Labem",
+    "country": "Czech Republic",
+    "geoResolution": "Admin2",
+    "geometry": {
+      "latitude": 50.6603327,
+      "longitude": 14.0381357
+    },
+    "name": "Ústí nad Labem"
+  },
+  "CZ-51": {
+    "administrativeAreaLevel1": "Liberecký kraj",
+    "country": "Czech Republic",
+    "geoResolution": "Admin1",
+    "geometry": {
+      "latitude": 50.670618649999994,
+      "longitude": 15.094905279098455
+    },
+    "name": "Liberecký kraj"
+  },
+  "CZ-511": {
+    "administrativeAreaLevel1": "Liberecký kraj",
+    "administrativeAreaLevel2": "Česká Lípa",
+    "country": "Czech Republic",
+    "geoResolution": "Admin2",
+    "geometry": {
+      "latitude": 50.6865452,
+      "longitude": 14.5372974
+    },
+    "name": "Česká Lípa"
+  },
+  "CZ-512": {
+    "administrativeAreaLevel1": "Liberecký kraj",
+    "administrativeAreaLevel2": "Jablonec nad Nisou",
+    "country": "Czech Republic",
+    "geoResolution": "Admin2",
+    "geometry": {
+      "latitude": 50.7240899,
+      "longitude": 15.1710958
+    },
+    "name": "Jablonec nad Nisou"
+  },
+  "CZ-513": {
+    "administrativeAreaLevel1": "Liberecký kraj",
+    "administrativeAreaLevel2": "Liberec",
+    "country": "Czech Republic",
+    "geoResolution": "Admin2",
+    "geometry": {
+      "latitude": 50.670618649999994,
+      "longitude": 15.094905279098455
+    },
+    "name": "Liberec"
+  },
+  "CZ-514": {
+    "administrativeAreaLevel1": "Liberecký kraj",
+    "administrativeAreaLevel2": "Semily",
+    "country": "Czech Republic",
+    "geoResolution": "Admin2",
+    "geometry": {
+      "latitude": 50.602249,
+      "longitude": 15.33526
+    },
+    "name": "Semily"
+  },
+  "CZ-52": {
+    "administrativeAreaLevel1": "Královéhradecký kraj",
+    "country": "Czech Republic",
+    "geoResolution": "Admin1",
+    "geometry": {
+      "latitude": 50.40939265,
+      "longitude": 15.68500539430977
+    },
+    "name": "Královéhradecký kraj"
+  },
+  "CZ-521": {
+    "administrativeAreaLevel1": "Královéhradecký kraj",
+    "administrativeAreaLevel2": "Hradec Králové",
+    "country": "Czech Republic",
+    "geoResolution": "Admin2",
+    "geometry": {
+      "latitude": 50.2092113,
+      "longitude": 15.8327512
+    },
+    "name": "Hradec Králové"
+  },
+  "CZ-522": {
+    "administrativeAreaLevel1": "Královéhradecký kraj",
+    "administrativeAreaLevel2": "Jičín",
+    "country": "Czech Republic",
+    "geoResolution": "Admin2",
+    "geometry": {
+      "latitude": 50.4370452,
+      "longitude": 15.3516528
+    },
+    "name": "Jičín"
+  },
+  "CZ-523": {
+    "administrativeAreaLevel1": "Královéhradecký kraj",
+    "administrativeAreaLevel2": "Náchod",
+    "country": "Czech Republic",
+    "geoResolution": "Admin2",
+    "geometry": {
+      "latitude": 50.4167811,
+      "longitude": 16.1630918
+    },
+    "name": "Náchod"
+  },
+  "CZ-524": {
+    "administrativeAreaLevel1": "Královéhradecký kraj",
+    "administrativeAreaLevel2": "Rychnov nad Kněžnou",
+    "country": "Czech Republic",
+    "geoResolution": "Admin2",
+    "geometry": {
+      "latitude": 50.1631069,
+      "longitude": 16.274837
+    },
+    "name": "Rychnov nad Kněžnou"
+  },
+  "CZ-525": {
+    "administrativeAreaLevel1": "Královéhradecký kraj",
+    "administrativeAreaLevel2": "Trutnov",
+    "country": "Czech Republic",
+    "geoResolution": "Admin2",
+    "geometry": {
+      "latitude": 50.5650371,
+      "longitude": 15.916961395515788
+    },
+    "name": "Trutnov"
+  },
+  "CZ-53": {
+    "administrativeAreaLevel1": "Pardubický kraj",
+    "country": "Czech Republic",
+    "geoResolution": "Admin1",
+    "geometry": {
+      "latitude": 49.889818950000006,
+      "longitude": 16.128325371948733
+    },
+    "name": "Pardubický kraj"
+  },
+  "CZ-531": {
+    "administrativeAreaLevel1": "Pardubický kraj",
+    "administrativeAreaLevel2": "Chrudim",
+    "country": "Czech Republic",
+    "geoResolution": "Admin2",
+    "geometry": {
+      "latitude": 49.9511458,
+      "longitude": 15.7947559
+    },
+    "name": "Chrudim"
+  },
+  "CZ-532": {
+    "administrativeAreaLevel1": "Pardubický kraj",
+    "administrativeAreaLevel2": "Pardubice",
+    "country": "Czech Republic",
+    "geoResolution": "Admin2",
+    "geometry": {
+      "latitude": 50.0385812,
+      "longitude": 15.7791356
+    },
+    "name": "Pardubice"
+  },
+  "CZ-533": {
+    "administrativeAreaLevel1": "Pardubický kraj",
+    "administrativeAreaLevel2": "Svitavy",
+    "country": "Czech Republic",
+    "geoResolution": "Admin2",
+    "geometry": {
+      "latitude": 49.7562053,
+      "longitude": 16.4688995
+    },
+    "name": "Svitavy"
+  },
+  "CZ-534": {
+    "administrativeAreaLevel1": "Pardubický kraj",
+    "administrativeAreaLevel2": "Ústí nad Orlicí",
+    "country": "Czech Republic",
+    "geoResolution": "Admin2",
+    "geometry": {
+      "latitude": 49.9737603,
+      "longitude": 16.3941695
+    },
+    "name": "Ústí nad Orlicí"
+  },
+  "CZ-63": {
+    "administrativeAreaLevel1": "Kraj Vysočina",
+    "country": "Czech Republic",
+    "geoResolution": "Admin1",
+    "geometry": {
+      "latitude": 49.399409750000004,
+      "longitude": 15.570468337643561
+    },
+    "name": "Kraj Vysočina"
+  },
+  "CZ-631": {
+    "administrativeAreaLevel1": "Kraj Vysočina",
+    "administrativeAreaLevel2": "Havlíčkův Brod",
+    "country": "Czech Republic",
+    "geoResolution": "Admin2",
+    "geometry": {
+      "latitude": 49.607079,
+      "longitude": 15.5794883
+    },
+    "name": "Havlíčkův Brod"
+  },
+  "CZ-632": {
+    "administrativeAreaLevel1": "Kraj Vysočina",
+    "administrativeAreaLevel2": "Jihlava",
+    "country": "Czech Republic",
+    "geoResolution": "Admin2",
+    "geometry": {
+      "latitude": 49.396064,
+      "longitude": 15.5903065
+    },
+    "name": "Jihlava"
+  },
+  "CZ-633": {
+    "administrativeAreaLevel1": "Kraj Vysočina",
+    "administrativeAreaLevel2": "Pelhřimov",
+    "country": "Czech Republic",
+    "geoResolution": "Admin2",
+    "geometry": {
+      "latitude": 49.4308737,
+      "longitude": 15.2232341
+    },
+    "name": "Pelhřimov"
+  },
+  "CZ-634": {
+    "administrativeAreaLevel1": "Kraj Vysočina",
+    "administrativeAreaLevel2": "Třebíč",
+    "country": "Czech Republic",
+    "geoResolution": "Admin2",
+    "geometry": {
+      "latitude": 49.2151907,
+      "longitude": 15.8816091
+    },
+    "name": "Třebíč"
+  },
+  "CZ-635": {
+    "administrativeAreaLevel1": "Kraj Vysočina",
+    "administrativeAreaLevel2": "Žďár nad Sázavou",
+    "country": "Czech Republic",
+    "geoResolution": "Admin2",
+    "geometry": {
+      "latitude": 49.5629014,
+      "longitude": 15.9391924
+    },
+    "name": "Žďár nad Sázavou"
+  },
+  "CZ-64": {
+    "administrativeAreaLevel1": "Jihomoravský kraj",
+    "country": "Czech Republic",
+    "geoResolution": "Admin1",
+    "geometry": {
+      "latitude": 49.2125608,
+      "longitude": 16.6266277
+    },
+    "name": "Jihomoravský kraj"
+  },
+  "CZ-641": {
+    "administrativeAreaLevel1": "Jihomoravský kraj",
+    "administrativeAreaLevel2": "Blansko",
+    "country": "Czech Republic",
+    "geoResolution": "Admin2",
+    "geometry": {
+      "latitude": 49.36021865,
+      "longitude": 16.652847141110076
+    },
+    "name": "Blansko"
+  },
+  "CZ-642": {
+    "administrativeAreaLevel1": "Jihomoravský kraj",
+    "administrativeAreaLevel2": "Brno-město",
+    "country": "Czech Republic",
+    "geoResolution": "Admin2",
+    "geometry": {
+      "latitude": 49.2125608,
+      "longitude": 16.6266277
+    },
+    "name": "Brno-město"
+  },
+  "CZ-643": {
+    "administrativeAreaLevel1": "Jihomoravský kraj",
+    "administrativeAreaLevel2": "Brno-venkov",
+    "country": "Czech Republic",
+    "geoResolution": "Admin2",
+    "geometry": {
+      "latitude": 49.2435916,
+      "longitude": 16.7130573
+    },
+    "name": "Brno-venkov"
+  },
+  "CZ-644": {
+    "administrativeAreaLevel1": "Jihomoravský kraj",
+    "administrativeAreaLevel2": "Břeclav",
+    "country": "Czech Republic",
+    "geoResolution": "Admin2",
+    "geometry": {
+      "latitude": 48.7594008,
+      "longitude": 16.8813137
+    },
+    "name": "Břeclav"
+  },
+  "CZ-645": {
+    "administrativeAreaLevel1": "Jihomoravský kraj",
+    "administrativeAreaLevel2": "Hodonín",
+    "country": "Czech Republic",
+    "geoResolution": "Admin2",
+    "geometry": {
+      "latitude": 48.8552594,
+      "longitude": 17.1219127
+    },
+    "name": "Hodonín"
+  },
+  "CZ-646": {
+    "administrativeAreaLevel1": "Jihomoravský kraj",
+    "administrativeAreaLevel2": "Vyškov",
+    "country": "Czech Republic",
+    "geoResolution": "Admin2",
+    "geometry": {
+      "latitude": 49.2778194,
+      "longitude": 16.9994446
+    },
+    "name": "Vyškov"
+  },
+  "CZ-647": {
+    "administrativeAreaLevel1": "Jihomoravský kraj",
+    "administrativeAreaLevel2": "Znojmo",
+    "country": "Czech Republic",
+    "geoResolution": "Admin2",
+    "geometry": {
+      "latitude": 48.8554341,
+      "longitude": 16.0489457
+    },
+    "name": "Znojmo"
+  },
+  "CZ-71": {
+    "administrativeAreaLevel1": "Olomoucký kraj",
+    "country": "Czech Republic",
+    "geoResolution": "Admin1",
+    "geometry": {
+      "latitude": 49.859105799999995,
+      "longitude": 16.956126746749305
+    },
+    "name": "Olomoucký kraj"
+  },
+  "CZ-711": {
+    "administrativeAreaLevel1": "Olomoucký kraj",
+    "administrativeAreaLevel2": "Jeseník",
+    "country": "Czech Republic",
+    "geoResolution": "Admin2",
+    "geometry": {
+      "latitude": 50.2296385,
+      "longitude": 17.2046012
+    },
+    "name": "Jeseník"
+  },
+  "CZ-712": {
+    "administrativeAreaLevel1": "Olomoucký kraj",
+    "administrativeAreaLevel2": "Olomouc",
+    "country": "Czech Republic",
+    "geoResolution": "Admin2",
+    "geometry": {
+      "latitude": 49.5940567,
+      "longitude": 17.251143
+    },
+    "name": "Olomouc"
+  },
+  "CZ-713": {
+    "administrativeAreaLevel1": "Olomoucký kraj",
+    "administrativeAreaLevel2": "Prostějov",
+    "country": "Czech Republic",
+    "geoResolution": "Admin2",
+    "geometry": {
+      "latitude": 49.4721467,
+      "longitude": 17.1117979
+    },
+    "name": "Prostějov"
+  },
+  "CZ-714": {
+    "administrativeAreaLevel1": "Olomoucký kraj",
+    "administrativeAreaLevel2": "Přerov",
+    "country": "Czech Republic",
+    "geoResolution": "Admin2",
+    "geometry": {
+      "latitude": 49.4553775,
+      "longitude": 17.4508621
+    },
+    "name": "Přerov"
+  },
+  "CZ-715": {
+    "administrativeAreaLevel1": "Olomoucký kraj",
+    "administrativeAreaLevel2": "Šumperk",
+    "country": "Czech Republic",
+    "geoResolution": "Admin2",
+    "geometry": {
+      "latitude": 49.9655521,
+      "longitude": 16.9705651
+    },
+    "name": "Šumperk"
+  },
+  "CZ-72": {
+    "administrativeAreaLevel1": "Zlínský kraj",
+    "country": "Czech Republic",
+    "geoResolution": "Admin1",
+    "geometry": {
+      "latitude": 49.05838715,
+      "longitude": 17.46020049249254
+    },
+    "name": "Zlínský kraj"
+  },
+  "CZ-721": {
+    "administrativeAreaLevel1": "Zlínský kraj",
+    "administrativeAreaLevel2": "Kroměříž",
+    "country": "Czech Republic",
+    "geoResolution": "Admin2",
+    "geometry": {
+      "latitude": 49.2984191,
+      "longitude": 17.3929804
+    },
+    "name": "Kroměříž"
+  },
+  "CZ-722": {
+    "administrativeAreaLevel1": "Zlínský kraj",
+    "administrativeAreaLevel2": "Uherské Hradiště",
+    "country": "Czech Republic",
+    "geoResolution": "Admin2",
+    "geometry": {
+      "latitude": 49.05838715,
+      "longitude": 17.46020049249254
+    },
+    "name": "Uherské Hradiště"
+  },
+  "CZ-723": {
+    "administrativeAreaLevel1": "Zlínský kraj",
+    "administrativeAreaLevel2": "Vsetín",
+    "country": "Czech Republic",
+    "geoResolution": "Admin2",
+    "geometry": {
+      "latitude": 49.3389775,
+      "longitude": 17.9961534
+    },
+    "name": "Vsetín"
+  },
+  "CZ-724": {
+    "administrativeAreaLevel1": "Zlínský kraj",
+    "administrativeAreaLevel2": "Zlín",
+    "country": "Czech Republic",
+    "geoResolution": "Admin2",
+    "geometry": {
+      "latitude": 49.05838715,
+      "longitude": 17.46020049249254
+    },
+    "name": "Zlín"
+  },
+  "CZ-80": {
+    "administrativeAreaLevel1": "Moravskoslezský kraj",
+    "country": "Czech Republic",
+    "geoResolution": "Admin1",
+    "geometry": {
+      "latitude": 49.860275,
+      "longitude": 18.038654134727693
+    },
+    "name": "Moravskoslezský kraj"
+  },
+  "CZ-801": {
+    "administrativeAreaLevel1": "Moravskoslezský kraj",
+    "administrativeAreaLevel2": "Bruntál",
+    "country": "Czech Republic",
+    "geoResolution": "Admin2",
+    "geometry": {
+      "latitude": 49.9885113,
+      "longitude": 17.4652901
+    },
+    "name": "Bruntál"
+  },
+  "CZ-802": {
+    "administrativeAreaLevel1": "Moravskoslezský kraj",
+    "administrativeAreaLevel2": "Frýdek Místek",
+    "country": "Czech Republic",
+    "geoResolution": "Admin2",
+    "geometry": {
+      "latitude": 49.685635,
+      "longitude": 18.3483416
+    },
+    "name": "Frýdek Místek"
+  },
+  "CZ-803": {
+    "administrativeAreaLevel1": "Moravskoslezský kraj",
+    "administrativeAreaLevel2": "Karviná",
+    "country": "Czech Republic",
+    "geoResolution": "Admin2",
+    "geometry": {
+      "latitude": 49.8542719,
+      "longitude": 18.5416556
+    },
+    "name": "Karviná"
+  },
+  "CZ-804": {
+    "administrativeAreaLevel1": "Moravskoslezský kraj",
+    "administrativeAreaLevel2": "Nový Jičín",
+    "country": "Czech Republic",
+    "geoResolution": "Admin2",
+    "geometry": {
+      "latitude": 49.594881,
+      "longitude": 18.0102584
+    },
+    "name": "Nový Jičín"
+  },
+  "CZ-805": {
+    "administrativeAreaLevel1": "Moravskoslezský kraj",
+    "administrativeAreaLevel2": "Opava",
+    "country": "Czech Republic",
+    "geoResolution": "Admin2",
+    "geometry": {
+      "latitude": 49.9389004,
+      "longitude": 17.9024174
+    },
+    "name": "Opava"
+  },
+  "CZ-806": {
+    "administrativeAreaLevel1": "Moravskoslezský kraj",
+    "administrativeAreaLevel2": "Ostrava-město",
+    "country": "Czech Republic",
+    "geoResolution": "Admin2",
+    "geometry": {
+      "latitude": 49.8349139,
+      "longitude": 18.2820084
+    },
+    "name": "Ostrava-město"
+  }
+}
