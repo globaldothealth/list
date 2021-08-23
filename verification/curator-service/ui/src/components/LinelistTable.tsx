@@ -136,7 +136,6 @@ interface Props
     onChangePageSize: (pageSize: number) => void;
 
     handleBreadcrumbDelete: (breadcrumbToDelete: ChipData) => void;
-    setTotalDataCount: (value: number) => void;
     setFiltersModalOpen: (value: boolean) => void;
     setActiveFilterInput: (value: string) => void;
     setSortBy: (value: SortBy) => void;
@@ -510,13 +509,7 @@ export function SortSelect({
     );
 }
 
-interface DownloadButtonProps {
-    totalCasesCount: number;
-}
-
-export function DownloadButton({
-    totalCasesCount,
-}: DownloadButtonProps): JSX.Element {
+export function DownloadButton(): JSX.Element {
     const location = useLocation<LocationState>();
     const [isDownloadModalOpen, setIsDownloadModalOpen] =
         useState<boolean>(false);
@@ -715,7 +708,7 @@ export function DownloadButton({
                                         isLoading || downloadButtonDisabled
                                     }
                                 >
-                                    {`Download ${totalCasesCount} rows`}
+                                    Download Filtered Dataset
                                 </Button>
                             </span>
                         </Tooltip>
@@ -1518,9 +1511,6 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                                             ?.verificationStatus,
                                                 });
                                             }
-                                            this.props.setTotalDataCount(
-                                                result.data.total,
-                                            );
                                             this.setState({
                                                 totalNumRows: result.data.total,
                                                 selectedRowsCurrentPage: [],

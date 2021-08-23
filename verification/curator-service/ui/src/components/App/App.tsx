@@ -372,7 +372,6 @@ export default function App(): JSX.Element {
     const isLoadingUser = useAppSelector(selectIsLoading);
     const user = useAppSelector(selectUser);
 
-    const [totalDataCount, setTotalDataCount] = useState<number>(0);
     const showMenu = useMediaQuery(theme.breakpoints.up('sm'));
     const [drawerOpen, setDrawerOpen] = useState<boolean>(false);
     const [createNewButtonAnchorEl, setCreateNewButtonAnchorEl] =
@@ -561,9 +560,7 @@ export default function App(): JSX.Element {
                                         }
                                     />
                                 </div>
-                                <DownloadButton
-                                    totalCasesCount={totalDataCount}
-                                />
+                                <DownloadButton/>
                             </>
                         ) : (
                             <span className={classes.spacer}></span>
@@ -757,7 +754,6 @@ export default function App(): JSX.Element {
                                     handleBreadcrumbDelete={
                                         handleFilterBreadcrumbDelete
                                     }
-                                    setTotalDataCount={setTotalDataCount}
                                     setFiltersModalOpen={setFiltersModalOpen}
                                     setActiveFilterInput={setActiveFilterInput}
                                     sortBy={sortBy}
