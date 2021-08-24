@@ -23,7 +23,8 @@ import { Alert } from '@material-ui/lab';
 // import { AppTooltip } from './common-form-fields/AppTooltip';
 import { useSelector } from 'react-redux';
 import { useDispatch } from 'react-redux';
-import { getCountries } from '../redux/countryList/CountryList'
+import { fetchCountries } from '../redux/filters/thunk';
+import { countryList } from '../redux/filters/selectors';
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -238,19 +239,12 @@ export default function FiltersModal({
  
     const dispatch = useDispatch();
 
-    // const { countryList } = useSelector((state) => state.countryListReducer);
-    // console.log(countryList);
-
-useSelector((state) => console.log(state));
-
-
     useEffect(() => {
-        console.log(getCountries());
-        
-        dispatch(getCountries())
+        dispatch(fetchCountries());
+
       }, [dispatch])
 
-      const tempArray = ["sadfsadfgdsa","sadgfas", "kjhgre"];
+      const contries = useSelector(countryList);
 
     return (
         <Dialog open={isOpen} maxWidth={'xl'} onClose={closeAndResetAlert}>
@@ -310,7 +304,7 @@ useSelector((state) => console.log(state));
                                 <MenuItem value="" disabled>
                                     None
                                 </MenuItem>
-                                {tempArray.map((country, i) => <MenuItem value={country}>{country}</MenuItem>)}
+                                {contries.map((country) => <MenuItem value={country} key={country}>{country}</MenuItem>)}
                             </Select>
                         </FormControl>
                         <FormControl
