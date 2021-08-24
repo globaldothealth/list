@@ -125,6 +125,44 @@
           }
         }
       },
+      "vaccines": {
+        "bsonType": "array",
+        "uniqueItems": true,
+        "items": {
+          "bsonType": "object",
+          "additionalProperties": false,
+          "properties": {
+            "name": {
+              "bsonType": "string"
+            },
+            "date": {
+              "bsonType": "date"
+            },
+            "sideEffects": {
+              "bsonType": "object",
+              "additionalProperties": false,
+              "properties": {
+                "values": {
+                  "bsonType": "array",
+                  "uniqueItems": true,
+                  "items": {
+                    "bsonType": "string"
+                  }
+                },
+                "status": {
+                  "bsonType": "string"
+                }
+              }
+            },
+            "previousInfection": {
+              "bsonType": "string"
+            },
+            "previousInfectionDetectionMethod": {
+              "bsonType": "string"
+            }
+          }
+        }
+      },
       "variant": {
         "bsonType": "object",
         "additionalProperties": false,

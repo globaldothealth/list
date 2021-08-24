@@ -18,6 +18,7 @@ import {
 import { SymptomsDocument, symptomsSchema } from './symptoms';
 import { TransmissionDocument, transmissionSchema } from './transmission';
 import { TravelHistoryDocument, travelHistorySchema } from './travel-history';
+import { VaccineDocument, vaccineSchema } from './vaccine';
 import { VariantDocument, variantSchema } from './variant';
 
 import { ObjectId } from 'mongodb';
@@ -56,6 +57,7 @@ export const caseSchema = new mongoose.Schema(
         symptoms: symptomsSchema,
         transmission: transmissionSchema,
         travelHistory: travelHistorySchema,
+        vaccines: [vaccineSchema],
         variant: variantSchema,
     },
     {
@@ -107,6 +109,7 @@ caseSchema.methods.equalsJSON = function (jsonCase: any): boolean {
         _.isEqual(thisJson.symptoms, other.symptoms) &&
         _.isEqual(thisJson.transmission, other.transmission) &&
         _.isEqual(thisJson.travelHistory, other.travelHistory) &&
+        _.isEqual(thisJson.vaccines, other.vaccines) &&
         _.isEqual(thisJson.variant, other.variant)
     );
 };
@@ -129,6 +132,7 @@ export type CaseDocument = mongoose.Document & {
     symptoms: SymptomsDocument;
     transmission: TransmissionDocument;
     travelHistory: TravelHistoryDocument;
+    vaccines: [VaccineDocument];
     variant: VariantDocument;
 
     // TODO: Type request Cases.
