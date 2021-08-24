@@ -571,24 +571,27 @@ export default function App(): JSX.Element {
                         {user && (
                             <>
                                 <Typography>
-                                {process.env.REACT_ENV_TYPE === "staging" ? 
                                 <a
                                         className={classes.mapLink}
                                         data-testid="mapLink"
-                                        href="http://dev-map.covid-19.global.health/"
+                                        href={process.env.REACT_ENV_TYPE === "staging"
+                                        ? "http://dev-map.covid-19.global.health/"
+                                        : "https://map.covid-19.global.health/"}
                                         rel="noopener noreferrer"
                                         target="_blank"
                                     >
                                         G.h Map
-                                    </a> : <a
-                                    className={classes.mapLink}
-                                    data-testid="mapLink"
-                                    href="https://map.covid-19.global.health/"
-                                    rel="noopener noreferrer"
-                                    target="_blank"
-                                >
-                                    G.h Map
-                                </a>}
+                                </a>
+                                    
+                                //     : <a
+                                //     className={classes.mapLink}
+                                //     data-testid="mapLink"
+                                //     href="https://map.covid-19.global.health/"
+                                //     rel="noopener noreferrer"
+                                //     target="_blank"
+                                // >
+                                //     G.h Map
+                                // </a>}
                                 </Typography>
                                 <ProfileMenu user={user} />{' '}
                             </>
