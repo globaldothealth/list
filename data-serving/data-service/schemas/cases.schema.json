@@ -138,6 +138,9 @@
             "date": {
               "bsonType": "date"
             },
+            "batch": {
+              "bsonType": "string"
+            },
             "sideEffects": {
               "bsonType": "object",
               "additionalProperties": false,
