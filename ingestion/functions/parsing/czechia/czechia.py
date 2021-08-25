@@ -64,15 +64,14 @@ def convert_demographics(gender: str, age: str):
 
 
 def convert_location(region, district):
-    # Both the regions and districts are entered in a slighty altered ISO 3166-2 format, where the '-' is replaced with a '0'
-    if district:
-        district = district.replace("0", "-", 1)
-        district_location = _GEOCODES.get(district, None)
-    if region:
-        region = region.replace("0", "-", 1)
-        region_location = _GEOCODES.get(region, None)
+    # Both the regions and districts are entered in a slighty
+    # altered ISO 3166-2 format, where the '-' is replaced with a '0'
     # Try locations in these order, falling back to country geocoding
-    return district_location or region_location or _CZ
+    return (
+        _GEOCODES.get(district.replace("0", "-", 1), None)
+        or _GEOCODES.get(region.replace("0", "-", 1), None)
+        or _CZ
+    )
 
 
 def convert_travel(travel_yn, travel_history: str):
