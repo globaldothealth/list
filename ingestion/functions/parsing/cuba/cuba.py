@@ -24,6 +24,7 @@ _PROVINCES = {}
 _MUNICIPALITIES = {}
 province_set = set()
 
+_CU = parsing_lib.geocode_country('CU')
 
 def _drop_admin2(municipality_location):
     "Drops admin2 info and uses same data for province location"
@@ -99,10 +100,11 @@ def convert_location(raw_entry):
     code_municipality = raw_entry.get('dpacode_municipio_deteccion', None)
     code_province = raw_entry.get('dpacode_provincia_deteccion', None)
     try:
-        if code_municipality:
+        if code_municipality != "00.00":
             return _MUNICIPALITIES[code_municipality]
-        if code_province:
+        if code_province != "00":
             return _PROVINCES[code_province]
+        return _CU
     except KeyError:
         print("Location not found:", raw_entry)
     return None
