@@ -37,19 +37,19 @@ def convert_demographics(entry):
     demo = {}
     if entry['AgeGroup'] == '85plus':
         demo["ageRange"] = {
-            "start": 85.0,
-            "end": 120.0
+            "start": 85,
+            "end": 120
         }
-    if entry['AgeGroup'] == '60+':
+    elif entry['AgeGroup'] == '60+':
         demo["ageRange"] = {
-            "start": 60.0,
-            "end": 120.0
+            "start": 60,
+            "end": 120
         }
     else:
         lb, ub = entry['AgeGroup'].split(' to ')
         demo["ageRange"] = {
-            "start": float(lb),
-            "end": float(ub)
+            "start": int(lb),
+            "end": int(ub)
         }
     demo["gender"] = entry['Sex']
     return demo
