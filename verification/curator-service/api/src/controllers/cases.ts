@@ -1,5 +1,4 @@
 import { Request, Response } from 'express';
-import { Worker } from 'worker_threads';
 import { User, UserDocument } from '../model/user';
 import axios from 'axios';
 import { logger } from '../util/logger';
@@ -45,15 +44,21 @@ export default class CasesController {
         req.body.correlationId = correlationId;
         try {
             const user = req.user as UserDocument;
-            await User.findOneAndUpdate(
-                {
-                    _id: user._id,
-                },
+            await User.findByIdAndUpdate(
+                user._id,
                 { $push: { downloads: {
                     timestamp: new Date(),
                     format: req.body.format,
                     query: req.body.query,
                 } } },
+                {},
+                function(err) {
+                    if (err) {
+                        logger.info(`An error occurred: ${err}`);
+                    } else {
+                        logger.info(`Document updated`);
+                    }
+                }
             );
             axios({
                 method: 'post',
@@ -93,16 +98,25 @@ export default class CasesController {
             req.body.correlationId = crypto.randomBytes(16).toString('hex');
             logger.info(`Streaming case data in format ${req.body.format} matching query ${req.body.query} for correlation ID ${req.body.correlationId}`);
             const user = req.user as UserDocument;
-            await User.findOneAndUpdate(
-                {
-                    _id: user._id,
-                },
+            logger.info(`Updating downloads for user: ${user.email}`);
+            logger.info(`Downloads before ${user.downloads}`);
+            await User.findByIdAndUpdate(
+                user._id,
                 { $push: { downloads: {
                     timestamp: new Date(),
                     format: req.body.format,
                     query: req.body.query,
                 } } },
+                function(err) {
+                    if (err) {
+                        logger.info(`An error occurred: ${err}`);
+                    } else {
+                        logger.info(`Document updated`);
+                    }
+                }
             );
+            logger.info('Updated downloads for user');
+            logger.info(`Downloads after ${user.downloads}`);
             axios({
                 method: 'post',
                 url: url,
@@ -158,11 +172,21 @@ export default class CasesController {
                 });
             });
 
+            logger.info("Updating download for full dataset");
+
             await User.findOneAndUpdate(
                 {
                     _id: user._id,
                 },
                 { $push: { downloads: { timestamp: new Date() } } },
+                {},
+                function(err) {
+                    if (err) {
+                        logger.info(`An error occurred: ${err}`);
+                    } else {
+                        logger.info(`Document updated`);
+                    }
+                }
             );
 
             res.status(200).send({ signedUrl });
