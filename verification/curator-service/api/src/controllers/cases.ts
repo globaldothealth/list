@@ -44,6 +44,17 @@ export default class CasesController {
         const correlationId = crypto.randomBytes(16).toString('hex');
         req.body.correlationId = correlationId;
         try {
+            const user = req.user as UserDocument;
+            await User.findOneAndUpdate(
+                {
+                    _id: user._id,
+                },
+                { $push: { downloads: {
+                    timestamp: new Date(),
+                    format: req.body.format,
+                    query: req.body.query,
+                } } },
+            );
             axios({
                 method: 'post',
                 url: this.dataServerURL + '/api' + req.url,
@@ -81,6 +92,17 @@ export default class CasesController {
             const url = this.dataServerURL + '/api' + req.url.replace('Async', '');
             req.body.correlationId = crypto.randomBytes(16).toString('hex');
             logger.info(`Streaming case data in format ${req.body.format} matching query ${req.body.query} for correlation ID ${req.body.correlationId}`);
+            const user = req.user as UserDocument;
+            await User.findOneAndUpdate(
+                {
+                    _id: user._id,
+                },
+                { $push: { downloads: {
+                    timestamp: new Date(),
+                    format: req.body.format,
+                    query: req.body.query,
+                } } },
+            );
             axios({
                 method: 'post',
                 url: url,
