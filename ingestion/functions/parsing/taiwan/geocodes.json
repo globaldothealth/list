@@ -1,0 +1,212 @@
+{
+  "南投縣": {
+    "administrativeAreaLevel1": "Nantou County",
+    "country": "Taiwan",
+    "geoResolution": "Admin1",
+    "geometry": {
+      "latitude": 23.90235,
+      "longitude": 120.6909167
+    },
+    "name": "Nantou County"
+  },
+  "台中市": {
+    "administrativeAreaLevel1": "Taichung",
+    "country": "Taiwan",
+    "geoResolution": "Admin1",
+    "geometry": {
+      "latitude": 24.163162,
+      "longitude": 120.6478282
+    },
+    "name": "Taichung"
+  },
+  "台北市": {
+    "administrativeAreaLevel1": "Taipei",
+    "country": "Taiwan",
+    "geoResolution": "Admin1",
+    "geometry": {
+      "latitude": 25.0375198,
+      "longitude": 121.5636796
+    },
+    "name": "Taipei"
+  },
+  "台南市": {
+    "administrativeAreaLevel1": "Tainan",
+    "country": "Taiwan",
+    "geoResolution": "Admin1",
+    "geometry": {
+      "latitude": 22.9912348,
+      "longitude": 120.184982
+    },
+    "name": "Tainan"
+  },
+  "台東縣": {
+    "administrativeAreaLevel1": "Taitung County",
+    "country": "Taiwan",
+    "geoResolution": "Admin1",
+    "geometry": {
+      "latitude": 22.7553667,
+      "longitude": 121.1506
+    },
+    "name": "Taitung County"
+  },
+  "嘉義市": {
+    "administrativeAreaLevel1": "Chiayi",
+    "country": "Taiwan",
+    "geoResolution": "Admin1",
+    "geometry": {
+      "latitude": 23.4811089,
+      "longitude": 120.4535412
+    },
+    "name": "Chiayi"
+  },
+  "嘉義縣": {
+    "administrativeAreaLevel1": "Chiayi County",
+    "country": "Taiwan",
+    "geoResolution": "Admin1",
+    "geometry": {
+      "latitude": 23.4591664,
+      "longitude": 120.2930004
+    },
+    "name": "Chiayi County"
+  },
+  "基隆市": {
+    "administrativeAreaLevel1": "Keelung",
+    "country": "Taiwan",
+    "geoResolution": "Admin1",
+    "geometry": {
+      "latitude": 25.1317232,
+      "longitude": 121.744652
+    },
+    "name": "Keelung"
+  },
+  "宜蘭縣": {
+    "administrativeAreaLevel1": "Yilan County",
+    "country": "Taiwan",
+    "geoResolution": "Admin1",
+    "geometry": {
+      "latitude": 24.7302791,
+      "longitude": 121.7631149
+    },
+    "name": "Yilan County"
+  },
+  "屏東縣": {
+    "administrativeAreaLevel1": "Pingtung County",
+    "country": "Taiwan",
+    "geoResolution": "Admin1",
+    "geometry": {
+      "latitude": 22.6828017,
+      "longitude": 120.487928
+    },
+    "name": "Pingtung County"
+  },
+  "彰化縣": {
+    "administrativeAreaLevel1": "Changhua County",
+    "country": "Taiwan",
+    "geoResolution": "Admin1",
+    "geometry": {
+      "latitude": 24.0755667,
+      "longitude": 120.5444667
+    },
+    "name": "Changhua County"
+  },
+  "新北市": {
+    "administrativeAreaLevel1": "New Taipei",
+    "country": "Taiwan",
+    "geoResolution": "Admin1",
+    "geometry": {
+      "latitude": 25.011997,
+      "longitude": 121.4656619
+    },
+    "name": "New Taipei"
+  },
+  "新竹市": {
+    "administrativeAreaLevel1": "Hsinchu",
+    "country": "Taiwan",
+    "geoResolution": "Admin1",
+    "geometry": {
+      "latitude": 24.8066333,
+      "longitude": 120.9686833
+    },
+    "name": "Hsinchu"
+  },
+  "新竹縣": {
+    "administrativeAreaLevel1": "Hsinchu County",
+    "country": "Taiwan",
+    "geoResolution": "Admin1",
+    "geometry": {
+      "latitude": 24.8267,
+      "longitude": 121.0128333
+    },
+    "name": "Hsinchu County"
+  },
+  "桃園市": {
+    "administrativeAreaLevel1": "Taoyuan City",
+    "country": "Taiwan",
+    "geoResolution": "Admin1",
+    "geometry": {
+      "latitude": 24.9929995,
+      "longitude": 121.3010003
+    },
+    "name": "Taoyuan City"
+  },
+  "澎湖縣": {
+    "administrativeAreaLevel1": "Penghu",
+    "country": "Taiwan",
+    "geoResolution": "Admin1",
+    "geometry": {
+      "latitude": 23.569694,
+      "longitude": 119.5664543
+    },
+    "name": "Penghu"
+  },
+  "花蓮縣": {
+    "administrativeAreaLevel1": "Hualien County",
+    "country": "Taiwan",
+    "geoResolution": "Admin1",
+    "geometry": {
+      "latitude": 23.9913421,
+      "longitude": 121.6197276
+    },
+    "name": "Hualien County"
+  },
+  "苗栗縣": {
+    "administrativeAreaLevel1": "Miaoli County",
+    "country": "Taiwan",
+    "geoResolution": "Admin1",
+    "geometry": {
+      "latitude": 24.5647667,
+      "longitude": 120.8205167
+    },
+    "name": "Miaoli County"
+  },
+  "連江縣": {
+    "administrativeAreaLevel1": "Lienchiang County",
+    "country": "Taiwan",
+    "geoResolution": "Admin1",
+    "geometry": {
+      "latitude": 26.1491915,
+      "longitude": 119.9389047
+    },
+    "name": "Lienchiang County"
+  },
+  "雲林縣": {
+    "administrativeAreaLevel1": "Yunlin County",
+    "country": "Taiwan",
+    "geoResolution": "Admin1",
+    "geometry": {
+      "latitude": 23.6990775,
+      "longitude": 120.5245511
+    },
+    "name": "Yunlin County"
+  },
+  "高雄市": {
+    "administrativeAreaLevel1": "Kaohsiung",
+    "country": "Taiwan",
+    "geoResolution": "Admin1",
+    "geometry": {
+      "latitude": 22.6203348,
+      "longitude": 120.3120375
+    },
+    "name": "Kaohsiung"
+  }
+}
