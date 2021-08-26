@@ -9,6 +9,6 @@
     "defaultCommandTimeout":50000,
     "execTimeout": 40000,
     "requestTimeout": 20000,
-    "responseTimeout": 20000,
+    "responseTimeout": 30000,
     "numTestsKeptInMemory": 10
 }
