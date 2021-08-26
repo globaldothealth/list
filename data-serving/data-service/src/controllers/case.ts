@@ -15,7 +15,6 @@ import { logger } from '../util/logger';
 import stringify from 'csv-stringify/lib/sync';
 import _ from 'lodash';
 
-const CaseFieldTextFile = './fields.txt';
 const CaseFieldFileURL = 'https://raw.githubusercontent.com/globaldothealth/list/main/data-serving/scripts/export-data/functions/01-split/fields.txt';
 
 class GeocodeNotFoundError extends Error {}
@@ -25,23 +24,19 @@ class InvalidParamError extends Error {}
 type BatchValidationErrors = { index: number; message: string }[];
 
 
-async function getFields(): Promise<string> {
-    let txtRes = await axios.get<string>(CaseFieldFileURL);
-    return txtRes.data;
-}
-
 export class CasesController {
-    private readonly caseFields: string[];
+    private caseFields: string[];
     constructor(private readonly geocoders: Geocoder[]) {
         let text: string = '';
-        try {
-            text = fs.readFileSync(CaseFieldTextFile).toString('utf-8');
-        } catch {
-            getFields().then(data => {
-                text = data;
-            });
-        }
-        this.caseFields = text.split('\n');
+        this.caseFields = [];
+        this.init();
+    }
+
+    // TODO: this belongs in a database, and then passed into the constructor
+    async init() {
+        let txtRes = await axios.get<string>(CaseFieldFileURL);
+        this.caseFields = txtRes.data.split('\n');
+        return this;
     }
 
     /**
@@ -144,10 +139,17 @@ export class CasesController {
                 .cursor();
             }
 
+            const date = (new Date()).toISOString().slice(0, 10);
+            const filename = `gh_${date}`;
+
             let doc: CaseDocument;
 
             if (req.body.format == 'csv' || req.body.format == 'tsv') {
                 res.setHeader('Content-Type', `text/${req.body.format}`);
+                res.setHeader(
+                    'Content-Disposition',
+                    `attachment; filename="${filename}.${req.body.format}"`,
+                );
                 let delimiter: string = (req.body.format == 'tsv') ? '\t' : ',';
                 const columnsString = this.caseFields.join(delimiter);
                 res.write(columnsString);
@@ -167,6 +169,10 @@ export class CasesController {
                 res.end();
             } else if (req.body.format == 'json') {
                 res.setHeader('Content-Type', 'application/json');
+                res.setHeader(
+                    'Content-Disposition',
+                    `attachment; filename="${filename}.json"`,
+                );
                 res.write('[');
                 doc = await cursor.next();
                 while (doc != null) {

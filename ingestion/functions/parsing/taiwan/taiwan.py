@@ -1,13 +1,14 @@
 import os
 import sys
-from datetime import datetime
 import csv
 import json
+from datetime import datetime
+from pathlib import Path
 
 # Layer code, like parsing_lib, is added to the path by AWS.
 # To test locally (e.g. via pytest), we have to modify sys.path.
 # pylint: disable=import-error
- 
+
 try:
     import parsing_lib
 except ImportError:
@@ -29,6 +30,9 @@ TAIWAN_LOCATION = {
     }
 }
 
+# Geocode data © OpenStreetMap contributors https://www.openstreetmap.org/copyright
+with (Path(__file__).parent / 'geocodes.json').open() as geof:
+    _GEOCODES = json.load(geof)
 
 def convert_date(raw_date):
     """
@@ -58,18 +62,18 @@ def convert_demographics(gender: str, age: str):
         if '-' in age:
             start, _, end = age.partition("-")
             demo["ageRange"] = {
-                "start": float(start),
-                "end": float(end),
+                "start": int(start),
+                "end": int(end),
             }
         elif age.isdigit():
             demo["ageRange"] = {
-                "start": float(age),
-                "end": float(age),
+                "start": int(age),
+                "end": int(age),
             }
         elif age == "70+":
             demo["ageRange"] = {
-                "start": 70.0,
-                "end": 120.0,
+                "start": 70,
+                "end": 120,
             }
         else:
             raise ValueError(f'Unhandled age: {age}')
@@ -79,6 +83,16 @@ def convert_demographics(gender: str, age: str):
 def convert_immigration(immigration_status: str):
     return ({"traveledPrior30Days": True} if immigration_status == "是"
         else None)
+
+
+def convert_location(location):
+    if location == '空值':  # means 'empty value', not a city
+        return TAIWAN_LOCATION
+    try:
+        return _GEOCODES[location]
+    except KeyError:
+        print("Location not found:", location)
+        return None
 
 
 def parse_cases(raw_data_file: str, source_id: str, source_url: str):
@@ -93,10 +107,7 @@ def parse_cases(raw_data_file: str, source_id: str, source_url: str):
                     "sourceId": source_id,
                     "sourceUrl": source_url,
                 },
-                "location": (
-                    # 空值 means "empty value", it's not a city.
-                    {"query": f"{row['縣市']}, Taiwan"} if row['縣市'] != '空值'
-                    else TAIWAN_LOCATION),
+                "location": convert_location(row['縣市']),
                 "events": [
                     {
                         "name": "confirmed",

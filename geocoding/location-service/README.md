@@ -55,3 +55,5 @@ If you get a response with status code 403 and this content:
     {'message': 'access is restricted to users with curator roles'}
 
 your access token has expired and you need to go through the login flow in the browser again. There _is_ a token refresh flow but it isn't honestly going to be any easier to work with than just reauthenticating. We don't control the session lifetime because Google own that part of the flow, but it's empirically usually two hours.
+
+You can also use the `dev/run_session.py` script as a jumping off point; just copy/paste the contents into a new file and modify it to do what you want.

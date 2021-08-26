@@ -361,14 +361,19 @@ export const createBatchUpsertCaseRevisions = async (
         },
     );
 
-    await CaseRevision.insertMany(casesToUpsert, {
-        ordered: false,
-        rawResult: true,
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore Mongoose types don't include the `lean` option from its
-        // documentation: https://mongoosejs.com/docs/api.html#model_Model.insertMany
-        lean: true,
-    });
+    try {
+        await CaseRevision.insertMany(casesToUpsert, {
+            ordered: false,
+            rawResult: true,
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore Mongoose types don't include the `lean` option from its
+            // documentation: https://mongoosejs.com/docs/api.html#model_Model.insertMany
+            lean: true,
+        });
+    } catch(err) {
+        console.log('Failed to insert some case revisions');
+        console.log(err);
+    }
 
     next();
 };
@@ -392,14 +397,19 @@ export const createBatchUpdateCaseRevisions = async (
         };
     });
 
-    await CaseRevision.insertMany(casesToUpdate, {
-        ordered: false,
-        rawResult: true,
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore Mongoose types don't include the `lean` option from its
-        // documentation: https://mongoosejs.com/docs/api.html#model_Model.insertMany
-        lean: true,
-    });
+    try {
+        await CaseRevision.insertMany(casesToUpdate, {
+            ordered: false,
+            rawResult: true,
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore Mongoose types don't include the `lean` option from its
+            // documentation: https://mongoosejs.com/docs/api.html#model_Model.insertMany
+            lean: true,
+        });
+    } catch(err) {
+        console.log('Failed to insert some case revisions');
+        console.log(err);
+    }
 
     next();
 };

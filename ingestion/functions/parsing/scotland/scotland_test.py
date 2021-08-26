@@ -1,9 +1,44 @@
 import os
 import unittest
+from pprint import pprint
 from scotland import scotland
 
 _SOURCE_ID = "placeholder_ID"
 _SOURCE_URL = "placeholder_URL"
+_LOCATION = {
+    "name": "Scotland",
+    "administrativeAreaLevel1": "Scotland",
+    "country": "United Kingdom",
+    "geoResolution": "Admin1",
+    "geometry": {"latitude": 56.7863, "longitude": -4.1140},
+}
+
+
+def _c(confirmed_date, gender, age_start, age_end):
+    return {
+        "caseReference": {
+            "sourceId": "placeholder_ID",
+            "sourceUrl": "placeholder_URL",
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange": {"start": confirmed_date, "end": confirmed_date},
+            }
+        ],
+        "demographics": {
+            "ageRange": {"start": age_start, "end": age_end},
+            "gender": gender,
+        },
+        "location": _LOCATION,
+    }
+
+
+_PARSED_CASES = [
+    _c("03/01/2020Z", "Female", 65, 74),
+    _c("03/01/2020Z", "Female", 85, 120),
+    _c("03/01/2020Z", "Male", 45, 64),
+]
 
 
 class ScotlandTest(unittest.TestCase):
@@ -15,19 +50,5 @@ class ScotlandTest(unittest.TestCase):
         current_dir = os.path.dirname(__file__)
         sample_data_file = os.path.join(current_dir, "sample_data.csv")
 
-        result = scotland.parse_cases(
-            sample_data_file, _SOURCE_ID, _SOURCE_URL)
-        self.assertCountEqual(list(result),
-                              [{'caseReference': {'sourceId': 'placeholder_ID',
-                                                  'sourceUrl': 'placeholder_URL'},
-                                'events': [{'name': 'confirmed',
-                                            'dateRange': {'start': '03/01/2020Z', 'end': '03/01/2020Z'}}],
-                                  'demographics': {'ageRange': {'start': 65.0, 'end': 74.0},
-                                                   'gender': 'Female'},
-                                'location': {'query': 'Scotland'}},
-                               {'caseReference': {'sourceId': 'placeholder_ID',
-                                                  'sourceUrl': 'placeholder_URL'},
-                                  'events': [{'name': 'confirmed',
-                                              'dateRange': {'start': '03/01/2020Z', 'end': '03/01/2020Z'}}],
-                                  'demographics': {'ageRange': {'start': 45.0, 'end': 64.0}, 'gender': 'Male'},
-                                  'location': {'query': 'Scotland'}}])
+        result = list(scotland.parse_cases(sample_data_file, _SOURCE_ID, _SOURCE_URL))
+        self.assertCountEqual(result, _PARSED_CASES)

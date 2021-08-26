@@ -6,13 +6,14 @@ const mockPutRule = jest
     .mockResolvedValue('arn:aws:events:fake:event:rule/name');
 const mockDoRetrieval = jest.fn().mockResolvedValue({ Payload: '' });
 const mockSend = jest.fn();
-const mockInitialize = jest.fn().mockResolvedValue({ send: mockSend });
+const mockInitialize = jest.fn().mockReturnValue({ send: mockSend });
 
 import * as baseUser from './users/base.json';
 
 import { Session, User } from '../src/model/user';
 
 import { MongoMemoryServer } from 'mongodb-memory-server';
+import { Case, RestrictedCase } from '../src/model/case';
 import { Source } from '../src/model/source';
 import app from '../src/index';
 import axios from 'axios';
@@ -34,8 +35,8 @@ jest.mock('../src/clients/aws-batch-client', () => {
 jest.mock('../src/clients/email-client', () => {
     return jest.fn().mockImplementation(() => {
         return {
-            send: mockSend,
             initialize: mockInitialize,
+            send: mockSend,
         };
     });
 });
@@ -253,7 +254,7 @@ describe('PUT', () => {
 
         expect(mockPutRule).not.toHaveBeenCalledTimes(2);
     });
-    it.skip('should create an AWS rule with target if provided schedule expression', async () => {
+    it('should create an AWS rule with target if provided schedule expression', async () => {
         const source = await new Source({
             name: 'test-source',
             origin: { url: 'http://foo.bar', license: 'MIT' },
@@ -280,7 +281,7 @@ describe('PUT', () => {
             source.toAwsStatementId(),
         );
     });
-    it.skip('should send a notification email if automation added and recipients defined', async () => {
+    it('should send a notification email if automation added and recipients defined', async () => {
         const recipients = ['foo@bar.com'];
         const source = await new Source({
             name: 'test-source',
@@ -304,7 +305,7 @@ describe('PUT', () => {
             expect.anything(),
         );
     });
-    it.skip('should send a notification email if automation removed', async () => {
+    it('should send a notification email if automation removed', async () => {
         const source = await new Source({
             name: 'test-source',
             origin: { url: 'http://foo.bar', license: 'MIT' },
@@ -488,7 +489,7 @@ describe('POST', () => {
             createdSource.toAwsStatementId(),
         );
     });
-    it.skip('should send a notification email if automation and recipients defined', async () => {
+    it('should send a notification email if automation and recipients defined', async () => {
         const recipients = ['foo@bar.com'];
         const source = {
             name: 'some_name',
@@ -545,6 +546,34 @@ describe('DELETE', () => {
         await curatorRequest.delete(`/api/sources/${source.id}`).expect(204);
         expect(mockDeleteRule).not.toHaveBeenCalled();
     });
+    it('should not delete a source where a case exists', async () => {
+        const source = await new Source({
+            name: 'test-source',
+            origin: { url: 'http://foo.bar', license: 'MIT' },
+            format: 'JSON',
+        }).save();
+        const aCase = await new Case({
+            caseReference: {
+                sourceId: source._id,
+            },
+        }).save();
+        await curatorRequest.delete(`/api/sources/${source.id}`).expect(403);
+        expect(mockDeleteRule).not.toHaveBeenCalled();
+    });
+    it('should not delete a source where a restricted case exists', async () => {
+        const source = await new Source({
+            name: 'test-source',
+            origin: { url: 'http://foo.bar', license: 'MIT' },
+            format: 'JSON',
+        }).save();
+        const aCase = await new RestrictedCase({
+            caseReference: {
+                sourceId: source._id,
+            },
+        }).save();
+        await curatorRequest.delete(`/api/sources/${source.id}`).expect(403);
+        expect(mockDeleteRule).not.toHaveBeenCalled();
+    });
     it('should delete corresponding AWS rule (et al.) if source contains ruleArn', async () => {
         const source = await new Source({
             name: 'test-source',
@@ -565,7 +594,7 @@ describe('DELETE', () => {
             source.toAwsStatementId(),
         );
     });
-    it.skip('should send a notification email if source contains ruleArn and recipients', async () => {
+    it('should send a notification email if source contains ruleArn and recipients', async () => {
         const recipients = ['foo@bar.com'];
         const source = await new Source({
             name: 'test-source',
