@@ -207,6 +207,16 @@
         }
     },
     {
+        "name": "revisionMetadataCreationMetadataDate",
+        "key": {
+            "revisionMetadata.creationMetadata.date": -1
+        },
+        "collation": {
+            "locale": "en_US",
+            "strength": 2
+        }
+    },
+    {
         "name": "countryAndDate",
         "key": {
             "location.country": -1,
