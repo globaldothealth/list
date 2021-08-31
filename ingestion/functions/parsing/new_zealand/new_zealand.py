@@ -62,13 +62,13 @@ def convert_demographics(entry):
     If age is listed as 90+, setting age range as between 90 and 120.
     '''
     demo = {}
-    if age := entry[_AGE]:
+    if (age := entry[_AGE]) != "NA":
         if '90+' in age:
             demo["ageRange"] = {"start": 90, "end": 120}
         else:
             start, end = list(map(int, age.split(' to ')))
             demo["ageRange"] = {"start": start, "end": end}
-    if gender := entry[_GENDER]:
+    if (gender := entry[_GENDER]) != "Unknown":
         demo["gender"] = gender if gender in ['Male', 'Female'] else None
 
     return demo or None
@@ -117,6 +117,8 @@ def parse_cases(raw_data_file, source_id, source_url):
                         },
                     ]
                 }
+                if case["demographics"] is None:
+                    del case["demographics"]
                 if entry[_TRAVEL] == 'Yes':
                     case["travelHistory"] = {
                         "traveledPrior30Days": True
