@@ -28,6 +28,9 @@ boundaries.json
 cases.csv
 cases.json
 
+# test output
+data-serving/data-service/test_*.csv
+
 # Created by https://www.gitignore.io/api/osx,linux,python,pycharm,windows,visualstudiocode,node
 # Edit at https://www.gitignore.io/?templates=osx,linux,python,pycharm,windows,visualstudiocode,node
 
