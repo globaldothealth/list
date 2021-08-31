@@ -21,7 +21,10 @@ from enum import Enum
 from pathlib import Path
 from google.oauth2 import service_account
 
+E2E_MOCK_SOURCE_URL = os.environ.get("MOCK_SOURCE_DATA_ADDRESS", "")
+
 _ENV_TO_SOURCE_API_URL = {
+    "locale2e": E2E_MOCK_SOURCE_URL,
     "local": "http://localhost:3001/api",
     "dev": "https://dev-data.covid-19.global.health/api",
     "prod": "https://data.covid-19.global.health/api"
@@ -54,7 +57,7 @@ def create_upload_record(env, source_id, headers, cookies):
         res_json = res.json()
         return res_json["_id"]
     e = RuntimeError(
-        f'Error creating upload record, status={res.status_code}, response={res.text}')
+        f"Error creating upload record, status={res.status_code}, response={res.text}")
     complete_with_error(e)
 
 
@@ -110,15 +113,15 @@ def login(email: str):
 
     Returns the cookie of the now logged-in user.
     """
-    print('Logging-in user', email)
+    print("Logging-in user", email)
     endpoint = "http://localhost:3001/auth/register"
     res = requests.post(endpoint, json={
         "email": email,
-        "roles": ['curator'],
+        "roles": ["curator"],
     })
     if not res or res.status_code != 200:
         raise RuntimeError(
-            f'Error registering local user, status={res.status_code}, response={res.text}')
+            f"Error registering local user, status={res.status_code}, response={res.text}")
     return res.cookies
 
 

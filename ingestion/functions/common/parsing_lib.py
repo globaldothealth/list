@@ -38,7 +38,7 @@ DATE_FORMATS = ["%m/%d/%YZ", "%m/%d/%Y"]
 CASES_BATCH_SIZE = 250
 
 try:
-    with (Path(__file__).parent / 'geocoding_countries.json').open() as g:
+    with (Path(__file__).parent / "geocoding_countries.json").open() as g:
         GEOCODING_COUNTRIES = json.load(g)
         COUNTRY_ISO2 = sorted(GEOCODING_COUNTRIES.keys())
 except json.decoder.JSONDecodeError as e:
@@ -49,7 +49,7 @@ s3_client = boto3.client("s3")
 
 if os.environ.get("DOCKERIZED"):
     s3_client = boto3.client("s3",
-        endpoint_url=os.environ.get("AWS_ENDPOINT", "http://localstack:4566"),
+        endpoint_url=os.environ.get("AWS_ENDPOINT", "http://localhost:4566"),
         aws_access_key_id=os.environ.get("AWS_ACCESS_KEY_ID", "test"),
         aws_secret_access_key=os.environ.get("AWS_SECRET_ACCESS_KEY", "test"),
         region_name=os.environ.get("AWS_REGION", "us-east-1")
@@ -79,7 +79,7 @@ def geocode_country(two_letter_iso_code):
 
 
 def extract_event_fields(event: Dict):
-    print('Extracting fields from event', event)
+    print("Extracting fields from event", event)
     if any(
         field not in event
         for field
@@ -104,6 +104,9 @@ def retrieve_raw_data_file(s3_bucket: str, s3_key: str, out_file):
 
 def retrieve_excluded_case_ids(source_id: str, date_filter: Dict, date_range: Dict, env: str,
                                headers=None, cookies=None):
+    if env == "locale2e":
+        return None
+
     if date_range:
         start_date = date_range["start"]
         end_date = date_range["end"]
@@ -119,7 +122,7 @@ def retrieve_excluded_case_ids(source_id: str, date_filter: Dict, date_range: Di
 
     else:
         now = get_today()
-        start_date = '2019-12-01'
+        start_date = "2019-12-01"
         end_date = datetime.datetime.strftime(now, "%Y-%m-%d")
         date_limits = f"&dateFrom={start_date}&dateTo={end_date}"
 
@@ -168,15 +171,17 @@ def write_to_server(
         cases_batch_size: int):
     """Upserts the provided cases via the G.h Case API."""
     source_api_url = common_lib.get_source_api_url(env)
+    if env == "locale2e":
+        source_api_url = common_lib.get_source_api_url("local")
     put_api_url = f"{source_api_url}/cases/batchUpsert"
     upload_status_url = f"{source_api_url}/sources/{source_id}/uploads/{upload_id}"
-    print(f'Prod URL: {put_api_url}')
+    print(f"Prod URL: {put_api_url}")
     counter = collections.defaultdict(int)
-    counter['batch_num'] = 0
+    counter["batch_num"] = 0
     start_time = time.time()
     while True:
-        batch_num = counter['batch_num']
-        counter['batch_num'] += 1
+        batch_num = counter["batch_num"]
+        counter["batch_num"] += 1
         batch = batch_of(cases, cases_batch_size)
         # End of batch.
         if not batch:
@@ -217,7 +222,7 @@ def write_to_server(
         if total_conn_wait >= MAX_CONN_WAIT_TIME:
             # data service has failed, raise alert
             notifymsg = f"[!] *Failed to connect to data-{env}* during {source_id} ingestion"
-            if webhook_url := os.getenv('NOTIFY_WEBHOOK_URL'):
+            if webhook_url := os.getenv("NOTIFY_WEBHOOK_URL"):
                 with contextlib.suppress(requests.exceptions.RequestException):
                     requests.post(webhook_url, json={"text": notifymsg})
             common_lib.complete_with_error(
@@ -225,20 +230,20 @@ def write_to_server(
                 env,
                 common_lib.UploadError.INTERNAL_ERROR,
                 source_id, upload_id, headers, cookies,
-                count_created=counter['numCreated'],
-                count_updated=counter['numUpdated'],
-                count_error=counter['numError']
+                count_created=counter["numCreated"],
+                count_updated=counter["numUpdated"],
+                count_error=counter["numError"]
             )
             return
 
         if res and res.status_code in [200, 207]:
-            counter['total'] += len(batch)
+            counter["total"] += len(batch)
             now = time.time()
-            cps = int(counter['total'] / (now - start_time))
-            print(f'\tCurrent speed: {cps} cases/sec')
+            cps = int(counter["total"] / (now - start_time))
+            print(f"\tCurrent speed: {cps} cases/sec")
             res_json = res.json()
-            counter['numCreated'] += res_json["numCreated"]
-            counter['numUpdated'] += res_json["numUpdated"]
+            counter["numCreated"] += res_json["numCreated"]
+            counter["numUpdated"] += res_json["numUpdated"]
             if res.status_code == 207:
                 # 207 encompasses both geocoding and case schema validation errors.
                 # We can consider separating geocoding issues, but for now classifying it
@@ -248,24 +253,24 @@ def write_to_server(
                 # The errors from the backend tell us which cases failed and for what reason. Make it
                 # easier to diagnose by extracting the failing case and attaching it to the error message.
                 res_json = res.json()
-                if 'errors' in res_json:
+                if "errors" in res_json:
                     def add_input_to_error(error):
                         res = dict(error)
                         res['input'] = batch[error['index']]
                         return res
                     augmented_errors = [add_input_to_error(e) for e in res_json['errors']]
                     reported_error = dict(res_json)
-                    reported_error['errors'] = augmented_errors
+                    reported_error["errors"] = augmented_errors
                     print(f"Validation error in batch {batch_num}:", json.dumps(reported_error))
-                    counter['numError'] += len(res_json['errors'])
+                    counter["numError"] += len(res_json["errors"])
                 else:
                     print(f"Validation error in batch {batch_num}: {res.text}")
             update_status = {
-                'status': 'IN_PROGRESS',
-                'summary': {
-                    'numCreated': counter['numCreated'],
-                    'numUpdated': counter['numUpdated'],
-                    'numError': counter['numError']
+                "status": "IN_PROGRESS",
+                "summary": {
+                    "numCreated": counter["numCreated"],
+                    "numUpdated": counter["numUpdated"],
+                    "numError": counter["numError"]
                 }
             }
             with contextlib.suppress(requests.exceptions.RequestException):
@@ -275,18 +280,18 @@ def write_to_server(
         # Response can contain an 'error' field which describe each error that
         # occurred, it will be contained in the res.text here below.
         e = RuntimeError(
-            f'Error sending cases to server, status={res.status_code}, response={res.text}')
+            f"Error sending cases to server, status={res.status_code}, response={res.text}")
         upload_error = common_lib.UploadError.DATA_UPLOAD_ERROR
         common_lib.complete_with_error(
             e, env, upload_error,
             source_id, upload_id, headers, cookies,
-            count_created=counter['numCreated'],
-            count_updated=counter['numUpdated'],
-            count_error=counter['numError']
+            count_created=counter["numCreated"],
+            count_updated=counter["numUpdated"],
+            count_error=counter["numError"]
         )
         return
-    print(f'sent {counter["total"]} cases in {time.time() - start_time} seconds')
-    return counter['numCreated'], counter['numUpdated'], counter['numError']
+    print(f"sent {counter['total']} cases in {time.time() - start_time} seconds")
+    return counter["numCreated"], counter["numUpdated"], counter["numError"]
 
 
 def get_today() -> datetime.datetime:
@@ -325,7 +330,7 @@ def filter_cases_by_date(
     and date_filter is ignored.
     """
     if date_range:
-        print(f'Filtering cases using date range {date_range}')
+        print(f"Filtering cases using date range {date_range}")
 
         def case_is_within_range(case, start, end):
             confirmed_event = [e for e in case["events"]
@@ -338,7 +343,7 @@ def filter_cases_by_date(
         return (case for case in case_data if case_is_within_range(case, start, end))
 
     elif date_filter:
-        print(f'Filtering cases using date filter {date_filter}')
+        print(f"Filtering cases using date filter {date_filter}")
         now = get_today()
         delta = datetime.timedelta(days=date_filter["numDaysBeforeToday"])
         cutoff_date = now - delta
@@ -356,7 +361,7 @@ def filter_cases_by_date(
             elif op == "GT":
                 return delta_days > 0
             else:
-                e = ValueError(f'Unsupported date filter operand: {op}')
+                e = ValueError(f"Unsupported date filter operand: {op}")
                 common_lib.complete_with_error(
                     e, env, common_lib.UploadError.SOURCE_CONFIGURATION_ERROR,
                     source_id, upload_id, api_creds, cookies)
@@ -404,10 +409,12 @@ def run(
 
     env, source_url, source_id, upload_id, s3_bucket, s3_key, date_filter, date_range, local_auth = extract_event_fields(
         event)
+    print(f"Event fields extracted in parsing_lib.run...env: {env}, source_url: {source_url}, source_id: {source_id}, \
+        upload_id: {upload_id}, s3_bucket: {s3_bucket}, s3_key: {s3_key}, date_filter: {date_filter}, date_range: {date_range}, local_auth: {local_auth}")
     api_creds = None
     cookies = None
-    if local_auth and env == 'local':
-        cookies = common_lib.login(local_auth['email'])
+    if local_auth and env in ["local", "locale2e"]:
+        cookies = common_lib.login(local_auth["email"])
     else:
         api_creds = common_lib.obtain_api_credentials(s3_client)
     if not upload_id:
@@ -427,7 +434,7 @@ def run(
         fd, local_data_file_name = tempfile.mkstemp()
         local_data_file = os.fdopen(fd, "wb")
         retrieve_raw_data_file(s3_bucket, s3_key, local_data_file)
-        print(f'Raw file retrieved at {local_data_file_name}')
+        print(f"Raw file retrieved at {local_data_file_name}")
 
         case_data = parsing_function(
             local_data_file_name, source_id,
@@ -457,7 +464,7 @@ def run(
                 api_creds = common_lib.obtain_api_credentials(s3_client)
                 continue
             else:
-                raise RuntimeError(f'Error updating upload record, status={status}, response={text}')
+                raise RuntimeError(f"Error updating upload record, status={status}, response={text}")
         return {"count_created": count_created, "count_updated": count_updated}
     except Exception as e:
         common_lib.complete_with_error(

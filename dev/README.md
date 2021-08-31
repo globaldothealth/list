@@ -8,6 +8,7 @@ This directory contains scripts to set up, run, and test the full stack during d
   collection, applies the schema, creates indexes, and inserts some sample data.
 - `test_all.sh`: A script to run all of the tests from the sub-packages. Uses `run_full_stack.sh`.
 - `run_session.py`: Creates a new user, logs in, requests downloads from the curator service, and checks each download for formatting and contents.
+- `parsing.py`: Lists, describes, and runs local end-to-end parsers
 
 What, exactly, is this stack that we're running and/or testing? All of the components of this repo working together: a
 curator UI server that talks to a curator API server that talks to a data server. More concretely, a user can log into
@@ -44,6 +45,9 @@ REACT_APP_POLICY_PUBLIC_ID=<Public id for Iubenda service that provides legal po
 REACT_APP_COOKIE_CONSENT_PUBLIC_ID=<Public ID for Iubenda service that provides cookie consent banner>
 LOCALSTACK_API_KEY=<Localstack (mock AWS) API key>
 ```
+
+**Note:** Local end-to-end testing, which uses `run_full_stack.sh` and `parsing.py`, requires `LOCALSTACK_API_KEY`
+in order to use the paid features of Localstack.
 
 These values are stored in a dedicated secret manager. To request AWS credentials, or for access to
 other secret values, contact one of:
@@ -149,6 +153,35 @@ Just run `./dev/run_stack.sh` from anywhere.
 
 Services will be accessible and connected to each other.
 
+### Local end-to-end testing
+
+Run `./run_full_stack.sh` from `/dev/`.
+
+`docker-compose` will create a number of services, which will wait on each other to guarantee correct timing:
+1. A set of AWS mocks (`localstack`) required to replicate cloud infrastructure on a developer machine
+1. A provisioner of those services to replicate cloud infrastructure configuration on AWS mocks (should exit with status code 0)
+1. A provisioner of those services to replicate global.health-specific logic on AWS mocks (should exit with status code 0)
+1. A mock for parser source data and configuration
+
+After this, services will be accessible and connected to each other, and a user can run parsing locally by running a subcommand of `parsing.py`:
+* `list [parsers]`: show which parser(s) are available
+* `describe [parsers]`: provide detailed information about available parser(s)
+* `run [parsers]`: run one/many parser(s)
+* `upload <parser>`: upload a sample data file for a parser
+* `build <parser>`: build a Docker image for a parser
+
+The `list`, `describe`, and `run` subcommands can take any number of parser names and default to targeting all available parsers.
+
+The `upload` and `build` subcommands require exactly one parser name.
+
+Results from `run` subcommand can be found by viewing the exit status code and `docker logs` for that container.
+
+#### Localstack
+
+Local end-to-end testing uses AWS mocks through `localstack`. Official docs: https://localstack.cloud/docs/getting-started/overview/
+The `compose` file forwards a number of ports from the developer system to the `localstack` container,
+including requirements for connecting to `localstack.cloud` to use paid features, a locally-accessible user interface, and ECR.
+
 ### Running services individually
 
 #### Mongo
@@ -176,7 +209,7 @@ You can also just run `mongo` from your workstation if you have it installed.
 By default docker wil persist the container data unless you rm it, to remove data in the db first run a mongo shell as
 explained above then:
 
-```js
+```shell
 use covid19
 db.cases.remove({})
 ```

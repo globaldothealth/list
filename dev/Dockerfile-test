@@ -1,0 +1,8 @@
+FROM python:3.9
+
+RUN pip install requests
+
+# COPY ./run_e2e_tests.sh ./
+COPY ./run_session.py ./
+
+CMD [ "" ]
