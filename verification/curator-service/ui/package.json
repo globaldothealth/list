@@ -31,6 +31,7 @@
     "axios": "^0.21.1",
     "clsx": "^1.1.1",
     "date-fns": "^2.22.1",
+    "envalid": "^6.0.2",
     "eslint-config-prettier": "^6.15.0",
     "eslint-plugin-cypress": "^2.11.3",
     "eslint-plugin-prettier": "^3.4.0",
