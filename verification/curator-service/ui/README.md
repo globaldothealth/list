@@ -116,6 +116,11 @@ Edit `./variantsofconcern.csv` to add the new variants, then run:
 
 This updates `src/assets/variants.json`, which you should then commit and push.
 
+#### Updating data dictionary
+
+    pushd ../../../data-serving/scripts/prepare_fields_list; npm run populate-fields; popd
+
+
 ## Development
 
 The React application was built with the `create-react-app` new project generator.
