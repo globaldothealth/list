@@ -28,6 +28,10 @@ boundaries.json
 cases.csv
 cases.json
 
+# CSV field conversion script output.
+
+data-serving/data-service/src/model/fields.json
+
 # Created by https://www.gitignore.io/api/osx,linux,python,pycharm,windows,visualstudiocode,node
 # Edit at https://www.gitignore.io/?templates=osx,linux,python,pycharm,windows,visualstudiocode,node
 
