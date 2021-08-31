@@ -47,20 +47,23 @@ _notes = (
 
 
 def _c(location, gender, age_start, age_end, confirmed_date, travel=False, notes=None):
+    demographics = {}
+    if age_start is not None and age_end is not None:
+        demographics["ageRange"] = {"start": age_start, "end": age_end}
+    if gender:
+        demographics["gender"] = gender
     C = {
         "caseReference": _caseReference,
         "location": location,
-        "demographics": {
-            "ageRange": {"start": age_start, "end": age_end},
-            "gender": gender,
-        },
         "events": [
             {
                 "name": "confirmed",
                 "dateRange": {"start": confirmed_date, "end": confirmed_date},
             }
-        ]
+        ],
     }
+    if demographics:
+        C["demographics"] = demographics
     if travel:
         C["travelHistory"] = {"traveledPrior30Days": True}
     if notes:
@@ -79,6 +82,7 @@ _CASES = [
     _c(_NZ, "Male", 20, 29, "01/10/2021Z", True, _notes),
     _c(_Bay_of_Plenty, "Female", 90, 120, "05/05/2021Z", True, "Case imported from abroad."),
     _c(_West_Coast, "Female", 20, 29, "05/06/2021Z", False),
+    _c(_West_Coast, None, None, None, "07/01/2021Z", False),
 ]
 
 
