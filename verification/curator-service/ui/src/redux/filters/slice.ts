@@ -1,18 +1,29 @@
 import { createSlice } from '@reduxjs/toolkit';
+import {fetchCountries} from './thunk';
 
 const initialState = {
     countryList: [],
+    isLoading: false
 };
+
+interface initialStateTypes {
+    countryList:string[],
+    isLoading: boolean
+  }
 
 const slice = createSlice({
     name: 'countryList',
-    initialState,
-    reducers: {
-        setCountries(state: any, action) {
+    initialState: initialState as initialStateTypes,
+    reducers: {},
+    extraReducers: builder => {
+        builder.addCase(fetchCountries.fulfilled, (state, action) => {
             state.countryList = action.payload;
-        },
-    },
+            state.isLoading = false;
+        })
+        builder.addCase(fetchCountries.pending, (state) => {
+            state.isLoading = true;
+        })
+    }
 });
 
-export const { setCountries } = slice.actions;
 export default slice.reducer;
