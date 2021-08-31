@@ -42,7 +42,7 @@ describe('<LandingPage />', () => {
         );
         expect(screen.getByText('Data dictionary')).toHaveAttribute(
             'href',
-            'https://github.com/globaldothealth/list/blob/main/data-serving/scripts/export-data/functions/01-split/fields.txt',
+            'fields.txt',
         );
         expect(screen.getByText('Data acknowledgments')).toHaveAttribute(
             'href',
