@@ -66,6 +66,7 @@ import { selectIsLoading } from '../../redux/app/selectors';
 import { getUserProfile, logout } from '../../redux/auth/thunk';
 import { selectUser } from '../../redux/auth/selectors';
 import { User } from '../../api/models/User';
+import validateEnv from '../util/validate-env';
 
 export const theme = createMuiTheme({
     palette: {
@@ -395,6 +396,8 @@ export default function App(): JSX.Element {
 
     const savedSearchQuery = localStorage.getItem('searchQuery');
 
+    const env = validateEnv();
+
     const menuList = user
         ? [
               {
@@ -521,6 +524,8 @@ export default function App(): JSX.Element {
         //eslint-disable-next-line
     }, [location.search]);
 
+    
+
     return (
         <div className={classes.root} ref={rootRef}>
             <ThemeProvider theme={theme}>
@@ -568,15 +573,17 @@ export default function App(): JSX.Element {
                         {user && (
                             <>
                                 <Typography>
-                                    <a
+                                <a
                                         className={classes.mapLink}
                                         data-testid="mapLink"
-                                        href="https://map.covid-19.global.health/"
+                                        href={env.SERVICE_ENV === "dev"
+                                        ? "http://dev-map.covid-19.global.health/"
+                                        : "https://map.covid-19.global.health/"}
                                         rel="noopener noreferrer"
                                         target="_blank"
                                     >
                                         G.h Map
-                                    </a>
+                                </a>
                                 </Typography>
                                 <ProfileMenu user={user} />{' '}
                             </>
