@@ -166,7 +166,7 @@ const LandingPage = (): JSX.Element => {
                         </div>
                         <div className={classes.link}>
                             <a
-                                href="https://github.com/globaldothealth/list/blob/main/data-serving/scripts/export-data/functions/01-split/fields.txt"
+                                href="fields.txt"
                                 rel="noopener noreferrer"
                                 target="_blank"
                             >
