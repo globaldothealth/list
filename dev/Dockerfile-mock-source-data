@@ -66,11 +66,10 @@ ENV EPID_INGESTION_SOURCE_ID "XXXXXXXXXXX"
 # will become mountpoint of our code
 WORKDIR /app
 
-COPY ./iam_role.json ./
-COPY ./setup_localstack.py ./
+COPY ./mock_source_data.py ./
 COPY poetry.lock pyproject.toml ./
 
 # quicker install as runtime deps are already installed
 RUN poetry install
 
-CMD [ "python", "./setup_localstack.py" ]
+CMD [ "python", "./mock_source_data.py" ]

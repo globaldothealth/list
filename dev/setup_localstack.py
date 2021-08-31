@@ -46,7 +46,10 @@ BATCH_COMPUTE_ENVIRONMENT_ORDER = [{
 
 DATA_BUCKET_NAME = environ.get("DATA_BUCKET_NAME", "covid-19-data-export")
 DOWNLOAD_BUCKET_NAME = environ.get("DOWNLOAD_BUCKET_NAME", "covid19-filtered-downloads")
+RETRIEVAL_BUCKET_NAME = environ.get("RETRIEVAL_BUCKET_NAME", "epid-sources-raw")
 SES_EMAIL_ADDRESS = environ.get("SES_EMAIL_ADDRESS", "info@global.health")
+ECR_REPOSITORY_NAME = environ.get("ECR_REPOSITORY_NAME", "gdh-ingestor")
+
 
 class LocalstackWrangler(object):
 
@@ -56,6 +59,7 @@ class LocalstackWrangler(object):
         self.s3_client = boto3.client("s3", endpoint_url=LOCALSTACK_URL)
         self.ses_client = boto3.client("ses", endpoint_url=LOCALSTACK_URL)
         self.batch_client = boto3.client("batch", endpoint_url=LOCALSTACK_URL)
+        self.ecr_client = boto3.client("ecr", endpoint_url=LOCALSTACK_URL)
 
     def create_iam_role(self, role_name):
         print(f"Creating IAM role {role_name} for Batch")
@@ -155,6 +159,13 @@ class LocalstackWrangler(object):
         )
         print("Verified email address")
 
+    def create_container_repository(self, repo_name):
+        print(f"Creating container repository {repo_name}")
+        self.ecr_client.create_repository(
+            repositoryName=repo_name
+        )
+        print("Created container repository")
+
 
 def wait_for_localstack():
     healthcheck_url = "".join([LOCALSTACK_URL, "/health"])
@@ -189,4 +200,6 @@ if __name__ == "__main__":
     lw.setup_ses(SES_EMAIL_ADDRESS)
     lw.create_s3_bucket(DATA_BUCKET_NAME)
     lw.create_s3_bucket(DOWNLOAD_BUCKET_NAME)
+    lw.create_s3_bucket(RETRIEVAL_BUCKET_NAME)
+    lw.create_container_repository(ECR_REPOSITORY_NAME)
     print("Done setting up localstack resources")
