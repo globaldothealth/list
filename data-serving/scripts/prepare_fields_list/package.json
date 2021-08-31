@@ -1,0 +1,27 @@
+{
+  "name": "prepare_fields_list",
+  "version": "0.0.1",
+  "description": "Generate a JSON version of the fields list for CSV export.",
+  "main": "dist/index.js",
+  "dependencies": {
+    "typescript": "4.3.5"
+  },
+  "devDependencies": {
+    "@types/node": "^16.7.8"
+  },
+  "scripts": {
+    "build": "tsc",
+    "make-json": "tsc && node dist/index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/globaldothealth/list.git"
+  },
+  "author": "Global.health: a Data Science Initiative",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/globaldothealth/list/issues"
+  },
+  "homepage": "https://github.com/globaldothealth/list#readme"
+}
