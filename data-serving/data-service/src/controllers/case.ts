@@ -1,21 +1,24 @@
 import { Case, CaseDocument, RestrictedCase } from '../model/case';
 import { EventDocument } from '../model/event';
+import caseFields from '../model/fields.json';
 import { Source } from '../model/source';
-import { DocumentQuery, Error, LeanDocument, Query, QueryCursor } from 'mongoose';
+import {
+    DocumentQuery,
+    Error,
+    LeanDocument,
+    Query,
+    QueryCursor,
+} from 'mongoose';
 import { ObjectId, QuerySelector } from 'mongodb';
 import { GeocodeOptions, Geocoder, Resolution } from '../geocoding/geocoder';
 import { NextFunction, Request, Response } from 'express';
 import parseSearchQuery, { ParsingError } from '../util/search';
 import { SortByOrder, getSortByKeyword } from '../util/case';
 import { parseDownloadedCase } from '../util/case';
-import fs from 'fs';
 
-import axios from 'axios';
 import { logger } from '../util/logger';
 import stringify from 'csv-stringify/lib/sync';
 import _ from 'lodash';
-
-const CaseFieldFileURL = 'https://raw.githubusercontent.com/globaldothealth/list/main/data-serving/scripts/export-data/functions/01-split/fields.txt';
 
 class GeocodeNotFoundError extends Error {}
 
@@ -23,19 +26,16 @@ class InvalidParamError extends Error {}
 
 type BatchValidationErrors = { index: number; message: string }[];
 
-
 export class CasesController {
     private caseFields: string[];
     constructor(private readonly geocoders: Geocoder[]) {
-        let text: string = '';
+        const text = '';
         this.caseFields = [];
         this.init();
     }
 
-    // TODO: this belongs in a database, and then passed into the constructor
-    async init() {
-        let txtRes = await axios.get<string>(CaseFieldFileURL);
-        this.caseFields = txtRes.data.split('\n');
+    init() {
+        this.caseFields = caseFields;
         return this;
     }
 
@@ -77,7 +77,9 @@ export class CasesController {
             return;
         }
 
-        logger.info(`Streaming case data in format ${req.body.format} matching query ${req.body.query} for correlation ID ${req.body.correlationId}`);
+        logger.info(
+            `Streaming case data in format ${req.body.format} matching query ${req.body.query} for correlation ID ${req.body.correlationId}`,
+        );
 
         const queryLimit = Number(req.body.limit);
 
@@ -93,53 +95,52 @@ export class CasesController {
                     searchQuery: req.body.query as string,
                     count: false,
                     limit: queryLimit,
-                })
-                .cursor();
+                }).cursor();
             } else if (req.body.caseIds && queryLimit) {
                 logger.info('Request body with case IDs and limit');
                 cursor = Case.find({
                     _id: { $in: req.body.caseIds },
                 })
-                .lean()
-                .limit(queryLimit)
-                .collation({
-                    locale: 'en_US',
-                    strength: 2,
-                })
-                .cursor();
+                    .lean()
+                    .limit(queryLimit)
+                    .collation({
+                        locale: 'en_US',
+                        strength: 2,
+                    })
+                    .cursor();
             } else if (req.body.caseIds) {
                 logger.info('Request body with case IDs and no limit');
                 cursor = Case.find({
                     _id: { $in: req.body.caseIds },
                 })
-                .lean()
-                .collation({
-                    locale: 'en_US',
-                    strength: 2,
-                })
-                .cursor();
+                    .lean()
+                    .collation({
+                        locale: 'en_US',
+                        strength: 2,
+                    })
+                    .cursor();
             } else if (queryLimit) {
                 logger.info('Request body with limit and no case IDs');
                 cursor = Case.find({ list: true })
-                .lean()
-                .limit(queryLimit)
-                .collation({
-                    locale: 'en_US',
-                    strength: 2,
-                })
-                .cursor();
+                    .lean()
+                    .limit(queryLimit)
+                    .collation({
+                        locale: 'en_US',
+                        strength: 2,
+                    })
+                    .cursor();
             } else {
                 logger.info('Request body with no query, limit, or case IDs');
                 cursor = Case.find({ list: true })
-                .lean()
-                .collation({
-                    locale: 'en_US',
-                    strength: 2,
-                })
-                .cursor();
+                    .lean()
+                    .collation({
+                        locale: 'en_US',
+                        strength: 2,
+                    })
+                    .cursor();
             }
 
-            const date = (new Date()).toISOString().slice(0, 10);
+            const date = new Date().toISOString().slice(0, 10);
             const filename = `gh_${date}`;
 
             let doc: CaseDocument;
@@ -150,7 +151,7 @@ export class CasesController {
                     'Content-Disposition',
                     `attachment; filename="${filename}.${req.body.format}"`,
                 );
-                let delimiter: string = (req.body.format == 'tsv') ? '\t' : ',';
+                const delimiter: string = req.body.format == 'tsv' ? '\t' : ',';
                 const columnsString = this.caseFields.join(delimiter);
                 res.write(columnsString);
                 res.write('\n');
@@ -163,7 +164,7 @@ export class CasesController {
                         columns: this.caseFields,
                         delimiter: delimiter,
                     });
-                    res.write((stringifiedCase));
+                    res.write(stringifiedCase);
                     doc = await cursor.next();
                 }
                 res.end();
@@ -187,20 +188,26 @@ export class CasesController {
                 res.end();
             } else {
                 logger.error(`Invalid format requested ${req.body.format}`);
-                res.status(400).json(`Invalid format requested ${req.body.format}`);
+                res.status(400).json(
+                    `Invalid format requested ${req.body.format}`,
+                );
                 return;
             }
-        } catch(err) {
+        } catch (err) {
             if (err instanceof ParsingError) {
                 logger.error(`ParsingError: ${err}`);
                 res.status(422).json({ message: err.message });
                 return;
             }
             logger.error(`Error streaming case data: ${err}`);
-            res.status(500).json('A server error occurred while streaming case data');
+            res.status(500).json(
+                'A server error occurred while streaming case data',
+            );
             return;
         }
-        logger.info(`Request with correlation ID ${req.body.correlationId} succeeded`);
+        logger.info(
+            `Request with correlation ID ${req.body.correlationId} succeeded`,
+        );
     };
 
     /**
@@ -1032,8 +1039,7 @@ export const casesMatchingSearchQuery = (opts: {
     // Always search with case-insensitivity.
     const casesQuery: Query<CaseDocument[], CaseDocument> = Case.find(
         queryOpts,
-    )
-    .collation({
+    ).collation({
         locale: 'en_US',
         strength: 2,
     });
@@ -1041,11 +1047,11 @@ export const casesMatchingSearchQuery = (opts: {
     const countQuery: Query<number, CaseDocument> = Case.countDocuments(
         queryOpts,
     )
-    .limit(countLimit)
-    .collation({
-        locale: 'en_US',
-        strength: 2,
-    });
+        .limit(countLimit)
+        .collation({
+            locale: 'en_US',
+            strength: 2,
+        });
 
     // Fill in keyword filters.
     parsedSearch.filters.forEach((f) => {
@@ -1121,13 +1127,13 @@ export const findCasesWithCaseReferenceData = async (
         });
 
     if (providedCaseReferenceData.length > 0) {
-        if(fieldsToSelect === undefined)
+        if (fieldsToSelect === undefined)
             return Case.find().or(providedCaseReferenceData).exec();
         else
             return Case.find()
-                       .or(providedCaseReferenceData)
-                       .select(fieldsToSelect)
-                       .exec();
+                .or(providedCaseReferenceData)
+                .select(fieldsToSelect)
+                .exec();
     } else {
         return [];
     }
