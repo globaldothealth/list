@@ -6,12 +6,12 @@ services:
       ENABLE_FAKE_GEOCODER: "True"
   mongo:
     volumes:
-      - ../verification/scripts:/verification/scripts
+      - "../verification/scripts:/verification/scripts"
   curator:
     command: "npm run dev"
     volumes:
-      - ../verification/curator-service/api/src:/usr/src/app/verification/curator-service/api/src
-      - ../verification/curator-service/api/openapi:/usr/src/app/verification/curator-service/api/openapi
+      - "../verification/curator-service/api/src:/usr/src/app/verification/curator-service/api/src"
+      - "../verification/curator-service/api/openapi:/usr/src/app/verification/curator-service/api/openapi"
     environment:
       LOCALHOST_URL: "http://localstack:4566"
       SERVICE_ENV: "locale2e"
@@ -19,14 +19,14 @@ services:
   data:
     command: "npm run dev"
     volumes:
-      - ../data-serving/data-service/src:/usr/src/app/data-serving/data-service/src
-      - ../data-serving/data-service/api:/usr/src/app/data-serving/data-service/api
+      - "../data-serving/data-service/src:/usr/src/app/data-serving/data-service/src"
+      - "../data-serving/data-service/api:/usr/src/app/data-serving/data-service/api"
     depends_on:
       - mongo
   curatorui:
     command: "npm run start-noenv"
     volumes:
-      - ../verification/curator-service/ui/src:/usr/src/app/verification/curator-service/ui/src
+      - "../verification/curator-service/ui/src:/usr/src/app/verification/curator-service/ui/src"
     environment:
       # We can't use curator:3001 here because that's an internal DNS,
       # not accessible from the user's browser.
@@ -41,17 +41,18 @@ services:
     ports:
       - "53:53"
       - "443:443"
+      - "4510:4510"
       - "4566:4566"
       - "4571:4571"
       - "8080:8080"
-    environment:
-      AWS_ACCESS_KEY_ID: fake
-      AWS_SECRET_ACCESS_KEY: fake
-      LOCALSTACK_API_KEY: "${LOCALSTACK_API_KEY}"
-      SERVICES: s3,ec2,ses,batch,events,iam,lambda
-      DEBUG: 1
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock"
+    environment:
+      AWS_ACCESS_KEY_ID: "fake"
+      AWS_SECRET_ACCESS_KEY: "fake"
+      LOCALSTACK_API_KEY: "${LOCALSTACK_API_KEY}"
+      SERVICES: s3,ec2,ses,batch,events,iam,lambda,ecr
+      DEBUG: 1
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:4566/health"]
       interval: 30s
@@ -70,5 +71,50 @@ services:
       AWS_ENDPOINT: "http://localstack:4566"
       DATA_BUCKET_NAME: "covid-19-data-export"
       DOWNLOAD_BUCKET_NAME: "covid19-filtered-downloads"
+      RETRIEVAL_BUCKET_NAME: "epid-sources-raw"
       BATCH_QUEUE_NAME: "ingestion-queue"
       SES_EMAIL_ADDRESS: "info@global.health"
+      ECR_REPOSITORY_NAME: "gdh-ingestor"
+  setup-ingestion:
+    build:
+      context: ./
+      dockerfile: Dockerfile-ingestion
+    depends_on:
+      - setup-localstack
+    volumes:
+      - "../ingestion/functions:/ingestion/functions"
+      - "/var/run/docker.sock:/var/run/docker.sock"
+    environment:
+      AWS_ACCESS_KEY_ID: "fake"
+      AWS_SECRET_ACCESS_KEY: "fake"
+      AWS_DEFAULT_REGION: "us-east-1"
+      AWS_ENDPOINT: "http://localstack:4566"
+      RETRIEVAL_BUCKET_NAME: "epid-sources-raw"
+      BATCH_QUEUE_NAME: "ingestion-queue"
+      ECR_REPOSITORY_NAME: "gdh-ingestor"
+      MOCK_SOURCE_DATA_SERVICE: "http://mock-source-data"
+      MOCK_SOURCE_DATA_PORT: 5000
+      CLIENT_EMAIL: "fake@fake.fake"
+  mock-source-data:
+    build:
+      context: ./
+      dockerfile: Dockerfile-mock-source-data
+    ports:
+      - "5000:5000"
+    volumes:
+      - "../ingestion/functions:/ingestion/functions"
+    environment:
+      MOCK_SOURCE_DATA_HOST: "0.0.0.0"
+      MOCK_SOURCE_DATA_PORT: 5000
+      MOCK_SOURCE_DATA_SERVICE: "http://mock-source-data"
+      AWS_ACCESS_KEY_ID: "fake"
+      AWS_SECRET_ACCESS_KEY: "fake"
+      AWS_DEFAULT_REGION: "us-east-1"
+      AWS_ENDPOINT: "http://localstack:4566"
+      RETRIEVAL_BUCKET_NAME: "epid-sources-raw"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s

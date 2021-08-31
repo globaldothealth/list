@@ -30,7 +30,7 @@ s3_client = boto3.client("s3")
 
 if os.environ.get("DOCKERIZED"):
     s3_client = boto3.client("s3",
-        endpoint_url=os.environ.get("AWS_ENDPOINT", "http://localstack:4566"),
+        endpoint_url=os.environ.get("AWS_ENDPOINT", "http://localhost:4566"),
         aws_access_key_id=os.environ.get("AWS_ACCESS_KEY_ID", "test"),
         aws_secret_access_key=os.environ.get("AWS_SECRET_ACCESS_KEY", "test"),
         region_name=os.environ.get("AWS_REGION", "us-east-1")
@@ -45,12 +45,12 @@ except ImportError:
     sys.path.append(
         os.path.join(
             os.path.dirname(os.path.abspath(__file__)),
-            os.pardir, 'common'))
+            os.pardir, "common"))
     import common_lib
 
 
 def extract_event_fields(event):
-    print('Extracting fields from event', event)
+    print("Extracting fields from event", event)
     if any(
             field not in event
             for field
@@ -61,7 +61,7 @@ def extract_event_fields(event):
         raise ValueError(error_message)
     return event[ENV_FIELD], event[SOURCE_ID_FIELD], event.get(
         PARSING_DATE_RANGE_FIELD), event.get(
-        'auth', {})
+        "auth", {})
 
 
 def get_source_details(env, source_id, upload_id, api_headers, cookies):
@@ -80,8 +80,8 @@ def get_source_details(env, source_id, upload_id, api_headers, cookies):
                 "automation", {}).get(
                 "parser", {}).get(
                 "awsLambdaArn", ""), api_json.get(
-                'dateFilter', {}), api_json.get(
-                'hasStableIdentifiers', False)
+                "dateFilter", {}), api_json.get(
+                "hasStableIdentifiers", False)
         upload_error = (
             common_lib.UploadError.SOURCE_CONFIGURATION_NOT_FOUND
             if r.status_code == 404 else common_lib.UploadError.INTERNAL_ERROR)
@@ -98,10 +98,10 @@ def get_source_details(env, source_id, upload_id, api_headers, cookies):
 
 def raw_content(url: str, content: bytes, tempdir: str = TEMP_PATH) -> io.BytesIO:
     # Detect the mimetype of a given URL.
-    print(f'Guessing mimetype of {url}')
+    print(f"Guessing mimetype of {url}")
     mimetype, _ = mimetypes.guess_type(url)
     if mimetype == "application/zip":
-        print('File seems to be a zip file, decompressing it now')
+        print("File seems to be a zip file, decompressing it now")
         # Writing the zip file to temp dir.
         fd, temp_name = tempfile.mkstemp(dir=tempdir)
         with os.fdopen(fd, 'wb') as temp:
@@ -113,7 +113,7 @@ def raw_content(url: str, content: bytes, tempdir: str = TEMP_PATH) -> io.BytesI
                     with zf.open(name) as f:
                         return io.BytesIO(f.read())
     elif not mimetype:
-        print('Could not determine mimetype')
+        print("Could not determine mimetype")
     return io.BytesIO(content)
 
 
@@ -130,7 +130,7 @@ def retrieve_content(
                 e, env, common_lib.UploadError.SOURCE_CONFIGURATION_ERROR,
                 source_id, upload_id, api_headers, cookies)
         print(f"Downloading {source_format} content from {url}")
-        if url.startswith('s3://'):
+        if url.startswith("s3://"):
             # strip the prefix
             s3Location = url[5:]
             # split at the first /
@@ -142,7 +142,7 @@ def retrieve_content(
             r = requests.get(url, headers=headers)
             r.raise_for_status()
             content = r.content
-        print('Download finished')
+        print("Download finished")
 
         key_filename_part = f"content.{source_format.lower()}"
         s3_object_key = (
@@ -166,18 +166,18 @@ def retrieve_content(
                     outfile.write(content)
             return [(outfile_name, s3_object_key)]
 
-        print('Detecting encoding of retrieved content')
+        print("Detecting encoding of retrieved content")
         # Read 2MB to be quite sure about the encoding.
         detected_enc = detect(bytesio.read(2 << 20))
         bytesio.seek(0)
-        if detected_enc['encoding']:
-            print(f'Source encoding is presumably {detected_enc}')
+        if detected_enc["encoding"]:
+            print(f"Source encoding is presumably {detected_enc}")
         else:
-            detected_enc['encoding'] = DEFAULT_ENCODING
-            print(f'Source encoding detection failed, setting to {DEFAULT_ENCODING}')
+            detected_enc["encoding"] = DEFAULT_ENCODING
+            print(f"Source encoding detection failed, setting to {DEFAULT_ENCODING}")
         fd, outfile_name = tempfile.mkstemp(dir=tempdir)
-        with os.fdopen(fd, "w", encoding='utf-8') as outfile:
-            text_stream = codecs.getreader(detected_enc['encoding'])(bytesio)
+        with os.fdopen(fd, "w", encoding="utf-8") as outfile:
+            text_stream = codecs.getreader(detected_enc["encoding"])(bytesio)
             # Write the output file as utf-8 in chunks because decoding the
             # whole data in one shot becomes really slow with big files.
             content = text_stream.read(READ_CHUNK_BYTES)
@@ -213,6 +213,10 @@ def upload_to_s3(
 def invoke_parser(
     env, parser_module, source_id, upload_id, api_headers, cookies, s3_object_key,
         source_url, date_filter, parsing_date_range):
+    if cookies:
+        auth = {
+            "email": os.getenv("EPID_INGESTION_EMAIL", "")
+        }
     payload = {
         "env": env,
         "s3Bucket": OUTPUT_BUCKET,
@@ -222,6 +226,7 @@ def invoke_parser(
         "uploadId": upload_id,
         "dateFilter": date_filter,
         "dateRange": parsing_date_range,
+        "auth": auth
     }
     print(f"Invoking parser ({parser_module})")
     sys.path.append(str(Path(__file__).parent.parent))  # ingestion/functions
@@ -290,16 +295,16 @@ def run_retrieval(tempdir=TEMP_PATH):
       https://docs.aws.amazon.com/lambda/latest/dg/python-handler.html
     """
 
-    env = os.environ['EPID_INGESTION_ENV']
-    source_id = os.environ['EPID_INGESTION_SOURCE_ID']
-    parsing_date_range = os.getenv('EPID_INGESTION_PARSING_DATE_RANGE', {})
+    env = os.environ["EPID_INGESTION_ENV"]
+    source_id = os.environ["EPID_INGESTION_SOURCE_ID"]
+    parsing_date_range = os.getenv("EPID_INGESTION_PARSING_DATE_RANGE", {})
     if isinstance(parsing_date_range, str):  # date range specified with comma
         parsing_date_range = dict(zip(["start", "end"], parsing_date_range.split(",")))
-    local_email = os.getenv('EPID_INGESTION_EMAIL', '')
+    local_email = os.getenv("EPID_INGESTION_EMAIL", "")
 
     auth_headers = None
     cookies = None
-    if local_email and env == 'local':
+    if local_email and env in ["local", "locale2e"]:
         cookies = common_lib.login(local_email)
     else:
         auth_headers = common_lib.obtain_api_credentials(s3_client)
@@ -307,6 +312,7 @@ def run_retrieval(tempdir=TEMP_PATH):
         env, source_id, auth_headers, cookies)
     url, source_format, parser, date_filter, stable_identifiers = get_source_details(
         env, source_id, upload_id, auth_headers, cookies)
+
     if not stable_identifiers:
         print(f"Source {source_id} does not have stable identifiers\n"
               "Ingesting entire dataset and ignoring date filter and date ranges")
