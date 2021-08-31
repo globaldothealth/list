@@ -23,8 +23,9 @@ import { Alert } from '@material-ui/lab';
 // import { AppTooltip } from './common-form-fields/AppTooltip';
 import { useSelector } from 'react-redux';
 import { useDispatch } from 'react-redux';
+import  {useAppDispatch} from '../hooks/redux';
 import { fetchCountries } from '../redux/filters/thunk';
-import { countryList } from '../redux/filters/selectors';
+import { countryList, isLoading } from '../redux/filters/selectors';
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -237,14 +238,15 @@ export default function FiltersModal({
     // );
 
  
-    const dispatch = useDispatch();
+    const dispatch = useAppDispatch();
+    const loadingState = useSelector(isLoading);
 
     useEffect(() => {
         dispatch(fetchCountries());
 
       }, [dispatch])
 
-      const contries = useSelector(countryList);
+      const countries:string[] = useSelector(countryList);
 
     return (
         <Dialog open={isOpen} maxWidth={'xl'} onClose={closeAndResetAlert}>
@@ -300,11 +302,12 @@ export default function FiltersModal({
                                 label="Country"
                                 value={formik.values.country || ''}
                                 onChange={formik.handleChange}
+                                disabled={loadingState}
                             >
                                 <MenuItem value="" disabled>
                                     None
                                 </MenuItem>
-                                {contries.map((country) => <MenuItem value={country} key={country}>{country}</MenuItem>)}
+                                {countries.map((country) => <MenuItem value={country} key={country}>{country}</MenuItem>)}
                             </Select>
                         </FormControl>
                         <FormControl
