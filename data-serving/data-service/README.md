@@ -8,6 +8,8 @@
 From the data-service root, run:
 `npm run import-data`
 
+(You may want to optionally `npm run drop-cases` first to remove any stale data: beware doing this in production!)
+
 # Update the fields used in CSV export
 1. edit `../scripts/export-data/functions/02-export/fields.txt`
 2. Generate the CSV fields list

@@ -6,7 +6,6 @@ interface SetupDatabaseParameters {
     collectionName: string;
     schemaPath: string;
     indexesPath: string;
-    deleteAllDocuments: boolean;  // defaults to false
 }
 
 const setupDatabase = async ({
@@ -15,7 +14,6 @@ const setupDatabase = async ({
     collectionName,
     schemaPath,
     indexesPath,
-    deleteAllDocuments = false,
 }: SetupDatabaseParameters): Promise<void> => {
     try {
         const schema = JSON.parse(await cat(schemaPath));
@@ -41,12 +39,6 @@ const setupDatabase = async ({
             )
         ) {
             collection = await database.getCollection(collectionName);
-            if (deleteAllDocuments) {
-                const results = await collection.remove({});
-                print(
-                    `Dropped all documents: (${results.nRemoved} total) 🗑️`,
-                );
-            }
 
             await database.runCommand({
                 collMod: collectionName,
