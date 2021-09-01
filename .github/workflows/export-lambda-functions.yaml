@@ -38,6 +38,5 @@ jobs:
         working-directory: data-serving/scripts/export-data
       - name: SAM deploy
         run: sam deploy --no-confirm-changeset --no-fail-on-empty-changeset
-        if: github.event_name == 'push'
         working-directory: data-serving/scripts/export-data
 
