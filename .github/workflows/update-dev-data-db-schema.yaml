@@ -5,7 +5,7 @@ on:
     # Run workflow when the schema changes.
     branches: [main]
     paths:
-      - "data-serving/data-service/schemas/**"
+      - "data-serving/scripts/setup-db/schemas/**"
       - ".github/workflows/update-dev-data-db-schema.yaml"
 
 jobs:
@@ -27,6 +27,6 @@ jobs:
           DB: "covid19"
           COLL: "cases"
           # Those are relative to the setup-db directory, not the working dir.
-          SCHEMA: "../../data-service/schemas/cases.schema.json"
-          INDEXES: "../../data-service/schemas/cases.indexes.json"
+          SCHEMA: "./schemas/cases.schema.json"
+          INDEXES: "./schemas/cases.indexes.json"
         run: npm --prefix data-serving/scripts/setup-db run setup
