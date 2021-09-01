@@ -5,7 +5,7 @@ on:
     # Run workflow when the schema changes.
     branches: [main]
     paths:
-      - "verification/curator-service/api/src/schemas/**"
+      - "data-serving/scripts/setup-db/schemas/**"
       - ".github/workflows/update-dev-curator-db-schema.yaml"
 
 jobs:
@@ -27,6 +27,6 @@ jobs:
           DB: "covid19"
           COLL: "sources"
           # Those are relative to the setup-db directory, not the working dir.
-          SCHEMA: "../../../verification/curator-service/api/src/schemas/sources.schema.json"
-          INDEXES: "../../../verification/curator-service/api/src/schemas/sources.indexes.json"
+          SCHEMA: "./schemas/sources.schema.json"
+          INDEXES: "./schemas/sources.indexes.json"
         run: npm --prefix data-serving/scripts/setup-db run setup
