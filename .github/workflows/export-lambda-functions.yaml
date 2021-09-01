@@ -37,6 +37,8 @@ jobs:
           sam build --use-container
         working-directory: data-serving/scripts/export-data
       - name: SAM deploy
-        run: sam deploy --no-confirm-changeset --no-fail-on-empty-changeset
+        run: |
+          sed -i "s/EXPORT_DB_PASSWORD/$EXPORT_DB_PASSWORD/g" template.yaml
+          sam deploy --no-confirm-changeset --no-fail-on-empty-changeset
         working-directory: data-serving/scripts/export-data
 
