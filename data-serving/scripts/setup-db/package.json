@@ -7,7 +7,9 @@
     "build": "tsc",
     "lint": "tsc --noEmit && eslint '*/**/*.{js,ts,tsx}' --quiet --fix",
     "drop-cases-and-import-sample-data": "mongoimport --drop --uri=$CONN --db $DB --collection cases --jsonArray --file ../../samples/cases.json",
-    "migrate": "npm install && migrate-mongo up"
+    "migrate": "npm install && migrate-mongo up",
+    "migrate-local": "CONN=mongodb://localhost/covid19 DB=covid19 npm install && migrate-mongo up",
+    "drop-and-import-local": "mongoimport --drop --uri=mongodb://localhost/covid19 --db covid19 --collection cases --jsonArray --file ../../samples/cases.json"
   },
   "repository": {
     "type": "git",
