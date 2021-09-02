@@ -70,7 +70,7 @@
     "start": "PORT=3002 react-scripts start",
     "build": "react-scripts build",
     "prepare-variants": "csvtojson ./variantsofconcern.csv > src/components/assets/variants.json",
-    "init-db": "cd ../../../data-serving/scripts/setup-db && npm run migrate",
+    "init-db": "CONN=mongodb://localhost/covid19 DB=covid19 cd ../../../data-serving/scripts/setup-db && npm run migrate",
     "import-case-data": "cd ../../../data-serving/scripts/setup-db && npm run drop-cases-and-import-sample-data",
     "lint": "tsc --noEmit && eslint '*/**/*.{js,ts,tsx}' --quiet --fix",
     "test": "react-scripts test --env=jest-environment-jsdom-fifteen",
