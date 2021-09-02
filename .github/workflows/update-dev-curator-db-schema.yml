@@ -1,11 +1,11 @@
-name: Update dev curator-service database schema
+name: Migrate dev database schema
 
 on:
   push:
     # Run workflow when the schema changes.
     branches: [main]
     paths:
-      - "data-serving/scripts/setup-db/schemas/**"
+      - "data-serving/scripts/setup-db/migrations/**"
       - ".github/workflows/update-dev-curator-db-schema.yaml"
 
 jobs:
@@ -21,12 +21,9 @@ jobs:
         with:
           node-version: "12.x"
       
-      - name: Update dev sources schema
+      - name: Migrate dev database
         env:
           CONN: ${{ secrets.DB_CONNECTION_URL_DEV }}
           DB: "covid19"
           COLL: "sources"
-          # Those are relative to the setup-db directory, not the working dir.
-          SCHEMA: "./schemas/sources.schema.json"
-          INDEXES: "./schemas/sources.indexes.json"
-        run: npm --prefix data-serving/scripts/setup-db run setup
+        run: npm --prefix data-serving/scripts/setup-db run migrate
