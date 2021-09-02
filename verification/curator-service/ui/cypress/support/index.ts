@@ -3,8 +3,7 @@ import './commands';
 // Before all tests have run, initialize the database. This removes all data,
 // applies the schema and adds any indexes.
 before(() => {
-    cy.exec('npm run init-case-db');
-    cy.exec('npm run init-sources-db');
+    cy.exec('npm run init-db');
     Cypress.Cookies.debug(true, { verbose: false });
 });
 
