@@ -4,7 +4,7 @@ This directory contains scripts to set up, run, and test the full stack during d
 
 - `run_stack.sh`: A script to run the dev docker compose file that runs an isolated environment of the full stack and uses AWS.
 - `run_full_stack.sh`: A script to run the dev docker compose file that runs an isolated environment of the full stack and uses localstack instead of AWS.
-- `setup-db.sh`: A script to that connects to your locally-running MongoDB instance and (re-)creates the database and
+- `setup-db.sh`: A script to that connects to your locally-running MongoDB instance (and ONLY that instance!) and (re-)creates the database and
   collection, applies the schema, creates indexes, and inserts some sample data.
 - `test_all.sh`: A script to run all of the tests from the sub-packages. Uses `run_full_stack.sh`.
 - `run_session.py`: Creates a new user, logs in, requests downloads from the curator service, and checks each download for formatting and contents.
