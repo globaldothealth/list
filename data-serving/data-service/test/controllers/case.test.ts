@@ -34,13 +34,13 @@ const invalidRequest = {
 const realDate = Date.now;
 const mockLocationServer = setupServer(...handlers);
 
-function stringParser (res: request.Response) {
-  const chunks: Buffer[] = [];
-  return new Promise((resolve, reject) => {
-    res.on('data', (chunk: Buffer) => chunks.push(Buffer.from(chunk)));
-    res.on('error', (err: Error) => reject(err));
-    res.on('end', () => resolve(Buffer.concat(chunks).toString('utf8')));
-  })
+function stringParser(res: request.Response) {
+    const chunks: Buffer[] = [];
+    return new Promise((resolve, reject) => {
+        res.on('data', (chunk: Buffer) => chunks.push(Buffer.from(chunk)));
+        res.on('error', (err: Error) => reject(err));
+        res.on('end', () => resolve(Buffer.concat(chunks).toString('utf8')));
+    });
 }
 
 beforeAll(async () => {
@@ -175,7 +175,7 @@ describe('GET', () => {
         });
         it('should query results', async () => {
             // Simulate index creation used in unit tests, in production they are
-            // setup by the setup-db script and such indexes are not present by
+            // setup by the migrations and such indexes are not present by
             // default in the in memory mongo spawned by unit tests.
             await mongoose.connection.collection('cases').createIndex({
                 notes: 'text',
@@ -778,7 +778,9 @@ describe('POST', () => {
 
             responseStream.pipe(fileStream);
             responseStream.on('finish', () => {
-                const text: string = fs.readFileSync(destination).toString('utf-8');
+                const text: string = fs
+                    .readFileSync(destination)
+                    .toString('utf-8');
                 expect(text).toContain(
                     '_id,caseReference.additionalSources,caseReference.sourceEntryId,caseReference.sourceId',
                 );
@@ -809,7 +811,9 @@ describe('POST', () => {
 
             responseStream.pipe(fileStream);
             responseStream.on('finish', () => {
-                const text: string = fs.readFileSync(destination).toString('utf-8');
+                const text: string = fs
+                    .readFileSync(destination)
+                    .toString('utf-8');
                 expect(text).toContain(c._id);
                 expect(text).not.toContain(c2._id);
 
@@ -833,7 +837,9 @@ describe('POST', () => {
 
             responseStream.pipe(fileStream);
             responseStream.on('finish', () => {
-                const text: string = fs.readFileSync(destination).toString('utf-8');
+                const text: string = fs
+                    .readFileSync(destination)
+                    .toString('utf-8');
                 expect(text).not.toContain(note);
 
                 fs.unlinkSync(destination);
@@ -886,7 +892,9 @@ describe('POST', () => {
 
             responseStream.pipe(fileStream);
             responseStream.on('finish', () => {
-                const text: string = fs.readFileSync(destination).toString('utf-8');
+                const text: string = fs
+                    .readFileSync(destination)
+                    .toString('utf-8');
                 expect(text).toContain(
                     '_id,caseReference.additionalSources,caseReference.sourceEntryId,caseReference.sourceId',
                 );
@@ -899,7 +907,7 @@ describe('POST', () => {
         });
         it('should filter results with text query', async () => {
             // Simulate index creation used in unit tests, in production they are
-            // setup by the setup-db script and such indexes are not present by
+            // setup by the migrations and such indexes are not present by
             // default in the in memory mongo spawned by unit tests.
             const destination = './test_filter_text_query.csv';
             const fileStream = fs.createWriteStream(destination);
@@ -930,7 +938,9 @@ describe('POST', () => {
 
             responseStream.pipe(fileStream);
             responseStream.on('finish', () => {
-                const text: string = fs.readFileSync(destination).toString('utf-8');
+                const text: string = fs
+                    .readFileSync(destination)
+                    .toString('utf-8');
                 expect(text).toContain(
                     '_id,caseReference.additionalSources,caseReference.sourceEntryId,caseReference.sourceId',
                 );
@@ -967,7 +977,9 @@ describe('POST', () => {
 
             responseStream.pipe(fileStream);
             responseStream.on('finish', () => {
-                const text: string = fs.readFileSync(destination).toString('utf-8');
+                const text: string = fs
+                    .readFileSync(destination)
+                    .toString('utf-8');
                 expect(text).toContain(
                     '_id,caseReference.additionalSources,caseReference.sourceEntryId,caseReference.sourceId',
                 );
@@ -1493,7 +1505,7 @@ describe('PUT', () => {
     });
     it('update many items from query should return 200 OK', async () => {
         // Simulate index creation used in unit tests, in production they are
-        // setup by the setup-db script and such indexes are not present by
+        // setup by the migrations script and such indexes are not present by
         // default in the in memory mongo spawned by unit tests.
         await mongoose.connection.collection('cases').createIndex({
             notes: 'text',
@@ -1789,7 +1801,7 @@ describe('DELETE', () => {
     });
     it('delete multiple cases with query should return 204 OK', async () => {
         // Simulate index creation used in unit tests, in production they are
-        // setup by the setup-db script and such indexes are not present by
+        // setup by the migrations and such indexes are not present by
         // default in the in memory mongo spawned by unit tests.
         await mongoose.connection.collection('cases').createIndex({
             notes: 'text',
@@ -1854,7 +1866,7 @@ describe('DELETE', () => {
     });
     it('delete multiple cases cannot go over threshold', async () => {
         // Simulate index creation used in unit tests, in production they are
-        // setup by the setup-db script and such indexes are not present by
+        // setup by the migrations and such indexes are not present by
         // default in the in memory mongo spawned by unit tests.
         await mongoose.connection.collection('cases').createIndex({
             notes: 'text',
