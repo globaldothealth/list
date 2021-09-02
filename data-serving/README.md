@@ -164,11 +164,7 @@ Schema updates can affect the whole stack, including:
 
 #### Adding an index
 
-1. Add your index to the
-   [schemas directory](https://github.com/globaldothealth/list/tree/main/data-serving/data-service/schemas)
-1. Update the
-   [database update script](https://github.com/globaldothealth/list/blob/main/data-serving/scripts/setup-db/src/index.ts)
-   to ensure it's applied to the database
+Add your index as a [migration](https://github.com/globaldothealth/list/tree/main/data-serving/scripts/setup-db/README.md)
 
 ##### Sample PRs
 

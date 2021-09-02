@@ -2,16 +2,12 @@
   "name": "setup-db",
   "version": "1.0.0",
   "description": "Creates or replaces a database and collection and sets it up with a schema and indexes.",
-  "main": "dist/scripts/setup-db/src/index.js",
+  "main": "dist/scripts/setup-db/migrate-mongo-config.js",
   "scripts": {
     "build": "tsc",
     "lint": "tsc --noEmit && eslint '*/**/*.{js,ts,tsx}' --quiet --fix",
     "drop-cases-and-import-sample-data": "mongoimport --drop --uri=$CONN --db covid19 --collection cases --jsonArray --file ../../samples/cases.json",
-    "migrate": "npm install && migrate-mongo up",
-    "setup": "npm install && tsc && mongo $CONN --eval \"let args={connectionString: '$CONN', databaseName: '$DB', collectionName: '$COLL', schemaPath: '$SCHEMA', indexesPath: '$INDEXES'}\" dist/index.js",
-    "setup-cases": "npm install && tsc && mongo --eval \"let args={databaseName: 'covid19', collectionName: 'cases', schemaPath: './schemas/cases.schema.json', indexesPath: './schemas/cases.indexes.json'}\" dist/index.js",
-    "setup-restricted-cases": "npm install && tsc && mongo --eval \"let args={databaseName: 'covid19', collectionName: 'restrictedcases', schemaPath: './schemas/cases.schema.json', indexesPath: './schemas/cases.indexes.json'}\" dist/index.js",
-    "setup-sources": "npm install && tsc && mongo --eval \"let args={databaseName: 'covid19', collectionName: 'sources', schemaPath: './schemas/sources.schema.json', indexesPath: './schemas/sources.schema.json'}\" dist/index.js"
+    "migrate": "npm install && migrate-mongo up"
   },
   "repository": {
     "type": "git",
