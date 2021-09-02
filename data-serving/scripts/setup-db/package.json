@@ -7,6 +7,7 @@
     "build": "tsc",
     "lint": "tsc --noEmit && eslint '*/**/*.{js,ts,tsx}' --quiet --fix",
     "drop-cases-and-import-sample-data": "mongoimport --drop --uri=$CONN --db covid19 --collection cases --jsonArray --file ../../samples/cases.json",
+    "migrate": "npm install && migrate-mongo up",
     "setup": "npm install && tsc && mongo $CONN --eval \"let args={connectionString: '$CONN', databaseName: '$DB', collectionName: '$COLL', schemaPath: '$SCHEMA', indexesPath: '$INDEXES'}\" dist/index.js",
     "setup-cases": "npm install && tsc && mongo --eval \"let args={databaseName: 'covid19', collectionName: 'cases', schemaPath: './schemas/cases.schema.json', indexesPath: './schemas/cases.indexes.json'}\" dist/index.js",
     "setup-restricted-cases": "npm install && tsc && mongo --eval \"let args={databaseName: 'covid19', collectionName: 'restrictedcases', schemaPath: './schemas/cases.schema.json', indexesPath: './schemas/cases.indexes.json'}\" dist/index.js",
@@ -32,6 +33,7 @@
     "eslint-config-google": "^0.14.0",
     "eslint-config-prettier": "^6.10.1",
     "eslint-plugin-prettier": "^3.1.4",
+    "migrate-mongo": "^8.2.3",
     "prettier": "^2.1.2",
     "typescript": "^3.9.7"
   }
