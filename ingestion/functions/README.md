@@ -78,14 +78,11 @@ ls -l /usr/bin/python*
 ```
 
 #### Setup
-1. Setup a virtual environment in `ingestion/functions`
+Setup a virtual environment in `ingestion/functions`: `poetry install`.
 
-    poetry install
+We're using Python 3.8, if you have a different version of Python, use
+`poetry env use 3.8` to switch to 3.8 for the environment.
   
-*NB:* Be sure you're using Python 3.8, which corresponds to the runtime of the job definitions run using Batch:
-
-    poetry env use 3.8
-
 #### Manual ingestion
 
 You should be able to run ingestion using the curator UI. This exists as
@@ -117,7 +114,9 @@ a fallback if the UI triggers for ingestion are not working.
    daily ingestion, but might not be enough time to run a backfill.
 
    To run a **backfill**, use the `-s` (`--start-date`) and `-e` (`--end-date`)
-   flags to delimit the backfill duration. You can now skip to step 6.
+   flags to delimit the backfill duration. You can now skip to step 6. Backfills are
+   allowed only for **UUID** sources, for non-UUID sources, the entire dataset
+   is always ingested.
 
 5. If there's no existing job definition for a source, you'll need to **register** one.
    Registration creates a new job definition which can be used to submit jobs.
@@ -128,15 +127,46 @@ a fallback if the UI triggers for ingestion are not working.
    the *dev* instance, you would put this as the parser `peru-peru-ingestor-dev`.
    Then, run the following:
 
-       python aws.py register -e prod|dev <source_id> <parser>
+       poetry run python aws.py register -e prod|dev <source_id> <parser>
 
    Here `<parser>` has to be of the form `subfolder.parser` such as `peru.peru` under
    the parsing folder. This will check that the parser corresponds to that in the
    curator UI, and create the job definition. You can then submit a job.
 
-6. Once your job has been submitted, you can view its logs through the Cloudwatch
-   AWS portal. The logs are stored in the `/aws/batch/job` log group. Once the job
+   Some ingestions can require more **memory, CPU or time**. The default settings
+   for ingestions are: 1 CPU (set using *-c, --cpu*), 2048 MiB RAM (set using *-m, --memory*), with a timeout of 60 minutes (set using *-t, --timeout*). The defaults
+   are fine for UUID sources and for small non-UUID sources. For larger sources (>100k cases), you should set at least the timeout (in minutes). A good rule of thumb
+   for timeout *t* is *t* = 2 *C* / (60 *r*), where *C* is the number of cases
+   (doubling it to ensure that we don't have to change the timeouts too often), and
+   *r* is the average ingestion speed in cases/second; we divide by 60 to get the
+   timeout in minutes. As a typical *r* = 100, this gives us *t* = *C* / 3000.
+
+   If you need to update the settings, re-register using the same command; this
+   will create a newer version of the job definition which will be used.
+
+6. Once your job has been submitted, you can **view its logs** through the Cloudwatch
+   AWS portal. The logs are stored in the */aws/batch/job* log group. Once the job
    is finished, the status of the upload will also be updated in the curator UI.
+
+7. An EventBridge rule needs to be created for automatic ingestion. To do this,
+   first make a list of the EventBridge rules according to the environment
+   (substitute *dev* for *prod* for the dev environment):
+
+       poetry run python define_rules.py prod
+
+   This will create a *rules.json* file in the current directory. Edit the file
+   to keep only the rules you want to create. Then:
+
+       poetry run python make_rules.py
+
+   will make the rules. The rules can be viewed from the
+   [EventBridge console](https://console.aws.amazon.com/events). Initially, the
+   created rules are **disabled** and set to run **once daily**. The schedule
+   can be edited from the console to use the
+   [`rate()`](https://docs.aws.amazon.com/lambda/latest/dg/services-cloudwatchevents-expressions.html) syntax or a
+   [`cron()`](https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-create-rule-schedule.html) syntax. If you're using the cron syntax, the console will tell
+   you the schedule of the next few events when the event will be triggered. Rules
+   can be enabled or disabled from the index page of the EventBridge console.
 
 ### Writing and editing functions
 
@@ -155,7 +185,7 @@ if __name__ == "__main__":
 You are free to write the parsers however you like. Use the existing functions as a template to get started. If you find you need a dependency that isn't supplied in the virtual environment, you can add it like this:
 
 ```shell
-poetry install packagename
+poetry add packagename
 ```
 
 ### Writing a parser
@@ -214,8 +244,8 @@ Example of a location which will not trigger geocoding on the server:
    "geoResolution": "Admin1",
    "name": "Zurich canton",
    "geometry": {
-         "longitude": "8.651071",
-         "latitude": "47.42568",
+         "longitude": 8.651071,
+         "latitude": 47.42568,
    }
 }
 ```
