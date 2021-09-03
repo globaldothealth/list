@@ -20,7 +20,7 @@ To learn more about what a `case` consists of, try
 [importing](https://github.com/globaldothealth/list/blob/main/dev/setup_db.sh) some
 [sample data](https://github.com/globaldothealth/list/tree/main/data-serving/samples) into a local MongoDB instance and
 connecting to it with [MongoDB Compass](https://www.mongodb.com/products/compass). Alternatively, you can peruse the
-[schema](https://github.com/globaldothealth/list/blob/main/data-serving/data-service/schemas/cases.schema.json).
+[schema](https://github.com/globaldothealth/list/blob/main/data-serving/scripts/setup-db/schemas/cases.schema.json).
 
 ### Version history
 
@@ -31,15 +31,6 @@ application layer when a case is updated; we follow the
 A `caserevision` document has a `case` field containing a snapshot of the `case` at a given revision. The collection
 indexes the id of the `case` and its revision for quick lookups.
 
-### Charts
-
-We use MongoDB to generate charts that surfaced in the curator portal. These are available through the prod MongoDB
-Atlas instance.
-
-- [Cumulative dataset metrics](https://charts.mongodb.com/charts-covid19map-prod-dznzw/dashboards/b897bb76-e761-49b4-b106-7e97c54aeca8)
-- [Dataset freshness metrics](https://charts.mongodb.com/charts-covid19map-prod-dznzw/dashboards/393c3fa3-27b2-483b-9e5e-88ae5229bbad)
-- [Dataset completeness metrics](https://charts.mongodb.com/charts-covid19map-prod-dznzw/dashboards/15306e1e-efed-427b-928a-753b70f971aa)
-
 ### Importing cases
 
 G.h has millions of case records that predate the new curator portal. These are exported to a
@@ -49,13 +40,6 @@ G.h has millions of case records that predate the new curator portal. These are 
 We can convert these cases to a json format that conforms to the `cases` collection schema and ingest these into a
 MongoDB instance using these scripts:
 1. [Convert the data only](https://github.com/globaldothealth/list/tree/main/database/convert-data)
-
-#### FIXME: this does not exist
-1. [Convert & ingest the data into MongoDB](https://github.com/globaldothealth/list/tree/main/data-serving/scripts/data-pipeline)
-
-As of writing, there is a
-[Github workflow to automate this conversion & import once a day to the prod MongoDB instance](https://github.com/globaldothealth/list/blob/main/.github/workflows/case-data-update-prod.yml);
-however, this is likely to be disabled and future imports will be done selectively.
 
 ### Exporting data
 
@@ -69,7 +53,7 @@ The script that aggregates and exports counts for the Map visualizations may als
 Schema updates can affect the whole stack, including:
 
 * The
-  **[MongoDB case json schema](https://github.com/globaldothealth/list/blob/main/data-serving/data-service/schemas/cases.schema.json)**,
+  **[MongoDB case json schema](https://github.com/globaldothealth/list/blob/main/data-serving/scripts/setup-db/schemas/cases.schema.json)**,
   which is a 'validator' applied to the cases collection on the database. This schema is similar to a relational
   database schema in that it enforces which fields are allowed to be present and what their types are. It does not
   validate any values. This validator will apply to all case data regardless of how it's entered into the database.
