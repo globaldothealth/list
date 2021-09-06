@@ -15,6 +15,7 @@ import {
     clear as clearFakeGeocodes,
     handlers,
 } from '../mocks/handlers';
+import fs from 'fs';
 
 let mongoServer: MongoMemoryServer;
 
@@ -32,6 +33,15 @@ const invalidRequest = {
 
 const realDate = Date.now;
 const mockLocationServer = setupServer(...handlers);
+
+function stringParser(res: request.Response) {
+    const chunks: Buffer[] = [];
+    return new Promise((resolve, reject) => {
+        res.on('data', (chunk: Buffer) => chunks.push(Buffer.from(chunk)));
+        res.on('error', (err: Error) => reject(err));
+        res.on('end', () => resolve(Buffer.concat(chunks).toString('utf8')));
+    });
+}
 
 beforeAll(async () => {
     mockLocationServer.listen();
@@ -165,7 +175,7 @@ describe('GET', () => {
         });
         it('should query results', async () => {
             // Simulate index creation used in unit tests, in production they are
-            // setup by the setup-db script and such indexes are not present by
+            // setup by the migrations and such indexes are not present by
             // default in the in memory mongo spawned by unit tests.
             await mongoose.connection.collection('cases').createIndex({
                 notes: 'text',
@@ -751,49 +761,89 @@ describe('POST', () => {
     });
     describe('download', () => {
         it('should return 200 OK', async () => {
+            const destination = './test_return.csv';
+            const fileStream = fs.createWriteStream(destination);
+
             const c = new Case(minimalCase);
             await c.save();
             const c2 = new Case(fullCase);
             await c2.save();
-            const res = await request(app)
+
+            const responseStream = request(app)
                 .post('/api/cases/download')
                 .send({ format: 'csv' })
                 .expect('Content-Type', 'text/csv')
-                .expect(200);
-            expect(res.text).toContain(
-                '_id,caseReference.additionalSources,caseReference.sourceEntryId,caseReference.sourceId',
-            );
-            expect(res.text).toContain(c._id);
-            expect(res.text).toContain(c.caseReference.verificationStatus);
-            expect(res.text).toContain(c.caseReference.sourceId);
-            expect(res.text).toContain(c2._id);
-            expect(res.text).toContain(c2.caseReference.verificationStatus);
-            expect(res.text).toContain(c2.caseReference.sourceId);
+                .expect(200)
+                .parse(stringParser);
+
+            responseStream.pipe(fileStream);
+            responseStream.on('finish', () => {
+                const text: string = fs
+                    .readFileSync(destination)
+                    .toString('utf-8');
+                expect(text).toContain(
+                    '_id,caseReference.additionalSources,caseReference.sourceEntryId,caseReference.sourceId',
+                );
+                expect(text).toContain(c._id);
+                expect(text).toContain(c.caseReference.verificationStatus);
+                expect(text).toContain(c.caseReference.sourceId);
+                expect(text).toContain(c2._id);
+                expect(text).toContain(c2.caseReference.verificationStatus);
+                expect(text).toContain(c2.caseReference.sourceId);
+
+                fs.unlinkSync(destination);
+            });
         });
         it('should exclude restricted cases', async () => {
+            const destination = './test_exclude_restricted_cases.csv';
+            const fileStream = fs.createWriteStream(destination);
+
             const c = new Case(minimalCase);
             await c.save();
             const c2 = new RestrictedCase(fullCase);
             await c2.save();
-            const res = await request(app)
+            const responseStream = request(app)
                 .post('/api/cases/download')
                 .send({ format: 'csv' })
                 .expect('Content-Type', 'text/csv')
-                .expect(200);
-            expect(res.text).toContain(c._id);
-            expect(res.text).not.toContain(c2._id);
+                .expect(200)
+                .parse(stringParser);
+
+            responseStream.pipe(fileStream);
+            responseStream.on('finish', () => {
+                const text: string = fs
+                    .readFileSync(destination)
+                    .toString('utf-8');
+                expect(text).toContain(c._id);
+                expect(text).not.toContain(c2._id);
+
+                fs.unlinkSync(destination);
+            });
         });
         it('strips the restricted notes from the download', async () => {
+            const destination = './test_exclude_restricted_notes.csv';
+            const fileStream = fs.createWriteStream(destination);
+
             const note = 'A saucerful of secrets';
             const c = new Case(minimalCase);
             c.restrictedNotes = note;
             await c.save();
-            const res = await request(app)
+            const responseStream = request(app)
                 .post('/api/cases/download')
                 .send({ format: 'csv' })
                 .expect('Content-Type', 'text/csv')
-                .expect(200);
-            expect(res.text).not.toContain(note);
+                .expect(200)
+                .parse(stringParser);
+
+            responseStream.pipe(fileStream);
+            responseStream.on('finish', () => {
+                const text: string = fs
+                    .readFileSync(destination)
+                    .toString('utf-8');
+                expect(text).not.toContain(note);
+
+                fs.unlinkSync(destination);
+            });
         });
         it('rejects invalid searches', (done) => {
             request(app)
@@ -817,7 +867,10 @@ describe('POST', () => {
                 })
                 .expect(400, done);
         });
-        it('should filter results with caseIds', async () => {
+        it('should filter results with caseIDs', async () => {
+            const destination = './test_filter_caseIDs.csv';
+            const fileStream = fs.createWriteStream(destination);
+
             const matchingCase = new Case(minimalCase);
             await matchingCase.save();
 
@@ -827,25 +880,38 @@ describe('POST', () => {
             const unmatchedCase = new Case(minimalCase);
             await unmatchedCase.save();
 
-            const res = await request(app)
+            const responseStream = request(app)
                 .post('/api/cases/download')
                 .send({
                     caseIds: [matchingCase._id, matchingCase2._id],
                     format: 'csv',
                 })
                 .expect('Content-Type', 'text/csv')
-                .expect(200);
-            expect(res.text).toContain(
-                '_id,caseReference.additionalSources,caseReference.sourceEntryId,caseReference.sourceId',
-            );
-            expect(res.text).toContain(matchingCase._id);
-            expect(res.text).toContain(matchingCase2._id);
-            expect(res.text).not.toContain(unmatchedCase._id);
+                .expect(200)
+                .parse(stringParser);
+
+            responseStream.pipe(fileStream);
+            responseStream.on('finish', () => {
+                const text: string = fs
+                    .readFileSync(destination)
+                    .toString('utf-8');
+                expect(text).toContain(
+                    '_id,caseReference.additionalSources,caseReference.sourceEntryId,caseReference.sourceId',
+                );
+                expect(text).toContain(matchingCase._id);
+                expect(text).toContain(matchingCase2._id);
+                expect(text).not.toContain(unmatchedCase._id);
+
+                fs.unlinkSync(destination);
+            });
         });
         it('should filter results with text query', async () => {
             // Simulate index creation used in unit tests, in production they are
-            // setup by the setup-db script and such indexes are not present by
+            // setup by the migrations and such indexes are not present by
             // default in the in memory mongo spawned by unit tests.
+            const destination = './test_filter_text_query.csv';
+            const fileStream = fs.createWriteStream(destination);
+
             await mongoose.connection.collection('cases').createIndex({
                 notes: 'text',
             });
@@ -860,24 +926,37 @@ describe('POST', () => {
             unmatchedCase.notes = unmatchedNotes;
             await unmatchedCase.save();
 
-            const res = await request(app)
+            const responseStream = request(app)
                 .post('/api/cases/download')
                 .send({
                     query: matchingNotes,
                     format: 'csv',
                 })
                 .expect('Content-Type', 'text/csv')
-                .expect(200);
-            expect(res.text).toContain(
-                '_id,caseReference.additionalSources,caseReference.sourceEntryId,caseReference.sourceId',
-            );
-            expect(res.text).toContain(matchingNotes);
-            expect(res.text).toContain(matchingCase._id);
-            expect(res.text).toContain(matchingNotes);
-            expect(res.text).not.toContain(unmatchedCase._id);
-            expect(res.text).not.toContain(unmatchedNotes);
+                .expect(200)
+                .parse(stringParser);
+
+            responseStream.pipe(fileStream);
+            responseStream.on('finish', () => {
+                const text: string = fs
+                    .readFileSync(destination)
+                    .toString('utf-8');
+                expect(text).toContain(
+                    '_id,caseReference.additionalSources,caseReference.sourceEntryId,caseReference.sourceId',
+                );
+                expect(text).toContain(matchingNotes);
+                expect(text).toContain(matchingCase._id);
+                expect(text).toContain(matchingNotes);
+                expect(text).not.toContain(unmatchedCase._id);
+                expect(text).not.toContain(unmatchedNotes);
+
+                fs.unlinkSync(destination);
+            });
         });
         it('should filter results with keyword query', async () => {
+            const destination = './test_filter_keyword_query.csv';
+            const fileStream = fs.createWriteStream(destination);
+
             const matchedCase = new Case(minimalCase);
             matchedCase.location.country = 'Germany';
             matchedCase.set('demographics.occupation', 'engineer');
@@ -886,20 +965,30 @@ describe('POST', () => {
             const unmatchedCase = new Case(minimalCase);
             await unmatchedCase.save();
 
-            const res = await request(app)
+            const responseStream = request(app)
                 .post('/api/cases/download')
                 .send({
                     query: 'country:Germany',
                     format: 'csv',
                 })
                 .expect('Content-Type', 'text/csv')
-                .expect(200);
-            expect(res.text).toContain(
-                '_id,caseReference.additionalSources,caseReference.sourceEntryId,caseReference.sourceId',
-            );
-            expect(res.text).toContain('Germany');
-            expect(res.text).toContain(matchedCase._id);
-            expect(res.text).not.toContain(unmatchedCase._id);
+                .expect(200)
+                .parse(stringParser);
+
+            responseStream.pipe(fileStream);
+            responseStream.on('finish', () => {
+                const text: string = fs
+                    .readFileSync(destination)
+                    .toString('utf-8');
+                expect(text).toContain(
+                    '_id,caseReference.additionalSources,caseReference.sourceEntryId,caseReference.sourceId',
+                );
+                expect(text).toContain('Germany');
+                expect(text).toContain(matchedCase._id);
+                expect(text).not.toContain(unmatchedCase._id);
+
+                fs.unlinkSync(destination);
+            });
         });
     });
     it('should return results in proper format', async () => {
@@ -1416,7 +1505,7 @@ describe('PUT', () => {
     });
     it('update many items from query should return 200 OK', async () => {
         // Simulate index creation used in unit tests, in production they are
-        // setup by the setup-db script and such indexes are not present by
+        // setup by the migrations script and such indexes are not present by
         // default in the in memory mongo spawned by unit tests.
         await mongoose.connection.collection('cases').createIndex({
             notes: 'text',
@@ -1712,7 +1801,7 @@ describe('DELETE', () => {
     });
     it('delete multiple cases with query should return 204 OK', async () => {
         // Simulate index creation used in unit tests, in production they are
-        // setup by the setup-db script and such indexes are not present by
+        // setup by the migrations and such indexes are not present by
         // default in the in memory mongo spawned by unit tests.
         await mongoose.connection.collection('cases').createIndex({
             notes: 'text',
@@ -1777,7 +1866,7 @@ describe('DELETE', () => {
     });
     it('delete multiple cases cannot go over threshold', async () => {
         // Simulate index creation used in unit tests, in production they are
-        // setup by the setup-db script and such indexes are not present by
+        // setup by the migrations and such indexes are not present by
         // default in the in memory mongo spawned by unit tests.
         await mongoose.connection.collection('cases').createIndex({
             notes: 'text',

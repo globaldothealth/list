@@ -22,11 +22,12 @@ _LOCATION = {
     "geoResolution": "Admin1",
     "name": "Zurich canton",
     "geometry": {
-        "longitude": "8.651071",
-        "latitude": "47.42568"
+        "longitude": 8.651071,
+        "latitude": 47.42568
     }
 }
 
+_GENDER_MAP = {"M": "Male", "F": "Female"}
 
 def convert_date(year: str, week: str):
     """
@@ -39,37 +40,29 @@ def convert_date(year: str, week: str):
     return date.strftime("%m/%d/%YZ")
 
 
-def convert_gender(raw_gender: str):
-    if raw_gender == "M":
-        return "Male"
-    elif raw_gender == "F":
-        return "Female"
-    return None
-
-
 def convert_demographics(gender: str, age: str):
     demo = {}
     if gender.lower() != 'unbekannt':
-        demo["gender"] = convert_gender(gender.upper())
+        demo["gender"] = _GENDER_MAP.get(gender.upper(), None)
     if age != 'unbekannt':
         # 100+
         if age.endswith("+"):
             demo["ageRange"] = {
-                "start": float(age[:-1]),
+                "start": int(age[:-1]),
                 "end": 120,
             }
         # 45-55
         elif '-' in age:
             start, _, end = age.partition('-')
             demo["ageRange"] = {
-                "start": float(start),
-                "end": float(end),
+                "start": int(start),
+                "end": int(end),
             }
         # 42
-        elif age.isalpha():
+        elif age.isdigit():
             demo["ageRange"] = {
-                "start": float(age),
-                "end": float(age),
+                "start": int(age),
+                "end": int(age),
             }
     return demo or None
 

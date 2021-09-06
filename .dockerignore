@@ -1,5 +1,4 @@
 # verification/curation/(ui|api)
-*/*/*/.env
 */*/*/coverage
 */*/*/dist
 */*/*/node_modules

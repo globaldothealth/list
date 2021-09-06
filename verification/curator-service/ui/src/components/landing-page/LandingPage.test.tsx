@@ -23,10 +23,10 @@ describe('<LandingPage />', () => {
         expect(screen.getByText(/Detailed line list data/)).toBeInTheDocument();
         expect(screen.getByText(/Welcome to G.h Data/)).toBeInTheDocument();
         expect(screen.getByText(/Sign in with Google/)).toBeInTheDocument();
+        expect(screen.getByText(/Sign up form/)).toBeInTheDocument();
         expect(
-            screen.getByText(/Sign in with username and password/),
+            screen.getByText(/Already have an account?/),
         ).toBeInTheDocument();
-        expect(screen.getByText(/Don't have an account?/)).toBeInTheDocument();
         expect(
             screen.getByText(
                 /I agree to be added to the Global.health newsletter/i,
@@ -42,7 +42,7 @@ describe('<LandingPage />', () => {
         );
         expect(screen.getByText('Data dictionary')).toHaveAttribute(
             'href',
-            'https://github.com/globaldothealth/list/blob/main/data-serving/scripts/export-data/functions/01-split/fields.txt',
+            'fields.txt',
         );
         expect(screen.getByText('Data acknowledgments')).toHaveAttribute(
             'href',
@@ -88,8 +88,14 @@ describe('<SignInForm />', () => {
 
         render(<LandingPage />);
 
+        // Go to sign in form
+        userEvent.click(screen.getByText('Sign in!'));
+        expect(
+            await screen.findByText(/Sign in with username and password/i),
+        ).toBeInTheDocument();
+
+        // Fill out the form
         userEvent.type(screen.getByLabelText(/Email/i), 'test@email.com');
-        userEvent.click(screen.getAllByRole('checkbox')[0]);
         userEvent.type(screen.getByLabelText('Password'), '1234567');
         userEvent.click(screen.getByRole('button', { name: 'Sign in' }));
 
@@ -103,10 +109,9 @@ describe('<SignInForm />', () => {
         );
     });
 
-    test('displays verification errors when checkbox is not checked', async () => {
+    it('displays verification errors when email input is empty', async () => {
         render(<SignInForm setRegistrationScreenOn={() => false} />);
 
-        userEvent.type(screen.getByRole('textbox'), 'test@email.com');
         userEvent.click(screen.getByTestId('sign-in-button'));
 
         await waitFor(() => {
@@ -116,18 +121,7 @@ describe('<SignInForm />', () => {
         });
     });
 
-    test('displays verification errors when email input is empty', async () => {
-        render(<SignInForm setRegistrationScreenOn={() => false} />);
-
-        userEvent.click(screen.getAllByRole('checkbox')[0]);
-        userEvent.click(screen.getByTestId('sign-in-button'));
-
-        await waitFor(() => {
-            expect(screen.getAllByText(/Required/i)).toHaveLength(2);
-        });
-    });
-
-    test('displays verification errors when email is incorrect', async () => {
+    it('displays verification errors when email is incorrect', async () => {
         render(<SignInForm setRegistrationScreenOn={() => false} />);
 
         userEvent.type(screen.getByRole('textbox'), 'incorrectemail');
@@ -140,14 +134,14 @@ describe('<SignInForm />', () => {
         });
     });
 
-    test('displays verification errors when both email, password and agreement checkbox are empty', async () => {
+    it('displays verification errors when both email, password and agreement checkbox are empty', async () => {
         render(<SignInForm setRegistrationScreenOn={() => false} />);
 
         userEvent.click(screen.getByTestId('sign-in-button'));
 
         await waitFor(() => {
             const errorMessages = screen.getAllByText(/required/i);
-            expect(errorMessages).toHaveLength(3);
+            expect(errorMessages).toHaveLength(2);
         });
     });
 });
@@ -160,7 +154,7 @@ describe('<SignUpForm />', () => {
                 disabled={false}
             />,
         );
-        expect(screen.getByText(/SignUp form/)).toBeInTheDocument();
+        expect(screen.getByText(/Sign up form/)).toBeInTheDocument();
         expect(screen.getByLabelText('Email')).toBeInTheDocument();
         expect(screen.getByLabelText('Confirm Email')).toBeInTheDocument();
         expect(screen.getByLabelText('Password')).toBeInTheDocument();

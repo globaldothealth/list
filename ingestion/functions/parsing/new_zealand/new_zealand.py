@@ -3,6 +3,7 @@ import os
 import sys
 from datetime import datetime
 import csv
+from pathlib import Path
 
 # Layer code, like parsing_lib, is added to the path by AWS.
 # To test locally (e.g. via pytest), we have to modify sys.path.
@@ -16,32 +17,44 @@ except ImportError:
             os.pardir,os.pardir, 'common'))
     import parsing_lib
 
+_NZ = parsing_lib.geocode_country('NZ')
 
-def convert_date(raw_date: str, dataserver=True):
-    """
-    Convert raw date field into a value interpretable by the dataserver.
+_DHB = "DHB"
+_REPORT_DATE = "Report Date"
+_STATUS = "Case Status"
+_GENDER = "Sex"
+_AGE = "Age group"
+_TRAVEL = "Overseas travel"
 
-    Set dataserver to False in order to return version appropriate for notes.
-    """
-    date = datetime.strptime(raw_date.split(' ')[0], "%d/%m/%Y")
-    if not dataserver:
-        return date.strftime("%m/%d/%Y")
-    return date.strftime("%m/%d/%YZ")
+# Geocode data © OpenStreetMap contributors https://www.openstreetmap.org/copyright
+
+# New Zealand data is organised by District Health Boards (DHBs) which are
+# mostly similar to the regions (admin1 for NZ), but do not overlap in some
+# cases. The mapping has been done manually via centroids or a city or town
+# in the region.
+with (Path(__file__).parent / 'geocodes.json').open() as geof:
+    _GEOCODES = json.load(geof)
+_GEOCODES = {
+    g: {
+        "name": g,
+        # not really admin1, but close enough
+        "administrativeAreaLevel1": g,
+        "country": "New Zealand",
+        "geoResolution": "Admin1",
+        "geometry": _GEOCODES[g]
+    }
+    for g in _GEOCODES
+}
 
 
-def convert_gender(raw_gender):
-    if raw_gender == "Male":
-        return "Male"
-    if raw_gender == "Female":
-        return "Female"
-    return None
+def convert_date(raw_date: str):
+    "Convert raw date field into a value interpretable by the dataserver"
+    return datetime.fromisoformat(raw_date).strftime("%m/%d/%YZ")
 
 
 def convert_location(raw_entry):
-    if 'Managed Isolation' in raw_entry['DHB_label']:
-        return {"query": "New Zealand"}
-    else:
-        return {"query": f"{raw_entry['DHB_label']}, New Zealand"}
+    dhb = raw_entry[_DHB]
+    return _GEOCODES[dhb] if 'Managed Isolation' not in dhb else _NZ
 
 
 def convert_demographics(entry):
@@ -49,19 +62,14 @@ def convert_demographics(entry):
     If age is listed as 90+, setting age range as between 90 and 120.
     '''
     demo = {}
-    if entry['age_bands_fixed']:
-        if '90+' in entry['age_bands_fixed']:
-            demo["ageRange"] = {
-                "start": 90,
-                "end": 120
-            }
+    if (age := entry[_AGE]) != "NA":
+        if '90+' in age:
+            demo["ageRange"] = {"start": 90, "end": 120}
         else:
-            demo["ageRange"] = {
-                "start": float(entry['age_bands_fixed'].split(' to ')[0]),
-                "end": float(entry['age_bands_fixed'].split(' to ')[1])
-            }
-    if entry['Gender']:
-        demo["gender"] = convert_gender(entry['Gender'])
+            start, end = list(map(int, age.split(' to ')))
+            demo["ageRange"] = {"start": start, "end": end}
+    if (gender := entry[_GENDER]) != "Unknown":
+        demo["gender"] = gender if gender in ['Male', 'Female'] else None
 
     return demo or None
 
@@ -72,26 +80,24 @@ def parse_cases(raw_data_file, source_id, source_url):
 
     New Zealand case data has no UUIDs, and provides just 6 fields:
 
-    age_bands_fixed - we convert 90+ to ageRange of 90 - 120
-    Status - (confirmed/suspected), we take only confirmed
+    Age group - we convert 90+ to ageRange of 90 - 120
+    Case Status - (confirmed/suspected), we take only confirmed
     DHB (where the case lives - listed as "Managed isolation & quarantine" for border cases)
     Overseas Travel - boolean, no details on where. We assume this means travel in last 30 days.
-    ReportDate
-    Gender
+    Report Date
+    Sex
 
-    We only count cases with a ReportDate and with Status=Confirmed
+    We only count cases with a Report Date and with Status=Confirmed
 
     Cases arriving to NZ from 'Overseas' are geocoded generically to 'New Zealand'. Cases arising in NZ should
-    have county data.
-
-
+    have health board data (equivalent to admin1)
     """
 
     with open(raw_data_file, "r") as f:
         reader = csv.DictReader(f)
         cases = []
         for entry in reader:
-            if entry['CaseStatus'] == 'Confirmed' and entry['ReportDate']:
+             if entry[_STATUS] == 'Confirmed' and entry[_REPORT_DATE]:
                 notes = []
                 case = {
                     "caseReference": {
@@ -105,24 +111,26 @@ def parse_cases(raw_data_file, source_id, source_url):
                             "name": "confirmed",
                             "dateRange":
                             {
-                                "start": convert_date(entry["ReportDate"]),
-                                "end": convert_date(entry["ReportDate"])
+                                "start": convert_date(entry[_REPORT_DATE]),
+                                "end": convert_date(entry[_REPORT_DATE])
                             }
                         },
                     ]
                 }
-                if entry['Overseas'] == 'Yes':
+                if case["demographics"] is None:
+                    del case["demographics"]
+                if entry[_TRAVEL] == 'Yes':
                     case["travelHistory"] = {
                         "traveledPrior30Days": True
                     }
                     notes.append('Case imported from abroad.')
 
-                if 'Managed Isolation' in entry['DHB_label']:
+                if 'Managed Isolation' in entry[_DHB]:
                     notes.append(
                         'Case identified at border and placed into managed quarantine.')
 
                 if notes:
-                    case["notes"] = ", ".join(notes)
+                    case["notes"] = " ".join(notes)
 
                 yield case
 

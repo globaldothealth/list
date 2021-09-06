@@ -28,10 +28,10 @@
                 "bsonType": "string"
             },
             "excludeFromLineList": {
-                "bsonType": "boolean"
+                "bsonType": "bool"
             },
             "hasStableIdentifiers": {
-                "bsonType": "boolean"
+                "bsonType": "bool"
             },
             "automation": {
                 "bsonType": "object",
@@ -103,7 +103,7 @@
                         "bsonType": "string"
                     },
                     "accepted": {
-                        "bsonType": "boolean"
+                        "bsonType": "bool"
                     },
                     "summary": {
                         "bsonType": "object",

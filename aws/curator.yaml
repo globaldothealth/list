@@ -78,10 +78,7 @@ spec:
                   name: curator-dev-bch28c9gkm
                   key: aws_secret_access_key
             - name: EMAIL_USER_ADDRESS
-              valueFrom:
-                secretKeyRef:
-                  name: curator-dev-969ttc49f5
-                  key: email_user_address
+              value: "info@global.health"
             - name: EMAIL_USER_PASSWORD
               valueFrom:
                 secretKeyRef:
@@ -126,7 +123,7 @@ spec:
     spec:
       containers:
         - name: curator
-          image: ghcr.io/globaldothealth/list/curatorservice:1.7.0
+          image: ghcr.io/globaldothealth/list/curatorservice:1.7.2
           ports:
             - containerPort: 3001
           livenessProbe:
@@ -179,10 +176,7 @@ spec:
                   name: curator-prod-4mtk8mh9t2
                   key: aws_secret_access_key
             - name: EMAIL_USER_ADDRESS
-              valueFrom:
-                secretKeyRef:
-                  name: curator-prod-9gkgc49f9h
-                  key: email_user_address
+              value: "info@global.health"
             - name: EMAIL_USER_PASSWORD
               valueFrom:
                 secretKeyRef:

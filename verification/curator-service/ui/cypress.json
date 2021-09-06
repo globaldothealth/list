@@ -5,5 +5,10 @@
     "videoCompression": false,
     "videoUploadOnPasses": false,
     "viewportWidth": 1280,
-    "viewportHeight": 1024
+    "viewportHeight": 1024,
+    "defaultCommandTimeout":60000,
+    "execTimeout": 60000,
+    "requestTimeout": 50000,
+    "responseTimeout": 50000,
+    "numTestsKeptInMemory": 5
 }

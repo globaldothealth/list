@@ -54,6 +54,7 @@ def is_acceptable(upload: Dict[str, Any], threshold: float) -> bool:
         and created > 0
         and updated == 0  # non-UUID sources should never update a case
         and errors / (errors + created) <= threshold
+        and "accepted" not in upload  # skip already accepted cases
     )
 
 
@@ -78,14 +79,18 @@ def find_acceptable_upload(
       (last acceptable upload, list of uploads to mark for deletion).
       If no acceptable upload is found, returns None
     """
-    uploads = source.get("uploads", [])
-    # skip accepted or rejected uploads
-    uploads = [u for u in uploads if "accepted" not in u]
-    if not uploads:
+    if not (uploads := source.get("uploads", [])):
         return None
 
     if source.get("hasStableIdentifiers", False):
-        return _ids(u for u in uploads if u['status'] != "IN_PROGRESS"), []
+        return _ids(
+            u for u in uploads
+            if u['status'] != "IN_PROGRESS"
+            and "accepted" not in u
+        ), []
+
+    # skip rejected uploads
+    uploads = [u for u in uploads if "accepted" not in u or u['accepted']]
 
     # sort uploads, with most recent being the first
     uploads.sort(key=lambda x: x["created"], reverse=True)
@@ -255,6 +260,9 @@ if __name__ == "__main__":
         print("database connection fail")
         sys.exit(1)
 
+    # This restricts prune-uploads to run on sources with automated
+    # ingestion setup only. prune-uploads should NOT be run on arbitrary
+    # sources which could have been used for one-off uploads
     ingestor_re = re.compile(r'.*-ingestor-(dev|qa|prod)')
 
     sources = (

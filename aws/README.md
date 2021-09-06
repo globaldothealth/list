@@ -223,46 +223,70 @@ Services exposed contain the environment in their names to avoid mistakenly taki
 
 ## Github Container Registry
 
-Images used in deployments are pulled from the Github Container Registry where images are automatically pushed by the [curator](/.github/workflows/curator-service-package.yml) and data [workflows](/.github/workflows/curator-service-package.yml).
-
-Check out the registries for the [curator service](https://github.com/orgs/globaldothealth/packages/container/list%2Fcuratorservice/) and [data service](https://github.com/orgs/globaldothealth/packages/container/list%2Fdataservice/).
+Images used in deployments are pulled from the
+[Github Container Registry](https://github.com/orgs/globaldothealth/packages)
+where images are automatically pushed by the
+[curator](/.github/workflows/curator-service-package.yml),
+[data](/.github/workflows/data-service-package.yml), and
+[geocoding](/.github/workflows/geocoding-service-package.yml) workflows.
 
 If you add a service, the packages will be _private_ by default which will make `k8s` have "image pull" errors as it won't be able to fetch the configured images from the Github Container Registry. You have to go to the [global.health packages list](https://github.com/orgs/globaldothealth/packages), find your new package, and in its settings change its visibility from private to public. This is a one-time action for each new package.
 
 ## Releases
 
-We follow [semantic versioning](https://semver.org/) which is basically:
+### Versioning scheme
 
-```text
-Given a version number MAJOR.MINOR.PATCH, increment the:
+Our versioning scheme is 1.MINOR.PATCH, with the following rules
 
-MAJOR version when you make incompatible API changes,
-MINOR version when you add functionality in a backwards compatible manner, and
-PATCH version when you make backwards compatible bug fixes.
-```
+* **MAJOR** version is fixed at 1. It is updated on major incompatible API
+  changes, but since we haven't finalized the API yet, this is not updated.
+* **MINOR** version is updated on new codename initial releases. We have
+  a regular cadence of releases every few months once we have accumulated an
+  agreed upon list of new features.
+* **PATCH** versions add minor functionality and bug fixes on the current
+  codename release.
 
-Github workflows will automatically extract the tags from the repository and apply them to the images built (thanks to the `add_git_labels: true` param in the workflow).
+Each codename initial release brings significant new functionality and/or UI
+changes. We organise feature requests and record known issues for each release
+by using GitHub milestones:
 
-To push a new release follow the [github UI flow](https://github.com/globaldothealth/list/releases/new) or do it using the command line:
+* Issues targeting the
+  [current](https://github.com/globaldothealth/list/issues?q=is%3Aopen+is%3Aissue+milestone%3AStrongcat)
+  release
+* Issues targeting the
+  [next](https://github.com/globaldothealth/list/issues?q=is%3Aopen+is%3Aissue+milestone%3AProxy)
+  release
 
-Tag main with the `0.1.2` tag:
+### Preparing a release
 
-```shell
-git checkout main
-git tag 0.1.2
-```
+Releases are done on -stable branches. Stable branches are tagged
+as *1.x-stable*, with patch updates being done from the -stable branch.
+**No releases are tagged from main**.
 
-then push it to the repo:
+**1.x.0 release**. Change the image tag in `aws/{location,curator,data}.yaml`
+files to point to 1.x.0. Then commit on *main*:
 
-`git push origin 0.1.2`
+    git commit -a -m 'Release 1.x.0'
+    git checkout -b 1.x-stable
+    git tag 1.x.0
+    git push -u origin 1.x-stable && git push --tags
 
 Github actions will automatically build the image, e.g. `ghcr.io/globaldothealth/list/curatorservice:0.1.2`.
 
-This tag can then be referenced in the deployment files:
-- Submit a PR to change the current image version to the new one. [Example](https://github.com/globaldothealth/list/pull/1170).
-- Apply the change: `kubectl apply -f curator.yaml -f data.yaml`.
+**1.x.y release**. For subsequent point releases, changes are usually merged
+from main, unless there are changes that shouldn't be deployed (such as
+a feature that needs more testing). In that case, cherry-pick from main or
+another hotfix branch onto *1.x-stable*. Once you've done that, update the
+deployment yaml files with the new version name. Then:
 
-In a few seconds the push should be complete.
+    git switch 1.x-stable
+    git commit -a -m 'Release 1.x.y'
+    git tag 1.x.0
+    git push && git push --tags
+
+**Deploy to production**: `kubectl apply -f curator.yaml -f data.yaml -f
+location.yaml` (should be complete within a minute, check with
+`kubectl get pods`)
 
 You can list the existing tags/versions with `git tag` or on the [github repo](https://github.com/globaldothealth/list/releases).
 
@@ -274,6 +298,7 @@ that the image should always be fetched when restarting the service, which can b
 ```shell
 kubectl rollout restart deployment/curator-dev
 kubectl rollout restart deployment/data-dev
+kubectl rollout restart deployment/location-dev
 ```
 
 ### Rollback
@@ -284,7 +309,8 @@ Just change the image tag referenced in the deployment file to an earlier versio
 
 If for some reason you need to delete a tag, you can do it with `git tag -d 1.2.3` then `git push origin :refs/tags/0.1.2` to delete it remotely.
 
-Note that because our packages are public, it is not possible to delete a package as github does not allow for that.
+Note that because our packages are public, it is not possible to delete
+a package as GitHub does not allow for that.
 
 ### Deprecated packages
 
@@ -292,7 +318,7 @@ https://github.com/globaldothealth/list/packages/253413 and https://github.com/g
 
 ## Metric server
 
-Metric server was installed in the custer:
+Metric server was installed in the cluster:
 
 ```shell
 kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/download/v0.3.6/components.yaml

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-DELETE_ALL_DOCUMENTS=true \
-npm --prefix=`dirname "$0"`/../data-serving/scripts/setup-db/ run-script setup-cases
-npm --prefix=`dirname "$0"`/../data-serving/scripts/setup-db/ run-script setup-restricted-cases
-npm --prefix=`dirname "$0"`/../data-serving/data-service/ run-script import-data
+CONN="mongodb://localhost/covid19"
+
+npm --prefix=`dirname "$0"`/../data-serving/scripts/setup-db/ run-script migrate
+npm --prefix=`dirname "$0"`/../data-serving/scripts/setup-db/ run-script drop-cases-and-import-sample-data

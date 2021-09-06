@@ -108,8 +108,6 @@ _CODE_NAME_LATLONG = dictionaries["code_name_latlong"]
 
 _COUNTRY_ISO2_MAP = dictionaries["country_iso2"]
 
-_COUNTRY_LAT_LONG_MAP = dictionaries['country_translate_lat_long']
-
 
 # Date function for ADI and mongoimport format
 def convert_date(raw_date: str, reference_date=None, dataserver=True, adi = True):
@@ -161,7 +159,7 @@ def convert_gender(raw_gender: str):
     elif raw_gender == "F":
         return "Female"
     elif raw_gender == "I":
-        return "Unknown"
+        return "Other"
 
 
 def convert_test(serological_igg, serological_igm, serological_iga, pcr):
@@ -360,22 +358,10 @@ def convert_travel(travel_yn, travel_country, travel_out, travel_in):
     International travel within 14 days before symptoms appeared is recorded.
     '''
     if travel_yn == "1":
-        location = {}
-        geometry = {}
         travel = {}
         travel_countries = []
-        country = travel_country
-        
-        country_ISO2 = _COUNTRY_ISO2_MAP[country.lower()]
-
-        location["country"] = _COUNTRY_LAT_LONG_MAP[country_ISO2]["name_english"]
-        location["geoResolution"] = "Country"
-        location["name"] = _COUNTRY_LAT_LONG_MAP[country_ISO2]["name_english"]
-        geometry["latitude"] = _COUNTRY_LAT_LONG_MAP[country_ISO2]["latitude"]
-        geometry["longitude"] = _COUNTRY_LAT_LONG_MAP[country_ISO2]["longitude"]
-        location["geometry"] = geometry
-
-        travel_countries.append({"location": location})
+        country_ISO2 = _COUNTRY_ISO2_MAP[travel_country.lower()]
+        travel_countries.append({"location": parsing_lib.geocode_country(country_ISO2)})
         travel["traveledPrior30Days"] = True
         travel["travel"] = travel_countries
         travel["dateRange"] = {"start": convert_date(travel_out), "end": convert_date(travel_in)}

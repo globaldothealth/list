@@ -91,7 +91,7 @@ const LandingPage = (): JSX.Element => {
     const smallHeight = useMediaQuery('(max-height:1050px)');
     const classes = useStyles({ smallHeight });
     const lastLocation = useLastLocation();
-    const [registrationScreenOn, setRegistrationScreenOn] = useState(false);
+    const [registrationScreenOn, setRegistrationScreenOn] = useState(true);
     const [changePasswordScreenOn, setChangePasswordScreenOn] = useState(false);
 
     const isLoading = useAppSelector(selectIsLoading);
@@ -166,7 +166,7 @@ const LandingPage = (): JSX.Element => {
                         </div>
                         <div className={classes.link}>
                             <a
-                                href="https://github.com/globaldothealth/list/blob/main/data-serving/scripts/export-data/functions/01-split/fields.txt"
+                                href="fields.txt"
                                 rel="noopener noreferrer"
                                 target="_blank"
                             >

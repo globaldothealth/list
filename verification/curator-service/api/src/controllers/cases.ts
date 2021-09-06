@@ -39,8 +39,10 @@ export default class CasesController {
     };
 
     /** Download forwards the request to the data service and streams the
-     * streamed response as a csv attachment. */
+     * streamed response as an attachment. */
     download = async (req: Request, res: Response): Promise<void> => {
+        const correlationId = crypto.randomBytes(16).toString('hex');
+        req.body.correlationId = correlationId;
         try {
             axios({
                 method: 'post',
@@ -67,52 +69,39 @@ export default class CasesController {
         }
     };
 
-    /** DownloadAsync spawns a worker thread that forwards the request to the data service
-     * and emails the streamed response as a csv attachment. It will only email to the
-     * logged-in user, and it replies immediately with 204. Any error will be reported
-     * in the email, except the error of not being able to email which we can only log.
-     *
-     * Question for code reviewers: do we want to retry on errors? If so we need to introduce
-     * a message bus rather than just using background workers, and we're probably back at the
-     * point where we use Batch for this.*/
+    /** DownloadAsync forwards the request to the data service and streams its
+     * streamed response to the client.
+     **/
     downloadAsync = async (req: Request, res: Response): Promise<void> => {
+        if (req.body.format == 'csv' && !req.body.caseIds && !req.body.query) {
+            this.getDownloadLink(req, res);
+            return;
+        }
         try {
-            const user = req.user as UserDocument;
-            const url =
-                this.dataServerURL + '/api' + req.url.replace('Async', '');
-            // the worker needs access to the AWS configuration.
-            const region = process.env.AWS_SES_REGION;
-            const accessKeyId = process.env.AWS_ACCESS_KEY_ID;
-            const secretKey = process.env.AWS_SECRET_ACCESS_KEY;
-            const sourceAddress = process.env.AWS_SES_SENDER;
-            const correlationId = crypto.randomBytes(16).toString('hex');
-
-            logger.info(
-                `Starting worker for asynchronous download with id ${correlationId}`,
-            );
-            const worker = new Worker('./src/workers/downloadAsync.js', {
-                workerData: {
-                    query: req.body.query as string,
-                    format: req.body.format,
-                    email: user.email,
-                    url,
-                    region,
-                    accessKeyId,
-                    secretKey,
-                    correlationId,
-                    sourceAddress,
-                },
-            });
-            /* we don't care what happens when the worker finishes, but for debugging
-             * I'm going to log this.
-             */
-            worker.on('exit', (code) => {
-                logger.info(
-                    `worker with id ${correlationId} exited. code: ${code}`,
+            const url = this.dataServerURL + '/api' + req.url.replace('Async', '');
+            req.body.correlationId = crypto.randomBytes(16).toString('hex');
+            logger.info(`Streaming case data in format ${req.body.format} matching query ${req.body.query} for correlation ID ${req.body.correlationId}`);
+            axios({
+                method: 'post',
+                url: url,
+                data: req.body,
+                responseType: 'stream',
+            }).then((response) => {
+                res.setHeader('Content-Type', response.headers['content-type']);
+                res.setHeader(
+                    'Content-Disposition',
+                    response.headers['content-disposition'],
                 );
+                res.setHeader('Cache-Control', 'no-cache');
+                res.setHeader('Pragma', 'no-cache');
+                response.data.pipe(res);
             });
-            res.status(204).end();
         } catch (err) {
+            logger.error(err);
+            if (err.response?.status && err.response?.data) {
+                res.status(err.response.status).send(err.response.data);
+                return;
+            }
             res.status(500).send(err);
         }
     };

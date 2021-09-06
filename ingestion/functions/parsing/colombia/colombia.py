@@ -23,7 +23,6 @@ with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "geocoding_di
 mun_code_coord = geocoding_dictionaries['mun_code_coord']
 mun_code_place_name = geocoding_dictionaries['mun_code_place_name']
 spanish_country_code_dict = geocoding_dictionaries['spanish_country_code_dict']
-iso_country_coord_map = geocoding_dictionaries['iso_country_coord_map']
 
 
 def convert_date(raw_date: str, dataserver=True):
@@ -79,17 +78,7 @@ def get_travel_history_location(raw_entry):
 
     try:
         iso2 = spanish_country_code_dict[country_spanish.lower()]
-        lat, long, country = iso_country_coord_map[iso2]
-        geometry = {'latitude': lat,
-                    'longitude': long}
-
-        location = {}
-        location["country"] = country
-        location["geoResolution"] = "Country"
-        location["name"] = country
-        location["geometry"] = geometry
-
-        return location
+        return parsing_lib.geocode_country(iso2)
     except BaseException:
         print(country_spanish)
 
