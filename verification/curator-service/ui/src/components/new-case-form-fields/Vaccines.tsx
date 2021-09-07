@@ -5,7 +5,7 @@ import AddCircleIcon from '@material-ui/icons/AddCircle';
 import Button from '@material-ui/core/Button';
 import CancelIcon from '@material-ui/icons/Cancel';
 import CaseFormValues from './CaseFormValues';
-import { DateField } from '../common-form-fields/FormikFields';
+import { DateField, FormikAutocomplete } from '../common-form-fields/FormikFields';
 import FieldTitle from '../common-form-fields/FieldTitle';
 import { StyledTooltip } from './StyledTooltip';
 import Scroll from 'react-scroll';
@@ -83,6 +83,14 @@ export default function Vaccines(): JSX.Element {
                                                 fullWidth
                                                 component={TextField}
                                             ></FastField>
+                                            <FormikAutocomplete
+                                                name="previousInfection"
+                                                label="Previous Infection?"
+                                                multiple={false}
+                                                optionsList={["Yes", "No", "NA"]}
+                                                initialValue="NA"
+                                            />
+
                                             <FastField
                                                 //className={classes.field}
                                                 name={`vaccines[${index}].previousInfectionDetectionMethod`}
