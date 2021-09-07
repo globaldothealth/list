@@ -33,12 +33,17 @@ export default function Vaccines(): JSX.Element {
                     return (
                         <div><p>Vaccine form here!</p>
                             <Button
-                                data-testid="addGenomeSequence"
+                                data-testid="addVaccine"
                                 startIcon={<AddCircleIcon />}
                                 onClick={(): void => {
                                     push({
                                         reactId: shortId.generate(),
-                                        sampleCollectionDate: null,
+                                        name: "",
+                                        batch: null,
+                                        date: new Date(),
+                                        sideEffects: [],
+                                        previousInfection: 'NA',
+                                        previousInfectionDetectionMethod: null,
                                     });
                                 }}
                             >
