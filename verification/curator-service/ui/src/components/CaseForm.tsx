@@ -485,7 +485,7 @@ export default function CaseForm(props: Props): JSX.Element {
                 }
             }
             setErrorMessage('');
-        } catch (e) {
+        } catch (e:any) {
             setErrorMessage(e.response?.data?.message || e.toString());
             return;
         }
