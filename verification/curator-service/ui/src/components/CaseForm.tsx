@@ -485,8 +485,9 @@ export default function CaseForm(props: Props): JSX.Element {
                 }
             }
             setErrorMessage('');
-        } catch (e:any) {
-            setErrorMessage(e.response?.data?.message || e.toString());
+        } catch (e) {
+            const err:any = e;
+            setErrorMessage(err.response?.data?.message || err.toString());
             return;
         }
         // Navigate to cases after successful submit
