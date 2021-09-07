@@ -27,6 +27,7 @@ import Scroll from 'react-scroll';
 import Symptoms from './new-case-form-fields/Symptoms';
 import Transmission from './new-case-form-fields/Transmission';
 import TravelHistory from './new-case-form-fields/TravelHistory';
+import Vaccines from './new-case-form-fields/Vaccines';
 import Variant from './new-case-form-fields/Variant';
 import axios from 'axios';
 import { cloneDeep } from 'lodash';
@@ -99,6 +100,7 @@ function initialValuesFromCase(c?: Case): CaseFormValues {
             pathogens: [],
             notes: '',
             numCases: 1,
+            vaccines: [],
         };
     }
     return {
@@ -179,6 +181,7 @@ function initialValuesFromCase(c?: Case): CaseFormValues {
         pathogens: c.pathogens,
         notes: c.notes,
         numCases: undefined,
+        vaccines: c.vaccines,
     };
 }
 
@@ -457,6 +460,7 @@ export default function CaseForm(props: Props): JSX.Element {
             genomeSequences: filterGenomeSequences(values.genomeSequences),
             pathogens: values.pathogens,
             notes: values.notes,
+            vaccines: values.vaccines,
         };
         let newCaseIds = [];
         try {
@@ -797,6 +801,16 @@ export default function CaseForm(props: Props): JSX.Element {
                                 </div>
                                 <div
                                     className={classes.tableOfContentsRow}
+                                    onClick={(): void => scrollTo('vaccines')}
+                                >
+                                    {tableOfContentsIcon({
+                                        isChecked: values.vaccines && values.vaccines.length > 0,
+                                        hasError: false,
+                                    })}
+                                    {'Vaccines'.toLocaleUpperCase()}
+                                </div>
+                                <div
+                                    className={classes.tableOfContentsRow}
                                     onClick={(): void => scrollTo('notes')}
                                 >
                                     {tableOfContentsIcon({
@@ -878,6 +892,9 @@ export default function CaseForm(props: Props): JSX.Element {
                                 </Paper>
                                 <Paper classes={{ root: classes.formSection }}>
                                     <Pathogens></Pathogens>
+                                </Paper>
+                                <Paper classes={{ root: classes.formSection }}>
+                                    <Vaccines></Vaccines>
                                 </Paper>
                                 <Paper classes={{ root: classes.formSection }}>
                                     <Notes></Notes>
