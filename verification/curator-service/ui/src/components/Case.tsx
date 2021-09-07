@@ -123,6 +123,16 @@ interface ExclusionData {
     note: string;
 }
 
+export interface Vaccine {
+    name: string;
+    batch: string;
+    date: Date;
+    sideEffects: [Symptoms];
+    previousInfection: 'yes' | 'no' | 'NA';
+    previousInfectionDetectionMethod: string;
+};
+
+
 export interface Case {
     _id: string;
     caseReference: CaseReference;
@@ -144,4 +154,5 @@ export interface Case {
     exclusionData?: ExclusionData;
     variant: Variant;
     isSourceExcluded?: boolean;
+    vaccines: Vaccine[];
 }
