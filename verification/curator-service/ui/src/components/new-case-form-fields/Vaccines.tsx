@@ -31,7 +31,41 @@ export default function Vaccines(): JSX.Element {
             <FieldArray name="vaccines">
                 {({ push, remove }): JSX.Element => {
                     return (
-                        <div><p>Vaccine form here!</p>
+                        <div>
+                            {
+                                values.vaccines && values.vaccines.map(
+                                    (vaccine, index) => (
+                                        <div
+                                            key={vaccine.reactId}
+                                            data-testid={
+                                                'vaccine-section'
+                                            }
+                                        >
+                                            <div
+                                                /*className={
+                                                    classes.genomeSequenceTitle
+                                                }*/
+                                            >
+                                                {`Vaccine ${index + 1}`}
+                                                <span
+                                                    /*className={classes.spacer}*/
+                                                ></span>
+                                                <Button
+                                                    startIcon={<CancelIcon />}
+                                                    data-testid={
+                                                        'remove-vaccine-button'
+                                                    }
+                                                    onClick={(): void => {
+                                                        remove(index);
+                                                    }}
+                                                >
+                                                    Remove
+                                                </Button>
+                                            </div>
+                                        </div>
+                                    )
+                                )
+                            }
                             <Button
                                 data-testid="addVaccine"
                                 startIcon={<AddCircleIcon />}
