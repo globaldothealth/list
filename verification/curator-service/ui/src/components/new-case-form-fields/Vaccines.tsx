@@ -15,7 +15,9 @@ import shortId from 'shortid';
 
 const TooltipText = () => (
     <StyledTooltip>
-        <p>I don't know what the tool tip will need to say yet.</p>
+        <p>You can enter the name and batch ID of the vaccine administered, and date the patient was vaccinated.
+        If any side-effects were reported, you can provide a list of these using the same data dictionary as for disease symptoms.</p>
+        <p>You can also indicate, for each dose of vaccine, whether the patient was previously infected and, if so, the detection method.</p>
     </StyledTooltip>
 );
 
@@ -61,6 +63,34 @@ export default function Vaccines(): JSX.Element {
                                                 >
                                                     Remove
                                                 </Button>
+                                            <DateField
+                                                name={`vaccines[${index}].date`}
+                                                label="Vaccination date"
+                                            ></DateField>
+                                            <FastField
+                                                //className={classes.field}
+                                                name={`vaccines[${index}].name`}
+                                                type="text"
+                                                label="Vaccine Name"
+                                                fullWidth
+                                                component={TextField}
+                                            ></FastField>
+                                            <FastField
+                                                //className={classes.field}
+                                                name={`vaccines[${index}].batch`}
+                                                type="text"
+                                                label="Vaccine Batch ID"
+                                                fullWidth
+                                                component={TextField}
+                                            ></FastField>
+                                            <FastField
+                                                //className={classes.field}
+                                                name={`vaccines[${index}].previousInfectionDetectionMethod`}
+                                                type="text"
+                                                label="Detection Method for Previous Infection"
+                                                fullWidth
+                                                component={TextField}
+                                            ></FastField>
                                             </div>
                                         </div>
                                     )
