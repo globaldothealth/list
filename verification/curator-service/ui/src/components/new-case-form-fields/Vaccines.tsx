@@ -12,6 +12,7 @@ import Scroll from 'react-scroll';
 import { TextField } from 'formik-material-ui';
 import { makeStyles } from '@material-ui/core';
 import shortId from 'shortid';
+import { VaccineSideEffects } from './Symptoms';
 
 const TooltipText = () => (
     <StyledTooltip>
@@ -99,6 +100,7 @@ export default function Vaccines(): JSX.Element {
                                                 fullWidth
                                                 component={TextField}
                                             ></FastField>
+                                            <VaccineSideEffects i={index}/>
                                             </div>
                                         </div>
                                     )
