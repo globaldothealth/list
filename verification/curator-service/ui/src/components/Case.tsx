@@ -127,7 +127,7 @@ export interface Vaccine {
     name: string;
     batch: string;
     date: Date;
-    sideEffects: [Symptoms];
+    sideEffects: Symptoms;
     previousInfection: 'yes' | 'no' | 'NA';
     previousInfectionDetectionMethod: string;
 };

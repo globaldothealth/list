@@ -179,7 +179,7 @@ interface SideEffectsProps {
 export const VaccineSideEffects = (props: SideEffectsProps) => (
     <SymptomList
         title="Side Effects"
-        collectionName={`vaccines[${props.i}].sideEffects`}
+        collectionName={`vaccines[${props.i}].sideEffects.values`}
         selectFieldName={`vaccines[${props.i}].sideEffectsStatus`}
         selectFieldLabel="Side effects status"
         isVaccineSideEffect
