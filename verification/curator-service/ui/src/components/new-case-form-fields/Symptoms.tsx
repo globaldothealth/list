@@ -83,6 +83,8 @@ interface SymptomListProps {
     collectionName: string;
     selectFieldName: string;
     selectFieldLabel: string;
+    isVaccineSideEffect: boolean;
+    vaccineIndex: number;
 }
 
 function SymptomList(props: SymptomListProps): JSX.Element {
@@ -111,7 +113,10 @@ function SymptomList(props: SymptomListProps): JSX.Element {
                 label={props.selectFieldLabel}
                 values={symptomStatusValues}
             ></SelectField>
-            {values.symptomsStatus === 'Symptomatic' && (
+            {(props.isVaccineSideEffect ? 
+            values.vaccines[props.vaccineIndex].sideEffectsStatus :
+            values.symptomsStatus)
+             === 'Symptomatic' && (
                 <>
                     {commonSymptoms.length > 0 && (
                         <>
@@ -162,7 +167,9 @@ const Symptoms = () => (
         collectionName="symptoms"
         selectFieldName="symptomsStatus"
         selectFieldLabel="Symptom status"
-    />
+        isVaccineSideEffect={false}
+        vaccineIndex={NaN}
+        />
 );
 
 interface SideEffectsProps {
@@ -175,6 +182,8 @@ export const VaccineSideEffects = (props: SideEffectsProps) => (
         collectionName={`vaccines[${props.i}].sideEffects`}
         selectFieldName={`vaccines[${props.i}].sideEffectsStatus`}
         selectFieldLabel="Side effects status"
+        isVaccineSideEffect
+        vaccineIndex={props.i}
     />
 );
 
