@@ -114,6 +114,7 @@ export default function Vaccines(): JSX.Element {
                                         batch: null,
                                         date: new Date(),
                                         sideEffects: [],
+                                        sideEffectsStatus: 'Asymptomatic',
                                         previousInfection: 'NA',
                                         previousInfectionDetectionMethod: null,
                                     });
