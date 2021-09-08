@@ -77,7 +77,11 @@ const TooltipText = () => (
     </StyledTooltip>
 );
 
-export default function Symptoms(): JSX.Element {
+interface SymptomListProps {
+    collectionName: string;
+}
+
+function SymptomList(props: SymptomListProps): JSX.Element {
     const { values, initialValues, setFieldValue } =
         useFormikContext<CaseFormValues>();
     const [commonSymptoms, setCommonSymptoms] = React.useState([]);
@@ -96,7 +100,7 @@ export default function Symptoms(): JSX.Element {
 
     const classes = useStyles();
     return (
-        <Scroll.Element name="symptoms">
+        <Scroll.Element name={props.collectionName}>
             <FieldTitle title="Symptoms" tooltip={<TooltipText />}></FieldTitle>
             <SelectField
                 name="symptomsStatus"
@@ -147,3 +151,9 @@ export default function Symptoms(): JSX.Element {
         </Scroll.Element>
     );
 }
+
+const Symptoms = () => (<SymptomList collectionName="symptoms"/>);
+
+export const VaccineSideEffects = (i :number) => (<SymptomList collectionName={`vaccines[${i}].sideEffects`}/>);
+
+export default Symptoms;

@@ -76,6 +76,7 @@ export interface Vaccine {
     batch?: string;
     date?: Date;
     sideEffects: Symptom[];
+    sideEffectsStatus?: string;
     previousInfection: 'yes'|'no'|'NA';
     previousInfectionDetectionMethod?: string;
 }
