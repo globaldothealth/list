@@ -114,7 +114,7 @@ function SymptomList(props: SymptomListProps): JSX.Element {
                 values={symptomStatusValues}
             ></SelectField>
             {(props.isVaccineSideEffect ? 
-            values.vaccines[props.vaccineIndex].sideEffectsStatus :
+            values.vaccines[props.vaccineIndex].sideEffects.status :
             values.symptomsStatus)
              === 'Symptomatic' && (
                 <>
@@ -180,7 +180,7 @@ export const VaccineSideEffects = (props: SideEffectsProps) => (
     <SymptomList
         title="Side Effects"
         collectionName={`vaccines[${props.i}].sideEffects.values`}
-        selectFieldName={`vaccines[${props.i}].sideEffectsStatus`}
+        selectFieldName={`vaccines[${props.i}].sideEffects.status`}
         selectFieldLabel="Side effects status"
         isVaccineSideEffect
         vaccineIndex={props.i}
