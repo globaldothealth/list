@@ -78,7 +78,10 @@ const TooltipText = () => (
 );
 
 interface SymptomListProps {
+    autocompleteLabel: string;
     collectionName: string;
+    selectFieldName: string;
+    selectFieldLabel: string;
 }
 
 function SymptomList(props: SymptomListProps): JSX.Element {
@@ -103,8 +106,8 @@ function SymptomList(props: SymptomListProps): JSX.Element {
         <Scroll.Element name={props.collectionName}>
             <FieldTitle title="Symptoms" tooltip={<TooltipText />}></FieldTitle>
             <SelectField
-                name="symptomsStatus"
-                label="Symptom status"
+                name={props.selectFieldName}
+                label={props.selectFieldLabel}
                 values={symptomStatusValues}
             ></SelectField>
             {values.symptomsStatus === 'Symptomatic' && (
@@ -140,9 +143,9 @@ function SymptomList(props: SymptomListProps): JSX.Element {
                         </>
                     )}
                     <FormikAutocomplete
-                        name="symptoms"
-                        label="Symptoms"
-                        initialValue={initialValues.symptoms}
+                        name={props.collectionName}
+                        label={props.autocompleteLabel}
+                        initialValue={initialValues[props.collectionName]}
                         multiple
                         optionsLocation="https://raw.githubusercontent.com/globaldothealth/list/main/suggest/symptoms.txt"
                     />
@@ -152,8 +155,22 @@ function SymptomList(props: SymptomListProps): JSX.Element {
     );
 }
 
-const Symptoms = () => (<SymptomList collectionName="symptoms"/>);
+const Symptoms = () => (
+    <SymptomList
+        autocompleteLabel="Symptoms"
+        collectionName="symptoms"
+        selectFieldName="symptomsStatus"
+        selectFieldLabel="Symptom status"
+    />
+);
 
-export const VaccineSideEffects = (i :number) => (<SymptomList collectionName={`vaccines[${i}].sideEffects`}/>);
+export const VaccineSideEffects = (i :number) => (
+    <SymptomList
+        autocompleteLabel="Side-effects"
+        collectionName={`vaccines[${i}].sideEffects`}
+        selectFieldName={`vaccines[${i}].sideEffectsStatus`}
+        selectFieldLabel="Side effects status"
+    />
+);
 
 export default Symptoms;
