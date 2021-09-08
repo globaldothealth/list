@@ -39,7 +39,7 @@ const TooltipText = () => (
                 the case.
                 <ul>
                     <li>
-                        <strong>Asymtomatic:</strong> Case is a confirmed
+                        <strong>Asymptomatic:</strong> Case is a confirmed
                         carrier of the disease but has not experienced any
                         symptoms.
                     </li>
@@ -79,7 +79,7 @@ const TooltipText = () => (
 );
 
 interface SymptomListProps {
-    autocompleteLabel: string;
+    title: string;
     collectionName: string;
     selectFieldName: string;
     selectFieldLabel: string;
@@ -107,7 +107,7 @@ function SymptomList(props: SymptomListProps): JSX.Element {
     const classes = useStyles();
     return (
         <Scroll.Element name={props.collectionName}>
-            <FieldTitle title="Symptoms" tooltip={<TooltipText />}></FieldTitle>
+            <FieldTitle title={props.title} tooltip={<TooltipText />}></FieldTitle>
             <SelectField
                 name={props.selectFieldName}
                 label={props.selectFieldLabel}
@@ -150,7 +150,7 @@ function SymptomList(props: SymptomListProps): JSX.Element {
                     )}
                     <FormikAutocomplete
                         name={props.collectionName}
-                        label={props.autocompleteLabel}
+                        label={props.title}
                         initialValue={initialValues[props.collectionName]}
                         multiple
                         optionsLocation="https://raw.githubusercontent.com/globaldothealth/list/main/suggest/symptoms.txt"
@@ -163,7 +163,7 @@ function SymptomList(props: SymptomListProps): JSX.Element {
 
 const Symptoms = () => (
     <SymptomList
-        autocompleteLabel="Symptoms"
+        title="Symptoms"
         collectionName="symptoms"
         selectFieldName="symptomsStatus"
         selectFieldLabel="Symptom status"
@@ -178,7 +178,7 @@ interface SideEffectsProps {
 
 export const VaccineSideEffects = (props: SideEffectsProps) => (
     <SymptomList
-        autocompleteLabel="Side-effects"
+        title="Side Effects"
         collectionName={`vaccines[${props.i}].sideEffects`}
         selectFieldName={`vaccines[${props.i}].sideEffectsStatus`}
         selectFieldLabel="Side effects status"
