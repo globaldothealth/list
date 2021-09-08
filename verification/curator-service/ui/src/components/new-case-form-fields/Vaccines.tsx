@@ -84,11 +84,11 @@ export default function Vaccines(): JSX.Element {
                                                 component={TextField}
                                             ></FastField>
                                             <FormikAutocomplete
-                                                name="previousInfection"
+                                                name={`vaccines[${index}].previousInfection`}
                                                 label="Previous Infection?"
                                                 multiple={false}
                                                 optionsList={["Yes", "No", "NA"]}
-                                                initialValue="NA"
+                                                initialValue={vaccine.previousInfection}
                                             />
 
                                             <FastField
