@@ -12,6 +12,7 @@ import Scroll from 'react-scroll';
 import axios from 'axios';
 import { makeStyles } from '@material-ui/core';
 import { useFormikContext } from 'formik';
+import { number } from 'yup';
 
 const useStyles = makeStyles(() => ({
     chip: {
@@ -164,11 +165,15 @@ const Symptoms = () => (
     />
 );
 
-export const VaccineSideEffects = (i :number) => (
+interface SideEffectsProps {
+    i: number;
+};
+
+export const VaccineSideEffects = (props: SideEffectsProps) => (
     <SymptomList
         autocompleteLabel="Side-effects"
-        collectionName={`vaccines[${i}].sideEffects`}
-        selectFieldName={`vaccines[${i}].sideEffectsStatus`}
+        collectionName={`vaccines[${props.i}].sideEffects`}
+        selectFieldName={`vaccines[${props.i}].sideEffectsStatus`}
         selectFieldLabel="Side effects status"
     />
 );
