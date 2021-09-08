@@ -40,6 +40,7 @@ export default interface CaseFormValues {
     notes: string;
     numCases?: number;
     vaccines: Vaccine[];
+    [index: string]: Pathogen[]|Vaccine[]|GenomeSequence[]|Travel[]|string[]|CaseReferenceForm|Loc|string|number|null|undefined;
 }
 
 export interface Travel {
