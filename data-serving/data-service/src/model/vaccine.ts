@@ -17,7 +17,7 @@ export type VaccineDocument = mongoose.Document & {
     name: string;
     batch: string;
     date: Date;
-    sideEffects: [SymptomsDocument];
+    sideEffects: SymptomsDocument;
     previousInfection: 'yes' | 'no' | 'NA';
     previousInfectionDetectionMethod: string;
 };
