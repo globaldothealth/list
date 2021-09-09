@@ -22,8 +22,23 @@ const TooltipText = () => (
     </StyledTooltip>
 );
 
+const useStyles = makeStyles(() => ({
+    vaccineTitle: {
+        alignItems: 'left',
+    },
+    spacer: {
+        flex: '1',
+    },
+    field: {
+        marginBottom: '1em',
+        marginLeft: '1em',
+        marginRight: '1em',
+    },
+}));
+
 export default function Vaccines(): JSX.Element {
     const { values } = useFormikContext<CaseFormValues>();
+    const classes = useStyles();
     return (
         <Scroll.Element name="vaccines">
             <FieldTitle
@@ -45,13 +60,11 @@ export default function Vaccines(): JSX.Element {
                                             }
                                         >
                                             <div
-                                                /*className={
-                                                    classes.genomeSequenceTitle
-                                                }*/
+                                                className={classes.vaccineTitle}
                                             >
                                                 {`Vaccine ${index + 1}`}
                                                 <span
-                                                    /*className={classes.spacer}*/
+                                                    className={classes.spacer}
                                                 ></span>
                                                 <Button
                                                     startIcon={<CancelIcon />}
@@ -69,7 +82,7 @@ export default function Vaccines(): JSX.Element {
                                                 label="Vaccination date"
                                             ></DateField>
                                             <FastField
-                                                //className={classes.field}
+                                                className={classes.field}
                                                 name={`vaccines[${index}].name`}
                                                 type="text"
                                                 label="Vaccine Name"
@@ -77,7 +90,7 @@ export default function Vaccines(): JSX.Element {
                                                 component={TextField}
                                             ></FastField>
                                             <FastField
-                                                //className={classes.field}
+                                                className={classes.field}
                                                 name={`vaccines[${index}].batch`}
                                                 type="text"
                                                 label="Vaccine Batch ID"
@@ -91,9 +104,8 @@ export default function Vaccines(): JSX.Element {
                                                 optionsList={["Yes", "No", "NA"]}
                                                 initialValue={vaccine.previousInfection}
                                             />
-
                                             <FastField
-                                                //className={classes.field}
+                                                className={classes.field}
                                                 name={`vaccines[${index}].previousInfectionDetectionMethod`}
                                                 type="text"
                                                 label="Detection Method for Previous Infection"

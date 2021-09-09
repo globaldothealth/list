@@ -12,7 +12,6 @@ import Scroll from 'react-scroll';
 import axios from 'axios';
 import { makeStyles } from '@material-ui/core';
 import { useFormikContext } from 'formik';
-import { number } from 'yup';
 
 const useStyles = makeStyles(() => ({
     chip: {
@@ -169,7 +168,7 @@ const Symptoms = () => (
         selectFieldLabel="Symptom status"
         isVaccineSideEffect={false}
         vaccineIndex={NaN}
-        />
+    />
 );
 
 interface SideEffectsProps {
