@@ -708,10 +708,11 @@ function CaseDetails(props: CaseDetailsProps): JSX.Element {
                             Vaccines
                         </Typography>
                         <Grid container className={classes.grid}>
-                            {props.c.vaccines?.map((e) => (
+                            {props.c.vaccines?.map((e, i) => (
                                 <VaccineRows
                                     key={shortId.generate()}
                                     vaccine={e}
+                                    index={i}
                                 />
                         ))}
                         </Grid>
@@ -759,9 +760,12 @@ function GenomeSequenceRows(props: { sequence: GenomeSequence }): JSX.Element {
     );
 }
 
-function VaccineRows(props: { vaccine: Vaccine }): JSX.Element {
+function VaccineRows(props: { vaccine: Vaccine, index: number }): JSX.Element {
     return (
         <>
+            <RowHeader title={`Vaccine ${props.index+1}`}/>
+            <RowContent content=""/>
+
             <RowHeader title="Vaccine administered" />
             <RowContent
                 content={props.vaccine.name}
