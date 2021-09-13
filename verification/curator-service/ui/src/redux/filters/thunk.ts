@@ -15,9 +15,7 @@ export const fetchCountries = createAsyncThunk(
     'countryList/fetchCountries',
     async (_, { rejectWithValue}) => {
         try {
-            const response = await axios.get(countryListJsonFile);
-            console.log(response.data, Object.entries(response.data));
-            
+            const response = await axios.get(countryListJsonFile);            
             const responseArray:[] = Object.entries(response.data)[0][1] as [];
             const countries:string[]= responseArray
                 .map((el:countryObject) => {
