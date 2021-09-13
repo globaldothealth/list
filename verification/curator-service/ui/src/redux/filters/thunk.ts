@@ -4,9 +4,6 @@ import axios from 'axios';
 const countryListJsonFile =
     'https://covid-19-aggregates.s3.amazonaws.com/country/latest.json';
 
-interface fetchedCountries {
-    mergedArray?: [];
-}
 type countryObject = {
     _id: string
 }
