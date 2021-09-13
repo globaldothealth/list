@@ -524,6 +524,7 @@ export default function App(): JSX.Element {
         //eslint-disable-next-line
     }, [location.search]);
 
+    console.log(activeFilterInput);
     
 
     return (
