@@ -327,7 +327,6 @@ describe('Linelist table', function () {
         cy.get('[data-value="France"]').click();
         cy.get('button[data-test-id="search-by-filter-button"]').click();
         cy.wait('@getCases');
-        cy.wait(200);
         cy.get('input[type="checkbox"]').eq(0).click();
         cy.contains('Select all 7 rows').click();
 
