@@ -295,9 +295,9 @@ describe('Linelist table', function () {
         cy.contains('Filter').click();
         cy.get("#country").click();
         cy.get('[data-value="France"]').click();
-        cy.contains('FILTER').click();
+        cy.get('#start-filtering').click();
         cy.wait('@getCases');
-
+        cy.wait(200);
         cy.get('input[type="checkbox"]').eq(0).click();
         cy.contains('Select all 7 rows').click();
 
@@ -323,7 +323,8 @@ describe('Linelist table', function () {
         cy.get('li').contains('5').click();
         cy.wait('@getCases');
         cy.contains('Filter').click();
-        cy.get('select#country').select('France');
+        cy.get("#country").click();
+        cy.get('[data-value="France"]').click().type('{Enter}');
         cy.wait('@getCases');
         cy.get('input[type="checkbox"]').eq(0).click();
         cy.contains('Select all 7 rows').click();
@@ -369,12 +370,16 @@ describe('Linelist table', function () {
         cy.contains('Germany');
 
         cy.contains('Filter').click();
-        cy.get('select#country').select('Uruguay');
+        cy.get("#country").click();
+        cy.get('[data-value="Uruguay"]').click().type('{Enter}');
+        cy.get('button[data-test-id="search-by-filter-button"]').click();
         cy.contains('France').should('not.exist');
         cy.contains('Germany').should('not.exist');
 
         cy.contains('Filter').click();
-        cy.get('select#country').select('France');
+        cy.get("#country").click();
+        cy.get('[data-value="France"]').click().type('{Enter}');
+        cy.get('button[data-test-id="search-by-filter-button"]').click();
         cy.get('td[value="France"]');
         cy.contains('Germany').should('not.exist');
 
@@ -397,7 +402,9 @@ describe('Linelist table', function () {
         cy.contains('France');
         cy.contains('United Kingdom');
         cy.contains('Filter').click();
-        cy.get('select#country').select('France');
+        cy.get("#country").click();
+        cy.get('[data-value="France"]').click().type('{Enter}');
+        cy.get('button[data-test-id="search-by-filter-button"]').click();
         cy.contains('United Kingdom').should('not.exist');
 
         // Navigate to case details and back
@@ -408,7 +415,7 @@ describe('Linelist table', function () {
 
         // Search is maintained
         cy.contains('Filter').click();
-        cy.get('select#country').select('France').should('have.value', 'France');
+        cy.get('#country').contains('France');
 
         cy.get('td[value="France"]');
         cy.contains('United Kingdom').should('not.exist');
@@ -445,9 +452,12 @@ describe('Linelist table', function () {
         cy.contains('Select all 7 rows').should('not.exist');
 
         cy.contains('Filter').click();
-        cy.get('select#country').select('France');
+        cy.get("#country").click();
+        cy.get('[data-value="France"]').click().type('{Enter}');
+        cy.get('button[data-test-id="search-by-filter-button"]').click();
 
         // Select all option available after search
+        cy.wait(200);
         cy.get('input[type="checkbox"]').eq(0).click();
         cy.contains('Select all 7 rows').click();
         cy.contains('7 rows selected');
@@ -477,7 +487,9 @@ describe('Linelist table', function () {
         cy.contains('rows').click();
         cy.get('li').contains('5').click();
         cy.contains('Filter').click();
-        cy.get('select#country').select('France');
+        cy.get("#country").click();
+        cy.get('[data-value="France"]').click().type('{Enter}');
+        cy.get('button[data-test-id="search-by-filter-button"]').click();
         cy.get('input[type="checkbox"]').eq(0).click();
         cy.contains('Select all 7 rows').click();
         cy.server();
