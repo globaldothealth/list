@@ -2,12 +2,12 @@ import { configureStore, combineReducers } from '@reduxjs/toolkit';
 
 import appReducer from './app/slice';
 import authReducer from './auth/slice';
-import countryListReducer from './filters/slice';
+import filtersReducer from './filters/slice';
 
 export const rootReducer = combineReducers({
     app: appReducer,
     auth: authReducer,
-    countryListReducer
+    filtersReducer
 });
 
 const store = configureStore({
