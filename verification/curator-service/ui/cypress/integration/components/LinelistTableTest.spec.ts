@@ -271,7 +271,7 @@ describe('Linelist table', function () {
         cy.get('[data-testid="unverified-svg"]').should('have.length', 3);
     });
 
-    it.only('Can toggle case verification status for rows across pages', function () {
+    it('Can toggle case verification status for rows across pages', function () {
         for (let i = 0; i < 7; i++) {
             cy.addCase({
                 country: 'France',
@@ -293,7 +293,9 @@ describe('Linelist table', function () {
         cy.get('li').contains('5').click();
         cy.wait('@getCases');
         cy.contains('Filter').click();
-        cy.get('select#country').select('France');
+        cy.get("#country").click();
+        cy.get('[data-value="France"]').click();
+        cy.contains('FILTER').click();
         cy.wait('@getCases');
 
         cy.get('input[type="checkbox"]').eq(0).click();
