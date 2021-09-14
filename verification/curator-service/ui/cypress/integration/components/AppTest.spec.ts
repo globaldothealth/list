@@ -80,7 +80,7 @@ describe('App', function () {
         cy.contains('www.variantb1351.com');
     });
 
-    it('allows the user to search by date and an additional filter', function () {
+    it.only('allows the user to search by date and an additional filter', function () {
         cy.login({ roles: ['curator'], name: "testName", email:'test@example.com' });
         cy.visit('/');
         cy.contains('Line list').click();
@@ -111,7 +111,9 @@ describe('App', function () {
         cy.get('.filter-button').click();
 
         cy.get('#dateconfirmedafter').type('2020-04-30');
-        cy.get('select#country').select('Italy');
+        cy.get("#country").click();
+        cy.get('[data-value="Italy"]').click().type('{Enter}');
+        cy.contains(/filter/i).click();
 
         cy.contains('2020-06-03');
         cy.contains('Italy');
