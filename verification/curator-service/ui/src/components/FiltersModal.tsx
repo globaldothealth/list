@@ -652,6 +652,7 @@ export default function FiltersModal({
                             type="submit"
                             data-test-id="search-by-filter-button"
                             name="filterButton"
+                            id="start-filtering"
                             className={classes.searchBtn}
                         >
                             Filter
