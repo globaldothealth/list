@@ -12,7 +12,7 @@ interface initialStateTypes {
   }
 
 const slice = createSlice({
-    name: 'countryList',
+    name: 'filters',
     initialState: initialState as initialStateTypes,
     reducers: {},
     extraReducers: builder => {
@@ -23,6 +23,9 @@ const slice = createSlice({
         builder.addCase(fetchCountries.pending, (state) => {
             state.isLoading = true;
         })
+        builder.addCase(fetchCountries.rejected, (state) => {
+            state.isLoading = false;
+        });
     }
 });
 
