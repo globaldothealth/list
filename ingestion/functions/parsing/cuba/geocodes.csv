@@ -1,0 +1,169 @@
+code_province,code_municipality,province,municipality,latitude,longitude
+22,22.08,Artemisa,Alquízar,22.80667,-82.58278
+22,22.09,Artemisa,Artemisa,22.81361,-82.76333
+22,22.01,Artemisa,Bahía Honda,22.90639,-83.16361
+22,22.05,Artemisa,Bauta,22.99194,-82.54917
+22,22.04,Artemisa,Caimito,22.95778,-82.59639
+22,22.10,Artemisa,Candelaria,22.74444,-82.96583
+22,22.03,Artemisa,Guanajay,22.93056,-82.68778
+22,22.07,Artemisa,Güira de Melena,22.80222,-82.50472
+22,22.02,Artemisa,Mariel,22.99389,-82.75389
+22,22.06,Artemisa,San Antonio de los Baños,22.88889,-82.49861
+22,22.11,Artemisa,San Cristóbal,22.71694,-83.05111
+30,30.08,Camagüey,Camagüey,21.38389,-77.90722
+30,30.01,Camagüey,Carlos Manuel de Céspedes,21.57694,-78.2775
+30,30.02,Camagüey,Esmeralda,21.85611,-78.11111
+30,30.09,Camagüey,Florida,21.52944,-78.2225
+30,30.06,Camagüey,Guáimaro,21.05889,-77.34778
+30,30.11,Camagüey,Jimaguayú,21.26667,-77.83028
+30,30.04,Camagüey,Minas,21.48944,-77.60472
+30,30.12,Camagüey,Najasa,21.08389,-77.74694
+30,30.05,Camagüey,Nuevitas,21.54028,-77.26444
+30,30.13,Camagüey,Santa Cruz del Sur,20.71944,-77.99083
+30,30.07,Camagüey,Sibanicú,21.23917,-77.52083
+30,30.03,Camagüey,Sierra de Cubitas,21.73306,-77.77056
+30,30.10,Camagüey,Vertientes,21.25722,-78.14889
+29,29.10,Ciego de Ávila,Baraguá,21.68222,-78.62444
+29,29.03,Ciego de Ávila,Bolivia,22.075,-78.35028
+29,29.01,Ciego de Ávila,Chambas,22.19667,-78.91306
+29,29.08,Ciego de Ávila,Ciego de Ávila,21.84806,-78.76278
+29,29.05,Ciego de Ávila,Ciro Redondo,22.01889,-78.70278
+29,29.06,Ciego de Ávila,Florencia,22.1475,-78.96694
+29,29.07,Ciego de Ávila,Majagua,21.92444,-78.99056
+29,29.02,Ciego de Ávila,Morón,22.11083,-78.62778
+29,29.04,Ciego de Ávila,Primero de Enero,21.94528,-78.41889
+29,29.09,Ciego de Ávila,Venezuela,21.75111,-78.77889
+27,27.08,Cienfuegos,Abreus,22.28056,-80.56778
+27,27.01,Cienfuegos,Aguada de Pasajeros,22.38472,-80.84611
+27,27.07,Cienfuegos,Cienfuegos,22.14583,-80.43639
+27,27.05,Cienfuegos,Cruces,22.34222,-80.27611
+27,27.06,Cienfuegos,Cumanayagua,22.1525,-80.20111
+27,27.04,Cienfuegos,Lajas,22.41639,-80.29056
+27,27.03,Cienfuegos,Palmira,22.24444,-80.39417
+27,27.02,Cienfuegos,Rodas,22.34278,-80.55528
+33,33.11,Granma,Bartolomé Masó,20.16861,-76.9425
+33,33.04,Granma,Bayamo,20.38167,-76.6425
+33,33.12,Granma,Buey Arriba,20.17361,-76.74917
+33,33.07,Granma,Campechuela,20.23333,-77.27889
+33,33.02,Granma,Cauto Cristo,20.56222,-76.46944
+33,33.13,Granma,Guisa,20.26111,-76.53806
+33,33.03,Granma,Jiguaní,20.37333,-76.42222
+33,33.06,Granma,Manzanillo,20.33972,-77.10861
+33,33.08,Granma,Media Luna,20.14444,-77.43611
+33,33.09,Granma,Niquero,20.04722,-77.57806
+33,33.10,Granma,Pilón,19.90556,-77.32083
+33,33.01,Granma,Río Cauto,20.56389,-76.91722
+33,33.05,Granma,Yara,20.27694,-76.94694
+35,35.04,Guantánamo,Baracoa,20.35056,-74.51028
+35,35.08,Guantánamo,Caimanera,19.995,-75.15972
+35,35.01,Guantánamo,El Salvador,20.20972,-75.22278
+35,35.09,Guantánamo,Guantánamo,20.13694,-75.21389
+35,35.06,Guantánamo,Imías,20.07694,-74.65167
+35,35.05,Guantánamo,Maisí,20.24333,-74.15583
+35,35.02,Guantánamo,Manuel Tames,20.18056,-75.05139
+35,35.10,Guantánamo,Niceto Pérez,20.12778,-75.34194
+35,35.07,Guantánamo,San Antonio del Sur,20.05694,-74.80778
+35,35.03,Guantánamo,Yateras,20.35028,-74.92417
+23,23.14,La Habana,Arroyo Naranjo,23.04361,-82.33278
+23,23.13,La Habana,Boyeros,23.00722,-82.40167
+23,23.03,La Habana,Centro Habana,23.13333,-82.38333
+23,23.10,La Habana,Cerro,23.11361,-82.36333
+23,23.15,La Habana,Cotorro,23.02611,-82.2475
+23,23.09,La Habana,Diez de Octubre,23.08806,-82.35972
+23,23.07,La Habana,Guanabacoa,23.06111,-82.28972
+23,23.06,La Habana,Habana del Este,23.15694,-82.29694
+23,23.04,La Habana,La Habana Vieja,23.13889,-82.35556
+23,23.12,La Habana,La Lisa,23.02472,-82.46306
+23,23.11,La Habana,Marianao,23.08417,-82.42972
+23,23.01,La Habana,Playa,23.09417,-82.44889
+23,23.02,La Habana,Plaza de la Revolución,23.12444,-82.38611
+23,23.05,La Habana,Regla,23.12556,-82.31528
+23,23.08,La Habana,San Miguel del Padrón,23.09639,-82.32667
+32,32.04,Holguín,Antilla,20.84861,-75.7525
+32,32.05,Holguín,Báguanos,20.76306,-76.02944
+32,32.03,Holguín,Banes,20.97,-75.71139
+32,32.08,Holguín,Cacocum,20.74389,-76.32417
+32,32.07,Holguín,Calixto García,20.85417,-76.60194
+32,32.10,Holguín,Cueto,20.64833,-75.93167
+32,32.12,Holguín,Frank País,20.66472,-75.28139
+32,32.01,Holguín,Gibara,21.10722,-76.13667
+32,32.06,Holguín,Holguín,20.88889,-76.25722
+32,32.11,Holguín,Mayarí,20.65944,-75.67778
+32,32.14,Holguín,Moa,20.64,-74.9175
+32,32.02,Holguín,Rafael Freyre,21.02833,-75.99639
+32,32.13,Holguín,Sagua de Tánamo,20.58611,-75.24167
+32,32.09,Holguín,Urbano Noris,20.60139,-76.1325
+40,40.01,Isla de la Juventud,Isla de la Juventud,21.88472,-82.86583
+31,31.08,Las Tunas,Amancio,20.81972,-77.58417
+31,31.07,Las Tunas,Colombia,20.99083,-77.41583
+31,31.03,Las Tunas,Jesús Menéndez,21.16361,-76.47722
+31,31.06,Las Tunas,Jobabo,20.90806,-77.28306
+31,31.05,Las Tunas,Las Tunas,20.96,-76.95444
+31,31.04,Las Tunas,Majibacoa,20.91722,-76.87611
+31,31.01,Las Tunas,Manatí,21.31472,-76.9375
+31,31.02,Las Tunas,Puerto Padre,21.19528,-76.60139
+25,25.12,Matanzas,Calimete,22.53389,-80.90972
+25,25.02,Matanzas,Cárdenas,23.04278,-81.20361
+25,25.10,Matanzas,Cienaga de Zapata,22.28806,-81.1975
+25,25.04,Matanzas,Colón,22.7225,-80.90639
+25,25.11,Matanzas,Jagüey Grande,22.52944,-81.1325
+25,25.06,Matanzas,Jovellanos,22.81056,-81.19778
+25,25.08,Matanzas,Limonar,22.95611,-81.40861
+25,25.13,Matanzas,Los Arabos,22.74,-80.71583
+25,25.03,Matanzas,Martí,22.9525,-80.91667
+25,25.01,Matanzas,Matanzas,23.05139,-81.575
+25,25.07,Matanzas,Pedro Betancourt,22.73056,-81.29083
+25,25.05,Matanzas,Perico,22.77528,-81.015
+25,25.09,Matanzas,Unión de Reyes,22.80056,-81.53694
+24,24.10,Mayabeque,Batabanó,22.72472,-82.28972
+24,24.01,Mayabeque,Bejucal,22.93278,-82.38694
+24,24.08,Mayabeque,Güines,22.84778,-82.02361
+24,24.03,Mayabeque,Jaruco,23.04278,-82.00917
+24,24.05,Mayabeque,Madruga,22.91639,-81.85694
+24,24.09,Mayabeque,Melena del Sur,22.78167,-82.14833
+24,24.06,Mayabeque,Nueva Paz,22.76333,-81.75806
+24,24.11,Mayabeque,Quivicán,22.82472,-82.35583
+24,24.02,Mayabeque,San José de las Lajas,22.96806,-82.15583
+24,24.07,Mayabeque,San Nicolás,22.78194,-81.90667
+24,24.04,Mayabeque,Santa Cruz del Norte,23.15583,-81.92639
+21,21.07,Pinar del Río,Consolación del Sur,22.5,-83.51528
+21,21.11,Pinar del Río,Guane,22.20056,-84.08361
+21,21.05,Pinar del Río,La Palma,22.75611,-83.55333
+21,21.06,Pinar del Río,Los Palacios,22.5825,-83.24889
+21,21.02,Pinar del Río,Mantua,22.29083,-84.28722
+21,21.03,Pinar del Río,Minas de Matahambre,22.5825,-83.94917
+21,21.08,Pinar del Río,Pinar del Río,22.42583,-83.68833
+21,21.10,Pinar del Río,San Juan y Martínez,22.26667,-83.83389
+21,21.09,Pinar del Río,San Luis,22.28306,-83.76778
+21,21.01,Pinar del Río,Sandino,22.08111,-84.22167
+21,21.04,Pinar del Río,Viñales,22.61528,-83.71583
+28,28.04,Sancti Spíritus,Cabaiguán,22.08389,-79.49528
+28,28.05,Sancti Spíritus,Fomento,22.10528,-79.72
+28,28.02,Sancti Spíritus,Jatibonico,21.94639,-79.1675
+28,28.08,Sancti Spíritus,La Sierpe,21.76083,-79.24333
+28,28.07,Sancti Spíritus,Sancti Spíritus,21.93417,-79.44361
+28,28.03,Sancti Spíritus,Taguasco,22.00528,-79.265
+28,28.06,Sancti Spíritus,Trinidad,21.80444,-79.98278
+28,28.01,Sancti Spíritus,Yaguajay,22.33056,-79.23694
+34,34.01,Santiago de Cuba,Contramaestre,20.3,-76.25056
+34,34.09,Santiago de Cuba,Guamá,19.95361,-76.74944
+34,34.02,Santiago de Cuba,Mella,20.36944,-75.91083
+34,34.07,Santiago de Cuba,Palma Soriano,20.21417,-75.99167
+34,34.03,Santiago de Cuba,San Luis,20.18806,-75.84861
+34,34.06,Santiago de Cuba,Santiago de Cuba,20.04028,-75.81472
+34,34.04,Santiago de Cuba,Segundo Frente,20.41194,-75.52861
+34,34.05,Santiago de Cuba,Songo La Maya,20.17333,-75.64611
+34,34.08,Santiago de Cuba,Tercer Frente,20.17194,-76.32722
+26,26.06,Villa Clara,Caibarién,22.51583,-79.47222
+26,26.05,Villa Clara,Camajuaní,22.46806,-79.72361
+26,26.10,Villa Clara,Cifuentes,22.62083,-80.06583
+26,26.01,Villa Clara,Corralillo,22.98583,-80.58278
+26,26.04,Villa Clara,Encrucijada,22.61722,-79.86611
+26,26.13,Villa Clara,Manicaragua,22.15028,-79.97611
+26,26.08,Villa Clara,Placetas,22.31611,-79.65528
+26,26.02,Villa Clara,Quemado de Güines,22.79,-80.25583
+26,26.12,Villa Clara,Ranchuelo,22.33611,-80.11278
+26,26.07,Villa Clara,Remedios,22.49222,-79.54556
+26,26.03,Villa Clara,Sagua La Grande,22.80889,-80.07083
+26,26.09,Villa Clara,Santa Clara,22.40556,-79.95389
+26,26.11,Villa Clara,Santo Domingo,22.58361,-80.23833

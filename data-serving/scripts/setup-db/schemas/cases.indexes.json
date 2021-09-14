@@ -62,16 +62,6 @@
         }
     },
     {
-        "name": "countriesIdx",
-        "key": {
-            "location.country": -1
-        },
-        "collation": {
-            "locale": "en_US",
-            "strength": 2
-        }
-    },
-    {
         "name": "travelHistoryCountriesIdx",
         "key": {
             "travelHistory.travel.location.country": -1
@@ -219,6 +209,17 @@
     {
         "name": "revisionMetadataCreationMetadataDate",
         "key": {
+            "revisionMetadata.creationMetadata.date": -1
+        },
+        "collation": {
+            "locale": "en_US",
+            "strength": 2
+        }
+    },
+    {
+        "name": "countryAndDate",
+        "key": {
+            "location.country": -1,
             "revisionMetadata.creationMetadata.date": -1
         },
         "collation": {

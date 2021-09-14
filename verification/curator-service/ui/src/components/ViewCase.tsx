@@ -12,6 +12,7 @@ import {
     Location,
     Travel,
     Variant,
+    Vaccine,
     VerificationStatus,
 } from './Case';
 import AppModal from './AppModal';
@@ -227,6 +228,12 @@ function CaseDetails(props: CaseDetailsProps): JSX.Element {
                         pathogens
                     </Button>
                     <br />
+                    <Button
+                        variant="text"
+                        onClick={(): void => scrollTo('vaccines')}
+                    >
+                        vaccines
+                    </Button>
                     <Button
                         variant="text"
                         onClick={(): void => scrollTo('notes')}
@@ -693,6 +700,25 @@ function CaseDetails(props: CaseDetailsProps): JSX.Element {
                     </Scroll.Element>
                 </Paper>
                 <Paper className={classes.paper} variant="outlined" square>
+                    <Scroll.Element name="vaccines" className={classes.casebox}>
+                        <Typography
+                            className={classes.sectionTitle}
+                            variant="overline"
+                        >
+                            Vaccines
+                        </Typography>
+                        <Grid container className={classes.grid}>
+                            {props.c.vaccines?.map((e, i) => (
+                                <VaccineRows
+                                    key={shortId.generate()}
+                                    vaccine={e}
+                                    index={i}
+                                />
+                        ))}
+                        </Grid>
+                    </Scroll.Element>
+                </Paper>
+                <Paper className={classes.paper} variant="outlined" square>
                     <Scroll.Element name="notes" className={classes.casebox}>
                         <Typography
                             className={classes.sectionTitle}
@@ -730,6 +756,28 @@ function GenomeSequenceRows(props: { sequence: GenomeSequence }): JSX.Element {
 
             <RowHeader title="Genome sequence accession" />
             <RowContent content={props.sequence?.sequenceId || ''} />
+        </>
+    );
+}
+
+function VaccineRows(props: { vaccine: Vaccine, index: number }): JSX.Element {
+    return (
+        <>
+            <RowHeader title={`Vaccine ${props.index+1}`}/>
+            <RowContent content=""/>
+
+            <RowHeader title="Vaccine administered" />
+            <RowContent
+                content={props.vaccine.name}
+            />
+            <RowHeader title="Batch code" />
+            <RowContent
+                content={props.vaccine.batch}
+            />
+            <RowHeader title="Date of vaccine" />
+            <RowContent
+                content={renderDate(props.vaccine.date)}
+            />
         </>
     );
 }

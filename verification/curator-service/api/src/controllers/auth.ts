@@ -269,7 +269,13 @@ export class AuthController {
                     }
 
                     // Check if user is a Gmail user and send appropriate email message in that case
-                    if (user.googleID) {
+                    // 42 googleID was set for non Google accounts in the past just to pass mongoose validation
+                    // so this check has to be made
+                    if (
+                        user.googleID &&
+                        user.googleID !== '42' &&
+                        user.googleID !== ''
+                    ) {
                         await this.emailClient.send(
                             [email],
                             'Password Change Request',

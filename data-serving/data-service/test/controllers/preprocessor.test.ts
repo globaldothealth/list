@@ -740,7 +740,7 @@ describe('batch update', () => {
         });
         it('does not call next function if over threshold', async () => {
             // Simulate index creation used in unit tests, in production they are
-            // setup by the setup-db script and such indexes are not present by
+            // setup by the migrations and such indexes are not present by
             // default in the in memory mongo spawned by unit tests.
             await mongoose.connection.collection('cases').createIndex({
                 notes: 'text',

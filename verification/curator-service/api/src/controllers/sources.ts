@@ -123,6 +123,7 @@ export default class SourcesController {
             const emailNotificationType =
                 await this.updateAutomationScheduleAwsResources(source);
             const result = await source.save();
+
             await this.sendNotifications(source, emailNotificationType);
             res.json(result);
         } catch (err) {
@@ -130,6 +131,7 @@ export default class SourcesController {
                 res.status(422).json(err);
                 return;
             }
+
             res.status(500).json(err);
             return;
         }
@@ -262,11 +264,13 @@ export default class SourcesController {
             return;
         }
 
-        const query = { 'caseReference.sourceId' : source._id };
+        const query = { 'caseReference.sourceId': source._id };
         const count = await Case.count(query);
         const restrictedCount = await RestrictedCase.count(query);
         if (count + restrictedCount !== 0) {
-            res.status(403).json({ message: 'Source still has cases and cannot be deleted.' });
+            res.status(403).json({
+                message: 'Source still has cases and cannot be deleted.',
+            });
             return;
         }
 
@@ -355,6 +359,7 @@ export default class SourcesController {
                     `Invalid notification type trigger for source event: ${type}`,
                 );
         }
+
         try {
             await this.emailClient.send(
                 source.notificationRecipients,

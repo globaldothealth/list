@@ -1,0 +1,22 @@
+{
+"Auckland": {"latitude": -36.8520950, "longitude": 174.7631803},
+"Bay of Plenty": {"latitude": -37.9519223, "longitude": 176.9945977},
+"Canterbury": {"latitude": -43.53095, "longitude": 172.63665},
+"Capital and Coast": {"latitude": -41.2887953, "longitude": 174.7772114},
+"Counties Manukau": {"latitude": -36.9938877, "longitude": 174.8774715},
+"Hawke's Bay": {"latitude": -39.4343, "longitude": 176.76526},
+"Hutt Valley": {"latitude": -41.12407, "longitude": 175.06996},
+"Lakes": {"latitude": -38.1381493, "longitude": 176.25292},
+"MidCentral": {"latitude": -40.356317, "longitude": 175.6112388},
+"Nelson Marlborough": {"latitude": -41.2710849, "longitude": 173.2836756},
+"Northland": {"latitude": -35.37127, "longitude": 173.74053},
+"South Canterbury": {"latitude": -44.1113, "longitude": 170.6918},
+"Southern": {"latitude": -45.3343708, "longitude": 168.7175147},
+"Tairawhiti": {"latitude": -38.25112, "longitude": 178.14891},
+"Taranaki": {"latitude": -39.3388499, "longitude": 174.2875945},
+"Waikato": {"latitude": -37.7878809, "longitude": 175.281788},
+"Wairarapa": {"latitude": -41.0243023, "longitude": 175.5259467},
+"Waitemata": {"latitude": -36.8805554, "longitude": 174.6333709},
+"West Coast": {"latitude": -42.87387, "longitude": 171.15336},
+"Whanganui": {"latitude": -39.9324904, "longitude": 175.0519306}
+}

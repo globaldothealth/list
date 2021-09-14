@@ -1,7 +1,6 @@
 import React, { RefObject, useState, useEffect } from 'react';
 import { RouteComponentProps, withRouter, useLocation } from 'react-router-dom';
 import axios from 'axios';
-import qs from 'qs';
 import { round } from 'lodash';
 import {
     Button,
@@ -53,7 +52,6 @@ import { ChipData } from './App/App';
 import { SortBy, SortByOrder } from '../constants/types';
 import { connect, ConnectedProps } from 'react-redux';
 import { RootState } from '../redux/store';
-import { SnackbarAlert } from './SnackbarAlert';
 
 // Limit number of data that can be displayed or downloaded to avoid long execution times of mongo queries
 const DATA_LIMIT = 10000;
@@ -138,7 +136,6 @@ interface Props
     onChangePageSize: (pageSize: number) => void;
 
     handleBreadcrumbDelete: (breadcrumbToDelete: ChipData) => void;
-    setTotalDataCount: (value: number) => void;
     setFiltersModalOpen: (value: boolean) => void;
     setActiveFilterInput: (value: string) => void;
     setSortBy: (value: SortBy) => void;
@@ -512,13 +509,7 @@ export function SortSelect({
     );
 }
 
-interface DownloadButtonProps {
-    totalCasesCount: number;
-}
-
-export function DownloadButton({
-    totalCasesCount,
-}: DownloadButtonProps): JSX.Element {
+export function DownloadButton(): JSX.Element {
     const location = useLocation<LocationState>();
     const [isDownloadModalOpen, setIsDownloadModalOpen] =
         useState<boolean>(false);
@@ -526,14 +517,15 @@ export function DownloadButton({
     const [fileFormat, setFileFormat] = useState('');
     const [showFullDatasetButton, setShowFullDatasetButton] = useState(true);
     const [downloadButtonDisabled, setDownloadButtonDisable] = useState(true);
-    const [snackbarOpen, setSnackbarOpen] = useState(false);
 
     const classes = downloadDataModalStyles();
 
     const downloadDataSet = async (dataSet: string, formatType?: string) => {
         setIsLoading(true);
 
+        console.log('downloading data set');
         const searchQuery: string = URLToSearchQuery(location.search);
+        console.log(`query ${searchQuery}`);
         switch (dataSet) {
             case 'fullDataset':
                 try {
@@ -554,7 +546,8 @@ export function DownloadButton({
                 }
                 break;
 
-            case 'mailDataset':
+            case 'partialDataset':
+            console.log('downloading partial data set');
                 try {
                     const response = await axios({
                         method: 'post',
@@ -563,34 +556,9 @@ export function DownloadButton({
                             format: formatType,
                             query: searchQuery,
                         },
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                    });
-
-                    if (response.status === 204) {
-                        setSnackbarOpen(true);
-                    }
-                } catch (err) {
-                    alert(
-                        `There was an error while downloading data, please try again later. ${err}`,
-                    );
-                }
-                break;
-
-            case 'partialDataset':
-                try {
-                    const response = await axios({
-                        method: 'post',
-                        url: '/api/cases/download',
-                        data: qs.stringify({
-                            format: formatType,
-                            limit: DATA_LIMIT,
-                            query: searchQuery,
-                        }),
                         responseType: 'blob',
                         headers: {
-                            'Content-Type': 'application/x-www-form-urlencoded',
+                            'Content-Type': 'application/json',
                         },
                     });
 
@@ -605,6 +573,7 @@ export function DownloadButton({
                     link.setAttribute('download', filename);
                     document.body.appendChild(link);
                     link.click();
+
                 } catch (err) {
                     alert(
                         `There was an error while downloading data, please try again later. ${err}`,
@@ -647,12 +616,6 @@ export function DownloadButton({
 
     return (
         <>
-            <SnackbarAlert
-                isOpen={snackbarOpen}
-                onClose={setSnackbarOpen}
-                message="Email sent successfully. Please check your inbox."
-                type="success"
-            />
             <StyledDownloadButton
                 variant="outlined"
                 color="primary"
@@ -731,51 +694,22 @@ export function DownloadButton({
                                     variant="contained"
                                     color="primary"
                                     className={classes.downloadButton}
-                                    onClick={() =>
-                                        downloadDataSet(
-                                            'partialDataset',
-                                            fileFormat,
-                                        )
+                                    onClick={() => 
+                                        {
+                                            downloadDataSet(
+                                                'partialDataset',
+                                                fileFormat,
+                                            );
+                                            setIsDownloadModalOpen(false);
+                                            alert('Downloading now. Depending on the size of the data set, this could take some time.');
+                                        }
                                     }
                                     disabled={
                                         isLoading || downloadButtonDisabled
                                     }
                                 >
-                                    {totalCasesCount >= DATA_LIMIT
-                                        ? `Download up to ${DATA_LIMIT} rows immediately`
-                                        : `Download ${totalCasesCount} rows`}
+                                    Download Filtered Dataset
                                 </Button>
-                            </span>
-                        </Tooltip>
-                    )}
-                    {!showFullDatasetButton && totalCasesCount >= DATA_LIMIT && (
-                        <Tooltip
-                            title={disabledButtonTooltipText}
-                            placement="top"
-                        >
-                            <span>
-                                <Button
-                                    variant="contained"
-                                    color="primary"
-                                    className={classes.downloadButton}
-                                    onClick={() =>
-                                        downloadDataSet(
-                                            'mailDataset',
-                                            fileFormat,
-                                        )
-                                    }
-                                    disabled={
-                                        isLoading || downloadButtonDisabled
-                                    }
-                                >
-                                    Download more than {DATA_LIMIT} rows through
-                                    link delivered by email
-                                </Button>
-                                <p>
-                                    Please add info@global.health to your email
-                                    contacts list or check spam so that you
-                                    don't miss the download link
-                                </p>
                             </span>
                         </Tooltip>
                     )}
@@ -1577,9 +1511,6 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                                             ?.verificationStatus,
                                                 });
                                             }
-                                            this.props.setTotalDataCount(
-                                                result.data.total,
-                                            );
                                             this.setState({
                                                 totalNumRows: result.data.total,
                                                 selectedRowsCurrentPage: [],

@@ -12,15 +12,16 @@ export const parseCaseEvents = (
 ): {
     [name: string]: {
         value?: string;
-        date: Date;
+        date?: Date;
     };
 } =>
     events.reduce(
-        (agg, { name, value, dateRange }: EventDocument) => ({
+        (agg, { name, value, dateRange }: EventDocument) => (
+        {
             ...agg,
             [name]: {
                 value: value ?? '',
-                date: new Date(dateRange.start).toISOString().split('T')[0], // dateRange.start and dateRange.end have always the same values
+                date: (dateRange) ? new Date(dateRange.start).toISOString().split('T')[0] : null, // dateRange.start and dateRange.end have always the same values
             },
         }),
         {},

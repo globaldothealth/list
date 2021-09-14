@@ -1,11 +1,11 @@
-name: Update prod curator-service database schema
+name: Migrate prod database schema
 
 on:
   push:
-    # Run workflow when the schema changes.
-    branches: [main]
+    # Run workflow when the schema changes. The branch name should always reflect the current release!
+    branches: [1.7-stable]
     paths:
-      - "verification/curator-service/api/src/schemas/**"
+      - "data-serving/scripts/setup-db/migrations/**"
       - ".github/workflows/update-prod-curator-db-schema.yaml"
 
 jobs:
@@ -21,12 +21,9 @@ jobs:
         with:
           node-version: "12.x"
       
-      - name: Update prod sources schema
+      - name: Migrate prod database
         env:
           CONN: ${{ secrets.DB_CONNECTION_URL_PROD }}
           DB: "covid19"
           COLL: "sources"
-          # Those are relative to the setup-db directory, not the working dir.
-          SCHEMA: "../../../verification/curator-service/api/src/schemas/sources.schema.json"
-          INDEXES: "../../../verification/curator-service/api/src/schemas/sources.indexes.json"
-        run: npm --prefix data-serving/scripts/setup-db run setup
+        run: npm --prefix data-serving/scripts/setup-db run migrate

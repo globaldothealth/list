@@ -5,6 +5,19 @@ from taiwan import taiwan
 
 _SOURCE_ID = "abc123"
 _SOURCE_URL = "some-source-url"
+
+_Changhua = {
+    "administrativeAreaLevel1": "Changhua County",
+    "country": "Taiwan",
+    "geoResolution": "Admin1",
+    "geometry": {
+      "latitude": 24.0755667,
+      "longitude": 120.5444667
+    },
+    "name": "Changhua County"
+}
+
+
 _PARSED_CASES = [
     {
         "caseReference": {
@@ -20,7 +33,7 @@ _PARSED_CASES = [
         ],
         'demographics': {
             'gender': 'Female',
-            'ageRange': {'start': 55.0, 'end': 59.0},
+            'ageRange': {'start': 55, 'end': 59},
         },
         "travelHistory": {
             "traveledPrior30Days": True
@@ -39,7 +52,7 @@ _PARSED_CASES = [
         ],
         'demographics': {
             'gender': 'Female',
-            'ageRange': {'start': 55.0, 'end': 59.0},
+            'ageRange': {'start': 55, 'end': 59},
         },
         "travelHistory": {
             "traveledPrior30Days": True
@@ -49,7 +62,7 @@ _PARSED_CASES = [
             "sourceId": _SOURCE_ID,
             "sourceUrl": _SOURCE_URL,
         },
-        'location': {'query': '彰化縣, Taiwan'},
+        'location': _Changhua,
         'events': [
             {
                 'name': 'confirmed',
@@ -58,7 +71,7 @@ _PARSED_CASES = [
         ],
         'demographics': {
             'gender': 'Male',
-            'ageRange': {'start': 55.0, 'end': 55.0},
+            'ageRange': {'start': 55, 'end': 55},
         },
         "travelHistory": None
     }, {
@@ -66,7 +79,7 @@ _PARSED_CASES = [
             "sourceId": _SOURCE_ID,
             "sourceUrl": _SOURCE_URL,
         },
-        'location': {'query': '彰化縣, Taiwan'},
+        'location': _Changhua,
         'events': [
             {
                 'name': 'confirmed',
@@ -75,7 +88,7 @@ _PARSED_CASES = [
         ],
         'demographics': {
             'gender': 'Male',
-            'ageRange': {'start': 70.0, 'end': 120.0},
+            'ageRange': {'start': 70, 'end': 120},
         },
         "travelHistory": None
     },

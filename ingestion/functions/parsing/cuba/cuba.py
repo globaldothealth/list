@@ -1,7 +1,11 @@
 import os
 import sys
+import csv
+import copy
 from datetime import datetime
 import json
+from pathlib import Path
+
 import pycountry
 
 # Layer code, like parsing_lib, is added to the path by AWS.
@@ -15,6 +19,60 @@ except ImportError:
             os.path.dirname(os.path.abspath(__file__)),
             os.pardir,os.pardir, 'common'))
     import parsing_lib
+
+_PROVINCES = {}
+_MUNICIPALITIES = {}
+province_set = set()
+
+_CU = parsing_lib.geocode_country('CU')
+
+def _drop_admin2(municipality_location):
+    "Drops admin2 info and uses same data for province location"
+    newloc = copy.deepcopy(municipality_location)
+    newloc['name'] = newloc['administrativeAreaLevel1']
+    del newloc['administrativeAreaLevel2']
+    newloc['geoResolution'] = "Admin1"
+    return newloc
+
+# Geocoding data is from Wikipedia:
+# Municipalities of Cuba,
+# https://en.wikipedia.org/w/index.php?title=Municipalities_of_Cuba&oldid=1010874027
+# (version as of 21 August 2021)
+
+with (Path(__file__).parent / 'geocodes.csv').open() as geof:
+    reader = csv.DictReader(geof)
+    for r in reader:
+        province_set.add(r['code_province'])
+        _MUNICIPALITIES[r['code_municipality']] = {
+            "name": r['municipality'],
+            "administrativeAreaLevel1": r['province'],
+            "administrativeAreaLevel2": r['municipality'],
+            "country": "Cuba",
+            "geoResolution": "Admin2",
+            "geometry": {
+                "latitude": float(r['latitude']),
+                "longitude": float(r['longitude'])
+            }
+        }
+        if r['province'] == r['municipality']:
+            # Add to province map in case municipality doesn't exist
+            _PROVINCES[r['code_province']] = {
+                "name": r['province'],
+                "administrativeAreaLevel1": r['province'],
+                "country": "Cuba",
+                "geoResolution": "Admin1",
+                "geometry": {
+                    "latitude": float(r['latitude']),
+                    "longitude": float(r['longitude'])
+                }
+            }
+
+    # For provinces without municipalities having the same name
+    # assign the .01 municipality geocode to the province
+    # As an example Villa Clara (26) will get assigned the
+    # geocode of Corralillo (26.01)
+    for p in province_set - set(_PROVINCES.keys()):
+        _PROVINCES[p] = _drop_admin2(_MUNICIPALITIES[p + '.01'])
 
 
 def convert_date(raw_date, dataserver=True):
@@ -39,14 +97,17 @@ def convert_gender(raw_gender):
 
 
 def convert_location(raw_entry):
-    query_terms = [
-        term for term in [
-            raw_entry.get("municipio_detección", ""),
-            raw_entry.get("provincia_detección", ""),
-            "Cuba"]
-        if term]
-
-    return {"query": ", ".join(query_terms)}
+    code_municipality = raw_entry.get('dpacode_municipio_deteccion', None)
+    code_province = raw_entry.get('dpacode_provincia_deteccion', None)
+    try:
+        if code_municipality != "00.00":
+            return _MUNICIPALITIES[code_municipality]
+        if code_province != "00":
+            return _PROVINCES[code_province]
+        return _CU
+    except KeyError:
+        print("Location not found:", raw_entry)
+    return None
 
 
 def convert_nationality(two_letter_country_code):
@@ -146,26 +207,23 @@ def parse_cases(raw_data_file, source_id, source_url):
                                     "places": "Cruise Ship"}
 
                             elif len(entry['posible_procedencia_contagio'][0]) == 2:
+                                case["travelHistory"] = {
+                                    "traveledPrior30Days": True,
+                                    "travel": []
+                                }
                                 for two_letter_country_code in entry['posible_procedencia_contagio']:
+                                    if len(two_letter_country_code) != 2:
+                                        continue
                                     if pycountry.countries.get(
                                             alpha_2=two_letter_country_code):
                                         country = pycountry.countries.get(
                                             alpha_2=two_letter_country_code).name
-                                        if country:
-                                            case["travelHistory"] = {
-                                                "traveledPrior30Days": True,
-                                                "travel": [
-                                                    {
-                                                        "location": {
-                                                            "query": country
-                                                        }
-                                                    }]
-                                            }
-
-                                            if entry.get(
-                                                    'arribo_a_cuba_foco', ""):
-                                                notes.append(
-                                                    f"Case arrived in Cuba from {country} on {convert_date(entry['arribo_a_cuba_foco'])}")
+                                        case["travelHistory"]["travel"].append({
+                                            "location": parsing_lib.geocode_country(two_letter_country_code)
+                                        })
+                                        if arrival_date := entry.get('arribo_a_cuba_foco', ""):
+                                            notes.append(
+                                                f"Case arrived in Cuba from {country} on {convert_date(arrival_date)}")
 
                         if entry.get('contagio', "") == 'introducido':
                             notes.append(
