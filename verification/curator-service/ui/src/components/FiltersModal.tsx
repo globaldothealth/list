@@ -21,8 +21,7 @@ import {
 import { Alert } from '@material-ui/lab';
 // import { HelpOutline } from '@material-ui/icons';
 // import { AppTooltip } from './common-form-fields/AppTooltip';
-import { useSelector } from 'react-redux';
-import  {useAppDispatch} from '../hooks/redux';
+import  {useAppSelector,  useAppDispatch} from '../hooks/redux';
 import { fetchCountries } from '../redux/filters/thunk';
 import { countryList, isLoading } from '../redux/filters/selectors';
 
@@ -238,14 +237,14 @@ export default function FiltersModal({
 
  
     const dispatch = useAppDispatch();
-    const loadingState = useSelector(isLoading);
+    const loadingState = useAppSelector(isLoading);
 
     useEffect(() => {
         dispatch(fetchCountries());
 
       }, [dispatch])
 
-      const countries:string[] = useSelector(countryList);
+      const countries:string[] = useAppSelector(countryList);
 
     return (
         <Dialog open={isOpen} maxWidth={'xl'} onClose={closeAndResetAlert}>
@@ -302,6 +301,7 @@ export default function FiltersModal({
                                 value={formik.values.country || ''}
                                 onChange={formik.handleChange}
                                 disabled={loadingState}
+                                data-testid="country-select"
                             >
                                 <MenuItem value="" disabled>
                                     None
