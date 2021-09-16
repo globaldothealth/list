@@ -31,18 +31,13 @@ def convert_date(raw_date: str, dataserver=True):
 
 def convert_demographics(entry):
     '''
-    If age is 85plus then give age range 85-120, and if age is 60+ give range 60-120. Otherwise extract lower bound and upper bound of age
+    If age is 85plus then give age range 85-120. Otherwise extract lower bound and upper bound of age
     No need for convert_gender function, as string is provided in correct format
     '''
     demo = {}
     if entry['AgeGroup'] == '85plus':
         demo["ageRange"] = {
             "start": 85,
-            "end": 120
-        }
-    elif entry['AgeGroup'] == '60+':
-        demo["ageRange"] = {
-            "start": 60,
             "end": 120
         }
     else:
@@ -74,6 +69,8 @@ def parse_cases(raw_data_file, source_id, source_url):
     If age is 85plus then give age range 85-120, otherwise extract lower bound and upper bound of age
     No need for convert_gender function, as string is provided in correct format
 
+    The data actually contains two different groups of age range: 0-14, 15-19, 20-24, 25-44, 45-64, 65-74, 75-84 and 85+,
+    and 0-59 and 60+. If we ingest all of these then we double count cases. Therefore, only use the more specific age ranges.
     """
 
     with open(raw_data_file, "r") as f:
@@ -81,8 +78,10 @@ def parse_cases(raw_data_file, source_id, source_url):
         cases = []
         notes = []
         for entry in reader:
+            ageGroup = entry['AgeGroup']
+            relevantAgeGroup = ageGroup not in ['Total', '60+', '0 to 59']
             if int(entry['DailyPositive']
-                   ) > 0 and entry['Sex'] != 'Total' and entry['AgeGroup'] != 'Total':
+                   ) > 0 and entry['Sex'] != 'Total' and relevantAgeGroup:
                 case = {
                     "caseReference": {
                         "sourceId": source_id,
