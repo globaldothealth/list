@@ -77,7 +77,7 @@
     "longjohn": "^0.2.12",
     "lru-cache": "^6.0.0",
     "mongodb": "^3.6.2",
-    "mongoose": "^5.10.5",
+    "mongoose": "^5.13.9",
     "pino": "^6.6.1",
     "pino-pretty": "^4.2.1",
     "search-query-parser": "^1.5.5",
