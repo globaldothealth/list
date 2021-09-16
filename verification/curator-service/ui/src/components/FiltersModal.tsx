@@ -23,7 +23,7 @@ import { Alert } from '@material-ui/lab';
 // import { AppTooltip } from './common-form-fields/AppTooltip';
 import  {useAppSelector,  useAppDispatch} from '../hooks/redux';
 import { fetchCountries } from '../redux/filters/thunk';
-import { countryList, isLoading } from '../redux/filters/selectors';
+import { countryList, isLoading, filterError } from '../redux/filters/selectors';
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -238,13 +238,14 @@ export default function FiltersModal({
  
     const dispatch = useAppDispatch();
     const loadingState = useAppSelector(isLoading);
+    const error = useAppSelector(filterError);
 
     useEffect(() => {
         dispatch(fetchCountries());
 
       }, [dispatch])
 
-      const countries:string[] = useAppSelector(countryList);
+      const countries = useAppSelector(countryList);
 
     return (
         <Dialog open={isOpen} maxWidth={'xl'} onClose={closeAndResetAlert}>
@@ -290,7 +291,7 @@ export default function FiltersModal({
                             <InputLabel id="country-label">
                                 Country
                             </InputLabel>
-                            <Select
+                            {!error && <Select
                                 autoFocus={
                                     activeFilterInput === 'country'
                                 }
@@ -306,8 +307,8 @@ export default function FiltersModal({
                                 <MenuItem value="" disabled>
                                     None
                                 </MenuItem>
-                                {countries.map((country) => <MenuItem value={country} key={country}>{country}</MenuItem>)}
-                            </Select>
+                                {countries.map((country: string) => <MenuItem value={country} key={country}>{country}</MenuItem>)}
+                            </Select>}
                         </FormControl>
                         <FormControl
                             variant="outlined"
