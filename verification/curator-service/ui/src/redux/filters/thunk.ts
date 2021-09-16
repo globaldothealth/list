@@ -8,7 +8,11 @@ type countryObject = {
     _id: string
 }
 
-export const fetchCountries = createAsyncThunk(
+export const fetchCountries = createAsyncThunk<
+string[],
+void,
+{rejectValue: string}
+>(
     'filters/fetchCountries',
     async (_, { rejectWithValue}) => {
         try {
@@ -20,6 +24,9 @@ export const fetchCountries = createAsyncThunk(
                 })
                 .sort();
 
+            if (response.status !== 200) {
+                throw new Error('Something went wrong, please try again');
+            }
             return countries;
     
         } catch (error) {
