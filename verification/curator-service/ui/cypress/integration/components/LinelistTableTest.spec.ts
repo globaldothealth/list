@@ -271,7 +271,7 @@ describe('Linelist table', function () {
         cy.get('[data-testid="unverified-svg"]').should('have.length', 3);
     });
 
-    it.only('Can toggle case verification status for rows across pages', function () {
+    it('Can toggle case verification status for rows across pages', function () {
         for (let i = 0; i < 7; i++) {
             cy.addCase({
                 country: 'France',

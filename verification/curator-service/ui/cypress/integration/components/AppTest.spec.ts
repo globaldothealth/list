@@ -80,7 +80,7 @@ describe('App', function () {
         cy.contains('www.variantb1351.com');
     });
 
-    it.only('allows the user to search by date and an additional filter', function () {
+    it('allows the user to search by date and an additional filter', function () {
         cy.login({ roles: ['curator'], name: "testName", email:'test@example.com' });
         cy.visit('/');
         cy.contains('Line list').click();
