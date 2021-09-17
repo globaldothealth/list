@@ -43,6 +43,10 @@ cloud Mapbox {
 	node "Mapbox API"
 }
 
+cloud Google {
+	node "Google OAuth"
+}
+
 cloud "Amazon Lambda" {
 	node "errorLogsToSlack"
 	node "SendWelcomeEmail"
@@ -60,5 +64,7 @@ cloud "Amazon Lambda" {
 [location-service 1] --> [Mapbox API]
 [location-service 2] --> [Mapbox API]
 [location-service] --> [Mapbox API]
-
+[curator-service 1] --> [Google OAuth]
+[curator-service 2] --> [Google OAuth]
+[curator-service] --> [Google OAuth]
 @enduml
