@@ -468,7 +468,7 @@ describe('Linelist table', function () {
         cy.contains('7 rows selected').should('not.exist');
     });
 
-    it('Can delete all cases across rows for a search result', function () {
+    it.only('Can delete all cases across rows for a search result', function () {
         for (let i = 0; i < 7; i++) {
             cy.addCase({
                 country: 'France',
@@ -492,6 +492,7 @@ describe('Linelist table', function () {
         cy.get("#country").click();
         cy.get('[data-value="France"]').click().type('{Enter}');
         cy.get('button[data-test-id="search-by-filter-button"]').click();
+        cy.wait(550);
         cy.get('input[type="checkbox"]').eq(0).click();
         cy.contains('Select all 7 rows').click();
         cy.server();
