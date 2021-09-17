@@ -1,7 +1,7 @@
 IMGDIR := images
 SRCDIR := src
 
-all: $(IMGDIR)/deployment.png
+all: $(IMGDIR)/deployment.png $(IMGDIR)/dataflow.png
 
 .PHONY: all
 
