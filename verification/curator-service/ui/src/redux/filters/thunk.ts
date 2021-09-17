@@ -17,8 +17,8 @@ void,
     async (_, { rejectWithValue}) => {
         try {
             const response = await axios.get(countryListJsonFile);            
-            const responseArray:[] = Object.entries(response.data)[0][1] as [];
-            const countries:string[]= responseArray
+            const responseArray = Object.entries(response.data)[0][1] as [];
+            const countries = responseArray
                 .map((el:countryObject) => {
                     return el._id;
                 })
