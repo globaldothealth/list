@@ -468,7 +468,7 @@ describe('Linelist table', function () {
         cy.contains('7 rows selected').should('not.exist');
     });
 
-    it.only('Can delete all cases across rows for a search result', function () {
+    it('Can delete all cases across rows for a search result', function () {
         for (let i = 0; i < 7; i++) {
             cy.addCase({
                 country: 'France',
