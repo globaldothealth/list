@@ -373,6 +373,7 @@ describe('Linelist table', function () {
 
         cy.contains('Filter').click();
         cy.get("#country").click();
+        cy.wait(300);
         cy.get('[data-value="Uruguay"]').click().type('{Enter}');
         cy.get('button[data-test-id="search-by-filter-button"]').click();
         cy.contains('France').should('not.exist');
@@ -380,6 +381,7 @@ describe('Linelist table', function () {
 
         cy.contains('Filter').click();
         cy.get("#country").click();
+        cy.wait(300);
         cy.get('[data-value="France"]').click().type('{Enter}');
         cy.get('button[data-test-id="search-by-filter-button"]').click();
         cy.get('td[value="France"]');
@@ -405,6 +407,7 @@ describe('Linelist table', function () {
         cy.contains('United Kingdom');
         cy.contains('Filter').click();
         cy.get("#country").click();
+        cy.wait(300);
         cy.get('[data-value="France"]').click().type('{Enter}');
         cy.get('button[data-test-id="search-by-filter-button"]').click();
         cy.contains('United Kingdom').should('not.exist');
