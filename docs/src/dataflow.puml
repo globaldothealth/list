@@ -10,13 +10,13 @@
                                               v
 +------------+      +------------+     +------+------+  case data   +----------+
 |Browser {io}+<---->+ Curator UI +<--->+ Curator API +<------------>+ Data API +<---------+
-+------------+      +------------+     +---+---+-----+              +------+---+          |
-                                           ^   ^                           ^              |
-                                           |   | ADI sources               | case data    | geocoding
-                                           |   | user records              v              | queries and results
-                                           |   |                      +----+--------+     |
-                                           |   +--------------------->+ mongo DB {s}|     |
-                                           |                          +------+------+     |
++-----+------+      +------------+     +---+---+-----+              +------+---+          |
+      |                                    ^   ^                           ^              |
+      |                                    |   | ADI sources               | case data    | geocoding
+ +----+-----+                              |   | user records              v              | queries and results
+ | Google   |                              |   |                      +----+--------+     |
+ | Auth {io}|                              |   +--------------------->+ mongo DB {s}|     |
+ +----------+                              |                          +------+------+     |
                                            |                                 |            |
                                            |           cached admin regions  v            |
                                            |                          +------+-------+    |
