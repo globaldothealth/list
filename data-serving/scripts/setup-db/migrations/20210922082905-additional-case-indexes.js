@@ -17,6 +17,20 @@ const indexes = [
       'revisionMetadata.creationMetadata.date': -1,
     },
   },
+  {
+    name: 'sourceAndUploadId',
+    key: {
+      'caseReference.sourceId': 1,
+      'caseReference.uploadIds': 1,
+    },
+  },
+  {
+    name: 'bySourceIfListed',
+    key: {
+      'caseReference.sourceId': 1,
+      'list': 1,
+    }
+  },
 ];
 
 module.exports = {
@@ -30,7 +44,7 @@ module.exports = {
   async down(db, client) {
     await db.command({
       dropIndexes: 'cases',
-      indexes: ['sourceAndVerificationStatus', 'byDateIfListed']
+      index: ['sourceAndVerificationStatus', 'byDateIfListed', 'sourceAndUploadId', 'bySourceIfListed']
     });
   }
 };
