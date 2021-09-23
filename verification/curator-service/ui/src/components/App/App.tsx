@@ -522,10 +522,7 @@ export default function App(): JSX.Element {
         dispatch(setSearchQuery(URLToSearchQuery(location.search)));
 
         //eslint-disable-next-line
-    }, [location.search]);
-
-    console.log(activeFilterInput);
-    
+    }, [location.search]);    
 
     return (
         <div className={classes.root} ref={rootRef}>

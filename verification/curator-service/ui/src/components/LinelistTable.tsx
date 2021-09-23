@@ -449,7 +449,7 @@ export function SortSelect({
         { name: 'None', value: SortBy.Default },
         // Commenting out until fix is found for big queries sorting in mongodb
         // { name: 'Confirmed date', value: SortBy.ConfirmedDate },
-        {... filteredKeys[0] !== 'country' && { name: 'Country', value: SortBy.Country }},
+        {...filteredKeys[0] !== 'country' && { name: 'Country', value: SortBy.Country }},
         { name: 'Location admin 1', value: SortBy.Admin1 },
         { name: 'Location admin 2', value: SortBy.Admin2 },
         { name: 'Location admin 3', value: SortBy.Admin3 },
