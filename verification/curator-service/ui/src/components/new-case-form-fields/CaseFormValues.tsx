@@ -39,6 +39,8 @@ export default interface CaseFormValues {
     pathogens: Pathogen[];
     notes: string;
     numCases?: number;
+    vaccines: Vaccine[];
+    [index: string]: Pathogen[]|Vaccine[]|GenomeSequence[]|Travel[]|string[]|CaseReferenceForm|Loc|string|number|null|undefined;
 }
 
 export interface Travel {
@@ -61,6 +63,22 @@ export interface GenomeSequence {
     sequenceId?: string;
     sequenceName?: string;
     sequenceLength?: number;
+}
+
+export interface Symptom {
+    status: string;
+    values: string[];
+}
+
+export interface Vaccine {
+    // Used to key react elements in the UI
+    reactId?: string;
+    name: string;
+    batch?: string;
+    date?: Date;
+    sideEffects: Symptom;
+    previousInfection: 'yes'|'no'|'NA';
+    previousInfectionDetectionMethod?: string;
 }
 
 interface Pathogen {

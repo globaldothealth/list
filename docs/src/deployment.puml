@@ -1,0 +1,70 @@
+@startuml
+cloud "Amazon S3" {
+	node "Map UI"
+	node "Map Data"
+	node "Source data"
+}
+
+cloud "Github/globaldothealth/common master" {
+	file "countries.data"
+	file "country_boundaries.json"
+}
+
+cloud "MongoDB Atlas" {
+	node "Prod mongoDB cluster"
+	node "Dev mongoDB cluster"
+}
+
+cloud "Amazon EKS" {
+	folder "ghdsi cluster" {
+		node "Ingress Controller"
+		node prod {
+			node "curator-service 1"
+			node "curator-service 2"
+			node "data-service 1"
+			node "data-service 2"
+			node "location-service 1"
+			node "location-service 2"
+		}
+		node dev {
+			node "curator-service"
+			node "data-service"
+			node "location-service"
+		}
+	}
+}
+
+cloud "Amazon Batch" {
+	node "ADI Retrieval"
+	node "ADI Parsers"
+}
+
+cloud Mapbox {
+	node "Mapbox API"
+}
+
+cloud Google {
+	node "Google OAuth"
+}
+
+cloud "Amazon Lambda" {
+	node "errorLogsToSlack"
+	node "SendWelcomeEmail"
+	node "Map Data Exporters"
+}
+
+[Map UI] --> [countries.data] : "Country geometry and population"
+[Map UI] --> [country_boundaries.json] : "Country geometry"
+[Map UI] --> [Map Data] : "Case data by date/country"
+[Map Data Exporters] --> [Map Data]
+[Map Data Exporters] <-- [Prod mongoDB cluster]
+[ADI Retrieval] --> [Source data]
+[ADI Parsers] <-- [Source data]
+[ADI Parsers] --> [Prod mongoDB cluster]
+[location-service 1] --> [Mapbox API]
+[location-service 2] --> [Mapbox API]
+[location-service] --> [Mapbox API]
+[curator-service 1] --> [Google OAuth]
+[curator-service 2] --> [Google OAuth]
+[curator-service] --> [Google OAuth]
+@enduml

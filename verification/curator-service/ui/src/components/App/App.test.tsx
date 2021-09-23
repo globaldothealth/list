@@ -180,13 +180,13 @@ describe('<App />', () => {
             expect(screen.getByText(/COVID-19 Linelist/i)).toBeInTheDocument();
         });
 
-        const columnHeader = screen.getByText(/Country/i);
+        const columnHeader = screen.getByText(/Nationality/i);
         userEvent.click(columnHeader);
 
         await waitFor(() => {
             expect(screen.getByText(/Apply filters/i)).toBeInTheDocument();
             expect(
-                screen.getByRole('textbox', { name: /country/i }),
+                screen.getByRole('textbox', { name: /nationality/i }),
             ).toHaveFocus();
         });
     });

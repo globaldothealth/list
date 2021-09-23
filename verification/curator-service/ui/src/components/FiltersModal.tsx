@@ -21,6 +21,9 @@ import {
 import { Alert } from '@material-ui/lab';
 // import { HelpOutline } from '@material-ui/icons';
 // import { AppTooltip } from './common-form-fields/AppTooltip';
+import  {useAppSelector,  useAppDispatch} from '../hooks/redux';
+import { fetchCountries } from '../redux/filters/thunk';
+import { countryList, isLoading, filterError } from '../redux/filters/selectors';
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -232,6 +235,18 @@ export default function FiltersModal({
     //     </>
     // );
 
+ 
+    const dispatch = useAppDispatch();
+    const loadingState = useAppSelector(isLoading);
+    const error = useAppSelector(filterError);
+
+    useEffect(() => {
+        dispatch(fetchCountries());
+
+      }, [dispatch])
+
+      const countries = useAppSelector(countryList);
+
     return (
         <Dialog open={isOpen} maxWidth={'xl'} onClose={closeAndResetAlert}>
             <DialogTitle>Apply filters</DialogTitle>
@@ -251,7 +266,7 @@ export default function FiltersModal({
                 <form className={classes.root} onSubmit={formik.handleSubmit}>
                     {/* GENERAL */}
                     <div>
-                        <TextField
+                        {/* <TextField
                             autoFocus={activeFilterInput === 'country'}
                             id="country"
                             name="country"
@@ -267,7 +282,34 @@ export default function FiltersModal({
                             helperText={
                                 formik.touched.country && formik.errors.country
                             }
-                        />
+                        /> */}
+              
+                        <FormControl
+                            variant="outlined"
+                            className={classes.formControl}
+                        >
+                            <InputLabel id="country-label">
+                                Country
+                            </InputLabel>
+                            {!error && <Select
+                                autoFocus={
+                                    activeFilterInput === 'country'
+                                }
+                                labelId="country-label"
+                                id="country"
+                                name="country"
+                                label="Country"
+                                value={formik.values.country || ''}
+                                onChange={formik.handleChange}
+                                disabled={loadingState}
+                                data-testid="country-select"
+                            >
+                                <MenuItem value="" disabled>
+                                    None
+                                </MenuItem>
+                                {countries.map((country: string) => <MenuItem value={country} key={country}>{country}</MenuItem>)}
+                            </Select>}
+                        </FormControl>
                         <FormControl
                             variant="outlined"
                             className={classes.formControl}
@@ -611,6 +653,7 @@ export default function FiltersModal({
                             type="submit"
                             data-test-id="search-by-filter-button"
                             name="filterButton"
+                            id="start-filtering"
                             className={classes.searchBtn}
                         >
                             Filter

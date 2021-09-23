@@ -6,8 +6,9 @@
   "scripts": {
     "build": "tsc",
     "lint": "tsc --noEmit && eslint '*/**/*.{js,ts,tsx}' --quiet --fix",
-    "drop-cases-and-import-sample-data": "mongoimport --drop --uri=$CONN --db $DB --collection cases --jsonArray --file ../../samples/cases.json",
-    "migrate": "npm install && migrate-mongo up"
+    "import-sample-data": "mongoimport --uri=$CONN --db $DB --collection cases --jsonArray --file ../../samples/cases.json",
+    "migrate": "npm install && migrate-mongo up",
+    "delete-all-cases": "mongo $CONN --eval 'db.collection.deleteMany({})'"
   },
   "repository": {
     "type": "git",

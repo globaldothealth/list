@@ -111,7 +111,9 @@ describe('App', function () {
         cy.get('.filter-button').click();
 
         cy.get('#dateconfirmedafter').type('2020-04-30');
-        cy.get('#country').type('italy{Enter}');
+        cy.get("#country").click();
+        cy.get('[data-value="Italy"]').click().type('{Enter}');
+        cy.get('#start-filtering').click();
 
         cy.contains('2020-06-03');
         cy.contains('Italy');
