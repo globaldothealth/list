@@ -1,7 +1,7 @@
 # This dockerfile builds the curator API service and its UI in a single container.
 # The UI is served as a static resource from the curator API service express server.
 # Security best practices are followed and a trimmed down image is used for production serving.
-FROM node:14 as builder
+FROM node:14.17.6-alpine as builder
 
 # Build the curator service.
 WORKDIR /usr/src/app/verification/curator-service/api
@@ -46,7 +46,7 @@ RUN npm run build
 
 
 # Multi-staged build, use a trimmed down version of node for prod.
-FROM node:14.17.1-alpine as prod
+FROM node:14.17.6-alpine as prod
 
 # No need to run as root.
 USER node
