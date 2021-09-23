@@ -9,6 +9,8 @@ WORKDIR /usr/src/app/verification/curator-service/api
 # A wildcard is used to ensure both package.json AND package-lock.json are copied
 # where available (npm@5+)
 COPY verification/curator-service/api/package*.json ./
+# we need git
+RUN apk add git
 # RUN npm clean install
 RUN npm cache clean --force
 RUN npm ci
