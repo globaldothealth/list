@@ -50,7 +50,8 @@ import renderDate, { renderDateRange } from './util/date';
 import { URLToSearchQuery } from './util/searchQuery';
 import { ChipData } from './App/App';
 import { SortBy, SortByOrder } from '../constants/types';
-import { connect, ConnectedProps, useSelector } from 'react-redux';
+import { connect, ConnectedProps } from 'react-redux';
+import  {useAppSelector} from '../hooks/redux';
 import { RootState } from '../redux/store';
 import { selectFilterBreadcrumbs } from '../redux/app/selectors';
 
@@ -442,19 +443,21 @@ export function SortSelect({
 }: SortSelectProps): JSX.Element {
     const classes = sortSelectStyles();
 
-    const filterBreadCrumbs = useSelector(selectFilterBreadcrumbs);
+    const filterBreadCrumbs = useAppSelector(selectFilterBreadcrumbs);
     let filteredKeys = filterBreadCrumbs.map(({ key }) => key);  
 
     const sortKeywords = [
         { name: 'None', value: SortBy.Default },
         // Commenting out until fix is found for big queries sorting in mongodb
         // { name: 'Confirmed date', value: SortBy.ConfirmedDate },
-        {...filteredKeys[0] !== 'country' && { name: 'Country', value: SortBy.Country }},
         { name: 'Location admin 1', value: SortBy.Admin1 },
         { name: 'Location admin 2', value: SortBy.Admin2 },
         { name: 'Location admin 3', value: SortBy.Admin3 },
         { name: 'Age', value: SortBy.Age },
     ];
+
+    !filteredKeys.includes('country') && sortKeywords.push({ name: 'Country', value: SortBy.Country });
+
 
     const handleChange = (
         event: React.ChangeEvent<{ value: unknown; name?: string | undefined }>,
