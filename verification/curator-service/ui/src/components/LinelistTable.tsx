@@ -456,7 +456,8 @@ export function SortSelect({
         { name: 'Age', value: SortBy.Age },
     ];
 
-    !filteredKeys.includes('country') && sortKeywords.push({ name: 'Country', value: SortBy.Country });
+    !filteredKeys.includes('country') &&   sortKeywords.splice(1, 0, { name: 'Country', value: SortBy.Country });;
+  
 
 
     const handleChange = (
