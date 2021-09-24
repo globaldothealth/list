@@ -1515,6 +1515,8 @@ components:
                             type: string
                             example: B.1.351
                             description: Name of the variant of concern or interest.
+                vaccines:
+                    $ref: '#/components/schemas/VaccineArray'
         CaseStatus:
             type: string
             enum: [UNVERIFIED, VERIFIED, EXCLUDED]
@@ -1827,6 +1829,26 @@ components:
             required:
                 - numCreated
                 - numUpdated
+        VaccineArray:
+            description: A list of vaccines
+            type: array
+            items:
+                $ref: '#/components/schemas/Location'
+        Vaccine:
+            description: An instance of an individual receiving a vaccine dose
+            properties:
+                name:
+                    description: The name of the vaccine administered
+                    example: AstraZeneca
+                    type: string
+                batch:
+                    description: The batch ID of the vaccine dose administered
+                    example: PV12345
+                    type: string
+                date:
+                    $ref: '#/components/schemas/Date'
+                sideEffects:
+                    $ref: '#/components/schemas/SymptomArray'
     responses:
         '200':
             description: OK
