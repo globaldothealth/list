@@ -160,6 +160,9 @@ export default class CasesController {
 
         const user = req.user as UserDocument;
 
+        logger.info(`User from doc: ${user}`)
+        logger.info(`User from req: ${req.user}`)
+
         try {
             const signedUrl: string = await new Promise((resolve, reject) => {
                 this.s3Client.getSignedUrl('getObject', params, (err, url) => {
@@ -174,12 +177,13 @@ export default class CasesController {
                 { $push: { downloads: {
                     timestamp: new Date(),
                 } } },
+                { returnOriginal: false },
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                function(err: any) {
+                function(err: any, doc: any) {
                     if (err) {
                         logger.info(`An error occurred: ${err}`);
                     } else {
-                        logger.info(`Document updated`);
+                        logger.info(`Document updated: ${doc}`);
                     }
                 }
             );
