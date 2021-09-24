@@ -4,7 +4,7 @@ import bcrypt from 'bcrypt';
 export const userRoles = ['admin', 'curator'];
 
 export type UserDocument = Document & {
-    googleID?: string;
+    googleID?: string | undefined;
     name?: string;
     email: string;
     password?: string;
