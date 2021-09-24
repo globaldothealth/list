@@ -1,7 +1,8 @@
 {
   "extends": "../../../common/tsconfig.json",
   "compilerOptions": {
-    "outDir": "dist" /* Redirect output structure to the directory. */
+    "outDir": "dist", /* Redirect output structure to the directory. */
+    "types": [ "@types/jest" ]
   },
   "include": [
     "src/**/*",
