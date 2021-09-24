@@ -160,8 +160,8 @@ export default class CasesController {
 
         const user = req.user as UserDocument;
 
-        logger.info(`User from doc: {user}`)
-        logger.info(`User from req: {req.user}`)
+        logger.info(`User from doc: ${user}`)
+        logger.info(`User from req: ${req.user}`)
 
         try {
             const signedUrl: string = await new Promise((resolve, reject) => {
