@@ -160,8 +160,9 @@ export default class CasesController {
 
         const user = req.user as UserDocument;
 
-        logger.info(`User from doc: ${user}`)
-        logger.info(`User from req: ${req.user}`)
+        logger.info(`User from doc: ${JSON.stringify(user)}`)
+        logger.info(`User id from doc: ${user._id}`)
+        logger.info(`User from req: ${JSON.stringify(req.user)}`)
 
         try {
             const signedUrl: string = await new Promise((resolve, reject) => {
