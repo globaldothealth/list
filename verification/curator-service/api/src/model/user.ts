@@ -11,7 +11,11 @@ export type UserDocument = Document & {
     roles: [string];
     picture?: string;
     newsletterAccepted?: boolean;
-    downloads?: [{ timestamp: Date }];
+    downloads?: [{
+        timestamp: Date,
+        format?: String,
+        query?: String,
+    }];
 
     isValidPassword(password: string): Promise<boolean>;
     publicFields(): {
@@ -42,6 +46,8 @@ const userSchema = new mongoose.Schema<UserDocument>({
     downloads: [
         {
             timestamp: Date,
+            format: String,
+            query: String,
         },
     ],
 });
