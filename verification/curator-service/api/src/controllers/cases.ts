@@ -161,7 +161,7 @@ export default class CasesController {
         const user = req.user as UserDocument;
 
         logger.info(`User from doc: ${JSON.stringify(user)}`)
-        logger.info(`User id from doc: ${user._id}`)
+        logger.info(`User id from doc: ${user.id}`)
         logger.info(`User from req: ${JSON.stringify(req.user)}`)
 
         try {
@@ -174,7 +174,7 @@ export default class CasesController {
             });
 
             await User.findByIdAndUpdate(
-                user._id,
+                user.id,
                 { $push: { downloads: {
                     timestamp: new Date(),
                 } } },
