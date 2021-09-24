@@ -1,5 +1,4 @@
 import { Request, Response } from 'express';
-import { Worker } from 'worker_threads';
 import { User, UserDocument } from '../model/user';
 import axios from 'axios';
 import { logger } from '../util/logger';
@@ -44,6 +43,23 @@ export default class CasesController {
         const correlationId = crypto.randomBytes(16).toString('hex');
         req.body.correlationId = correlationId;
         try {
+            const user = req.user as UserDocument;
+            await User.findByIdAndUpdate(
+                user._id,
+                { $push: { downloads: {
+                    timestamp: new Date(),
+                    format: req.body.format,
+                    query: req.body.query,
+                } } },
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                function(err: any) {
+                    if (err) {
+                        logger.info(`An error occurred: ${err}`);
+                    } else {
+                        logger.info(`Document updated`);
+                    }
+                }
+            );
             axios({
                 method: 'post',
                 url: this.dataServerURL + '/api' + req.url,
@@ -78,9 +94,26 @@ export default class CasesController {
             return;
         }
         try {
+            const user = req.user as UserDocument;
             const url = this.dataServerURL + '/api' + req.url.replace('Async', '');
             req.body.correlationId = crypto.randomBytes(16).toString('hex');
             logger.info(`Streaming case data in format ${req.body.format} matching query ${req.body.query} for correlation ID ${req.body.correlationId}`);
+            await User.findByIdAndUpdate(
+                user._id,
+                { $push: { downloads: {
+                    timestamp: new Date(),
+                    format: req.body.format,
+                    query: req.body.query,
+                } } },
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                function(err: any) {
+                    if (err) {
+                        logger.info(`An error occurred: ${err}`);
+                    } else {
+                        logger.info(`Document updated`);
+                    }
+                }
+            );
             axios({
                 method: 'post',
                 url: url,
@@ -136,11 +169,19 @@ export default class CasesController {
                 });
             });
 
-            await User.findOneAndUpdate(
-                {
-                    _id: user._id,
-                },
-                { $push: { downloads: { timestamp: new Date() } } },
+            await User.findByIdAndUpdate(
+                user._id,
+                { $push: { downloads: {
+                    timestamp: new Date(),
+                } } },
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                function(err: any) {
+                    if (err) {
+                        logger.info(`An error occurred: ${err}`);
+                    } else {
+                        logger.info(`Document updated`);
+                    }
+                }
             );
 
             res.status(200).send({ signedUrl });
