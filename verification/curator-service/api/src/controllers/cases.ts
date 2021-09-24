@@ -174,9 +174,9 @@ export default class CasesController {
                 { $push: { downloads: {
                     timestamp: new Date(),
                 } } },
-                { new: true },
+                { returnOriginal: false },
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                function(err: any, doc: UserDocument) {
+                function(err: any, doc: any) {
                     if (err) {
                         logger.info(`An error occurred: ${err}`);
                     } else {
