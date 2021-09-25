@@ -45,7 +45,7 @@ export default class CasesController {
         try {
             const user = req.user as UserDocument;
             await User.findByIdAndUpdate(
-                user._id,
+                user.id,
                 { $push: { downloads: {
                     timestamp: new Date(),
                     format: req.body.format,
@@ -99,7 +99,7 @@ export default class CasesController {
             req.body.correlationId = crypto.randomBytes(16).toString('hex');
             logger.info(`Streaming case data in format ${req.body.format} matching query ${req.body.query} for correlation ID ${req.body.correlationId}`);
             await User.findByIdAndUpdate(
-                user._id,
+                user.id,
                 { $push: { downloads: {
                     timestamp: new Date(),
                     format: req.body.format,
@@ -160,10 +160,6 @@ export default class CasesController {
 
         const user = req.user as UserDocument;
 
-        logger.info(`User from doc: ${JSON.stringify(user)}`)
-        logger.info(`User id from doc: ${user.id}`)
-        logger.info(`User from req: ${JSON.stringify(req.user)}`)
-
         try {
             const signedUrl: string = await new Promise((resolve, reject) => {
                 this.s3Client.getSignedUrl('getObject', params, (err, url) => {
@@ -178,13 +174,12 @@ export default class CasesController {
                 { $push: { downloads: {
                     timestamp: new Date(),
                 } } },
-                { returnOriginal: false },
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                function(err: any, doc: any) {
+                function(err: any) {
                     if (err) {
                         logger.info(`An error occurred: ${err}`);
                     } else {
-                        logger.info(`Document updated: ${doc}`);
+                        logger.info(`Document updated`);
                     }
                 }
             );
