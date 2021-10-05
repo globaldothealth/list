@@ -52,6 +52,7 @@ import { ChipData } from './App/App';
 import { SortBy, SortByOrder } from '../constants/types';
 import { connect, ConnectedProps } from 'react-redux';
 import { RootState } from '../redux/store';
+import Helmet from 'react-helmet';
 
 // Limit number of data that can be displayed or downloaded to avoid long execution times of mongo queries
 const DATA_LIMIT = 10000;
@@ -547,7 +548,7 @@ export function DownloadButton(): JSX.Element {
                 break;
 
             case 'partialDataset':
-            console.log('downloading partial data set');
+                console.log('downloading partial data set');
                 try {
                     const response = await axios({
                         method: 'post',
@@ -573,7 +574,6 @@ export function DownloadButton(): JSX.Element {
                     link.setAttribute('download', filename);
                     document.body.appendChild(link);
                     link.click();
-
                 } catch (err) {
                     alert(
                         `There was an error while downloading data, please try again later. ${err}`,
@@ -694,16 +694,16 @@ export function DownloadButton(): JSX.Element {
                                     variant="contained"
                                     color="primary"
                                     className={classes.downloadButton}
-                                    onClick={() => 
-                                        {
-                                            downloadDataSet(
-                                                'partialDataset',
-                                                fileFormat,
-                                            );
-                                            setIsDownloadModalOpen(false);
-                                            alert('Downloading now. Depending on the size of the data set, this could take some time.');
-                                        }
-                                    }
+                                    onClick={() => {
+                                        downloadDataSet(
+                                            'partialDataset',
+                                            fileFormat,
+                                        );
+                                        setIsDownloadModalOpen(false);
+                                        alert(
+                                            'Downloading now. Depending on the size of the data set, this could take some time.',
+                                        );
+                                    }}
                                     disabled={
                                         isLoading || downloadButtonDisabled
                                     }
@@ -950,6 +950,9 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
 
         return (
             <>
+                <Helmet>
+                    <title>Global.health | Cases</title>
+                </Helmet>
                 {this.props.user ? (
                     <>
                         {this.state.error && (

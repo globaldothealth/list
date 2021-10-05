@@ -24,6 +24,8 @@ import { SnackbarAlert } from '../SnackbarAlert';
 
 import { useParams } from 'react-router-dom';
 
+import Helmet from 'react-helmet';
+
 interface StylesProps {
     smallHeight: boolean;
 }
@@ -130,131 +132,139 @@ const LandingPage = (): JSX.Element => {
     }, [lastLocation]);
 
     return (
-        <Paper classes={{ root: classes.paper }}>
-            <Typography variant="h4">
-                Detailed line list data to power your research
-            </Typography>
-            <div className={classes.body}>
-                <Typography
-                    classes={{ root: classes.description }}
-                    variant="h5"
-                >
-                    Welcome to G.h Data. The first of its kind, easy to use
-                    global data repository with open access to real-time
-                    epidemiological anonymized line list data.
+        <>
+            <Helmet>
+                <title>Global.health | Data</title>
+            </Helmet>
+            <Paper classes={{ root: classes.paper }}>
+                <Typography variant="h4">
+                    Detailed line list data to power your research
                 </Typography>
-                <div className={classes.linksContainer}>
-                    <div>
-                        <Typography>More information</Typography>
-                        <div className={classes.link}>
-                            <a
-                                href="https://global.health/"
-                                rel="noopener noreferrer"
-                                target="_blank"
+                <div className={classes.body}>
+                    <Typography
+                        classes={{ root: classes.description }}
+                        variant="h5"
+                    >
+                        Welcome to G.h Data. The first of its kind, easy to use
+                        global data repository with open access to real-time
+                        epidemiological anonymized line list data.
+                    </Typography>
+                    <div className={classes.linksContainer}>
+                        <div>
+                            <Typography>More information</Typography>
+                            <div className={classes.link}>
+                                <a
+                                    href="https://global.health/"
+                                    rel="noopener noreferrer"
+                                    target="_blank"
+                                >
+                                    Global.health website
+                                </a>
+                            </div>
+                            <div className={classes.link}>
+                                <a
+                                    href="https://map.covid-19.global.health/"
+                                    rel="noopener noreferrer"
+                                    target="_blank"
+                                >
+                                    Global.health map
+                                </a>
+                            </div>
+                            <div className={classes.link}>
+                                <a
+                                    href="fields.txt"
+                                    rel="noopener noreferrer"
+                                    target="_blank"
+                                >
+                                    Data dictionary
+                                </a>
+                            </div>
+                            <div className={classes.link}>
+                                <a
+                                    href="https://global.health/acknowledgement/"
+                                    rel="noopener noreferrer"
+                                    target="_blank"
+                                >
+                                    Data acknowledgments
+                                </a>
+                            </div>
+                            <div className={classes.link}>
+                                <a
+                                    href="https://global.health/terms-of-use/"
+                                    rel="noopener noreferrer"
+                                    target="_blank"
+                                >
+                                    Terms of use
+                                </a>
+                            </div>
+                            <div className={classes.link}>
+                                <a
+                                    href="https://global.health/privacy/"
+                                    rel="noopener noreferrer"
+                                    target="_blank"
+                                >
+                                    Privacy policy
+                                </a>
+                            </div>
+                            <PolicyLink
+                                type="cookie-policy"
+                                classes={{
+                                    root: classes.link,
+                                }}
                             >
-                                Global.health website
-                            </a>
+                                Cookie policy
+                            </PolicyLink>
                         </div>
-                        <div className={classes.link}>
-                            <a
-                                href="https://map.covid-19.global.health/"
-                                rel="noopener noreferrer"
-                                target="_blank"
-                            >
-                                Global.health map
-                            </a>
-                        </div>
-                        <div className={classes.link}>
-                            <a
-                                href="fields.txt"
-                                rel="noopener noreferrer"
-                                target="_blank"
-                            >
-                                Data dictionary
-                            </a>
-                        </div>
-                        <div className={classes.link}>
-                            <a
-                                href="https://global.health/acknowledgement/"
-                                rel="noopener noreferrer"
-                                target="_blank"
-                            >
-                                Data acknowledgments
-                            </a>
-                        </div>
-                        <div className={classes.link}>
-                            <a
-                                href="https://global.health/terms-of-use/"
-                                rel="noopener noreferrer"
-                                target="_blank"
-                            >
-                                Terms of use
-                            </a>
-                        </div>
-                        <div className={classes.link}>
-                            <a
-                                href="https://global.health/privacy/"
-                                rel="noopener noreferrer"
-                                target="_blank"
-                            >
-                                Privacy policy
-                            </a>
-                        </div>
-                        <PolicyLink
-                            type="cookie-policy"
-                            classes={{
-                                root: classes.link,
-                            }}
-                        >
-                            Cookie policy
-                        </PolicyLink>
                     </div>
                 </div>
-            </div>
 
-            {registrationScreenOn && !changePasswordScreenOn ? (
-                <SignUpForm
-                    disabled={isLoading}
-                    setRegistrationScreenOn={setRegistrationScreenOn}
-                />
-            ) : (
-                !changePasswordScreenOn && (
-                    <SignInForm
+                {registrationScreenOn && !changePasswordScreenOn ? (
+                    <SignUpForm
                         disabled={isLoading}
                         setRegistrationScreenOn={setRegistrationScreenOn}
                     />
-                )
-            )}
-            {changePasswordScreenOn && (
-                <ChangePasswordForm
-                    token={token}
-                    id={id}
-                    disabled={isLoading}
+                ) : (
+                    !changePasswordScreenOn && (
+                        <SignInForm
+                            disabled={isLoading}
+                            setRegistrationScreenOn={setRegistrationScreenOn}
+                        />
+                    )
+                )}
+                {changePasswordScreenOn && (
+                    <ChangePasswordForm
+                        token={token}
+                        id={id}
+                        disabled={isLoading}
+                    />
+                )}
+
+                {isLoading && !forgotPasswordPopupOpen && (
+                    <LinearProgress color="primary" />
+                )}
+
+                {error && !forgotPasswordPopupOpen && (
+                    <Alert
+                        severity="error"
+                        onClose={() => dispatch(resetError())}
+                    >
+                        {error}
+                    </Alert>
+                )}
+
+                <SnackbarAlert
+                    isOpen={isOpen}
+                    type="success"
+                    message={message}
+                    durationMs={5000}
+                    onClose={(open: boolean) =>
+                        dispatch(toggleSnackbar({ isOpen: open, message: '' }))
+                    }
                 />
-            )}
 
-            {isLoading && !forgotPasswordPopupOpen && (
-                <LinearProgress color="primary" />
-            )}
-
-            {error && !forgotPasswordPopupOpen && (
-                <Alert severity="error" onClose={() => dispatch(resetError())}>
-                    {error}
-                </Alert>
-            )}
-
-            <SnackbarAlert
-                isOpen={isOpen}
-                type="success"
-                message={message}
-                durationMs={5000}
-                onClose={(open: boolean) =>
-                    dispatch(toggleSnackbar({ isOpen: open, message: '' }))
-                }
-            />
-
-            <PartnerLogos />
-        </Paper>
+                <PartnerLogos />
+            </Paper>
+        </>
     );
 };
 

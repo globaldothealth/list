@@ -99,11 +99,13 @@
   },
   "devDependencies": {
     "@types/qs": "^6.9.6",
+    "@types/react-helmet": "^6.1.2",
     "csvtojson": "^2.0.10",
     "cypress": "^5.6.0",
     "cypress-file-upload": "^4.1.1",
     "jest-canvas-mock": "^2.3.1",
-    "jest-environment-jsdom-fifteen": "^1.0.2"
+    "jest-environment-jsdom-fifteen": "^1.0.2",
+    "react-helmet": "^6.1.0"
   },
   "husky": {
     "hooks": {
