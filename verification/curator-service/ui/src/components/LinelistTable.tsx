@@ -51,7 +51,9 @@ import { URLToSearchQuery } from './util/searchQuery';
 import { ChipData } from './App/App';
 import { SortBy, SortByOrder } from '../constants/types';
 import { connect, ConnectedProps } from 'react-redux';
+import  {useAppSelector} from '../hooks/redux';
 import { RootState } from '../redux/store';
+import { selectFilterBreadcrumbs } from '../redux/app/selectors';
 
 // Limit number of data that can be displayed or downloaded to avoid long execution times of mongo queries
 const DATA_LIMIT = 10000;
@@ -441,16 +443,22 @@ export function SortSelect({
 }: SortSelectProps): JSX.Element {
     const classes = sortSelectStyles();
 
+    const filterBreadCrumbs = useAppSelector(selectFilterBreadcrumbs);
+    let filteredKeys = filterBreadCrumbs.map(({ key }) => key);  
+
     const sortKeywords = [
         { name: 'None', value: SortBy.Default },
         // Commenting out until fix is found for big queries sorting in mongodb
         // { name: 'Confirmed date', value: SortBy.ConfirmedDate },
-        { name: 'Country', value: SortBy.Country },
         { name: 'Location admin 1', value: SortBy.Admin1 },
         { name: 'Location admin 2', value: SortBy.Admin2 },
         { name: 'Location admin 3', value: SortBy.Admin3 },
         { name: 'Age', value: SortBy.Age },
     ];
+
+    !filteredKeys.includes('country') &&   sortKeywords.splice(1, 0, { name: 'Country', value: SortBy.Country });;
+  
+
 
     const handleChange = (
         event: React.ChangeEvent<{ value: unknown; name?: string | undefined }>,
@@ -944,7 +952,7 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
         this.props.setFiltersModalOpen(true);
         this.props.setActiveFilterInput(filter);
     }
-
+    
     render(): JSX.Element {
         const { history, classes } = this.props;
 
