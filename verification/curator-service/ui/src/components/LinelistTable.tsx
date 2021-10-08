@@ -432,6 +432,8 @@ interface SortSelectProps {
     sortByOrder: SortByOrder;
     handleSortByChange: (sortBy: SortBy) => void;
     handleSortByOrderChange: (sortByOrder: SortByOrder) => void;
+    isUploadByIdFilterUsed: boolean;
+    
 }
 
 export function SortSelect({
@@ -439,6 +441,7 @@ export function SortSelect({
     sortByOrder,
     handleSortByChange,
     handleSortByOrderChange,
+    isUploadByIdFilterUsed
 }: SortSelectProps): JSX.Element {
     const classes = sortSelectStyles();
 
@@ -464,6 +467,9 @@ export function SortSelect({
             handleSortByOrderChange(value as SortByOrder);
         }
     };
+
+    console.log("isUploadByIdFilterUsed", isUploadByIdFilterUsed)
+    
 
     return (
         <>
@@ -944,6 +950,8 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
         this.props.setFiltersModalOpen(true);
         this.props.setActiveFilterInput(filter);
     }
+
+
 
     render(): JSX.Element {
         const { history, classes } = this.props;
@@ -1566,6 +1574,7 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                                 handleSortByOrderChange={
                                                     this.handleSortByOrderChange
                                                 }
+                                                isUploadByIdFilterUsed={this.props.filterBreadcrumbs.some(e => e.key === 'uploadid')}
                                             />
 
                                             {this.props.filterBreadcrumbs
