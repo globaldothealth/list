@@ -34,7 +34,7 @@ class USATest(unittest.TestCase):
                 "events": [
                     {
                         "name": "confirmed",
-                        "dateRange": {"start": "08/30/2020Z", "end": "08/30/2020Z"},
+                        "dateRange": {"start": "08/29/2020Z", "end": "08/29/2020Z"},
                     },
                     {
                         "name": "onsetSymptoms",
