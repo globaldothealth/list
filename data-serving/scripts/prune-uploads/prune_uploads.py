@@ -37,12 +37,14 @@ def accept_reject_msg(accept, reject, success=True, prefix=' '):
     return m
 
 
-def is_acceptable(upload: Dict[str, Any], threshold: float) -> bool:
+def is_acceptable(upload: Dict[str, Any], threshold: float,
+                  prev_created_count: int = 0) -> bool:
     """Whether an upload is acceptable
 
     :param upload: Upload data as a dictionary
     :param threshold: Threshold ratio of errors above which an upload
     is not accepted
+    :param prev_created_count: Created count of previous upload
 
     :return: Whether the upload is acceptable
     """
@@ -51,7 +53,7 @@ def is_acceptable(upload: Dict[str, Any], threshold: float) -> bool:
     errors = upload['summary'].get('numError', 0)
     return (
         upload['status'] == "SUCCESS"
-        and created > 0
+        and created > prev_created_count
         and updated == 0  # non-UUID sources should never update a case
         and errors / (errors + created) <= threshold
         and "accepted" not in upload  # skip already accepted cases
@@ -59,7 +61,8 @@ def is_acceptable(upload: Dict[str, Any], threshold: float) -> bool:
 
 
 def find_acceptable_upload(
-    source: Dict[str, Any], threshold: float, epoch: datetime = None
+    source: Dict[str, Any], threshold: float, epoch: datetime = None,
+    allow_decrease: bool = False
 ) -> Optional[Tuple[List[str], List[str]]]:
     """Finds uploads that can be accepted for inclusion in line list
 
@@ -67,6 +70,7 @@ def find_acceptable_upload(
     :param threshold: Threshold ratio of errors above which
       an upload is not accepted.
     :param epoch: Epoch date after which acceptable uploads will be considered
+    :param allow_decrease: Whether uploads with fewer cases are allowed
 
     epoch is the initial datetime after which we should consider non-UUID
     sources to have data only corresponding to a single upload. Prior to
@@ -94,7 +98,12 @@ def find_acceptable_upload(
 
     # sort uploads, with most recent being the first
     uploads.sort(key=lambda x: x["created"], reverse=True)
-    accept_uploads = [is_acceptable(u, threshold) for u in uploads]
+    accepted_uploads = [u for u in uploads if u.get("accepted", False)]
+    if accepted_uploads and not allow_decrease:
+        prev_created_count = accepted_uploads[0]["summary"].get("numCreated", 0)
+    else:
+        prev_created_count = 0
+    accept_uploads = [is_acceptable(u, threshold, prev_created_count) for u in uploads]
     try:
         accept_idx = accept_uploads.index(True)
     except ValueError:
@@ -182,6 +191,7 @@ def prune_uploads(
     threshold: float,
     epoch: datetime = None,
     dry_run: bool = False,
+    allow_decrease: bool = False,
 ) -> List[str]:
     "Prune uploads for a source"
     _id = str(source["_id"])
@@ -235,6 +245,7 @@ if __name__ == "__main__":
         help="Error threshold percentage below which uploads are accepted",
     )
     parser.add_argument("-n", "--dry-run", help="Dry run", action="store_true")
+    parser.add_argument("-d", "--allow-decrease", help="Allow decrease in cases (non-UUID)")
     args = parser.parse_args()
 
     # Prefer command line arguments to environment variables
@@ -274,7 +285,8 @@ if __name__ == "__main__":
     )
     m = []
     for s in sources:
-        if result := prune_uploads(db.cases, db.sources, s, threshold, epoch, args.dry_run):
+        if result := prune_uploads(db.cases, db.sources, s, threshold,
+                                   epoch, args.dry_run, args.allow_decrease):
             list_msgs = "\n".join(result)
             m.append(f"*{s['name']}* ({str(s['_id'])}):\n{list_msgs}")
 
