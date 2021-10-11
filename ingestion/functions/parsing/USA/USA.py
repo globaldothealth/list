@@ -22,7 +22,10 @@ except ImportError:
 _AGE = "age_group"
 _GENDER = "sex"
 _ETHNICITY = "race_ethnicity_combined"
-_DATE_CONFIRMED = "cdc_report_dt"
+# There's a space in the name of this column in the upstream data.
+# This is defined as the earliest non-empty value of either the CDC report date, or
+# specimen collection. https://data.cdc.gov/Case-Surveillance/COVID-19-Case-Surveillance-Public-Use-Data-with-Ge/n8mc-b4w4
+_DATE_CONFIRMED = "cdc_case_earliest_dt "
 _DATE_SYMPTOMS = "onset_dt"
 _COMORBIDITIES = "medcond_yn"
 _CONFIRMED = "current_status"
