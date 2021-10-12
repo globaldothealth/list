@@ -479,6 +479,7 @@ export function SortSelect({
     useEffect(() => {
         if (!isUploadByIdFilterUsed || sortBy === SortBy.ConfirmedDate) return;
         isUploadByIdFilterUsed && handleSortByChange(SortBy.ConfirmedDate);
+         //eslint-disable-next-line
  }, [isUploadByIdFilterUsed])
 
 
