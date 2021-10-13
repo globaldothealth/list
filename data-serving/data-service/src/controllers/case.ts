@@ -256,8 +256,7 @@ export class CasesController {
             const sortByKeyword = getSortByKeyword(sortBy);
 
             const sortedQuery = casesQuery.sort({
-                [sortByKeyword]:
-                    sortByOrder === SortByOrder.Ascending ? 'asc' : 'desc',
+                [sortByKeyword]: sortByOrder === SortByOrder.Ascending ? 1 : -1,
             });
 
             // Do a fetch of documents and another fetch in parallel for total documents
