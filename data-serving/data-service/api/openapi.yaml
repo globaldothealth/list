@@ -1015,7 +1015,7 @@ components:
             description: A list of vaccines
             type: array
             items:
-                $ref: '#/components/schemas/Location'
+                $ref: '#/components/schemas/Vaccine'
         Vaccine:
             description: An instance of an individual receiving a vaccine dose
             properties:
