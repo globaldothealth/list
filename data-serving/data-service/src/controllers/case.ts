@@ -256,9 +256,10 @@ export class CasesController {
             const sortByKeyword = getSortByKeyword(sortBy);
 
             const sortedQuery = casesQuery.sort({
-                [sortByKeyword]: sortByOrder === SortByOrder.Ascending ? 1 : -1,
-                'revisionMetadata.creationMetadata.date': -1,
+                [sortByKeyword]:
+                    sortByOrder === SortByOrder.Ascending ? 'asc' : 'desc',
             });
+
             // Do a fetch of documents and another fetch in parallel for total documents
             // count used in pagination.
             const [docs, total] = await Promise.all([

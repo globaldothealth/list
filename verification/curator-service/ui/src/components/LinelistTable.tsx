@@ -51,7 +51,7 @@ import { URLToSearchQuery } from './util/searchQuery';
 import { ChipData } from './App/App';
 import { SortBy, SortByOrder } from '../constants/types';
 import { connect, ConnectedProps } from 'react-redux';
-import  {useAppSelector} from '../hooks/redux';
+import { useAppSelector } from '../hooks/redux';
 import { RootState } from '../redux/store';
 import { selectFilterBreadcrumbs } from '../redux/app/selectors';
 
@@ -444,21 +444,19 @@ export function SortSelect({
     const classes = sortSelectStyles();
 
     const filterBreadCrumbs = useAppSelector(selectFilterBreadcrumbs);
-    let filteredKeys = filterBreadCrumbs.map(({ key }) => key);  
+    let filteredKeys = filterBreadCrumbs.map(({ key }) => key);
 
     const sortKeywords = [
         { name: 'None', value: SortBy.Default },
-        // Commenting out until fix is found for big queries sorting in mongodb
-        // { name: 'Confirmed date', value: SortBy.ConfirmedDate },
+        { name: 'Confirmed date', value: SortBy.ConfirmedDate },
         { name: 'Location admin 1', value: SortBy.Admin1 },
         { name: 'Location admin 2', value: SortBy.Admin2 },
         { name: 'Location admin 3', value: SortBy.Admin3 },
         { name: 'Age', value: SortBy.Age },
     ];
 
-    !filteredKeys.includes('country') &&   sortKeywords.splice(1, 0, { name: 'Country', value: SortBy.Country });;
-  
-
+    !filteredKeys.includes('country') &&
+        sortKeywords.splice(1, 0, { name: 'Country', value: SortBy.Country });
 
     const handleChange = (
         event: React.ChangeEvent<{ value: unknown; name?: string | undefined }>,
@@ -555,7 +553,7 @@ export function DownloadButton(): JSX.Element {
                 break;
 
             case 'partialDataset':
-            console.log('downloading partial data set');
+                console.log('downloading partial data set');
                 try {
                     const response = await axios({
                         method: 'post',
@@ -581,7 +579,6 @@ export function DownloadButton(): JSX.Element {
                     link.setAttribute('download', filename);
                     document.body.appendChild(link);
                     link.click();
-
                 } catch (err) {
                     alert(
                         `There was an error while downloading data, please try again later. ${err}`,
@@ -702,16 +699,16 @@ export function DownloadButton(): JSX.Element {
                                     variant="contained"
                                     color="primary"
                                     className={classes.downloadButton}
-                                    onClick={() => 
-                                        {
-                                            downloadDataSet(
-                                                'partialDataset',
-                                                fileFormat,
-                                            );
-                                            setIsDownloadModalOpen(false);
-                                            alert('Downloading now. Depending on the size of the data set, this could take some time.');
-                                        }
-                                    }
+                                    onClick={() => {
+                                        downloadDataSet(
+                                            'partialDataset',
+                                            fileFormat,
+                                        );
+                                        setIsDownloadModalOpen(false);
+                                        alert(
+                                            'Downloading now. Depending on the size of the data set, this could take some time.',
+                                        );
+                                    }}
                                     disabled={
                                         isLoading || downloadButtonDisabled
                                     }
@@ -952,7 +949,7 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
         this.props.setFiltersModalOpen(true);
         this.props.setActiveFilterInput(filter);
     }
-    
+
     render(): JSX.Element {
         const { history, classes } = this.props;
 
