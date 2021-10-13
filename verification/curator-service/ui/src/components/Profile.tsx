@@ -28,6 +28,7 @@ import { Chip, Tooltip } from '@material-ui/core';
 import Alert from '@material-ui/lab/Alert';
 import LinearProgress from '@material-ui/core/LinearProgress';
 import { SnackbarAlert } from './SnackbarAlert';
+import Helmet from 'react-helmet';
 
 const styles = makeStyles((theme: Theme) => ({
     root: {
@@ -144,7 +145,7 @@ export function ChangePasswordFormInProfile(): JSX.Element {
 
         formik.resetForm();
         //eslint-disable-next-line
-    }, [changePasswordResponse]);    
+    }, [changePasswordResponse]);
 
     return (
         <>
@@ -159,7 +160,10 @@ export function ChangePasswordFormInProfile(): JSX.Element {
                 onSubmit={formik.handleSubmit}
                 className={classes.formFlexContainer}
             >
-                <Typography className={classes.title} data-testid="change-your-password-title">
+                <Typography
+                    className={classes.title}
+                    data-testid="change-your-password-title"
+                >
                     Change your password
                 </Typography>
                 <FormControl
@@ -329,6 +333,9 @@ export default function Profile(): JSX.Element {
 
     return (
         <>
+            <Helmet>
+                <title>Global.health | Profile</title>
+            </Helmet>
             {user ? (
                 <div className={classes.root}>
                     {!user.email && (

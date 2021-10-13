@@ -54,6 +54,7 @@
     "react-dom": "^16.13.1",
     "react-draggable": "^4.4.3",
     "react-google-button": "^0.7.2",
+    "react-helmet": "^6.1.0",
     "react-highlight-words": "^0.17.0",
     "react-redux": "^7.2.4",
     "react-router-dom": "^5.1.2",
@@ -99,6 +100,7 @@
   },
   "devDependencies": {
     "@types/qs": "^6.9.6",
+    "@types/react-helmet": "^6.1.2",
     "csvtojson": "^2.0.10",
     "cypress": "^5.6.0",
     "cypress-file-upload": "^4.1.1",
