@@ -854,18 +854,18 @@ describe('POST', () => {
                 })
                 .expect(422, done);
         });
-        it('rejects request bodies with query and caseIds', async (done) => {
+        it('rejects request bodies with query and caseIds', async () => {
             const c = new Case(minimalCase);
             await c.save();
 
-            request(app)
+            await request(app)
                 .post('/api/cases/download')
                 .send({
                     query: 'country:India',
                     caseIds: [c._id],
                     format: 'csv',
                 })
-                .expect(400, done);
+                .expect(400);
         });
         it('should filter results with caseIDs', async () => {
             const destination = './test_filter_caseIDs.csv';
