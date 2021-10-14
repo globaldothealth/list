@@ -1,3 +1,4 @@
+import csv
 import datetime
 import json
 import os
@@ -14,6 +15,7 @@ import requests
 import requests.exceptions
 
 import common_lib
+
 
 ENV_FIELD = "env"
 SOURCE_URL_FIELD = "sourceUrl"
@@ -36,6 +38,7 @@ DATE_FORMATS = ["%m/%d/%YZ", "%m/%d/%Y"]
 # Increasing that number will speed-up the ingestion but will increase memory
 # usage on the server-side and is known to cause OOMs so increase with caution.
 CASES_BATCH_SIZE = 250
+
 
 try:
     with (Path(__file__).parent / "geocoding_countries.json").open() as g:
@@ -442,6 +445,7 @@ def run(
         excluded_case_ids = retrieve_excluded_case_ids(source_id, date_filter, date_range, env,
                                                        headers=api_creds, cookies=cookies)
         final_cases = prepare_cases(case_data, upload_id, excluded_case_ids)
+
         count_created, count_updated, count_error = write_to_server(
             filter_cases_by_date(
                 final_cases,
@@ -452,6 +456,7 @@ def run(
             env, source_id, upload_id,
             api_creds, cookies,
             CASES_BATCH_SIZE)
+
         for _ in range(5):  # Maximum number of attempts to finalize upload
             status, text = common_lib.finalize_upload(
                 env, source_id, upload_id, api_creds, cookies, count_created,
@@ -465,6 +470,7 @@ def run(
                 continue
             else:
                 raise RuntimeError(f"Error updating upload record, status={status}, response={text}")
+
         return {"count_created": count_created, "count_updated": count_updated}
     except Exception as e:
         common_lib.complete_with_error(

@@ -124,7 +124,17 @@ const awsEventsClient = new AwsEventsClient(
     awsBatchClient,
     env.EVENT_ROLE_ARN,
 );
-const s3Client = new S3({ region: 'us-east-1', signatureVersion: 'v4' });
+
+let s3Client;
+if (env.SERVICE_ENV == 'locale2e') {
+    s3Client = new S3({
+        region: env.AWS_SERVICE_REGION,
+        endpoint: env.LOCALSTACK_URL,
+        s3ForcePathStyle: true,
+    });
+} else {
+    s3Client = new S3({ region: env.AWS_SERVICE_REGION, signatureVersion: 'v4' });
+}
 
 // Configure Email Client
 const emailClient = new EmailClient(
