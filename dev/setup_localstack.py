@@ -45,7 +45,7 @@ BATCH_COMPUTE_ENVIRONMENT_ORDER = [{
 }]
 
 DATA_BUCKET_NAME = environ.get("DATA_BUCKET_NAME", "covid-19-data-export")
-DOWNLOAD_BUCKET_NAME = environ.get("DOWNLOAD_BUCKET_NAME", "covid19-filtered-downloads")
+CACHE_BUCKET_NAME = environ.get("CACHE_BUCKET_NAME", "covid-19-cache")
 RETRIEVAL_BUCKET_NAME = environ.get("RETRIEVAL_BUCKET_NAME", "epid-sources-raw")
 SES_EMAIL_ADDRESS = environ.get("SES_EMAIL_ADDRESS", "info@global.health")
 ECR_REPOSITORY_NAME = environ.get("ECR_REPOSITORY_NAME", "gdh-ingestor")
@@ -199,7 +199,7 @@ if __name__ == "__main__":
     lw.create_batch_job_queue(BATCH_JOB_QUEUE_NAME)
     lw.setup_ses(SES_EMAIL_ADDRESS)
     lw.create_s3_bucket(DATA_BUCKET_NAME)
-    lw.create_s3_bucket(DOWNLOAD_BUCKET_NAME)
+    lw.create_s3_bucket(CACHE_BUCKET_NAME)
     lw.create_s3_bucket(RETRIEVAL_BUCKET_NAME)
     lw.create_container_repository(ECR_REPOSITORY_NAME)
     print("Done setting up localstack resources")

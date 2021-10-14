@@ -92,6 +92,13 @@ export default class CasesController {
         if (req.body.format == 'csv' && !req.body.caseIds && !req.body.query) {
             this.getDownloadLink(req, res);
             return;
+        } else if (this.hasCountryOnly(req.body.query)) {
+            const country = req.body.query.split(":")[1].toLowerCase();
+            const inBucket = await this.S3BucketContains(country, req.body.format);
+            if (inBucket) {
+                this.getCountryDownloadLink(req, res, country, req.body.format);
+                return;
+            }
         }
         try {
             const user = req.user as UserDocument;
@@ -190,6 +197,79 @@ export default class CasesController {
         }
 
         return;
+    };
+
+    /* getCountryDownloadLink generates signed URL to download national data set from AWS S3 */
+    getCountryDownloadLink = async (req: Request, res: Response, country: string, format: string): Promise<void> => {
+        const filename = `${country}.${format}`;
+        const params = {
+            Bucket: "covid-19-cache",
+            Key: filename,
+            Expires: 5 * 60,
+            ResponseContentDisposition:
+                `attachment; filename ="${filename}"`,
+        };
+
+        const user = req.user as UserDocument;
+
+        try {
+            const signedUrl: string = await new Promise((resolve, reject) => {
+                this.s3Client.getSignedUrl("getObject", params, (err, url) => {
+                    if (err) reject(err);
+
+                    resolve(url);
+                });
+            });
+
+            await User.findByIdAndUpdate(
+                user.id,
+                { $push: { downloads: {
+                    timestamp: new Date(),
+                    format: format,
+                    query: country,
+                } } },
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                function(err: any) {
+                    if (err) {
+                        logger.info(`An error occurred: ${err}`);
+                    } else {
+                        logger.info(`Document updated`);
+                    }
+                }
+            );
+
+            res.status(200).send({ signedUrl });
+        } catch (err) {
+            res.status(500).send(err);
+        }
+
+        return;
+    };
+
+    /** hasCountryOnly checks the query string to see whether it contains only a filter for a nation **/
+    hasCountryOnly = (queryString: string): boolean => {
+        const split = queryString.split(":");
+        if (split.length == 2 && split[0] === "country") {
+            return true;
+        }
+        return false;
+    };
+
+    /** S3BucketContains checks AWS storage to see whether it contains a desired file **/
+    S3BucketContains = async (country: string, format: string): Promise<boolean> => {
+        const filename = `${country}.${format}`;
+        const contains = await this.s3Client.headObject({
+            Bucket: "covid-19-cache",
+            Key: filename,
+        })
+        .promise()
+        .then(
+        () => true,
+            err => {
+                return false;
+            }
+        );
+        return contains;
     };
 
     /** listSymptoms simply forwards the request to the data service */

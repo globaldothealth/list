@@ -583,7 +583,7 @@ paths:
     /cases/downloadAsync:
         post:
             summary: >
-                Emails a CSV attachment of cases matching the search query.
+                Streams an attachment of cases matching the search query.
             tags: [Case]
             operationId: downloadAsync
             requestBody:
@@ -597,6 +597,8 @@ paths:
                                         Cases matching this query will be returned.
                                     type: string
             responses:
+                '200':
+                    $ref: '#/components/responses/200FilteredDataSetDownload'
                 '204':
                     $ref: '#/components/responses/204'
                 '500':
@@ -1900,6 +1902,12 @@ components:
                 text/csv:
                     schema:
                         description: A CSV with headers detailing case data.
+        '200FilteredDataSetDownload':
+            description: OK
+            content:
+                application/json:
+                    schema:
+                        $ref: '#/components/schemas/SignedUrl'
         '200FullDataSetDownload':
             description: OK
             content:

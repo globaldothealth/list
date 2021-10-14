@@ -197,12 +197,12 @@ def retrieve_content(
 
 def upload_to_s3(
         file_name, s3_object_key, env, source_id, upload_id, api_headers,
-        cookies):
+        cookies, bucket=OUTPUT_BUCKET):
     try:
         s3_client.upload_file(
-            file_name, OUTPUT_BUCKET, s3_object_key)
+            file_name, bucket, s3_object_key)
         print(
-            f"Uploaded source content to s3://{OUTPUT_BUCKET}/{s3_object_key}")
+            f"Uploaded source content to s3://{bucket}/{s3_object_key}")
         os.unlink(file_name)
     except Exception as e:
         common_lib.complete_with_error(
@@ -331,6 +331,7 @@ def run_retrieval(tempdir=TEMP_PATH):
                 env, parser_module,
                 source_id, upload_id, auth_headers, cookies,
                 s3_object_key, url, date_filter, parsing_date_range)
+
     else:
         common_lib.complete_with_error(
             ValueError(f"No parser set for {source_id}"),
