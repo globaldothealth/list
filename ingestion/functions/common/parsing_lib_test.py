@@ -26,6 +26,7 @@ except ImportError:
     sys.path.append(os.path.dirname(os.path.abspath(__file__)))
     import common_lib
 
+
 _SOURCE_API_URL = "http://bar.baz"
 _SOURCE_ID = "5f0b9a7ead3a2b003edc0e7f"
 _SOURCE_URL = "https://foo.bar"
@@ -78,6 +79,20 @@ CASE_JUNE_FIFTH = {
     ],
 }
 
+MOCK_SOURCE_DETAILS = {
+    "origin": {
+        "url": ""
+    },
+    "format": "",
+    "automation": {
+        "parser": {
+            "awsLambdaArn": "",
+        },
+    },
+    "dateFilter": "",
+    "hasStableIdentifiers": False
+}
+
 
 def fake_parsing_fn(raw_data_file, source_id, source_url):
     """For use in testing parsing_lib.run_lambda()."""
@@ -101,9 +116,9 @@ def mock_source_api_url_fixture():
             os.pardir,
             os.pardir,
             os.pardir,
-            'common'))
+            "common"))
     import common_lib  # pylint: disable=import-error
-    with patch('common_lib.get_source_api_url') as mock:
+    with patch("common_lib.get_source_api_url") as mock:
         mock.return_value = _SOURCE_API_URL
         yield common_lib
 
@@ -156,11 +171,11 @@ def test_e2e(
         json={"numCreated": num_created,
               "numUpdated": num_updated})
     source_info_url = f"{_SOURCE_API_URL}/sources/{input_event['sourceId']}"
+    source_details = MOCK_SOURCE_DETAILS.copy()
+    source_details["hasStableIdentifiers"] = True
     requests_mock.get(
         source_info_url,
-        json={
-            "hasStableIdentifiers": True
-        }
+        json=source_details
     )
 
     # Delete the provided upload ID to force parsing_lib to create a new upload.
@@ -224,11 +239,10 @@ def test_e2e_with_unstable_case_ids(
         json={"numCreated": num_created,
               "numUpdated": num_updated})
     source_info_url = f"{_SOURCE_API_URL}/sources/{input_event['sourceId']}"
+    source_details = MOCK_SOURCE_DETAILS.copy()
     requests_mock.get(
         source_info_url,
-        json={
-            "hasStableIdentifiers": False
-        }
+        json=source_details
     )
 
     # Delete the provided upload ID to force parsing_lib to create a new upload.

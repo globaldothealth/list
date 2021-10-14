@@ -13,7 +13,7 @@ services:
       - "../verification/curator-service/api/src:/usr/src/app/verification/curator-service/api/src"
       - "../verification/curator-service/api/openapi:/usr/src/app/verification/curator-service/api/openapi"
     environment:
-      LOCALHOST_URL: "http://localstack:4566"
+      LOCALSTACK_URL: "http://localstack:4566"
       SERVICE_ENV: "locale2e"
       AFTER_LOGIN_REDIRECT_URL: "http://localhost:3002"
   data:
@@ -70,7 +70,7 @@ services:
       AWS_DEFAULT_REGION: "us-east-1"
       AWS_ENDPOINT: "http://localstack:4566"
       DATA_BUCKET_NAME: "covid-19-data-export"
-      DOWNLOAD_BUCKET_NAME: "covid19-filtered-downloads"
+      CACHE_BUCKET_NAME: "covid-19-cache"
       RETRIEVAL_BUCKET_NAME: "epid-sources-raw"
       BATCH_QUEUE_NAME: "ingestion-queue"
       SES_EMAIL_ADDRESS: "info@global.health"
