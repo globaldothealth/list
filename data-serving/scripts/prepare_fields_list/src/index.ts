@@ -1,7 +1,7 @@
 import fs from 'fs';
 
 try {
-    const data = fs.readFileSync('../export-data/functions/02-export/fields.txt', 'utf-8');
+    const data = fs.readFileSync('../export-data/functions/01-split/fields.txt', 'utf-8');
     const fieldNames = data.split(/\n/);
     const fieldsList = JSON.stringify(fieldNames);
     fs.writeFileSync('../../data-service/src/model/fields.json', fieldsList);
