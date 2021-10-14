@@ -18,6 +18,11 @@ const initialLoggedInState: RootState = {
         searchQuery: '',
         filterBreadcrumbs: [],
     },
+    filtersReducer: {
+        countryList: [],
+        error: '',
+        isLoading: false,
+    },
     auth: {
         isLoading: false,
         error: undefined,
@@ -62,6 +67,11 @@ const noUserInfoState: RootState = {
             message: '',
         },
     },
+    filtersReducer: {
+        countryList: [],
+        error: '',
+        isLoading: false,
+    },
 };
 
 describe('<Profile />', () => {
@@ -91,12 +101,16 @@ describe('<Profile />', () => {
         );
         render(<Profile />, { initialState: noUserInfoState });
 
-
         userEvent.type(screen.getByLabelText('Old Password'), '1234567');
         userEvent.type(screen.getByLabelText('New password'), 'asdD?234');
-        userEvent.type(screen.getByLabelText('Repeat new password'), 'asdD?234');
+        userEvent.type(
+            screen.getByLabelText('Repeat new password'),
+            'asdD?234',
+        );
 
-        userEvent.click(screen.getByRole('button', { name: 'Change password' }));
+        userEvent.click(
+            screen.getByRole('button', { name: 'Change password' }),
+        );
 
         await waitFor(
             () => {
@@ -107,7 +121,6 @@ describe('<Profile />', () => {
             { timeout: 15000 },
         );
     });
-
 
     it('checks if the password was changed successfully', async () => {
         server.use(
@@ -120,12 +133,16 @@ describe('<Profile />', () => {
         );
         render(<Profile />, { initialState: noUserInfoState });
 
-
         userEvent.type(screen.getByLabelText('Old Password'), '1234567');
         userEvent.type(screen.getByLabelText('New password'), 'asdD?234');
-        userEvent.type(screen.getByLabelText('Repeat new password'), 'asdD?234');
+        userEvent.type(
+            screen.getByLabelText('Repeat new password'),
+            'asdD?234',
+        );
 
-        userEvent.click(screen.getByRole('button', { name: 'Change password' }));
+        userEvent.click(
+            screen.getByRole('button', { name: 'Change password' }),
+        );
 
         await waitFor(
             () => {
@@ -136,5 +153,4 @@ describe('<Profile />', () => {
             { timeout: 15000 },
         );
     });
-
 });

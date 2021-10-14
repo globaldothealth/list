@@ -1,4 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { String } from 'lodash';
 import { User } from '../../api/models/User';
 import {
     signInWithEmailAndPassword,
@@ -10,6 +11,9 @@ import {
     changePassword,
 } from './thunk';
 
+import { WritableDraft } from 'immer/dist/internal';
+import { Writable } from 'stream';
+
 interface SnackbarProps {
     isOpen: boolean;
     message: string;
@@ -17,11 +21,11 @@ interface SnackbarProps {
 
 interface AuthState {
     isLoading: boolean;
-    user: User | undefined;
-    error: string | undefined;
+    user?: User;
+    error?: string;
     resetPasswordEmailSent: boolean;
     passwordReset: boolean;
-    changePasswordResponse: string | undefined;
+    changePasswordResponse?: string;
     forgotPasswordPopupOpen: boolean;
     snackbar: SnackbarProps;
 }
@@ -82,8 +86,9 @@ const authSlice = createSlice({
             (state, action) => {
                 state.isLoading = false;
                 state.error = action.payload
-                    ? action.payload
-                    : action.error.message;
+                    ? (action.payload as unknown as WritableDraft<string>)
+                    : (action.error
+                          .message as unknown as WritableDraft<string>);
             },
         );
 
@@ -105,8 +110,9 @@ const authSlice = createSlice({
             (state, action) => {
                 state.isLoading = false;
                 state.error = action.payload
-                    ? action.payload
-                    : action.error.message;
+                    ? (action.payload as unknown as WritableDraft<string>)
+                    : (action.error
+                          .message as unknown as WritableDraft<string>);
             },
         );
 
@@ -133,8 +139,8 @@ const authSlice = createSlice({
             state.isLoading = false;
             state.resetPasswordEmailSent = false;
             state.error = action.payload
-                ? action.payload
-                : action.error.message;
+                ? (action.payload as unknown as WritableDraft<string>)
+                : (action.error.message as unknown as WritableDraft<string>);
         });
 
         // RESET PASSWORD
@@ -150,8 +156,8 @@ const authSlice = createSlice({
             state.isLoading = false;
             state.passwordReset = false;
             state.error = action.payload
-                ? action.payload
-                : action.error.message;
+                ? (action.payload as unknown as WritableDraft<string>)
+                : (action.error.message as unknown as WritableDraft<string>);
         });
 
         // LOGOUT
@@ -173,8 +179,8 @@ const authSlice = createSlice({
             state.isLoading = false;
             state.changePasswordResponse = undefined;
             state.error = action.payload
-                ? action.payload
-                : action.error.message;
+                ? (action.payload as unknown as WritableDraft<string>)
+                : (action.error.message as unknown as WritableDraft<string>);
         });
     },
 });

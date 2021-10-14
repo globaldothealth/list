@@ -35,6 +35,11 @@ const initialState: RootState = {
         searchQuery: '',
         filterBreadcrumbs: [],
     },
+    filtersReducer: {
+        countryList: [],
+        isLoading: false,
+        error: '',
+    },
     auth: {
         isLoading: false,
         error: undefined,
@@ -141,7 +146,6 @@ describe('<LinelistTable />', () => {
                 onChangePage={jest.fn()}
                 onChangePageSize={jest.fn()}
                 handleBreadcrumbDelete={jest.fn()}
-                setTotalDataCount={jest.fn()}
                 setFiltersModalOpen={jest.fn()}
                 setActiveFilterInput={jest.fn()}
                 sortBy={0}
@@ -223,7 +227,6 @@ describe('<LinelistTable />', () => {
                 onChangePage={jest.fn()}
                 onChangePageSize={jest.fn()}
                 handleBreadcrumbDelete={jest.fn()}
-                setTotalDataCount={jest.fn()}
                 setFiltersModalOpen={jest.fn()}
                 setActiveFilterInput={jest.fn()}
                 sortBy={0}
@@ -298,7 +301,6 @@ describe('<LinelistTable />', () => {
                 pageSize={50}
                 onChangePage={jest.fn()}
                 onChangePageSize={jest.fn()}
-                setTotalDataCount={jest.fn()}
                 handleBreadcrumbDelete={jest.fn()}
                 setFiltersModalOpen={jest.fn()}
                 setActiveFilterInput={jest.fn()}
@@ -409,7 +411,6 @@ describe('<LinelistTable />', () => {
                 pageSize={50}
                 onChangePage={jest.fn()}
                 onChangePageSize={jest.fn()}
-                setTotalDataCount={jest.fn()}
                 handleBreadcrumbDelete={jest.fn()}
                 setFiltersModalOpen={jest.fn()}
                 setActiveFilterInput={jest.fn()}
@@ -490,7 +491,6 @@ describe('<LinelistTable />', () => {
                 pageSize={50}
                 onChangePage={jest.fn()}
                 onChangePageSize={jest.fn()}
-                setTotalDataCount={jest.fn()}
                 handleBreadcrumbDelete={jest.fn()}
                 setFiltersModalOpen={jest.fn()}
                 setActiveFilterInput={jest.fn()}
@@ -573,7 +573,6 @@ describe('<LinelistTable />', () => {
                 pageSize={10}
                 onChangePage={jest.fn()}
                 onChangePageSize={jest.fn()}
-                setTotalDataCount={jest.fn()}
                 handleBreadcrumbDelete={jest.fn()}
                 setFiltersModalOpen={jest.fn()}
                 setActiveFilterInput={jest.fn()}
@@ -646,7 +645,6 @@ describe('<LinelistTable />', () => {
                 pageSize={10}
                 onChangePage={changePage}
                 onChangePageSize={changePageSize}
-                setTotalDataCount={jest.fn()}
                 handleBreadcrumbDelete={jest.fn()}
                 setFiltersModalOpen={jest.fn()}
                 setActiveFilterInput={jest.fn()}
@@ -689,7 +687,6 @@ describe('<LinelistTable />', () => {
                 pageSize={10}
                 onChangePage={jest.fn()}
                 onChangePageSize={jest.fn()}
-                setTotalDataCount={jest.fn()}
                 handleBreadcrumbDelete={jest.fn()}
                 setFiltersModalOpen={jest.fn()}
                 setActiveFilterInput={jest.fn()}
@@ -728,7 +725,6 @@ describe('<LinelistTable />', () => {
                 pageSize={10}
                 onChangePage={jest.fn()}
                 onChangePageSize={jest.fn()}
-                setTotalDataCount={jest.fn()}
                 handleBreadcrumbDelete={jest.fn()}
                 setFiltersModalOpen={setFiltersModalOpen}
                 setActiveFilterInput={jest.fn()}

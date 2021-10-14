@@ -52,6 +52,7 @@ const initialLoggedInState: RootState = {
             message: '',
         },
     },
+    filtersReducer: { countryList: [], isLoading: false, error: undefined },
 };
 
 describe('<Users />', () => {

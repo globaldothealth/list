@@ -560,7 +560,7 @@ export default function App(): JSX.Element {
                                         }
                                     />
                                 </div>
-                                <DownloadButton/>
+                                <DownloadButton />
                             </>
                         ) : (
                             <span className={classes.spacer}></span>
@@ -568,7 +568,7 @@ export default function App(): JSX.Element {
                         {user && (
                             <>
                                 <Typography>
-                                <a
+                                    <a
                                         className={classes.mapLink}
                                         data-testid="mapLink"
                                         href="https://map.covid-19.global.health/"
@@ -576,7 +576,7 @@ export default function App(): JSX.Element {
                                         target="_blank"
                                     >
                                         G.h Map
-                                </a>
+                                    </a>
                                 </Typography>
                                 <ProfileMenu user={user} />{' '}
                             </>

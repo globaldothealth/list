@@ -106,16 +106,18 @@ function SymptomList(props: SymptomListProps): JSX.Element {
     const classes = useStyles();
     return (
         <Scroll.Element name={props.collectionName}>
-            <FieldTitle title={props.title} tooltip={<TooltipText />}></FieldTitle>
+            <FieldTitle
+                title={props.title}
+                tooltip={<TooltipText />}
+            ></FieldTitle>
             <SelectField
                 name={props.selectFieldName}
                 label={props.selectFieldLabel}
                 values={symptomStatusValues}
             ></SelectField>
-            {(props.isVaccineSideEffect ? 
-            values.vaccines[props.vaccineIndex].sideEffects.status :
-            values.symptomsStatus)
-             === 'Symptomatic' && (
+            {(props.isVaccineSideEffect
+                ? values.vaccines[props.vaccineIndex].sideEffects.status
+                : values.symptomsStatus) === 'Symptomatic' && (
                 <>
                     {commonSymptoms.length > 0 && (
                         <>
@@ -173,7 +175,7 @@ const Symptoms = () => (
 
 interface SideEffectsProps {
     i: number;
-};
+}
 
 export const VaccineSideEffects = (props: SideEffectsProps) => (
     <SymptomList

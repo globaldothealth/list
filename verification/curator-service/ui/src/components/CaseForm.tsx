@@ -486,7 +486,7 @@ export default function CaseForm(props: Props): JSX.Element {
             }
             setErrorMessage('');
         } catch (e) {
-            const err:any = e;
+            const err: any = e;
             setErrorMessage(err.response?.data?.message || err.toString());
             return;
         }
@@ -805,7 +805,9 @@ export default function CaseForm(props: Props): JSX.Element {
                                     onClick={(): void => scrollTo('vaccines')}
                                 >
                                     {tableOfContentsIcon({
-                                        isChecked: values.vaccines && values.vaccines.length > 0,
+                                        isChecked:
+                                            values.vaccines &&
+                                            values.vaccines.length > 0,
                                         hasError: false,
                                     })}
                                     {'Vaccines'.toLocaleUpperCase()}

@@ -159,7 +159,10 @@ export function ChangePasswordFormInProfile(): JSX.Element {
                 onSubmit={formik.handleSubmit}
                 className={classes.formFlexContainer}
             >
-                <Typography className={classes.title} data-testid="change-your-password-title">
+                <Typography
+                    className={classes.title}
+                    data-testid="change-your-password-title"
+                >
                     Change your password
                 </Typography>
                 <FormControl

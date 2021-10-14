@@ -118,11 +118,11 @@ export default function ChangePasswordForm({
 
     const validationSchema = Yup.object().shape({
         password: Yup.string()
-        .matches(lowercaseRegex, 'one lowercase required!')
-        .matches(uppercaseRegex, 'one uppercase required!')
-        .matches(numericRegex, 'one number required!')
-        .min(8, 'Minimum 8 characters required!')
-        .required('Required!'),
+            .matches(lowercaseRegex, 'one lowercase required!')
+            .matches(uppercaseRegex, 'one uppercase required!')
+            .matches(numericRegex, 'one number required!')
+            .min(8, 'Minimum 8 characters required!')
+            .required('Required!'),
         passwordConfirmation: Yup.string().test(
             'passwords-match',
             'Passwords must match',

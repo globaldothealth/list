@@ -276,9 +276,7 @@ describe('<SignUpForm />', () => {
         userEvent.click(screen.getByTestId('sign-up-button'));
 
         await waitFor(() => {
-            expect(
-                screen.getByText(/Required!/i),
-            ).toBeInTheDocument();
+            expect(screen.getByText(/Required!/i)).toBeInTheDocument();
             expect(
                 screen.getByText(/Passwords must match/i),
             ).toBeInTheDocument();
@@ -370,9 +368,7 @@ describe('<ChangePasswordForm />', () => {
         userEvent.click(screen.getByTestId('change-password-button'));
 
         await waitFor(() => {
-            expect(
-                screen.getByText('Required!'),
-            ).toBeInTheDocument();
+            expect(screen.getByText('Required!')).toBeInTheDocument();
         });
     });
 

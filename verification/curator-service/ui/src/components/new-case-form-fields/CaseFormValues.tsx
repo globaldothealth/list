@@ -40,7 +40,18 @@ export default interface CaseFormValues {
     notes: string;
     numCases?: number;
     vaccines: Vaccine[];
-    [index: string]: Pathogen[]|Vaccine[]|GenomeSequence[]|Travel[]|string[]|CaseReferenceForm|Loc|string|number|null|undefined;
+    [index: string]:
+        | Pathogen[]
+        | Vaccine[]
+        | GenomeSequence[]
+        | Travel[]
+        | string[]
+        | CaseReferenceForm
+        | Loc
+        | string
+        | number
+        | null
+        | undefined;
 }
 
 export interface Travel {
@@ -77,7 +88,7 @@ export interface Vaccine {
     batch?: string;
     date?: Date;
     sideEffects: Symptom;
-    previousInfection: 'yes'|'no'|'NA';
+    previousInfection: 'yes' | 'no' | 'NA';
     previousInfectionDetectionMethod?: string;
 }
 
