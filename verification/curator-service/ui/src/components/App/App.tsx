@@ -45,12 +45,11 @@ import PublishIcon from '@material-ui/icons/Publish';
 import SearchBar from '../SearchBar';
 import SourceTable from '../SourceTable';
 import TermsOfUse from '../TermsOfUse';
-import { ThemeProvider } from '@material-ui/core/styles';
+import { createTheme, ThemeProvider } from '@material-ui/core/styles';
 import UploadsTable from '../UploadsTable';
 import Users from '../Users';
 import ViewCase from '../ViewCase';
 import clsx from 'clsx';
-import { createMuiTheme } from '@material-ui/core/styles';
 import { useLastLocation } from 'react-router-last-location';
 import PolicyLink from '../PolicyLink';
 import { useCookieBanner } from '../../hooks/useCookieBanner';
@@ -67,7 +66,52 @@ import { getUserProfile, logout } from '../../redux/auth/thunk';
 import { selectUser } from '../../redux/auth/selectors';
 import { User } from '../../api/models/User';
 
-export const theme = createMuiTheme({
+// to use our custom theme values in typescript we need to define an extension to the ThemeOptions type.
+declare module '@material-ui/core/styles' {
+    interface Theme {
+        custom: {
+            palette: {
+                button: {
+                    buttonCaption: string;
+                    customizeButtonColor: string;
+                };
+                tooltip: {
+                    backgroundColor: string;
+                    textColor: string;
+                };
+                appBar: {
+                    backgroundColor: string;
+                };
+                landingPage: {
+                    descriptionTextColor: string;
+                };
+            };
+        };
+    }
+    // allow configuration using `createTheme`
+    interface ThemeOptions {
+        custom?: {
+            palette?: {
+                button?: {
+                    buttonCaption?: string;
+                    customizeButtonColor?: string;
+                };
+                tooltip?: {
+                    backgroundColor?: string;
+                    textColor?: string;
+                };
+                appBar?: {
+                    backgroundColor?: string;
+                };
+                landingPage?: {
+                    descriptionTextColor?: string;
+                };
+            };
+        };
+    }
+}
+
+export const theme = createTheme({
     palette: {
         background: {
             default: '#ecf3f0',
