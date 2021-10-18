@@ -24,9 +24,9 @@
   "node_modules": [],
   "dependencies": {
     "@types/node": "^13.13.21",
-    "@typescript-eslint/eslint-plugin": "^2.34.0",
-    "@typescript-eslint/parser": "^2.34.0",
-    "eslint": "^6.8.0",
+    "@typescript-eslint/eslint-plugin": "^5.0.0",
+    "@typescript-eslint/parser": "^5.0.0",
+    "eslint": "^8.0.1",
     "eslint-config-google": "^0.14.0",
     "eslint-config-prettier": "^6.10.1",
     "eslint-plugin-prettier": "^3.1.4",
