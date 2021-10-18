@@ -28,7 +28,6 @@
     "material-table": "^1.69.3",
     "material-ui-chip-input": "^2.0.0-beta.2",
     "mongodb": "^3.6.9",
-    "mongodb-client-encryption": "^1.2.5",
     "msw": "^0.30.1",
     "prettier": "^2.3.1",
     "qs": "^6.10.1",
