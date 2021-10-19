@@ -12,7 +12,7 @@
     "axios": "^0.21.1",
     "clsx": "^1.1.1",
     "date-fns": "^2.25.0",
-    "envalid": "^6.0.2",
+    "envalid": "^7.2.1",
     "formik": "^2.2.9",
     "formik-material-ui": "^2.0.1",
     "formik-material-ui-pickers": "0.0.8",
