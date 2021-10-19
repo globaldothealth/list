@@ -15,7 +15,7 @@ import {
     VerificationStatus,
 } from './Case';
 import { Form, Formik } from 'formik';
-import Papa, { ParseConfig, ParseResult } from 'papaparse';
+import Papa, { ParseLocalConfig, ParseResult } from 'papaparse';
 import { RouteComponentProps, withRouter } from 'react-router-dom';
 import Source, { submitSource } from './common-form-fields/Source';
 import { Theme, createStyles } from '@material-ui/core/styles';
@@ -571,7 +571,10 @@ class BulkCaseForm extends React.Component<
                 caseReference: CaseReference,
             ): Promise<unknown> => {
                 return new Promise((resolve) => {
-                    const papaparseOptions: ParseConfig<RawParsedCase> = {
+                    const papaparseOptions: ParseLocalConfig<
+                        RawParsedCase,
+                        File
+                    > = {
                         complete: async (results) => {
                             await this.uploadData(
                                 results,
@@ -584,7 +587,7 @@ class BulkCaseForm extends React.Component<
                         header: true,
                         skipEmptyLines: true,
                     };
-                    Papa.parse(file, papaparseOptions);
+                    Papa.parse<RawParsedCase, File>(file, papaparseOptions);
                 });
             };
             return parsePromise(values.file, values.caseReference);
