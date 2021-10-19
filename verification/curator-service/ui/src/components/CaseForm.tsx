@@ -196,7 +196,7 @@ const NewCaseValidation = Yup.object().shape(
         caseReference: Yup.object().shape({
             sourceUrl: Yup.string().required('Required'),
             sourceName: Yup.string().when('sourceId', {
-                is: (sourceId) => !sourceId,
+                is: (sourceId: any) => !sourceId,
                 then: Yup.string().required('Required'),
             }),
         }),
@@ -204,7 +204,8 @@ const NewCaseValidation = Yup.object().shape(
             .min(0, 'Age must be between 0 and 120')
             .max(120, 'Age must be between 0 and 120')
             .when('maxAge', {
-                is: (maxAge) => maxAge !== undefined && maxAge !== '',
+                is: (maxAge: number | string) =>
+                    maxAge !== undefined && maxAge !== '',
                 then: Yup.number().required(
                     'Min age required in range. Minimum value is 0.',
                 ),
@@ -213,7 +214,8 @@ const NewCaseValidation = Yup.object().shape(
             .min(0, 'Age must be between 0 and 120')
             .max(120, 'Age must be between 0 and 120')
             .when('minAge', {
-                is: (minAge) => minAge !== undefined && minAge !== '',
+                is: (minAge: number | string) =>
+                    minAge !== undefined && minAge !== '',
                 then: Yup.number()
                     .min(
                         Yup.ref('minAge'),
@@ -227,14 +229,16 @@ const NewCaseValidation = Yup.object().shape(
             .min(0, 'Age must be between 0 and 120')
             .max(120, 'Age must be between 0 and 120')
             .when('minAge', {
-                is: (minAge) => minAge !== undefined && minAge !== '',
+                is: (minAge: number | string) =>
+                    minAge !== undefined && minAge !== '',
                 then: Yup.number().oneOf(
                     [undefined],
                     'Cannot enter age and age range',
                 ),
             })
             .when('maxAge', {
-                is: (maxAge) => maxAge !== undefined && maxAge !== '',
+                is: (maxAge: number | string) =>
+                    maxAge !== undefined && maxAge !== '',
                 then: Yup.number().oneOf(
                     [undefined],
                     'Cannot enter age and age range',
@@ -486,7 +490,7 @@ export default function CaseForm(props: Props): JSX.Element {
             }
             setErrorMessage('');
         } catch (e) {
-            const err:any = e;
+            const err: any = e;
             setErrorMessage(err.response?.data?.message || err.toString());
             return;
         }
@@ -805,7 +809,9 @@ export default function CaseForm(props: Props): JSX.Element {
                                     onClick={(): void => scrollTo('vaccines')}
                                 >
                                     {tableOfContentsIcon({
-                                        isChecked: values.vaccines && values.vaccines.length > 0,
+                                        isChecked:
+                                            values.vaccines &&
+                                            values.vaccines.length > 0,
                                         hasError: false,
                                     })}
                                     {'Vaccines'.toLocaleUpperCase()}

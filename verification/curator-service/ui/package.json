@@ -37,7 +37,7 @@
     "shortid": "^2.2.15",
     "typeface-roboto": "^1.1.13",
     "typescript": "^3.9.10",
-    "yup": "^0.29.3"
+    "yup": "^0.32.11"
   },
   "scripts": {
     "start-noenv": "react-scripts start",
