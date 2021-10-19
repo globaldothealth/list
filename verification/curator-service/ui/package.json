@@ -35,7 +35,7 @@
     "react-scripts": "^3.4.4",
     "react-scroll": "^1.8.4",
     "shortid": "^2.2.15",
-    "typeface-roboto": "0.0.75",
+    "typeface-roboto": "^1.1.13",
     "typescript": "^3.9.10",
     "yup": "^0.29.3"
   },
