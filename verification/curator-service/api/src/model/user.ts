@@ -8,6 +8,7 @@ export type UserDocument = Document & {
     name?: string;
     email: string;
     password?: string;
+    apiKey?: string;
     roles: [string];
     picture?: string;
     newsletterAccepted?: boolean;
@@ -43,6 +44,7 @@ const userSchema = new mongoose.Schema<UserDocument>({
     picture: String,
     newsletterAccepted: Boolean,
     password: String,
+    apiKey: String,
     downloads: [
         {
             timestamp: Date,

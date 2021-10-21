@@ -209,6 +209,56 @@ export class AuthController {
         );
 
         /**
+         * Retrieve the logged-in user's api key
+         */
+        this.router.get(
+            '/profile/apiKey',
+            mustBeAuthenticated,
+            async (req: Request, res: Response): Promise<void> => {
+                const theUser = req.user as UserDocument;
+                const currentUser = await User.findById(theUser.id);
+                if (!currentUser) {
+                    // internal server error as you were authenticated but unknown
+                    res.status(500).end();
+                    return;
+                }
+                const theKey = currentUser.apiKey;
+                if (theKey) {
+                    res.json(theKey);
+                } else {
+                    res.status(404).end();
+                }
+            }
+        );
+
+        /**
+         * Create a new api key for the logged-in user
+         */
+        this.router.post(
+            '/profile/apiKey',
+            mustBeAuthenticated,
+            async (req: Request, res: Response): Promise<void> => {
+                const theUser = (req.user as UserDocument);
+                if (!theUser) {
+                    // internal server error as you were authenticated but unknown
+                    res.status(500).end();
+                }
+                else {
+                    const currentUser = await User.findById(theUser.id);
+                    if (!currentUser) {
+                        // internal server error as you were authenticated but unknown
+                        res.status(500).end();
+                        return;
+                    }
+                    // prefix the API key with the user ID to make it easier to find users by API key in auth
+                    const randomPart = bcrypt.hash(new Date().toISOString(), 5);
+                    currentUser.apiKey = `${theUser.id}${randomPart}`;
+                    await currentUser.save();
+                    res.status(201).json(theUser.apiKey).end();
+                }
+            }
+        )
+        /**
          * Update user's password
          */
         this.router.post(
