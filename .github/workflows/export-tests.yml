@@ -1,0 +1,36 @@
+name: Export tests
+
+on:
+  push:
+    branches: [main]
+    paths:
+    - '.github/workflows/ingestion-functions-python.yml'
+    - 'data-serving/scripts/export-data/*.py'
+  pull_request:
+    paths:
+    - '.github/workflows/ingestion-functions-python.yml'
+    - 'data-serving/scripts/export-data/*.py'
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: data-serving/scripts/export-data
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python 3.9
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.9
+    - name: Lint with flake8
+      run: |
+        pip install flake8
+        # stop the build if there are Python syntax errors or undefined names
+        flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+        # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
+        flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+    - name: Test
+      run: |
+        pip install pytest
+        pytest
