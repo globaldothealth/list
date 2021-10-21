@@ -1,6 +1,6 @@
 #!/bin/bash
 # Sets up batch job definitions for the various countries
-# Depends: jq aws-cli
+# Depends: jq aws-cli curl
 
 set -eou pipefail
 
