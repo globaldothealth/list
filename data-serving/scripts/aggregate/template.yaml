@@ -32,7 +32,7 @@ Resources:
   DataExportAggregateFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: functions/05-aggregate/
+      CodeUri: aggregate/
       Handler: app.lambda_handler
       Description: Generate aggregate data for map
       Events:
