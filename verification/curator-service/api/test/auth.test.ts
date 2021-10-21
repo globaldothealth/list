@@ -244,3 +244,50 @@ describe('mustHaveAnyRole', () => {
         request.get('/mustbeadmin').expect(403);
     });
 });
+
+describe('api keys', () => {
+    it('must let a user update their API key', async () => {
+        const request = supertest.agent(app);
+        await request
+            .post('/auth/register')
+            .send({
+                name: 'test-curator',
+                email: 'foo@bar.com',
+            })
+            .expect(200, /test-curator/);
+        await request
+            .post('/auth/profile/apiKey')
+            .expect(201);
+    });
+
+    it('must let a user retrieve their API key', async () => {
+        const request = supertest.agent(app);
+        await request
+            .post('/auth/register')
+            .send({
+                name: 'test-curator',
+                email: 'foo@bar.com',
+            })
+            .expect(200, /test-curator/);
+        await request
+            .post('/auth/profile/apiKey')
+            .expect(201);
+        await request
+            .get('/auth/profile/apiKey')
+            .expect(200);
+    });
+
+    it('does not find an API key where none has been set', async () => {
+        const request = supertest.agent(app);
+        await request
+            .post('/auth/register')
+            .send({
+                name: 'test-curator',
+                email: 'foo@bar.com',
+            })
+            .expect(200, /test-curator/);
+        await request
+            .get('/auth/profile/apiKey')
+            .expect(404);
+    });
+});
