@@ -43,10 +43,15 @@ export const authenticateByAPIKey = async (
     next: NextFunction,
 ): Promise<void> => {
     try {
-        const user = await findUserByAPIKey(req.header('X-API-Key'));
-        req.user = user;
-        res.status(200);
-        next();
+        const theKey = req.header('X-API-Key');
+        const user = await findUserByAPIKey(theKey);
+        if (user && (user as UserDocument).apiKey === theKey) {
+            req.user = user;
+            res.status(200);
+        } else {
+            res.status(403);
+        }
+        return next();
     } catch (err) {
         // set 403 but carry on processing so the next middleware can try
         res.status(403);
