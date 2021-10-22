@@ -1,5 +1,4 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { String } from 'lodash';
 import { User } from '../../api/models/User';
 import {
     signInWithEmailAndPassword,
@@ -12,7 +11,6 @@ import {
 } from './thunk';
 
 import { WritableDraft } from 'immer/dist/internal';
-import { Writable } from 'stream';
 
 interface SnackbarProps {
     isOpen: boolean;
