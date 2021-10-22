@@ -290,4 +290,25 @@ describe('api keys', () => {
             .get('/auth/profile/apiKey')
             .expect(404);
     });
+
+    it('lets the user get their profile by API key', async () => {
+        const request = supertest.agent(app);
+        await request
+            .post('/auth/register')
+            .send({
+                name: 'test-curator',
+                email: 'foo@bar.com',
+            })
+            .expect(200, /test-curator/);
+        await request
+            .post('/auth/profile/apiKey')
+            .expect(201);
+        const apiKey = await request
+            .get('/auth/profile/apiKey');
+        request.set('X-API-key', apiKey.body);
+        await request.get('/auth/logout').expect(302);
+        await request
+            .get('/auth/profile')
+            .expect(200, /test-curator/);
+    })
 });

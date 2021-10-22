@@ -2,6 +2,7 @@ import * as usersController from './controllers/users';
 
 import {
     AuthController,
+    authenticateByAPIKey,
     mustBeAuthenticated,
     mustHaveAnyRole,
 } from './controllers/auth';
@@ -181,34 +182,43 @@ const sourcesController = new SourcesController(
     awsEventsClient,
     env.DATASERVER_URL,
 );
-apiRouter.get('/sources', mustHaveAnyRole(['curator']), sourcesController.list);
+apiRouter.get('/sources',
+    authenticateByAPIKey,
+    mustHaveAnyRole(['curator']),
+    sourcesController.list);
 apiRouter.get(
     '/sources/:id([a-z0-9]{24})',
+    authenticateByAPIKey,
     mustHaveAnyRole(['curator']),
     sourcesController.get,
 );
 apiRouter.post(
     '/sources',
+    authenticateByAPIKey,
     mustHaveAnyRole(['curator']),
     sourcesController.create,
 );
 apiRouter.put(
     '/sources/:id([a-z0-9]{24})',
+    authenticateByAPIKey,
     mustHaveAnyRole(['curator']),
     sourcesController.update,
 );
 apiRouter.delete(
     '/sources/:id([a-z0-9]{24})',
+    authenticateByAPIKey,
     mustHaveAnyRole(['curator']),
     sourcesController.del,
 );
 apiRouter.post(
     '/sources/:id([a-z0-9]{24})/retrieve',
+    authenticateByAPIKey,
     mustHaveAnyRole(['curator']),
     sourcesController.retrieve,
 );
 apiRouter.get(
     '/sources/parsers',
+    authenticateByAPIKey,
     mustHaveAnyRole(['curator']),
     sourcesController.listParsers,
 );
@@ -217,105 +227,131 @@ apiRouter.get(
 const uploadsController = new UploadsController(emailClient);
 apiRouter.get(
     '/sources/uploads',
+    authenticateByAPIKey,
     mustHaveAnyRole(['curator']),
     uploadsController.list,
 );
 apiRouter.post(
     '/sources/:sourceId([a-z0-9]{24})/uploads',
+    authenticateByAPIKey,
     mustHaveAnyRole(['curator']),
     uploadsController.create,
 );
 apiRouter.put(
     '/sources/:sourceId([a-z0-9]{24})/uploads/:id([a-z0-9]{24})',
+    authenticateByAPIKey,
     mustHaveAnyRole(['curator']),
     uploadsController.update,
 );
 
 // Configure cases controller proxying to data service.
 const casesController = new CasesController(env.DATASERVER_URL, s3Client);
-apiRouter.get('/cases', mustBeAuthenticated, casesController.list);
+apiRouter.get('/cases',
+    authenticateByAPIKey,
+    mustBeAuthenticated,
+    casesController.list);
 apiRouter.get(
     '/cases/symptoms',
+    authenticateByAPIKey,
     mustHaveAnyRole(['curator']),
     casesController.listSymptoms,
 );
 apiRouter.get(
     '/cases/placesOfTransmission',
+    authenticateByAPIKey,
     mustHaveAnyRole(['curator']),
     casesController.listPlacesOfTransmission,
 );
 apiRouter.get(
     '/cases/occupations',
+    authenticateByAPIKey,
     mustHaveAnyRole(['curator']),
     casesController.listOccupations,
 );
 apiRouter.get(
     '/cases/:id([a-z0-9]{24})',
+    authenticateByAPIKey,
     mustBeAuthenticated,
     casesController.get,
 );
 apiRouter.post(
     '/cases/getDownloadLink',
+    authenticateByAPIKey,
     mustBeAuthenticated,
     casesController.getDownloadLink,
 );
 apiRouter.post('/cases', mustHaveAnyRole(['curator']), casesController.create);
 apiRouter.post(
     '/cases/download',
+    authenticateByAPIKey,
     mustBeAuthenticated,
     casesController.download,
 );
 apiRouter.post(
     '/cases/downloadAsync',
+    authenticateByAPIKey,
     mustBeAuthenticated,
     casesController.downloadAsync,
 );
 apiRouter.post(
     '/cases/batchUpsert',
+    authenticateByAPIKey,
     mustHaveAnyRole(['curator']),
     casesController.batchUpsert,
 );
 apiRouter.put('/cases', mustHaveAnyRole(['curator']), casesController.upsert);
 apiRouter.post(
     '/cases/batchUpdate',
+    authenticateByAPIKey,
     mustHaveAnyRole(['curator']),
     casesController.batchUpdate,
 );
 apiRouter.post(
     '/cases/batchUpdateQuery',
+    authenticateByAPIKey,
     mustHaveAnyRole(['curator']),
     casesController.batchUpdateQuery,
 );
 apiRouter.post(
     '/cases/batchStatusChange',
+    authenticateByAPIKey,
     mustHaveAnyRole(['curator']),
     casesController.batchStatusChange,
 );
 apiRouter.put(
     '/cases/:id([a-z0-9]{24})',
+    authenticateByAPIKey,
     mustHaveAnyRole(['curator']),
     casesController.update,
 );
 apiRouter.delete(
     '/cases',
+    authenticateByAPIKey,
     mustHaveAnyRole(['curator', 'admin']),
     casesController.batchDel,
 );
 apiRouter.delete(
     '/cases/:id([a-z0-9]{24})',
+    authenticateByAPIKey,
     mustHaveAnyRole(['curator']),
     casesController.del,
 );
 
 // Configure users controller.
-apiRouter.get('/users', mustHaveAnyRole(['admin']), usersController.list);
+apiRouter.get(
+    '/users',
+    authenticateByAPIKey,
+    mustHaveAnyRole(['admin']),
+    usersController.list);
 apiRouter.put(
     '/users/:id',
+    authenticateByAPIKey,
     mustHaveAnyRole(['admin']),
     usersController.updateRoles,
 );
 apiRouter.get(
     '/users/roles',
+    authenticateByAPIKey,
     mustHaveAnyRole(['admin']),
     usersController.listRoles,
 );
@@ -325,6 +361,7 @@ const geocodeProxy = new GeocodeProxy(env.LOCATION_SERVICE_URL);
 // Forward geocode requests to location service.
 apiRouter.get(
     '/geocode/suggest',
+    authenticateByAPIKey,
     mustHaveAnyRole(['curator']),
     geocodeProxy.suggest,
 );
