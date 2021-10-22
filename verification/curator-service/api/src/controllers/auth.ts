@@ -231,6 +231,11 @@ export class AuthController {
             }
         );
 
+        async function getRandomString(bytes: number) : Promise<string> {
+            const randomValues = await crypto.randomBytes(bytes);
+            return randomValues.toString('hex');
+        }
+
         /**
          * Create a new api key for the logged-in user
          */
@@ -251,7 +256,7 @@ export class AuthController {
                         return;
                     }
                     // prefix the API key with the user ID to make it easier to find users by API key in auth
-                    const randomPart = bcrypt.hash(new Date().toISOString(), 5);
+                    const randomPart = await getRandomString(32);
                     currentUser.apiKey = `${theUser.id}${randomPart}`;
                     await currentUser.save();
                     res.status(201).json(theUser.apiKey).end();
