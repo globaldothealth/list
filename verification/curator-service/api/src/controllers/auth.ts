@@ -45,6 +45,7 @@ export const authenticateByAPIKey = async (
     try {
         const user = await findUserByAPIKey(req.header('X-API-Key'));
         req.user = user;
+        res.status(200);
         next();
     } catch (err) {
         // set 403 but carry on processing so the next middleware can try
@@ -62,6 +63,7 @@ export const mustBeAuthenticated = (
     next: NextFunction,
 ): void => {
     if (req.isAuthenticated()) {
+        res.status(200);
         return next();
     } else {
         passport.authenticate('bearer', (err, user) => {
