@@ -21,6 +21,37 @@ import EmailClient from '../clients/email-client';
 // Global variable for newsletter acceptance
 let isNewsletterAccepted: boolean;
 
+async function findUserByAPIKey(apiKey?: string): Promise<Express.User> {
+    if (!apiKey) {
+        throw new Error("No API key");
+    }
+    const user = await User.findById(apiKey.slice(0, 24));
+    if (!user) {
+        throw new Error("Invalid API key");
+    }
+    return user as Express.User;
+}
+
+/**
+ * authenticateByAPIKey is a middleware that checks whether the user has a valid API key in their request.
+ * If they do, then attach the user object to the request and continue; if not then
+ * still call the next middleware in case they can authenticate in another way.
+ */
+export const authenticateByAPIKey = async (
+    req: Request,
+    res: Response,
+    next: NextFunction,
+): Promise<void> => {
+    try {
+        const user = await findUserByAPIKey(req.header('X-API-Key'));
+        req.user = user;
+        next();
+    } catch (err) {
+        // set 403 but carry on processing so the next middleware can try
+        res.status(403);
+        next();
+    }
+}
 /**
  * mustBeAuthenticated is a middleware that checks that the user making the call is authenticated.
  * Subsequent request handlers can be assured req.user will be defined.
@@ -39,6 +70,8 @@ export const mustBeAuthenticated = (
             }
             if (user) {
                 req.user = user;
+                // override any 403/401 that was set by an upstream middleware, as we now know the user
+                res.status(200);
                 return next();
             } else {
                 res.sendStatus(403);
@@ -74,6 +107,8 @@ export const mustHaveAnyRole = (requiredRoles: string[]) => {
             req.isAuthenticated() &&
             userHasRequiredRole(req.user as UserDocument, requiredSet)
         ) {
+            // override an upstream 403/401
+            res.status(200);
             return next();
         } else {
             passport.authenticate('bearer', (err, user) => {
@@ -83,6 +118,8 @@ export const mustHaveAnyRole = (requiredRoles: string[]) => {
                     user &&
                     userHasRequiredRole(user as UserDocument, requiredSet)
                 ) {
+                    // override an upstream 403/401
+                    res.status(200);
                     req.user = user;
                     return next();
                 } else {
@@ -202,6 +239,7 @@ export class AuthController {
 
         this.router.get(
             '/profile',
+            authenticateByAPIKey,
             mustBeAuthenticated,
             (req: Request, res: Response): void => {
                 res.json(req.user);
@@ -209,7 +247,8 @@ export class AuthController {
         );
 
         /**
-         * Retrieve the logged-in user's api key
+         * Retrieve the logged-in user's api key.
+         * @note this API can't be authenticated by API key because, well…
          */
         this.router.get(
             '/profile/apiKey',
@@ -237,7 +276,10 @@ export class AuthController {
         }
 
         /**
-         * Create a new api key for the logged-in user
+         * Create a new api key for the logged-in user.
+         * @note This API cannot be authenticated by API key. If you believe your API key
+         * is compromised you should not use it to request reset; if you haven't yet set an API
+         * key then you couldn't use an API key to call this method anyway.
          */
         this.router.post(
             '/profile/apiKey',
@@ -264,7 +306,8 @@ export class AuthController {
             }
         )
         /**
-         * Update user's password
+         * Update user's password.
+         * @note I chose not to support this endpoint with API auth key as there's no particular need.
          */
         this.router.post(
             '/change-password',
