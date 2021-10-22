@@ -2,7 +2,21 @@
 
 ## Authentication
 
-Users are currently authenticated using [passport.js's Google OAuth strategy](http://www.passportjs.org/packages/passport-google-oauth20/).
+Users are currently authenticated using three mechanisms: [passport.js's Google OAuth strategy](http://www.passportjs.org/packages/passport-google-oauth20/); local password checking with bcrypt (passportjs's Local strategy); or API keys.
+
+### Command-line use of API keys
+
+**This is far and away the preferred way of using the API in a script or command line. You may wish to use the below though, if you have a particular need to emulate browser-like behaviour from the command line.**
+
+Firstly, generate yourself an API key. There currently isn't a UI for that (but will be soon), so grab your bearer token from a browser session cookie (see below) and use it to `POST` to `/api/profile/apiKey`. This will create the API key, which you can subsequently `GET` from `/api/profile/apiKey` (you can `POST` again to regenerate the key, which will invalidate the old one).
+
+Now you can call the API, setting the `X-API-Key` header to your API key:
+
+```bash
+curl --data '{"format": "csv", "query": "country:France"}' -H "Content-Type: application/json" -H "X-API-Key: 6172ba644d856700a24c5aa07410dbfcbf931431a7c54d87f5aa0d96df2443b3a1c42471e54797096d2ce43f" https://data.covid-19.global.health/api/cases/downloadAsync
+```
+
+### Command-line use of session cookies
 
 To authenticate from the command line, you can use [curl(1)](https://manpages.debian.org/stable/curl/curl.1.en.html).
 You'll need the session cookie after logging in, which is described in

@@ -22,7 +22,7 @@ Given proper permissions, one can see the sources in the UI at https://data.covi
 
 ## Users
 
-Users are either service-accounts API users (authenticated with bearer tokens) or human users (authenticated with Google OAuth 2.0). Authentication, roles and users in general is described in more details in the `../auth.md` document.
+Users are either service-accounts API users (authenticated with bearer tokens) or human users (authenticated with Google OAuth 2.0 or local email and password). Users can also represent themselves in stateless API calls using an API key that they generate for themselves. Authentication, roles and users in general is described in more details in the `../auth.md` document.
 
 You can see your profile in the UI at https://data.covid-19.global.health/profile.
 
