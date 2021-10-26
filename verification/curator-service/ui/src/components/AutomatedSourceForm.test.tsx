@@ -25,6 +25,7 @@ const initialLoggedInState: RootState = {
     auth: {
         isLoading: false,
         error: undefined,
+        changePasswordResponse: undefined,
         user,
         forgotPasswordPopupOpen: false,
         passwordReset: false,

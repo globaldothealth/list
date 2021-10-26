@@ -19,11 +19,11 @@ interface SnackbarProps {
 
 interface AuthState {
     isLoading: boolean;
-    user?: User;
-    error?: string;
+    user: User | undefined;
+    error: string | undefined;
     resetPasswordEmailSent: boolean;
     passwordReset: boolean;
-    changePasswordResponse?: string;
+    changePasswordResponse: string | undefined;
     forgotPasswordPopupOpen: boolean;
     snackbar: SnackbarProps;
 }
@@ -84,9 +84,8 @@ const authSlice = createSlice({
             (state, action) => {
                 state.isLoading = false;
                 state.error = action.payload
-                    ? (action.payload as unknown as WritableDraft<string>)
-                    : (action.error
-                          .message as unknown as WritableDraft<string>);
+                    ? (action.payload as WritableDraft<string>)
+                    : (action.error.message as WritableDraft<string>);
             },
         );
 

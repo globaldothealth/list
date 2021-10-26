@@ -35,6 +35,7 @@ const initialLoggedInState: RootState = {
         filterBreadcrumbs: [],
     },
     auth: {
+        changePasswordResponse: undefined,
         isLoading: false,
         error: undefined,
         user: {

@@ -26,6 +26,7 @@ const initialLoggedInState: RootState = {
     auth: {
         isLoading: false,
         error: undefined,
+        changePasswordResponse: undefined,
         user: {
             _id: '1',
             googleID: '42',
@@ -52,6 +53,7 @@ const noUserInfoState: RootState = {
     auth: {
         isLoading: false,
         error: undefined,
+        changePasswordResponse: undefined,
         user: {
             _id: '',
             googleID: '',
