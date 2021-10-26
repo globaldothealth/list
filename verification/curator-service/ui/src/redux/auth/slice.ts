@@ -84,8 +84,8 @@ const authSlice = createSlice({
             (state, action) => {
                 state.isLoading = false;
                 state.error = action.payload
-                    ? (action.payload as WritableDraft<string>)
-                    : (action.error.message as WritableDraft<string>);
+                    ? action.payload
+                    : action.error.message;
             },
         );
 
@@ -107,9 +107,8 @@ const authSlice = createSlice({
             (state, action) => {
                 state.isLoading = false;
                 state.error = action.payload
-                    ? (action.payload as unknown as WritableDraft<string>)
-                    : (action.error
-                          .message as unknown as WritableDraft<string>);
+                    ? action.payload
+                    : action.error.message;
             },
         );
 
