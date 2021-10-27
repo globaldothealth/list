@@ -135,8 +135,8 @@ const authSlice = createSlice({
             state.isLoading = false;
             state.resetPasswordEmailSent = false;
             state.error = action.payload
-                ? (action.payload as unknown as WritableDraft<string>)
-                : (action.error.message as unknown as WritableDraft<string>);
+                ? action.payload
+                : action.error.message;
         });
 
         // RESET PASSWORD
@@ -152,8 +152,8 @@ const authSlice = createSlice({
             state.isLoading = false;
             state.passwordReset = false;
             state.error = action.payload
-                ? (action.payload as unknown as WritableDraft<string>)
-                : (action.error.message as unknown as WritableDraft<string>);
+                ? action.payload
+                : action.error.message;
         });
 
         // LOGOUT
@@ -175,8 +175,8 @@ const authSlice = createSlice({
             state.isLoading = false;
             state.changePasswordResponse = undefined;
             state.error = action.payload
-                ? (action.payload as unknown as WritableDraft<string>)
-                : (action.error.message as unknown as WritableDraft<string>);
+                ? action.payload
+                : action.error.message;
         });
     },
 });
