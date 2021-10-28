@@ -16,7 +16,7 @@ Various buckets (data containers) are used for both temporary and long-term stor
  - `amplify-curatorui-*`:  unused deployments of a component that global.health does not rely on and can (and should!) be deleted. They are in us-east-2.
  - `archive-epid-sources-raw`:  contains copies of upstream data for ingestion that were processed by the old AWS Lambda implementation of ADI. They can (and should!) be deleted. They are in us-east-1.
  - `aws-sam-cli-exportdatasourcebucket`:  is empty.
- - `aws-sam-cli-managed-default-samclisourcebucket-1txyh416iht6x`:  contains templates and images for the old AWS Lambda implementation of ADI. It can (and should!) be deleted. It is in us-east-1.
+ - `aws-sam-cli-managed-default-samclisourcebucket-1txyh416iht6x`:  contains templates and images for the old AWS Lambda implementation of ADI. Most of this can (and should!) be deleted, but the aggregation script for generating map data is still defined here. It is in us-east-1.
  - `aws.healthmap.org`: the deployment of the healthmap website. It isn't part of Global.health. It's in us-east-2.
  - `config-bucket-612888738066`: contains logs relating to secrets management of the AWS Lambda infrastructure. This doesn't only relate to the old ADI implementation, so check whether this is still needed. It's in us-east-2.
  - `covid-19-aggregates`: aggregated data from the line list used by the map visualisation. In us-east-1. Check whether historical copies of data are still needed.
@@ -29,7 +29,7 @@ Various buckets (data containers) are used for both temporary and long-term stor
  - `epid-ingestion`: contains details for a google service account. In us-east-1.
  - `epid-sources-raw`: copies of upstream data for ingestion by the new AWS Batch implementation of ADI. Should have a data retention policy defined and implemented. In us-east-1.
  - `gh-metrics-report-bucket`: summary statistics on user activity. In us-east-1.
- - `global-dot-health-data-export-bucket` and `global-dot-health-data-export-bucket-2`: historical copies of CSV exports of the line list to support downloads. Check whether we need to keep the historical versions. In us-east-1.
+ - `global-dot-health-data-export-bucket` and `global-dot-health-data-export-bucket-2`: historical copies of CSV exports of the line list used as intermediate data in building daily downloads. Check whether we need to keep the historical versions, and whether we need these at all once the data exporter is migrated to AWS Batch. In us-east-1.
  - `h1n1.global.health`: the deployment of the h1n1 outbreak map. In us-east-2.
  - `map.covid-19.global.health`: the deployment of the covid-19 outbreak map. In us-east-2.
  - `ncov19`: the last export of the beoutbreakprepared data from September 2020. In us-east-1.
