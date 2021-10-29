@@ -310,5 +310,67 @@ describe('api keys', () => {
         await request
             .get('/auth/profile')
             .expect(200, /test-curator/);
-    })
+    });
+
+    it("lets an admin delete another user's API key", async () => {
+        const request = supertest.agent(app);
+        const userRes = await request
+            .post('/auth/register')
+            .send({
+                name: 'test-curator',
+                email: 'foo@bar.com',
+            })
+            .expect(200, /test-curator/);
+        await request
+            .post('/auth/profile/apiKey')
+            .expect(201);
+        const apiKey = await request
+            .get('/auth/profile/apiKey');
+        await request.get('/auth/logout').expect(302);
+        await request
+            .post('/auth/register')
+            .send({
+                name: 'test-admin',
+                email: 'admin@bar.com',
+                roles: ['admin'],
+            })
+            .expect(200, /test-admin/);
+        await request
+            .post(`/auth/deleteApiKey/${userRes.body._id}`)
+            .expect(204);
+        // now try to use the API key
+        await request.get('/auth/logout').expect(302);
+        request.set('X-API-key', apiKey.body);
+        await request
+            .get('/auth/profile')
+            .expect(403);
+    });
+
+    it("does not let a non-admin delete another user's API key", async () => {
+        const request = supertest.agent(app);
+        const userRes = await request
+            .post('/auth/register')
+            .send({
+                name: 'test-curator',
+                email: 'foo@bar.com',
+            })
+            .expect(200, /test-curator/);
+        await request
+            .post('/auth/profile/apiKey')
+            .expect(201);
+        const apiKey = await request
+            .get('/auth/profile/apiKey');
+        await request.get('/auth/logout').expect(302);
+        await request
+            .post('/auth/register')
+            .send({
+                name: 'test-not-admin',
+                email: 'nimda@bar.com',
+                roles: ['curator'],
+            })
+            .expect(200, /test-not-admin/);
+        await request
+            .post(`/auth/deleteApiKey/${userRes.body._id}`)
+            .expect(403);
+    });
 });
