@@ -312,6 +312,49 @@ export class AuthController {
                 }
             }
         )
+
+        /**
+         * Delete a user's API key
+         */
+        this.router.post('/deleteApiKey/:id',
+            mustBeAuthenticated,
+            mustHaveAnyRole(['admin']),
+            async (
+                req: Request,
+                res: Response,
+            ): Promise<void> => {
+                try {
+                    logger.info(`user ID ${req.params.id} API key deletion requested`);
+                    const user = await User.findByIdAndUpdate(
+                        req.params.id,
+                        { apiKey: undefined },
+                        {
+                            new: false,
+                            runValidators: true,
+                        },
+                    );
+                    if (!user) {
+                        logger.warn(`user with ID ${req.params.id} does not exist`);
+                        res.status(404).json({
+                            message: `user with id ${req.params.id} could not be found`,
+                        });
+                        return;
+                    }
+                    logger.info(`API key deleted for user ${req.params.id}`);
+                    res.sendStatus(204);
+                } catch (err) {
+                    if (err.name === 'ValidationError') {
+                        res.status(422).json(err);
+                        return;
+                    }
+                    res.status(500).json(err);
+                    return;
+                }
+            }
+        );
+
+
+
         /**
          * Update user's password.
          * @note I chose not to support this endpoint with API auth key as there's no particular need.
