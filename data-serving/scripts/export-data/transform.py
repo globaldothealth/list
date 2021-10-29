@@ -84,10 +84,12 @@ def convert_event(event: dict[str, Any]) -> dict[str, Any]:
     suffix = event["name"]
     col_name = f"events.{suffix}"
 
-    return {
-        f"{col_name}.value": event.get("value"),
+    o = {
         f"{col_name}.date": convert_date(deep_get(event, "dateRange.end.$date")),
     }
+    if suffix not in ["selfIsolation", "onsetSymptoms", "firstClinicalConsultation"]:
+        o[f"{col_name}.value"] = event.get("value")
+    return o
 
 
 def convert_addl_sources(sources_string: str) -> str:
@@ -181,18 +183,19 @@ def get_fields(fileobject) -> list[str]:
     reader = csv.DictReader(fileobject)
     row = next(reader)
     headers = list(row.keys())
-    cols_to_add = []
-    for col_name in [
-        "confirmed",
-        "firstClinicalConsultation",
-        "hospitalAdmission",
-        "icuAdmission",
-        "onsetSymptoms",
-        "outcome",
-        "selfIsolation",
-    ]:
-        cols_to_add.extend([f"events.{col_name}.value", f"events.{col_name}.date"])
-
+    cols_to_add = [
+        "events.confirmed.value",
+        "events.confirmed.date",
+        "events.firstClinicalConsultation.date",
+        "events.hospitalAdmission.date",
+        "events.hospitalAdmission.value",
+        "events.icuAdmission.date",
+        "events.icuAdmission.value",
+        "events.onsetSymptoms.date",
+        "events.outcome.date",
+        "events.outcome.value",
+        "events.selfIsolation.date",
+    ]
     fields = set(headers).union(set(cols_to_add))
     fields = fields.union(set(__TRAVEL + __GENOME + __VARIANT))
     fields = sorted(list(fields - set(__OMIT)))
