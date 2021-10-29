@@ -7,12 +7,16 @@
 import sys
 import csv
 import json
+import gzip
 import logging
+import argparse
 from functools import reduce
+from contextlib import contextmanager
 from typing import Any, Optional
 
 logging.basicConfig(filename="transform.log", level=logging.INFO)
 
+VALID_FORMATS = ["csv", "tsv", "json"]
 
 __ARRAYS = [
     "caseReference.uploadIds",
@@ -84,12 +88,12 @@ def convert_event(event: dict[str, Any]) -> dict[str, Any]:
     suffix = event["name"]
     col_name = f"events.{suffix}"
 
-    o = {
+    event = {
         f"{col_name}.date": convert_date(deep_get(event, "dateRange.end.$date")),
     }
     if suffix not in ["selfIsolation", "onsetSymptoms", "firstClinicalConsultation"]:
-        o[f"{col_name}.value"] = event.get("value")
-    return o
+        event[f"{col_name}.value"] = event.get("value")
+    return event
 
 
 def convert_addl_sources(sources_string: str) -> str:
@@ -135,7 +139,6 @@ def convert_travel(travel_array: str) -> dict[str, Any]:
             ]
         }:
             unnest = field.removeprefix("travelHistory.travel.")
-            print(unnest)
             items = [deep_get(x, unnest) for x in travel_array]
             if any(i for i in items):
                 travel_dict[field] = ",".join(items)
@@ -223,13 +226,70 @@ def convert_row(row: dict[str, Any]) -> Optional[dict[str, Any]]:
     return row
 
 
+def writerow(
+    formats: list[str], writers: dict[str, Any], row: dict[str, Any], row_number: int
+):
+    for fmt in formats:
+        if row_number == 0:  # first row, write header
+            if fmt == "json":
+                writers[fmt].write("[\n")
+            else:
+                writers[fmt].writeheader()
+
+        if fmt == "json":
+            tok = ", " if row_number > 0 else "  "
+            writers[fmt].write(tok + json.dumps(row, sort_keys=True) + "\n")
+        else:
+            writers[fmt].writerow(row)
+
+
+@contextmanager
+def open_writers(formats: list[str], fields: list[str], output: str):
+    if unknown_formats := set(formats) - set(VALID_FORMATS):
+        raise ValueError(f"Unknown formats passed: {unknown_formats}")
+    files = {}
+    writers = {}
+    for fmt in formats:
+        files[fmt] = gzip.open(f"{output}.{fmt}.gz", "wt")
+        if fmt == "csv":
+            writers[fmt] = csv.DictWriter(
+                files[fmt], fieldnames=fields, extrasaction="ignore"
+            )
+        if fmt == "tsv":
+            writers[fmt] = csv.DictWriter(
+                files[fmt], fieldnames=fields, extrasaction="ignore", delimiter="\t"
+            )
+        if fmt == "json":
+            writers[fmt] = files[fmt]
+    try:
+        yield writers
+    except Exception as e:
+        print("Error occurred in open_writers():")
+        print(e)
+    finally:
+        for fmt in files:
+            if fmt == "json":
+                files[fmt].write("]\n")
+            files[fmt].close()
+
+
 def parse():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("output", help="Output file stem to use (extension is added)")
+    parser.add_argument(
+        "-f",
+        "--format",
+        help="Output formats to use, comma separated (default=csv,tsv,json)",
+        default="csv,tsv,json",
+    )
+    args = parser.parse_args()
     headers, fields = get_fields(sys.stdin)
     reader = csv.DictReader(sys.stdin, fieldnames=headers)
-    writer = csv.DictWriter(sys.stdout, fieldnames=fields, extrasaction="ignore")
-    writer.writeheader()
-    for row in reader:
-        writer.writerow(convert_row(row))
+
+    formats = args.format.split(",")
+    with open_writers(formats, fields, args.output) as writers:
+        for i, row in enumerate(map(convert_row, reader)):
+            writerow(formats, writers, row, i)
 
 
 if __name__ == "__main__":
