@@ -335,7 +335,7 @@ describe('<SourceTable />', () => {
         expect(oldRow).not.toBeInTheDocument();
     });
 
-    it.only('can edit the boolean fields in a row', async () => {
+    it('can edit the boolean fields in a row', async () => {
         const sources = [
             {
                 _id: 'abc123',
