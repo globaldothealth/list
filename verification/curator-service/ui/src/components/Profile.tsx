@@ -80,6 +80,32 @@ interface FormValues {
     passwordConfirmation: string;
 }
 
+export function ResetAPIKeyForm(): JSX.Element {
+    const classes = useStyles();
+    const dispatch = useAppDispatch();
+    const error = useAppSelector(selectError);
+    const user = useAppSelector(selectUser);
+
+    return (
+        <div>
+            <p>
+                {user?.apiKey
+                    ? `API Key: {user!.apiKey}`
+                    : 'You have yet to set an API key.'}
+            </p>
+            <p>
+                Your API key lets you access the{' '}
+                <a href="https://data.covid-19.global.health/api-docs/">
+                    Global.health API
+                </a>{' '}
+                programmatically, from Python, R, or another programming
+                environment. It is unique to you and requests made using the API
+                are associated with your account, so keep your API key secret.
+            </p>
+            <Button variant="contained">Reset API Key</Button>
+        </div>
+    );
+}
 export function ChangePasswordFormInProfile(): JSX.Element {
     const classes = useStyles();
     const dispatch = useAppDispatch();
@@ -389,6 +415,7 @@ export default function Profile(): JSX.Element {
                             }
                         })}
                     {!user.googleID && <ChangePasswordFormInProfile />}
+                    <ResetAPIKeyForm />
                 </div>
             ) : (
                 <></>

@@ -6,4 +6,5 @@ export interface User {
     roles: string[];
     picture?: string;
     newsletterAccepted?: boolean;
+    apiKey?: string;
 }

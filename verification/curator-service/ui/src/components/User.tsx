@@ -4,4 +4,5 @@ export default interface User {
     email: string;
     roles: string[];
     picture?: string;
+    apiKey?: string;
 }
