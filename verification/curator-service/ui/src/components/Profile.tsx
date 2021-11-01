@@ -50,7 +50,7 @@ const styles = makeStyles((theme: Theme) => ({
 }));
 
 const useStyles = makeStyles((theme: Theme) => ({
-    inpputField: {
+    inputField: {
         display: 'block',
         width: '240px',
         marginBottom: '10px',
@@ -168,7 +168,7 @@ export function ChangePasswordFormInProfile(): JSX.Element {
                 </Typography>
                 <FormControl
                     disabled={isLoading}
-                    className={classes.inpputField}
+                    className={classes.inputField}
                     variant="outlined"
                     error={
                         formik.touched.oldPassword &&
@@ -211,7 +211,7 @@ export function ChangePasswordFormInProfile(): JSX.Element {
 
                 <FormControl
                     disabled={isLoading}
-                    className={classes.inpputField}
+                    className={classes.inputField}
                     variant="outlined"
                     error={
                         formik.touched.password &&
@@ -252,7 +252,7 @@ export function ChangePasswordFormInProfile(): JSX.Element {
 
                 <FormControl
                     disabled={isLoading}
-                    className={classes.inpputField}
+                    className={classes.inputField}
                     variant="outlined"
                     error={
                         formik.touched.passwordConfirmation &&
