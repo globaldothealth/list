@@ -293,7 +293,6 @@ export class AuthController {
             mustBeAuthenticated,
             async (req: Request, res: Response): Promise<void> => {
                 const theUser = (req.user as UserDocument);
-                console.error('post API key reset');
                 if (!theUser) {
                     // internal server error as you were authenticated but unknown
                     res.status(500).end();

@@ -108,3 +108,7 @@ export const changePassword = createAsyncThunk<
         return rejectWithValue(error.response.data.message);
     }
 });
+
+export const resetApiKey = createAsyncThunk('auth/resetApiKey', async () => {
+    await axios.post('/auth/profile/apiKey');
+});
