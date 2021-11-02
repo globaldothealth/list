@@ -90,7 +90,7 @@ export function ResetAPIKeyForm(): JSX.Element {
         <div>
             <p>
                 {user?.apiKey
-                    ? `API Key: {user!.apiKey}`
+                    ? `API Key: ${user!.apiKey}`
                     : 'You have yet to set an API key.'}
             </p>
             <p>

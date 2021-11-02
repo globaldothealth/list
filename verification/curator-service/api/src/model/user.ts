@@ -27,6 +27,7 @@ export type UserDocument = Document & {
         roles: string[];
         picture?: string;
         newsletterAccepted?: boolean;
+        apiKey?: string;
     };
 };
 
@@ -73,6 +74,7 @@ userSchema.methods.publicFields = function () {
         roles: this.roles,
         picture: this.picture,
         newsletterAccepted: this.newsletterAccepted,
+        apiKey: this.apiKey,
     };
 };
 
