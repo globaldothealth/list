@@ -5,7 +5,7 @@
         "lib": [
             "dom"
         ],
-        "types": [
+        "types": [ 
             "cypress"
         ],
         "sourceMap": false,

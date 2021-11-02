@@ -7,7 +7,7 @@ import filtersReducer from './filters/slice';
 export const rootReducer = combineReducers({
     app: appReducer,
     auth: authReducer,
-    filtersReducer
+    filtersReducer,
 });
 
 const store = configureStore({

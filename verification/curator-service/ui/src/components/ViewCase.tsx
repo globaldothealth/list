@@ -714,7 +714,7 @@ function CaseDetails(props: CaseDetailsProps): JSX.Element {
                                     vaccine={e}
                                     index={i}
                                 />
-                        ))}
+                            ))}
                         </Grid>
                     </Scroll.Element>
                 </Paper>
@@ -760,24 +760,18 @@ function GenomeSequenceRows(props: { sequence: GenomeSequence }): JSX.Element {
     );
 }
 
-function VaccineRows(props: { vaccine: Vaccine, index: number }): JSX.Element {
+function VaccineRows(props: { vaccine: Vaccine; index: number }): JSX.Element {
     return (
         <>
-            <RowHeader title={`Vaccine ${props.index+1}`}/>
-            <RowContent content=""/>
+            <RowHeader title={`Vaccine ${props.index + 1}`} />
+            <RowContent content="" />
 
             <RowHeader title="Vaccine administered" />
-            <RowContent
-                content={props.vaccine.name}
-            />
+            <RowContent content={props.vaccine.name} />
             <RowHeader title="Batch code" />
-            <RowContent
-                content={props.vaccine.batch}
-            />
+            <RowContent content={props.vaccine.batch} />
             <RowHeader title="Date of vaccine" />
-            <RowContent
-                content={renderDate(props.vaccine.date)}
-            />
+            <RowContent content={renderDate(props.vaccine.date)} />
         </>
     );
 }
