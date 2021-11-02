@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 
 import { useAppSelector, useAppDispatch } from '../hooks/redux';
-import { changePassword } from '../redux/auth/thunk';
+import { changePassword, resetApiKey } from '../redux/auth/thunk';
 import {
     selectUser,
     selectError,
@@ -83,7 +83,6 @@ interface FormValues {
 export function ResetAPIKeyForm(): JSX.Element {
     const classes = useStyles();
     const dispatch = useAppDispatch();
-    const error = useAppSelector(selectError);
     const user = useAppSelector(selectUser);
 
     return (
@@ -102,7 +101,14 @@ export function ResetAPIKeyForm(): JSX.Element {
                 environment. It is unique to you and requests made using the API
                 are associated with your account, so keep your API key secret.
             </p>
-            <Button variant="contained">Reset API Key</Button>
+            <Button
+                variant="contained"
+                onClick={() => {
+                    dispatch(resetApiKey());
+                }}
+            >
+                Reset API Key
+            </Button>
         </div>
     );
 }
