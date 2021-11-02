@@ -3,15 +3,15 @@
 # Depends: jq aws-cli curl
 
 set -eou pipefail
+source ./common.sh
 
 CASECOUNT_URL="https://covid-19-aggregates.s3.amazonaws.com/country/latest.json"
 # mongoexport rate in cases/s
 # actual rate is higher, but this allows some wiggle room
 # in calculation of Batch job timeouts
 EXPORT_RATE=400
-IMAGE="${IMAGE:-612888738066.dkr.ecr.us-east-1.amazonaws.com/gdh-country-exporter:latest}"
+IMAGE="${IMAGE:-$ECR/gdh-country-exporter:latest}"
 # ingestion role contains necessary permissions to access S3 buckets
-JOB_ROLE_ARN="arn:aws:iam::612888738066:role/gdh-ingestion-job-role"
 
 function casecounts {
     curl -s -o - "$CASECOUNT_URL" |  jq -r 'to_entries[0].value[] | [._id, .casecount] | @tsv'
