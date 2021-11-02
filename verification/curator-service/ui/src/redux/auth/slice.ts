@@ -1,13 +1,13 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { User } from '../../api/models/User';
 import {
-    signInWithEmailAndPassword,
-    signUpWithEmailAndPassword,
+    changePassword,
     getUserProfile,
+    logout,
     requestResetPasswordLink,
     resetPassword,
-    logout,
-    changePassword,
+    signInWithEmailAndPassword,
+    signUpWithEmailAndPassword,
 } from './thunk';
 
 interface SnackbarProps {
@@ -16,14 +16,14 @@ interface SnackbarProps {
 }
 
 interface AuthState {
-    isLoading: boolean;
-    user: User | undefined;
-    error: string | undefined;
-    resetPasswordEmailSent: boolean;
-    passwordReset: boolean;
     changePasswordResponse: string | undefined;
+    error: string | undefined;
     forgotPasswordPopupOpen: boolean;
+    isLoading: boolean;
+    passwordReset: boolean;
+    resetPasswordEmailSent: boolean;
     snackbar: SnackbarProps;
+    user: User | undefined;
 }
 
 const initialState: AuthState = {

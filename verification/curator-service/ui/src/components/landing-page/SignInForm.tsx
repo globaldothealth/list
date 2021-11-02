@@ -202,10 +202,9 @@ export default function SignInForm({
                             className={classes.googleButton}
                             disabled={disabled}
                             onClick={() => {
-                                    window.location.href = `${process.env
-                                        .REACT_APP_LOGIN_URL!}`
-                                    }
-                                }
+                                window.location.href = `${process.env
+                                    .REACT_APP_LOGIN_URL!}`;
+                            }}
                         />
                     </div>
                 </div>

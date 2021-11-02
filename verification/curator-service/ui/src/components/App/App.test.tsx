@@ -18,9 +18,15 @@ const initialLoggedInState: RootState = {
         searchQuery: '',
         filterBreadcrumbs: [],
     },
+    filtersReducer: {
+        countryList: [],
+        error: '',
+        isLoading: false,
+    },
     auth: {
         isLoading: false,
         error: undefined,
+        changePasswordResponse: undefined,
         user: {
             _id: '1',
             googleID: '42',

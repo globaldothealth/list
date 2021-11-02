@@ -130,8 +130,7 @@ export interface Vaccine {
     sideEffects: Symptoms;
     previousInfection: 'yes' | 'no' | 'NA';
     previousInfectionDetectionMethod: string;
-};
-
+}
 
 export interface Case {
     _id: string;

@@ -51,7 +51,7 @@ import { URLToSearchQuery } from './util/searchQuery';
 import { ChipData } from './App/App';
 import { SortBy, SortByOrder } from '../constants/types';
 import { connect, ConnectedProps } from 'react-redux';
-import  {useAppSelector} from '../hooks/redux';
+import { useAppSelector } from '../hooks/redux';
 import { RootState } from '../redux/store';
 import Helmet from 'react-helmet';
 import { selectFilterBreadcrumbs } from '../redux/app/selectors';
@@ -445,7 +445,7 @@ export function SortSelect({
     const classes = sortSelectStyles();
 
     const filterBreadCrumbs = useAppSelector(selectFilterBreadcrumbs);
-    let filteredKeys = filterBreadCrumbs.map(({ key }) => key);  
+    const filteredKeys = filterBreadCrumbs.map(({ key }) => key);
 
     const sortKeywords = [
         { name: 'None', value: SortBy.Default },
@@ -457,9 +457,8 @@ export function SortSelect({
         { name: 'Age', value: SortBy.Age },
     ];
 
-    !filteredKeys.includes('country') &&   sortKeywords.splice(1, 0, { name: 'Country', value: SortBy.Country });;
-  
-
+    !filteredKeys.includes('country') &&
+        sortKeywords.splice(1, 0, { name: 'Country', value: SortBy.Country });
 
     const handleChange = (
         event: React.ChangeEvent<{ value: unknown; name?: string | undefined }>,
@@ -952,7 +951,7 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
         this.props.setFiltersModalOpen(true);
         this.props.setActiveFilterInput(filter);
     }
-    
+
     render(): JSX.Element {
         const { history, classes } = this.props;
 
