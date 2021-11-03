@@ -81,15 +81,27 @@ interface FormValues {
 }
 
 export function ResetAPIKeyForm(): JSX.Element {
-    const classes = useStyles();
     const dispatch = useAppDispatch();
-    const user = useAppSelector(selectUser);
+    const [apiKey, setApiKey] = useState(null);
+
+    useEffect(() => {
+        // can't use a react hook here, so grab the user manually
+        const user = JSON.parse(localStorage.getItem('user') ?? 'null');
+        setApiKey(user?.apiKey);
+        window.addEventListener('storage', storageEventHandler, false);
+    }, []);
+
+    function storageEventHandler() {
+        // can't use a react hook here, so grab the user manually
+        const user = JSON.parse(localStorage.getItem('user') ?? 'null');
+        setApiKey(user?.apiKey);
+    }
 
     return (
         <div>
             <p>
-                {user?.apiKey
-                    ? `API Key: ${user!.apiKey}`
+                {apiKey
+                    ? `API Key: ${apiKey}`
                     : 'You have yet to set an API key.'}
             </p>
             <p>
@@ -104,7 +116,7 @@ export function ResetAPIKeyForm(): JSX.Element {
             <Button
                 variant="contained"
                 onClick={() => {
-                    dispatch(resetApiKey());
+                    dispatch(resetApiKey(storageEventHandler));
                 }}
             >
                 Reset API Key
