@@ -109,16 +109,12 @@ export const changePassword = createAsyncThunk<
     }
 });
 
-export const resetApiKey = createAsyncThunk(
-    'auth/resetApiKey',
-    async (callback: VoidFunction) => {
-        await axios.post('/auth/profile/apiKey');
-        // refetch the user profile to get the updated API key
-        const response = await axios.get('/auth/profile');
-        if (response.status !== 200) {
-            throw new Error('Error updating profile details, please try again');
-        }
-        localStorage.setItem('user', JSON.stringify(response.data));
-        callback();
-    },
-);
+export const resetApiKey = createAsyncThunk('auth/resetApiKey', async () => {
+    await axios.post('/auth/profile/apiKey');
+    // refetch the user profile to get the updated API key
+    const response = await axios.get('/auth/profile');
+    if (response.status !== 200) {
+        throw new Error('Error updating profile details, please try again');
+    }
+    localStorage.setItem('user', JSON.stringify(response.data));
+});

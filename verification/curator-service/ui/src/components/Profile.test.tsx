@@ -38,6 +38,33 @@ const initialLoggedInState: RootState = {
     },
 };
 
+const loggedInWithApiKeyState: RootState = {
+    app: {
+        isLoading: false,
+        searchQuery: '',
+        filterBreadcrumbs: [],
+    },
+    auth: {
+        isLoading: false,
+        error: undefined,
+        user: {
+            _id: '1',
+            googleID: '42',
+            name: 'Alice Smith',
+            email: 'foo@bar.com',
+            roles: ['admin', 'curator'],
+            apiKey: 'An API Key',
+        },
+        forgotPasswordPopupOpen: false,
+        passwordReset: false,
+        resetPasswordEmailSent: false,
+        snackbar: {
+            isOpen: false,
+            message: '',
+        },
+    },
+};
+
 const noUserInfoState: RootState = {
     app: {
         isLoading: false,
@@ -71,6 +98,41 @@ describe('<Profile />', () => {
         expect(screen.getByText(/foo@bar.com/i)).toBeInTheDocument();
         expect(screen.getByText(/admin/i)).toBeInTheDocument();
         expect(screen.getByText(/curator/i)).toBeInTheDocument();
+        expect(
+            screen.getByText(/You have yet to set an API key/i),
+        ).toBeInTheDocument();
+    });
+
+    it('shows API key when the user has one', async () => {
+        render(<Profile />, { initialState: loggedInWithApiKeyState });
+        expect(screen.getByText(/API Key: An API Key/i)).toBeInTheDocument();
+    });
+
+    it('resets the API key on request', async () => {
+        server.use(
+            rest.post('/auth/profile/apiKey', (req, res, ctx) => {
+                return res(ctx.status(201));
+            }),
+        );
+
+        server.use(
+            rest.get('/auth/profile', (req, res, ctx) => {
+                return res(
+                    ctx.status(200),
+                    ctx.json(loggedInWithApiKeyState.auth.user),
+                );
+            }),
+        );
+        render(<Profile />, { initialState: initialLoggedInState });
+        userEvent.click(screen.getByRole('button', { name: 'Reset API Key' }));
+        await waitFor(
+            () => {
+                expect(
+                    screen.getByText(/API Key: An API Key/i),
+                ).toBeInTheDocument();
+            },
+            { timeout: 15000 },
+        );
     });
 
     it('shows login message when not passed user information', async () => {
@@ -91,12 +153,16 @@ describe('<Profile />', () => {
         );
         render(<Profile />, { initialState: noUserInfoState });
 
-
         userEvent.type(screen.getByLabelText('Old Password'), '1234567');
         userEvent.type(screen.getByLabelText('New password'), 'asdD?234');
-        userEvent.type(screen.getByLabelText('Repeat new password'), 'asdD?234');
+        userEvent.type(
+            screen.getByLabelText('Repeat new password'),
+            'asdD?234',
+        );
 
-        userEvent.click(screen.getByRole('button', { name: 'Change password' }));
+        userEvent.click(
+            screen.getByRole('button', { name: 'Change password' }),
+        );
 
         await waitFor(
             () => {
@@ -107,7 +173,6 @@ describe('<Profile />', () => {
             { timeout: 15000 },
         );
     });
-
 
     it('checks if the password was changed successfully', async () => {
         server.use(
@@ -120,12 +185,16 @@ describe('<Profile />', () => {
         );
         render(<Profile />, { initialState: noUserInfoState });
 
-
         userEvent.type(screen.getByLabelText('Old Password'), '1234567');
         userEvent.type(screen.getByLabelText('New password'), 'asdD?234');
-        userEvent.type(screen.getByLabelText('Repeat new password'), 'asdD?234');
+        userEvent.type(
+            screen.getByLabelText('Repeat new password'),
+            'asdD?234',
+        );
 
-        userEvent.click(screen.getByRole('button', { name: 'Change password' }));
+        userEvent.click(
+            screen.getByRole('button', { name: 'Change password' }),
+        );
 
         await waitFor(
             () => {
@@ -136,5 +205,4 @@ describe('<Profile />', () => {
             { timeout: 15000 },
         );
     });
-
 });
