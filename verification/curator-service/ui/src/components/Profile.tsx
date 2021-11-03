@@ -33,7 +33,6 @@ import Alert from '@material-ui/lab/Alert';
 import LinearProgress from '@material-ui/core/LinearProgress';
 import { SnackbarAlert } from './SnackbarAlert';
 import Helmet from 'react-helmet';
-import { useStore } from 'react-redux';
 
 const styles = makeStyles((theme: Theme) => ({
     root: {
