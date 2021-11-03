@@ -159,7 +159,7 @@ export default class CasesController {
 
         const params = {
             Bucket: 'covid-19-data-export',
-            Key: 'latest/latestdata.tar',
+            Key: 'latest/latestdata-csv.tar',
             Expires: 5 * 60,
             ResponseContentDisposition:
                 'attachment; filename ="' + filename + '"',
