@@ -28,10 +28,14 @@ jobs:
       working-directory: data-serving/scripts/export-data
       env:
         CONN: ${{ secrets.EXPORT_CONN_PROD }}
-        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-        ECR_REPOSITORY: gdh-country-exporter
+        REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        REPO_COUNTRY: gdh-country-exporter
+        REPO_FULL: gdh-full-exporter
         IMAGE_TAG: ${{ github.sha }}
       run: |
-        docker build --build-arg CONN -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG -t $ECR_REGISTRY/$ECR_REPOSITORY .
-        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-        docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
+        docker build --build-arg CONN -t $REGISTRY/$REPO_COUNTRY:$IMAGE_TAG -t $REGISTRY/$REPO_COUNTRY .
+        docker push $REGISTRY/$REPO_COUNTRY:$IMAGE_TAG
+        docker push $REGISTRY/$REPO_COUNTRY:latest
+        docker build -f ./Dockerfile_full_export -t $REGISTRY/$REPO_FULL:$IMAGE_TAG -t $REGISTRY/$REPO_FULL
+        docker push $REGISTRY/$REPO_FULL:$IMAGE_TAG
+        docker push $REGISTRY/$REPO_FULL:latest
