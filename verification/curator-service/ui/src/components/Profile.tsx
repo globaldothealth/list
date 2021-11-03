@@ -1,7 +1,11 @@
 import React, { useState, useEffect } from 'react';
 
 import { useAppSelector, useAppDispatch } from '../hooks/redux';
-import { changePassword, resetApiKey } from '../redux/auth/thunk';
+import {
+    changePassword,
+    getUserProfile,
+    resetApiKey,
+} from '../redux/auth/thunk';
 import {
     selectUser,
     selectError,
@@ -29,6 +33,7 @@ import Alert from '@material-ui/lab/Alert';
 import LinearProgress from '@material-ui/core/LinearProgress';
 import { SnackbarAlert } from './SnackbarAlert';
 import Helmet from 'react-helmet';
+import { useStore } from 'react-redux';
 
 const styles = makeStyles((theme: Theme) => ({
     root: {
@@ -82,20 +87,7 @@ interface FormValues {
 
 export function ResetAPIKeyForm(): JSX.Element {
     const dispatch = useAppDispatch();
-    const [apiKey, setApiKey] = useState(null);
-
-    useEffect(() => {
-        // can't use a react hook here, so grab the user manually
-        const user = JSON.parse(localStorage.getItem('user') ?? 'null');
-        setApiKey(user?.apiKey);
-        window.addEventListener('storage', storageEventHandler, false);
-    }, []);
-
-    function storageEventHandler() {
-        // can't use a react hook here, so grab the user manually
-        const user = JSON.parse(localStorage.getItem('user') ?? 'null');
-        setApiKey(user?.apiKey);
-    }
+    const apiKey = useAppSelector(selectUser)?.apiKey;
 
     return (
         <div>
@@ -114,9 +106,11 @@ export function ResetAPIKeyForm(): JSX.Element {
                 are associated with your account, so keep your API key secret.
             </p>
             <Button
+                data-testid="reset-api-key"
                 variant="contained"
-                onClick={() => {
-                    dispatch(resetApiKey(storageEventHandler));
+                onClick={async () => {
+                    await dispatch(resetApiKey());
+                    await dispatch(getUserProfile());
                 }}
             >
                 Reset API Key
