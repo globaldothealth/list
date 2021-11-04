@@ -1,13 +1,12 @@
-import { CleanEnv, cleanEnv, port, str, bool, num } from 'envalid';
+import { cleanEnv, port, str } from 'envalid';
 
 export default function validateEnv(): Readonly<{
     LOCATION_SERVICE_URL: string;
     DB_CONNECTION_STRING: string;
     PORT: number;
     SERVICE_ENV: string;
-}> &
-    CleanEnv & {
-        readonly [varName: string]: string | undefined;
+}> & {
+        readonly [varName: string]: string | boolean | number | undefined;
         // eslint-disable-next-line indent
     } {
     return cleanEnv(process.env, {
