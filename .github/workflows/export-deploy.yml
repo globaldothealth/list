@@ -36,6 +36,6 @@ jobs:
         docker build --build-arg CONN -t $REGISTRY/$REPO_COUNTRY:$IMAGE_TAG -t $REGISTRY/$REPO_COUNTRY .
         docker push $REGISTRY/$REPO_COUNTRY:$IMAGE_TAG
         docker push $REGISTRY/$REPO_COUNTRY:latest
-        docker build -f ./Dockerfile_full_export -t $REGISTRY/$REPO_FULL:$IMAGE_TAG -t $REGISTRY/$REPO_FULL
+        docker build -f ./Dockerfile_full_export -t $REGISTRY/$REPO_FULL:$IMAGE_TAG -t $REGISTRY/$REPO_FULL .
         docker push $REGISTRY/$REPO_FULL:$IMAGE_TAG
         docker push $REGISTRY/$REPO_FULL:latest
