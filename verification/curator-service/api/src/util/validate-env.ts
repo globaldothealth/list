@@ -1,4 +1,4 @@
-import { CleanEnv, bool, cleanEnv, port, str, url } from 'envalid';
+import { bool, cleanEnv, port, str, url } from 'envalid';
 
 export default function validateEnv(): Readonly<{
     AFTER_LOGIN_REDIRECT_URL: string;
@@ -21,8 +21,8 @@ export default function validateEnv(): Readonly<{
     SESSION_COOKIE_KEY: string;
     STATIC_DIR: string;
 }> &
-    CleanEnv & {
-        readonly [varName: string]: string | undefined;
+    {
+        readonly [varName: string]: string | boolean | number | undefined;
         // eslint-disable-next-line indent
     } {
     return cleanEnv(process.env, {
