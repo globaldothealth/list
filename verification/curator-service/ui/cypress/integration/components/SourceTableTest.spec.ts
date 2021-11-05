@@ -6,7 +6,7 @@ describe('Sources table', function () {
     });
 
     it('Can edit a source', function () {
-        cy.addSource('Example source', 'www.example.com');
+        cy.addSource('Example source', 'www.example.com', ['US', 'CA', 'MX']);
         cy.visit('/');
         cy.visit('/sources');
         cy.contains('Example source');
