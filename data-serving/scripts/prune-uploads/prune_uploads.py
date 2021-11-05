@@ -16,6 +16,7 @@ import pymongo
 import requests
 from bson.objectid import ObjectId
 
+import hooks.country_export
 
 def _ids(xs):
     return [str(x["_id"]) for x in xs]
@@ -284,9 +285,11 @@ if __name__ == "__main__":
         )
     )
     m = []
+    ingested_sources = []
     for s in sources:
         if result := prune_uploads(db.cases, db.sources, s, threshold,
                                    epoch, args.dry_run, args.allow_decrease):
+            ingested_sources.append(s)
             list_msgs = "\n".join(result)
             m.append(f"*{s['name']}* ({str(s['_id'])}):\n{list_msgs}")
 
@@ -295,3 +298,5 @@ if __name__ == "__main__":
 
     if webhook_url := os.environ.get("PRUNE_UPLOADS_WEBHOOK_URL"):
         notify("\n".join(m), webhook_url)
+
+    hooks.country_export.run(ingested_sources)
