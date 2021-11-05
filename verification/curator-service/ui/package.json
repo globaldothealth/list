@@ -18,6 +18,7 @@
     "formik-material-ui-pickers": "^0.0.12",
     "history": "^4.10.1",
     "http-proxy-middleware": "^2.0.1",
+    "iso-3166-1": "^2.1.1",
     "lodash": "^4.17.21",
     "material-table": "^1.69.3",
     "material-ui-chip-input": "^2.0.0-beta.2",
