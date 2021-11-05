@@ -26,7 +26,7 @@ declare global {
                 roles: string[];
                 removeGoogleID?: boolean;
             }) => void;
-            addSource: (name: string, url: string, uploads?: []) => void;
+            addSource: (name: string, url: string, countryCodes?: string[], uploads?: []) => void;
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             seedLocation: (loc: any) => void;
             clearSeededLocations: () => void;
@@ -130,12 +130,13 @@ export function clearSeededLocations(): void {
     });
 }
 
-export function addSource(name: string, url: string, uploads?: []): void {
+export function addSource(name: string, url: string, countryCodes?: string[], uploads?: []): void {
     cy.request({
         method: 'POST',
         url: '/api/sources',
         body: {
             name: name,
+            countryCodes: countryCodes ?? ['ZZ'],
             origin: {
                 url: url,
                 license: 'MIT',

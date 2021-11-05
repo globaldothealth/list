@@ -12,6 +12,7 @@ import {
     Switch,
 } from '@material-ui/core';
 import MaterialTable, { QueryResult } from 'material-table';
+import iso from 'iso-3166-1';
 
 import MuiAlert from '@material-ui/lab/Alert';
 import Paper from '@material-ui/core/Paper';
@@ -58,6 +59,7 @@ interface DateFilter {
 interface Source {
     _id: string;
     name: string;
+    countryCodes: string[];
     format?: string;
     origin: Origin;
     automation?: Automation;
@@ -83,6 +85,7 @@ interface SourceTableState {
 interface TableRow {
     _id: string;
     name: string;
+    countryCodes: string; // flattened
     // origin
     url: string;
 
@@ -170,6 +173,7 @@ class SourceTable extends React.Component<Props, SourceTableState> {
                     this.validateRequired(newRowData.name) &&
                     this.validateRequired(newRowData.url) &&
                     this.validateRequired(newRowData.license) &&
+                    this.validateCountryCodes(newRowData.countryCodes) &&
                     this.validateAutomationFields(newRowData)
                 )
             ) {
@@ -223,6 +227,7 @@ class SourceTable extends React.Component<Props, SourceTableState> {
         return {
             _id: rowData._id,
             name: rowData.name,
+            countryCodes: rowData.countryCodes.split(','),
             origin: {
                 url: rowData.url,
                 license: rowData.license,
@@ -273,6 +278,18 @@ class SourceTable extends React.Component<Props, SourceTableState> {
         return field?.trim() !== '';
     }
 
+    validateCountryCode(cc: string): boolean {
+        // use ZZ to represent all countries
+        return iso.whereAlpha2(cc) !== undefined || cc.toUpperCase() === 'ZZ';
+    }
+
+    validateCountryCodes(field: string | undefined): boolean {
+        // ensure at least one country present
+        if (field === undefined) return false;
+        const countryCodes = field?.split(',');
+        return countryCodes?.every(this.validateCountryCode);
+    }
+
     render(): JSX.Element {
         const { classes } = this.props;
         return (
@@ -307,6 +324,34 @@ class SourceTable extends React.Component<Props, SourceTableState> {
                                             this.validateRequired(props.value)
                                                 ? ''
                                                 : 'Required field'
+                                        }
+                                        onChange={(event): void =>
+                                            props.onChange(event.target.value)
+                                        }
+                                        defaultValue={props.value}
+                                    />
+                                ),
+                            },
+                            {
+                                title: 'Country Codes',
+                                field: 'countryCodes',
+                                editComponent: (props): JSX.Element => (
+                                    <TextField
+                                        type="text"
+                                        size="small"
+                                        fullWidth
+                                        placeholder="ISO 3166-1 alpha-2, comma separated"
+                                        error={
+                                            !this.validateCountryCodes(
+                                                props.value,
+                                            )
+                                        }
+                                        helperText={
+                                            this.validateCountryCodes(
+                                                props.value,
+                                            )
+                                                ? ''
+                                                : 'Required: two letter country codes'
                                         }
                                         onChange={(event): void =>
                                             props.onChange(event.target.value)
@@ -606,6 +651,8 @@ class SourceTable extends React.Component<Props, SourceTableState> {
                                             flattenedSources.push({
                                                 _id: s._id,
                                                 name: s.name,
+                                                countryCodes:
+                                                    s.countryCodes.join(','),
                                                 format: s.format,
                                                 url: s.origin.url,
                                                 license: s.origin.license,

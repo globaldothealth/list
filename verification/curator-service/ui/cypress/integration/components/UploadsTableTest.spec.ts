@@ -6,7 +6,7 @@ describe('Uploads table', function () {
     });
 
     it('displays uploads properly', function () {
-        cy.addSource('New source', 'www.example.com', [
+        cy.addSource('New source', 'www.example.com', ['IN'], [
             {
                 _id: '5ef8e943dfe6e00030892d58',
                 status: 'IN_PROGRESS',
@@ -71,7 +71,7 @@ describe('Uploads table', function () {
             uploadIds: ['5ef8e943dfe6e00030892d60'],
             country: 'Germany',
         });
-        cy.addSource('New source', 'www.example.com', [
+        cy.addSource('New source', 'www.example.com', ['IN'], [
             {
                 _id: '5ef8e943dfe6e00030892d58',
                 status: 'IN_PROGRESS',
