@@ -9,3 +9,7 @@ services:
       GOOGLE_OAUTH_CLIENT_ID: "foo"
       GOOGLE_OAUTH_CLIENT_SECRET: "bar"
       MAPBOX_TOKEN: ""
+      NODE_ENV: "dev"
+  data:
+    environment:
+      NODE_ENV: "dev"
