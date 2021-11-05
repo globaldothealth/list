@@ -6,12 +6,13 @@ import {
 import { DateFilterDocument, dateFilterSchema } from './date-filter';
 import { OriginDocument, originSchema } from './origin';
 import { UploadDocument, uploadSchema } from './upload';
-
+import iso from 'iso-3166-1';
 import mongoose from 'mongoose';
 
 interface ISource {
     _id: mongoose.Types.ObjectId;
     name: string;
+    countryCodes: string[];
     origin: OriginDocument;
     format: string;
     excludeFromLineList: boolean;
@@ -29,6 +30,11 @@ interface ISource {
 
 type ISourceInstanceCreation = mongoose.Model<ISource>;
 
+const validCountryCode = function(cc: string): boolean {
+    // use ZZ to represent all countries
+    return (iso.whereAlpha2(cc) !== undefined || cc.toUpperCase() === "ZZ")
+}
+
 const sourceSchema = new mongoose.Schema<
     ISource,
     ISourceInstanceCreation,
@@ -41,6 +47,15 @@ const sourceSchema = new mongoose.Schema<
     origin: {
         type: originSchema,
         required: [true, 'Enter an origin'],
+    },
+    countryCodes: {
+        type: [String],
+        validate: {
+            validator: function(cc: string[]): boolean {
+                return cc.every(validCountryCode)
+            }
+        },
+        message: 'Invalid country code entered'
     },
     format: String,
     excludeFromLineList: Boolean,

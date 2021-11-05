@@ -22,6 +22,7 @@ describe('<SourceTable />', () => {
         const sourceName = 'source_name';
         const originUrl = 'origin url';
         const format = 'JSON';
+        const countryCodes = ['US', 'MX', 'CA'];
         const license = 'MIT';
         const recipients = ['foo@bar.com', 'bar@baz.com'];
         const awsLambdaArn = 'arn:aws:lambda:a:b:functions:c';
@@ -32,6 +33,7 @@ describe('<SourceTable />', () => {
                 _id: sourceId,
                 name: sourceName,
                 format: format,
+                countryCodes: countryCodes,
                 origin: {
                     url: originUrl,
                     license: license,
@@ -79,6 +81,9 @@ describe('<SourceTable />', () => {
             await screen.findByText(new RegExp(sourceName)),
         ).toBeInTheDocument();
         expect(
+            await screen.findByText(new RegExp(countryCodes.join(','))),
+        ).toBeInTheDocument();
+        expect(
             await screen.findByText(new RegExp(originUrl)),
         ).toBeInTheDocument();
         expect(await screen.findByText(new RegExp(format))).toBeInTheDocument();
@@ -110,6 +115,7 @@ describe('<SourceTable />', () => {
             {
                 _id: 'abc123',
                 name: 'source_name',
+                countryCodes: ['US', 'CA', 'MX'],
                 format: 'JSON',
                 origin: {
                     url: 'origin url',
@@ -164,6 +170,7 @@ describe('<SourceTable />', () => {
             {
                 _id: 'abc123',
                 name: 'source_name',
+                countryCodes: ['US', 'CA', 'MX'],
                 format: 'JSON',
                 origin: {
                     url: 'origin url',
@@ -244,6 +251,7 @@ describe('<SourceTable />', () => {
             {
                 _id: 'abc123',
                 name: 'source_name',
+                countryCodes: ['US', 'CA', 'MX'],
                 origin: {
                     url: 'origin url',
                     license: 'origin license',
@@ -284,6 +292,7 @@ describe('<SourceTable />', () => {
             {
                 _id: 'abc123',
                 name: 'source_name',
+                countryCodes: ['US', 'CA', 'MX'],
                 format: 'format',
                 origin: {
                     url: 'new source url',
@@ -340,6 +349,7 @@ describe('<SourceTable />', () => {
             {
                 _id: 'abc123',
                 name: 'source_name',
+                countryCodes: ['US', 'CA', 'MX'],
                 origin: {
                     url: 'origin url',
                     license: 'origin license',
@@ -382,6 +392,7 @@ describe('<SourceTable />', () => {
             {
                 _id: 'abc123',
                 name: 'source_name',
+                countryCodes: ['US', 'CA', 'MX'],
                 format: 'format',
                 origin: {
                     url: 'origin url',
@@ -441,6 +452,7 @@ describe('<SourceTable />', () => {
             {
                 _id: 'abc123',
                 name: 'source_name',
+                countryCodes: ['US', 'CA', 'MX'],
                 origin: {
                     url: 'origin url',
                     license: 'origin license',
@@ -481,6 +493,7 @@ describe('<SourceTable />', () => {
             {
                 _id: 'abc123',
                 name: 'source_name',
+                countryCodes: ['US', 'CA', 'MX'],
                 format: 'format',
                 origin: {
                     url: 'origin url',
