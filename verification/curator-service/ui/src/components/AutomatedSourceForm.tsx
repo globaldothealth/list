@@ -83,6 +83,7 @@ export interface AutomatedSourceFormValues {
     url: string;
     license: string;
     name: string;
+    countryCodes: string[];
     format: string;
     notificationRecipients: string[];
     excludeFromLineList: boolean;
@@ -92,6 +93,7 @@ export interface AutomatedSourceFormValues {
 const AutomatedSourceFormSchema = Yup.object().shape({
     url: Yup.string().required('Required'),
     name: Yup.string().required('Required'),
+    countryCodes: Yup.array().of(Yup.string()).required('Required'),
     format: Yup.string().required('Required'),
     license: Yup.string().required('Required'),
     notificationRecipients: Yup.array().of(Yup.string().email()),
@@ -111,6 +113,7 @@ export default function AutomatedSourceForm(props: Props): JSX.Element {
     ): Promise<void> => {
         const newSource = {
             name: values.name,
+            countryCodes: values.countryCodes,
             origin: { url: values.url, license: values.license },
             format: values.format,
             notificationRecipients: values.notificationRecipients,
@@ -143,6 +146,7 @@ export default function AutomatedSourceForm(props: Props): JSX.Element {
                         initialValues={{
                             url: '',
                             name: '',
+                            countryCodes: [],
                             format: '',
                             license: '',
                             notificationRecipients: [user.email],
@@ -205,6 +209,32 @@ export default function AutomatedSourceForm(props: Props): JSX.Element {
                                                 component={TextField}
                                                 fullWidth
                                             />
+                                        </div>
+                                        <div className={classes.formSection}>
+                                            <ChipInput
+                                                classes={{
+                                                    helperText:
+                                                        classes.errorHelper,
+                                                }}
+                                                data-testid="countryCodes"
+                                                helperText={
+                                                    errors.countryCodes
+                                                        ? 'Values must be valid country codes'
+                                                        : undefined
+                                                }
+                                                fullWidth
+                                                alwaysShowPlaceholder
+                                                placeholder="Two letter ISO-3166-1 country codes (or ZZ for world)"
+                                                defaultValue={
+                                                    initialValues.countryCodes
+                                                }
+                                                onChange={(values): void =>
+                                                    setFieldValue(
+                                                        'countryCodes',
+                                                        values ?? undefined,
+                                                    )
+                                                }
+                                            ></ChipInput>
                                         </div>
                                         <div className={classes.formSection}>
                                             <FastField
