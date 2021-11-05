@@ -87,3 +87,16 @@ Then for
 After this, prune-uploads marks line list cases as *list = true* (*list = false*) for
 accepted (rejected) uploads, and updates the uploads array in the sources collection to
 indicate that these uploads have been processed, by setting the *accepted* attribute.
+
+## Hooks
+
+Following ingestion, prune-uploads runs the following hooks:
+
+**country-export**: Each ingested source has a corresponding list of [two
+letter ISO 3166-1 country
+codes](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2). A map to country
+names is used to construct the corresponding `exporter_*` job definitions (as
+an example: US would map to `exporter_united_states`). These job definitions
+export country-specific data to an S3 bucket. This hook submits jobs to the
+`export-queue` jom queue, triggering the country export process for the sources
+it just ingested.
