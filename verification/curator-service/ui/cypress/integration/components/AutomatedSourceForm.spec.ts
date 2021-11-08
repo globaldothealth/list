@@ -19,6 +19,7 @@ describe('Automated source form', function () {
         const name = 'New source name';
         const format = 'JSON';
         const license = 'WTFPL';
+        const countryCodes = 'CA';
         const otherEmail = 'other.curator9001@gmail.com';
 
         cy.visit('/');
@@ -27,6 +28,7 @@ describe('Automated source form', function () {
         cy.wait(100);
         cy.get('div[data-testid="url"]').type(url);
         cy.get('div[data-testid="name"]').type(name);
+        cy.get('div[data-testid="countryCodes"]').type(countryCodes);
         cy.get('div[data-testid="license"]').type(license);
         cy.get('div[data-testid="recipients"]').type(otherEmail);
         cy.get('div[data-testid="format"]').click();
@@ -48,14 +50,18 @@ describe('Automated source form', function () {
     });
 
     it('Does not add source on submission error', function () {
+
         cy.visit('/');
         cy.contains('Sources').click();
         cy.contains('No records to display');
+
+        const countryCodes = 'XX';
 
         cy.contains('Create new').click();
         cy.contains('New automated source').click();
         cy.get('div[data-testid="url"]').type('www.newsource.com');
         cy.get('div[data-testid="name"]').type('New source name');
+        cy.get('div[data-testid="countryCodes"]').type(countryCodes);
         cy.get('div[data-testid="license"]').type('WTFPL');
         cy.get('div[data-testid="format"]').click();
         cy.get('li[data-value="JSON"').click();
