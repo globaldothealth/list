@@ -71,7 +71,7 @@ def get_exporters(source: dict[str, Any]) -> set[str]:
         return {f"exporter_{slug(name)}"}
 
 
-def run(sources: list[dict[str, Any]]):
+def run(sources: list[dict[str, Any]], dry_run: bool = False):
     print("*** Running hook: country_export ***")
     batch = boto3.client("batch")
     jobdefs = set.union(*(get_exporters(s) for s in sources))
@@ -81,9 +81,10 @@ def run(sources: list[dict[str, Any]]):
     for jobdef in jobdefs & all_exporters:
         try:
             print(f"Submitting job for {jobdef} ...")
-            batch.submit_job(
-                jobName=jobdef, jobDefinition=jobdef, jobQueue="export-queue"
-            )
+            if not dry_run:
+                batch.submit_job(
+                    jobName=jobdef, jobDefinition=jobdef, jobQueue="export-queue"
+                )
         except Exception as e:
             print(f"Error occurred while trying to submit {jobdef}")
             print(e)
