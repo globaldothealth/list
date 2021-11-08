@@ -227,7 +227,7 @@ class SourceTable extends React.Component<Props, SourceTableState> {
         return {
             _id: rowData._id,
             name: rowData.name,
-            countryCodes: rowData.countryCodes.split(','),
+            countryCodes: rowData.countryCodes?.split(',') ?? [],
             origin: {
                 url: rowData.url,
                 license: rowData.license,
@@ -652,7 +652,8 @@ class SourceTable extends React.Component<Props, SourceTableState> {
                                                 _id: s._id,
                                                 name: s.name,
                                                 countryCodes:
-                                                    s.countryCodes.join(','),
+                                                    s.countryCodes?.join(',') ??
+                                                    '',
                                                 format: s.format,
                                                 url: s.origin.url,
                                                 license: s.origin.license,
