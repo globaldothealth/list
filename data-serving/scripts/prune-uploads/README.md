@@ -69,6 +69,8 @@ Remove the -n to actually prune uploads.
   of cases. This option has no effect on UUID source uploads, which are always
   ingested.
 
+* **-r**, **--run-hooks**=*hook1*[,*hook2*]: Runs hooks after prune finishes. Specify
+  *all* to run all hooks configured to run.
 
 ## How it works
 
