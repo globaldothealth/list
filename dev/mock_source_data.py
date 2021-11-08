@@ -1,3 +1,4 @@
+from copy import deepcopy
 from os import environ, path
 from pathlib import Path
 
@@ -50,15 +51,20 @@ def set_names_to_parsers():
 				name = path.stem.lower()
 				# if there are .py files, get the non "test"/"___init__" .py file and remove the extension
 				parser_files = [f.stem for f in list(path.glob("*.py")) if "test" not in str(f) and "__init__" not in str(f)]
+				print(f"Parser file candidates: {parser_files}")
 				if len(parser_files) == 1:
 					file_name = parser_files[0]
 					parser = f"{path.stem}-{file_name}-ingestor-locale2e"
+					SOURCE_NAMES_TO_PARSERS[name] = parser
+				elif name in parser_files:
+					parser = f"{path.stem}-{name}-ingestor-locale2e"
 					SOURCE_NAMES_TO_PARSERS[name] = parser
 				else:
 					print(f"No single identifiable parser file for source {name}")
 			else:
 				print(f"No single sample_data file in directory {path}")
 	print("Got parsers from file system")
+	print(f"Source names to parsers: {SOURCE_NAMES_TO_PARSERS}")
 
 
 class MockSourceData(object):
@@ -85,18 +91,20 @@ class MockSourceData(object):
 		return obj_key
 
 	def make_source_details(self, source_id, file_name):
-		source_details = SOURCE_DETAILS.copy()
+		source_details = deepcopy(SOURCE_DETAILS)
 		ext = path.splitext(file_name)[1]
 		source_details["origin"]["url"] = f"s3://{BUCKET_NAME}/{file_name}"
 		source_details["format"] = ext.replace(".", "").upper()
 
 		source_name = SOURCE_IDS_TO_NAMES.get(source_id)
+		print(f"Source name for id {source_id}: {source_name}")
 		if not source_name:
 			raise Exception(f"Missing source name for source id {source_id}")
 
 		source_details["automation"]["parser"]["awsLambdaArn"] = SOURCE_NAMES_TO_PARSERS.get(source_name)
 
 		self.source_details[source_id] = source_details
+		print(f"Source details in object now {self.source_details}")
 		return source_details
 
 
@@ -106,6 +114,24 @@ msd = MockSourceData()
 @app.route("/health")
 def healthcheck():
 	return "OK", status.HTTP_200_OK
+
+
+@app.route("/names")
+def get_all_source_ids():
+	return SOURCE_IDS_TO_NAMES, status.HTTP_200_OK
+
+
+@app.route("/names/<source_name>")
+def get_source_id(source_name):
+	vals = list(SOURCE_IDS_TO_NAMES.values())
+	if source_name in vals:
+		return list(SOURCE_IDS_TO_NAMES.keys())[vals.index(source_name)], status.HTTP_200_OK
+	return f"Source ID for {source_name} not found", status.HTTP_404_NOT_FOUND
+
+
+@app.route("/sources")
+def get_all_source_details():
+	return msd.source_details, status.HTTP_200_OK
 
 
 @app.route("/sources/<source_id>")
@@ -140,8 +166,8 @@ def map_id_to_name():
 	if not source_id or not source_name:
 		return f"Invalid request. Source ID: {source_id}, source name: {source_name}", status.HTTP_400_BAD_REQUEST
 	if SOURCE_IDS_TO_NAMES.get(source_id):
-		SOURCE_IDS_TO_NAMES[source_id] = source_name
 		return "OK", status.HTTP_200_OK
+	print(f"Mapping source id {source_id} to source name {source_name}")
 	SOURCE_IDS_TO_NAMES[source_id] = source_name
 	return "OK", status.HTTP_201_CREATED
 

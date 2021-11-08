@@ -34,7 +34,7 @@ RUN apt-get update \
         build-essential
 
 # install poetry - respects $POETRY_VERSION & $POETRY_HOME
-RUN curl -sSL https://raw.githubusercontent.com/sdispater/poetry/master/get-poetry.py | python
+RUN curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python
 
 # copy project requirement files here to ensure they will be cached.
 WORKDIR $PYSETUP_PATH
@@ -70,6 +70,6 @@ COPY ./mock_source_data.py ./
 COPY poetry.lock pyproject.toml ./
 
 # quicker install as runtime deps are already installed
-RUN poetry install
+RUN poetry install --no-dev
 
 CMD [ "python", "./mock_source_data.py" ]

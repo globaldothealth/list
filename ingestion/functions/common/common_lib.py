@@ -22,6 +22,7 @@ from pathlib import Path
 from google.oauth2 import service_account
 
 E2E_MOCK_SOURCE_URL = os.environ.get("MOCK_SOURCE_DATA_ADDRESS", "")
+REGISTRATION_ENDPOINT = os.environ.get("REGISTRATION_ENDPOINT", "http://localhost:3001/auth/register")
 
 _ENV_TO_SOURCE_API_URL = {
     "locale2e": E2E_MOCK_SOURCE_URL,
@@ -114,7 +115,7 @@ def login(email: str):
     Returns the cookie of the now logged-in user.
     """
     print("Logging-in user", email)
-    endpoint = "http://localhost:3001/auth/register"
+    endpoint = REGISTRATION_ENDPOINT
     res = requests.post(endpoint, json={
         "email": email,
         "roles": ["curator"],

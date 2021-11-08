@@ -5,6 +5,7 @@ import { logger } from '../util/logger';
  * Client that sends emails via AWS SES
  */
 export default class EmailClient {
+    private serviceEnv: string;
     private accessKeyId: string;
     private secretAccessKey: string;
     private region: string;
@@ -13,11 +14,13 @@ export default class EmailClient {
     private initialized = false;
 
     constructor(
+        serviceEnv: string,
         accessKeyId: string,
         secretAccessKey: string,
         region: string,
         sourceEmail: string,
     ) {
+        this.serviceEnv = serviceEnv;
         this.accessKeyId = accessKeyId;
         this.secretAccessKey = secretAccessKey;
         this.region = region;
@@ -61,6 +64,11 @@ export default class EmailClient {
         subject: string,
         message: string,
     ): Promise<unknown> {
+
+        if (this.serviceEnv == 'locale2e') {
+            return;
+        }
+
         const emailParams = {
             Destination: {
                 ToAddresses: addresses,
