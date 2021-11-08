@@ -148,7 +148,7 @@ describe('mustHaveAnyRole', () => {
         localApp = express();
         localApp.use(bodyParser.json());
         const mLambdaClient = new MockLambdaClient('', '', '');
-        const mEmailClient = new MockEmailClient('', '', '', '');
+        const mEmailClient = new MockEmailClient('', '', '', '', '');
         const authController = new AuthController(
             'local',
             '/redirect-after-login',

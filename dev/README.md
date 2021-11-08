@@ -2,8 +2,9 @@
 
 This directory contains scripts to set up, run, and test the full stack during development, including:
 
-- `run_stack.sh`: A script to run the dev docker compose file that runs an isolated environment of the full stack and uses AWS.
-- `run_full_stack.sh`: A script to run the dev docker compose file that runs an isolated environment of the full stack and uses localstack instead of AWS.
+- `run_stack.sh`: A script to run the docker compose file that runs an isolated environment of the full stack and uses AWS.
+- `run_full_stack.sh`: A script to run the docker compose file that runs an isolated environment of the full stack, using localstack instead of AWS.
+- `test_full_stack.sh`: A script to run the docker compose file that runs a suite of end-to-end tests on an isolated environment of the full stack, using localstack instead of AWS. After running the tests it provides a report of test output.
 - `setup-db.sh`: A script to that connects to your locally-running MongoDB instance (and ONLY that instance!) and (re-)creates the database and
   collection, applies the schema, creates indexes, and inserts some sample data.
 - `test_all.sh`: A script to run all of the tests from the sub-packages. Uses `run_full_stack.sh`.
@@ -46,7 +47,7 @@ REACT_APP_COOKIE_CONSENT_PUBLIC_ID=<Public ID for Iubenda service that provides 
 LOCALSTACK_API_KEY=<Localstack (mock AWS) API key>
 ```
 
-**Note:** Local end-to-end testing, which uses `run_full_stack.sh` and `parsing.py`, requires `LOCALSTACK_API_KEY`
+**Note:** Local end-to-end testing, which uses `parsing.py` with either `run_full_stack.sh`  or `test_full_stack.sh`, requires `LOCALSTACK_API_KEY`
 in order to use the paid features of Localstack.
 
 These values are stored in a dedicated secret manager. To request AWS credentials, or for access to

@@ -139,6 +139,7 @@ if (env.SERVICE_ENV == 'locale2e') {
 
 // Configure Email Client
 const emailClient = new EmailClient(
+    env.SERVICE_ENV,
     env.AWS_ACCESS_KEY_ID,
     env.AWS_SECRET_ACCESS_KEY,
     'us-east-2',
