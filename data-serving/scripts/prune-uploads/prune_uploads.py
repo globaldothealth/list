@@ -18,6 +18,8 @@ from bson.objectid import ObjectId
 
 import hooks.country_export
 
+HOOKS = ["country_export"]
+
 def _ids(xs):
     return [str(x["_id"]) for x in xs]
 
@@ -232,6 +234,14 @@ def prune_uploads(
     return msgs
 
 
+def get_selected_hooks(run_hooks):
+    if not run_hooks:
+        return []
+    if run_hooks == "all":
+        return HOOKS
+    return [hook for hook in run_hooks.split(',') if hook in HOOKS]
+
+
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(
@@ -246,7 +256,10 @@ if __name__ == "__main__":
         help="Error threshold percentage below which uploads are accepted",
     )
     parser.add_argument("-n", "--dry-run", help="Dry run", action="store_true")
-    parser.add_argument("-d", "--allow-decrease", help="Allow decrease in cases (non-UUID)")
+    parser.add_argument("-d", "--allow-decrease",
+                        help="Allow decrease in cases (non-UUID)", action="store_true")
+    parser.add_argument("-r", "--run-hooks",
+                        help="Run hooks after prune finishes. Specify 'all' to run all hooks")
     args = parser.parse_args()
 
     # Prefer command line arguments to environment variables
@@ -299,4 +312,6 @@ if __name__ == "__main__":
     if webhook_url := os.environ.get("PRUNE_UPLOADS_WEBHOOK_URL"):
         notify("\n".join(m), webhook_url)
 
-    hooks.country_export.run(ingested_sources)
+    selected_hooks = get_selected_hooks(args.run_hooks)
+    if "country_export" in selected_hooks:
+        hooks.country_export.run(ingested_sources, args.dry_run)

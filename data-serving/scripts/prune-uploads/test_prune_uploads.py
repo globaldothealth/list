@@ -3,7 +3,7 @@ from bson.objectid import ObjectId
 from datetime import datetime
 from enum import Enum
 
-from prune_uploads import find_acceptable_upload
+from prune_uploads import find_acceptable_upload, HOOKS, get_selected_hooks
 
 # If the ratio of numError / numCreated is greater than this,
 # do not accept upload
@@ -141,3 +141,11 @@ def test_find_acceptable_upload_with_epoch(source, expected):
         find_acceptable_upload(source, ERROR_THRESHOLD, datetime(2021, 3, 1))
         == expected
     )
+
+
+@pytest.mark.parametrize(
+    "source,expected",
+    [(None, []), ("all", HOOKS), ("country_export", ["country_export"])],
+)
+def test_get_selected_hooks(source, expected):
+    assert get_selected_hooks(source) == expected
