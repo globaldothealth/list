@@ -32,15 +32,6 @@ class JobRunner(object):
     def __init__(self):
         self.batch_client = boto3.client(
             service_name="batch",
-            region_name=AWS_DEFAULT_REGION,
-            endpoint_url=LOCALSTACK_URL,
-            aws_access_key_id=AWS_ACCESS_KEY_ID,
-            aws_secret_access_key=AWS_SECRET_ACCESS_KEY,
-            verify=False
-        )
-        self.s3_client = boto3.client(
-            service_name="s3",
-            region_name=AWS_DEFAULT_REGION,
             endpoint_url=LOCALSTACK_URL,
             aws_access_key_id=AWS_ACCESS_KEY_ID,
             aws_secret_access_key=AWS_SECRET_ACCESS_KEY,
@@ -48,12 +39,12 @@ class JobRunner(object):
         )
         self.ecr_client = boto3.client(
             service_name="ecr",
-            region_name=AWS_DEFAULT_REGION,
             endpoint_url=LOCALSTACK_URL,
             aws_access_key_id=AWS_ACCESS_KEY_ID,
             aws_secret_access_key=AWS_SECRET_ACCESS_KEY,
             verify=False
         )
+        self.s3_client = boto3.client(service_name="s3")
         self.docker_client = docker.from_env()
         self.ecr_repository = ""
         self.set_ecr_config()
@@ -89,10 +80,22 @@ class JobRunner(object):
         else:
             self.run_all_jobs()
 
-    def run_all_jobs():
+    def run_all_jobs(self):
         job_definition_names = self.get_job_definition_names()
+        print(f"All job definition names")
+        errors = []
         for name in job_definition_names:
-            self.run_job(name)
+            try:
+                self.run_job(name)
+            except Exception as exc:
+                print(f"An error occurred while running the {name} job definition: {exc}")
+                errors.append(exc)
+        print(f"Errors running all jobs: {errors}")
+
+    def get_job_definition_names(self):
+        response = self.batch_client.describe_job_definitions()
+        job_definitions = response.get("jobDefinitions")
+        return [jd.get("jobDefinitionName") for jd in job_definitions]
 
     def run_job(self, name):
 
@@ -119,6 +122,7 @@ class JobRunner(object):
         response = self.batch_client.describe_job_definitions(
             jobDefinitionName=name
         )
+        print(f"Response from Batch {response}")
         job_definitions = response.get("jobDefinitions")
         container_props = job_definitions[0].get("containerProperties", {})
         environment = container_props.get("environment", [{}])
