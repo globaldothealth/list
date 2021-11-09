@@ -184,7 +184,11 @@ def get_fields(fileobject) -> list[str]:
     Add processed event fieldnames to fields.
     """
     reader = csv.DictReader(fileobject)
-    row = next(reader)
+    try:
+        row = next(reader)
+    except StopIteration:
+        print("No rows found for country, aborting")
+        sys.exit(1)
     headers = list(row.keys())
     cols_to_add = [
         "events.confirmed.value",

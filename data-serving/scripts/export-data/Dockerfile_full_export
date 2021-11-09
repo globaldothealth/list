@@ -2,6 +2,7 @@ FROM alpine:3.14
 RUN apk update
 RUN apk add bash aws-cli
 
+COPY common.sh .
 COPY full_export.sh .
 COPY data_dictionary.txt .
 COPY citation.txt .
