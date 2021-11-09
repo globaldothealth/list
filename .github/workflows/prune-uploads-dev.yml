@@ -28,4 +28,4 @@ jobs:
       env:
         PRUNE_EPOCH: 2021-07-30
         CONN: ${{ secrets.DB_CONNECTION_URL_DEV }}
-      run: python prune_uploads.py --run-hooks=all
+      run: python prune_uploads.py --run-hooks=all --env=dev
