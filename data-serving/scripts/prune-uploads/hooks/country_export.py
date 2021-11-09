@@ -42,17 +42,17 @@ _CODE_NAME_MAP.update(_QUIRKS)
 
 
 @cache
-def list_exporters() -> set[str]:
-    "Returns all job definitions starting with exporter_"
+def list_exporters(env: str) -> set[str]:
+    "Returns all job definitions starting with env-exporter_"
     batch = boto3.client("batch")
     return {
         j["jobDefinitionName"]
         for j in batch.describe_job_definitions()["jobDefinitions"]
-        if j["jobDefinitionName"].startswith("exporter_")
+        if j["jobDefinitionName"].startswith(f"{env}-exporter_")
     }
 
 
-def get_exporters(source: dict[str, Any]) -> set[str]:
+def get_exporters(source: dict[str, Any], env: str) -> set[str]:
     "Gets possible exporter job definition names from source"
     name = source["name"]
     countryCodes = set(source.get("countryCodes", []))
@@ -64,18 +64,18 @@ def get_exporters(source: dict[str, Any]) -> set[str]:
         return set()
     if countryCodes:  # prefer country codes to names
         return {
-            f"exporter_{slug(_CODE_NAME_MAP[cc])}"
+            f"{env}-exporter_{slug(_CODE_NAME_MAP[cc])}"
             for cc in countryCodes & validCountryCodes
         }
     else:  # works if country:source is 1:1 and name matches
-        return {f"exporter_{slug(name)}"}
+        return {f"{env}-exporter_{slug(name)}"}
 
 
-def run(sources: list[dict[str, Any]], dry_run: bool = False):
+def run(sources: list[dict[str, Any]], env: str, dry_run: bool = False):
     print("*** Running hook: country_export ***")
     batch = boto3.client("batch")
-    jobdefs = set.union(*(get_exporters(s) for s in sources))
-    all_exporters = list_exporters()
+    jobdefs = set.union(*(get_exporters(s, env) for s in sources))
+    all_exporters = list_exporters(env)
     if unknown_exporters := jobdefs - all_exporters:
         print(f"Ignoring unknown exporters {unknown_exporters}")
     for jobdef in jobdefs & all_exporters:

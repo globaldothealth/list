@@ -260,6 +260,8 @@ if __name__ == "__main__":
                         help="Allow decrease in cases (non-UUID)", action="store_true")
     parser.add_argument("-r", "--run-hooks",
                         help="Run hooks after prune finishes. Specify 'all' to run all hooks")
+    parser.add_argument("--env",
+                        help="Which environment to use for hooks (default: prod)", default="prod")
     args = parser.parse_args()
 
     # Prefer command line arguments to environment variables
@@ -314,4 +316,4 @@ if __name__ == "__main__":
 
     selected_hooks = get_selected_hooks(args.run_hooks)
     if "country_export" in selected_hooks:
-        hooks.country_export.run(ingested_sources, args.dry_run)
+        hooks.country_export.run(ingested_sources, args.env, args.dry_run)
