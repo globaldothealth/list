@@ -28,12 +28,12 @@ def test_slug(source, expected):
     [
         (
             _NORTH_AMERICA,
-            {"exporter_united_states", "exporter_canada", "exporter_mexico"},
+            {"prod-exporter_united_states", "prod-exporter_canada", "prod-exporter_mexico"},
         ),
-        (_REUNION, {"exporter_reunion"}),
-        (_NEW_ZEALAND, {"exporter_new_zealand"}),
+        (_REUNION, {"prod-exporter_reunion"}),
+        (_NEW_ZEALAND, {"prod-exporter_new_zealand"}),
         (_INVALID, set()),
     ],
 )
 def test_get_exporters(source, expected):
-    assert T.get_exporters(source) == expected
+    assert T.get_exporters(source, "prod") == expected

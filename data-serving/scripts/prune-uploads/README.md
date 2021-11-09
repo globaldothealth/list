@@ -72,6 +72,9 @@ Remove the -n to actually prune uploads.
 * **-r**, **--run-hooks**=*hook1*[,*hook2*]: Runs hooks after prune finishes. Specify
   *all* to run all hooks configured to run.
 
+* **--env** (default=prod): Specifies which environment to use. This is passed to hooks
+  which can vary behaviour based on this, as with the country export script.
+
 ## How it works
 
 Prune uploads uses the *uploads* array in the sources collection to get a list
