@@ -5,7 +5,12 @@
 set -eou pipefail
 source ./common.sh
 
-CASECOUNT_URL="https://covid-19-aggregates.s3.amazonaws.com/country/latest.json"
+require_env "${ENV:-}" "Specify environment in ENV"
+require_env "${CONN:-}" "Specify MongoDB connection string in CONN"
+
+echo "Setting up country export job definitions for environment {ENV}..."
+
+CASECOUNT_URL=${CASECOUNT_URL:-https://covid-19-aggregates.s3.amazonaws.com/country/latest.json}
 # mongoexport rate in cases/s
 # actual rate is higher, but this allows some wiggle room
 # in calculation of Batch job timeouts
@@ -19,12 +24,18 @@ function casecounts {
 
 function containerprops {
     # usage: containerprops "<country>"
-    P='{'
-    P+="\"image\": \"${IMAGE}\""
-    P+=", \"vcpus\": 2, \"memory\": 4096, \"jobRoleArn\": \"${JOB_ROLE_ARN}\""
-    P+=", \"environment\": [{\"name\": \"COUNTRY\", \"value\": \"$1\" }]"
-    P+='}'
-    echo "$P"
+    cat << EOF
+{
+  "image": "$IMAGE",
+  "vcpus": 2,
+  "memory": 4096,
+  "jobRoleArn": "$JOB_ROLE_ARN",
+  "environment: [
+     {"name": "COUNTRY", "value": "$1" }
+   , {"name": "CONN", "value": "$CONN" }
+  ]
+}
+EOF
 }
 
 casecounts | \
@@ -39,8 +50,8 @@ casecounts | \
         fi
         slug=$(echo "${country}" | sed "s/ /_/g;s/[.,']//g" | tr '[:upper:]' '[:lower:]')
         printf 'exporter_%s; casecount=%d; timeout=%d\n' "$slug" "$casecount" "$timeout"
-        echo "$(containerprops "${country}")"
-        aws batch register-job-definition --job-definition-name "exporter_${slug}" \
+        containerprops "${country}"
+        aws batch register-job-definition --job-definition-name "${ENV}-exporter_${slug}" \
             --container-properties "$(containerprops "${country}")" \
             --timeout "attemptDurationSeconds=${timeout}" --type container
     done
