@@ -17,7 +17,5 @@ mongoexport --query="$QUERY" --uri="$CONN" --collection=cases \
 # shellcheck disable=SC2086
 for fmt in ${FORMAT//,/ }
 do
-    if [ -f "${SLUG}.{fmt}.gz" ]; then
-        aws s3 cp "${SLUG}.${fmt}.gz" "s3://${BUCKET}/${fmt}/"
-    fi
+    test -f "${SLUG}.${fmt}.gz" && aws s3 cp "${SLUG}.${fmt}.gz" "s3://${BUCKET}/${fmt}/"
 done
