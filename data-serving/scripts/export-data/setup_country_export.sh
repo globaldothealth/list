@@ -7,6 +7,7 @@ source ./common.sh
 
 require_env "${ENV:-}" "Specify environment in ENV"
 require_env "${CONN:-}" "Specify MongoDB connection string in CONN"
+require_env "${BUCKET:-}" "Specify S3 bucket to output files in BUCKET"
 
 echo "Setting up country export job definitions for environment {ENV}..."
 
@@ -30,9 +31,10 @@ function containerprops {
   "vcpus": 2,
   "memory": 4096,
   "jobRoleArn": "$JOB_ROLE_ARN",
-  "environment: [
+  "environment": [
      {"name": "COUNTRY", "value": "$1" }
    , {"name": "CONN", "value": "$CONN" }
+   , {"name": "BUCKET", "value": "$BUCKET" }
   ]
 }
 EOF
