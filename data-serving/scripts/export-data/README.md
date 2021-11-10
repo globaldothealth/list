@@ -73,11 +73,12 @@ Currently the corresponding S3 buckets according to environment are:
       (set ENV to environment, such as prod | dev | qa)
 
   ```bash
-  CONN=<MongoDB connection URI> ENV=<env> bash setup_country_export.sh
+  CONN=<MongoDB connection URI> ENV=<env> BUCKET=<bucket> bash setup_country_export.sh
   ```
 
   Job definitions are named *env-exporter_slug* where *slug* is the lowercase
   form of the country with punctuation removed and spaces replaced by underscores.
+  The compressed exports are copied to *bucket*.
 
 * **setup_full_export.sh**: Sets up full export job definitions
 
@@ -87,3 +88,5 @@ Currently the corresponding S3 buckets according to environment are:
   ```
 
   Job definitions are named *env-full-exporter-format* where *format* is one of tsv,json,csv.
+  Files are downloaded from the country export bucket, added to a tarball, and uploaded
+  to the full export bucket.
