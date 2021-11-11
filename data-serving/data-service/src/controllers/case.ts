@@ -1,4 +1,4 @@
-import { Case, CaseDocument, RestrictedCase } from '../model/case';
+import { Case, CaseDocument, caseWithDenormalisedConfirmationDate, RestrictedCase } from '../model/case';
 import { EventDocument } from '../model/event';
 import caseFields from '../model/fields.json';
 import { Source } from '../model/source';
@@ -332,7 +332,7 @@ export class CasesController {
                     const cases = Array.from(
                         { length: numCases },
                         () => new ctor(req.body),
-                    );
+                    ).map(c => caseWithDenormalisedConfirmationDate(c));
                     result = { cases: await ctor.insertMany(cases) };
                 }
             }
@@ -465,6 +465,7 @@ export class CasesController {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const upsertLambda = (c: any) => {
                 delete c.caseCount;
+                c = caseWithDenormalisedConfirmationDate(c as CaseDocument);
                 if (
                     c.caseReference?.sourceId &&
                     c.caseReference?.sourceEntryId
@@ -530,26 +531,18 @@ export class CasesController {
      */
     update = async (req: Request, res: Response): Promise<void> => {
         try {
-            let c = await Case.findByIdAndUpdate(req.params.id, req.body, {
-                new: true,
-                runValidators: true,
-            });
+            let c = await Case.findById(req.params.id);
             if (!c) {
-                c = await RestrictedCase.findByIdAndUpdate(
-                    req.params.id,
-                    req.body,
-                    {
-                        new: true,
-                        runValidators: true,
-                    },
-                );
-                if (!c) {
-                    res.status(404).send({
-                        message: `Case with ID ${req.params.id} not found.`,
-                    });
-                    return;
-                }
+                c = await RestrictedCase.findById(req.params.id);
             }
+            if (!c) {
+                res.status(404).send({
+                    message: `Case with ID ${req.params.id} not found.`,
+                });
+                return;
+            }
+            c.set(req.body);
+            await c.save();
             res.json(c);
         } catch (err) {
             if (err.name === 'ValidationError') {

@@ -25,6 +25,12 @@ import { ObjectId } from 'mongodb';
 import _ from 'lodash';
 import mongoose from 'mongoose';
 import { ExclusionDataDocument, exclusionDataSchema } from './exclusion-data';
+import { dateFieldInfo } from './date';
+
+const requiredDateField = {
+    ...dateFieldInfo,
+    required: true,
+};
 
 export const caseSchema = new mongoose.Schema(
     {
@@ -32,6 +38,7 @@ export const caseSchema = new mongoose.Schema(
             type: caseReferenceSchema,
             required: true,
         },
+        confirmationDate: requiredDateField,
         demographics: demographicsSchema,
         events: {
             type: [eventSchema],
@@ -117,6 +124,7 @@ caseSchema.methods.equalsJSON = function (jsonCase: any): boolean {
 export type CaseDocument = mongoose.Document & {
     _id: ObjectId;
     caseReference: CaseReferenceDocument;
+    confirmationDate: Date;
     demographics: DemographicsDocument;
     events: [EventDocument];
     exclusionData: ExclusionDataDocument;
@@ -139,6 +147,37 @@ export type CaseDocument = mongoose.Document & {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     equalsJSON(jsonCase: any): boolean;
 };
+
+/* Denormalise the confirmation date before saving or updating any case object */
+
+function denormaliseConfirmationDate(aCase: CaseDocument) {
+    const confirmationEvents = _.filter(aCase.events, (e) => e.name === 'confirmed');
+    if (confirmationEvents.length) {
+        aCase.confirmationDate = confirmationEvents[0].dateRange.start;
+    }
+}
+
+export function caseWithDenormalisedConfirmationDate(aCase: CaseDocument) {
+    denormaliseConfirmationDate(aCase);
+    return aCase;
+}
+
+caseSchema.pre('save', async function(this: CaseDocument) {
+    denormaliseConfirmationDate(this);
+});
+
+caseSchema.pre('validate', async function(this: CaseDocument) {
+    denormaliseConfirmationDate(this);
+});
+
+caseSchema.pre('insertMany', async function(next: (err?: mongoose.CallbackError | undefined) => void, docs: CaseDocument[]) {
+    _.forEach(docs, denormaliseConfirmationDate);
+    next();
+});
+
+caseSchema.pre('updateOne', { document: true, query: false }, async function(this: CaseDocument) {
+    denormaliseConfirmationDate(this);
+});
 
 export const Case = mongoose.model<CaseDocument>('Case', caseSchema);
 export const RestrictedCase = mongoose.model<CaseDocument>(
