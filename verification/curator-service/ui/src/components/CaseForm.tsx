@@ -196,6 +196,7 @@ const NewCaseValidation = Yup.object().shape(
         caseReference: Yup.object().shape({
             sourceUrl: Yup.string().required('Required'),
             sourceName: Yup.string().when('sourceId', {
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 is: (sourceId: any) => !sourceId,
                 then: Yup.string().required('Required'),
             }),
@@ -256,6 +257,7 @@ const NewCaseValidation = Yup.object().shape(
     [['maxAge', 'minAge']],
 );
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function hasErrors(fields: string[], errors: any, touched: any): boolean {
     for (const field of fields) {
         if (
@@ -490,8 +492,7 @@ export default function CaseForm(props: Props): JSX.Element {
             }
             setErrorMessage('');
         } catch (e) {
-            const err: any = e;
-            setErrorMessage(err.response?.data?.message || err.toString());
+            setErrorMessage(e.response?.data?.message || e.toString());
             return;
         }
         // Navigate to cases after successful submit

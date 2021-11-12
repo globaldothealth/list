@@ -865,6 +865,7 @@ function RowHeader(props: { title: string }): JSX.Element {
 
 function RowContent(props: { content: string; isLink?: boolean }): JSX.Element {
     const searchQuery = useSelector(selectSearchQuery);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const searchQueryArray: any[] = [];
 
     function words(s: string) {
