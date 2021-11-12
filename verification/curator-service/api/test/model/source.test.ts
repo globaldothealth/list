@@ -25,7 +25,7 @@ describe('validate', () => {
 describe('custom instance methods', () => {
     it('toAwsStatementId returns formatted source ID', () => {
         const s = new Source(minimalSource);
-        expect(s.toAwsStatementId()).toContain(s._id);
+        expect(s.toAwsStatementId()).toContain(s._id.toString());
     });
     it('toAwsRuleDescription returns formatted source name', () => {
         const s = new Source(minimalSource);
@@ -33,10 +33,10 @@ describe('custom instance methods', () => {
     });
     it('toAwsRuleName returns formatted source ID', () => {
         const s = new Source(minimalSource);
-        expect(s.toAwsRuleName()).toContain(s._id);
+        expect(s.toAwsRuleName()).toContain(s._id.toString());
     });
     it('toAwsRuleTargetId returns formatted source ID', () => {
         const s = new Source(minimalSource);
-        expect(s.toAwsRuleTargetId()).toContain(s._id);
+        expect(s.toAwsRuleTargetId()).toContain(s._id.toString());
     });
 });
