@@ -201,10 +201,11 @@ export default class CasesController {
 
     /* getCountryDownloadLink generates signed URL to download national data set from AWS S3 */
     getCountryDownloadLink = async (req: Request, res: Response, country: string, format: string): Promise<void> => {
-        const filename = `${country}.${format}`;
+        const filename = `${country}.${format}.gz`;
+        const filepath = `${format}/${filename}`;
         const params = {
-            Bucket: "covid-19-cache",
-            Key: filename,
+            Bucket: "covid-19-country-export",
+            Key: filepath,
             Expires: 5 * 60,
             ResponseContentDisposition:
                 `attachment; filename ="${filename}"`,
@@ -257,10 +258,10 @@ export default class CasesController {
 
     /** S3BucketContains checks AWS storage to see whether it contains a desired file **/
     S3BucketContains = async (country: string, format: string): Promise<boolean> => {
-        const filename = `${country}.${format}`;
+        const filepath = `${format}/${country}.${format}.gz`;
         const contains = await this.s3Client.headObject({
-            Bucket: "covid-19-cache",
-            Key: filename,
+            Bucket: "covid-19-country-export",
+            Key: filepath,
         })
         .promise()
         .then(
