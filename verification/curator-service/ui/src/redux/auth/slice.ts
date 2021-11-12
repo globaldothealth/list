@@ -30,7 +30,7 @@ const initialState: AuthState = {
     isLoading: false,
     user:
         (localStorage.getItem('user')
-            ? (JSON.parse(localStorage.getItem('user')!) as User)
+            ? (JSON.parse(localStorage.getItem('user') ?? '') as User)
             : undefined) || undefined,
     error: undefined,
     resetPasswordEmailSent: false,
