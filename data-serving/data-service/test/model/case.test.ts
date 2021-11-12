@@ -37,6 +37,12 @@ describe('validate', () => {
         return new Case(minimalModel).validate();
     });
 
+    it('denormalises the date of the confirmed event', async () => {
+        const c = new Case(minimalModel);
+        await c.validate();
+        expect(c.confirmationDate.toISOString()).toEqual(minimalModel.events[0].dateRange.start);
+    });
+    
     it('fully-specified model is valid', async () => {
         return new Case(fullModel).validate();
     });
