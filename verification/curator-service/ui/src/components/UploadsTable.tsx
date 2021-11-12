@@ -78,6 +78,7 @@ interface TableRow {
 }
 
 class UploadsTable extends React.Component<Props, UploadsTableState> {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     tableRef: RefObject<any> = React.createRef();
 
     constructor(props: Props) {

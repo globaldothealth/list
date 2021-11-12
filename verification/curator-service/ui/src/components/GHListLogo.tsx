@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 
-export default function GHListLogo(props: any) {
+export default function GHListLogo(props: unknown): JSX.Element {
     const enableBackground = {
         enableBackground: 'new 0 0 4324.1 1211',
         minWidth: '80px',

@@ -439,34 +439,48 @@ export default function App(): JSX.Element {
 
     const savedSearchQuery = localStorage.getItem('searchQuery');
 
-    const menuList = user
-        ? [
-              {
-                  text: 'Line list',
-                  icon: <ListIcon />,
-                  to: { pathname: '/cases', search: '' },
-                  displayCheck: (): boolean => true,
-              },
-              {
-                  text: 'Sources',
-                  icon: <LinkIcon />,
-                  to: '/sources',
-                  displayCheck: (): boolean => hasAnyRole(['curator']),
-              },
-              {
-                  text: 'Uploads',
-                  icon: <PublishIcon />,
-                  to: '/uploads',
-                  displayCheck: (): boolean => hasAnyRole(['curator']),
-              },
-              {
-                  text: 'Manage users',
-                  icon: <PeopleIcon />,
-                  to: '/users',
-                  displayCheck: (): boolean => hasAnyRole(['admin']),
-              },
-          ]
-        : [];
+    const hasAnyRole = useCallback(
+        (requiredRoles: string[]): boolean => {
+            if (!user) {
+                return false;
+            }
+            return user?.roles?.some((r: string) => requiredRoles.includes(r));
+        },
+        [user],
+    );
+
+    const menuList = React.useMemo(
+        () =>
+            user
+                ? [
+                      {
+                          text: 'Line list',
+                          icon: <ListIcon />,
+                          to: { pathname: '/cases', search: '' },
+                          displayCheck: (): boolean => true,
+                      },
+                      {
+                          text: 'Sources',
+                          icon: <LinkIcon />,
+                          to: '/sources',
+                          displayCheck: (): boolean => hasAnyRole(['curator']),
+                      },
+                      {
+                          text: 'Uploads',
+                          icon: <PublishIcon />,
+                          to: '/uploads',
+                          displayCheck: (): boolean => hasAnyRole(['curator']),
+                      },
+                      {
+                          text: 'Manage users',
+                          icon: <PeopleIcon />,
+                          to: '/users',
+                          displayCheck: (): boolean => hasAnyRole(['admin']),
+                      },
+                  ]
+                : [],
+        [hasAnyRole, user],
+    );
 
     // Update filter breadcrumbs
     useEffect(() => {
@@ -500,17 +514,11 @@ export default function App(): JSX.Element {
         dispatch(getUserProfile());
     }, [dispatch]);
 
-    const hasAnyRole = (requiredRoles: string[]): boolean => {
-        if (!user) {
-            return false;
-        }
-        return user?.roles?.some((r: string) => requiredRoles.includes(r));
-    };
-
     const toggleDrawer = (): void => {
         setDrawerOpen(!drawerOpen);
     };
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const openCreateNewPopup = (event: any): void => {
         setCreateNewButtonAnchorEl(event.currentTarget);
     };

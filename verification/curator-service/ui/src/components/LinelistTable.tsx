@@ -93,7 +93,7 @@ interface TableRow {
         date: string;
         note: string;
     };
-    nationalities?: any;
+    nationalities?: string[];
 }
 
 interface LinelistTableState {
@@ -259,6 +259,7 @@ function RowMenu(props: {
         setAnchorEl(event.currentTarget);
     };
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const handleClose = (event?: any): void => {
         if (event) {
             event.stopPropagation();
@@ -266,6 +267,7 @@ function RowMenu(props: {
         setAnchorEl(null);
     };
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const openDeleteDialog = (event?: any): void => {
         if (event) {
             event.stopPropagation();
@@ -273,6 +275,7 @@ function RowMenu(props: {
         setDeleteDialogOpen(true);
     };
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const openExcludeDialog = (event?: any): void => {
         if (event) {
             event.stopPropagation();
@@ -280,6 +283,7 @@ function RowMenu(props: {
         setExcludeDialogOpen(true);
     };
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const openIncludeDialog = (event?: any): void => {
         if (event) {
             event.stopPropagation();
@@ -287,6 +291,7 @@ function RowMenu(props: {
         setIncludeDialogOpen(true);
     };
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const handleDelete = async (event?: any): Promise<void> => {
         if (event) {
             event.stopPropagation();
@@ -727,6 +732,7 @@ export function DownloadButton(): JSX.Element {
 }
 
 interface ColumnHeaderProps {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     theClass: any;
     columnTitle: string;
     onClickAction: (e: React.MouseEvent<HTMLDivElement>) => void;
@@ -750,7 +756,9 @@ const ColumnHeaderTitle: React.FC<ColumnHeaderProps> = ({
 
 class LinelistTable extends React.Component<Props, LinelistTableState> {
     maxDeletionThreshold = 10000;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     tableRef: RefObject<any> = React.createRef();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     formRef: RefObject<any> = React.createRef();
     // eslint-disable-next-line @typescript-eslint/no-empty-function
     unlisten: () => void = () => {};
@@ -1425,7 +1433,7 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                                 [];
                                             const cases = result.data.cases;
                                             const nationalitiesRender = (
-                                                nationalities: any,
+                                                nationalities: string[],
                                             ) => {
                                                 if (nationalities) {
                                                     nationalities.sort();
@@ -1783,8 +1791,8 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                       } all rows across pages`,
                                                         // eslint-disable-next-line @typescript-eslint/no-explicit-any
                                                         onClick: async (
-                                                            _: any,
-                                                            rows: any,
+                                                            _: unknown,
+                                                            rows: TableRow[],
                                                         ): Promise<void> => {
                                                             const shouldSelectAll =
                                                                 this.state
@@ -1817,8 +1825,8 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                               tooltip: 'Verify selected rows',
                                               // eslint-disable-next-line @typescript-eslint/no-explicit-any
                                               onClick: async (
-                                                  _: any,
-                                                  rows: any,
+                                                  _: unknown,
+                                                  rows: TableRow[],
                                               ): Promise<void> => {
                                                   this.changeVerificationStatus(
                                                       rows,
@@ -1836,8 +1844,8 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                               tooltip: 'Unverify selected rows',
                                               // eslint-disable-next-line @typescript-eslint/no-explicit-any
                                               onClick: async (
-                                                  _: any,
-                                                  rows: any,
+                                                  _: unknown,
+                                                  rows: TableRow[],
                                               ): Promise<void> => {
                                                   this.changeVerificationStatus(
                                                       rows,

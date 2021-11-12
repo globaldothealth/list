@@ -318,8 +318,10 @@ export default function SignUpForm({
                                             'isAgreementChecked',
                                         );
                                     } else {
-                                        window.location.href = `${process.env
-                                            .REACT_APP_LOGIN_URL!}?newsletterAccepted=${
+                                        window.location.href = `${
+                                            process.env.REACT_APP_LOGIN_URL ??
+                                            ''
+                                        }?newsletterAccepted=${
                                             formik.values.isNewsletterChecked
                                         }`;
                                     }
