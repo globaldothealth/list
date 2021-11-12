@@ -162,7 +162,7 @@ function SymptomList(props: SymptomListProps): JSX.Element {
     );
 }
 
-const Symptoms = () => (
+const Symptoms: () => JSX.Element = () => (
     <SymptomList
         title="Symptoms"
         collectionName="symptoms"
@@ -177,7 +177,9 @@ interface SideEffectsProps {
     i: number;
 }
 
-export const VaccineSideEffects = (props: SideEffectsProps) => (
+export const VaccineSideEffects: (props: SideEffectsProps) => JSX.Element = (
+    props,
+) => (
     <SymptomList
         title="Side Effects"
         collectionName={`vaccines[${props.i}].sideEffects.values`}
