@@ -1,4 +1,4 @@
-import { Field, useFormikContext } from 'formik';
+import { Field, FormikTouched, useFormikContext } from 'formik';
 
 import { Autocomplete } from '@material-ui/lab';
 import CaseFormValues from './CaseFormValues';
@@ -109,7 +109,11 @@ export function PathogensAutocomplete(): JSX.Element {
                     }) ?? undefined,
                 );
             }}
-            onBlur={(): void => setTouched({ pathogens: true } as any)}
+            onBlur={(): void =>
+                setTouched({
+                    pathogens: true,
+                } as unknown as FormikTouched<CaseFormValues>)
+            }
             defaultValue={initialValues.pathogens?.map(
                 (pathogen) => pathogen.name,
             )}

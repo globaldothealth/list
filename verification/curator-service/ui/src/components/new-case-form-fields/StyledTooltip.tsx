@@ -20,6 +20,7 @@ const styles = makeStyles(() => ({
     },
 }));
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const StyledTooltip: FunctionComponent<any> = ({ children }) => {
     const classes = styles();
 
