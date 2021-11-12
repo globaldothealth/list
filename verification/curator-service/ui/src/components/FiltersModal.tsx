@@ -78,7 +78,7 @@ interface FiltersModalProps {
     handleClose: () => void;
     setActiveFilterInput: (value: string) => void;
     showModalAlert: boolean;
-    closeAlert: any;
+    closeAlert: (flag: boolean) => void;
 }
 
 export interface FilterFormValues {
@@ -113,7 +113,7 @@ export default function FiltersModal({
     setActiveFilterInput,
     showModalAlert,
     closeAlert,
-}: FiltersModalProps) {
+}: FiltersModalProps): JSX.Element {
     const classes = useStyles();
     const location = useLocation();
     const history = useHistory();
@@ -156,6 +156,7 @@ export default function FiltersModal({
         initialValues: formValues,
         validate: validateForm,
         validateOnChange: true,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         onSubmit: (values: any) => {
             Object.keys(values).map(
                 (k) =>
