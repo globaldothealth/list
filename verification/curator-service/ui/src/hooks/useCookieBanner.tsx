@@ -3,7 +3,11 @@ import { useTheme, Theme } from '@material-ui/core/styles';
 const POLICY_ID = process.env.REACT_APP_POLICY_PUBLIC_ID;
 const SITE_ID = process.env.REACT_APP_COOKIE_CONSENT_PUBLIC_ID;
 
-const useCookieBanner = () => {
+interface CookieInitialiser {
+    initCookieBanner: () => void;
+}
+
+const useCookieBanner: () => CookieInitialiser = () => {
     const theme = useTheme<Theme>();
     const configuration = {
         whitelabel: false,
