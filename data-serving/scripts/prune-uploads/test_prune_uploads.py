@@ -24,7 +24,30 @@ def _u(i, status, date, created=0, errors=0, updated=0, accepted=None):
     return u
 
 
-S0 = {"_id": ObjectId("123456789012345678901231"), "hasStableIdentifiers": True}
+S0 = {
+    "_id": ObjectId("123456789012345678901231"),
+    "hasStableIdentifiers": True,
+    "uploads": [
+        _u("60f733dcfae8bf76717d598e", Status.SUCCESS, "2021-01-01", 100),
+        _u("60f734296e50eb2592992fb0", Status.ERROR, "2020-12-31", 5),
+        _u("60f7343a6e50eb2592992fb1", Status.ERROR, "2020-12-25", 0, accepted=True),
+    ],
+}
+
+S0_all_accepted = {
+    "_id": ObjectId("123456789012345678901231"),
+    "hasStableIdentifiers": True,
+    "uploads": [
+        _u("60f733dcfae8bf76717d598e", Status.SUCCESS, "2021-01-01", 100, accepted=True),
+        _u("60f734296e50eb2592992fb0", Status.ERROR, "2020-12-31", 5, accepted=True),
+        _u("60f7343a6e50eb2592992fb1", Status.ERROR, "2020-12-25", 0, accepted=True),
+    ],
+}
+
+T0 = [
+    (S0, (["60f733dcfae8bf76717d598e", "60f734296e50eb2592992fb0"], [])),
+    (S0_all_accepted, None)
+]
 S1 = {"_id": ObjectId("123456789012345678901232"), "uploads": []}
 
 S2 = {
@@ -141,6 +164,11 @@ def test_find_acceptable_upload_with_epoch(source, expected):
         find_acceptable_upload(source, ERROR_THRESHOLD, datetime(2021, 3, 1))
         == expected
     )
+
+
+@pytest.mark.parametrize("source,expected", T0)
+def test_find_acceptable_upload_uuid(source, expected):
+    assert find_acceptable_upload(source, ERROR_THRESHOLD) == expected
 
 
 @pytest.mark.parametrize(

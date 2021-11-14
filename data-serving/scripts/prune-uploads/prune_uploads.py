@@ -90,11 +90,12 @@ def find_acceptable_upload(
         return None
 
     if source.get("hasStableIdentifiers", False):
-        return _ids(
+        pending_upload_ids = _ids(
             u for u in uploads
             if u['status'] != "IN_PROGRESS"
             and "accepted" not in u
-        ), []
+        )
+        return (pending_upload_ids, []) if pending_upload_ids else None
 
     # skip rejected uploads
     uploads = [u for u in uploads if "accepted" not in u or u['accepted']]
@@ -315,5 +316,5 @@ if __name__ == "__main__":
         notify("\n".join(m), webhook_url)
 
     selected_hooks = get_selected_hooks(args.run_hooks)
-    if "country_export" in selected_hooks:
+    if ingested_sources and "country_export" in selected_hooks:
         hooks.country_export.run(ingested_sources, args.env, args.dry_run)

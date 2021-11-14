@@ -74,6 +74,9 @@ def get_exporters(source: dict[str, Any], env: str) -> set[str]:
 def run(sources: list[dict[str, Any]], env: str, dry_run: bool = False):
     print("*** Running hook: country_export ***")
     batch = boto3.client("batch")
+    if not sources:
+        print("No sources to run hook for, quitting.")
+        return
     jobdefs = set.union(*(get_exporters(s, env) for s in sources))
     all_exporters = list_exporters(env)
     if unknown_exporters := jobdefs - all_exporters:
