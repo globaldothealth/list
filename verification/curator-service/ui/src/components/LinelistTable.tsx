@@ -575,17 +575,22 @@ export function DownloadButton(): JSX.Element {
                         },
                     });
 
-                    const filename = response.headers['content-disposition']
-                        .split('filename=')[1]
-                        .replace(/["]/g, '');
-                    const downloadUrl = window.URL.createObjectURL(
-                        new Blob([response.data]),
-                    );
-                    const link = document.createElement('a');
-                    link.href = downloadUrl;
-                    link.setAttribute('download', filename);
-                    document.body.appendChild(link);
-                    link.click();
+                    // Check for S3 signed URL
+                    if (response.data.signedUrl !== undefined) {
+                        window.location.href = response.data.signedUrl;
+                    } else {
+                        const filename = response.headers['content-disposition']
+                            .split('filename=')[1]
+                            .replace(/["]/g, '');
+                        const downloadUrl = window.URL.createObjectURL(
+                            new Blob([response.data]),
+                        );
+                        const link = document.createElement('a');
+                        link.href = downloadUrl;
+                        link.setAttribute('download', filename);
+                        document.body.appendChild(link);
+                        link.click();
+                    }
                 } catch (err) {
                     alert(
                         `There was an error while downloading data, please try again later. ${err}`,
