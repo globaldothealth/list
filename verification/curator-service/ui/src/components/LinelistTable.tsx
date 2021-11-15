@@ -536,9 +536,7 @@ export function DownloadButton(): JSX.Element {
     const downloadDataSet = async (dataSet: string, formatType?: string) => {
         setIsLoading(true);
 
-        console.log('downloading data set');
         const searchQuery: string = URLToSearchQuery(location.search);
-        console.log(`query ${searchQuery}`);
         switch (dataSet) {
             case 'fullDataset':
                 try {
@@ -560,7 +558,6 @@ export function DownloadButton(): JSX.Element {
                 break;
 
             case 'partialDataset':
-                console.log('downloading partial data set');
                 try {
                     const response = await axios({
                         method: 'post',
@@ -569,7 +566,6 @@ export function DownloadButton(): JSX.Element {
                             format: formatType,
                             query: searchQuery,
                         },
-                        responseType: 'blob',
                         headers: {
                             'Content-Type': 'application/json',
                         },
