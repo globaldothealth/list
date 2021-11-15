@@ -4,6 +4,7 @@
 # The CSV file is read from stdin, with the processed CSV file written
 # to stdout
 
+import os
 import sys
 import csv
 import json
@@ -11,7 +12,8 @@ import gzip
 import logging
 import argparse
 from functools import reduce
-from contextlib import contextmanager
+from pathlib import Path
+from contextlib import contextmanager, suppress
 from typing import Any, Optional
 
 logging.basicConfig(filename="transform.log", level=logging.INFO)
@@ -183,13 +185,12 @@ def get_fields(fileobject) -> list[str]:
     """
     Add processed event fieldnames to fields.
     """
-    reader = csv.DictReader(fileobject)
     try:
-        row = next(reader)
-    except StopIteration:
-        print("No rows found for country, aborting")
+        headers = fileobject.readline().strip().split(',')
+    except Exception as e:
+        print("Error in reading mongoexport header")
+        print(e)
         sys.exit(1)
-    headers = list(row.keys())
     cols_to_add = [
         "events.confirmed.value",
         "events.confirmed.date",
@@ -254,7 +255,10 @@ def open_writers(formats: list[str], fields: list[str], output: str):
     files = {}
     writers = {}
     for fmt in formats:
-        files[fmt] = gzip.open(f"{output}.{fmt}.gz", "wt")
+        files[fmt] = (
+            gzip.open(f"{output}.{fmt}.gz", "wt")
+            if output != '-' else sys.stdout
+        )
         if fmt == "csv":
             writers[fmt] = csv.DictWriter(
                 files[fmt], fieldnames=fields, extrasaction="ignore"
@@ -271,30 +275,42 @@ def open_writers(formats: list[str], fields: list[str], output: str):
         print("Error occurred in open_writers():")
         print(e)
     finally:
-        for fmt in files:
+        if output == '-':
+            return
+        for fmt in formats:
             if fmt == "json":
                 files[fmt].write("]\n")
             files[fmt].close()
 
 
-def parse():
+def transform(input: Optional[str], output: str, formats: list[str]):
+    with (open(input) if input else sys.stdin) as inputfile:
+        headers, fields = get_fields(inputfile)
+        reader = csv.DictReader(inputfile, fieldnames=headers)
+        hasrows = False
+        with open_writers(formats, fields, output) as writers:
+            for i, row in enumerate(map(convert_row, reader)):
+                hasrows = True
+                writerow(formats, writers, row, i)
+        if output != '-' and not hasrows:  # cleanup empty files
+            cleanup_files = [Path(f"{output}.{fmt}.gz") for fmt in formats]
+            for file in cleanup_files:
+                file.unlink(missing_ok=True)
+
+
+if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("output", help="Output file stem to use (extension is added)")
+    parser.add_argument("output", help="Output file stem to use (extension is added), specify - for stdout")
     parser.add_argument(
         "-f",
         "--format",
         help="Output formats to use, comma separated (default=csv,tsv,json)",
         default="csv,tsv,json",
     )
+    parser.add_argument(
+        "-i",
+        "--input",
+        help="Input file to transform instead of stdin"
+    )
     args = parser.parse_args()
-    headers, fields = get_fields(sys.stdin)
-    reader = csv.DictReader(sys.stdin, fieldnames=headers)
-
-    formats = args.format.split(",")
-    with open_writers(formats, fields, args.output) as writers:
-        for i, row in enumerate(map(convert_row, reader)):
-            writerow(formats, writers, row, i)
-
-
-if __name__ == "__main__":
-    parse()
+    transform(args.input, args.output, args.format.split(','))
