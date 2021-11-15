@@ -536,9 +536,7 @@ export function DownloadButton(): JSX.Element {
     const downloadDataSet = async (dataSet: string, formatType?: string) => {
         setIsLoading(true);
 
-        console.log('downloading data set');
         const searchQuery: string = URLToSearchQuery(location.search);
-        console.log(`query ${searchQuery}`);
         switch (dataSet) {
             case 'fullDataset':
                 try {
@@ -560,7 +558,6 @@ export function DownloadButton(): JSX.Element {
                 break;
 
             case 'partialDataset':
-                console.log('downloading partial data set');
                 try {
                     const response = await axios({
                         method: 'post',
@@ -569,23 +566,27 @@ export function DownloadButton(): JSX.Element {
                             format: formatType,
                             query: searchQuery,
                         },
-                        responseType: 'blob',
                         headers: {
                             'Content-Type': 'application/json',
                         },
                     });
 
-                    const filename = response.headers['content-disposition']
-                        .split('filename=')[1]
-                        .replace(/["]/g, '');
-                    const downloadUrl = window.URL.createObjectURL(
-                        new Blob([response.data]),
-                    );
-                    const link = document.createElement('a');
-                    link.href = downloadUrl;
-                    link.setAttribute('download', filename);
-                    document.body.appendChild(link);
-                    link.click();
+                    // Check for S3 signed URL
+                    if (response.data.signedUrl !== undefined) {
+                        window.location.href = response.data.signedUrl;
+                    } else {
+                        const filename = response.headers['content-disposition']
+                            .split('filename=')[1]
+                            .replace(/["]/g, '');
+                        const downloadUrl = window.URL.createObjectURL(
+                            new Blob([response.data]),
+                        );
+                        const link = document.createElement('a');
+                        link.href = downloadUrl;
+                        link.setAttribute('download', filename);
+                        document.body.appendChild(link);
+                        link.click();
+                    }
                 } catch (err) {
                     alert(
                         `There was an error while downloading data, please try again later. ${err}`,

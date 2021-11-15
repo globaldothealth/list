@@ -16,6 +16,10 @@ services:
       LOCALSTACK_URL: "http://localstack:4566"
       SERVICE_ENV: "locale2e"
       AFTER_LOGIN_REDIRECT_URL: "http://localhost:3002"
+      EVENT_ROLE_ARN: "fake"
+      JOB_QUEUE_ARN: "fake"
+      SESSION_COOKIE_KEY: "fake"
+      STATIC_DIR: ""
   data:
     command: "npm run dev"
     volumes:
@@ -23,6 +27,8 @@ services:
       - "../data-serving/data-service/api:/usr/src/app/data-serving/data-service/api"
     depends_on:
       - mongo
+    environment:
+      SERVICE_ENV: "local"
   curatorui:
     command: "npm run start-noenv"
     volumes:
@@ -70,7 +76,7 @@ services:
       AWS_DEFAULT_REGION: "us-east-1"
       AWS_ENDPOINT: "http://localstack:4566"
       DATA_BUCKET_NAME: "covid-19-data-export"
-      CACHE_BUCKET_NAME: "covid-19-cache"
+      CACHE_BUCKET_NAME: "covid-19-country-export"
       RETRIEVAL_BUCKET_NAME: "epid-sources-raw"
       BATCH_QUEUE_NAME: "ingestion-queue"
       SES_EMAIL_ADDRESS: "info@global.health"
