@@ -93,7 +93,7 @@ export default class CasesController {
             this.getDownloadLink(req, res);
             return;
         } else if (this.hasCountryOnly(req.body.query)) {
-            const country = req.body.query.split(":")[1].toLowerCase();
+            const country = req.body.query.split(':')[1].toLowerCase().replace(/ /g,'_');
             const inBucket = await this.S3BucketContains(country, req.body.format);
             if (inBucket) {
                 this.getCountryDownloadLink(req, res, country, req.body.format);
