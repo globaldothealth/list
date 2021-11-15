@@ -1,7 +1,10 @@
+import io
 import csv
 import pytest
 import json
+from pathlib import Path
 from pprint import pprint
+from contextlib import redirect_stdout
 import transform as T
 
 _DEEP_GET = [
@@ -69,8 +72,23 @@ def test_convert_travel():
     assert T.convert_travel(json.dumps(_TRAVEL)) == _TRAVEL_parsed
 
 
-def test_convert_row():
-    output = [T.convert_row(r) for r in _read_csv("test_transform_mongoexport.csv")]
-    with open("test_transform_expected.json") as f:
-        expected = json.load(f)
-    assert output == expected
+def test_transform_output_match():
+    expected = Path('test_transform_mongoexport_expected.csv').read_text()
+    with redirect_stdout(io.StringIO()) as f:
+        T.transform('test_transform_mongoexport.csv', '-', ['csv'])
+    # use str.splitlines to ignore line endings
+    assert f.getvalue().splitlines() == expected.splitlines()
+
+
+def test_transform_empty(tmp_path):
+    output = f"{tmp_path}/empty"
+    T.transform('test_transform_mongoexport_header.csv', output, ['csv'])
+    assert not Path(f"{output}.csv.gz").exists()
+
+
+def test_transform_creates_output(tmp_path):
+    formats = ['csv', 'tsv', 'json']
+    output = f"{tmp_path}/output"
+    T.transform('test_transform_mongoexport.csv', output, formats)
+    for fmt in formats:
+        assert Path(f"{output}.{fmt}.gz").exists()
