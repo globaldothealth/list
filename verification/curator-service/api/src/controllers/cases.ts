@@ -208,7 +208,7 @@ export default class CasesController {
             Key: filepath,
             Expires: 5 * 60,
             ResponseContentDisposition:
-                `attachment; filename ="${filename}"`,
+                'attachment; filename ="' + filename + '"',
         };
 
         const user = req.user as UserDocument;
