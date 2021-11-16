@@ -62,17 +62,6 @@ _CODES_COUNTRY_ADD = {
 
 _EXCLUDE = ["Puerto Rico"]
 
-username = os.environ.get("MONGO_USERNAME")
-password = os.environ.get("MONGO_PASSWORD")
-print("Logging into MongoDB...")
-client = pymongo.MongoClient(
-    f"mongodb+srv://{username}:{password}@covid19-map-cluster01.sc7u9.mongodb.net/covid19?retryWrites=true&w=majority"
-)
-db = client.covid19
-cases = db.cases
-print("And we're in!")
-
-
 def _quote_country(c):
     "Returns quoted country name used in query string of data url"
     cq = urllib.parse.quote_plus(c)
@@ -84,12 +73,17 @@ def _coverage(gh, jhu):
     return f"{gh/jhu:.0%}" if jhu > 0 else None
 
 
-def _country_data_csv(d):
-    "Convert from latest.json attributes to those used in latest.csv"
+def _country_data_csv(d, line_list_url, map_url):
+    """
+    Convert from latest.json attributes to those used in latest.csv
+    d -- Record for a country
+    line_list_url -- Base URL for the line list portal
+    map_url -- Base URL for the map visualisation
+    """
     return {
         'country': d['_id'],
-        'data': f"https://data.covid-19.global.health/cases?country={_quote_country(d['_id'])}",
-        'map': f"https://map.covid-19.global.health/#country/{d['code']}",
+        'data': f"{line_list_url}/cases?country={_quote_country(d['_id'])}",
+        'map': f"{map_url}/#country/{d['code']}",
         'casecount_gh': d['casecount'],
         'casecount_jhu': d['jhu'],
         'coverage': _coverage(d['casecount'], d['jhu'])
@@ -151,11 +145,16 @@ def get_country_codes():
     return countrycodes_dict
 
 
-def generate_country_json():
+def generate_country_json(cases, s3_endpoint, bucket, date, line_list_url, map_url):
     """
     Generate json of case counts by country and upload to S3.
+    cases -- The mongodb case collection.
+    s3_endpoint -- API endpoint for S3 (None for default).
+    bucket -- The S3 bucket identifier for the results to live in.
+    date -- Formatted date used as a key for the output records.
+    line_list_url -- Base URL to the line list data portal (e.g. 'https://data.covid-19.global.health')
+    map_url -- Base URL to the map visualisation (e.g. 'https://map.covid-19.global.health')
     """
-    now = datetime.datetime.now().strftime("%m-%d-%Y")
     pipeline = [
         {"$match": {"list": True}},
         {
@@ -213,24 +212,24 @@ def generate_country_json():
             record["lat"] = -1.0
             record["long"] = -1.0
 
-    records = {now: records}
+    records = {date: records}
 
-    s3 = boto3.client("s3")
+    s3 = boto3.client("s3", endpoint_url=s3_endpoint)
     s3.put_object(
         ACL="public-read",
         Body=json.dumps(records),
-        Bucket="covid-19-aggregates",
+        Bucket=bucket,
         Key="country/latest.json",
     )
     s3.put_object(
         ACL="public-read",
         Body=json.dumps(records),
-        Bucket="covid-19-aggregates",
-        Key=f"country/{now}.json",
+        Bucket=bucket,
+        Key=f"country/{date}.json",
     )
 
     # generate CSV data
-    _csv = records[now]
+    _csv = records[date]
 
     csvstr = None
     with io.StringIO() as csvbuf:
@@ -240,23 +239,26 @@ def generate_country_json():
         writer.writeheader()
         for i in _csv:
             if i['_id']:
-                writer.writerow(_country_data_csv(i))
+                writer.writerow(_country_data_csv(i, line_list_url, map_url))
         csvstr = csvbuf.getvalue()
 
     if csvstr:
         s3.put_object(
             ACL="public-read",
             Body=csvstr,
-            Bucket="covid-19-aggregates",
+            Bucket=bucket,
             Key="country/latest.csv",
         )
 
 
-def generate_region_json():
+def generate_region_json(cases, s3_endpoint, bucket, date):
     """
     Generate json of case counts by region and upload to S3.
+    cases -- The mongodb case collection.
+    s3_endpoint -- The API endpoint for S3 (None for default).
+    bucket -- The destination S3 bucket.
+    date -- Formatted date used as a key for the output records.
     """
-    now = datetime.datetime.now().strftime("%m-%d-%Y")
     pipeline = [
         {"$match": {"list": True}},
         {
@@ -314,29 +316,31 @@ def generate_region_json():
             }
             print(new_record)
             records.append(new_record)
-    records = {now: records}
+    records = {date: records}
 
-    s3 = boto3.client("s3")
+    s3 = boto3.client("s3", endpoint_url=s3_endpoint)
     s3.put_object(
         ACL="public-read",
         Body=json.dumps(records),
-        Bucket="covid-19-aggregates",
+        Bucket=bucket,
         Key="regional/latest.json",
     )
     s3.put_object(
         ACL="public-read",
         Body=json.dumps(records),
-        Bucket="covid-19-aggregates",
-        Key=f"regional/{now}.json",
+        Bucket=bucket,
+        Key=f"regional/{date}.json",
     )
 
 
-def generate_total_json():
+def generate_total_json(cases, s3_endpoint, bucket, date):
     """
     Generate json of total count of cases in MongoDB Atlas and upload to S3.
+    cases -- The mongodb case collection.
+    s3_endpoint -- API endpoint for S3 (None for default).
+    bucket -- The destination S3 bucket.
+    date -- Formatted date used as a key for the output records.
     """
-    now = datetime.datetime.now().strftime("%m-%d-%Y")
-
     count = cases.count_documents({"list": True})
 
     with open("variants.json") as v:
@@ -354,40 +358,43 @@ def generate_total_json():
         "total_b1351": int(total_b1351),
     }
 
-    s3 = boto3.client("s3")
+    s3 = boto3.client("s3", endpoint_url=s3_endpoint)
     s3.put_object(
         ACL="public-read",
         Body=json.dumps(record),
-        Bucket="covid-19-aggregates",
+        Bucket=bucket,
         Key="total/latest.json",
     )
     s3.put_object(
         ACL="public-read",
         Body=json.dumps(record),
-        Bucket="covid-19-aggregates",
-        Key=f"total/{now}.json",
+        Bucket=bucket,
+        Key=f"total/{date}.json",
     )
 
 
-def lambda_handler(event, context):
-    """Generates aggregate data for Map and uploads to S3.
+if __name__ == '__main__':
+    connection_string = os.environ.get("CONN")
+    line_list_url = os.environ.get("LINE_LIST_URL")
+    map_url = os.environ.get("MAP_URL")
+    s3_bucket = os.environ.get("S3_BUCKET")
+    # S3 endpoint is allowed to be None (i.e. connect to default S3 endpoint),
+    # it's also allowed to be not-None (to use localstack or another test double).
+    s3_endpoint = os.environ.get("S3_ENDPOINT", None)
+    print("Logging into MongoDB...")
+    client = pymongo.MongoClient(connection_string)
+    db = client.covid19
+    cases = db.cases
+    print("And we're in!")
 
-    Parameters
-    ----------
-    event: dict, required
-        Input event JSON-as-dict specified by EventBridge.
-    context: object, required
-        Lambda Context runtime methods and attributes.
-        For more information, see:
-          https://docs.aws.amazon.com/lambda/latest/dg/python-context-object.html
-    """
+    date_string = datetime.datetime.now().strftime("%m-%d-%Y")
     print("Generating country json...")
-    generate_country_json()
+    generate_country_json(cases, s3_endpoint, s3_bucket, date_string, line_list_url, map_url)
     print("Country json generated!")
     print("Generating region json...")
-    generate_region_json()
+    generate_region_json(cases, s3_endpoint, s3_bucket, date_string)
     print("Region json generated!")
     print("Generating total json...")
-    generate_total_json()
+    generate_total_json(cases, s3_endpoint, s3_bucket, date_string)
     print("Total json generated!")
     print("Done!")
