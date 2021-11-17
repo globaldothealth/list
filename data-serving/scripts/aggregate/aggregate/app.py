@@ -5,6 +5,7 @@ import io
 import json
 import os
 import re
+import sys
 
 import boto3
 import pandas as pd
@@ -372,15 +373,25 @@ def generate_total_json(cases, s3_endpoint, bucket, date):
         Key=f"total/{date}.json",
     )
 
+def get_environment_value_or_bail(key):
+    """
+    Retrieve a value from the environment, but print a message and quit if it isn't set.
+    key -- The name of the environment variable.
+    """
+    value = os.environ.get(key)
+    if value is None:
+        print(f"{key} not set in the environment, exiting")
+        sys.exit(1)
+    return value
 
 if __name__ == '__main__':
-    connection_string = os.environ.get("CONN")
-    line_list_url = os.environ.get("LINE_LIST_URL")
-    map_url = os.environ.get("MAP_URL")
-    s3_bucket = os.environ.get("S3_BUCKET")
+    connection_string = get_environment_value_or_bail("CONN")
+    line_list_url = get_environment_value_or_bail("LINE_LIST_URL")
+    map_url = get_environment_value_or_bail("MAP_URL")
+    s3_bucket = get_environment_value_or_bail("S3_BUCKET")
     # S3 endpoint is allowed to be None (i.e. connect to default S3 endpoint),
     # it's also allowed to be not-None (to use localstack or another test double).
-    s3_endpoint = os.environ.get("S3_ENDPOINT", None)
+    s3_endpoint = os.environ.get("S3_ENDPOINT")
     print("Logging into MongoDB...")
     client = pymongo.MongoClient(connection_string)
     db = client.covid19
