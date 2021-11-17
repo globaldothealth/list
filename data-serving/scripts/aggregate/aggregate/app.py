@@ -171,25 +171,12 @@ def generate_country_json(cases, s3_endpoint, bucket, date, line_list_url, map_u
     records = [record for record in records if record["_id"] not in _EXCLUDE]
 
     jhu_counts = get_jhu_counts()
-    with open("variants.json") as v:
-        variant_counts = json.load(v)
     country_codes = get_country_codes()
 
     merged_countries = []
     for record in records:
         country = record["_id"]
-        if country in variant_counts.keys():
-            record["casecount_p1"] = variant_counts[country]["casecount_p1"]
-            record["casecount_b1351"] = variant_counts[country]["casecount_b1351"]
-            merged_countries.append(country)
-        else:
-            record["casecount_p1"] = 0
-            record["casecount_b1351"] = 0
-            merged_countries.append(country)
-
-    for country in variant_counts.keys():
-        if country not in merged_countries:
-            records.append(variant_counts[country])
+        merged_countries.append(country)
 
     for record in records:
         country = record["_id"]
@@ -344,19 +331,8 @@ def generate_total_json(cases, s3_endpoint, bucket, date):
     """
     count = cases.count_documents({"list": True})
 
-    with open("variants.json") as v:
-        variant_counts = json.load(v)
-
-    total_p1 = 0
-    total_b1351 = 0
-    for record in variant_counts.values():
-        total_p1 += record["casecount_p1"]
-        total_b1351 += record["casecount_b1351"]
-
     record = {
         "total": int(count),
-        "total_p1": int(total_p1),
-        "total_b1351": int(total_b1351),
     }
 
     s3 = boto3.client("s3", endpoint_url=s3_endpoint)
