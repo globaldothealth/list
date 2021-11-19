@@ -23,11 +23,12 @@ let isNewsletterAccepted: boolean;
 
 async function findUserByAPIKey(apiKey?: string): Promise<Express.User> {
     if (!apiKey) {
-        throw new Error("No API key");
+        throw new Error('No API key');
     }
-    const user = await User.findById(apiKey.slice(0, 24));
+    const userID = apiKey.slice(0, 24);
+    const user = await User.findById(userID);
     if (!user) {
-        throw new Error("Invalid API key");
+        throw new Error('Invalid API key');
     }
     return user as Express.User;
 }
@@ -57,7 +58,7 @@ export const authenticateByAPIKey = async (
         res.status(403);
         next();
     }
-}
+};
 /**
  * mustBeAuthenticated is a middleware that checks that the user making the call is authenticated.
  * Subsequent request handlers can be assured req.user will be defined.
@@ -274,10 +275,10 @@ export class AuthController {
                 } else {
                     res.status(404).end();
                 }
-            }
+            },
         );
 
-        async function getRandomString(bytes: number) : Promise<string> {
+        async function getRandomString(bytes: number): Promise<string> {
             const randomValues = await crypto.randomBytes(bytes);
             return randomValues.toString('hex');
         }
@@ -292,12 +293,11 @@ export class AuthController {
             '/profile/apiKey',
             mustBeAuthenticated,
             async (req: Request, res: Response): Promise<void> => {
-                const theUser = (req.user as UserDocument);
+                const theUser = req.user as UserDocument;
                 if (!theUser) {
                     // internal server error as you were authenticated but unknown
                     res.status(500).end();
-                }
-                else {
+                } else {
                     const currentUser = await User.findById(theUser.id);
                     if (!currentUser) {
                         // internal server error as you were authenticated but unknown
@@ -306,25 +306,25 @@ export class AuthController {
                     }
                     // prefix the API key with the user ID to make it easier to find users by API key in auth
                     const randomPart = await getRandomString(32);
-                    currentUser.apiKey = `${theUser.id}${randomPart}`;
+                    currentUser.apiKey = `${theUser.id.toString()}${randomPart}`;
                     await currentUser.save();
                     res.status(201).json(theUser.apiKey).end();
                 }
-            }
-        )
+            },
+        );
 
         /**
          * Delete a user's API key
          */
-        this.router.post('/deleteApiKey/:id',
+        this.router.post(
+            '/deleteApiKey/:id',
             mustBeAuthenticated,
             mustHaveAnyRole(['admin']),
-            async (
-                req: Request,
-                res: Response,
-            ): Promise<void> => {
+            async (req: Request, res: Response): Promise<void> => {
                 try {
-                    logger.info(`user ID ${req.params.id} API key deletion requested`);
+                    logger.info(
+                        `user ID ${req.params.id} API key deletion requested`,
+                    );
                     const user = await User.findByIdAndUpdate(
                         req.params.id,
                         { apiKey: undefined },
@@ -334,7 +334,9 @@ export class AuthController {
                         },
                     );
                     if (!user) {
-                        logger.warn(`user with ID ${req.params.id} does not exist`);
+                        logger.warn(
+                            `user with ID ${req.params.id} does not exist`,
+                        );
                         res.status(404).json({
                             message: `user with id ${req.params.id} could not be found`,
                         });
@@ -350,10 +352,8 @@ export class AuthController {
                     res.status(500).json(err);
                     return;
                 }
-            }
+            },
         );
-
-
 
         /**
          * Update user's password.
