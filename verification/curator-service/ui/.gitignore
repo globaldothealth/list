@@ -5,6 +5,8 @@
 # Don't include CSVs, except for Cypress fixtures.
 *.csv
 !cypress/fixtures/*.csv
+# and the variants definitions
+!variantsofconcern.csv
 
 #amplify
 amplify/\#current-cloud-backend
