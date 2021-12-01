@@ -17,6 +17,7 @@ export const fetchCountries = createAsyncThunk<
 
         const countries = response.data.sort();
         return countries;
+        // return countries;
     } catch (error) {
         if (!error.response) throw error;
         return rejectWithValue(error.response.data.message);
