@@ -104,7 +104,7 @@ interface FiltersModalProps {
 
 export interface FilterFormValues {
     country?: string;
-    gender?: '' | 'Male' | 'Female' | 'No gender';
+    gender?: '' | 'Male' | 'Female' | 'Not provided';
     verificationstatus?: string;
     admin1?: string;
     admin2?: string;
@@ -338,7 +338,7 @@ export default function FiltersModal({
                                 <MenuItem value="">None</MenuItem>
                                 <MenuItem value="male">Male</MenuItem>
                                 <MenuItem value="female">Female</MenuItem>
-                                <MenuItem value="noGender">
+                                <MenuItem value="notProvided">
                                     Not provided
                                 </MenuItem>
                             </Select>

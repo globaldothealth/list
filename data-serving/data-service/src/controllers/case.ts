@@ -1,4 +1,9 @@
-import { Case, CaseDocument, caseWithDenormalisedConfirmationDate, RestrictedCase } from '../model/case';
+import {
+    Case,
+    CaseDocument,
+    caseWithDenormalisedConfirmationDate,
+    RestrictedCase,
+} from '../model/case';
 import { EventDocument } from '../model/event';
 import caseFields from '../model/fields.json';
 import { Source } from '../model/source';
@@ -332,7 +337,7 @@ export class CasesController {
                     const cases = Array.from(
                         { length: numCases },
                         () => new ctor(req.body),
-                    ).map(c => caseWithDenormalisedConfirmationDate(c));
+                    ).map((c) => caseWithDenormalisedConfirmationDate(c));
                     result = { cases: await ctor.insertMany(cases) };
                 }
             }
@@ -1074,6 +1079,12 @@ export const casesMatchingSearchQuery = (opts: {
                         },
                     },
                 ]);
+            } else if (
+                f.path === 'demographics.gender' &&
+                f.values[0] === 'notProvided'
+            ) {
+                casesQuery.where(f.path).exists(false);
+                countQuery.where(f.path).exists(false);
             } else {
                 casesQuery.where(f.path).equals(f.values[0]);
                 countQuery.where(f.path).equals(f.values[0]);

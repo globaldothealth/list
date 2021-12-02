@@ -1,5 +1,4 @@
 import 'cypress-file-upload';
-import { any } from 'cypress/types/bluebird';
 
 declare global {
     // One-off Cypress setup.
@@ -19,6 +18,7 @@ declare global {
                 startConfirmedDate?: any;
                 variant?: any;
                 sourceUrl?: any;
+                gender?: string;
             }) => void;
             login: (opts?: {
                 name: string;
@@ -26,7 +26,12 @@ declare global {
                 roles: string[];
                 removeGoogleID?: boolean;
             }) => void;
-            addSource: (name: string, url: string, countryCodes?: string[], uploads?: []) => void;
+            addSource: (
+                name: string,
+                url: string,
+                countryCodes?: string[],
+                uploads?: [],
+            ) => void;
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             seedLocation: (loc: any) => void;
             clearSeededLocations: () => void;
@@ -48,6 +53,7 @@ export function addCase(opts: {
     variant?: string;
     caseid?: string;
     sourceUrl?: string;
+    gender?: string;
 }): void {
     cy.request({
         method: 'POST',
@@ -62,6 +68,7 @@ export function addCase(opts: {
             demographics: {
                 nationalities: opts.nationalities,
                 occupation: opts.occupation,
+                gender: opts.gender,
             },
             location: {
                 country: opts.country,
@@ -130,7 +137,12 @@ export function clearSeededLocations(): void {
     });
 }
 
-export function addSource(name: string, url: string, countryCodes?: string[], uploads?: []): void {
+export function addSource(
+    name: string,
+    url: string,
+    countryCodes?: string[],
+    uploads?: [],
+): void {
     cy.request({
         method: 'POST',
         url: '/api/sources',
