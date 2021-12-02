@@ -92,7 +92,7 @@ describe('App', function () {
         cy.contains('www.variantb1351.com');
     });
 
-    it.only('allows the user to search by not provided gender', function () {
+    it('allows the user to search by not provided gender', function () {
         cy.login({
             roles: ['curator'],
             name: 'testName',
