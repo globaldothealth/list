@@ -1,6 +1,5 @@
 import React from 'react';
 import { render, screen, fireEvent } from './util/test-utils';
-import userEvent from '@testing-library/user-event';
 import FiltersModal from './FiltersModal';
 import { MemoryRouter } from 'react-router-dom';
 import { format } from 'date-fns';

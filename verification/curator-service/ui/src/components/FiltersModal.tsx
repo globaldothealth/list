@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useLocation, useHistory } from 'react-router-dom';
 import { useFormik } from 'formik';
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
+import useMediaQuery from '@material-ui/core/useMediaQuery';
 import { filtersToURL, URLToFilters } from './util/searchQuery';
 
 import {
@@ -35,6 +36,10 @@ const useStyles = makeStyles((theme: Theme) =>
             '& .MuiTextField-root': {
                 margin: theme.spacing(1),
                 width: '25ch',
+
+                '@media (max-height:800px)': {
+                    width: '20ch',
+                },
             },
         },
         dialogContent: {
@@ -43,16 +48,28 @@ const useStyles = makeStyles((theme: Theme) =>
         textField: {
             width: '25ch',
             margin: theme.spacing(1),
+
+            '@media (max-height:800px)': {
+                width: '20ch',
+            },
         },
         formControl: {
             margin: theme.spacing(1),
             minWidth: '25ch',
+
+            '@media (max-height:800px)': {
+                minWidth: '20ch',
+            },
         },
         searchBtnContainer: {
             width: '100%',
             display: 'flex',
             justifyContent: 'flex-end',
             marginTop: '2rem',
+
+            '@media (max-height:800px)': {
+                marginTop: '1rem',
+            },
         },
         searchBtn: {
             marginLeft: '0.5rem',
@@ -62,6 +79,10 @@ const useStyles = makeStyles((theme: Theme) =>
             height: '1px',
             width: '90%',
             backgroundColor: '#ccc',
+
+            '@media (max-height:800px)': {
+                margin: '1rem auto',
+            },
         },
         helpIcon: {
             color: '#ccc',
@@ -83,7 +104,7 @@ interface FiltersModalProps {
 
 export interface FilterFormValues {
     country?: string;
-    gender?: '' | 'Male' | 'Female' | 'No gender';
+    gender?: '' | 'Male' | 'Female' | 'Not provided';
     verificationstatus?: string;
     admin1?: string;
     admin2?: string;
@@ -121,6 +142,10 @@ export default function FiltersModal({
     const [formValues, setFormValues] = useState<FilterFormValues>(
         URLToFilters(location.search),
     );
+
+    // Check screen size
+    const isSmallScreen = useMediaQuery('(max-height:800px)');
+    const inputSize = isSmallScreen ? 'small' : 'medium';
 
     useEffect(() => {
         const newFilters = URLToFilters(location.search);
@@ -183,9 +208,6 @@ export default function FiltersModal({
 
     const handleClearFiltersClick = () => {
         setFormValues({});
-        // commented in case we want in future the button to reset the filters already applied
-        // formik.resetForm();
-        // history.push({ pathname: '/cases', search: '' });
     };
 
     function handleSetModalAlert() {
@@ -269,27 +291,10 @@ export default function FiltersModal({
                 <form className={classes.root} onSubmit={formik.handleSubmit}>
                     {/* GENERAL */}
                     <div>
-                        {/* <TextField
-                            autoFocus={activeFilterInput === 'country'}
-                            id="country"
-                            name="country"
-                            label="Country"
-                            type="text"
-                            variant="outlined"
-                            value={formik.values.country || ''}
-                            onChange={formik.handleChange}
-                            error={
-                                formik.touched.country &&
-                                Boolean(formik.errors.country)
-                            }
-                            helperText={
-                                formik.touched.country && formik.errors.country
-                            }
-                        /> */}
-
                         <FormControl
                             variant="outlined"
                             className={classes.formControl}
+                            size={inputSize}
                         >
                             <InputLabel id="country-label">Country</InputLabel>
                             {!error && (
@@ -318,6 +323,7 @@ export default function FiltersModal({
                         <FormControl
                             variant="outlined"
                             className={classes.formControl}
+                            size={inputSize}
                         >
                             <InputLabel id="gender-label">Gender</InputLabel>
                             <Select
@@ -332,7 +338,7 @@ export default function FiltersModal({
                                 <MenuItem value="">None</MenuItem>
                                 <MenuItem value="male">Male</MenuItem>
                                 <MenuItem value="female">Female</MenuItem>
-                                <MenuItem value="noGender">
+                                <MenuItem value="notProvided">
                                     Not provided
                                 </MenuItem>
                             </Select>
@@ -340,6 +346,7 @@ export default function FiltersModal({
                         <FormControl
                             variant="outlined"
                             className={classes.formControl}
+                            size={inputSize}
                         >
                             <InputLabel id="verification-label">
                                 Verification status
@@ -372,6 +379,7 @@ export default function FiltersModal({
                         <FormControl
                             variant="outlined"
                             className={classes.textField}
+                            size={inputSize}
                         >
                             <InputLabel htmlFor="admin1">
                                 Location admin 1
@@ -390,6 +398,7 @@ export default function FiltersModal({
                         <FormControl
                             variant="outlined"
                             className={classes.textField}
+                            size={inputSize}
                         >
                             <InputLabel htmlFor="admin2">
                                 Location admin 2
@@ -408,6 +417,7 @@ export default function FiltersModal({
                         <FormControl
                             variant="outlined"
                             className={classes.textField}
+                            size={inputSize}
                         >
                             <InputLabel htmlFor="admin3">
                                 Location admin 3
@@ -435,6 +445,7 @@ export default function FiltersModal({
                             name="nationality"
                             type="text"
                             variant="outlined"
+                            size={inputSize}
                             value={formik.values.nationality || ''}
                             onChange={formik.handleChange}
                             error={
@@ -453,6 +464,7 @@ export default function FiltersModal({
                             name="occupation"
                             type="text"
                             variant="outlined"
+                            size={inputSize}
                             value={formik.values.occupation || ''}
                             onChange={formik.handleChange}
                             error={
@@ -471,6 +483,7 @@ export default function FiltersModal({
                             name="outcome"
                             type="text"
                             variant="outlined"
+                            size={inputSize}
                             value={formik.values.outcome || ''}
                             onChange={formik.handleChange}
                             error={
@@ -491,6 +504,7 @@ export default function FiltersModal({
                             name="variant"
                             type="text"
                             variant="outlined"
+                            size={inputSize}
                             value={formik.values.variant || ''}
                             onChange={formik.handleChange}
                             error={
@@ -510,6 +524,7 @@ export default function FiltersModal({
                             name="dateconfirmedbefore"
                             type="date"
                             variant="outlined"
+                            size={inputSize}
                             InputLabelProps={{ shrink: true }}
                             value={formik.values.dateconfirmedbefore || ''}
                             onChange={formik.handleChange}
@@ -531,6 +546,7 @@ export default function FiltersModal({
                             name="dateconfirmedafter"
                             type="date"
                             variant="outlined"
+                            size={inputSize}
                             InputLabelProps={{ shrink: true }}
                             value={formik.values.dateconfirmedafter || ''}
                             onChange={formik.handleChange}
@@ -555,6 +571,7 @@ export default function FiltersModal({
                             name="curatoremail"
                             type="text"
                             variant="outlined"
+                            size={inputSize}
                             value={formik.values.curatoremail || ''}
                             onChange={formik.handleChange}
                             error={
@@ -573,6 +590,7 @@ export default function FiltersModal({
                             name="caseid"
                             type="text"
                             variant="outlined"
+                            size={inputSize}
                             value={formik.values.caseid || ''}
                             onChange={formik.handleChange}
                             error={
@@ -590,6 +608,7 @@ export default function FiltersModal({
                             name="sourceurl"
                             type="text"
                             variant="outlined"
+                            size={inputSize}
                             value={formik.values.sourceurl || ''}
                             onChange={formik.handleChange}
                             error={
@@ -611,6 +630,7 @@ export default function FiltersModal({
                             name="uploadid"
                             type="text"
                             variant="outlined"
+                            size={inputSize}
                             value={formik.values.uploadid || ''}
                             onChange={formik.handleChange}
                             error={
@@ -629,6 +649,7 @@ export default function FiltersModal({
                             name="sourceid"
                             type="text"
                             variant="outlined"
+                            size={inputSize}
                             value={formik.values.sourceid || ''}
                             onChange={formik.handleChange}
                             error={
@@ -647,6 +668,7 @@ export default function FiltersModal({
                             color="primary"
                             variant="outlined"
                             type="button"
+                            size={inputSize}
                             onClick={handleClearFiltersClick}
                         >
                             Clear filters
@@ -659,6 +681,7 @@ export default function FiltersModal({
                             data-test-id="search-by-filter-button"
                             name="filterButton"
                             id="start-filtering"
+                            size={inputSize}
                             className={classes.searchBtn}
                         >
                             Filter

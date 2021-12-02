@@ -75,7 +75,7 @@ spec:
     spec:
       containers:
         - name: data
-          image: ghcr.io/globaldothealth/list/dataservice:1.8.1
+          image: ghcr.io/globaldothealth/list/dataservice:1.8.2
           ports:
             - containerPort: 3000
           livenessProbe:
