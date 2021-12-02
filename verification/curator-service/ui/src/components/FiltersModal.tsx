@@ -382,7 +382,7 @@ export default function FiltersModal({
                                 type="text"
                                 label="Location admin 1"
                                 name="admin1"
-                                value={formik.values.admin1}
+                                value={formik.values.admin1 || ''}
                                 onChange={formik.handleChange}
                                 // endAdornment={tooltipHelpIcon(admin1Tooltip)}
                             />
@@ -400,7 +400,7 @@ export default function FiltersModal({
                                 type="text"
                                 label="Location admin 2"
                                 name="admin2"
-                                value={formik.values.admin2}
+                                value={formik.values.admin2 || ''}
                                 onChange={formik.handleChange}
                                 // endAdornment={tooltipHelpIcon(admin2Tooltip)}
                             />
@@ -418,7 +418,7 @@ export default function FiltersModal({
                                 type="text"
                                 label="Location admin 3"
                                 name="admin3"
-                                value={formik.values.admin3}
+                                value={formik.values.admin3 || ''}
                                 onChange={formik.handleChange}
                                 // endAdornment={tooltipHelpIcon(admin3Tooltip)}
                             />
