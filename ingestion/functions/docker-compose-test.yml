@@ -7,5 +7,5 @@ services:
       dockerfile: Dockerfile-test
     env_file: ./.env
   localstack:
-    image: localstack/localstack:latest
+    image: localstack/localstack:0.12.17.5
     env_file: ./.env
