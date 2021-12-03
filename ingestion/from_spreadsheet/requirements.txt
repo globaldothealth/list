@@ -1,7 +1,7 @@
 appnope==0.1.2
 async-generator==1.10
 attrs==20.3.0
-bleach==3.2.2
+bleach==3.3.0
 cachetools==4.2.0
 certifi==2020.12.5
 chardet==3.0.4
