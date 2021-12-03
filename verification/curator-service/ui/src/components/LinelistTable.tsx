@@ -1337,10 +1337,18 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                 {
                                     title: 'Age',
                                     field: 'age',
-                                    render: (rowData) =>
-                                        rowData.age[0] === rowData.age[1]
-                                            ? rowData.age[0]
-                                            : `${rowData.age[0]}-${rowData.age[1]}`,
+                                    render: (rowData) => {
+                                        const ageFrom = rowData.age[0]
+                                            ? Math.floor(rowData.age[0])
+                                            : undefined;
+                                        const ageTo = rowData.age[1]
+                                            ? Math.floor(rowData.age[1])
+                                            : undefined;
+
+                                        return ageFrom === ageTo
+                                            ? ageFrom
+                                            : `${ageFrom}-${ageTo}`;
+                                    },
                                     cellStyle: { whiteSpace: 'nowrap' },
                                 },
                                 {
