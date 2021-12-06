@@ -196,11 +196,8 @@ def generate_country_json(cases, s3_endpoint, bucket, date, line_list_url, map_u
                 record["code"] = str("NA")
             record["lat"] = country_codes[country]['latitude']
             record["long"] = country_codes[country]['longitude']
-        except:
-            print(f"I couldn't find {country} in the list of country codes.")
-            record["code"] = "ZZ"
-            record["lat"] = -1.0
-            record["long"] = -1.0
+        except KeyError:
+            raise ValueError(f"Could not find country in list of country codes: {country}")
 
     records = {date: records}
 
