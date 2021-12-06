@@ -60,6 +60,7 @@ export const caseSchema = new mongoose.Schema(
         restrictedNotes: String,
         pathogens: [pathogenSchema],
         list: Boolean,
+        SGTF: Number,
         preexistingConditions: preexistingConditionsSchema,
         symptoms: symptomsSchema,
         transmission: transmissionSchema,
@@ -117,7 +118,8 @@ caseSchema.methods.equalsJSON = function (jsonCase: any): boolean {
         _.isEqual(thisJson.transmission, other.transmission) &&
         _.isEqual(thisJson.travelHistory, other.travelHistory) &&
         _.isEqual(thisJson.vaccines, other.vaccines) &&
-        _.isEqual(thisJson.variant, other.variant)
+        _.isEqual(thisJson.variant, other.variant) &&
+        _.isEqual(thisJson.SGTF, other.SGTF)
     );
 };
 
@@ -136,6 +138,7 @@ export type CaseDocument = mongoose.Document & {
     restrictedNotes?: string;
     pathogens: [PathogenDocument];
     list: boolean;
+    SGTF: number;
     preexistingConditions: PreexistingConditionsDocument;
     symptoms: SymptomsDocument;
     transmission: TransmissionDocument;
