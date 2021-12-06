@@ -48,6 +48,8 @@ _CODES_COUNTRY_MAP = {
     "Congo [DRC]": "Democratic Republic of the Congo",
     "Congo [Republic]": "Republic of Congo",
     "Macedonia [FYROM]": "North Macedonia",
+    "The Gambia": "Gambia",
+    "People's Republic of China": "China",
     "U.S. Virgin Islands": "Virgin Islands, U.S.",
     "Swaziland": "Eswatini",
     "Cape Verde": "Cabo Verde"
@@ -139,7 +141,7 @@ def get_country_codes():
     req = requests.get(url, timeout=10)
 
     countrycodes_df = pd.read_csv(io.StringIO(req.text))
-    countrycodes_df["name"] = countrycodes_df["name"].apply(lambda x: _CODES_COUNTRY_MAP[x] if x in _CODES_COUNTRY_MAP.keys() else x)
+    countrycodes_df["name"] = countrycodes_df["name"].apply(lambda x: _CODES_COUNTRY_MAP.get(x, x))
     countrycodes_df = countrycodes_df.set_index('name')
 
     countrycodes_dict = countrycodes_df.to_dict('index')
