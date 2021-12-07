@@ -38,7 +38,7 @@ DOWNLOADS = {
     "all.tsv": {"format": "tsv"}
 }
 
-FIELDS_FILE = "../data-serving/scripts/export-data/functions/01-split/fields.txt"
+FIELDS_FILE = "../data-serving/scripts/export-data/fields.txt"
 
 
 def sign_up(session: Session) -> None:

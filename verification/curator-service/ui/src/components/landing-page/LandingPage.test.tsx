@@ -42,7 +42,7 @@ describe('<LandingPage />', () => {
         );
         expect(screen.getByText('Data dictionary')).toHaveAttribute(
             'href',
-            'fields.txt',
+            'https://raw.githubusercontent.com/globaldothealth/list/main/data-serving/scripts/export-data/data_dictionary.txt',
         );
         expect(screen.getByText('Data acknowledgments')).toHaveAttribute(
             'href',
