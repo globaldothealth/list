@@ -172,7 +172,7 @@ const LandingPage = (): JSX.Element => {
                             </div>
                             <div className={classes.link}>
                                 <a
-                                    href="fields.txt"
+                                    href="https://raw.githubusercontent.com/globaldothealth/list/main/data-serving/scripts/export-data/data_dictionary.txt"
                                     rel="noopener noreferrer"
                                     target="_blank"
                                 >

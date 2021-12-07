@@ -364,7 +364,7 @@ function ProfileMenu(props: { user: User }): JSX.Element {
                     className={classes.link}
                     rel="noopener noreferrer"
                     target="_blank"
-                    href="https://github.com/globaldothealth/list/blob/main/data-serving/scripts/export-data/functions/01-split/fields.txt"
+                    href="https://raw.githubusercontent.com/globaldothealth/list/main/data-serving/scripts/export-data/data_dictionary.txt"
                     onClick={handleClose}
                 >
                     <MenuItem>Data dictionary</MenuItem>
@@ -737,7 +737,7 @@ export default function App(): JSX.Element {
                             <div className={classes.spacer}></div>
                             <div className={classes.divider}></div>
                             <a
-                                href="https://github.com/globaldothealth/list/blob/main/data-serving/scripts/export-data/functions/01-split/fields.txt"
+                                href="https://raw.githubusercontent.com/globaldothealth/list/main/data-serving/scripts/export-data/data_dictionary.txt"
                                 rel="noopener noreferrer"
                                 target="_blank"
                                 data-testid="dictionaryButton"
