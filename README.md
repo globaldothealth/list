@@ -22,7 +22,7 @@ You can tell if a case was imported from the manually created spreadsheets data 
 
 A daily export of case data can be downloaded from the data portal. The data
 is generated using this [script](data-serving/scripts/export-data/README.md), with
-this [data dictionary](data-serving/scripts/export-data/functions/01-split/fields.txt).
+this [data dictionary](data-serving/scripts/export-data/data_dictionary.txt).
 
 ## CI/CD status
 

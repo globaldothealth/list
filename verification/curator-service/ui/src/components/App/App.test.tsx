@@ -104,7 +104,7 @@ describe('<App />', () => {
         );
         expect(await screen.findByTestId('dictionaryButton')).toHaveAttribute(
             'href',
-            'https://github.com/globaldothealth/list/blob/main/data-serving/scripts/export-data/functions/01-split/fields.txt',
+            'https://raw.githubusercontent.com/globaldothealth/list/main/data-serving/scripts/export-data/data_dictionary.txt',
         );
         expect(
             await screen.findByTestId('acknowledgmentsButton'),
