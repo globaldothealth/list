@@ -184,6 +184,8 @@ def generate_country_json(cases, s3_endpoint, bucket, date, line_list_url, map_u
 
     for record in records:
         country = record["_id"]
+        if country is None:
+            continue
         try:
             jhu = jhu_counts[country]
             record["jhu"] = int(jhu)
@@ -294,6 +296,8 @@ def generate_region_json(cases, s3_endpoint, bucket, date):
                 search_term = "admin1"
             else:
                 id = record["country"]
+                if id is None:
+                    continue
                 search_term = "country"
             new_record = {
                 "_id": id,
