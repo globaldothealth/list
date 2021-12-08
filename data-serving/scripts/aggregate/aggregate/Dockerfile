@@ -5,5 +5,5 @@ WORKDIR /app
 COPY poetry.lock pyproject.toml /app/
 RUN poetry config virtualenvs.create false
 RUN poetry install --no-interaction --no-dev
-COPY app.py entrypoint.sh /app/
-ENTRYPOINT ["/app/entrypoint.sh"]
+COPY app.py /app/
+ENTRYPOINT ["/app/app.py"]
