@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import urllib.parse
 import datetime
 import csv
@@ -360,6 +362,7 @@ def get_environment_value_or_bail(key):
     return value
 
 if __name__ == '__main__':
+    print("Starting aggregation")
     connection_string = get_environment_value_or_bail("CONN")
     line_list_url = get_environment_value_or_bail("LINE_LIST_URL")
     map_url = get_environment_value_or_bail("MAP_URL")
