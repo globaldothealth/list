@@ -17,8 +17,9 @@ import requests
 from bson.objectid import ObjectId
 
 import hooks.country_export
+import hooks.aggregate
 
-HOOKS = ["country_export"]
+HOOKS = ["country_export", "aggregate"]
 
 def _ids(xs):
     return [str(x["_id"]) for x in xs]
@@ -316,5 +317,11 @@ if __name__ == "__main__":
         notify("\n".join(m), webhook_url)
 
     selected_hooks = get_selected_hooks(args.run_hooks)
-    if ingested_sources and "country_export" in selected_hooks:
+    if not ingested_sources:
+        print("No sources were ingested, skipping hooks.")
+        sys.exit(0)
+
+    if "country_export" in selected_hooks:
         hooks.country_export.run(ingested_sources, args.env, args.dry_run)
+    if "aggregate" in selected_hooks:
+        hooks.aggregate.run(ingested_sources, args.env, args.dry_run)
