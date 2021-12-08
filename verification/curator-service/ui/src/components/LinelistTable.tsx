@@ -726,6 +726,25 @@ export function DownloadButton(): JSX.Element {
                             </span>
                         </Tooltip>
                     )}
+                    <Typography variant="body2">
+                        <a
+                            href="https://raw.githubusercontent.com/globaldothealth/list/main/data-serving/scripts/export-data/citation.txt"
+                            target="_blank"
+                            rel="noreferrer"
+                        >
+                            Citation guidelines
+                        </a>
+                    </Typography>
+
+                    <Typography variant="body2">
+                        <a
+                            href="https://raw.githubusercontent.com/globaldothealth/list/main/data-serving/scripts/export-data/data_dictionary.txt"
+                            target="_blank"
+                            rel="noreferrer"
+                        >
+                            Data dictionary
+                        </a>
+                    </Typography>
                 </DialogContent>
             </Dialog>
         </>
