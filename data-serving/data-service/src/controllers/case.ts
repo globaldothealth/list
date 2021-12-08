@@ -145,8 +145,7 @@ export class CasesController {
                     .cursor();
             }
 
-            const date = new Date().toISOString().slice(0, 10);
-            const filename = `gh_${date}`;
+            const filename = req.body.query.replace(/[:\s]/g, '_');
 
             let doc: CaseDocument;
 
