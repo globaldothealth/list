@@ -381,7 +381,7 @@ if __name__ == '__main__':
     line_list_url = get_environment_value_or_bail("LINE_LIST_URL")
     map_url = get_environment_value_or_bail("MAP_URL")
     s3_bucket = get_environment_value_or_bail("S3_BUCKET")
-    S3 endpoint is allowed to be None (i.e. connect to default S3 endpoint),
+    # S3 endpoint is allowed to be None (i.e. connect to default S3 endpoint),
     # it's also allowed to be not-None (to use localstack or another test double).
     s3_endpoint = os.environ.get("S3_ENDPOINT")
     logging.info("Logging into MongoDB...")
