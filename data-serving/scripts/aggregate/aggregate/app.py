@@ -1,13 +1,14 @@
 #!/usr/bin/env python3
 
-import urllib.parse
-import datetime
 import csv
+import datetime
 import io
 import json
+import logging
 import os
 import re
 import sys
+import urllib.parse
 
 import boto3
 import pandas as pd
@@ -66,6 +67,15 @@ _CODES_COUNTRY_ADD = {
 
 _EXCLUDE = ["Puerto Rico"]
 
+
+
+def setup_logger():
+    h = logging.StreamHandler(sys.stdout)
+    rootLogger = logging.getLogger()
+    rootLogger.addHandler(h)
+    rootLogger.setLevel(logging.DEBUG)
+
+
 def _quote_country(c):
     "Returns quoted country name used in query string of data url"
     cq = urllib.parse.quote_plus(c)
@@ -107,18 +117,18 @@ def get_jhu_counts():
     req = requests.head(url, timeout=10)
 
     while req.status_code != 200:
-        print("Got status " + str(req.status_code) + " for '" + url + "'")
+        logging.info("Got status " + str(req.status_code) + " for '" + url + "'")
         date = date - datetime.timedelta(days=1)
         now = date.strftime("%m-%d-%Y")
-        print(f"Checking for JHU data on {now}")
+        logging.info(f"Checking for JHU data on {now}")
         url = f"https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_daily_reports/{now}.csv"
         req = requests.head(url, timeout=10)
 
-    print(f"JHU data found for {now}.")
-    print(f"Attempting to retrieve JHU data for {now}")
+    logging.info(f"JHU data found for {now}.")
+    logging.info(f"Attempting to retrieve JHU data for {now}")
     req = requests.get(url, timeout=10)
     jhu_df = pd.read_csv(io.StringIO(req.text))
-    print(f"Retrieved JHU case counts from {now}.")
+    logging.info(f"Retrieved JHU case counts from {now}.")
 
     jhu_counts = (
         jhu_df["Confirmed"].groupby(jhu_df["Country_Region"]).sum().reset_index()
@@ -189,7 +199,7 @@ def generate_country_json(cases, s3_endpoint, bucket, date, line_list_url, map_u
             jhu = jhu_counts[country]
             record["jhu"] = int(jhu)
         except:
-            print(f"I couldn't find {country} in the JHU case counts.")
+            logging.info(f"I couldn't find {country} in the JHU case counts.")
             record["jhu"] = 0
         try:
             if country != "Namibia":
@@ -306,7 +316,7 @@ def generate_region_json(cases, s3_endpoint, bucket, date):
                 "long": record["_id"]["longitude"],
                 "search": search_term,
             }
-            print(new_record)
+            logging.info(new_record)
             records.append(new_record)
     records = {date: records}
 
@@ -355,38 +365,39 @@ def generate_total_json(cases, s3_endpoint, bucket, date):
 
 def get_environment_value_or_bail(key):
     """
-    Retrieve a value from the environment, but print a message and quit if it isn't set.
+    Retrieve a value from the environment, but logging.info a message and quit if it isn't set.
     key -- The name of the environment variable.
     """
     value = os.environ.get(key)
     if value is None:
-        print(f"{key} not set in the environment, exiting")
+        logging.info(f"{key} not set in the environment, exiting")
         sys.exit(1)
     return value
 
 if __name__ == '__main__':
-    print("Starting aggregation")
+    setup_logger()
+    logging.info("Starting aggregation")
     connection_string = get_environment_value_or_bail("CONN")
     line_list_url = get_environment_value_or_bail("LINE_LIST_URL")
     map_url = get_environment_value_or_bail("MAP_URL")
     s3_bucket = get_environment_value_or_bail("S3_BUCKET")
-    # S3 endpoint is allowed to be None (i.e. connect to default S3 endpoint),
+    S3 endpoint is allowed to be None (i.e. connect to default S3 endpoint),
     # it's also allowed to be not-None (to use localstack or another test double).
     s3_endpoint = os.environ.get("S3_ENDPOINT")
-    print("Logging into MongoDB...")
+    logging.info("Logging into MongoDB...")
     client = pymongo.MongoClient(connection_string)
     db = client.covid19
     cases = db.cases
-    print("And we're in!")
+    logging.info("And we're in!")
 
     date_string = datetime.datetime.now().strftime("%m-%d-%Y")
-    print("Generating country json...")
+    logging.info("Generating country json...")
     generate_country_json(cases, s3_endpoint, s3_bucket, date_string, line_list_url, map_url)
-    print("Country json generated!")
-    print("Generating region json...")
+    logging.info("Country json generated!")
+    logging.info("Generating region json...")
     generate_region_json(cases, s3_endpoint, s3_bucket, date_string)
-    print("Region json generated!")
-    print("Generating total json...")
+    logging.info("Region json generated!")
+    logging.info("Generating total json...")
     generate_total_json(cases, s3_endpoint, s3_bucket, date_string)
-    print("Total json generated!")
-    print("Done!")
+    logging.info("Total json generated!")
+    logging.info("Done!")
