@@ -50,7 +50,6 @@ _CODES_COUNTRY_MAP = {
     "Congo [DRC]": "Democratic Republic of the Congo",
     "Congo [Republic]": "Republic of Congo",
     "Macedonia [FYROM]": "North Macedonia",
-    "The Gambia": "Gambia",
     "People's Republic of China": "China",
     "U.S. Virgin Islands": "Virgin Islands, U.S.",
     "Swaziland": "Eswatini",
