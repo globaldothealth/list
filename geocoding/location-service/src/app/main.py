@@ -1,4 +1,6 @@
+import sys
 import json
+import logging
 import pymongo
 from flask import Blueprint, Flask, jsonify, request
 from os import environ
@@ -83,5 +85,14 @@ def suggest_geocode():
     except ValueError:
         return f"Bad limitToResolution value {request.args.get('limitToResolution', str)}", 422
 
+
+def setup_logger():
+    h = logging.StreamHandler(sys.stdout)
+    rootLogger = logging.getLogger()
+    rootLogger.addHandler(h)
+    rootLogger.setLevel(logging.DEBUG)
+
+
 if __name__ == '__main__':
+    setup_logger()
     app.run(host='0.0.0.0', port=8080)
