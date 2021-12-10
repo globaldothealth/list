@@ -1,9 +1,10 @@
 import json
+import logging
+
 import ratelimiter
 from lru import LRU
 
 from src.integration.mapbox_client import mapbox_tile_query
-
 
 class AdminsFetcher:
 
@@ -23,7 +24,7 @@ class AdminsFetcher:
         else:
             response = mapbox_tile_query(self.access_token, geocode['geometry'], rate_limit=self.rate_limit)
             self.cache[cacheKey] = response
-        if not 'features' in response:
+        if 'features' not in response:
             # probably your API key doesn't support the premium APIs, skip this step
             return geocode
         for feature in response['features']:
@@ -47,6 +48,9 @@ class AdminsFetcher:
         }[layer]
 
     def getName(self, id):
-        return self.admins.find_one({
-            'id': id
-        })['name']
+        admin = self.admins.find_one({'id': id})
+        if not admin:
+            logging.warning(f"ID {id} not found in admins collection, returning None")
+            return None
+        else:
+            return admin['name']
