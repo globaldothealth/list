@@ -77,7 +77,13 @@ def test_transform_output_match():
     with redirect_stdout(io.StringIO()) as f:
         T.transform('test_transform_mongoexport.csv', '-', ['csv'])
     # use str.splitlines to ignore line endings
-    assert f.getvalue().splitlines() == expected.splitlines()
+
+    expected_lines = expected.splitlines()
+    actual_lines = f.getvalue().splitlines()
+
+    lines_to_compare = zip(expected_lines, actual_lines)
+    for line_pair in lines_to_compare:
+        assert line_pair[0] == line_pair[1]
 
 
 def test_transform_empty(tmp_path):
