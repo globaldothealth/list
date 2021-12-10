@@ -181,7 +181,7 @@ def convert_travel(travel_array: str) -> dict[str, Any]:
         return {k: None for k in __TRAVEL}
 
 
-def get_fields(fileobject) -> list[str]:
+def get_headers_and_fields(fileobject) -> list[str]:
     """
     Add processed event fieldnames to fields.
     """
@@ -206,7 +206,7 @@ def get_fields(fileobject) -> list[str]:
     ]
     fields = set(headers).union(set(cols_to_add))
     fields = fields.union(set(__TRAVEL + __GENOME + __VARIANT))
-    fields = sorted(list(fields - set(__OMIT)))
+    fields = sorted(list(fields - set(__OMIT)), key=str.casefold)
     return headers, fields
 
 
@@ -285,7 +285,7 @@ def open_writers(formats: list[str], fields: list[str], output: str):
 
 def transform(input: Optional[str], output: str, formats: list[str]):
     with (open(input) if input else sys.stdin) as inputfile:
-        headers, fields = get_fields(inputfile)
+        headers, fields = get_headers_and_fields(inputfile)
         reader = csv.DictReader(inputfile, fieldnames=headers)
         hasrows = False
         with open_writers(formats, fields, output) as writers:
