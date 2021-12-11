@@ -578,9 +578,21 @@ export function DownloadButton(): JSX.Element {
                         const filename = response.headers['content-disposition']
                             .split('filename=')[1]
                             .replace(/["]/g, '');
-                        const downloadUrl = window.URL.createObjectURL(
-                            new Blob([response.data]),
-                        );
+                        let downloadUrl;
+                        if (
+                            response.headers['content-type'] ===
+                            'application/json'
+                        ) {
+                            downloadUrl =
+                                'data:text/json;charset=utf-8,' +
+                                encodeURIComponent(
+                                    JSON.stringify(response.data),
+                                );
+                        } else {
+                            downloadUrl = window.URL.createObjectURL(
+                                new Blob([response.data]),
+                            );
+                        }
                         const link = document.createElement('a');
                         link.href = downloadUrl;
                         link.setAttribute('download', filename);
