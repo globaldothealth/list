@@ -401,15 +401,13 @@ paths:
                   description: Keyword to sort by
                   required: false
                   schema:
-                      type: integer
-                      default: 0
+                      type: string                      
                 - name: order
                   in: query
                   description: Sorting order
                   required: false
                   schema:
-                      type: integer
-                      default: 0
+                      type: string                      
                 - name: q
                   in: query
                   description: The search query
