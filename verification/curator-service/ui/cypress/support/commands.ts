@@ -19,6 +19,7 @@ declare global {
                 variant?: any;
                 sourceUrl?: any;
                 gender?: string;
+                creationDate?: Date;
             }) => void;
             login: (opts?: {
                 name: string;
@@ -54,6 +55,7 @@ export function addCase(opts: {
     caseid?: string;
     sourceUrl?: string;
     gender?: string;
+    creationDate?: Date;
 }): void {
     cy.request({
         method: 'POST',
@@ -99,6 +101,14 @@ export function addCase(opts: {
                 places: opts.transmissionPlaces ?? [],
             },
             notes: opts.notes,
+            revisionMetadata: {
+                revisionNumber: 0,
+                creationMetadata: {
+                    curator:
+                        'ingestion@covid-19-map-277002.iam.gserviceaccount.com',
+                    date: opts.creationDate,
+                },
+            },
         },
     });
 }
