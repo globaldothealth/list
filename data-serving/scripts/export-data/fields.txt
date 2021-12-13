@@ -34,6 +34,7 @@ revisionMetadata.editMetadata.curator
 revisionMetadata.editMetadata.date
 revisionMetadata.editMetadata.notes
 revisionMetadata.revisionNumber
+SGTF
 symptoms.status
 symptoms.values
 transmission.linkedCaseIds

@@ -235,13 +235,19 @@ REVISION METADATA
 
     Revision number of the case (positive integer)
 
+SGTF
+
+49. SGTF
+
+    S-Gene Target failure (0 = no deletion, 1 = deletion (S-))
+
 SYMPTOMS
 
-49. symptoms.status
+50. symptoms.status
 
     Symptom status (Asymptomatic | Symptomatic | Presymptomatic | null)
 
-50. symptoms.values []
+51. symptoms.values []
 
     List of symptoms
 
@@ -249,96 +255,96 @@ TRANSMISSION
 
 How this case got infected and by who if known
 
-51. transmission.linkedCaseIds []
+52. transmission.linkedCaseIds []
 
     UUID of a related case in the system
 
-52. transmission.places []
+53. transmission.places []
 
     Places where transmission occurred
 
-53. transmission.routes []
+54. transmission.routes []
 
     Routes of transmission
 
 TRAVEL HISTORY
 
-54. travelHistory.travel.dateRange.end
-55. travelHistory.travel.dateRange.start
+55. travelHistory.travel.dateRange.end
+56. travelHistory.travel.dateRange.start
 
     Start and end dates for travel history
 
-56. travelHistory.travel.location.administrativeAreaLevel1 []
-57. travelHistory.travel.location.administrativeAreaLevel2 []
-58. travelHistory.travel.location.administrativeAreaLevel3 []
-59. travelHistory.travel.location.country []
-60. travelHistory.travel.location.geoResolution []
+57. travelHistory.travel.location.administrativeAreaLevel1 []
+58. travelHistory.travel.location.administrativeAreaLevel2 []
+59. travelHistory.travel.location.administrativeAreaLevel3 []
+60. travelHistory.travel.location.country []
+61. travelHistory.travel.location.geoResolution []
 
     These have the same meaning as in LOCATION, except that these
     pertain to travel history of the individual. Unlike the fields in
     location, the fields here are all comma-separated arrays, with each
     item corresponding to a travel location in the last 30 days.
 
-61. travelHistory.travel.location.geometry.coordinates []
+62. travelHistory.travel.location.geometry.coordinates []
 
     Comma-separated tuples of latitude and longitude. If the individual
     visited latitude m1 and longitude n1 this would be represented as
     "(m1, n1)". If there was another travel coordinate (m2, n2), then
     this would be represented as "(m1, n1),(m2, n2)"
 
-62. travelHistory.travel.location.name []
-63. travelHistory.travel.location.place []
+63. travelHistory.travel.location.name []
+64. travelHistory.travel.location.place []
     
     Same as LOCATION, except these are arrays
 
-64. travelHistory.travel.methods []
+65. travelHistory.travel.methods []
 
     Corresponding travel methods (such as air, ship, rail ...)
 
-65. travelHistory.travel.purpose []
+66. travelHistory.travel.purpose []
 
     Purpose of travel
 
-66. travelHistory.traveledPrior30Days
+67. travelHistory.traveledPrior30Days
 
     Whether the patient has travelled in the past 30 days
     Boolean: True | False
 
 VACCINES
 
-67. vaccines.0.batch
+68. vaccines.0.batch
 
     First vaccine batch
 
-68. vaccines.0.date
+69. vaccines.0.date
 
     Date of first vaccine
 
-69. vaccines.0.name
+70. vaccines.0.name
 
     Name of first vaccine
 
-70. vaccines.0.sideEffects []
+71. vaccines.0.sideEffects []
 
     List of side-effects experienced after vaccine
 
-71. vaccines.1.batch
-72. vaccines.1.date
-73. vaccines.1.name
-74. vaccines.1.sideEffects
-75. vaccines.2.batch
-76. vaccines.2.date
-77. vaccines.2.name
-78. vaccines.2.sideEffects
-79. vaccines.3.batch
-80. vaccines.3.date
-81. vaccines.3.name
-82. vaccines.3.sideEffects
+72. vaccines.1.batch
+73. vaccines.1.date
+74. vaccines.1.name
+75. vaccines.1.sideEffects
+76. vaccines.2.batch
+77. vaccines.2.date
+78. vaccines.2.name
+79. vaccines.2.sideEffects
+80. vaccines.3.batch
+81. vaccines.3.date
+82. vaccines.3.name
+83. vaccines.3.sideEffects
 
     Same as before, for subsequent vaccines taken by the same individual
 
 VARIANT OF CONCERN
 
-83. variantOfConcern
+84. variantOfConcern
 
     Variant of concern that was detected. This uses the Pango lineage.
