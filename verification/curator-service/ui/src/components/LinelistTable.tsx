@@ -458,16 +458,7 @@ export function SortSelect({
             value: SortBy.Default,
             order: SortByOrder.Descending,
         },
-        // Commenting out until fix is found for big queries sorting in mongodb
-        // { name: 'Confirmed date', value: SortBy.ConfirmedDate },
-        // { name: 'Location admin 1', value: SortBy.Admin1 },
-        // { name: 'Location admin 2', value: SortBy.Admin2 },
-        // { name: 'Location admin 3', value: SortBy.Admin3 },
-        // { name: 'Age', value: SortBy.Age },
     ];
-
-    // !filteredKeys.includes('country') &&
-    //     sortKeywords.splice(1, 0, { name: 'Country', value: SortBy.Country });
 
     const parseSelectValues = (value: SortBy, order: SortByOrder) => {
         return `${value}|${order}`;
@@ -511,25 +502,6 @@ export function SortSelect({
                     ))}
                 </Select>
             </FormControl>
-
-            {/* {sortBy !== SortBy.Default && (
-                <FormControl className={classes.formControl}>
-                    <InputLabel id="sort-by-order-label">Order</InputLabel>
-                    <Select
-                        labelId="sort-by-order-label"
-                        name="sortByOrder"
-                        value={sortByOrder}
-                        onChange={handleChange}
-                    >
-                        <MenuItem value={SortByOrder.Ascending}>
-                            Ascending
-                        </MenuItem>
-                        <MenuItem value={SortByOrder.Descending}>
-                            Descending
-                        </MenuItem>
-                    </Select>
-                </FormControl>
-            )} */}
         </>
     );
 }
