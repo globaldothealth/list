@@ -51,10 +51,8 @@ import { URLToSearchQuery } from './util/searchQuery';
 import { ChipData } from './App/App';
 import { SortBy, SortByOrder } from '../constants/types';
 import { connect, ConnectedProps } from 'react-redux';
-import { useAppSelector } from '../hooks/redux';
 import { RootState } from '../redux/store';
 import Helmet from 'react-helmet';
-import { selectFilterBreadcrumbs } from '../redux/app/selectors';
 
 // Limit number of data that can be displayed or downloaded to avoid long execution times of mongo queries
 const DATA_LIMIT = 10000;
@@ -233,7 +231,7 @@ const downloadDataModalStyles = makeStyles((theme: Theme) =>
 
 const sortSelectStyles = makeStyles((theme: Theme) => ({
     formControl: {
-        minWidth: 150,
+        minWidth: 220,
         margin: '0 20px 0 0',
     },
 }));
@@ -449,32 +447,43 @@ export function SortSelect({
 }: SortSelectProps): JSX.Element {
     const classes = sortSelectStyles();
 
-    const filterBreadCrumbs = useAppSelector(selectFilterBreadcrumbs);
-    const filteredKeys = filterBreadCrumbs.map(({ key }) => key);
-
     const sortKeywords = [
-        { name: 'None', value: SortBy.Default },
+        {
+            name: 'Creation date ascending',
+            value: SortBy.Default,
+            order: SortByOrder.Ascending,
+        },
+        {
+            name: 'Creation date descending',
+            value: SortBy.Default,
+            order: SortByOrder.Descending,
+        },
         // Commenting out until fix is found for big queries sorting in mongodb
         // { name: 'Confirmed date', value: SortBy.ConfirmedDate },
-        { name: 'Location admin 1', value: SortBy.Admin1 },
-        { name: 'Location admin 2', value: SortBy.Admin2 },
-        { name: 'Location admin 3', value: SortBy.Admin3 },
-        { name: 'Age', value: SortBy.Age },
+        // { name: 'Location admin 1', value: SortBy.Admin1 },
+        // { name: 'Location admin 2', value: SortBy.Admin2 },
+        // { name: 'Location admin 3', value: SortBy.Admin3 },
+        // { name: 'Age', value: SortBy.Age },
     ];
 
-    !filteredKeys.includes('country') &&
-        sortKeywords.splice(1, 0, { name: 'Country', value: SortBy.Country });
+    // !filteredKeys.includes('country') &&
+    //     sortKeywords.splice(1, 0, { name: 'Country', value: SortBy.Country });
+
+    const parseSelectValues = (value: SortBy, order: SortByOrder) => {
+        return `${value}|${order}`;
+    };
 
     const handleChange = (
-        event: React.ChangeEvent<{ value: unknown; name?: string | undefined }>,
+        event: React.ChangeEvent<{
+            value: unknown;
+            name?: string | undefined;
+        }>,
     ) => {
-        const { value, name } = event.target;
+        const value = event.target.value as string;
+        if (!value) return;
 
-        if (name === 'sortBy') {
-            handleSortByChange(value as SortBy);
-        } else {
-            handleSortByOrderChange(value as SortByOrder);
-        }
+        const chosenSortByOrder = value.split('|')[1];
+        handleSortByOrderChange(chosenSortByOrder as SortByOrder);
     };
 
     return (
@@ -485,13 +494,16 @@ export function SortSelect({
                     id="sort-by-select"
                     labelId="sort-by-label"
                     name="sortBy"
-                    value={sortBy}
+                    value={parseSelectValues(sortBy, sortByOrder)}
                     onChange={handleChange}
                 >
                     {sortKeywords.map((keyword) => (
                         <MenuItem
-                            value={keyword.value}
-                            key={keyword.value}
+                            value={parseSelectValues(
+                                keyword.value,
+                                keyword.order,
+                            )}
+                            key={keyword.order}
                             data-testid="sortby-option"
                         >
                             {keyword.name}
@@ -500,7 +512,7 @@ export function SortSelect({
                 </Select>
             </FormControl>
 
-            {sortBy !== SortBy.Default && (
+            {/* {sortBy !== SortBy.Default && (
                 <FormControl className={classes.formControl}>
                     <InputLabel id="sort-by-order-label">Order</InputLabel>
                     <Select
@@ -517,7 +529,7 @@ export function SortSelect({
                         </MenuItem>
                     </Select>
                 </FormControl>
-            )}
+            )} */}
         </>
     );
 }
