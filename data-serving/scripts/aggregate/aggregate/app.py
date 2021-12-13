@@ -185,6 +185,7 @@ def generate_country_json(cases, s3_endpoint, bucket, date, line_list_url, map_u
         }
     ]
 
+    logging.debug("Aggregating country results from database")
     results = cases.aggregate(pipeline)
     records = list(results)
     records = [record for record in records if record["_id"] not in _EXCLUDE]
@@ -220,6 +221,7 @@ def generate_country_json(cases, s3_endpoint, bucket, date, line_list_url, map_u
 
     records = {date: records}
 
+    logging.debug("Uploading country aggregation results to S3")
     s3 = boto3.client("s3", endpoint_url=s3_endpoint)
     s3.put_object(
         ACL="public-read",
@@ -244,7 +246,7 @@ def generate_country_json(cases, s3_endpoint, bucket, date, line_list_url, map_u
         writer = csv.DictWriter(csvbuf, fieldnames=fieldnames)
         writer.writeheader()
         for i in _csv:
-            if i['_id']:
+            if all (key in i for key in ("_id", "code", "casecount", "jhu")):
                 writer.writerow(_country_data_csv(i, line_list_url, map_url))
         csvstr = csvbuf.getvalue()
 
@@ -293,6 +295,7 @@ def generate_region_json(cases, s3_endpoint, bucket, date):
         },
     ]
 
+    logging.debug("Aggregating regional results from database")
     results = cases.aggregate(pipeline)
     raw_records = list(results)
     # Set null entries as equal to country
@@ -326,6 +329,7 @@ def generate_region_json(cases, s3_endpoint, bucket, date):
             records.append(new_record)
     records = {date: records}
 
+    logging.debug("Uploading regional aggregation results to S3")
     s3 = boto3.client("s3", endpoint_url=s3_endpoint)
     s3.put_object(
         ACL="public-read",
@@ -369,6 +373,7 @@ def generate_total_json(cases, s3_endpoint, bucket, date):
         Key=f"total/{date}.json",
     )
 
+
 def get_environment_value_or_bail(key):
     """
     Retrieve a value from the environment, but logging.info a message and quit if it isn't set.
@@ -379,6 +384,7 @@ def get_environment_value_or_bail(key):
         logging.info(f"{key} not set in the environment, exiting")
         sys.exit(1)
     return value
+
 
 if __name__ == '__main__':
     setup_logger()
