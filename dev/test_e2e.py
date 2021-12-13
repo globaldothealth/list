@@ -29,7 +29,7 @@ LOCALSTACK_URL = environ.get("AWS_ENDPOINT", "http://localstack:4566")
 RETRIEVAL_BUCKET_NAME = environ.get("RETRIEVAL_BUCKET_NAME", "epid-sources-raw")
 
 MOCK_SOURCE_DATA_URL = environ.get("MOCK_SOURCE_DATA_SERVICE", "http://mock-source-data")
-MOCK_SOURCE_DATA_PORT = environ.get("MOCK_SOURCE_DATA_PORT", 5000)
+MOCK_SOURCE_DATA_PORT = environ.get("MOCK_SOURCE_DATA_PORT", 5001)
 MOCK_SOURCE_DATA_ADDRESS = f"{MOCK_SOURCE_DATA_URL}:{MOCK_SOURCE_DATA_PORT}"
 
 UI_ADDRESS = environ.get("CURATOR_UI_ADDRESS", "http://localhost:3002")
