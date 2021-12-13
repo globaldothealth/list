@@ -6,32 +6,37 @@ describe('Uploads table', function () {
     });
 
     it('displays uploads properly', function () {
-        cy.addSource('New source', 'www.example.com', ['IN'], [
-            {
-                _id: '5ef8e943dfe6e00030892d58',
-                status: 'IN_PROGRESS',
-                summary: { numCreated: 5, numUpdated: 3 },
-                created: '2020-01-01',
-            },
-            {
-                _id: '5ef8e943dfe6e00030892d59',
-                status: 'SUCCESS',
-                summary: { numCreated: 2 },
-                created: '2020-01-02',
-            },
-            {
-                _id: '5ef8e943dfe6e00030892d60',
-                status: 'SUCCESS',
-                summary: { numUpdated: 4, numError: 1 },
-                created: '2020-01-03',
-            },
-            {
-                _id: '5ef8e943dfe6e00030892d61',
-                status: 'SUCCESS',
-                summary: { numCreated: 0, numUpdated: 0 },
-                created: '2020-01-04',
-            },
-        ]);
+        cy.addSource(
+            'New source',
+            'www.example.com',
+            ['IN'],
+            [
+                {
+                    _id: '5ef8e943dfe6e00030892d58',
+                    status: 'IN_PROGRESS',
+                    summary: { numCreated: 5, numUpdated: 3 },
+                    created: '2020-01-01',
+                },
+                {
+                    _id: '5ef8e943dfe6e00030892d59',
+                    status: 'SUCCESS',
+                    summary: { numCreated: 2 },
+                    created: '2020-01-02',
+                },
+                {
+                    _id: '5ef8e943dfe6e00030892d60',
+                    status: 'SUCCESS',
+                    summary: { numUpdated: 4, numError: 1 },
+                    created: '2020-01-03',
+                },
+                {
+                    _id: '5ef8e943dfe6e00030892d61',
+                    status: 'SUCCESS',
+                    summary: { numCreated: 0, numUpdated: 0 },
+                    created: '2020-01-04',
+                },
+            ],
+        );
         cy.visit('/');
         cy.visit('/uploads');
         cy.contains('www.example.com');
@@ -54,7 +59,9 @@ describe('Uploads table', function () {
         cy.contains('2020-01-04');
     });
 
-    it('can navigate to filtered linelist', function () {
+    it.only('can navigate to filtered linelist', function () {
+        cy.task('clearCasesDB', {});
+
         cy.addCase({
             uploadIds: ['5ef8e943dfe6e00030892d58'],
             country: 'France',
@@ -71,20 +78,25 @@ describe('Uploads table', function () {
             uploadIds: ['5ef8e943dfe6e00030892d60'],
             country: 'Germany',
         });
-        cy.addSource('New source', 'www.example.com', ['IN'], [
-            {
-                _id: '5ef8e943dfe6e00030892d58',
-                status: 'IN_PROGRESS',
-                summary: { numCreated: 5, numUpdated: 3 },
-                created: '2020-01-01',
-            },
-            {
-                _id: '5ef8e943dfe6e00030892d59',
-                status: 'SUCCESS',
-                summary: { numCreated: 2 },
-                created: '2020-01-02',
-            },
-        ]);
+        cy.addSource(
+            'New source',
+            'www.example.com',
+            ['IN'],
+            [
+                {
+                    _id: '5ef8e943dfe6e00030892d58',
+                    status: 'IN_PROGRESS',
+                    summary: { numCreated: 5, numUpdated: 3 },
+                    created: '2020-01-01',
+                },
+                {
+                    _id: '5ef8e943dfe6e00030892d59',
+                    status: 'SUCCESS',
+                    summary: { numCreated: 2 },
+                    created: '2020-01-02',
+                },
+            ],
+        );
         cy.visit('/');
         cy.visit('/uploads');
         cy.contains(
