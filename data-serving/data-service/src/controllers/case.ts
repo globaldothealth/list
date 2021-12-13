@@ -18,7 +18,7 @@ import { ObjectId, QuerySelector } from 'mongodb';
 import { GeocodeOptions, Geocoder, Resolution } from '../geocoding/geocoder';
 import { NextFunction, Request, Response } from 'express';
 import parseSearchQuery, { ParsingError } from '../util/search';
-import { SortByOrder, getSortByKeyword } from '../util/case';
+import { SortByOrder, getSortByKeyword, SortBy } from '../util/case';
 import { parseDownloadedCase } from '../util/case';
 
 import { logger } from '../util/logger';
@@ -226,8 +226,8 @@ export class CasesController {
         const page = Number(req.query.page) || 1;
         const limit = Number(req.query.limit) || 10;
         const countLimit = Number(req.query.count_limit) || 10000;
-        const sortBy = Number(req.query.sort_by) || 0;
-        const sortByOrder = Number(req.query.order) || 0;
+        const sortBy = String(req.query.sort_by) || 'default';
+        const sortByOrder = String(req.query.order) || 'ascending';
 
         logger.info('Got query params');
 
@@ -259,11 +259,10 @@ export class CasesController {
                 count: true,
             });
 
-            const sortByKeyword = getSortByKeyword(sortBy);
+            const sortByKeyword = getSortByKeyword(sortBy as SortBy);
 
             const sortedQuery = casesQuery.sort({
                 [sortByKeyword]: sortByOrder === SortByOrder.Ascending ? 1 : -1,
-                'revisionMetadata.creationMetadata.date': -1,
             });
             // Do a fetch of documents and another fetch in parallel for total documents
             // count used in pagination.
