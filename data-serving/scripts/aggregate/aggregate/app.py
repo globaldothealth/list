@@ -110,19 +110,22 @@ def get_jhu_counts():
 
     Return aggregated counts by country as Series.
     """
-
+    logging.debug("Getting aggregated counts from JHU")
     now = datetime.datetime.now().strftime("%m-%d-%Y")
     date = datetime.datetime.now()
     url = f"https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_daily_reports/{now}.csv"
     req = requests.head(url, timeout=10)
 
-    while req.status_code != 200:
+    retries = 5
+    current_attempt = 0
+    while req.status_code != 200 and current_attempt < retries:
         logging.info("Got status " + str(req.status_code) + " for '" + url + "'")
         date = date - datetime.timedelta(days=1)
         now = date.strftime("%m-%d-%Y")
         logging.info(f"Checking for JHU data on {now}")
         url = f"https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_daily_reports/{now}.csv"
         req = requests.head(url, timeout=10)
+        current_attempt += 1
 
     logging.info(f"JHU data found for {now}.")
     logging.info(f"Attempting to retrieve JHU data for {now}")
@@ -141,6 +144,7 @@ def get_jhu_counts():
     )
     jhu_counts = jhu_counts.set_index("Country_Region")
     jhu_counts = pd.Series(jhu_counts.values.flatten(), index=jhu_counts.index)
+    logging.debug("Got aggregated counts from JHU")
     return jhu_counts
 
 
@@ -148,6 +152,7 @@ def get_country_codes():
     """
     Retrieve standardized country codes and coordinates.
     """
+    logging.debug("Getting country codes")
     url = "https://raw.githubusercontent.com/google/dspl/master/samples/google/canonical/countries.csv"
     req = requests.get(url, timeout=10)
 
@@ -156,6 +161,7 @@ def get_country_codes():
     countrycodes_df = countrycodes_df.set_index('name')
 
     countrycodes_dict = countrycodes_df.to_dict('index')
+    logging.debug("Got country codes")
     return countrycodes_dict
 
 
@@ -199,7 +205,7 @@ def generate_country_json(cases, s3_endpoint, bucket, date, line_list_url, map_u
             jhu = jhu_counts[country]
             record["jhu"] = int(jhu)
         except:
-            logging.info(f"I couldn't find {country} in the JHU case counts.")
+            logging.warning(f"I couldn't find {country} in the JHU case counts.")
             record["jhu"] = 0
         try:
             if country != "Namibia":
@@ -210,7 +216,7 @@ def generate_country_json(cases, s3_endpoint, bucket, date, line_list_url, map_u
             record["lat"] = country_codes[country]['latitude']
             record["long"] = country_codes[country]['longitude']
         except KeyError:
-            raise ValueError(f"Could not find country in list of country codes: {country}")
+            logging.critical(f"Could not find country in list of country codes: {country}")
 
     records = {date: records}
 
