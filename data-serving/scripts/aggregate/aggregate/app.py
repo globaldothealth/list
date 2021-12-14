@@ -114,22 +114,23 @@ def get_jhu_counts():
     now = datetime.datetime.now().strftime("%m-%d-%Y")
     date = datetime.datetime.now()
     url = f"https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_daily_reports/{now}.csv"
-    req = requests.head(url, timeout=10)
+    logging.info(f"Attempting to retrieve JHU data for {now} at {url}")
+    req = requests.get(url, timeout=10)
 
-    retries = 5
-    current_attempt = 0
-    while req.status_code != 200 and current_attempt < retries:
-        logging.info("Got status " + str(req.status_code) + " for '" + url + "'")
+    if req.status_code != 200:
+        logging.info(f"Got status {req.status_code} for {url}")
         date = date - datetime.timedelta(days=1)
         now = date.strftime("%m-%d-%Y")
         logging.info(f"Checking for JHU data on {now}")
         url = f"https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_daily_reports/{now}.csv"
-        req = requests.head(url, timeout=10)
-        current_attempt += 1
+        req = requests.get(url, timeout=10)
 
-    logging.info(f"JHU data found for {now}.")
-    logging.info(f"Attempting to retrieve JHU data for {now}")
-    req = requests.get(url, timeout=10)
+    if req.status_code != 200:
+        raise Exception(f"Could not download {url}, got status {req.status_code}")
+
+    logging.info(f"Downloaded JHU data found for {now}.")
+
+
     jhu_df = pd.read_csv(io.StringIO(req.text))
     logging.info(f"Retrieved JHU case counts from {now}.")
 
@@ -144,7 +145,8 @@ def get_jhu_counts():
     )
     jhu_counts = jhu_counts.set_index("Country_Region")
     jhu_counts = pd.Series(jhu_counts.values.flatten(), index=jhu_counts.index)
-    logging.debug("Got aggregated counts from JHU")
+    logging.info("Got aggregated counts from JHU")
+
     return jhu_counts
 
 
@@ -185,6 +187,7 @@ def generate_country_json(cases, s3_endpoint, bucket, date, line_list_url, map_u
         }
     ]
 
+    logging.debug("Aggregating country results from database")
     results = cases.aggregate(pipeline)
     records = list(results)
     records = [record for record in records if record["_id"] not in _EXCLUDE]
@@ -216,10 +219,11 @@ def generate_country_json(cases, s3_endpoint, bucket, date, line_list_url, map_u
             record["lat"] = country_codes[country]['latitude']
             record["long"] = country_codes[country]['longitude']
         except KeyError:
-            logging.critical(f"Could not find country in list of country codes: {country}")
+            logging.warning(f"Could not find country in list of country codes: {country}")
 
     records = {date: records}
 
+    logging.debug("Uploading country aggregation results to S3")
     s3 = boto3.client("s3", endpoint_url=s3_endpoint)
     s3.put_object(
         ACL="public-read",
@@ -244,7 +248,7 @@ def generate_country_json(cases, s3_endpoint, bucket, date, line_list_url, map_u
         writer = csv.DictWriter(csvbuf, fieldnames=fieldnames)
         writer.writeheader()
         for i in _csv:
-            if i['_id']:
+            if all (key in i for key in ("_id", "code", "casecount", "jhu")):
                 writer.writerow(_country_data_csv(i, line_list_url, map_url))
         csvstr = csvbuf.getvalue()
 
@@ -293,6 +297,7 @@ def generate_region_json(cases, s3_endpoint, bucket, date):
         },
     ]
 
+    logging.debug("Aggregating regional results from database")
     results = cases.aggregate(pipeline)
     raw_records = list(results)
     # Set null entries as equal to country
@@ -326,6 +331,7 @@ def generate_region_json(cases, s3_endpoint, bucket, date):
             records.append(new_record)
     records = {date: records}
 
+    logging.debug("Uploading regional aggregation results to S3")
     s3 = boto3.client("s3", endpoint_url=s3_endpoint)
     s3.put_object(
         ACL="public-read",
@@ -369,6 +375,7 @@ def generate_total_json(cases, s3_endpoint, bucket, date):
         Key=f"total/{date}.json",
     )
 
+
 def get_environment_value_or_bail(key):
     """
     Retrieve a value from the environment, but logging.info a message and quit if it isn't set.
@@ -379,6 +386,7 @@ def get_environment_value_or_bail(key):
         logging.info(f"{key} not set in the environment, exiting")
         sys.exit(1)
     return value
+
 
 if __name__ == '__main__':
     setup_logger()
