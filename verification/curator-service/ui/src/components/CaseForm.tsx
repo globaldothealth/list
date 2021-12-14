@@ -89,6 +89,7 @@ function initialValuesFromCase(c?: Case): CaseFormValues {
             symptomsStatus: '',
             symptoms: [],
             variantName: undefined,
+            SGTF: undefined,
             hasPreexistingConditions: '',
             preexistingConditions: [],
             transmissionRoutes: [],
@@ -156,6 +157,7 @@ function initialValuesFromCase(c?: Case): CaseFormValues {
         symptomsStatus: c.symptoms?.status || '',
         symptoms: c.symptoms?.values,
         variantName: c.variant?.name || undefined,
+        SGTF: c.SGTF || undefined,
         hasPreexistingConditions:
             c.preexistingConditions?.hasPreexistingConditions === undefined
                 ? ''
@@ -250,6 +252,10 @@ const NewCaseValidation = Yup.object().shape(
         ),
         confirmedDate: Yup.string().nullable().required('Required'),
         location: Yup.object().required('Required'),
+        SGTF: Yup.number().oneOf(
+            [0, 1],
+            'S-Gene Target Failure must be 0 or 1',
+        ),
         numCases: Yup.number()
             .nullable()
             .min(1, 'Must enter one or more cases'),
@@ -434,6 +440,7 @@ export default function CaseForm(props: Props): JSX.Element {
             variant: {
                 name: values.variantName,
             },
+            SGTF: values.SGTF,
             preexistingConditions: {
                 hasPreexistingConditions:
                     values.hasPreexistingConditions === 'Yes'
