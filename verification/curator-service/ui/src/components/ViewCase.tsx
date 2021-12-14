@@ -695,7 +695,10 @@ function CaseDetails(props: CaseDetailsProps): JSX.Element {
                                     sequence={e}
                                 />
                             ))}
-                            <VariantRows variant={props.c.variant} />
+                            <VariantRows
+                                variant={props.c.variant}
+                                SGTF={props.c.SGTF}
+                            />
                         </Grid>
                     </Scroll.Element>
                 </Paper>
@@ -776,11 +779,13 @@ function VaccineRows(props: { vaccine: Vaccine; index: number }): JSX.Element {
     );
 }
 
-function VariantRows(props: { variant: Variant }): JSX.Element {
+function VariantRows(props: { variant: Variant; SGTF?: number }): JSX.Element {
     return (
         <>
             <RowHeader title="Variant of Concern" />
             <RowContent content={props.variant?.name || ''} />
+            <RowHeader title="S-Gene Target Failure" />
+            <RowContent content={props.SGTF?.toString() || ''} />
         </>
     );
 }
