@@ -114,7 +114,8 @@ def get_jhu_counts():
     now = datetime.datetime.now().strftime("%m-%d-%Y")
     date = datetime.datetime.now()
     url = f"https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_daily_reports/{now}.csv"
-    req = requests.head(url, timeout=10)
+    logging.info(f"Attempting to retrieve JHU data for {now} at {url}")
+    req = requests.get(url, timeout=10)
 
     if req.status_code != 200:
         logging.info(f"Got status {req.status_code} for {url}")
@@ -122,14 +123,13 @@ def get_jhu_counts():
         now = date.strftime("%m-%d-%Y")
         logging.info(f"Checking for JHU data on {now}")
         url = f"https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_daily_reports/{now}.csv"
-        req = requests.head(url, timeout=10)
+        req = requests.get(url, timeout=10)
 
     if req.status_code != 200:
         raise Exception(f"Could not download {url}, got status {req.status_code}")
 
-    logging.info(f"JHU data found for {now}.")
-    logging.info(f"Attempting to retrieve JHU data for {now}")
-    req = requests.get(url, timeout=10)
+    logging.info(f"Downloaded JHU data found for {now}.")
+
     jhu_df = pd.read_csv(io.StringIO(req.text))
     logging.info(f"Retrieved JHU case counts from {now}.")
 
