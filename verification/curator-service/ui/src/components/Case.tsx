@@ -152,6 +152,7 @@ export interface Case {
     revisionMetadata: RevisionMetadata;
     exclusionData?: ExclusionData;
     variant: Variant;
+    SGTF?: number;
     isSourceExcluded?: boolean;
     vaccines: Vaccine[];
 }
