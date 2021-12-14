@@ -116,16 +116,16 @@ def get_jhu_counts():
     url = f"https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_daily_reports/{now}.csv"
     req = requests.head(url, timeout=10)
 
-    retries = 5
-    current_attempt = 0
-    while req.status_code != 200 and current_attempt < retries:
-        logging.info("Got status " + str(req.status_code) + " for '" + url + "'")
+    if req.status_code != 200:
+        logging.info(f"Got status {req.status_code} for {url}")
         date = date - datetime.timedelta(days=1)
         now = date.strftime("%m-%d-%Y")
         logging.info(f"Checking for JHU data on {now}")
         url = f"https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_daily_reports/{now}.csv"
         req = requests.head(url, timeout=10)
-        current_attempt += 1
+
+    if req.status_code != 200:
+        raise Exception(f"Could not download {url}, got status {req.status_code}")
 
     logging.info(f"JHU data found for {now}.")
     logging.info(f"Attempting to retrieve JHU data for {now}")
@@ -144,7 +144,7 @@ def get_jhu_counts():
     )
     jhu_counts = jhu_counts.set_index("Country_Region")
     jhu_counts = pd.Series(jhu_counts.values.flatten(), index=jhu_counts.index)
-    logging.debug("Got aggregated counts from JHU")
+    logging.info("Got aggregated counts from JHU")
     return jhu_counts
 
 
@@ -217,7 +217,7 @@ def generate_country_json(cases, s3_endpoint, bucket, date, line_list_url, map_u
             record["lat"] = country_codes[country]['latitude']
             record["long"] = country_codes[country]['longitude']
         except KeyError:
-            logging.critical(f"Could not find country in list of country codes: {country}")
+            logging.warning(f"Could not find country in list of country codes: {country}")
 
     records = {date: records}
 
