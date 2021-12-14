@@ -9,6 +9,7 @@ import range from 'lodash/range';
 import userEvent from '@testing-library/user-event';
 import { ChipData } from './App/App';
 import { RootState } from '../redux/store';
+import { SortBy, SortByOrder } from '../constants/types';
 
 jest.mock('axios');
 const mockedAxios = axios as jest.Mocked<typeof axios>;
@@ -149,8 +150,8 @@ describe('<LinelistTable />', () => {
                 handleBreadcrumbDelete={jest.fn()}
                 setFiltersModalOpen={jest.fn()}
                 setActiveFilterInput={jest.fn()}
-                sortBy={0}
-                sortByOrder={1}
+                sortBy={SortBy.Default}
+                sortByOrder={SortByOrder.Ascending}
                 setSortBy={jest.fn()}
                 setSortByOrder={jest.fn()}
             />,
@@ -161,7 +162,7 @@ describe('<LinelistTable />', () => {
 
         expect(mockedAxios.get).toHaveBeenCalledTimes(1);
         expect(mockedAxios.get).toHaveBeenCalledWith(
-            `/api/cases/?limit=50&page=1&count_limit=${DATA_LIMIT}&sort_by=0&order=1`,
+            `/api/cases/?limit=50&page=1&count_limit=${DATA_LIMIT}&sort_by=default&order=ascending`,
         );
 
         await waitFor(() => {
@@ -230,8 +231,8 @@ describe('<LinelistTable />', () => {
                 handleBreadcrumbDelete={jest.fn()}
                 setFiltersModalOpen={jest.fn()}
                 setActiveFilterInput={jest.fn()}
-                sortBy={0}
-                sortByOrder={1}
+                sortBy={SortBy.Default}
+                sortByOrder={SortByOrder.Ascending}
                 setSortBy={jest.fn()}
                 setSortByOrder={jest.fn()}
             />,
@@ -305,8 +306,8 @@ describe('<LinelistTable />', () => {
                 handleBreadcrumbDelete={jest.fn()}
                 setFiltersModalOpen={jest.fn()}
                 setActiveFilterInput={jest.fn()}
-                sortBy={0}
-                sortByOrder={1}
+                sortBy={SortBy.Default}
+                sortByOrder={SortByOrder.Ascending}
                 setSortBy={jest.fn()}
                 setSortByOrder={jest.fn()}
             />,
@@ -317,7 +318,7 @@ describe('<LinelistTable />', () => {
         );
         expect(mockedAxios.get).toHaveBeenCalledTimes(1);
         expect(mockedAxios.get).toHaveBeenCalledWith(
-            `/api/cases/?limit=50&page=1&count_limit=${DATA_LIMIT}&sort_by=0&order=1`,
+            `/api/cases/?limit=50&page=1&count_limit=${DATA_LIMIT}&sort_by=default&order=ascending`,
         );
 
         await waitFor(() => {
@@ -415,8 +416,8 @@ describe('<LinelistTable />', () => {
                 handleBreadcrumbDelete={jest.fn()}
                 setFiltersModalOpen={jest.fn()}
                 setActiveFilterInput={jest.fn()}
-                sortBy={0}
-                sortByOrder={1}
+                sortBy={SortBy.Default}
+                sortByOrder={SortByOrder.Ascending}
                 setSortBy={jest.fn()}
                 setSortByOrder={jest.fn()}
             />,
@@ -427,7 +428,7 @@ describe('<LinelistTable />', () => {
         );
         expect(mockedAxios.get).toHaveBeenCalledTimes(1);
         expect(mockedAxios.get).toHaveBeenCalledWith(
-            `/api/cases/?limit=50&page=1&count_limit=${DATA_LIMIT}&sort_by=0&order=1`,
+            `/api/cases/?limit=50&page=1&count_limit=${DATA_LIMIT}&sort_by=default&order=ascending`,
         );
 
         await waitFor(() => {
@@ -495,8 +496,8 @@ describe('<LinelistTable />', () => {
                 handleBreadcrumbDelete={jest.fn()}
                 setFiltersModalOpen={jest.fn()}
                 setActiveFilterInput={jest.fn()}
-                sortBy={0}
-                sortByOrder={1}
+                sortBy={SortBy.Default}
+                sortByOrder={SortByOrder.Ascending}
                 setSortBy={jest.fn()}
                 setSortByOrder={jest.fn()}
             />,
@@ -518,7 +519,7 @@ describe('<LinelistTable />', () => {
         );
         expect(mockedAxios.get).toHaveBeenCalledTimes(1);
         expect(mockedAxios.get).toHaveBeenCalledWith(
-            `/api/cases/?limit=50&page=1&count_limit=${DATA_LIMIT}&sort_by=0&order=1`,
+            `/api/cases/?limit=50&page=1&count_limit=${DATA_LIMIT}&sort_by=default&order=ascending`,
         );
 
         await waitFor(() => {
@@ -577,8 +578,8 @@ describe('<LinelistTable />', () => {
                 handleBreadcrumbDelete={jest.fn()}
                 setFiltersModalOpen={jest.fn()}
                 setActiveFilterInput={jest.fn()}
-                sortBy={0}
-                sortByOrder={1}
+                sortBy={SortBy.Default}
+                sortByOrder={SortByOrder.Ascending}
                 setSortBy={jest.fn()}
                 setSortByOrder={jest.fn()}
             />,
@@ -649,8 +650,8 @@ describe('<LinelistTable />', () => {
                 handleBreadcrumbDelete={jest.fn()}
                 setFiltersModalOpen={jest.fn()}
                 setActiveFilterInput={jest.fn()}
-                sortBy={0}
-                sortByOrder={1}
+                sortBy={SortBy.Default}
+                sortByOrder={SortByOrder.Ascending}
                 setSortBy={jest.fn()}
                 setSortByOrder={jest.fn()}
             />,
@@ -691,8 +692,8 @@ describe('<LinelistTable />', () => {
                 handleBreadcrumbDelete={jest.fn()}
                 setFiltersModalOpen={jest.fn()}
                 setActiveFilterInput={jest.fn()}
-                sortBy={0}
-                sortByOrder={1}
+                sortBy={SortBy.Default}
+                sortByOrder={SortByOrder.Ascending}
                 setSortBy={jest.fn()}
                 setSortByOrder={jest.fn()}
             />,
@@ -729,8 +730,8 @@ describe('<LinelistTable />', () => {
                 handleBreadcrumbDelete={jest.fn()}
                 setFiltersModalOpen={setFiltersModalOpen}
                 setActiveFilterInput={jest.fn()}
-                sortBy={0}
-                sortByOrder={1}
+                sortBy={SortBy.Default}
+                sortByOrder={SortByOrder.Ascending}
                 setSortBy={jest.fn()}
                 setSortByOrder={jest.fn()}
             />,

@@ -24,8 +24,12 @@ ECR_REPOSITORY_NAME = environ.get("ECR_REPOSITORY_NAME", "gdh-ingestor")
 RETRIEVAL_BUCKET_NAME = environ.get("RETRIEVAL_BUCKET_NAME", "epid-sources-raw")
 
 MOCK_SOURCE_DATA_URL = environ.get("MOCK_SOURCE_DATA_SERVICE", "http://mock-source-data")
-MOCK_SOURCE_DATA_PORT = environ.get("MOCK_SOURCE_DATA_PORT", 5000)
+MOCK_SOURCE_DATA_PORT = environ.get("MOCK_SOURCE_DATA_PORT", 5001)
 MOCK_SOURCE_DATA_ADDRESS = f"{MOCK_SOURCE_DATA_URL}:{MOCK_SOURCE_DATA_PORT}"
+
+REGISTRATION_ENDPOINT = environ.get("REGISTRATION_ENDPOINT", "http://localhost:3001/auth/register")
+
+TESTING = environ.get("TESTING", False)
 
 DOCKERFILE_PATH = "/ingestion/functions"
 PARSERS_PATH = "/ingestion/functions/parsing"
@@ -34,6 +38,9 @@ CONTAINER_VCPUS = 1
 CONTAINER_MEMORY = 2048
 
 CLIENT_EMAIL = environ.get("CLIENT_EMAIL", "fake@fake.fake")
+
+WAIT_TIME = 5
+WAIT_RETRIES = 42
 
 
 def make_source_id():
@@ -60,7 +67,7 @@ class IngestionWrangler(object):
 	def wait_for_localstack_setup(self):
 		print("Waiting for localstack setup to finish")
 		counter = 0
-		while counter < 42:
+		while counter < WAIT_RETRIES:
 			containers = self.docker_client.containers.list(
 				filters = {
 					"exited": 0,
@@ -72,8 +79,8 @@ class IngestionWrangler(object):
 				return
 			counter += 1
 			print("Waiting for localstack setup to finish")
-			sleep(5)
-		pass
+			sleep(WAIT_TIME)
+		raise Exception(f"Localstack setup did not finish in {WAIT_TIME * WAIT_RETRIES} seconds")
 
 	def set_parser_names(self):
 		for path in Path(PARSERS_PATH).iterdir():
@@ -187,7 +194,8 @@ class IngestionWrangler(object):
 					{"name": "AWS_ACCESS_KEY_ID", "value": AWS_ACCESS_KEY_ID},
 					{"name": "AWS_SECRET_ACCESS_KEY", "value": AWS_SECRET_ACCESS_KEY},
 					{"name": "AWS_REGION", "value": AWS_REGION},
-					{"name": "MOCK_SOURCE_DATA_ADDRESS", "value": f"http://localhost:{MOCK_SOURCE_DATA_PORT}"}
+					{"name": "MOCK_SOURCE_DATA_ADDRESS", "value": f"http://localhost:{MOCK_SOURCE_DATA_PORT}"},
+					{"name": "REGISTRATION_ENDPOINT", "value": REGISTRATION_ENDPOINT}
 				]
 			}
 		)
@@ -215,7 +223,8 @@ class IngestionWrangler(object):
 if __name__ == "__main__":
 	print("Setting up ingestion jobs")
 	iw = IngestionWrangler()
-	iw.wait_for_localstack_setup()
+	if not TESTING:
+		iw.wait_for_localstack_setup()
 
 	iw.set_parser_names()
 

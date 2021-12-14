@@ -125,7 +125,7 @@ describe('App', function () {
         cy.server();
         cy.route(
             'GET',
-            '/api/cases/?limit=50&page=1&count_limit=10000&sort_by=0&order=1&q=gender:notProvided',
+            '/api/cases/?limit=50&page=1&count_limit=10000&sort_by=default&order=ascending&q=gender:notProvided',
         ).as('filterByGender');
 
         cy.get('.filter-button').click();

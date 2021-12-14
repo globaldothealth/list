@@ -1,14 +1,14 @@
 export enum SortBy {
-    Default,
-    ConfirmedDate,
-    Country,
-    Admin1,
-    Admin2,
-    Admin3,
-    Age,
+    Default = 'default',
+    ConfirmedDate = 'confirmedDate',
+    Country = 'country',
+    Admin1 = 'admin1',
+    Admin2 = 'admin2',
+    Admin3 = 'admin3',
+    Age = 'age',
 }
 
 export enum SortByOrder {
-    Ascending,
-    Descending,
+    Ascending = 'ascending',
+    Descending = 'descending',
 }

@@ -130,6 +130,7 @@ def get_jhu_counts():
 
     logging.info(f"Downloaded JHU data found for {now}.")
 
+
     jhu_df = pd.read_csv(io.StringIO(req.text))
     logging.info(f"Retrieved JHU case counts from {now}.")
 
@@ -145,6 +146,7 @@ def get_jhu_counts():
     jhu_counts = jhu_counts.set_index("Country_Region")
     jhu_counts = pd.Series(jhu_counts.values.flatten(), index=jhu_counts.index)
     logging.info("Got aggregated counts from JHU")
+
     return jhu_counts
 
 

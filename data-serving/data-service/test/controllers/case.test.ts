@@ -114,7 +114,7 @@ describe('GET', () => {
             }
             // Fetch first page.
             let res = await request(app)
-                .get('/api/cases?page=1&limit=10&sort_by=0')
+                .get('/api/cases?page=1&limit=10&sort_by=default')
                 .expect(200)
                 .expect('Content-Type', /json/);
             expect(res.body.cases).toHaveLength(10);
