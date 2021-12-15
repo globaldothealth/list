@@ -213,10 +213,7 @@ def upload_to_s3(
 def invoke_parser(
     env, parser_module, source_id, upload_id, api_headers, cookies, s3_object_key,
         source_url, date_filter, parsing_date_range):
-    if cookies:
-        auth = {
-            "email": os.getenv("EPID_INGESTION_EMAIL", "")
-        }
+    auth = {"email": os.getenv("EPID_INGESTION_EMAIL", "")} if cookies else None
     payload = {
         "env": env,
         "s3Bucket": OUTPUT_BUCKET,
