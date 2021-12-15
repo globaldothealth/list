@@ -6,12 +6,13 @@ authors = ["Global.health: a Data Science Initiative <info@global.health>"]
 
 [tool.poetry.dependencies]
 python = "^3.8"
-boto3 = "1.13.26"
+boto3 = "1.20.24"
 google = "2.0.3"
-google-auth = "1.16.1"
+google-auth = "1.35.0"
 requests-mock = "1.8.0"
 pycountry = "20.7.3"
 pytest = "^6.2.3"
+chardet = "^4.0.0"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
