@@ -57,6 +57,9 @@ import Helmet from 'react-helmet';
 // Limit number of data that can be displayed or downloaded to avoid long execution times of mongo queries
 const DATA_LIMIT = 10000;
 
+// Query sent to API when first loading line list
+const defaultQuery = `/api/cases/?limit=50&page=1&count_limit=${DATA_LIMIT}&sort_by=default&order=ascending`;
+
 interface ListResponse {
     cases: Case[];
     nextPage: number;
@@ -1448,6 +1451,9 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                         isLoading: true,
                                         error: '',
                                     });
+                                    if (listUrl === defaultQuery) {
+                                        listUrl = '/api/cases';
+                                    }
                                     const response =
                                         axios.get<ListResponse>(listUrl);
 
