@@ -284,10 +284,11 @@ describe('Linelist table', function () {
             country: 'United Kingdom',
         });
         cy.server();
+        cy.route('GET', '/api/cases').as('getCasesDefault');
         cy.route('GET', '/api/cases/*').as('getCases');
         cy.visit('/');
         cy.visit('/cases');
-        cy.wait('@getCases');
+        cy.wait('@getCasesDefault');
         cy.get('svg[data-testid="unverified-svg"]').should('have.length', 9);
         cy.contains('rows').click();
         cy.get('li').contains('5').click();
@@ -434,7 +435,7 @@ describe('Linelist table', function () {
             });
         }
         cy.server();
-        cy.route('GET', '/api/cases/*').as('getCases');
+        cy.route('GET', '/api/cases').as('getCases');
         cy.visit('/');
         cy.visit('/cases');
         cy.wait('@getCases');
@@ -484,7 +485,7 @@ describe('Linelist table', function () {
             country: 'United Kingdom',
         });
         cy.server();
-        cy.route('GET', '/api/cases/*').as('getCases');
+        cy.route('GET', '/api/cases').as('getCases');
         cy.visit('/');
         cy.visit('/cases');
         cy.wait('@getCases');
@@ -523,7 +524,7 @@ describe('Linelist table', function () {
             });
         }
         cy.server();
-        cy.route('GET', '/api/cases/*').as('getCases');
+        cy.route('GET', '/api/cases').as('getCases');
         cy.visit('/');
         cy.visit('/cases');
         cy.wait('@getCases');
@@ -552,7 +553,7 @@ describe('Linelist table', function () {
             });
         }
         cy.server();
-        cy.route('GET', '/api/cases/*').as('getCases');
+        cy.route('GET', '/api/cases').as('getCases');
         cy.visit('/');
         cy.visit('/cases');
         cy.wait('@getCases');
@@ -591,7 +592,7 @@ describe('Linelist table', function () {
             creationDate: new Date(2021, 7, 12),
         });
         cy.server();
-        cy.route('GET', '/api/cases/*').as('getCases');
+        cy.route('GET', '/api/cases').as('getCases');
         cy.visit('/');
         cy.visit('/cases');
         cy.wait('@getCases');

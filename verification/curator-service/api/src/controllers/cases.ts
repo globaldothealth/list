@@ -10,6 +10,10 @@ import crypto from 'crypto';
 //   https://github.com/globaldothealth/list/issues/961.
 axios.defaults.timeout = 0;
 
+// The query (URL) when the line list first loads
+const defaultInputQuery = '/cases';
+const defaultOutputQuery = '/cases/?limit=50&page=1&count_limit=10000&sort_by=default&order=ascending';
+
 /**
  * CasesController mostly forwards case-related requests to the data service.
  * It handles CRUD operations from curators.
@@ -22,10 +26,20 @@ export default class CasesController {
 
     /** List simply forwards the request to the data service */
     list = async (req: Request, res: Response): Promise<void> => {
+        let query;
+        if (req.url === defaultInputQuery) {
+            query = defaultOutputQuery;
+        } else {
+            query = req.url
+            logger.info(`Applying filter: ${query}`);
+        }
         try {
             const response = await axios.get(
-                this.dataServerURL + '/api' + req.url,
+                this.dataServerURL + '/api' + query,
             );
+            if (response.status >= 400) {
+                logger.error(`A server error occurred when trying to list data using URL: ${query}. Response status code: ${response.status}`);
+            }
             res.status(response.status).json(response.data);
         } catch (err) {
             logger.error(err);
