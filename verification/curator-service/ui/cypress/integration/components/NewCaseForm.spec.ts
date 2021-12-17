@@ -277,8 +277,9 @@ describe('New case form', function () {
         cy.get('button[data-testid="submit"]').click();
         cy.wait('@addCase');
         cy.request({ method: 'GET', url: '/api/cases' }).then((resp) => {
-            cy.contains(`Case ${resp.body.cases[0]._id} added`);
-            cy.visit(`/cases/view/${resp.body.cases[0]._id}`);
+            const casesLength = resp.body.cases.length;
+            cy.contains(`Case ${resp.body.cases[casesLength - 1]._id} added`);
+            cy.visit(`/cases/view/${resp.body.cases[casesLength - 1]._id}`);
             cy.contains('Horse trainer');
             cy.contains('Actor').should('not.exist');
             cy.contains('fever');

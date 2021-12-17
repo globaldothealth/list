@@ -19,8 +19,9 @@ describe('View case', function () {
         });
 
         cy.server();
-        cy.route('GET', '/api/cases/*').as('getCases');
+        cy.route('GET', '/api/cases').as('getCases');
         cy.visit('/');
+
         cy.visit('/cases');
         cy.wait('@getCases');
 

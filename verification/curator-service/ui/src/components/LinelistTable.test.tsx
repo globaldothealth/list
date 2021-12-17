@@ -162,7 +162,7 @@ describe('<LinelistTable />', () => {
 
         expect(mockedAxios.get).toHaveBeenCalledTimes(1);
         expect(mockedAxios.get).toHaveBeenCalledWith(
-            `/api/cases/?limit=50&page=1&count_limit=${DATA_LIMIT}&sort_by=default&order=ascending`,
+            `/api/cases`,
         );
 
         await waitFor(() => {
@@ -318,7 +318,7 @@ describe('<LinelistTable />', () => {
         );
         expect(mockedAxios.get).toHaveBeenCalledTimes(1);
         expect(mockedAxios.get).toHaveBeenCalledWith(
-            `/api/cases/?limit=50&page=1&count_limit=${DATA_LIMIT}&sort_by=default&order=ascending`,
+            `/api/cases`,
         );
 
         await waitFor(() => {
@@ -428,7 +428,7 @@ describe('<LinelistTable />', () => {
         );
         expect(mockedAxios.get).toHaveBeenCalledTimes(1);
         expect(mockedAxios.get).toHaveBeenCalledWith(
-            `/api/cases/?limit=50&page=1&count_limit=${DATA_LIMIT}&sort_by=default&order=ascending`,
+            `/api/cases`,
         );
 
         await waitFor(() => {
@@ -519,7 +519,7 @@ describe('<LinelistTable />', () => {
         );
         expect(mockedAxios.get).toHaveBeenCalledTimes(1);
         expect(mockedAxios.get).toHaveBeenCalledWith(
-            `/api/cases/?limit=50&page=1&count_limit=${DATA_LIMIT}&sort_by=default&order=ascending`,
+            `/api/cases`,
         );
 
         await waitFor(() => {
