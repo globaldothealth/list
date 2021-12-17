@@ -5,21 +5,25 @@
 # sources). For UUID sources, set everything to list = true. After marking,
 # this deletes everything with list = false.
 
+import argparse
+from datetime import datetime
+import logging
 import os
 import re
 import sys
-import argparse
 from typing import Optional, List, Tuple, Dict, Any
-from datetime import datetime
 
-import pymongo
-import requests
 from bson.objectid import ObjectId
+import requests
+import pymongo
 
-import hooks.country_export
 import hooks.aggregate
+import hooks.country_export
+from logger import setup_logger
+
 
 HOOKS = ["country_export", "aggregate"]
+
 
 def _ids(xs):
     return [str(x["_id"]) for x in xs]
@@ -133,7 +137,7 @@ def mark_cases_non_uuid(
 ):
     assert len(accept) == 1
     if reject:
-        print("  ... reject")
+        logging.info("  ... reject")
         cases.update_many(
             {
                 "caseReference.sourceId": source_id,
@@ -141,13 +145,13 @@ def mark_cases_non_uuid(
             },
             {"$set": {"list": False}},
         )
-        print("\n".join(accept_reject_msg([], reject)))
-    print("  ... accept")
+        logging.info("\n".join(accept_reject_msg([], reject)))
+    logging.info("  ... accept")
     cases.update_many(
         {"caseReference.sourceId": source_id, "caseReference.uploadIds": accept},
         {"$set": {"list": True}},
     )
-    print("\n".join(accept_reject_msg(accept, [])))
+    logging.info("\n".join(accept_reject_msg(accept, [])))
     mark_upload(sources, source_id, accept, accept=True)
     if reject:
         mark_upload(sources, source_id, reject, accept=False)
@@ -166,7 +170,7 @@ def mark_upload(
         {"$set": {"uploads.$[u].accepted": accept}},
         array_filters=[{"u._id": {"$in": upload_ids}}],
     )
-    print("\n".join([f"  mark-upload {u} {accept}" for u in upload_ids]))
+    logging.info("\n".join([f"  mark-upload {u} {accept}" for u in upload_ids]))
 
 
 
@@ -177,7 +181,7 @@ def mark_cases_uuid(
     accept: List[str],
 ):
     "Marks cases for UUID sources"
-    print("  ... accept")
+    logging.info("  ... accept")
     cases.update_many(
         {
             "caseReference.sourceId": source_id,
@@ -185,7 +189,7 @@ def mark_cases_uuid(
         },
         {"$set": {"list": True}},
     )
-    print("\n".join(accept_reject_msg(accept, [])))
+    logging.info("\n".join(accept_reject_msg(accept, [])))
     mark_upload(sources, source_id, accept, accept=True)
 
 
@@ -205,24 +209,24 @@ def prune_uploads(
         return []
     accept, reject = m
     if not dry_run:
-        print(f"source {_id} {source['name']}")
+        logging.info(f"source {_id} {source['name']}")
     if not s.get("hasStableIdentifiers", False):
         try:
             if not dry_run:
                 mark_cases_non_uuid(cases, sources, _id, accept, reject)
             msgs.extend(accept_reject_msg(accept, reject, True, prefix='-'))
         except pymongo.errors.PyMongoError:
-            print(accept_reject_msg(accept, reject, False))
+            logging.info(accept_reject_msg(accept, reject, False))
             msgs.extend(accept_reject_msg(accept, reject, False, prefix='-'))
         try:
             if reject and not dry_run:
-                print("  ... prune")
+                logging.info("  ... prune")
                 cases.delete_many({"caseReference.sourceId": _id, "list": False})
             if not dry_run:
-                print("  prune ok")
+                logging.info("  prune ok")
             msgs.append("- prune ok")
         except pymongo.errors.PyMongoError:
-            print("  prune fail")
+            logging.info("  prune fail")
             msgs.append("- prune fail")
             return msgs
     else:
@@ -231,7 +235,7 @@ def prune_uploads(
                 mark_cases_uuid(cases, sources, _id, accept)
             return accept_reject_msg(accept, [], True, prefix='-')
         except pymongo.errors.PyMongoError:
-            print(accept_reject_msg(accept, [], False))
+            logging.info(accept_reject_msg(accept, [], False))
             return accept_reject_msg(accept, [], False, prefix='-')
     return msgs
 
@@ -246,6 +250,7 @@ def get_selected_hooks(run_hooks):
 
 if __name__ == "__main__":
 
+    setup_logger()
     parser = argparse.ArgumentParser(
         description="Mark new uploads as ingested and delete failed uploads"
     )
@@ -276,17 +281,17 @@ if __name__ == "__main__":
     threshold = int(threshold) / 100
 
     if args.dry_run:
-        print("dry run, no changes will be made")
+        logging.info("Dry run, no changes will be made")
     # CONN is https://docs.mongodb.com/manual/reference/connection-string/
     try:
         if (CONN := os.environ.get("CONN")) is None:
-            print("Specify MongoDB connection_string in CONN")
+            logging.error("Specify MongoDB connection_string in CONN")
             sys.exit(1)
         client = pymongo.MongoClient(CONN)
         db = client[os.environ.get("DB", "covid19")]
-        print("database connection ok\n")
+        logging.info("Database connection ok\n")
     except pymongo.errors.ConnectionFailure:
-        print("database connection fail")
+        logging.error("Database connection fail")
         sys.exit(1)
 
     # This restricts prune-uploads to run on sources with automated
@@ -311,14 +316,14 @@ if __name__ == "__main__":
             m.append(f"*{s['name']}* ({str(s['_id'])}):\n{list_msgs}")
 
     if args.dry_run:
-        print("\n".join(m))
+        logging.info("\n".join(m))
 
     if webhook_url := os.environ.get("PRUNE_UPLOADS_WEBHOOK_URL"):
         notify("\n".join(m), webhook_url)
 
     selected_hooks = get_selected_hooks(args.run_hooks)
     if not ingested_sources:
-        print("No sources were ingested, skipping hooks.")
+        logging.info("No sources were ingested, skipping hooks.")
         sys.exit(0)
 
     if "country_export" in selected_hooks:
