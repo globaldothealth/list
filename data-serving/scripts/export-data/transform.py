@@ -4,19 +4,20 @@
 # The CSV file is read from stdin, with the processed CSV file written
 # to stdout
 
-import os
-import sys
-import csv
-import json
-import gzip
-import logging
 import argparse
-from functools import reduce
-from pathlib import Path
 from contextlib import contextmanager, suppress
+import csv
+from functools import reduce
+import gzip
+import json
+import logging
+import os
+from pathlib import Path
+import sys
 from typing import Any, Optional
 
-logging.basicConfig(filename="transform.log", level=logging.INFO)
+from logger import setup_logger
+
 
 VALID_FORMATS = ["csv", "tsv", "json"]
 
@@ -186,10 +187,9 @@ def get_headers_and_fields(fileobject) -> list[str]:
     Add processed event fieldnames to fields.
     """
     try:
-        headers = fileobject.readline().strip().split(',')
+        headers = fileobject.readline().strip().split(",")
     except Exception as e:
-        print("Error in reading mongoexport header")
-        print(e)
+        logging.exception("Error in reading mongoexport header")
         sys.exit(1)
     cols_to_add = [
         "events.confirmed.value",
@@ -257,7 +257,7 @@ def open_writers(formats: list[str], fields: list[str], output: str):
     for fmt in formats:
         files[fmt] = (
             gzip.open(f"{output}.{fmt}.gz", "wt")
-            if output != '-' else sys.stdout
+            if output != "-" else sys.stdout
         )
         if fmt == "csv":
             writers[fmt] = csv.DictWriter(
@@ -272,10 +272,9 @@ def open_writers(formats: list[str], fields: list[str], output: str):
     try:
         yield writers
     except Exception as e:
-        print("Error occurred in open_writers():")
-        print(e)
+        logging.exception("Error occurred in open_writers():")
     finally:
-        if output == '-':
+        if output == "-":
             return
         for fmt in formats:
             if fmt == "json":
@@ -292,13 +291,14 @@ def transform(input: Optional[str], output: str, formats: list[str]):
             for i, row in enumerate(map(convert_row, reader)):
                 hasrows = True
                 writerow(formats, writers, row, i)
-        if output != '-' and not hasrows:  # cleanup empty files
+        if output != "-" and not hasrows:  # cleanup empty files
             cleanup_files = [Path(f"{output}.{fmt}.gz") for fmt in formats]
             for file in cleanup_files:
                 file.unlink(missing_ok=True)
 
 
 if __name__ == "__main__":
+    setup_logger()
     parser = argparse.ArgumentParser()
     parser.add_argument("output", help="Output file stem to use (extension is added), specify - for stdout")
     parser.add_argument(
@@ -313,4 +313,4 @@ if __name__ == "__main__":
         help="Input file to transform instead of stdin"
     )
     args = parser.parse_args()
-    transform(args.input, args.output, args.format.split(','))
+    transform(args.input, args.output, args.format.split(","))

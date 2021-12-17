@@ -1,7 +1,10 @@
 #!/usr/bin/env python
 import argparse
-import pprint
+import logging
+
 import pymongo
+
+from logger import setup_logger
 
 
 def database(connection_string, db_name):
@@ -15,18 +18,20 @@ def move_notes(db, collection, source_id, source, dest, dry_run):
     collection in the 'db' where their caseReference.sourceId matches 'source_id'.
     If 'dry_run' is set, then don't actually change anything, but do report on which cases
     would be modified."""
+    logging.info(f"Moving values from {source} to {dest} in collection: {collection}")
     query = { "caseReference.sourceId": source_id }
     if dry_run:
+        logging.info("Dry running notes movement")
         cases = db[collection].find(query)
-        print(f"Would move {source} to {dest} on:")
+        logging.info(f"Would move {source} to {dest} on:")
         for case in cases:
-            pprint.pprint(case)
+            logging.info(f"Case: {case}")
         return
     operations = [
         pymongo.UpdateMany(query, { "$rename": { source: dest } })
     ]
     outcome = db[collection].bulk_write(operations)
-    pprint.pprint(outcome.bulk_api_result)
+    logging.info(f"Outcome: {outcome.bulk_api_result}")
 
 
 def main():
@@ -49,4 +54,5 @@ def main():
 
 
 if __name__ == '__main__':
+    setup_logger()
     main()
