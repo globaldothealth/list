@@ -1,7 +1,7 @@
 openapi: 3.0.3
 info:
-    title: Global Health curator service API
-    description: Server for CRUD operations on Global Health data
+    title: Global.health curator service API
+    description: Server for CRUD operations on Global.health data
     termsOfService: 'https://global.health/terms-of-use/'
     contact:
         name: Global.health
