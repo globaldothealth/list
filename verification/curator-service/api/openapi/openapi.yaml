@@ -2,11 +2,11 @@ openapi: 3.0.3
 info:
     title: Global Health curator service API
     description: Server for CRUD operations on Global Health data
-    termsOfService: 'https://www.healthmap.org/about/termsofuse/'
+    termsOfService: 'https://global.health/terms-of-use/'
     contact:
-        name: Healthmap
-        url: http://www.diseasedaily.org/about
-        email: info@healthmap.org
+        name: Global.health
+        url: https://global.health
+        email: info@global.health
     license:
         name: MIT
         url: 'https://opensource.org/licenses/MIT'
