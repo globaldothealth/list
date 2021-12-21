@@ -104,7 +104,7 @@ export interface Pathogen {
 }
 
 export interface Variant {
-    name: string;
+    name?: string;
 }
 
 interface Revision {
@@ -151,8 +151,8 @@ export interface Case {
     notes: string;
     revisionMetadata: RevisionMetadata;
     exclusionData?: ExclusionData;
-    variant: Variant;
-    SGTF?: number;
+    variant?: Variant;
+    SGTF?: string;
     isSourceExcluded?: boolean;
     vaccines: Vaccine[];
 }

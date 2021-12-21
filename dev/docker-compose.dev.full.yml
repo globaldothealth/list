@@ -20,6 +20,7 @@ services:
       JOB_QUEUE_ARN: "fake"
       SESSION_COOKIE_KEY: "fake"
       STATIC_DIR: ""
+      ENABLE_LOCAL_AUTH: "true"
   data:
     command: "npm run dev"
     volumes:

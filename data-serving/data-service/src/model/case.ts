@@ -60,7 +60,11 @@ export const caseSchema = new mongoose.Schema(
         restrictedNotes: String,
         pathogens: [pathogenSchema],
         list: Boolean,
-        SGTF: Number,
+        SGTF: {
+            type: String,
+            enum: ['0', '1', 'NA'],
+            default: 'NA',
+        },
         preexistingConditions: preexistingConditionsSchema,
         symptoms: symptomsSchema,
         transmission: transmissionSchema,
@@ -138,7 +142,7 @@ export type CaseDocument = mongoose.Document & {
     restrictedNotes?: string;
     pathogens: [PathogenDocument];
     list: boolean;
-    SGTF: number;
+    SGTF: '0'|'1'|'NA';
     preexistingConditions: PreexistingConditionsDocument;
     symptoms: SymptomsDocument;
     transmission: TransmissionDocument;

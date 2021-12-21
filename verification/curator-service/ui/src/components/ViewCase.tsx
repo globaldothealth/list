@@ -779,7 +779,7 @@ function VaccineRows(props: { vaccine: Vaccine; index: number }): JSX.Element {
     );
 }
 
-function VariantRows(props: { variant: Variant; SGTF?: number }): JSX.Element {
+function VariantRows(props: { variant: Variant; SGTF?: string }): JSX.Element {
     return (
         <>
             <RowHeader title="Variant of Concern" />

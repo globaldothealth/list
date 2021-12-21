@@ -25,7 +25,7 @@ const SGTFToolTip = () => (
         <span>
             <strong>S-Gene Dropout:</strong> Enter 1 if S-Gene target failure
             (SGTF) was detected, or 0 if it was not detected. If SGTF was not
-            tested then you can leave it blank.
+            tested then you can leave it blank or select NA.
         </span>
     </StyledTooltip>
 );
@@ -43,7 +43,7 @@ export default function Variant(): JSX.Element {
                 values={variantNames}
             ></SelectField>
             <FieldTitle title="S-Gene dropout?" tooltip={<SGTFToolTip />} />
-            <SelectField name="SGTF" label="SGTF" values={['0', '1']} />
+            <SelectField name="SGTF" label="SGTF" values={['0', '1', 'NA']} />
         </Scroll.Element>
     );
 }
