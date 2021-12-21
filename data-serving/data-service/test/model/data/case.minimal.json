@@ -4,6 +4,12 @@
         "sourceUrl": "cdc.gov",
         "uploadIds": ["5fabc12344aa09130affce91"]
     },
+    "demographics": {
+        "ageRange": {
+            "start": 40,
+            "end": 50
+        }
+    },
     "list": true,
     "events": [
         {

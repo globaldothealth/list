@@ -833,6 +833,14 @@ components:
                             $ref: '#/components/schemas/EditMetadata'
                     required:
                         - revisionNumber
+                SGTF:
+                    type: string
+                    enum:
+                        [
+                            'NA',
+                            '0',
+                            '1',
+                        ]
         CaseArray:
             type: object
             properties:
