@@ -3,7 +3,6 @@ import csv
 import pytest
 import json
 from pathlib import Path
-from pprint import pprint
 from contextlib import redirect_stdout
 import transform as T
 
@@ -17,6 +16,31 @@ _ADDITIONAL_SOURCES = [
     (
         '[{"sourceUrl": "http://foo.bar"}, {"sourceUrl": "http://bar.baz"}]',
         "http://foo.bar,http://bar.baz",
+    ),
+]
+
+_EVENTS = [
+    (
+        {
+            "name": "outcome",
+            "value": "Recovered",
+            "dateRange": {
+                "start": {"$date": "2021-07-21T00:00:00.000Z"},
+                "end": {"$date": "2021-07-21T00:00:00.000Z"},
+            },
+        },
+        {"events.outcome.date": "2021-07-21", "events.outcome.value": "Recovered"},
+    ),
+    (
+        {
+            "name": "outcome",
+            "value": "Death",
+            "dateRange": {
+                "start": {"$date": "2021-06-23T00:00:00.000Z"},
+                "end": {"$date": "2021-06-23T00:00:00.000Z"},
+            },
+        },
+        {"events.outcome.date": "2021-06-23", "events.outcome.value": "Death"},
     ),
 ]
 
@@ -53,10 +77,12 @@ _TRAVEL_parsed = {
     "travelHistory.travel.methods": "Ship,Raft",
 }
 
+
 def _read_csv(fn):
     with open(fn) as f:
         c = csv.DictReader(f)
         return [row for row in c]
+
 
 @pytest.mark.parametrize("dictionary,key,value", _DEEP_GET)
 def test_deep_get(dictionary, key, value):
@@ -66,6 +92,11 @@ def test_deep_get(dictionary, key, value):
 @pytest.mark.parametrize("sources,expected", _ADDITIONAL_SOURCES)
 def test_convert_addl_sources(sources, expected):
     assert T.convert_addl_sources(sources) == expected
+
+
+@pytest.mark.parametrize("source,expected", _EVENTS)
+def test_convert_event(source, expected):
+    assert T.convert_event(source) == expected
 
 
 def test_convert_travel():
