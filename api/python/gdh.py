@@ -6,7 +6,6 @@
 # >>> from gdh import get_cases
 # >>> key = "API KEY HERE"
 # >>> c1 = get_cases(key, country="New Zealand")
-# >>> c2 = get_cases(key, country="New Zealand", admin1="Auckland")
 #
 # Use get_cached_cases() to cache the cases locally. This is useful for
 # rerunning the script which will then use the cached version.
@@ -26,23 +25,7 @@ downloadAsync = "/api/cases/downloadAsync"
 
 # sync with data-serving/data-service/src/util/search.ts
 FILTERS = {
-    "curator",
-    "gender",
-    "nationality",
-    "occupation",
-    "country",
-    "outcome",
-    "caseid",
-    "uploadid",
-    "sourceid",
-    "sourceurl",
-    "verificationstatus",
-    "admin1",
-    "admin2",
-    "admin3",
-    "variant",
-    "dateconfirmedafter",
-    "dateconfirmedbefore",
+    "country"
 }
 
 
