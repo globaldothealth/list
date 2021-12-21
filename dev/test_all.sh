@@ -12,7 +12,7 @@ not_directory() {
 install_dependencies() {
   if not_directory `dirname "$0"`"$1"/node_modules; then
     echo "Missing dependencies in $0$1, installing now..."
-    npm --prefix=`dirname "$0"`"$1" install
+    npm --prefix=`dirname "$0"`"$1" ci
   fi
 }
 

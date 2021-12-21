@@ -5,6 +5,7 @@ import {
     RestrictedCase,
 } from '../model/case';
 import { EventDocument } from '../model/event';
+import { GenomeSequenceDocument } from '../model/genome-sequence';
 import caseFields from '../model/fields.json';
 import { Source } from '../model/source';
 import {
@@ -19,7 +20,7 @@ import { GeocodeOptions, Geocoder, Resolution } from '../geocoding/geocoder';
 import { NextFunction, Request, Response } from 'express';
 import parseSearchQuery, { ParsingError } from '../util/search';
 import { SortByOrder, getSortByKeyword, SortBy } from '../util/case';
-import { parseDownloadedCase } from '../util/case';
+import { denormalizeFields, denormalizeEventsHeaders, parseDownloadedCase, removeBlankHeader } from '../util/case';
 
 import { logger } from '../util/logger';
 import stringify from 'csv-stringify/lib/sync';
@@ -32,15 +33,17 @@ class InvalidParamError extends Error {}
 type BatchValidationErrors = { index: number; message: string }[];
 
 export class CasesController {
-    private caseFields: string[];
+    private csvHeaders: string[];
     constructor(private readonly geocoders: Geocoder[]) {
         const text = '';
-        this.caseFields = [];
+        this.csvHeaders = [];
         this.init();
     }
 
     init() {
-        this.caseFields = caseFields;
+        this.csvHeaders = denormalizeEventsHeaders(caseFields);
+        this.csvHeaders = removeBlankHeader(this.csvHeaders);
+        this.csvHeaders.sort((a, b) => a.localeCompare(b, undefined, {sensitivity: 'base'}));
         return this;
     }
 
@@ -158,16 +161,18 @@ export class CasesController {
                     `attachment; filename="${filename}.${req.body.format}"`,
                 );
                 const delimiter: string = req.body.format == 'tsv' ? '\t' : ',';
-                const columnsString = this.caseFields.join(delimiter);
+
+                const columnsString = this.csvHeaders.join(delimiter);
                 res.write(columnsString);
                 res.write('\n');
+
                 doc = await cursor.next();
                 while (doc != null) {
                     delete doc.restrictedNotes;
                     const parsedCase = parseDownloadedCase(doc);
                     const stringifiedCase = stringify([parsedCase], {
                         header: false,
-                        columns: this.caseFields,
+                        columns: this.csvHeaders,
                         delimiter: delimiter,
                     });
                     res.write(stringifiedCase);
@@ -184,7 +189,14 @@ export class CasesController {
                 doc = await cursor.next();
                 while (doc != null) {
                     delete doc.restrictedNotes;
-                    res.write(JSON.stringify(doc));
+                    const normalizedDoc = denormalizeFields(doc);
+                    if (!(doc.hasOwnProperty('notes'))) {
+                        normalizedDoc.notes = '';
+                    }
+                    if (!(doc.hasOwnProperty('SGTF'))) {
+                        normalizedDoc.SGTF = 'NA';
+                    }
+                    res.write(JSON.stringify(normalizedDoc));
                     doc = await cursor.next();
                     if (doc != null) {
                         res.write(',');
@@ -1238,6 +1250,11 @@ export const listOccupations = async (
             { $sortByCount: '$demographics.occupation' },
             { $sort: { count: -1, _id: 1 } },
         ]).limit(limit);
+        for (let i = 0; i < occupations.length; i++) {
+            if (occupations[i]._id === null) {
+                occupations.splice(i, 1);
+            }
+        }
         res.json({
             occupations: occupations.map(
                 (occupationObject) => occupationObject._id,

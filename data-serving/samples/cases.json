@@ -109,7 +109,7 @@
       }
     ],
     "list": true,
-    "SGTF": 1,
+    "SGTF": "1",
     "symptoms": {
       "values": [
         "Severe pneumonia",
@@ -278,7 +278,7 @@
       "travel_history_binary": "False"
     },
     "list": true,
-    "SGTF": 0
+    "SGTF": "0"
   },
   {
     "demographics": {

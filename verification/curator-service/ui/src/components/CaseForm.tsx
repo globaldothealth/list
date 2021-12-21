@@ -252,9 +252,9 @@ const NewCaseValidation = Yup.object().shape(
         ),
         confirmedDate: Yup.string().nullable().required('Required'),
         location: Yup.object().required('Required'),
-        SGTF: Yup.number().oneOf(
-            [0, 1],
-            'S-Gene Target Failure must be 0 or 1',
+        SGTF: Yup.string().oneOf(
+            ['NA', '0', '1'],
+            'S-Gene Target Failure must be 0, 1, or NA',
         ),
         numCases: Yup.number()
             .nullable()
@@ -327,7 +327,7 @@ export default function CaseForm(props: Props): JSX.Element {
     const filterGenomeSequences = (
         genomeSequences: GenomeSequence[],
     ): GenomeSequence[] => {
-        const filteredGenomeSequences = cloneDeep(genomeSequences);
+        const filteredGenomeSequences = cloneDeep(genomeSequences) || [];
         filteredGenomeSequences.forEach((genomeSequence) => {
             delete genomeSequence.reactId;
             if (genomeSequence.sampleCollectionDate) {
