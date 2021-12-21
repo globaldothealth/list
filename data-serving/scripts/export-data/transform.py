@@ -5,13 +5,12 @@
 # to stdout
 
 import argparse
-from contextlib import contextmanager, suppress
+from contextlib import contextmanager
 import csv
 from functools import reduce
 import gzip
 import json
 import logging
-import os
 from pathlib import Path
 import sys
 from typing import Any, Optional
@@ -91,12 +90,12 @@ def convert_event(event: dict[str, Any]) -> dict[str, Any]:
     suffix = event["name"]
     col_name = f"events.{suffix}"
 
-    event = {
+    flattened_event = {
         f"{col_name}.date": convert_date(deep_get(event, "dateRange.end.$date")),
     }
     if suffix not in ["selfIsolation", "onsetSymptoms", "firstClinicalConsultation"]:
-        event[f"{col_name}.value"] = event.get("value")
-    return event
+        flattened_event[f"{col_name}.value"] = event.get("value")
+    return flattened_event
 
 
 def convert_addl_sources(sources_string: str) -> str:
