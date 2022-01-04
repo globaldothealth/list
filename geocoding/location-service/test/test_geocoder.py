@@ -29,7 +29,7 @@ class GeocodeTests(unittest.TestCase):
         })
         assert len(feats) == 1
         wantFeature = {
-            'country': 'France',
+            'country': 'FR',
             'geometry': {
                 'latitude': 45.75889,
                 'longitude': 4.84139
