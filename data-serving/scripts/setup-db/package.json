@@ -30,6 +30,7 @@
     "eslint-config-google": "^0.14.0",
     "eslint-config-prettier": "^6.10.1",
     "eslint-plugin-prettier": "^3.1.4",
+    "i18n-iso-countries": "^7.2.0",
     "migrate-mongo": "^8.2.3",
     "prettier": "^2.1.2",
     "typescript": "^3.9.7"
