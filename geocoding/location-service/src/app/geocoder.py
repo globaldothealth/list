@@ -1,3 +1,4 @@
+import iso3166
 import json
 import ratelimiter
 from lru import LRU
@@ -10,6 +11,7 @@ class Geocoder:
     Admin2 = 'Admin2'
     Admin1 = 'Admin1'
     Point = 'Point'
+    INDEX = {c.name.lower(): c for c in iso3166.countries}
 
     def __init__(self, api_token, admins_fetcher, rate_limit=600):
         """Needs a mapbox API token."""
@@ -49,6 +51,26 @@ class Geocoder:
         else:
             return Geocoder.Country
 
+    def getISO3166Code(self, countryName):
+        """
+        Get the single matching Country's ISO-3166-2 code from a partial name.
+        countryName:  The country name, or sub-string thereof, to find.
+        Return:  The ISO-3166 two-letter code, or None if the countryName was unfound or ambiguous.
+        """
+        name = countryName.lower()
+        country = None
+        for key in Geocoder.INDEX:
+            if name in key:
+                if country is not None:
+                    # Ambiguous countryName
+                    return None
+                country = Geocoder.INDEX[key]
+
+        if country is not None:
+            return country.alpha2
+        return None
+
+
     def unpackGeoJson(self, feature):
         """Turn mapbox geojson into the data structure we need."""
         contexts = [feature]
@@ -61,7 +83,7 @@ class Geocoder:
                 'latitude': feature['center'][1]
             },
             'name': feature['place_name'],
-            'country': self.getFeatureDescriptionFromContext(contexts, 'country'),
+            'country': self.getISO3166Code(self.getFeatureDescriptionFromContext(contexts, 'country')),
             'place': self.getFeatureDescriptionFromContext(contexts, 'poi'),
             'geoResolution': self.getResolution(contexts)
         }

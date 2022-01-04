@@ -75,6 +75,10 @@ components:
                     type: string
                 country:
                     type: string
+                    description: ISO-3166-2 code of a country
+                    minLength: 2
+                    maxLength: 2
+                    example: CR
                 administrativeAreaLevel1:
                     type: string
                 administrativeAreaLevel2:
