@@ -75,12 +75,12 @@ paths:
                           value: 'this -butnotthis'
                           summary: Full text search with items that must or must not be present.
                       keywords:
-                          value: 'curator:foo@bar.com,baz@meh.com country:france'
+                          value: 'curator:foo@bar.com,baz@meh.com country:fr'
                           summary: >
                               values are OR'ed for the same keyword and all keywords are AND'ed.
                               Keyword values can be quoted for multi-words matches and concatenated
                               with a comma to union them. Bare words are compared for equality, e.g.
-                              country:Germany. The special character '*' matches any value, e.g. 
+                              country:de. The special character '*' matches any value, e.g. 
                               variant:* returns any case where the variant is not empty.
                               Supported keywords are: curator, gender, nationality, occupation,
                               country, outcome, caseid, uploadid, sourceid, sourceurl, verificationstatus,
@@ -911,6 +911,10 @@ components:
                     type: string
                 country:
                     type: string
+                    minLength: 2
+                    maxLength: 2
+                    description: ISO-3166-2 code for a country.
+                    example: GB
                 administrativeAreaLevel1:
                     type: string
                 administrativeAreaLevel2:
@@ -943,8 +947,10 @@ components:
             properties:
                 country:
                     type: string
-                    description: English full name of a country
-                    example: Costa Rica
+                    description: ISO-3166-2 code for a country.
+                    minLength: 2
+                    maxLength: 2
+                    example: CR
                 administrativeAreaLevel1:
                     type: string
                     description: First administrative subdivision of a country
