@@ -23,6 +23,8 @@ export const locationSchema = new mongoose.Schema(
         country: {
             type: String,
             required: true,
+            minLength: 2,
+            maxLength: 2,
         },
         administrativeAreaLevel1: String,
         administrativeAreaLevel2: String,

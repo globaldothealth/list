@@ -229,14 +229,14 @@ describe('GET', () => {
         describe('keywords', () => {
             beforeEach(async () => {
                 const c = new Case(minimalCase);
-                c.location.country = 'Germany';
+                c.location.country = 'DE';
                 c.set('demographics.occupation', 'engineer');
                 c.set('variant.name', 'B.1.1.7');
                 await c.save();
             });
             it('returns no case if no match', async () => {
                 const res = await request(app)
-                    .get('/api/cases?page=1&limit=1&q=country%3ASwitzerland')
+                    .get('/api/cases?page=1&limit=1&q=country%3ACH')
                     .expect(200)
                     .expect('Content-Type', /json/);
                 expect(res.body.cases).toHaveLength(0);
@@ -244,20 +244,20 @@ describe('GET', () => {
             });
             it('returns the case if matches', async () => {
                 await request(app)
-                    .get('/api/cases?page=1&limit=1&q=country%3AGermany')
-                    .expect(200, /Germany/)
+                    .get('/api/cases?page=1&limit=1&q=country%3ADE')
+                    .expect(200, /DE/)
                     .expect('Content-Type', /json/);
             });
             it('returns the case if variant matches', async () => {
                 await request(app)
                     .get('/api/cases?page=1&limit=1&q=variant%3AB.1.1.7')
-                    .expect(200, /Germany/)
+                    .expect(200, /DE/)
                     .expect('Content-Type', /json/);
             });
             it('returns the case on wildcard variant check', async () => {
                 await request(app)
                     .get('/api/cases?page=1&limit=1&q=variant%3A%2A')
-                    .expect(200, /Germany/)
+                    .expect(200, /DE/)
                     .expect('Content-Type', /json/);
             });
             it('returns no case if no wildcard match', async () => {
@@ -269,14 +269,14 @@ describe('GET', () => {
             });
             it('returns the case if non case sensitive matches', async () => {
                 await request(app)
-                    .get('/api/cases?page=1&limit=1&q=country%3Agermany')
-                    .expect(200, /Germany/)
+                    .get('/api/cases?page=1&limit=1&q=country%3Ade')
+                    .expect(200, /DE/)
                     .expect('Content-Type', /json/);
             });
             it('Search for matching country and something else that does not match', async () => {
                 const res = await request(app)
                     .get(
-                        '/api/cases?page=1&limit=1&q=country%3AGermany%occupation%3Anope',
+                        '/api/cases?page=1&limit=1&q=country%3ADE%occupation%3Anope',
                     )
                     .expect(200)
                     .expect('Content-Type', /json/);
@@ -286,7 +286,7 @@ describe('GET', () => {
             it('Search for matching country and something else that also matches', async () => {
                 await request(app)
                     .get(
-                        '/api/cases?page=1&limit=1&q=country%3AGermany%20occupation%3Aengineer',
+                        '/api/cases?page=1&limit=1&q=country%3ADE%20occupation%3Aengineer',
                     )
                     .expect(200, /engineer/)
                     .expect('Content-Type', /json/);
@@ -294,9 +294,9 @@ describe('GET', () => {
             it('Search for multiple occurrences of the same keyword', async () => {
                 await request(app)
                     .get(
-                        '/api/cases?page=1&limit=1&q=country%3AGermany%20country%3APeru',
+                        '/api/cases?page=1&limit=1&q=country%3ADE%20country%3APE',
                     )
-                    .expect(200, /Germany/)
+                    .expect(200, /DE/)
                     .expect('Content-Type', /json/);
             });
         });
@@ -643,14 +643,14 @@ describe('POST', () => {
     });
     it('geocodes everything that is necessary', async () => {
         seedFakeGeocodes('Canada', {
-            country: 'Canada',
+            country: 'CA',
             geoResolution: 'Country',
             geometry: { latitude: 42.42, longitude: 11.11 },
             name: 'Canada',
         });
         seedFakeGeocodes('Montreal', {
             administrativeAreaLevel1: 'Quebec',
-            country: 'Canada',
+            country: 'CA',
             geoResolution: 'Admin1',
             geometry: { latitude: 33.33, longitude: 99.99 },
             name: 'Montreal',
@@ -664,7 +664,7 @@ describe('POST', () => {
             .expect(201)
             .expect('Content-Type', /json/);
         expect(
-            await Case.collection.findOne({ 'location.name': 'Canada' }),
+            await Case.collection.findOne({ 'location.name': 'CA' }),
         ).toBeDefined();
         expect(
             await Case.collection.findOne({
@@ -958,7 +958,7 @@ describe('POST', () => {
             const fileStream = fs.createWriteStream(destination);
 
             const matchedCase = new Case(minimalCase);
-            matchedCase.location.country = 'Germany';
+            matchedCase.location.country = 'DE';
             matchedCase.set('demographics.occupation', 'engineer');
             await matchedCase.save();
 
@@ -968,7 +968,7 @@ describe('POST', () => {
             const responseStream = request(app)
                 .post('/api/cases/download')
                 .send({
-                    query: 'country:Germany',
+                    query: 'country:DE',
                     format: 'csv',
                 })
                 .expect('Content-Type', 'text/csv')
@@ -983,7 +983,7 @@ describe('POST', () => {
                 expect(text).toContain(
                     '_id,caseReference.additionalSources,caseReference.sourceEntryId,caseReference.sourceId',
                 );
-                expect(text).toContain('Germany');
+                expect(text).toContain('DE');
                 expect(text).toContain(matchedCase._id);
                 expect(text).not.toContain(unmatchedCase._id);
 
@@ -993,14 +993,14 @@ describe('POST', () => {
     });
     it('should return results in proper format', async () => {
         const matchedCase = new Case(minimalCase);
-        matchedCase.location.country = 'Germany';
+        matchedCase.location.country = 'DE';
         await matchedCase.save();
 
         //CSV
         await request(app)
             .post('/api/cases/download')
             .send({
-                query: 'country:Germany',
+                query: 'country:DE',
                 format: 'csv',
             })
             .expect('Content-Type', 'text/csv')
@@ -1010,7 +1010,7 @@ describe('POST', () => {
         await request(app)
             .post('/api/cases/download')
             .send({
-                query: 'country:Germany',
+                query: 'country:DE',
                 format: 'tsv',
             })
             .expect('Content-Type', 'text/tsv')
@@ -1020,7 +1020,7 @@ describe('POST', () => {
         await request(app)
             .post('/api/cases/download')
             .send({
-                query: 'country:Germany',
+                query: 'country:DE',
                 format: 'json',
             })
             .expect('Content-Type', 'application/json')
@@ -1180,7 +1180,7 @@ describe('POST', () => {
             await request(app)
                 .post('/api/cases/batchStatusChange')
                 .send({
-                    query: 'country:France',
+                    query: 'country:FR',
                     status: 'EXCLUDED',
                     note: 'Duplicate',
                     ...curatorMetadata,

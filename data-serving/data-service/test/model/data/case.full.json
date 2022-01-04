@@ -37,7 +37,7 @@
         }
     ],
     "location": {
-        "country": "France",
+        "country": "FR",
         "administrativeAreaLevel1": "Île-de-France",
         "administrativeAreaLevel2": "Paris",
         "name": "Wuhan",
@@ -104,7 +104,7 @@
                     "end": "2020-01-17"
                 },
                 "location": {
-                    "country": "United States",
+                    "country": "US",
                     "administrativeAreaLevel1": "New York",
                     "administrativeAreaLevel2": "Kings County",
                     "administrativeAreaLevel3": "Brooklyn",
