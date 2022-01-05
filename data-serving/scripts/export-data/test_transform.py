@@ -103,10 +103,11 @@ def test_convert_travel():
     assert T.convert_travel(json.dumps(_TRAVEL)) == _TRAVEL_parsed
 
 
-def test_transform_output_match():
-    expected = Path('test_transform_mongoexport_expected.csv').read_text()
+@pytest.mark.parametrize("fmt", ["csv", "tsv", "json"])
+def test_transform_output_match(fmt):
+    expected = Path(f'test_transform_mongoexport_expected.{fmt}').read_text()
     with redirect_stdout(io.StringIO()) as f:
-        T.transform('test_transform_mongoexport.csv', '-', ['csv'])
+        T.transform('test_transform_mongoexport.csv', '-', [fmt])
     # use str.splitlines to ignore line endings
 
     expected_lines = expected.splitlines()
