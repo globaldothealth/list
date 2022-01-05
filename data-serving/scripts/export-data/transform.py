@@ -4,6 +4,7 @@
 # The CSV file is read from stdin, with the processed CSV file written
 # to stdout
 
+import io
 import argparse
 from contextlib import contextmanager
 import csv
@@ -221,6 +222,8 @@ def convert_row(row: dict[str, Any]) -> Optional[dict[str, Any]]:
         row["caseReference.additionalSources"] = convert_addl_sources(
             row["caseReference.additionalSources"]
         )
+    if not row.get("SGTF"):
+        row["SGTF"] = "NA"
     if row.get("events", None):
         for e in json.loads(row["events"]):
             row.update(convert_event(e))
@@ -230,19 +233,29 @@ def convert_row(row: dict[str, Any]) -> Optional[dict[str, Any]]:
     return row
 
 
+class JSONWriter:
+    "JSON Writer class similar to csv.DictWriter"
+    def __init__(self, file: io.TextIOBase, fieldnames: list[str]):
+        self.file = file
+        self.fieldnames = fieldnames
+
+    def writeheader(self):
+        self.file.write("[\n")
+
+    def writerow(self, row: dict[str, Any], row_number: int):
+        row_to_write = {field: row.get(field, "") for field in self.fieldnames}
+        tok = ", " if row_number > 0 else "  "
+        self.file.write(tok + json.dumps(row_to_write, sort_keys=True) + "\n")
+
+
 def writerow(
     formats: list[str], writers: dict[str, Any], row: dict[str, Any], row_number: int
 ):
     for fmt in formats:
         if row_number == 0:  # first row, write header
-            if fmt == "json":
-                writers[fmt].write("[\n")
-            else:
-                writers[fmt].writeheader()
-
+            writers[fmt].writeheader()
         if fmt == "json":
-            tok = ", " if row_number > 0 else "  "
-            writers[fmt].write(tok + json.dumps(row, sort_keys=True) + "\n")
+            writers[fmt].writerow(row, row_number)
         else:
             writers[fmt].writerow(row)
 
@@ -267,13 +280,15 @@ def open_writers(formats: list[str], fields: list[str], output: str):
                 files[fmt], fieldnames=fields, extrasaction="ignore", delimiter="\t"
             )
         if fmt == "json":
-            writers[fmt] = files[fmt]
+            writers[fmt] = JSONWriter(files[fmt], fieldnames=fields)
     try:
         yield writers
     except Exception as e:
-        logging.exception("Error occurred in open_writers():")
+        logging.exception(f"Error occurred in open_writers(): {e}")
     finally:
         if output == "-":
+            if formats == ["json"]:
+                print("]")
             return
         for fmt in formats:
             if fmt == "json":
