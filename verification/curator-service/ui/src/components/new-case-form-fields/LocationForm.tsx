@@ -30,7 +30,7 @@ const TooltipText = () => (
                     </li>
                     <li>
                         You can enter a location up to Admin level 3; as an
-                        example this corresponds to country level ocation data
+                        example this corresponds to country level location data
                         in the USA. Specific locations are not supported
                     </li>
                 </ul>
