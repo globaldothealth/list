@@ -55,14 +55,6 @@ __TRAVEL = [
     "travelHistory.travel.purpose",
 ]
 
-__GENOME = [
-    "genomeSequences.sampleCollectionDate",
-    "genomeSequences.repositoryUrl",
-    "genomeSequences.sequenceId",
-    "genomeSequences.sequenceName",
-    "genomeSequences.sequenceLength",
-]
-
 __VARIANT = ["variantOfConcern"]
 
 
@@ -205,7 +197,7 @@ def get_headers_and_fields(fileobject) -> list[str]:
         "events.selfIsolation.date",
     ]
     fields = set(headers).union(set(cols_to_add))
-    fields = fields.union(set(__TRAVEL + __GENOME + __VARIANT))
+    fields = fields.union(set(__TRAVEL + __VARIANT))
     fields = sorted(list(fields - set(__OMIT)), key=str.casefold)
     return headers, fields
 
