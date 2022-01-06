@@ -11,6 +11,10 @@ const oldCountryValidation = {
 }
 
 function countryNameToCode(country) {
+  // specific hack to fix https://github.com/globaldothealth/list/issues/2221
+  if (country === 'Algiers') {
+    country = 'Algeria';
+  }
   return countries.getAlpha2Code(country, 'en');
 }
 
