@@ -6,8 +6,6 @@ import {
     Paper,
     Typography,
 } from '@material-ui/core';
-import countries from 'i18n-iso-countries';
-import en from 'i18n-iso-countries/langs/en.json';
 import {
     Case,
     GenomeSequence,
@@ -37,9 +35,7 @@ import {
     selectFilterBreadcrumbs,
 } from '../redux/app/selectors';
 import Chip from '@material-ui/core/Chip';
-
-// register en locale so we don't pack all the others
-countries.registerLocale(en);
+import nameCountry from './util/countryNames';
 
 const styles = makeStyles((theme) => ({
     errorMessage: {
@@ -816,11 +812,7 @@ function LocationRows(props: { loc?: Location }): JSX.Element {
             <RowHeader title="Country" />
             <RowContent
                 content={
-                    props.loc?.country
-                        ? countries.getName(props.loc?.country, 'en', {
-                              select: 'official',
-                          })
-                        : ''
+                    props.loc?.country ? nameCountry(props.loc?.country) : ''
                 }
             />
 
