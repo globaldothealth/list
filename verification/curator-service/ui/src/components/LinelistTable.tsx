@@ -1,6 +1,8 @@
 import React, { RefObject, useState, useEffect } from 'react';
 import { RouteComponentProps, withRouter, useLocation } from 'react-router-dom';
 import axios from 'axios';
+import countries from 'i18n-iso-countries';
+import en from 'i18n-iso-countries/langs/en.json';
 import { round } from 'lodash';
 import {
     Button,
@@ -53,6 +55,9 @@ import { SortBy, SortByOrder } from '../constants/types';
 import { connect, ConnectedProps } from 'react-redux';
 import { RootState } from '../redux/store';
 import Helmet from 'react-helmet';
+
+// register en locale so we don't pack all the others
+countries.registerLocale(en);
 
 // Limit number of data that can be displayed or downloaded to avoid long execution times of mongo queries
 const DATA_LIMIT = 10000;
@@ -1325,6 +1330,12 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                     ),
 
                                     field: 'country',
+                                    render: (rowData) =>
+                                        countries.getName(
+                                            rowData.country,
+                                            'en',
+                                            { select: 'official' },
+                                        ),
                                 },
                                 {
                                     title: 'Latitude',
