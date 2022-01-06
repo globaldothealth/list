@@ -81,7 +81,7 @@ describe('<LinelistTable />', () => {
                     gender: 'Female',
                 },
                 location: {
-                    country: 'France',
+                    country: 'FR',
                     administrativeAreaLevel1: 'some admin 1',
                     administrativeAreaLevel2: 'some admin 2',
                     administrativeAreaLevel3: 'some admin 3',
