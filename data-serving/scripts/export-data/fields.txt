@@ -12,7 +12,6 @@ demographics.gender
 demographics.nationalities
 demographics.occupation
 events
-genomeSequences
 location.administrativeAreaLevel1
 location.administrativeAreaLevel2
 location.administrativeAreaLevel3
