@@ -6,7 +6,7 @@ on:
     paths:
     - '.github/workflows/api-python-tests.yml'
     - 'api/python/**'
-  pull_request:
+  [pull_request, workflow_dispatch]:
     paths:
     - '.github/workflows/api-python-tests.yml'
     - 'api/python/**'

@@ -1,7 +1,7 @@
 name: Map data aggregator code deploy
 
 on:
-  push:
+  [push, workflow_dispatch]:
     branches: [main]
     paths:
     - '.github/workflows/aggregate-deploy.yml'
