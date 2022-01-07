@@ -1,7 +1,7 @@
 name: Ingestion functions deploy
 
 on:
-  push:
+  [push, workflow_dispatch]:
     branches: [main, '*-stable']
     paths:
     - '.github/workflows/ingestion-functions-deploy.yml'

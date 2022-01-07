@@ -1,7 +1,7 @@
 name: Migrate dev database schema
 
 on:
-  push:
+  [push, workflow_dispatch]:
     # Run workflow when the schema changes.
     branches: [main]
     paths:

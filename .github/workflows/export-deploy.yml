@@ -1,7 +1,7 @@
 name: Exporter code deploy
 
 on:
-  push:
+  [push, workflow_dispatch]:
     branches: ['*-stable']
     paths:
     - '.github/workflows/export-deploy.yml'
