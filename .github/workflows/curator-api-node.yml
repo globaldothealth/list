@@ -4,7 +4,7 @@
 name: Curator API Node.js CI
 
 on:
-  push:
+  [push, workflow_dispatch]:
     branches: [main, '*-stable']
     paths:
       - ".github/workflows/curator-api-node.yml"
