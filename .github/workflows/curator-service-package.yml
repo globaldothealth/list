@@ -2,7 +2,7 @@ name: Curator Service Github Packages Push
 
 on:
   # Build whenever a PR is merged into the main branch.
-  [push, workflow_dispatch]:
+  push:
     branches: [main, '*-stable']
     paths:
       - ".github/workflows/curator-service-package.yml"
@@ -11,6 +11,12 @@ on:
     # Build whenever a new tag is created.
     tags:
       - "*"
+  workflow_dispatch:
+    branches: [main, '*-stable']
+    paths:
+      - ".github/workflows/curator-service-package.yml"
+      - "verification/curator-service/**"
+      - "!verification/curator-service/auth.md"
   pull_request:
     paths:
       - ".github/workflows/curator-service-package.yml"
