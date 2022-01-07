@@ -4,7 +4,12 @@
 name: Curator UI Node.js CI
 
 on:
-  [push, workflow_dispatch]:
+  push:
+    branches: [main, '*-stable']
+    paths:
+      - ".github/workflows/curator-ui-node.yml"
+      - "verification/curator-service/ui/**"
+  workflow_dispatch:
     branches: [main, '*-stable']
     paths:
       - ".github/workflows/curator-ui-node.yml"

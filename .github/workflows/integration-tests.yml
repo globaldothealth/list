@@ -9,7 +9,14 @@ on:
       - "verification/curator-service/**"
       - "data-serving/data-service/**"
       - "data-serving/samples/**"
-  [pull_request, workflow_dispatch]:
+  pull_request:
+    paths:
+      - ".github/workflows/integration-tests.yml"
+      - "dev/docker-compose.yml"
+      - "verification/curator-service/**"
+      - "data-serving/data-service/**"
+      - "data-serving/samples/**"
+  workflow_dispatch:
     paths:
       - ".github/workflows/integration-tests.yml"
       - "dev/docker-compose.yml"

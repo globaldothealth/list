@@ -1,7 +1,13 @@
 name: Exporter code deploy
 
 on:
-  [push, workflow_dispatch]:
+  push:
+    branches: ['*-stable']
+    paths:
+    - '.github/workflows/export-deploy.yml'
+    - 'data-serving/scripts/export-data/**'
+    - '!data-serving/scripts/export-data/README.md'
+  workflow_dispatch:
     branches: ['*-stable']
     paths:
     - '.github/workflows/export-deploy.yml'
