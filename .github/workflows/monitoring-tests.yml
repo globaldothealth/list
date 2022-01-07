@@ -6,7 +6,11 @@ on:
     paths:
     - '.github/workflows/monitoring-tests.yml'
     - 'ingestion/monitoring/**'
-  [pull_request, workflow_dispatch]:
+  pull_request:
+    paths:
+    - '.github/workflows/monitoring-tests.yml'
+    - 'ingestion/monitoring/**'
+  workflow_dispatch:
     paths:
     - '.github/workflows/monitoring-tests.yml'
     - 'ingestion/monitoring/**'

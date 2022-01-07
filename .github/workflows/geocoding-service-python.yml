@@ -6,7 +6,11 @@ on:
     paths:
     - '.github/workflows/geocoding-service-python.yml'
     - 'geocoding/location-service/**'
-  [pull_request, workflow_dispatch]:
+  pull_request:
+    paths:
+    - '.github/workflows/geocoding-service-python.yml'
+    - 'geocoding/location-service/**'
+  workflow_dispatch:
     paths:
     - '.github/workflows/geocoding-service-python.yml'
     - 'geocoding/location-service/**'

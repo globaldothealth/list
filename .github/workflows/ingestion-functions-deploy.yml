@@ -1,7 +1,7 @@
 name: Ingestion functions deploy
 
 on:
-  [push, workflow_dispatch]:
+  push:
     branches: [main, '*-stable']
     paths:
     - '.github/workflows/ingestion-functions-deploy.yml'
@@ -10,6 +10,12 @@ on:
     # Build whenever a new tag is created.
     tags:
       - "*"
+  workflow_dispatch:
+    branches: [main, '*-stable']
+    paths:
+    - '.github/workflows/ingestion-functions-deploy.yml'
+    - 'ingestion/functions/**'
+    - '!ingestion/functions/README.md'
 
 jobs:
   deploy:
