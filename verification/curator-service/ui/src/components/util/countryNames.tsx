@@ -8,6 +8,10 @@ export default function nameCountry(isoCode: string): string {
     return countries.getName(isoCode, 'en', { select: 'official' });
 }
 
+export function codeForCountry(name: string): string {
+    return countries.getAlpha2Code(name, 'en');
+}
+
 export function allCountryNames(): LocalizedCountryNames<{
     select: 'official';
 }> {

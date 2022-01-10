@@ -29,6 +29,7 @@ import {
     isLoading,
     filterError,
 } from '../redux/filters/selectors';
+import { codeForCountry } from './util/countryNames';
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -316,7 +317,10 @@ export default function FiltersModal({
                                         None
                                     </MenuItem>
                                     {countries.map((country: string) => (
-                                        <MenuItem value={country} key={country}>
+                                        <MenuItem
+                                            value={codeForCountry(country)}
+                                            key={codeForCountry(country)}
+                                        >
                                             {country}
                                         </MenuItem>
                                     ))}
