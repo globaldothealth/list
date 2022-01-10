@@ -53,7 +53,7 @@ import { SortBy, SortByOrder } from '../constants/types';
 import { connect, ConnectedProps } from 'react-redux';
 import { RootState } from '../redux/store';
 import Helmet from 'react-helmet';
-import nameCountry from './util/countryNames';
+import { nameCountry } from './util/countryNames';
 
 // Limit number of data that can be displayed or downloaded to avoid long execution times of mongo queries
 const DATA_LIMIT = 10000;
