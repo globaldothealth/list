@@ -35,7 +35,7 @@ import {
     selectFilterBreadcrumbs,
 } from '../redux/app/selectors';
 import Chip from '@material-ui/core/Chip';
-import nameCountry from './util/countryNames';
+import { nameCountry } from './util/countryNames';
 
 const styles = makeStyles((theme) => ({
     errorMessage: {
