@@ -294,9 +294,9 @@ describe('New case form', function () {
     it('Does not add row on submission error', function () {
         // Avoid geolocation fail, the "Request failed" check below happens at the data service level.
         cy.seedLocation({
-            name: 'FR',
+            name: 'France',
             geometry: { latitude: 42, longitude: 12 },
-            country: 'France',
+            country: 'FR',
             geoResolution: 'Country',
         });
         cy.addSource('Test source', 'www.example.com');
