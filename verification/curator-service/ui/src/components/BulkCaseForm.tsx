@@ -31,6 +31,7 @@ import ValidationErrorList from './bulk-case-form-fields/ValidationErrorList';
 import { WithStyles } from '@material-ui/core/styles/withStyles';
 import axios from 'axios';
 import { toUTCDate } from './util/date';
+import { codeForCountry } from './util/countryNames';
 
 // Return type isn't meaningful.
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
@@ -392,7 +393,7 @@ class BulkCaseForm extends React.Component<
                 occupation: c.occupation,
             },
             location: {
-                country: c.country,
+                country: codeForCountry(c.country),
                 administrativeAreaLevel1: c.admin1,
                 administrativeAreaLevel2: c.admin2,
                 administrativeAreaLevel3: c.admin3,

@@ -5,7 +5,7 @@ describe('Bulk upload form', function () {
         cy.task('clearCasesDB', {});
         cy.login();
         cy.seedLocation({
-            country: 'United Kingdom',
+            country: 'UK',
             administrativeAreaLevel1: 'England',
             administrativeAreaLevel2: 'Greater London',
             administrativeAreaLevel3: 'London',
@@ -14,7 +14,7 @@ describe('Bulk upload form', function () {
             geoResolution: 'Admin3',
         });
         cy.seedLocation({
-            country: 'Canada',
+            country: 'CA',
             administrativeAreaLevel1: 'Alberta',
             administrativeAreaLevel3: 'Banff',
             geometry: { latitude: 51.1784, longitude: 115.5708 },
