@@ -361,6 +361,11 @@ export default function CaseForm(props: Props): JSX.Element {
         const ageRange = values.age
             ? { start: values.age, end: values.age }
             : { start: values.minAge, end: values.maxAge };
+
+        const country =
+            values.location?.country.length === 2
+                ? values.location?.country
+                : codeForCountry(values.location?.country ?? '');
         const newCase = {
             caseReference: {
                 ...values.caseReference,
@@ -376,7 +381,7 @@ export default function CaseForm(props: Props): JSX.Element {
             },
             location: {
                 ...values.location,
-                country: codeForCountry(values.location?.country ?? ''),
+                country,
             },
             events: [
                 {
