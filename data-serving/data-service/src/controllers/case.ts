@@ -365,6 +365,8 @@ export class CasesController {
                 err.name === 'ValidationError' ||
                 err instanceof InvalidParamError
             ) {
+                console.error('validation error');
+                console.error(err);
                 res.status(422).json(err);
                 return;
             }
