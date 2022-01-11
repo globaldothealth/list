@@ -14,19 +14,19 @@ describe('Curator', function () {
         cy.visit('/cases');
         cy.contains('No records to display');
         cy.seedLocation({
-            country: 'France',
+            country: 'FR',
             geometry: { latitude: 45.75889, longitude: 4.84139 },
             name: 'France',
             geoResolution: 'Country',
         });
         cy.seedLocation({
-            country: 'Germany',
+            country: 'DE',
             geometry: { latitude: 51.0968509, longitude: 5.9688274 },
             name: 'Germany',
             geoResolution: 'Country',
         });
         cy.seedLocation({
-            country: 'United Kingdom',
+            country: 'GB',
             geometry: { latitude: 54.2316104, longitude: -13.4274035 },
             name: 'United Kingdom',
             geoResolution: 'Country',
