@@ -157,6 +157,14 @@ optional = false
 python-versions = "*"
 
 [[package]]
+name = "iso3166"
+version = "2.0.2"
+description = "Self-contained ISO 3166-1 country definitions."
+category = "main"
+optional = false
+python-versions = ">= 3.6"
+
+[[package]]
 name = "jmespath"
 version = "0.10.0"
 description = "JSON Matching Expressions"
@@ -364,7 +372,7 @@ socks = ["PySocks (>=1.5.6,!=1.5.7,<2.0)"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.8"
-content-hash = "39f56dd5c73ae659132b2c33fae00da62056d644540934b39b6c7a2846b40199"
+content-hash = "a73fe16268f41b3366983343c19535b5a42f192fcda65bc06db361d3bc3aacaf"
 
 [metadata.files]
 atomicwrites = [
@@ -422,6 +430,10 @@ idna = [
 iniconfig = [
     {file = "iniconfig-1.1.1-py2.py3-none-any.whl", hash = "sha256:011e24c64b7f47f6ebd835bb12a743f2fbe9a26d4cecaa7f53bc4f35ee9da8b3"},
     {file = "iniconfig-1.1.1.tar.gz", hash = "sha256:bc3af051d7d14b2ee5ef9969666def0cd1a000e121eaea580d4a313df4b37f32"},
+]
+iso3166 = [
+    {file = "iso3166-2.0.2-py3-none-any.whl", hash = "sha256:55e93c8a7587cae9479ad68c823390e33493d17d95b457271032594e5f1f7aae"},
+    {file = "iso3166-2.0.2.tar.gz", hash = "sha256:04d02cfcfc18a6f8a9a4edb4d0a55e2e4fc575626c29d702f750de415e88d372"},
 ]
 jmespath = [
     {file = "jmespath-0.10.0-py2.py3-none-any.whl", hash = "sha256:cdf6525904cc597730141d61b36f2e4b8ecc257c420fa2f4549bac2c2d0cb72f"},
