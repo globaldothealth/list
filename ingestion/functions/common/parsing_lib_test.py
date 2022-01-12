@@ -669,3 +669,27 @@ def test_excluded_case_are_removed_from_cases():
     cases_list = list(cases)
     assert len(cases_list) == 1
     assert cases_list[0]["caseReference"]["sourceEntryId"] == valid_case["caseReference"]["sourceEntryId"]
+
+def test_country_code_lookup_by_exact_name():
+    import parsing_lib # Import locally to avoid superseding mock
+
+    code = parsing_lib.iso3166_country_code('Germany')
+    assert(code == 'DE')
+
+def test_country_code_lookup_by_partial_name():
+    import parsing_lib # Import locally to avoid superseding mock
+
+    code = parsing_lib.iso3166_country_code('Netherland')
+    assert(code == 'NL')
+
+def test_country_code_lookup_by_code_returns_code():
+    import parsing_lib # Import locally to avoid superseding mock
+
+    code = parsing_lib.iso3166_country_code('GB')
+    assert(code == 'GB')
+
+def test_country_code_lookup_raises_on_ambiguous_name():
+    import parsing_lib # Import locally to avoid superseding mock
+
+    with pytest.raises(KeyError):
+        code = parsing_lib.iso3166_country_code('United')
