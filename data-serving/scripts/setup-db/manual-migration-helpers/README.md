@@ -1,0 +1,1 @@
+These scripts are run in mongosh and are workarounds to fix up data in mongosh batch operations, which is much faster than editing the data in the migration itself. See the comments in each file for more information about which migration it's associated with, how/when to run and so on.
