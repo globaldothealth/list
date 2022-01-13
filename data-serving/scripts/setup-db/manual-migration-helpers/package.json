@@ -1,0 +1,22 @@
+{
+  "name": "manual-migration-helpers",
+  "version": "0.0.1",
+  "description": "Scripts to make batch database changes.",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/globaldothealth/list.git"
+  },
+  "author": "Global.health <info@global.health>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/globaldothealth/list/issues"
+  },
+  "homepage": "https://github.com/globaldothealth/list#readme",
+  "dependencies": {
+    "i18n-iso-countries": "^7.2.0"
+  }
+}
