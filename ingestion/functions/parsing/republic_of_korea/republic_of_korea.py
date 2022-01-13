@@ -1,7 +1,7 @@
 import json
 import os
 import sys
-from datetime import date, datetime
+import datetime
 import csv
 
 # Layer code, like parsing_lib, is added to the path by AWS.
@@ -21,7 +21,7 @@ def convert_date(raw_date: str, dataserver=True):
     Convert raw date field into a value interpretable by the dataserver.
     The date is listed in mddyy format,
     """
-    date = datetime.strptime(raw_date, "%m/%d/%y")
+    date = datetime.datetime.strptime(raw_date, "%m/%d/%y")
     if not dataserver:
         return date.strftime("%m/%d/%Y")
     return date.strftime("%m/%d/%YZ")
@@ -54,13 +54,14 @@ def convert_location(entry):
     return {"query": ", ".join(query_terms)}
 
 
-def convert_demographics(entry, current_year):
-    ''' Calculating age by subtracting birth year field from current_year global variable.'''
+def convert_demographics(entry):
+    ''' Calculating age by subtracting birth year field from confirmed date'''
     demo = {}
+    date = datetime.datetime.strptime(entry["confirmed_date"], "%m/%d/%y")
     if entry['birth_year']:
         demo["ageRange"] = {
-            "start": float(current_year - float(entry['birth_year']) - 1),
-            "end": float(current_year - float(entry['birth_year']))
+            "start": float(date.year - float(entry['birth_year']) - 1),
+            "end": float(date.year - float(entry['birth_year']))
         }
     if entry['sex']:
         demo["gender"] = convert_gender(entry['sex'])
@@ -97,8 +98,8 @@ def parse_cases(raw_data_file, source_id, source_url):
 
     Province field is not always a place name, sometimes just a note, eg 'filtered at airport'
 
-    We are only provided patient's birth_year, so we create a global variable current_year, and get age by:
-    age = current_year - birth_year. This gives patients age by end of this year, so we provide a 1 year
+    We are only provided patient's birth_year, so we calculate the age by using the year of the confirmed date
+    as the reference point. This gives patients age by end of this year, so we provide a 1 year
     range for a patient's current age.
 
     A subset of cases contain information on which case IDs infected others, contact number and infection number.
@@ -107,10 +108,8 @@ def parse_cases(raw_data_file, source_id, source_url):
 
     """
 
-    current_year = datetime.now().year
     with open(raw_data_file, "r") as f:
         reader = csv.DictReader(f, delimiter=',')
-        cases = []
         notes = []
         for entry in reader:
             if entry["confirmed_date"]:
@@ -131,7 +130,7 @@ def parse_cases(raw_data_file, source_id, source_url):
                                 }
                         }
                     ],
-                    "demographics": convert_demographics(entry, current_year),
+                    "demographics": convert_demographics(entry),
                 }
 
                 if entry['state'] == 'deceased':
@@ -184,7 +183,6 @@ def parse_cases(raw_data_file, source_id, source_url):
                     case["notes"] = ", ".join(notes)
 
                 yield case
-
 
 
 def event_handler(event):
