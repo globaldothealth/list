@@ -68,7 +68,6 @@ _CODES_COUNTRY_ADD = {
 _EXCLUDE = ["Puerto Rico"]
 
 
-
 def setup_logger():
     h = logging.StreamHandler(sys.stdout)
     rootLogger = logging.getLogger()
@@ -126,16 +125,17 @@ def get_jhu_counts():
         req = requests.get(url, timeout=10)
 
     if req.status_code != 200:
-        raise Exception(f"Could not download {url}, got status {req.status_code}")
+        raise Exception(
+            f"Could not download {url}, got status {req.status_code}")
 
     logging.info(f"Downloaded JHU data found for {now}.")
-
 
     jhu_df = pd.read_csv(io.StringIO(req.text))
     logging.info(f"Retrieved JHU case counts from {now}.")
 
     jhu_counts = (
-        jhu_df["Confirmed"].groupby(jhu_df["Country_Region"]).sum().reset_index()
+        jhu_df["Confirmed"].groupby(
+            jhu_df["Country_Region"]).sum().reset_index()
     )
     jhu_counts["Country_Region"] = jhu_counts["Country_Region"].apply(
         lambda x: re.sub(r"[^a-zA-Z ]", "", x)
@@ -159,7 +159,8 @@ def get_country_codes():
     req = requests.get(url, timeout=10)
 
     countrycodes_df = pd.read_csv(io.StringIO(req.text))
-    countrycodes_df["name"] = countrycodes_df["name"].apply(lambda x: _CODES_COUNTRY_MAP.get(x, x))
+    countrycodes_df["name"] = countrycodes_df["name"].apply(
+        lambda x: _CODES_COUNTRY_MAP.get(x, x))
     countrycodes_df = countrycodes_df.set_index('name')
 
     countrycodes_dict = countrycodes_df.to_dict('index')
@@ -208,7 +209,8 @@ def generate_country_json(cases, s3_endpoint, bucket, date, line_list_url, map_u
             jhu = jhu_counts[country]
             record["jhu"] = int(jhu)
         except:
-            logging.warning(f"I couldn't find {country} in the JHU case counts.")
+            logging.warning(
+                f"I couldn't find {country} in the JHU case counts.")
             record["jhu"] = 0
         try:
             if country != "Namibia":
@@ -219,7 +221,8 @@ def generate_country_json(cases, s3_endpoint, bucket, date, line_list_url, map_u
             record["lat"] = country_codes[country]['latitude']
             record["long"] = country_codes[country]['longitude']
         except KeyError:
-            logging.warning(f"Could not find country in list of country codes: {country}")
+            logging.warning(
+                f"Could not find country in list of country codes: {country}")
 
     records = {date: records}
 
@@ -248,7 +251,7 @@ def generate_country_json(cases, s3_endpoint, bucket, date, line_list_url, map_u
         writer = csv.DictWriter(csvbuf, fieldnames=fieldnames)
         writer.writeheader()
         for i in _csv:
-            if all (key in i for key in ("_id", "code", "casecount", "jhu")):
+            if all(key in i for key in ("_id", "code", "casecount", "jhu")):
                 writer.writerow(_country_data_csv(i, line_list_url, map_url))
         csvstr = csvbuf.getvalue()
 
@@ -323,6 +326,9 @@ def generate_region_json(cases, s3_endpoint, bucket, date):
                 "_id": id,
                 "casecount": record["casecount"],
                 "country": record["country"],
+                "admin1": record["admin1"],
+                "admin2": record["admin2"],
+                "admin3": record["admin3"],
                 "lat": record["_id"]["latitude"],
                 "long": record["_id"]["longitude"],
                 "search": search_term,
@@ -406,7 +412,8 @@ if __name__ == '__main__':
 
     date_string = datetime.datetime.now().strftime("%m-%d-%Y")
     logging.info("Generating country json...")
-    generate_country_json(cases, s3_endpoint, s3_bucket, date_string, line_list_url, map_url)
+    generate_country_json(cases, s3_endpoint, s3_bucket,
+                          date_string, line_list_url, map_url)
     logging.info("Country json generated!")
     logging.info("Generating region json...")
     generate_region_json(cases, s3_endpoint, s3_bucket, date_string)
