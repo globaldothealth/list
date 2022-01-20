@@ -780,8 +780,11 @@ export default function App(): JSX.Element {
                                 Cookie policy
                             </PolicyLink>
                             <a
-                                href="mailto:info@global.health?subject=Feedback regarding Global.health map"
-                                className={`${classes.link} ${classes.lastLink}`}
+                                href="mailto:info@global.health?subject=Feedback regarding Global.health data portal"
+                                className={clsx([
+                                    classes.link,
+                                    classes.lastLink,
+                                ])}
                             >
                                 Feedback
                             </a>
