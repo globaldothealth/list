@@ -6,6 +6,189 @@ from brazil_srag import srag
 _SOURCE_ID = "abc123"
 _SOURCE_URL = "foo.bar"
 
+_EXPECTED = [
+    {
+        "caseReference": {"sourceId": "abc123", "sourceUrl": "foo.bar"},
+        "demographics": {
+            "ageRange": {"end": 79.0, "start": 79.0},
+            "ethnicity": "White",
+            "gender": "Male",
+        },
+        "events": [
+            {
+                "dateRange": {"end": "01/11/2021Z", "start": "01/11/2021Z"},
+                "name": "confirmed",
+                "value": "PCR test",
+            },
+            {
+                "dateRange": {"end": "01/03/2021Z", "start": "01/03/2021Z"},
+                "name": "onsetSymptoms",
+            },
+            {
+                "dateRange": {"end": "01/11/2021Z", "start": "01/11/2021Z"},
+                "name": "hospitalAdmission",
+                "value": "Yes",
+            },
+            {"name": "icuAdmission", "value": "No"},
+            {
+                "dateRange": {"end": "01/23/2021Z", "start": "01/23/2021Z"},
+                "name": "outcome",
+                "value": "Recovered",
+            },
+        ],
+        "location": {
+            "administrativeAreaLevel1": "São Paulo",
+            "administrativeAreaLevel2": "São Paulo",
+            "country": "Brazil",
+            "geoResolution": "Admin2",
+            "geometry": {"latitude": -23.65008109, "longitude": -46.64811076},
+            "name": "São Paulo, São Paulo, Brazil",
+        },
+        "preexistingConditions": {
+            "hasPreexistingConditions": True,
+            "values": ["heart disease"],
+        },
+        "symptoms": {"status": "Symptomatic", "values": ["dyspnea", "hypoxemia"]},
+        "travelHistory": None,
+        "vaccines": [
+            {"batch": "231123w2", "date": "08/13/2021Z"},
+            {"batch": "231123w3", "date": "11/13/2021Z"},
+        ],
+    },
+    {
+        "caseReference": {"sourceId": "abc123", "sourceUrl": "foo.bar"},
+        "demographics": {
+            "ageRange": {"end": 47.0, "start": 47.0},
+            "ethnicity": "Black",
+            "gender": "Female",
+        },
+        "events": [
+            {
+                "dateRange": {"end": "01/10/2021Z", "start": "01/10/2021Z"},
+                "name": "confirmed",
+                "value": None,
+            },
+            {
+                "dateRange": {"end": "01/10/2021Z", "start": "01/10/2021Z"},
+                "name": "onsetSymptoms",
+            },
+            {
+                "dateRange": {"end": "01/10/2021Z", "start": "01/10/2021Z"},
+                "name": "hospitalAdmission",
+                "value": "Yes",
+            },
+        ],
+        "location": {
+            "administrativeAreaLevel1": "São Paulo",
+            "administrativeAreaLevel2": "Campinas",
+            "country": "Brazil",
+            "geoResolution": "Admin2",
+            "geometry": {"latitude": -22.88376008, "longitude": -47.04379961},
+            "name": "Campinas, São Paulo, Brazil",
+        },
+        "preexistingConditions": {
+            "hasPreexistingConditions": True,
+            "values": ["respiratory system disease"],
+        },
+        "symptoms": {
+            "status": "Symptomatic",
+            "values": ["dyspnea", "fever", "cough", "hypoxemia"],
+        },
+        "travelHistory": None,
+        "vaccines": [{"batch": "245231", "date": "08/14/2021Z"}],
+    },
+    {
+        "caseReference": {"sourceId": "abc123", "sourceUrl": "foo.bar"},
+        "demographics": {
+            "ageRange": {"end": 90.0, "start": 90.0},
+            "ethnicity": "White",
+            "gender": "Female",
+        },
+        "events": [
+            {
+                "dateRange": {"end": "01/11/2021Z", "start": "01/11/2021Z"},
+                "name": "confirmed",
+                "value": None,
+            },
+            {
+                "dateRange": {"end": "01/05/2021Z", "start": "01/05/2021Z"},
+                "name": "onsetSymptoms",
+            },
+            {
+                "dateRange": {"end": "01/08/2021Z", "start": "01/08/2021Z"},
+                "name": "hospitalAdmission",
+                "value": "Yes",
+            },
+            {
+                "dateRange": {"end": "01/12/2021Z", "start": "01/12/2021Z"},
+                "name": "outcome",
+                "value": "Death",
+            },
+        ],
+        "location": {
+            "administrativeAreaLevel1": "Santa Catarina",
+            "administrativeAreaLevel2": "Florianópolis",
+            "country": "Brazil",
+            "geoResolution": "Admin2",
+            "geometry": {"latitude": -27.57884066, "longitude": -48.50909204},
+            "name": "Florianópolis, Santa Catarina, Brazil",
+        },
+        "preexistingConditions": {
+            "hasPreexistingConditions": True,
+            "values": ["asthma", "nervous system disease"],
+        },
+        "restrictedNotes": "Patient died from other causes",
+        "symptoms": {"status": "Symptomatic", "values": ["dyspnea", "hypoxemia"]},
+        "travelHistory": None,
+    },
+    {
+        "caseReference": {"sourceId": "abc123", "sourceUrl": "foo.bar"},
+        "demographics": {
+            "ageRange": {"end": 55.0, "start": 55.0},
+            "ethnicity": "White",
+            "gender": "Female",
+        },
+        "events": [
+            {
+                "dateRange": {"end": "01/13/2021Z", "start": "01/13/2021Z"},
+                "name": "confirmed",
+                "value": "PCR test",
+            },
+            {
+                "dateRange": {"end": "01/09/2021Z", "start": "01/09/2021Z"},
+                "name": "onsetSymptoms",
+            },
+            {
+                "dateRange": {"end": "01/13/2021Z", "start": "01/13/2021Z"},
+                "name": "hospitalAdmission",
+                "value": "Yes",
+            },
+            {"name": "icuAdmission", "value": "No"},
+        ],
+        "location": {
+            "administrativeAreaLevel1": "São Paulo",
+            "administrativeAreaLevel2": "São Paulo",
+            "country": "Brazil",
+            "geoResolution": "Admin2",
+            "geometry": {"latitude": -23.65008109, "longitude": -46.64811076},
+            "name": "São Paulo, São Paulo, Brazil",
+        },
+        "preexistingConditions": {
+            "hasPreexistingConditions": True,
+            "values": ["diabetes mellitus", "heart disease"],
+        },
+        "symptoms": {
+            "status": "Symptomatic",
+            "values": ["throat pain", "dyspnea", "fever", "cough", "hypoxemia"],
+        },
+        "travelHistory": None,
+        "vaccines": [
+            {"batch": "13141ax2", "date": "08/16/2021Z"},
+            {"batch": "151234i", "date": "12/25/2021Z"},
+        ],
+    },
+]
+
 
 class BrazilSRAGTest(unittest.TestCase):
     def setUp(self):
@@ -17,240 +200,4 @@ class BrazilSRAGTest(unittest.TestCase):
         sample_data_file = os.path.join(current_dir, "sample_data.csv")
 
         result = srag.parse_cases(sample_data_file, _SOURCE_ID, _SOURCE_URL)
-        self.assertCountEqual(list(result), [
-            {
-                "caseReference": {"sourceId": _SOURCE_ID, "sourceUrl": _SOURCE_URL},
-                "location": {
-                    "country": "Brazil",
-                    "administrativeAreaLevel1": "Amazonas",
-                    "administrativeAreaLevel2": "Manaus",
-                    "geoResolution": "Admin2",
-                    "name": "Manaus, Amazonas, Brazil",
-                    "geometry": {
-                        "longitude": -60.25962801,
-                        "latitude": -2.625919383
-                    }
-                },
-                "events": [
-                    {
-                        "name": "confirmed",
-                        "dateRange": {
-                            "start": '01/26/2021Z',
-                            "end": '01/26/2021Z'
-                        },
-                        "value": "PCR test"
-                    },
-                    {
-                        "name": "onsetSymptoms",
-                        "dateRange": {
-                            "start": '01/23/2021Z',
-                            "end": '01/23/2021Z'
-                        }
-                    },
-                    {
-                        "name": "hospitalAdmission",
-                        "value": "Yes",
-                        "dateRange": {
-                            "start": '01/26/2021Z',
-                            "end": '01/26/2021Z'
-                        }
-                    },
-                    {
-                        "name": "icuAdmission",
-                        "value": "Yes",
-                        "dateRange": {
-                            "start": '01/28/2021Z',
-                            "end": None
-                        }
-                    },
-                    {
-                        "name": "outcome",
-                        "value": "Recovered",
-                        "dateRange": {
-                            "start": None,
-                            "end": None
-                        }
-                    }
-                ],
-                "symptoms": {
-                    "status": "Symptomatic",
-                    "values": [
-                        "dyspnea", "fever", "cough", "hypoxemia"
-                    ]
-                },
-                "demographics": {
-                    "gender": "Male",
-                    "ageRange": {
-                        "start": 18.0,
-                        "end": 18.0
-                    },
-                    "ethnicity": "Mixed"
-                },
-                "preexistingConditions": {
-                    "hasPreexistingConditions": True,
-                    "values": [
-                        "nervous system disease"
-                    ]
-                },
-                "travelHistory": None
-            },
-            {
-                "caseReference": {"sourceId": _SOURCE_ID, "sourceUrl": _SOURCE_URL},
-                "location": {
-                    "country": "Brazil",
-                    "administrativeAreaLevel1": "Amazonas",
-                    "administrativeAreaLevel2": "Manacapuru",
-                    "geoResolution": "Admin2",
-                    "name": "Manacapuru, Amazonas, Brazil",
-                    "geometry": {
-                        "longitude": -60.9587578,
-                        "latitude": -3.291538169
-                    }
-                },
-                "events": [
-                    {
-                        "name": "confirmed",
-                        "dateRange": {
-                            "start": '03/10/2021Z',
-                            "end": '03/10/2021Z'
-                        },
-                        "value": "Serological test"
-                    },
-                    {
-                        "name": "onsetSymptoms",
-                        "dateRange": {
-                            "start": '02/27/2021Z',
-                            "end": '02/27/2021Z'
-                        }
-                    },
-                    {
-                        "name": "hospitalAdmission",
-                        "value": "Yes",
-                        "dateRange": {
-                            "start": '03/09/2021Z',
-                            "end": '03/09/2021Z'
-                        }
-                    },
-                    {
-                        "name": "icuAdmission",
-                        "value": "No",
-                    },
-                    {
-                        "name": "outcome",
-                        "value": "Death",
-                        "dateRange": {
-                            "start": '03/17/2021Z',
-                            "end": '03/17/2021Z'
-                        }
-                    }
-                ],
-                "symptoms": {
-                    "status": "Symptomatic",
-                    "values": [
-                        "dyspnea", "fever", "cough"
-                    ]
-                },
-                "demographics": {
-                    "gender": "Male",
-                    "ageRange": {
-                        "start": 46.0,
-                        "end": 46.0
-                    },
-                    "ethnicity": "White"
-                },
-                "preexistingConditions": None,
-                "travelHistory": {
-                    "traveledPrior30Days": True,
-                    "travel": [
-                        {
-                            "location": {
-                                "country": "Antarctica",
-                                "geoResolution": "Country",
-                                "name": "Antarctica",
-                                "geometry": {
-                                    "latitude": -75.250973,
-                                    "longitude": -0.071389
-                                }
-                            },
-                        }
-                    ],
-                    "dateRange": {
-                        "start": None,
-                        "end": None
-                    }
-                },
-                "restrictedNotes": "Patient died from other causes"
-            },
-            {
-                "caseReference": {"sourceId": _SOURCE_ID, "sourceUrl": _SOURCE_URL},
-                "location": {
-                    "country": "Brazil",
-                    "administrativeAreaLevel1": "Minas Gerais",
-                    "administrativeAreaLevel2": "Montes Claros",
-                    "geoResolution": "Admin2",
-                    "name": "Montes Claros, Minas Gerais, Brazil",
-                    "geometry": {
-                        "latitude": -16.62071806,
-                        "longitude": -43.92881683
-                    }
-                },
-                "events": [
-                    {
-                        "name": "confirmed",
-                        "dateRange": {
-                            "start": '04/07/2021Z',
-                            "end": '04/07/2021Z'
-                        },
-                        "value": "PCR test"
-                    },
-                    {
-                        "name": "onsetSymptoms",
-                        "dateRange": {
-                            "start": '04/01/2021Z',
-                            "end": '04/01/2021Z'
-                        }
-                    },
-                    {
-                        "name": "hospitalAdmission",
-                        "value": "Yes",
-                        "dateRange": {
-                            "start": '04/07/2021Z',
-                            "end": '04/07/2021Z'
-                        }
-                    },
-                    {
-                        "name": "icuAdmission",
-                        "value": "No",
-                    },
-                    {
-                        "name": "outcome",
-                        "value": "Death",
-                        "dateRange": {
-                            "start": '04/13/2021Z',
-                            "end": '04/13/2021Z'
-                        }
-                    }
-                ],
-                "symptoms": {
-                    "status": "Symptomatic",
-                    "values": [
-                        "dyspnea", "cough", "hypoxemia"
-                    ]
-                },
-                "demographics": {
-                    "gender": "Female",
-                    "ageRange": {
-                        "start": 74.0,
-                        "end": 74.0
-                    },
-                    "ethnicity": "White"
-                },
-                "preexistingConditions": {
-                    "hasPreexistingConditions": True,
-                    "values": [
-                        'other comorbidity listed as: HAS'
-                    ]
-                },
-                "travelHistory": None
-            },
-        ])
+        self.assertCountEqual(list(result), _EXPECTED)
