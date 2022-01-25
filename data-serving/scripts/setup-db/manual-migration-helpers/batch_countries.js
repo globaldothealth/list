@@ -23,21 +23,25 @@ print("Processing " + count + " documents");
 sourceCollection.find(filter, { _id: 1, location: 1, travelHistory: 1 }).batchSize(1000).forEach(function(doc) {
   prog++;
   const country = countryNameToCode(doc.location.country);
-  batch.find({ _id: doc._id }).updateOne({ $set: { location: { country }}});
+  batch.find({ _id: doc._id }).updateOne({ $set: { 'location.country' : country }});
   const travel = doc.travelHistory?.travel ?? null;
   if (travel) {
-      const replacementTravel = travel.map(aTravel => {
-          const newTravel = Object.assign({}, aTravel);
-          if (newTravel.location && newTravel.location.country) {
-              newTravel.location.country = countryNameToCode(aTravel.location.country);
-          }
-      });
-      batch.find({ _id: doc._id }).updateOne({ $set: { travelHistory: { travel: replacementTravel }}});
+    travel.forEach((aTravel, i) => {
+        if (aTravel.location?.country) {
+            const key = `travelHistory.travel.${i}.location.country`;
+            batch.find({ _id: doc._id }).updateOne({ $set: { [key]: countryNameToCode(aTravel.location.country)}});
+        }
+    });
   }
   
   if (prog % flush == 0) {
     print(new Date() + " - Processing " + prog + " of " + count);
-    batch.execute();    
+	try {
+	    batch.execute();    
+	} catch(e) {
+		print(e);
+		throw e;
+	}
     batch = sourceCollection.initializeUnorderedBulkOp();
   }
 });
