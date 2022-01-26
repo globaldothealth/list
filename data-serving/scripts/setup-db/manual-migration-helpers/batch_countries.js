@@ -10,7 +10,20 @@ function countryNameToCode(country) {
     if (country === 'Algiers') {
         country = 'Algeria';
     }
-    return countries.getAlpha2Code(country, 'en');
+    /* specific workarounds for limitations in the coding library.
+     * I have a PR at https://github.com/michaelwittig/node-i18n-iso-countries/pull/277
+     * but will belt-and-braces this to continue with the import.
+     */
+    else if (country === 'The Gambia') {
+        country = 'Gambia';
+    }
+    else if (country === 'Tanzania') {
+        country = 'Tanzania, United Republic of';
+    }
+    const code = countries.getAlpha2Code(country, 'en');
+    if (!code) {
+        print(`${country} was not recognised, skipping!`);
+    }
 }
 
 var sourceCollection = db.getSiblingDB("covid19").getCollection("cases");
@@ -23,13 +36,18 @@ print("Processing " + count + " documents");
 sourceCollection.find(filter, { _id: 1, location: 1, travelHistory: 1 }).batchSize(1000).forEach(function(doc) {
   prog++;
   const country = countryNameToCode(doc.location.country);
-  batch.find({ _id: doc._id }).updateOne({ $set: { 'location.country' : country }});
+  if (country) {
+    batch.find({ _id: doc._id }).updateOne({ $set: { 'location.country' : country }});
+}
   const travel = doc.travelHistory?.travel ?? null;
   if (travel) {
     travel.forEach((aTravel, i) => {
         if (aTravel.location?.country) {
             const key = `travelHistory.travel.${i}.location.country`;
-            batch.find({ _id: doc._id }).updateOne({ $set: { [key]: countryNameToCode(aTravel.location.country)}});
+            const code = countryNameToCode(aTravel.location.country);
+            if (code) {
+                batch.find({ _id: doc._id }).updateOne({ $set: { [key]: code}});
+            }
         }
     });
   }
