@@ -35,14 +35,16 @@ var prog = 0;
 print("Processing " + count + " documents");
 sourceCollection.find(filter, { _id: 1, location: 1, travelHistory: 1 }).batchSize(1000).forEach(function(doc) {
   prog++;
-  const country = countryNameToCode(doc.location.country);
-  if (country) {
-    batch.find({ _id: doc._id }).updateOne({ $set: { 'location.country' : country }});
-}
+  if (doc.location.country.length !== 2) {
+    const country = countryNameToCode(doc.location.country);
+    if (country) {
+        batch.find({ _id: doc._id }).updateOne({ $set: { 'location.country' : country }});
+    }
+  }
   const travel = doc.travelHistory?.travel ?? null;
   if (travel) {
     travel.forEach((aTravel, i) => {
-        if (aTravel.location?.country) {
+        if (aTravel.location?.country && aTravel.location?.country.length !== 2) {
             const key = `travelHistory.travel.${i}.location.country`;
             const code = countryNameToCode(aTravel.location.country);
             if (code) {
