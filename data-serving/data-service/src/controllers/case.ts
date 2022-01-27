@@ -309,9 +309,11 @@ export class CasesController {
             res.json({ cases: docs, total: reportedTotal });
         } catch (e) {
             if (e instanceof ParsingError) {
+                logger.error(`Parsing error ${e.message}`);
                 res.status(422).json({ message: e.message });
                 return;
             }
+            logger.error(`non-parsing error for query ${req.query}`);
             logger.error(e);
             res.status(500).json(e);
             return;
