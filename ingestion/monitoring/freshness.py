@@ -74,7 +74,7 @@ def upload(data, bucket, s3_endpoint=None):
             ACL="public-read",
             Body=json.dumps(data, indent=2, sort_keys=True),
             Bucket=bucket,
-            Key="country/freshness.json",
+            Key="metrics/freshness.json",
         )
     except Exception as e:
         logging.error(f"Failed to upload with exception:\n{e}")
