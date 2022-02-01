@@ -31,7 +31,6 @@ const styles = (theme: Theme) =>
             zIndex: 1500,
             borderRadius: 5,
             padding: theme.spacing(4),
-            // overflow: 'scroll',
         },
         closeIcon: {
             width: 30,
