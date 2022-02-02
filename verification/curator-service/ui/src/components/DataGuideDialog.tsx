@@ -100,21 +100,23 @@ const SearchGuideDialog = ({
                 bounds="body"
                 defaultPosition={positionOffset}
                 nodeRef={nodeRef}
+                cancel="#close-guide-icon"
             >
                 <div
                     ref={nodeRef}
                     className={classes.root}
                     id="draggable-search-guide"
                 >
-                    <Box position="relative">
-                        <Box position="absolute" top={0} right={0}>
+                    <Box sx={{ position: 'relative' }}>
+                        <Box sx={{ position: 'absolute', top: 0, right: 0 }}>
                             <CloseIcon
                                 className={classes.closeIcon}
                                 onClick={onToggle}
                                 data-testid="close-search-guide-button"
+                                id="close-guide-icon"
                             />
                         </Box>
-                        <Box mb={1}>
+                        <Box sx={{ mb: 1 }}>
                             <Typography className={classes.title}>
                                 Welcome to Global.health Data!
                             </Typography>
