@@ -171,14 +171,12 @@ def prepare_cases(cases: Generator[Dict, None, None], upload_id: str, excluded_c
     """
     for case in cases:
         case["caseReference"]["uploadIds"] = [upload_id]
-        if "location" in case and "country" in case["location"]:
-            country = case["location"]["country"]
+        if country := case.get("location", {}).get("country"):
             case["location"]["country"] = iso3166_country_code(country)
-        if "travelHistory" in case and "travel" in case["travelHistory"] is not None:
+        if case.get("travelHistory") and case.get("travelHistory").get("travel"):
             for travel in case["travelHistory"]["travel"]:
-                if "location" in travel and "country" in travel["location"]:
-                    country = travel["location"]["country"]
-                    travel["location"]["country"] = iso3166_country_code(country)
+                if travel_country := travel.get("location", {}).get("country"):
+                    travel["location"]["country"] = iso3166_country_code(travel_country)
         if (excluded_case_ids is None) or ("sourceEntryId" not in case["caseReference"]) or (not case["caseReference"]["sourceEntryId"] in excluded_case_ids):
             yield remove_nested_none_and_empty(case)
 
