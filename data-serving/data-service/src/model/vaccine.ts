@@ -6,7 +6,7 @@ export const vaccineSchema = new mongoose.Schema(
         name: String,
         batch: String,
         date: Date,
-        sideEffects: [symptomsSchema],
+        sideEffects: symptomsSchema,
         previousInfection: String,
         previousInfectionDetectionMethod: String,
     },
