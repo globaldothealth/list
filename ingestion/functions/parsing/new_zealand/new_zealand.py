@@ -18,6 +18,7 @@ except ImportError:
     import parsing_lib
 
 _NZ = parsing_lib.geocode_country('NZ')
+_NZ["country"] = "New Zealand"
 
 _DHB = "DHB"
 _REPORT_DATE = "Report Date"
