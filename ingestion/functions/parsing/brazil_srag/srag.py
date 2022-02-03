@@ -149,7 +149,7 @@ def convert_vaccines(date_dose_1, date_dose_2, batch_dose_1, batch_dose_2):
             "date": convert_date(date_dose_1),
             "batch": batch_dose_1
         }
-    if date_dose_2:
+    if date_dose_2 and date_dose_2 != date_dose_1:
         vaccines[1] = {
             "date": convert_date(date_dose_2),
             "batch": batch_dose_2
