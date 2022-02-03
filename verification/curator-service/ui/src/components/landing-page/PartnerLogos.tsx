@@ -32,6 +32,7 @@ const useStyles = makeStyles((theme: Theme) => ({
         marginTop: '10px',
         '&.fullWidth': {
             justifyContent: 'space-evenly',
+            alignItems: 'center',
         },
     },
     logo: {

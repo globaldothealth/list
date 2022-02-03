@@ -1,11 +1,11 @@
-import React from 'react';
+import React, { ReactNode } from 'react';
 import Snackbar from '@material-ui/core/Snackbar';
 import MuiAlert, { AlertProps } from '@material-ui/lab/Alert';
 
 interface SnackbarAlertProps {
-    isOpen: boolean;
+    isOpen: boolean | undefined;
     onClose: (value: boolean) => void;
-    message: string;
+    message: string | ReactNode;
     type: 'success' | 'warning' | 'info' | 'error';
     durationMs?: number;
 }
