@@ -63,10 +63,19 @@ const useStyles = makeStyles((theme: Theme) => ({
         // margin: '35px 0 0 0',
         fontWeight: 400,
     },
+    googleButtonContainer: {
+        marginBottom: '50px',
+    },
     formFlexContainer: {
         display: 'flex',
-        gap: '79px',
+        columnGap: '79px',
         marginTop: '20px',
+        flexWrap: 'wrap',
+    },
+    passwordBlockContainer: {
+        [theme.breakpoints.down(649)]: {
+            marginTop: '30px',
+        },
     },
 }));
 
@@ -207,7 +216,7 @@ export default function SignUpForm({
                         />
                     </div>
 
-                    <div>
+                    <div className={classes.passwordBlockContainer}>
                         <FormControl
                             disabled={disabled}
                             className={classes.inpputField}
@@ -300,7 +309,8 @@ export default function SignUpForm({
                             </FormHelperText>
                         </FormControl>
                     </div>
-                    <div>
+
+                    <div className={classes.googleButtonContainer}>
                         <div>
                             <Typography className={classes.title}>
                                 Or sign up with Google

@@ -48,6 +48,9 @@ const useStyles = makeStyles((theme: Theme) => ({
     body: {
         display: 'flex',
         marginTop: '20px',
+        [theme.breakpoints.down(770)]: {
+            marginBottom: '60px',
+        },
     },
     description: {
         color: theme.custom.palette.landingPage.descriptionTextColor,

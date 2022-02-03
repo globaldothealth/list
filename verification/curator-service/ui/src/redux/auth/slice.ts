@@ -12,7 +12,7 @@ import {
 
 export interface SnackbarProps {
     isOpen: boolean;
-    message: string;
+    message: string | undefined;
 }
 
 interface AuthState {
