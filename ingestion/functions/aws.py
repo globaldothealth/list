@@ -9,6 +9,7 @@ from uuid import uuid4
 import boto3
 
 import common.common_lib as common_lib
+from aws_access.EventBridgeClient import EventBridgeClient
 
 AWS_REGION = "us-east-1"
 AWS_IMAGE = {
@@ -92,7 +93,8 @@ deregister    Deregister a Batch job definition
         parser.add_argument("command", help="Subcommand to run")
         args = parser.parse_args(sys.argv[1:2])  # only parse command
         self.batch_client = boto3.client("batch", AWS_REGION)
-        self.event_bridge_client = boto3.client("events", AWS_REGION)
+        self.event_bridge_client = EventBridgeClient(AWS_REGION)
+
         getattr(
             self,
             {"list-compute": "list_compute", "list": "list_jobs"}.get(
@@ -251,7 +253,7 @@ deregister    Deregister a Batch job definition
             print("Enabled and disabled are mutually exclusive options")
             sys.exit(2)
 
-        rules = self.event_bridge_client.list_rules().get("Rules")
+        rules = self.event_bridge_client.get_rule_descriptions()
         if not rules:
             print("Could not get EventBridge rules")
             return
@@ -276,14 +278,7 @@ deregister    Deregister a Batch job definition
                 print(rule_names)
 
     def get_rule_targets(self, rule_name):
-        batch_targets = {}
-        targets = self.event_bridge_client.list_targets_by_rule(Rule=rule_name)
-        for target in targets.get("Targets"):
-            target_id = target.get("Id")
-            if not target_id:
-                raise KeyError(f"Could not get target ID for {rule_name}")
-            batch_targets[target_id] = target.get("BatchParameters")
-        return batch_targets
+        return self.event_bridge_client.get_rule_targets(rule_name)
 
     def enable(self):
         parser = argparse.ArgumentParser(
@@ -294,7 +289,7 @@ deregister    Deregister a Batch job definition
         )
         args = parser.parse_args(sys.argv[2:])
         try:
-            self.event_bridge_client.enable_rule(Rule=args.rule_name)
+            self.event_bridge_client.enable_schedule(args.rule_name)
         except Exception as exc:
             print(f"An exception occurred while enabling rule {args.rule_name}: {exc}")
             raise
@@ -309,7 +304,7 @@ deregister    Deregister a Batch job definition
         )
         args = parser.parse_args(sys.argv[2:])
         try:
-            self.event_bridge_client.disable_rule(Rule=args.rule_name)
+            self.event_bridge_client.disable_schedule(rgs.rule_name)
         except Exception as exc:
             print(f"An exception occurred while disabling rule {args.rule_name}: {exc}")
             raise
@@ -338,10 +333,8 @@ deregister    Deregister a Batch job definition
             "-d", "--description", help="Rule description", type=str, required=False
         )
         args = parser.parse_args(sys.argv[2:])
-        state = "DISABLED"
+        state = True if args.enabled else False
         description = args.description if args.description else ""
-        if args.enabled:
-            state = "ENABLED"
         if args.target_name:
             if not args.source_name:
                 print("Data source name required for target creation")
@@ -351,11 +344,10 @@ deregister    Deregister a Batch job definition
                 sys.exit(2)
 
         try:
-            self.event_bridge_client.put_rule(
-                Name=args.rule_name,
-                ScheduleExpression=DEFAULT_SCHEDULE_EXPRESSION,
-                State=state,
-                Description=description
+            self.event_bridge_client.add_schedule(
+                rule_name,
+                description,
+                state
             )
         except Exception as exc:
             print(f"An exception occurred while creating rule {args.rule_name}: {exc}")
@@ -363,18 +355,14 @@ deregister    Deregister a Batch job definition
         print(f"Created rule {args.rule_name}")
 
         if args.target_name:
-            target_id = str(uuid4())
-            target = [{
-                "Id": target_id,
-                "Arn": AWS_JOB_QUEUE_ARN,
-                "RoleArn": AWS_EVENT_ROLE_ARN,
-                "BatchParameters": {
-                    "JobDefinition": args.target_name,
-                    "JobName": args.job_name
-                }
-            }]
             try:
-                self.event_bridge_client.put_targets(Rule=args.rule_name, Targets=target)
+                self.event_bridge_client.add_target_to_rule(
+                    args.rule_name,
+                    args.target_name,
+                    args.job_name,
+                    AWS_JOB_QUEUE_ARN,
+                    AWS_EVENT_ROLE_ARN
+                )
             except Exception as exc:
                 print(f"An exception occurred while targeting {args.target_name} for rule {args.rule_name}: {exc}")
                 raise
@@ -389,7 +377,7 @@ deregister    Deregister a Batch job definition
         )
         args = parser.parse_args(sys.argv[2:])
         try:
-            self.event_bridge_client.delete_rule(Name=args.rule_name)
+            self.event_bridge_client.unschedule(args.rule_name)
         except Exception as exc:
             print(f"An exception occurred while deleting rule {args.rule_name}: {exc}")
             raise
@@ -410,17 +398,14 @@ deregister    Deregister a Batch job definition
         )
         args = parser.parse_args(sys.argv[2:])
         try:
-            target_id = str(uuid4())
-            target = [{
-                "Id": target_id,
-                "Arn": AWS_JOB_QUEUE_ARN,
-                "RoleArn": AWS_EVENT_ROLE_ARN,
-                "BatchParameters": {
-                    "JobDefinition": args.target_name,
-                    "JobName": args.job_name
-                }
-            }]
-            self.event_bridge_client.put_targets(Rule=args.rule_name, Targets=target)
+            self.event_bridge_client.add_target_to_rule(
+                    args.rule_name,
+                    args.target_name,
+                    args.job_name,
+                    AWS_JOB_QUEUE_ARN,
+                    AWS_EVENT_ROLE_ARN
+                )
+
         except Exception as exc:
             print(f"An exception occurred while setting target for rule {args.rule_name}: {exc}")
             raise
@@ -434,23 +419,8 @@ deregister    Deregister a Batch job definition
             "rule_name", help="Name of rule with targets to delete"
         )
         args = parser.parse_args(sys.argv[2:])
-        target_ids = []
         try:
-            self.event_bridge_client.list_targets_by_rule(Rule=args.rule_name)
-            targets = self.event_bridge_client.list_targets_by_rule(Rule=args.rule_name)
-            for target in targets.get("Targets"):
-                target_id = target.get("Id")
-                if not target_id:
-                    raise KeyError(f"Could not get target ID for rule {args.rule_name}")
-                target_ids.append(target_id)
-            if len(target_ids) == 0:
-                print(f"No targets found for rule {args.rule_name}")
-                return
-        except Exception as exc:
-            print(f"An exception occurred while getting target ids for rule {args.rule_name}: {exc}")
-            raise
-        try:
-            self.event_bridge_client.remove_targets(Rule=args.rule_name, Ids=target_ids)
+            self.event_bridge_client.remove_targets_from_rule(args.rule_name)
         except Exception as exc:
             print(f"An exception occurred while deleting targets {target_ids} for rule {args.rule_name}: {exc}")
             raise
