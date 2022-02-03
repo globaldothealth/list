@@ -9,7 +9,7 @@ _SOURCE_URL = "foo.bar"
 _UA = {
     "location": {
         "name": "Ukraine",
-        "country": "Ukraine",
+        "country": "UA",
         "geoResolution": "Country",
         "geometry": {"latitude": 48.379433, "longitude": 31.16558},
     }

@@ -19,7 +19,7 @@ _TRINIDAD = {
 }
 _ITALY = {
     "name": "Italy",
-    "country": "Italy",
+    "country": "IT",
     "geoResolution": "Country",
     "geometry": {"latitude": 41.87194, "longitude": 12.56738}
 }
