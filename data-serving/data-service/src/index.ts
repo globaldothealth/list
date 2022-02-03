@@ -35,7 +35,7 @@ const app = express();
 dotenv.config();
 const env = validateEnv();
 
-const deployment_envs = ['prod', 'dev'];
+const deployment_envs = ['dev', 'qa', 'prod'];
 if (!deployment_envs.includes(env.SERVICE_ENV)) {
     require('longjohn');
 }

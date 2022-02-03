@@ -94,7 +94,7 @@ a fallback if the UI triggers for ingestion are not working.
        poetry run python aws.py jobdefs
 
    This should show existing **job definitions**. Job definitions are templates that
-   tell AWS Batch which parser to run and in which environment (dev or prod). If this
+   tell AWS Batch which parser to run and in which environment (dev, qa, or prod). If this
    command doesn't work, contact the engineering team to setup access.
 
 3. Check if the ingestion you want to run already has an associated job definition

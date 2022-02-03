@@ -96,7 +96,7 @@ export default function validateEnv(): Readonly<{
         }),
         PORT: port({ default: 3001 }),
         SERVICE_ENV: str({
-            choices: ['local', 'locale2e', 'dev', 'prod'],
+            choices: ['local', 'locale2e', 'dev', 'qa', 'prod'],
             desc: 'Environment in which the service is running',
             devDefault: 'local',
         }),
