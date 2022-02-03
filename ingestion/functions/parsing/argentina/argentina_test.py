@@ -140,7 +140,7 @@ class ArgentinaTest(unittest.TestCase):
                     "travel": [
                         {
                             "location": {
-                                "country": "Italy",
+                                "country": "IT",
                                 "geoResolution": "Country",
                                 "name": 'Italy',
                                 "geometry": {

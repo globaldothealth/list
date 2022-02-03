@@ -72,7 +72,7 @@ def geocode_country(two_letter_iso_code):
     try:
         lat, lon, country = GEOCODING_COUNTRIES[two_letter_iso_code]
         return {
-            "country": country,
+            "country": two_letter_iso_code,
             "geoResolution": "Country",
             "name": country,
             "geometry": {"latitude": lat, "longitude": lon}
@@ -150,6 +150,8 @@ def iso3166_country_code(country_name: str) -> str:
     This is only used in cases where the parser supplies the location info: typically we would
     expect the parser to give a location query which is later geocoded anyway.
     """
+    if len(country_name) == 2 and country_name.isalpha():
+        return country_name.upper()
     ucase_name = country_name.upper()
 
     country = iso3166.countries.get(ucase_name, None)
