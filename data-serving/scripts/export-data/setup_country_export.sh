@@ -24,7 +24,7 @@ function casecounts {
 }
 
 function containerprops {
-    # usage: containerprops "<country>"
+    # usage: containerprops "<code>"
     cat << EOF
 {
   "image": "$IMAGE",
@@ -41,19 +41,18 @@ EOF
 }
 
 casecounts | \
-    while IFS=$'\t' read -r country casecount; do
+    while IFS=$'\t' read -r code casecount; do
         if [[ "$casecount" == "0" ]]; then
             continue
         fi
-        if [[ "$casecount" -lt "$((EXPORT_RATE * 1800))" ]]; then
-            timeout=1800  # allow minimum of 30 minutes for a job
+        if [[ "$casecount" -lt "$((EXPORT_RATE * 3600))" ]]; then
+            timeout=3600  # allow minimum of 60 minutes for a job
         else
             timeout=$((casecount / EXPORT_RATE))
         fi
-        slug=$(echo "${country}" | sed "s/ /_/g;s/[.,']//g" | tr '[:upper:]' '[:lower:]')
-        printf 'exporter_%s; casecount=%d; timeout=%d\n' "$slug" "$casecount" "$timeout"
-        containerprops "${country}"
-        aws batch register-job-definition --job-definition-name "${ENV}-exporter_${slug}" \
-            --container-properties "$(containerprops "${country}")" \
+        printf '%s-exporter-%s; casecount=%d; timeout=%d\n' "$ENV" "$code" "$casecount" "$timeout"
+        containerprops "${code}"
+        aws batch register-job-definition --job-definition-name "${ENV}-exporter-${code}" \
+            --container-properties "$(containerprops "${code}")" \
             --timeout "attemptDurationSeconds=${timeout}" --type container
     done
