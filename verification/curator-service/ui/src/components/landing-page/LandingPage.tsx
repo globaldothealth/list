@@ -51,11 +51,18 @@ const useStyles = makeStyles((theme: Theme) => ({
         [theme.breakpoints.down(770)]: {
             marginBottom: '60px',
         },
+        [theme.breakpoints.down(460)]: {
+            flexFlow: 'column',
+            rowGap: '30px',
+        },
     },
     description: {
         color: theme.custom.palette.landingPage.descriptionTextColor,
         marginRight: '90px',
         width: '60%',
+        [theme.breakpoints.down(460)]: {
+            width: '100%',
+        },
     },
     linksContainer: {
         width: '40%',
@@ -91,6 +98,82 @@ interface UrlParams {
     token?: string;
     id?: string;
 }
+interface StyleProps {
+    classes: {
+        linksContainer: string;
+        link: string;
+    };
+}
+
+const MoreInformationLinks = ({
+    classes,
+    version,
+}: StyleProps & { version: string }) => {
+    return (
+        <div className={classes.linksContainer}>
+            <div>
+                <Typography>More information</Typography>
+                <div className={classes.link}>Version: {version}</div>
+                <div className={classes.link}>
+                    <a
+                        href="https://global.health/"
+                        rel="noopener noreferrer"
+                        target="_blank"
+                    >
+                        Global.health website
+                    </a>
+                </div>
+                <div className={classes.link}>
+                    <a
+                        href="https://map.covid-19.global.health/"
+                        rel="noopener noreferrer"
+                        target="_blank"
+                    >
+                        Global.health map
+                    </a>
+                </div>
+                <div className={classes.link}>
+                    <a
+                        href="https://raw.githubusercontent.com/globaldothealth/list/main/data-serving/scripts/export-data/data_dictionary.txt"
+                        rel="noopener noreferrer"
+                        target="_blank"
+                    >
+                        Data dictionary
+                    </a>
+                </div>
+                <div className={classes.link}>
+                    <Link to="/data-acknowledgments">Data acknowledgments</Link>
+                </div>
+                <div className={classes.link}>
+                    <a
+                        href="https://global.health/terms-of-use/"
+                        rel="noopener noreferrer"
+                        target="_blank"
+                    >
+                        Terms of use
+                    </a>
+                </div>
+                <div className={classes.link}>
+                    <a
+                        href="https://global.health/privacy/"
+                        rel="noopener noreferrer"
+                        target="_blank"
+                    >
+                        Privacy policy
+                    </a>
+                </div>
+                <PolicyLink
+                    type="cookie-policy"
+                    classes={{
+                        root: classes.link,
+                    }}
+                >
+                    Cookie policy
+                </PolicyLink>
+            </div>
+        </div>
+    );
+};
 
 const LandingPage = (): JSX.Element => {
     const dispatch = useAppDispatch();
@@ -160,72 +243,7 @@ const LandingPage = (): JSX.Element => {
                         global data repository with open access to real-time
                         epidemiological anonymized line list data.
                     </Typography>
-                    <div className={classes.linksContainer}>
-                        <div>
-                            <Typography>More information</Typography>
-                            <div className={classes.link}>
-                                Version: {version}
-                            </div>
-                            <div className={classes.link}>
-                                <a
-                                    href="https://global.health/"
-                                    rel="noopener noreferrer"
-                                    target="_blank"
-                                >
-                                    Global.health website
-                                </a>
-                            </div>
-                            <div className={classes.link}>
-                                <a
-                                    href="https://map.covid-19.global.health/"
-                                    rel="noopener noreferrer"
-                                    target="_blank"
-                                >
-                                    Global.health map
-                                </a>
-                            </div>
-                            <div className={classes.link}>
-                                <a
-                                    href="https://raw.githubusercontent.com/globaldothealth/list/main/data-serving/scripts/export-data/data_dictionary.txt"
-                                    rel="noopener noreferrer"
-                                    target="_blank"
-                                >
-                                    Data dictionary
-                                </a>
-                            </div>
-                            <div className={classes.link}>
-                                <Link to="/data-acknowledgments">
-                                    Data acknowledgments
-                                </Link>
-                            </div>
-                            <div className={classes.link}>
-                                <a
-                                    href="https://global.health/terms-of-use/"
-                                    rel="noopener noreferrer"
-                                    target="_blank"
-                                >
-                                    Terms of use
-                                </a>
-                            </div>
-                            <div className={classes.link}>
-                                <a
-                                    href="https://global.health/privacy/"
-                                    rel="noopener noreferrer"
-                                    target="_blank"
-                                >
-                                    Privacy policy
-                                </a>
-                            </div>
-                            <PolicyLink
-                                type="cookie-policy"
-                                classes={{
-                                    root: classes.link,
-                                }}
-                            >
-                                Cookie policy
-                            </PolicyLink>
-                        </div>
-                    </div>
+                    <MoreInformationLinks classes={classes} version={version} />
                 </div>
 
                 {registrationScreenOn && !changePasswordScreenOn ? (

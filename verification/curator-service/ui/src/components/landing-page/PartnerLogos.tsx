@@ -27,7 +27,7 @@ const useStyles = makeStyles((theme: Theme) => ({
             props.smallWidth ? 'column' : 'row',
 
         alignItems: (props: StylesProps) =>
-            props.smallWidth ? 'flex-start' : 'center',
+            props.smallWidth ? 'center' : 'flex-start',
 
         marginTop: '10px',
         '&.fullWidth': {
