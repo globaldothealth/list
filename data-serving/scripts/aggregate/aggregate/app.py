@@ -15,6 +15,8 @@ import pandas as pd
 import pymongo
 import requests
 
+from iso3166 import countries
+
 _JHU_COUNTRY_MAP = {
     "Czechia": "Czech Republic",
     "Korea South": "South Korea",
@@ -168,6 +170,10 @@ def get_country_codes():
     return countrycodes_dict
 
 
+def country_name(c):
+    return countries.get(c).name
+
+
 def generate_country_json(cases, s3_endpoint, bucket, date, line_list_url, map_url):
     """
     Generate json of case counts by country and upload to S3.
@@ -196,13 +202,10 @@ def generate_country_json(cases, s3_endpoint, bucket, date, line_list_url, map_u
     jhu_counts = get_jhu_counts()
     country_codes = get_country_codes()
 
-    merged_countries = []
-    for record in records:
-        country = record["_id"]
-        merged_countries.append(country)
+    merged_countries = [country_name(record["_id"]) for record in records]
 
     for record in records:
-        country = record["_id"]
+        country = country_name(record["_id"])
         if country is None:
             continue
         try:
@@ -318,14 +321,15 @@ def generate_region_json(cases, s3_endpoint, bucket, date):
                 id = record["admin1"]
                 search_term = "admin1"
             else:
-                id = record["country"]
+                id = country_name(record["country"])
                 if id is None:
                     continue
                 search_term = "country"
             new_record = {
                 "_id": id,
                 "casecount": record["casecount"],
-                "country": record["country"],
+                "country": id,
+                "country_code": record["country"],
                 "admin1": record["admin1"],
                 "admin2": record["admin2"],
                 "admin3": record["admin3"],
