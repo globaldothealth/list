@@ -17,21 +17,13 @@ def test_to_ascii(source, expected):
 
 @pytest.mark.parametrize(
     "source,expected",
-    [("Cote d'Ivoire", "cote_divoire"), ("Virgin Islands, U.S.", "virgin_islands_us")],
-)
-def test_slug(source, expected):
-    assert T.slug(source) == expected
-
-
-@pytest.mark.parametrize(
-    "source,expected",
     [
         (
             _NORTH_AMERICA,
-            {"prod-exporter_united_states", "prod-exporter_canada", "prod-exporter_mexico"},
+            {"prod-exporter-US", "prod-exporter-CA", "prod-exporter-MX"},
         ),
-        (_REUNION, {"prod-exporter_reunion"}),
-        (_NEW_ZEALAND, {"prod-exporter_new_zealand"}),
+        (_REUNION, {"prod-exporter-RE"}),
+        (_NEW_ZEALAND, {"prod-exporter-NZ"}),
         (_INVALID, set()),
     ],
 )
