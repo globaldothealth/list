@@ -67,6 +67,14 @@ optional = false
 python-versions = ">=3.5"
 
 [[package]]
+name = "iso3166"
+version = "2.0.2"
+description = "Self-contained ISO 3166-1 country definitions."
+category = "main"
+optional = false
+python-versions = ">= 3.6"
+
+[[package]]
 name = "jmespath"
 version = "0.10.0"
 description = "JSON Matching Expressions"
@@ -193,7 +201,7 @@ socks = ["PySocks (>=1.5.6,!=1.5.7,<2.0)"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.8"
-content-hash = "0f590ce2987d893560caa69061114d28f137f076bea4569a58df8514b0fc33ad"
+content-hash = "1f3abeb7ba7a465a5f9d4e894f060905421e8a9a0c39fb46ae5c4993dfdb6ec3"
 
 [metadata.files]
 boto3 = [
@@ -219,6 +227,10 @@ dnspython = [
 idna = [
     {file = "idna-3.3-py3-none-any.whl", hash = "sha256:84d9dd047ffa80596e0f246e2eab0b391788b0503584e8945f2368256d2735ff"},
     {file = "idna-3.3.tar.gz", hash = "sha256:9d643ff0a55b762d5cdb124b8eaa99c66322e2157b69160bc32796e824360e6d"},
+]
+iso3166 = [
+    {file = "iso3166-2.0.2-py3-none-any.whl", hash = "sha256:55e93c8a7587cae9479ad68c823390e33493d17d95b457271032594e5f1f7aae"},
+    {file = "iso3166-2.0.2.tar.gz", hash = "sha256:04d02cfcfc18a6f8a9a4edb4d0a55e2e4fc575626c29d702f750de415e88d372"},
 ]
 jmespath = [
     {file = "jmespath-0.10.0-py2.py3-none-any.whl", hash = "sha256:cdf6525904cc597730141d61b36f2e4b8ecc257c420fa2f4549bac2c2d0cb72f"},
