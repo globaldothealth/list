@@ -329,6 +329,7 @@ def generate_region_json(cases, s3_endpoint, bucket, date):
                 "_id": id,
                 "casecount": record["casecount"],
                 "country": id,
+                "country_code": record["country"],
                 "admin1": record["admin1"],
                 "admin2": record["admin2"],
                 "admin3": record["admin3"],
