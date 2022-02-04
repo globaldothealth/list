@@ -10,8 +10,9 @@ import boto3
 
 import common.common_lib as common_lib
 from aws_access.EventBridgeClient import EventBridgeClient
+import aws_access.globaldothealth_configuration as gdoth
 
-AWS_REGION = "us-east-1"
+AWS_REGION = gdoth.AWS_REGION
 AWS_IMAGE = {
     'dev': "612888738066.dkr.ecr.us-east-1.amazonaws.com/gdh-ingestor:latest",
     'prod': "612888738066.dkr.ecr.us-east-1.amazonaws.com/gdh-ingestor:stable"
