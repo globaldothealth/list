@@ -263,17 +263,23 @@ Releases are done on -stable branches. Stable branches are tagged
 as *1.x-stable*, with patch updates being done from the -stable branch.
 **No releases are tagged from main**.
 
-**1.x.0 release**. Change the image tag in `aws/{location,curator,data}.yaml`
-files to point to 1.x.0. Then commit on *main*:
+#### 1.x.0 release
 
-    git commit -a -m 'Release 1.x.0'
-    git checkout -b 1.x-stable
-    git tag 1.x.0
-    git push -u origin 1.x-stable && git push --tags
+* Change the image tag in `aws/{location,curator,data}.yaml`
+  files to point to 1.x.0.
+* Update any reference to the previous stable in GitHub workflows
+* Then commit on *main*:
+
+      git commit -a -m 'Release 1.x.0'
+      git checkout -b 1.x-stable
+      git tag 1.x.0
+      git push -u origin 1.x-stable && git push --tags
 
 Github actions will automatically build the image, e.g. `ghcr.io/globaldothealth/list/curatorservice:0.1.2`.
 
-**1.x.y release**. For subsequent point releases, changes are usually merged
+#### 1.x.y release
+
+For subsequent point releases, changes are usually merged
 from main, unless there are changes that shouldn't be deployed (such as
 a feature that needs more testing). In that case, cherry-pick from main or
 another hotfix branch onto *1.x-stable*. Once you've done that, update the
