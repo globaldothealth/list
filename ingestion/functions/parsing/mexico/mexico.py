@@ -77,7 +77,7 @@ def convert_gender(raw_gender: str):
         return "Female"
 
 
-def convert_events(date_admitted, hospitalized, icu, date_death):
+def convert_events(date_admitted, hospitalized, icu, date_death, date_symptoms):
     events = [
         {
             "name": "confirmed",
@@ -118,6 +118,16 @@ def convert_events(date_admitted, hospitalized, icu, date_death):
                     "end": convert_date(date_death),
                 },
                 "value": "Death",
+            }
+        )
+    if date_symptoms:
+        events.append(
+            {
+                "name": "onsetSymptoms",
+                "dateRange": {
+                    "start": convert_date(date_symptoms),
+                    "end": convert_date(date_symptoms),
+                }
             }
         )
     return events
@@ -201,6 +211,7 @@ def parse_cases(raw_data_file: str, source_id: str, source_url: str):
                         row["TIPO_PACIENTE"],
                         row["UCI"],
                         row["FECHA_DEF"],
+                        row["FECHA_SINTOMAS"]
                     ),
                     "demographics": convert_demographics(
                         row["SEXO"],
