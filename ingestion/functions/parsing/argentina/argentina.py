@@ -275,19 +275,19 @@ def parse_cases(raw_data_file, source_id, source_url):
                             "end": convert_date(entry['fecha_fallecimiento']),
                         }
                     })
-                elif entry["fecha_internacion"]:
+                if entry["fecha_internacion"]:
                     case["events"].append({
-                        "name": "outcome",
-                        "value": "hospitalAdmission",
+                        "name": "hospitalAdmission",
+                        "value": "Yes",
                         "dateRange": {
                             "start": convert_date(entry['fecha_internacion']),
                             "end": convert_date(entry['fecha_internacion']),
                         }
                     })
-                elif entry["fecha_cui_intensivo"]:
+                if entry["fecha_cui_intensivo"]:
                     case["events"].append({
-                        "name": "outcome",
-                        "value": "icuAdmission",
+                        "name": "icuAdmission",
+                        "value": "Yes",
                         "dateRange": {
                             "start": convert_date(entry['fecha_cui_intensivo']),
                             "end": convert_date(entry['fecha_cui_intensivo']),
