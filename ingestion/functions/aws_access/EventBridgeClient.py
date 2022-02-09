@@ -115,8 +115,12 @@ class ScheduleRule:
 Discover AWS EventBridge rules
 """
 class EventBridgeClient:
-    def __init__(self, region: str):
-        self.aws_client = boto3.client("events", region)
+    def __init__(self, region: str, endpoint_url=None):
+        """
+        region: work with EventBridge events in the specified AWS region.
+        endpoint_url: optionally specify an AWS URL (e.g. for testing with localstack)
+        """
+        self.aws_client = boto3.client("events", region, endpoint_url=endpoint_url)
 
     def get_rule_descriptions(self):
         return self.aws_client.list_rules().get("Rules")
