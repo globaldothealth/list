@@ -30,6 +30,10 @@ _PARSED_CASES = [{
             "dateRange": {"start": "05/09/2020Z", "end": "05/09/2020Z"},
             "value": "Death",
         },
+        {
+            "name": "onsetSymptoms",
+            "dateRange": {"start": "04/28/2020Z", "end": "04/28/2020Z"},
+        }
     ],
     "demographics": {
         "gender": "Male",
