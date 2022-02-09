@@ -1,8 +1,11 @@
 import boto3
 
 class S3Client:
-    def __init__(self):
-        self.s3_adapter = boto3.resource('s3')
+    def __init__(self, endpoint_url=None):
+        """
+        Optionally pass the AWS endpoint URL, e.g. to test with localstack.
+        """
+        self.s3_adapter = boto3.resource('s3', endpoint_url=endpoint_url)
     
     def objects_in_bucket_for_ingestion_source(self, bucket_name, source_id):
         """
