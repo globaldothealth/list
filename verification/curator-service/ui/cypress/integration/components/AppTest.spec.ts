@@ -371,8 +371,23 @@ describe('App', function () {
         cy.visit('/cases');
         cy.contains('Line list');
 
+        cy.get('#popup-small-screens').should('not.exist');
+
         cy.get('a[data-testid="home-button-data"')
             .should('have.attr', 'href')
             .and('equal', '/');
+    });
+
+    it.only('Displays popup on small devices', () => {
+        cy.viewport(520, 780);
+        cy.login();
+        cy.visit('/cases');
+
+        cy.get('#popup-small-screens').contains(
+            'For a better experience please visit this website using a device with a bigger screen',
+        );
+
+        cy.get('#small-screens-popup-close-btn').click();
+        cy.get('#popup-small-screens').should('not.exist');
     });
 });
