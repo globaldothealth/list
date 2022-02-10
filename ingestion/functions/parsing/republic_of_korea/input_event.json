@@ -1,6 +1,6 @@
 {
     "env": "local",
-    "s3Bucket": "epid-sources-raw",
+    "s3Bucket": "gdh-sources",
     "s3Key": "test/republic_of_korea/rok_feb21.csv",
     "sourceUrl": "https://raw.githubusercontent.com/ThisIsIsaac/Data-Science-for-COVID-19/master/Covid19_Dataset/patients.csv",
     "sourceId": "6032763bc73880004393e502"

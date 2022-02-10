@@ -75,11 +75,11 @@ services:
     environment:
       AWS_ACCESS_KEY_ID: "fake"
       AWS_SECRET_ACCESS_KEY: "fake"
-      AWS_DEFAULT_REGION: "us-east-1"
+      AWS_DEFAULT_REGION: "eu-central-1"
       AWS_ENDPOINT: "http://localstack:4566"
       DATA_BUCKET_NAME: "covid-19-data-export"
       CACHE_BUCKET_NAME: "covid-19-country-export"
-      RETRIEVAL_BUCKET_NAME: "epid-sources-raw"
+      RETRIEVAL_BUCKET_NAME: "gdh-sources"
       BATCH_QUEUE_NAME: "ingestion-queue"
       SES_EMAIL_ADDRESS: "info@global.health"
       ECR_REPOSITORY_NAME: "gdh-ingestor"
@@ -95,9 +95,9 @@ services:
     environment:
       AWS_ACCESS_KEY_ID: "fake"
       AWS_SECRET_ACCESS_KEY: "fake"
-      AWS_DEFAULT_REGION: "us-east-1"
+      AWS_DEFAULT_REGION: "eu-central-1"
       AWS_ENDPOINT: "http://localstack:4566"
-      RETRIEVAL_BUCKET_NAME: "epid-sources-raw"
+      RETRIEVAL_BUCKET_NAME: "gdh-sources"
       BATCH_QUEUE_NAME: "ingestion-queue"
       ECR_REPOSITORY_NAME: "gdh-ingestor"
       MOCK_SOURCE_DATA_SERVICE: "http://mock-source-data"
@@ -117,9 +117,9 @@ services:
       MOCK_SOURCE_DATA_SERVICE: "http://mock-source-data"
       AWS_ACCESS_KEY_ID: "fake"
       AWS_SECRET_ACCESS_KEY: "fake"
-      AWS_DEFAULT_REGION: "us-east-1"
+      AWS_DEFAULT_REGION: "eu-central-1"
       AWS_ENDPOINT: "http://localstack:4566"
-      RETRIEVAL_BUCKET_NAME: "epid-sources-raw"
+      RETRIEVAL_BUCKET_NAME: "gdh-sources"
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:5001/health"]
       interval: 30s

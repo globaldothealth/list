@@ -11,28 +11,51 @@ MongoDB Atlas stores line list case data (including revision history), user reco
 
 ## S3 stores
 
-Various buckets (data containers) are used for both temporary and long-term storage of G.h data.
+Various buckets (data containers) are used for both temporary and long-term storage of G.h data. Unless otherwise noted, all S3 buckets are in eu-central-1.
 
- - `amplify-curatorui-*`:  unused deployments of a component that global.health does not rely on and can (and should!) be deleted. They are in us-east-2.
- - `archive-epid-sources-raw`:  contains copies of upstream data for ingestion that were processed by the old AWS Lambda implementation of ADI. They can (and should!) be deleted. They are in us-east-1.
- - `aws-sam-cli-exportdatasourcebucket`:  is empty.
- - `aws-sam-cli-managed-default-samclisourcebucket-1txyh416iht6x`:  contains templates and images for the old AWS Lambda implementation of ADI. Most of this can (and should!) be deleted, but the aggregation script for generating map data is still defined here. It is in us-east-1.
- - `aws.healthmap.org`: the deployment of the healthmap website. It isn't part of Global.health. It's in us-east-2.
- - `config-bucket-612888738066`: contains logs relating to secrets management of the AWS Lambda infrastructure. This doesn't only relate to the old ADI implementation, so check whether this is still needed. It's in us-east-2.
- - `covid-19-aggregates`: aggregated data from the line list used by the map visualisation. In us-east-1. Check whether historical copies of data are still needed.
- - `covid-19-cache`: empty.
- - `covid-19-country-export`: per-country exports of the line list to support downloads. In us-east-1.
- - `covid-19-data-export`: exports of the whole line list data for downloads. Check whether we need to keep the historical versions. In us-east-1.
- - `covid-19.global.health`: the deployment of the top-level covid-19 website. In us-east-2.
- - `covid-19-filtered-downloads`: empty.
- - `dev-covid-19.global.health`, `dev-map.covid-19.global.health` and `dev-vocviz-sample`: all internal deployments of parts of the website. All in us-east-2.
- - `epid-ingestion`: contains details for a google service account. In us-east-1.
- - `epid-sources-raw`: copies of upstream data for ingestion by the new AWS Batch implementation of ADI. Should have a data retention policy defined and implemented. In us-east-1.
- - `gh-metrics-report-bucket`: summary statistics on user activity. In us-east-1.
- - `global-dot-health-data-export-bucket` and `global-dot-health-data-export-bucket-2`: historical copies of CSV exports of the line list used as intermediate data in building daily downloads. Check whether we need to keep the historical versions, and whether we need these at all once the data exporter is migrated to AWS Batch. In us-east-1.
- - `h1n1.global.health`: the deployment of the h1n1 outbreak map. In us-east-2.
- - `map.covid-19.global.health`: the deployment of the covid-19 outbreak map. In us-east-2.
- - `ncov19`: the last export of the beoutbreakprepared data from September 2020. In us-east-1.
+### Unknown use
+
+* config-bucket-612888738066 (contains logs relating to secrets management of the AWS Lambda infrastructure. This doesn't only relate to the old ADI implementation, so check whether this is still needed. In us-east-2)
+* dev-vocviz-sample (old map code, probably not required, in us-east-2)
+* ncov19 (us-east-1)
+
+### Aggregates
+
+Aggregated data from the line list used by the map visualisation.
+
+* covid-19-aggregates
+* covid-19-aggregates-dev
+
+### Export
+
+Country specific (country-) and full (data-) export files in various formats
+
+* covid-19-country-export
+* covid-19-country-export-dev
+* covid-19-data-export
+* covid-19-data-export-dev
+
+### Map
+
+Map is a static site exported to an S3 bucket
+
+* dev-covid-19.global.health (only one of dev/dev-map is used, in us-east-2)
+* dev-map.covid-19.global.health
+* map.covid-19.global.health
+* dev-react-map.covid-19.global.health (us-east-2, should move to dev-map)
+* react-map.covid-19.global.health (should move to map.covid-19.global.health)
+* qa-covid-19.global.health
+
+### Ingestion
+
+* gdh-credentials (used to authenticate against backend, should move to API keys)
+* gdh-sources (raw files downloaded from source URLs, was epid-ingestion-raw)
+
+### Miscellaneous
+
+* gdh-terraform-state-main (terraform state for our stack)
+* gdh-metrics (telemetry on UI and Map)
+* h1n1.global.health (us-east-2, H1N1 map)
 
 ## Application logs
 

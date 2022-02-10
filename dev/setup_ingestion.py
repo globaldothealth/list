@@ -14,14 +14,14 @@ import requests
 
 
 LOCALSTACK_URL = environ.get("AWS_ENDPOINT", "http://localstack:4566")
-AWS_REGION = environ.get("AWS_DEFAULT_REGION", "us-east-1")
+AWS_REGION = environ.get("AWS_DEFAULT_REGION", "eu-central-1")
 AWS_ACCOUNT_ID = environ.get("AWS_ACCOUNT_ID", "000000000000")
 AWS_ACCESS_KEY_ID = environ.get("AWS_ACCESS_KEY_ID", "fake")
 AWS_SECRET_ACCESS_KEY = environ.get("AWS_SECRET_ACCESS_KEY", "fake")
 
 BATCH_QUEUE_NAME = environ.get("BATCH_QUEUE_NAME", "ingestion-queue")
 ECR_REPOSITORY_NAME = environ.get("ECR_REPOSITORY_NAME", "gdh-ingestor")
-RETRIEVAL_BUCKET_NAME = environ.get("RETRIEVAL_BUCKET_NAME", "epid-sources-raw")
+RETRIEVAL_BUCKET_NAME = environ.get("RETRIEVAL_BUCKET_NAME", "gdh-sources")
 
 MOCK_SOURCE_DATA_URL = environ.get("MOCK_SOURCE_DATA_SERVICE", "http://mock-source-data")
 MOCK_SOURCE_DATA_PORT = environ.get("MOCK_SOURCE_DATA_PORT", 5001)

@@ -12,7 +12,7 @@ AWSCLOUDFORMATIONCONFIG="{\
 \"configLevel\":\"project\",\
 \"useProfile\":true,\
 \"profileName\":\"default\",\
-\"region\":\"us-east-2\"\
+\"region\":\"eu-central-1\"\
 }"
 AMPLIFY="{\
 \"projectName\":\"curatorui\",\

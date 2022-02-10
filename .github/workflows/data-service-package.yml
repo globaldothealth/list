@@ -3,7 +3,7 @@ name: Data Service Github Packages Push
 on:
   # Build whenever a PR is merged into the main branch.
   push:
-    branches: [main, '*-stable']
+    branches: [main, '*-stable', 'main-eu']
     paths:
       - ".github/workflows/data-service-package.yml"
       - "data-serving/data-service/**"
@@ -11,7 +11,7 @@ on:
     tags:
       - "*"
   workflow_dispatch:
-    branches: [main, '*-stable']
+    branches: [main, '*-stable', 'main-eu']
     paths:
       - ".github/workflows/data-service-package.yml"
       - "data-serving/data-service/**"

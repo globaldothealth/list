@@ -35,12 +35,12 @@ beforeEach(() => {
     client = new AwsEventsClient(
         env.SERVICE_ENV,
         env.LOCALSTACK_URL,
-        'us-east-1',
+        env.AWS_SERVICE_REGION,
         new AwsBatchClient(
             env.SERVICE_ENV,
             env.LOCALSTACK_URL,
             'test-arn',
-            'us-east-1',
+            env.AWS_SERVICE_REGION,
         ),
         'test-arn',
     );

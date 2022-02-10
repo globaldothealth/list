@@ -49,7 +49,7 @@ beforeEach(() => {
         env.SERVICE_ENV,
         env.LOCALSTACK_URL,
         'test-arn',
-        'us-east-1',
+        env.AWS_SERVICE_REGION,
     );
 });
 

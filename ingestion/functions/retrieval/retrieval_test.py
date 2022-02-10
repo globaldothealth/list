@@ -9,6 +9,8 @@ import zipfile
 
 from unittest.mock import MagicMock, patch
 
+SOURCES_BUCKET = "gdh-sources"
+
 try:
     import common_lib
 except ImportError:
@@ -23,7 +25,7 @@ s3_client = boto3.client("s3",
     endpoint_url=os.environ.get("AWS_ENDPOINT", "http://localstack:4566"),
     aws_access_key_id=os.environ.get("AWS_ACCESS_KEY_ID", "test"),
     aws_secret_access_key=os.environ.get("AWS_SECRET_ACCESS_KEY", "test"),
-    region_name=os.environ.get("AWS_REGION", "us-east-1")
+    region_name=os.environ.get("AWS_REGION", "eu-central-1")
 )
 
 _SOURCE_API_URL = "http://foo.bar"
@@ -281,9 +283,9 @@ def test_retrieve_content_persists_downloaded_json_locally(requests_mock):
 def test_retrieve_content_from_s3():
     from retrieval import retrieval  # Import locally to avoid superseding mock
     source_id = "id"
-    content_url = "s3://epid-sources-raw/bar"
+    content_url = f"s3://{SOURCES_BUCKET}/bar"
     format = "JSON"
-    s3_client.put_object(Bucket='epid-sources-raw', Key='bar', Body=b'{"data": "yes"}')
+    s3_client.put_object(Bucket=SOURCES_BUCKET, Key='bar', Body=b'{"data": "yes"}')
     files_s3_keys = retrieval.retrieve_content(
         "env", source_id, "upload_id", content_url, format, {}, {}, tempdir="/tmp")
     with open(files_s3_keys[0][0], "r") as f:

@@ -2,7 +2,7 @@ name: Ingestion functions deploy
 
 on:
   push:
-    branches: [main, '*-stable']
+    branches: [main, '*-stable', 'main-eu']
     paths:
     - '.github/workflows/ingestion-functions-deploy.yml'
     - 'ingestion/functions/**'
@@ -11,7 +11,7 @@ on:
     tags:
       - "*"
   workflow_dispatch:
-    branches: [main, '*-stable']
+    branches: [main, '*-stable', 'main-eu']
     paths:
     - '.github/workflows/ingestion-functions-deploy.yml'
     - 'ingestion/functions/**'
@@ -27,14 +27,14 @@ jobs:
       with:
         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws-region: us-east-1
+        aws-region: eu-central-1
 
     - name: Login to Amazon ECR
       id: login-ecr
       uses: aws-actions/amazon-ecr-login@v1
 
     - name: Build, tag, and push image to Amazon ECR (latest)
-      if: ${{ github.ref == 'refs/heads/main' }}
+      if: ${{ contains(github.ref, 'main') }}
       working-directory: ingestion/functions
       env:
         NOTIFY_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_METRICS_URL }}

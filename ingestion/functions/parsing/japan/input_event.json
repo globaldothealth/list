@@ -1,6 +1,6 @@
 {
     "env": "local",
-    "s3Bucket": "epid-sources-raw",
+    "s3Bucket": "gdh-sources",
     "sourceUrl": "https://foo.bar",
     "s3Key": "5f6209479d3e3000302d0f6c/2020/09/21/1014/content.json",
     "sourceId": "5f6209479d3e3000302d0f6c"

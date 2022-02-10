@@ -145,7 +145,7 @@ const emailClient = new EmailClient(
     env.SERVICE_ENV,
     env.AWS_ACCESS_KEY_ID,
     env.AWS_SECRET_ACCESS_KEY,
-    'us-east-2',
+    env.AWS_SERVICE_REGION,
     env.EMAIL_USER_ADDRESS,
 ).initialize();
 

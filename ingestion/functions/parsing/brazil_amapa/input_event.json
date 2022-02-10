@@ -1,6 +1,6 @@
 {
     "env": "local",
-    "s3Bucket": "epid-sources-raw",
+    "s3Bucket": "gdh-sources",
     "s3Key": "5fb686d201340e0044cb7ff5/2020/11/19/1458/content.csv",
     "sourceUrl": "https://drive.google.com/uc?export=download&id=1_BcEumgJRFQ52PBiKUGrp_ik6na2bVPz",
     "sourceId": "5fb686d201340e0044cb7ff5"

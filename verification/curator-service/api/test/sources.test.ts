@@ -401,7 +401,7 @@ describe('PUT', () => {
                 automation: {
                     parser: {
                         awsLambdaArn:
-                            'arn:aws:batch:us-east-1:612888738066:job-definition:some-def',
+                            'arn:aws:batch:eu-central-1:612888738066:job-definition:some-def',
                     },
                 },
             })

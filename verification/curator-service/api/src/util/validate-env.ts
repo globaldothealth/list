@@ -42,7 +42,7 @@ export default function validateEnv(): Readonly<{
         }),
         AWS_SERVICE_REGION: str({
             desc: 'AWS region in which to interact with services/resources',
-            default: 'us-east-1',
+            default: 'eu-central-1',
         }),
         CURATOR_VERSION: str({
             desc: 'version string to display in UI for bug reports etc.',
