@@ -1,4 +1,6 @@
 import boto3
+import os
+import pytest
 import unittest
 from datetime import datetime, timedelta
 from botocore.exceptions import ClientError
@@ -60,6 +62,8 @@ class CleanupScriptTests(unittest.TestCase):
         bucket.objects.all().delete()
         bucket.delete()
 
+    @pytest.mark.skipif(not os.environ.get("DOCKERIZED", False),
+                        reason="Running integration tests outside of mock environment disabled")
     def testCleanupScript(self):
         clean_old_ingestion_source_files.main(localstack)
         assert self.s3.Object(gdoth.INGESTION_SOURCES_BUCKET, self.today_key).delete_marker is not True
