@@ -1,2 +1,3 @@
 AWS_REGION = "us-east-1"
 INGESTION_SOURCES_BUCKET = "epid-sources-raw"
+DEFAULT_SCHEDULE_EXPRESSION = "rate(1 day)"

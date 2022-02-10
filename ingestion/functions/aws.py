@@ -4,7 +4,6 @@ from datetime import datetime
 from pprint import pprint
 import re
 import sys
-from uuid import uuid4
 
 import boto3
 
@@ -305,7 +304,7 @@ deregister    Deregister a Batch job definition
         )
         args = parser.parse_args(sys.argv[2:])
         try:
-            self.event_bridge_client.disable_schedule(rgs.rule_name)
+            self.event_bridge_client.disable_schedule(args.rule_name)
         except Exception as exc:
             print(f"An exception occurred while disabling rule {args.rule_name}: {exc}")
             raise
@@ -346,7 +345,7 @@ deregister    Deregister a Batch job definition
 
         try:
             self.event_bridge_client.add_schedule(
-                rule_name,
+                args.rule_name,
                 description,
                 state
             )
@@ -423,9 +422,9 @@ deregister    Deregister a Batch job definition
         try:
             self.event_bridge_client.remove_targets_from_rule(args.rule_name)
         except Exception as exc:
-            print(f"An exception occurred while deleting targets {target_ids} for rule {args.rule_name}: {exc}")
+            print(f"An exception occurred while deleting targets for rule {args.rule_name}: {exc}")
             raise
-        print(f"Deleted targets {target_ids} for rule {args.rule_name}")
+        print(f"Deleted targets for rule {args.rule_name}")
 
     def submit(self):
         parser = argparse.ArgumentParser(

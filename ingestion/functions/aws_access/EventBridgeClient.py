@@ -4,6 +4,8 @@ from uuid import uuid4
 from datetime import datetime, timedelta
 from monthdelta import monthdelta
 
+from . import globaldothealth_configuration as gdoth
+
 # Amazon weeks start on Sunday
 WEEKDAYS = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT']
 
@@ -145,7 +147,7 @@ class EventBridgeClient:
         state = "ENABLED" if is_enabled else "DISABLED"
         self.aws_client.put_rule(
                 Name=rule_name,
-                ScheduleExpression=DEFAULT_SCHEDULE_EXPRESSION,
+                ScheduleExpression=gdoth.DEFAULT_SCHEDULE_EXPRESSION,
                 State=state,
                 Description=description
             )
@@ -168,4 +170,4 @@ class EventBridgeClient:
 
     def remove_targets_from_rule(self, rule_name: str):
         target_ids = list(self.get_rule_targets(rule_name).keys())
-        self.aws_client.remove_targets(Rule=args.rule_name, Ids=target_ids)
+        self.aws_client.remove_targets(Rule=rule_name, Ids=target_ids)

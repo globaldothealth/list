@@ -1,6 +1,6 @@
 import unittest
 from datetime import datetime, timedelta
-from EventBridgeClient import ScheduleRule, date_of_requested_weekday_in_month
+from .EventBridgeClient import ScheduleRule, date_of_requested_weekday_in_month
 
 
 class ScheduleRuleTests(unittest.TestCase):
