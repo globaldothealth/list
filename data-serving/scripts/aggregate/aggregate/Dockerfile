@@ -5,5 +5,5 @@ WORKDIR /app
 COPY poetry.lock pyproject.toml /app/
 RUN poetry config virtualenvs.create false
 RUN poetry install --no-interaction --no-dev
-COPY app.py /app/
+COPY app.py geocoding_countries.json /app/
 ENTRYPOINT ["/app/app.py"]
