@@ -13,7 +13,7 @@ def get_schedule_rules(endpoint_url=None):
 def main(endpoint_url=None):
     print("Let's do this!")
     sources_and_ages = {r.ingestion_source_id(): r.oldest_file_age(datetime.today()) for r in get_schedule_rules(endpoint_url) if r.is_ingestion_rule()}
-    s3 = S3Client(endpoint_url)
+    s3 = S3Client(gdoth.AWS_REGION, endpoint_url)
     for source_id, oldest_age in sources_and_ages.items():
         print(f"Working on {source_id}")
         earliest_date = datetime.now() + oldest_age
