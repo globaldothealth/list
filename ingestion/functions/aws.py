@@ -23,7 +23,6 @@ DEFAULT_VCPU = 1
 DEFAULT_MEMORY_MIB = 2048
 DEFAULT_JOB_QUEUE = "ingestion-queue"
 DEFAULT_TIMEOUT_MIN = 60
-DEFAULT_SCHEDULE_EXPRESSION = "rate(1 day)"
 
 
 def get_parser_name_source(source_id, env):
