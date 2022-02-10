@@ -1,11 +1,12 @@
 import boto3
 
 class S3Client:
-    def __init__(self, endpoint_url=None):
+    def __init__(self, region, endpoint_url=None):
         """
+        Create an S3 client for the specified AWS region.
         Optionally pass the AWS endpoint URL, e.g. to test with localstack.
         """
-        self.s3_adapter = boto3.resource('s3', endpoint_url=endpoint_url)
+        self.s3_adapter = boto3.resource('s3', endpoint_url=endpoint_url, region_name=region)
     
     def objects_in_bucket_for_ingestion_source(self, bucket_name, source_id):
         """
