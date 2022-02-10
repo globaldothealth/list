@@ -22,5 +22,5 @@ class S3Client:
         Deletes the given object from the bucket.
         Note that S3 is not hierarchical, so file_name is the "full path" to the object.
         """
-        self.s3_adapter.Bucket(bucket_name).delete_objects([file_name])
+        self.s3_adapter.Bucket(bucket_name).delete_objects(Delete={'Objects':[{'Key': file_name}]})
 
