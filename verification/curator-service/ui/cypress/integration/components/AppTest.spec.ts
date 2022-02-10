@@ -378,7 +378,7 @@ describe('App', function () {
             .and('equal', '/');
     });
 
-    it.only('Displays popup on small devices', () => {
+    it('Displays popup on small devices', () => {
         cy.viewport(520, 780);
         cy.login();
         cy.visit('/cases');
