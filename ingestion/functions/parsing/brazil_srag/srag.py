@@ -61,6 +61,10 @@ _ICU_ENTRY = "DT_ENTUTI"
 _ICU_DISCHARGE = "DT_SAIDUTI"
 _OUTCOME = "EVOLUCAO"
 _DATE_OUTCOME = "DT_EVOLUCA"
+_BATCH_DOSE_1 = "LOTE_1_COV"
+_BATCH_DOSE_2 = "LOTE_2_COV"
+_DATE_DOSE_1 = "DOSE_1_COV"
+_DATE_DOSE_2 = "DOSE_2_COV"
 _TRAVEL_YN = "HISTO_VGM"
 _TRAVEL_COUNTRY = "PAIS_VGM"
 _TRAVEL_OUT = "DT_VGM"
@@ -136,6 +140,28 @@ def convert_date(raw_date: str, reference_date=None, dataserver=True, adi = True
         if raw_date and datetime.strptime(raw_date, "%d/%m/%Y") < datetime.strptime(str(today), "%Y-%m-%d"):
             date = datetime.strptime(raw_date, "%d/%m/%Y")
             return date.strftime("%m/%d/%YZ")
+
+
+def convert_vaccines(date_dose_1, date_dose_2, batch_dose_1, batch_dose_2):
+    vaccines = {}
+    if date_dose_1:
+        vaccines[0] = {
+            "date": convert_date(date_dose_1),
+            "batch": batch_dose_1
+        }
+    if date_dose_2 and date_dose_2 != date_dose_1:
+        vaccines[1] = {
+            "date": convert_date(date_dose_2),
+            "batch": batch_dose_2
+        }
+    if not vaccines:
+        return None
+    n_vaccines = max(vaccines) + 1
+    # Ensure vaccines are listed in order
+    if list(range(n_vaccines)) == sorted(vaccines.keys()):
+        return [vaccines[i] for i in range(n_vaccines)]
+    else:
+        return None
 
 
 def convert_location(state, municipality):
@@ -445,6 +471,13 @@ def parse_cases(raw_data_file: str, source_id: str, source_url: str):
                     notes = convert_notes(
                         row[_OUTCOME]
                     )
+                    if vaccines := convert_vaccines(
+                            row[_DATE_DOSE_1],
+                            row[_DATE_DOSE_2],
+                            row[_BATCH_DOSE_1],
+                            row[_BATCH_DOSE_2]
+                    ):
+                        case["vaccines"] = vaccines
                     if notes:
                         case["restrictedNotes"] = notes
                     yield case

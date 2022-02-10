@@ -14,19 +14,19 @@ describe('Curator', function () {
         cy.visit('/cases');
         cy.contains('No records to display');
         cy.seedLocation({
-            country: 'France',
+            country: 'FR',
             geometry: { latitude: 45.75889, longitude: 4.84139 },
             name: 'France',
             geoResolution: 'Country',
         });
         cy.seedLocation({
-            country: 'Germany',
+            country: 'DE',
             geometry: { latitude: 51.0968509, longitude: 5.9688274 },
             name: 'Germany',
             geoResolution: 'Country',
         });
         cy.seedLocation({
-            country: 'United Kingdom',
+            country: 'GB',
             geometry: { latitude: 54.2316104, longitude: -13.4274035 },
             name: 'United Kingdom',
             geoResolution: 'Country',
@@ -61,8 +61,10 @@ describe('Curator', function () {
         cy.get('div[data-testid="location"]').type('France');
         cy.contains('France');
         cy.contains('li', 'France').click();
-        // Change France to something else to check we can edit geocode results.
-        cy.get('input[name="location.country"]').clear().type('Frankreich');
+        /* Change France to something else to check we can edit geocode results.
+         * We need to change it to a valid country so that we can find the ISO code!
+         */
+        cy.get('input[name="location.country"]').clear().type('Germany');
         cy.get('input[name="confirmedDate"]').type('2020-01-01');
         cy.get('div[data-testid="methodOfConfirmation"]').click();
         cy.get('li[data-value="PCR test"').click();
@@ -176,7 +178,7 @@ describe('Curator', function () {
             cy.contains('www.example.com');
             cy.contains('Female');
             cy.contains('21');
-            cy.contains('Frankreich');
+            cy.contains('Germany');
             cy.contains('2020-01-01');
             cy.contains('Recovered');
 
@@ -215,7 +217,7 @@ describe('Curator', function () {
             // Location.
             cy.get('input[name="location.country"]').should(
                 'have.value',
-                'Frankreich',
+                'Germany',
             );
             cy.get('input[name="location.geometry.latitude"]').should(
                 'have.value',
@@ -321,7 +323,7 @@ describe('Curator', function () {
             cy.contains('Test occupation');
             cy.contains('Afghan, Albanian');
             cy.contains('Asian');
-            cy.contains('Frankreich');
+            cy.contains('Germany');
             // Rounded numbers when displayed.
             cy.contains('45.7589');
             cy.contains('4.8414');

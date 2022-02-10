@@ -106,7 +106,7 @@ it('loads and displays case', async () => {
 
     // Travel history.
     expect(getByText('2020-02-10 - 2020-02-17')).toBeInTheDocument();
-    expect(getByText('United States')).toBeInTheDocument();
+    expect(getByText('United States of America')).toBeInTheDocument();
     expect(getByText('New York')).toBeInTheDocument();
     expect(getByText('Kings County')).toBeInTheDocument();
     expect(getByText('Brooklyn')).toBeInTheDocument();

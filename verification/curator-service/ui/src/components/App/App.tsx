@@ -774,14 +774,20 @@ export default function App(): JSX.Element {
                             <PolicyLink
                                 type="cookie-policy"
                                 classes={{
-                                    root: clsx([
-                                        classes.link,
-                                        classes.lastLink,
-                                    ]),
+                                    root: clsx([classes.link]),
                                 }}
                             >
                                 Cookie policy
                             </PolicyLink>
+                            <a
+                                href="mailto:info@global.health?subject=Feedback regarding Global.health data portal"
+                                className={clsx([
+                                    classes.link,
+                                    classes.lastLink,
+                                ])}
+                            >
+                                Feedback
+                            </a>
                         </div>
                     </Drawer>
                 )}

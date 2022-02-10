@@ -82,12 +82,14 @@ class ArgentinaTest(unittest.TestCase):
                            {'name': 'onsetSymptoms',
                             'dateRange': {'start': '05/26/2020', 'end': '05/26/2020'}},
                            {'name': 'outcome',
-                            'value': 'hospitalAdmission',
-                            'dateRange': {'start': '05/31/2020', 'end': '05/31/2020'}},
-                           {'name': 'outcome', 'value': 'Recovered'}],
+                            'value': 'Death',
+                            'dateRange': {'start': '07/01/2020', 'end': '07/01/2020'}},
+                           {'name': 'hospitalAdmission',
+                            'value': 'Yes',
+                            'dateRange': {'start': '05/31/2020', 'end': '05/31/2020'}}],
                 'symptoms': {'status': 'Symptomatic'},
                 'travelHistory': None,
-                'notes': 'Using Date of Diagnosis as the date of confirmation., Patient recovery was confirmed by a negative laboratory test., Province in charge of case reported as CABA, Argentina., Case last updated on 09/18/2020., Case was dealt with through Private health system., Diagnostic notes: Caso confirmado por laboratorio - No Activo por criterio de laboratorio'},
+                'notes': 'Using Date of Diagnosis as the date of confirmation., Province in charge of case reported as CABA, Argentina., Case last updated on 07/01/2020., Case was dealt with through Private health system., Diagnostic notes: Caso confirmado por laboratorio'},
             {'caseReference': {'sourceId': 'placeholder_ID',
                                'sourceEntryId': '1000015',
                                'sourceUrl': 'placeholder_URL'},
@@ -140,7 +142,7 @@ class ArgentinaTest(unittest.TestCase):
                     "travel": [
                         {
                             "location": {
-                                "country": "Italy",
+                                "country": "IT",
                                 "geoResolution": "Country",
                                 "name": 'Italy',
                                 "geometry": {

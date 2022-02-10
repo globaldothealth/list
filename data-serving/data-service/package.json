@@ -72,6 +72,7 @@
     "express": "^4.17.1",
     "express-openapi-validator": "^4.9.0",
     "express-validator": "^6.13.0",
+    "express-winston": "^4.2.0",
     "limiter": "^1.1.5",
     "lodash": "^4.17.21",
     "longjohn": "^0.2.12",
@@ -82,6 +83,7 @@
     "pino-pretty": "^4.2.1",
     "search-query-parser": "^1.5.5",
     "swagger-ui-express": "^4.1.4",
+    "winston": "^3.5.0",
     "yamljs": "^0.3.0"
   },
   "husky": {

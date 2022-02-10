@@ -12,7 +12,8 @@ axios.defaults.timeout = 0;
 
 // The query (URL) when the line list first loads
 const defaultInputQuery = '/cases';
-const defaultOutputQuery = '/cases/?limit=50&page=1&count_limit=10000&sort_by=default&order=ascending';
+const defaultOutputQuery =
+    '/cases/?limit=50&page=1&count_limit=10000&sort_by=default&order=ascending';
 
 /**
  * CasesController mostly forwards case-related requests to the data service.
@@ -30,7 +31,7 @@ export default class CasesController {
         if (req.url === defaultInputQuery) {
             query = defaultOutputQuery;
         } else {
-            query = req.url
+            query = req.url;
             logger.info(`Applying filter: ${query}`);
         }
         try {
@@ -38,10 +39,13 @@ export default class CasesController {
                 this.dataServerURL + '/api' + query,
             );
             if (response.status >= 400) {
-                logger.error(`A server error occurred when trying to list data using URL: ${query}. Response status code: ${response.status}`);
+                logger.error(
+                    `A server error occurred when trying to list data using URL: ${query}. Response status code: ${response.status}`,
+                );
             }
             res.status(response.status).json(response.data);
         } catch (err) {
+            logger.error(`Exception thrown by axios accessing URL: ${query}`);
             logger.error(err);
             if (err.response?.status && err.response?.data) {
                 res.status(err.response.status).send(err.response.data);
@@ -60,19 +64,23 @@ export default class CasesController {
             const user = req.user as UserDocument;
             await User.findByIdAndUpdate(
                 user.id,
-                { $push: { downloads: {
-                    timestamp: new Date(),
-                    format: req.body.format,
-                    query: req.body.query,
-                } } },
+                {
+                    $push: {
+                        downloads: {
+                            timestamp: new Date(),
+                            format: req.body.format,
+                            query: req.body.query,
+                        },
+                    },
+                },
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                function(err: any) {
+                function (err: any) {
                     if (err) {
                         logger.info(`An error occurred: ${err}`);
                     } else {
-                        logger.info(`Document updated`);
+                        logger.info('Document updated');
                     }
-                }
+                },
             );
             axios({
                 method: 'post',
@@ -107,8 +115,11 @@ export default class CasesController {
             this.getDownloadLink(req, res);
             return;
         } else if (this.hasCountryOnly(req.body.query)) {
-            const country = req.body.query.split(':')[1].toLowerCase().replace(/ /g,'_');
-            const inBucket = await this.S3BucketContains(country, req.body.format);
+            const country = req.body.query.split(':')[1].toUpperCase(); // capitalise ISO code
+            const inBucket = await this.S3BucketContains(
+                country,
+                req.body.format,
+            );
             if (inBucket) {
                 this.getCountryDownloadLink(req, res, country, req.body.format);
                 return;
@@ -116,24 +127,31 @@ export default class CasesController {
         }
         try {
             const user = req.user as UserDocument;
-            const url = this.dataServerURL + '/api' + req.url.replace('Async', '');
+            const url =
+                this.dataServerURL + '/api' + req.url.replace('Async', '');
             req.body.correlationId = crypto.randomBytes(16).toString('hex');
-            logger.info(`Streaming case data in format ${req.body.format} matching query ${req.body.query} for correlation ID ${req.body.correlationId}`);
+            logger.info(
+                `Streaming case data in format ${req.body.format} matching query ${req.body.query} for correlation ID ${req.body.correlationId}`,
+            );
             await User.findByIdAndUpdate(
                 user.id,
-                { $push: { downloads: {
-                    timestamp: new Date(),
-                    format: req.body.format,
-                    query: req.body.query,
-                } } },
+                {
+                    $push: {
+                        downloads: {
+                            timestamp: new Date(),
+                            format: req.body.format,
+                            query: req.body.query,
+                        },
+                    },
+                },
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                function(err: any) {
+                function (err: any) {
                     if (err) {
                         logger.info(`An error occurred: ${err}`);
                     } else {
-                        logger.info(`Document updated`);
+                        logger.info('Document updated');
                     }
-                }
+                },
             );
             axios({
                 method: 'post',
@@ -192,17 +210,21 @@ export default class CasesController {
 
             await User.findByIdAndUpdate(
                 user.id,
-                { $push: { downloads: {
-                    timestamp: new Date(),
-                } } },
+                {
+                    $push: {
+                        downloads: {
+                            timestamp: new Date(),
+                        },
+                    },
+                },
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                function(err: any) {
+                function (err: any) {
                     if (err) {
                         logger.info(`An error occurred: ${err}`);
                     } else {
-                        logger.info(`Document updated`);
+                        logger.info('Document updated');
                     }
-                }
+                },
             );
 
             res.status(200).send({ signedUrl });
@@ -214,11 +236,16 @@ export default class CasesController {
     };
 
     /* getCountryDownloadLink generates signed URL to download national data set from AWS S3 */
-    getCountryDownloadLink = async (req: Request, res: Response, country: string, format: string): Promise<void> => {
+    getCountryDownloadLink = async (
+        req: Request,
+        res: Response,
+        country: string,
+        format: string,
+    ): Promise<void> => {
         const filename = `${country}.${format}.gz`;
         const filepath = `${format}/${filename}`;
         const params = {
-            Bucket: "covid-19-country-export",
+            Bucket: 'covid-19-country-export',
             Key: filepath,
             Expires: 5 * 60,
             ResponseContentDisposition:
@@ -229,7 +256,7 @@ export default class CasesController {
 
         try {
             const signedUrl: string = await new Promise((resolve, reject) => {
-                this.s3Client.getSignedUrl("getObject", params, (err, url) => {
+                this.s3Client.getSignedUrl('getObject', params, (err, url) => {
                     if (err) reject(err);
 
                     resolve(url);
@@ -238,19 +265,23 @@ export default class CasesController {
 
             await User.findByIdAndUpdate(
                 user.id,
-                { $push: { downloads: {
-                    timestamp: new Date(),
-                    format: format,
-                    query: country,
-                } } },
+                {
+                    $push: {
+                        downloads: {
+                            timestamp: new Date(),
+                            format: format,
+                            query: country,
+                        },
+                    },
+                },
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                function(err: any) {
+                function (err: any) {
                     if (err) {
                         logger.info(`An error occurred: ${err}`);
                     } else {
-                        logger.info(`Document updated`);
+                        logger.info('Document updated');
                     }
-                }
+                },
             );
 
             res.status(200).send({ signedUrl });
@@ -263,27 +294,31 @@ export default class CasesController {
 
     /** hasCountryOnly checks the query string to see whether it contains only a filter for a nation **/
     hasCountryOnly = (queryString: string): boolean => {
-        const split = queryString.split(":");
-        if (split.length == 2 && split[0] === "country") {
+        const split = queryString.split(':');
+        if (split.length == 2 && split[0] === 'country') {
             return true;
         }
         return false;
     };
 
     /** S3BucketContains checks AWS storage to see whether it contains a desired file **/
-    S3BucketContains = async (country: string, format: string): Promise<boolean> => {
+    S3BucketContains = async (
+        country: string,
+        format: string,
+    ): Promise<boolean> => {
         const filepath = `${format}/${country}.${format}.gz`;
-        const contains = await this.s3Client.headObject({
-            Bucket: "covid-19-country-export",
-            Key: filepath,
-        })
-        .promise()
-        .then(
-        () => true,
-            err => {
-                return false;
-            }
-        );
+        const contains = await this.s3Client
+            .headObject({
+                Bucket: 'covid-19-country-export',
+                Key: filepath,
+            })
+            .promise()
+            .then(
+                () => true,
+                (err) => {
+                    return false;
+                },
+            );
         return contains;
     };
 

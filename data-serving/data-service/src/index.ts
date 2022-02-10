@@ -25,6 +25,8 @@ import dotenv from 'dotenv';
 import express from 'express';
 import mongoose from 'mongoose';
 import swaggerUi from 'swagger-ui-express';
+import winston from 'winston';
+import expressWinston from 'express-winston';
 import validateEnv from './util/validate-env';
 import { logger } from './util/logger';
 
@@ -40,6 +42,20 @@ if (!deployment_envs.includes(env.SERVICE_ENV)) {
 
 // Express configuration.
 app.set('port', env.PORT);
+
+// log all non-200 responses: this needs to come _before_ any middleware or routers
+app.use(expressWinston.logger({
+    transports: [
+        new winston.transports.Console(),
+    ],
+    format: winston.format.json(),
+    /* don't log user info. We don't get user cookies or passwords in this service, so it's just
+     * belt-and-braces to ensure we don't log the API key if it was forwarded from the curator service.
+     */
+    headerBlacklist: ['X-Api-Key'],
+}));
+
+
 app.use(bodyParser.json({ limit: '50mb' }));
 app.use(
     bodyParser.urlencoded({
@@ -154,6 +170,14 @@ apiRouter.post('/cases/batchStatusChange', caseController.batchStatusChange);
 apiRouter.get('/excludedCaseIds', caseController.listExcludedCaseIds);
 
 app.use('/api', apiRouter);
+
+// report errors in the pipeline - this has to come after all other middleware and routers
+app.use(expressWinston.errorLogger({
+    transports: [
+        new winston.transports.Console(),
+    ],
+    format: winston.format.json(),
+}));
 
 (async (): Promise<void> => {
     try {

@@ -1683,8 +1683,10 @@ components:
             properties:
                 country:
                     type: string
-                    description: English full name of a country
-                    example: Costa Rica
+                    description: ISO-3166-2 code of a country
+                    minLength: 2
+                    maxLength: 2
+                    example: CR
                 administrativeAreaLevel1:
                     type: string
                     description: First administrative subdivision of a country
@@ -1735,8 +1737,10 @@ components:
             properties:
                 country:
                     type: string
-                    description: English full name of a country
-                    example: Costa Rica
+                    description: ISO-3166-2 code of a country
+                    minLength: 2
+                    maxLength: 2
+                    example: CR
                 administrativeAreaLevel1:
                     type: string
                     description: First administrative subdivision of a country

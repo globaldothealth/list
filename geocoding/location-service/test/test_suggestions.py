@@ -9,7 +9,7 @@ class SuggestionsTest(unittest.TestCase):
         self.client = main.app.test_client()
         self.lyon = {
             'administrativeAreaLevel1': 'Rhône',
-            'country': 'France',
+            'country': 'FR',
             'geometry': {
                 'latitude': 45.75889,
                 'longitude': 4.84139

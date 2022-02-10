@@ -13,6 +13,7 @@ from typing import Callable, Dict, Generator, List
 import boto3
 import requests
 import requests.exceptions
+import iso3166
 
 import common_lib
 
@@ -71,7 +72,7 @@ def geocode_country(two_letter_iso_code):
     try:
         lat, lon, country = GEOCODING_COUNTRIES[two_letter_iso_code]
         return {
-            "country": country,
+            "country": two_letter_iso_code,
             "geoResolution": "Country",
             "name": country,
             "geometry": {"latitude": lat, "longitude": lon}
@@ -136,6 +137,46 @@ def retrieve_excluded_case_ids(source_id: str, date_filter: Dict, date_range: Di
         return res_json["cases"]
     return None
 
+# This structure is needed for the partial name matching below.
+countries_index = {c.name.upper(): c.alpha2 for c in iso3166.countries}
+
+country_to_iso_fixes = {
+    "CZECH REPUBLIC": "CZ",
+    "UNITED STATES": "US",
+    "REUNION": "RE",
+    "DEMOCRATIC REPUBLIC OF THE CONGO": "CD",
+    "VIETNAM": "VN",
+    "SOUTH KOREA": "KR",
+    "REPUBLIC OF CONGO": "CG",
+    "COTE D'IVOIRE": "CI",
+}
+
+def iso3166_country_code(country_name: str) -> str:
+    """
+    Given the name of a country, find the alpha2 code. Hopefully we find that the country name
+    is an exact match for the actual name of a country. If it is not, we try partial matches.
+    If there is neither an exact match nor EXACTLY ONE partial match, raise KeyError: it is a
+    bug in the parser if it generates locations with bad country names.
+
+    This is only used in cases where the parser supplies the location info: typically we would
+    expect the parser to give a location query which is later geocoded anyway.
+    """
+    if len(country_name) == 2 and country_name.isalpha():
+        return country_name.upper()
+    if (ucase_name := country_name.upper()) in country_to_iso_fixes:
+        return country_to_iso_fixes[ucase_name]
+
+    country = iso3166.countries.get(ucase_name, None)
+    if country is not None:
+        return country.alpha2
+    # Didn't find an exact match, so try a partial match
+    matched_countries = [countries_index[k] for k in countries_index.keys() if ucase_name in k]
+    if len(matched_countries) == 1:
+        return matched_countries[0]
+    # Found 0 or many partial matches
+    raise KeyError
+
+
 def prepare_cases(cases: Generator[Dict, None, None], upload_id: str, excluded_case_ids: list):
     """
     Populates standard required fields for the G.h Case API.
@@ -144,6 +185,12 @@ def prepare_cases(cases: Generator[Dict, None, None], upload_id: str, excluded_c
     """
     for case in cases:
         case["caseReference"]["uploadIds"] = [upload_id]
+        if country := case.get("location", {}).get("country"):
+            case["location"]["country"] = iso3166_country_code(country)
+        if case.get("travelHistory") and case.get("travelHistory").get("travel"):
+            for travel in case["travelHistory"]["travel"]:
+                if travel_country := travel.get("location", {}).get("country"):
+                    travel["location"]["country"] = iso3166_country_code(travel_country)
         if (excluded_case_ids is None) or ("sourceEntryId" not in case["caseReference"]) or (not case["caseReference"]["sourceEntryId"] in excluded_case_ids):
             yield remove_nested_none_and_empty(case)
 

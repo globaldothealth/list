@@ -3,7 +3,6 @@
 
 from functools import cache
 import logging
-import re
 from typing import Any
 import unicodedata
 
@@ -13,21 +12,17 @@ import pycountry
 
 # We do not always use the pycountry names, here's a list of exceptions
 _QUIRKS = {
-    "CD": "Democratic Republic of the Congo",
-    "CG": "Republic of Congo",
-    "CZ": "Czech Republic",
-    "IR": "Iran",
-    "KR": "South Korea",
-    "RU": "Russia",
+    "DEMOCRATIC REPUBLIC OF THE CONGO": "CD",
+    "REPUBLIC OF CONGO": "CG",
+    "CZECH REPUBLIC": "CZ",
+    "IRAN": "IR",
+    "SOUTH KOREA": "KR",
+    "RUSSIA": "RU",
 }
 
 
 def to_ascii(s: str) -> str:  # We use ASCII only for country names :(
     return unicodedata.normalize("NFD", s).encode("ascii", "ignore").decode()
-
-
-def slug(s: str) -> str:
-    return re.sub(r"[,.']", "", s.strip().lower()).replace(" ", "_")
 
 
 def country_name(country) -> str:
@@ -38,18 +33,18 @@ def country_name(country) -> str:
         return getattr(country, "name")
 
 
-_CODE_NAME_MAP = {c.alpha_2: to_ascii(country_name(c)) for c in pycountry.countries}
-_CODE_NAME_MAP.update(_QUIRKS)
+_NAME_CODE_MAP = {to_ascii(country_name(c)).upper(): c.alpha_2 for c in pycountry.countries}
+_NAME_CODE_MAP.update(_QUIRKS)
 
 
 @cache
 def list_exporters(env: str) -> set[str]:
-    "Returns all job definitions starting with env-exporter_"
+    "Returns all job definitions starting with env-exporter-"
     batch = boto3.client("batch")
     return {
         j["jobDefinitionName"]
         for j in batch.describe_job_definitions()["jobDefinitions"]
-        if j["jobDefinitionName"].startswith(f"{env}-exporter_")
+        if j["jobDefinitionName"].startswith(f"{env}-exporter-")
     }
 
 
@@ -59,17 +54,19 @@ def get_exporters(source: dict[str, Any], env: str) -> set[str]:
     countryCodes = set(source.get("countryCodes", []))
     if "ZZ" in countryCodes:  # all countries
         return list_exporters()
-    validCountryCodes = set(_CODE_NAME_MAP)
+    validCountryCodes = set(_NAME_CODE_MAP.values())
     if invalidCountryCodes := countryCodes - validCountryCodes:
         logging.info(f"Invalid country codes {invalidCountryCodes}")
         return set()
     if countryCodes:  # prefer country codes to names
         return {
-            f"{env}-exporter_{slug(_CODE_NAME_MAP[cc])}"
+            f"{env}-exporter-{cc}"
             for cc in countryCodes & validCountryCodes
         }
-    else:  # works if country:source is 1:1 and name matches
-        return {f"{env}-exporter_{slug(name)}"}
+    else:  # works if name is found in name to code map
+        if countryCode := _NAME_CODE_MAP.get(name.upper()):
+            return {f"{env}-exporter-{countryCode}"}
+    return set()
 
 
 def run(sources: list[dict[str, Any]], env: str, dry_run: bool = False):

@@ -4,14 +4,8 @@ from gdh import stringify_filters, cases_cachefile
 
 
 _STRINGIFY_FILTERS = [
-    (
-        {
-            "country": "New Zealand",
-            "dateconfirmedafter": datetime.date(2021, 11, 1),
-        },
-        "country:'New Zealand' dateconfirmedafter:2021-11-01",
-    ),
-    ({"country": "Argentina", "gender": "Male"}, "country:Argentina gender:Male"),
+    ({"country": "New Zealand"}, "country:'New Zealand'"),
+    ({"country": "Argentina"}, "country:Argentina"),
 ]
 
 

@@ -3,13 +3,13 @@ name: Migrate prod database schema
 on:
   push:
     # Run workflow when the schema changes. The branch name should always reflect the current release!
-    branches: [1.7-stable]
+    branches: [1.9-stable]
     paths:
       - "data-serving/scripts/setup-db/migrations/**"
       - ".github/workflows/update-prod-curator-db-schema.yaml"
   workflow_dispatch:
     # Run workflow when the schema changes. The branch name should always reflect the current release!
-    branches: [1.7-stable]
+    branches: [1.9-stable]
     paths:
       - "data-serving/scripts/setup-db/migrations/**"
       - ".github/workflows/update-prod-curator-db-schema.yaml"
@@ -31,5 +31,4 @@ jobs:
         env:
           CONN: ${{ secrets.DB_CONNECTION_URL_PROD }}
           DB: "covid19"
-          COLL: "sources"
         run: npm --prefix data-serving/scripts/setup-db run migrate

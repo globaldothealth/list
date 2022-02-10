@@ -37,6 +37,7 @@ import { toUTCDate } from './util/date';
 import { useHistory } from 'react-router-dom';
 import useMediaQuery from '@material-ui/core/useMediaQuery';
 import { useTheme } from '@material-ui/core/styles';
+import { codeForCountry, nameCountry } from './util/countryNames';
 
 const useStyles = makeStyles((theme) => ({
     appBar: {
@@ -122,7 +123,10 @@ function initialValuesFromCase(c?: Case): CaseFormValues {
         ethnicity: c.demographics?.ethnicity,
         nationalities: c.demographics?.nationalities,
         occupation: c.demographics?.occupation ?? '',
-        location: c.location,
+        location: {
+            ...c.location,
+            country: nameCountry(c.location.country),
+        },
         confirmedDate:
             c.events.find((event) => event.name === 'confirmed')?.dateRange
                 ?.start || null,
@@ -357,6 +361,11 @@ export default function CaseForm(props: Props): JSX.Element {
         const ageRange = values.age
             ? { start: values.age, end: values.age }
             : { start: values.minAge, end: values.maxAge };
+
+        const country =
+            values.location?.country.length === 2
+                ? values.location?.country
+                : codeForCountry(values.location?.country ?? '');
         const newCase = {
             caseReference: {
                 ...values.caseReference,
@@ -370,7 +379,10 @@ export default function CaseForm(props: Props): JSX.Element {
                 nationalities: values.nationalities,
                 occupation: unknownOrEmptyToUndefined(values.occupation),
             },
-            location: values.location,
+            location: {
+                ...values.location,
+                country,
+            },
             events: [
                 {
                     name: 'confirmed',

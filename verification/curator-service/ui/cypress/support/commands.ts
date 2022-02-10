@@ -1,4 +1,8 @@
 import 'cypress-file-upload';
+import countries from 'i18n-iso-countries';
+import en from 'i18n-iso-countries/langs/en.json';
+
+countries.registerLocale(en);
 
 declare global {
     // One-off Cypress setup.
@@ -73,7 +77,7 @@ export function addCase(opts: {
                 gender: opts.gender,
             },
             location: {
-                country: opts.country,
+                country: countries.getAlpha2Code(opts.country, 'en'),
                 geoResolution: 'Country',
                 geometry: {
                     latitude: 42,

@@ -35,6 +35,7 @@ import {
     selectFilterBreadcrumbs,
 } from '../redux/app/selectors';
 import Chip from '@material-ui/core/Chip';
+import { nameCountry } from './util/countryNames';
 
 const styles = makeStyles((theme) => ({
     errorMessage: {
@@ -809,7 +810,11 @@ function LocationRows(props: { loc?: Location }): JSX.Element {
             <RowContent content={props.loc?.administrativeAreaLevel3 || ''} />
 
             <RowHeader title="Country" />
-            <RowContent content={props.loc?.country || ''} />
+            <RowContent
+                content={
+                    props.loc?.country ? nameCountry(props.loc?.country) : ''
+                }
+            />
 
             <RowHeader title="Latitude" />
             <RowContent

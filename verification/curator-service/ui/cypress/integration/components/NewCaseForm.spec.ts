@@ -13,7 +13,7 @@ describe('New case form', function () {
     // Full case is covered in curator test.
     it('Can add minimal row to linelist with existing source', function () {
         cy.seedLocation({
-            country: 'France',
+            country: 'FR',
             geometry: { latitude: 45.75889, longitude: 4.84139 },
             name: 'France',
             geoResolution: 'Country',
@@ -45,7 +45,7 @@ describe('New case form', function () {
 
     it('Can add minimal row to linelist with new source', function () {
         cy.seedLocation({
-            country: 'France',
+            country: 'FR',
             geometry: { latitude: 45.75889, longitude: 4.84139 },
             name: 'France',
             geoResolution: 'Country',
@@ -82,7 +82,7 @@ describe('New case form', function () {
 
     it('Can add multiple cases to linelist', function () {
         cy.seedLocation({
-            country: 'France',
+            country: 'FR',
             geometry: { latitude: 45.75889, longitude: 4.84139 },
             name: 'France',
             geoResolution: 'Country',
@@ -114,7 +114,7 @@ describe('New case form', function () {
         cy.visit('/cases');
         cy.contains('No records to display');
         cy.seedLocation({
-            country: 'France',
+            country: 'FR',
             geometry: { latitude: 45.75889, longitude: 4.84139 },
             name: 'France',
             geoResolution: 'Country',
@@ -156,7 +156,7 @@ describe('New case form', function () {
 
     it('Can submit with unknown fields', function () {
         cy.seedLocation({
-            country: 'France',
+            country: 'FR',
             geometry: { latitude: 45.75889, longitude: 4.84139 },
             name: 'France',
             geoResolution: 'Country',
@@ -206,7 +206,7 @@ describe('New case form', function () {
 
     it('Can add fields from chips', function () {
         cy.seedLocation({
-            country: 'France',
+            country: 'FR',
             geometry: { latitude: 45.75889, longitude: 4.84139 },
             name: 'France',
             geoResolution: 'Country',
@@ -296,7 +296,7 @@ describe('New case form', function () {
         cy.seedLocation({
             name: 'France',
             geometry: { latitude: 42, longitude: 12 },
-            country: 'France',
+            country: 'FR',
             geoResolution: 'Country',
         });
         cy.addSource('Test source', 'www.example.com');
