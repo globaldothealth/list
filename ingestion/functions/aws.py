@@ -4,6 +4,7 @@ from datetime import datetime
 from pprint import pprint
 import re
 import sys
+import os
 
 import boto3
 
@@ -17,9 +18,12 @@ AWS_IMAGE = {
     "qa": "612888738066.dkr.ecr.us-east-1.amazonaws.com/gdh-ingestor:latest",
     "prod": "612888738066.dkr.ecr.us-east-1.amazonaws.com/gdh-ingestor:stable"
 }
-AWS_JOB_ROLE_ARN = "arn:aws:iam::612888738066:role/gdh-ingestion-job-role"
-AWS_EVENT_ROLE_ARN = "arn:aws:iam::612888738066:role/service-role/AWS_Events_Invoke_Batch_Job_Queue_1312384119"
-AWS_JOB_QUEUE_ARN = "arn:aws:batch:us-east-1:612888738066:job-queue/ingestion-queue"
+AWS_JOB_ROLE_ARN = os.getenv("AWS_JOB_ROLE_ARN", "arn:aws:iam::612888738066:role/gdh-ingestion-job-role")
+AWS_EVENT_ROLE_ARN = os.getenv(
+    "AWS_EVENT_ROLE_ARN",
+    "arn:aws:iam::612888738066:role/service-role/AWS_Events_Invoke_Batch_Job_Queue_1312384119"
+)
+AWS_JOB_QUEUE_ARN = f"arn:aws:batch:{AWS_REGION}:612888738066:job-queue/ingestion-queue"
 DEFAULT_VCPU = 1
 DEFAULT_MEMORY_MIB = 2048
 DEFAULT_JOB_QUEUE = "ingestion-queue"

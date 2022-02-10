@@ -58,8 +58,8 @@ COPY --from=builder-base $POETRY_HOME $POETRY_HOME
 COPY --from=builder-base $PYSETUP_PATH $PYSETUP_PATH
 ENV PATH="${PATH}:/root/.poetry/bin"
 
-ENV AWS_REGION='us-east-1'
-ENV INGESTION_SOURCES_BUCKET='epid-sources-raw'
+ENV AWS_REGION='eu-central-1'
+ENV INGESTION_SOURCES_BUCKET='gdh-sources'
 ENV GRACE_PERIOD_IN_DAYS='10'
 
 # will become mountpoint of our code

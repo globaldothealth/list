@@ -11,7 +11,7 @@ FLASK_HOST = environ.get("FLASK_HOST", "0.0.0.0")
 FLASK_PORT = environ.get("FLASK_PORT", 5001)
 
 LOCALSTACK_URL = environ.get("AWS_ENDPOINT", "http://localstack:4566")
-BUCKET_NAME = environ.get("RETRIEVAL_BUCKET_NAME", "epid-sources-raw")
+BUCKET_NAME = environ.get("RETRIEVAL_BUCKET_NAME", "gdh-sources")
 S3_BUCKET_URL = f"s3://{BUCKET_NAME}"
 
 SOURCE_DETAILS = {

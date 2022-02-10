@@ -41,7 +41,7 @@ _ENV_TO_SOURCE_API_URL = {
     "prod": "https://data.covid-19.global.health/api"
 }
 _SERVICE_ACCOUNT_CRED_FILE = "covid-19-map-277002-0943eeb6776b.json"
-_METADATA_BUCKET = "epid-ingestion"
+_METADATA_BUCKET = "gdh-credentials"
 MIN_SOURCE_ID_LENGTH, MAX_SOURCE_ID_LENGTH = 24, 24
 
 logger = logging.getLogger(__name__)

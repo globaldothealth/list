@@ -1270,7 +1270,7 @@ components:
                                 awsLambdaArn:
                                     type: string
                                     #pattern: '^arn\:aws\:lambda\:.+\:.+\:function\:.+'
-                                    example: arn:aws:lambda:us-east-1:612888738066:function:epid-ingestion-IndiaParsingFunction-J20HSC838QT6
+                                    example: arn:aws:lambda:eu-central-1:612888738066:function:epid-ingestion-IndiaParsingFunction-J20HSC838QT6
                         regexParsing:
                             type: object
                             properties:
@@ -1289,7 +1289,7 @@ components:
                                 awsRuleArn:
                                     type: string
                                     pattern: '^arn\:aws\:events\:.+\:.+\:rule\/.+'
-                                    example: arn:aws:events:us-east-1:612888738066:rule/5ef22491937717c3331c3729
+                                    example: arn:aws:events:eu-central-1:612888738066:rule/5ef22491937717c3331c3729
                                 awsScheduleExpression:
                                     type: string
                                     pattern: '^((rate\(((1 (minute|hour|day))|([1-9]+ (minutes|hours|days)))\))|(cron\((.+\s){5}.+\)))'

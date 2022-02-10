@@ -26,7 +26,7 @@ MONGO_COLLECTION = environ.get("MONGO_COLLECTION", "cases")
 
 LOCALSTACK_URL = environ.get("AWS_ENDPOINT", "http://localstack:4566")
 
-RETRIEVAL_BUCKET_NAME = environ.get("RETRIEVAL_BUCKET_NAME", "epid-sources-raw")
+RETRIEVAL_BUCKET_NAME = environ.get("RETRIEVAL_BUCKET_NAME", "gdh-sources")
 
 MOCK_SOURCE_DATA_URL = environ.get("MOCK_SOURCE_DATA_SERVICE", "http://mock-source-data")
 MOCK_SOURCE_DATA_PORT = environ.get("MOCK_SOURCE_DATA_PORT", 5001)

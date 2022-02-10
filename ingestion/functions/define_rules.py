@@ -7,6 +7,7 @@ import argparse
 import json
 import requests
 import sys
+import os
 
 import boto3
 from slugify import slugify
@@ -28,7 +29,7 @@ ENV_TO_URL = {
 	PROD:PROD_CURATOR_URL
 }
 
-AWS_REGION = "us-east-1"
+AWS_REGION = os.getenv("AWS_REGION", "eu-central-1")
 
 LIMIT = 100 # when we go over 100 sources we will need to update the maximum limit in the curator API
 

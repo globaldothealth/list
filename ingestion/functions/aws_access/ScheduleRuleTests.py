@@ -5,7 +5,7 @@ from .EventBridgeClient import EventBridgeClient, date_of_requested_weekday_in_m
 
 class ScheduleRuleTests(unittest.TestCase):
     real_ingestion_rule = {
-        'Arn': 'arn:aws:events:us-east-1:612888738066:rule/taiwan-taiwan-ingestor-prod',
+        'Arn': 'arn:aws:events:eu-central-1:612888738066:rule/taiwan-taiwan-ingestor-prod',
         'Description': 'Scheduled Batch ingestion rule for source: Taiwan with ID: '
                         '5f7796ece78c6866f6f676e0 for environment: prod',
         'EventBusName': 'default',
@@ -15,7 +15,7 @@ class ScheduleRuleTests(unittest.TestCase):
     }
 
     real_non_ingestion_rule = {
-        'Arn': 'arn:aws:events:us-east-1:612888738066:rule/testy',
+        'Arn': 'arn:aws:events:eu-central-1:612888738066:rule/testy',
         'Description': 'Delete me',
         'EventBusName': 'default',
         'Name': 'testy',

@@ -22,7 +22,7 @@ logger.setLevel("INFO")
 
 TEMP_PATH = "/tmp"
 ENV_FIELD = "env"
-OUTPUT_BUCKET = "epid-sources-raw"
+OUTPUT_BUCKET = "gdh-sources"
 SOURCE_ID_FIELD = "sourceId"
 PARSING_DATE_RANGE_FIELD = "parsingDateRange"
 TIME_FILEPART_FORMAT = "/%Y/%m/%d/%H%M/"
@@ -38,7 +38,7 @@ if os.environ.get("DOCKERIZED"):
         endpoint_url=os.environ.get("AWS_ENDPOINT", "http://localhost:4566"),
         aws_access_key_id=os.environ.get("AWS_ACCESS_KEY_ID", "test"),
         aws_secret_access_key=os.environ.get("AWS_SECRET_ACCESS_KEY", "test"),
-        region_name=os.environ.get("AWS_REGION", "us-east-1")
+        region_name=os.environ.get("AWS_REGION", "eu-central-1")
     )
 
 # Layer code, like common_lib, is added to the path by AWS.
