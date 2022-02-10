@@ -19,7 +19,7 @@ def s3_object_key_helper(source_id, date, file_name):
 class CleanupScriptTests(unittest.TestCase):
     def setUp(self):
         # create eventbridge rule for an ingestion source
-        self.eventbridge = boto3.client("events", endpoint_url=localstack)
+        self.eventbridge = boto3.client("events", gdoth.AWS_REGION, endpoint_url=localstack)
         self.eventbridge.put_rule(
             Name='Test ingestion rule',
             ScheduleExpression='rate(7 days)',
