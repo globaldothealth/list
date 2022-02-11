@@ -30,11 +30,9 @@ class CleanupScriptTests(unittest.TestCase):
             Description=f'Scheduled Batch ingestion rule for source: Taiwan with ID: '
                         f'{rate_event_id} for environment: prod'
         )
-        # create ingestion data bucket
+        # create s3 client, but assume ingestion data bucket already exists
+        # (because other tests assume that so if I create/delete here they fail)
         self.s3 = boto3.resource("s3", endpoint_url=localstack)
-        self.s3.create_bucket(Bucket=gdoth.INGESTION_SOURCES_BUCKET, CreateBucketConfiguration={
-            'LocationConstraint': gdoth.AWS_REGION
-        })
         # create various "source files" in the ingestion data bucket
         # one from today (we will do this all relative to today's date rather than pin the date,
         # if this causes a problem later please hunt me down)
@@ -57,11 +55,9 @@ class CleanupScriptTests(unittest.TestCase):
     def tearDown(self):
         # destroy eventbridge rules
         self.eventbridge.delete_rule(Name='Test ingestion rule')
-        # delete ingestion bucket
-        # first delete objects that test didn't delete
+        # delete objects that test didn't delete
         bucket = self.s3.Bucket(gdoth.INGESTION_SOURCES_BUCKET)
         bucket.objects.all().delete()
-        bucket.delete()
 
     @pytest.mark.skipif(not os.environ.get("DOCKERIZED", False),
                         reason="Running integration tests outside of mock environment disabled")
