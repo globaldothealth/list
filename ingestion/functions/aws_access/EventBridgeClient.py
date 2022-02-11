@@ -157,8 +157,7 @@ class EventBridgeClient:
         batch_targets = {}
         targets = self.aws_client.list_targets_by_rule(Rule=rule_name)
         for target in targets.get("Targets"):
-            target_id = target.get("Id")
-            if not target_id:
+            if (target_id := target.get("Id")) is None:
                 raise KeyError(f"Could not get target ID for {rule_name}")
             batch_targets[target_id] = target.get("BatchParameters")
         return batch_targets
