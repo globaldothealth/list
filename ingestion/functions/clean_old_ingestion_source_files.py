@@ -8,7 +8,7 @@ import aws_access.globaldothealth_configuration as gdoth
 def get_schedule_rules(endpoint_url=None):
     """Find a list of the schedule rules related to ingestion in G.h"""
     event_bridge = EventBridgeClient(gdoth.AWS_REGION, endpoint_url)
-    return [ScheduleRule(r) for r in event_bridge.get_rule_descriptions()]
+    return event_bridge.get_schedule_rules()
 
 def main(endpoint_url=None):
     print("Let's do this!")
