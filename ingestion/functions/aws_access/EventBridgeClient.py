@@ -35,24 +35,29 @@ class ScheduleRule:
         return self.rule_description.get("ScheduleExpression")
     
     def is_ingestion_rule(self):
-        return self.description().startswith("Scheduled Batch ingestion rule")
+        return False
     
     def description(self):
         return self.rule_description.get("Description", "")
 
+class IngestionScheduleRule (ScheduleRule):
+    def is_ingestion_rule(self):
+        return True
+
     def ingestion_source_id(self):
-        assert self.is_ingestion_rule()
         return re.search("[a-f0-9]{24}", self.description()).group(0)
 
     def date_of_requested_weekday_in_month(self, weekday, week_of_month, year, month):
         return date_of_requested_weekday_in_month(weekday, week_of_month, year, month)
+    
+    def difference_between_weekdays(self, our_day, their_day):
+        return our_day - their_day if our_day > their_day else our_day - their_day + 7
 
     def oldest_file_age(self, now):
         """
         What is the age in days of the oldest source file for an ingestion rule that we can keep?
         now: reference time from which to compute file age
         """
-        assert self.is_ingestion_rule()
         schedule = self.schedule()
         if schedule.startswith('rate'):
             components = re.match(r'rate\(([0-9]+) ([a-z]+)\)', schedule)
@@ -108,10 +113,6 @@ class ScheduleRule:
         # it should be longer than the gdoth.GRACE period
         assert age < timedelta(days = gdoth.GRACE_PERIOD_IN_DAYS)
         return age
-    
-    def difference_between_weekdays(self, our_day, their_day):
-        return our_day - their_day if our_day > their_day else our_day - their_day + 7
-
 
 """
 Discover AWS EventBridge rules
@@ -124,8 +125,18 @@ class EventBridgeClient:
         """
         self.aws_client = boto3.client("events", region, endpoint_url=endpoint_url)
 
+    @staticmethod
+    def rule_for_description(rule_description):
+        if rule_description.get("Description", "").startswith("Scheduled Batch ingestion rule"):
+            return IngestionScheduleRule(rule_description)
+        else:
+            return ScheduleRule(rule_description)
+
     def get_rule_descriptions(self):
         return self.aws_client.list_rules().get("Rules")
+
+    def get_schedule_rules(self):
+        return [EventBridgeClient.rule_for_description(d) for d in self.get_rule_descriptions()]
 
     def get_rule_targets(self, rule_name: str):
         batch_targets = {}
