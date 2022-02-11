@@ -1,13 +1,17 @@
-import boto3
+import logging
 import re
 from uuid import uuid4
 from datetime import datetime, timedelta
+
+import boto3
 from monthdelta import monthdelta
 
 from . import globaldothealth_configuration as gdoth
 
 # Amazon weeks start on Sunday
 WEEKDAYS = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT']
+
+logger = logging.getLogger(__name__)
 
 def date_of_requested_weekday_in_month(weekday, week_of_month, year, month):
     # find the isoweekday of the first of the month
@@ -60,58 +64,69 @@ class IngestionScheduleRule (ScheduleRule):
         """
         schedule = self.schedule()
         if schedule.startswith('rate'):
-            components = re.match(r'rate\(([0-9]+) ([a-z]+)\)', schedule)
-            assert components is not None # I'm assuming the format is rate(1 day)
-            assert components.group(2).startswith('day') # I'm assuming the unit is day or days
-            number_of_days = int(components.group(1))
-            assert number_of_days > 0 # I'm assuming a positive schedule
-            age = timedelta(days = -2 * number_of_days - gdoth.GRACE_PERIOD_IN_DAYS)
-        else:
-            assert schedule.startswith('cron') # I'm assuming that if it isn't a rate, it's a cron
-            components = re.match(r'cron\(([0-9]+) ([0-9]+) (\?|\*) (\*) ([0-6]#[1-4]|[A-Z]{3}|[0-6]|\?) (\*)\)', schedule)
-            assert components is not None # Assuming a restricted subset of https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-create-rule-schedule.html rules
-            # I also assume that you never ask for the fifth weekday of the month, because that's a very odd schedule
-            (minute, hour, day_of_month, month, day_of_week, year) = components.groups()
-            # calculate from midnight as we don't want odd seconds etc
-            today = datetime(now.year, now.month, now.day)
-            our_day = today.isoweekday() % 7 # ISO runs 1-7 Mon-Sun, we want 0-6 Sun-Sat
-            # Because of my assumptions above in the regex, I only need the day of the week here
-            # When we are using Python 3.10+, this should be a match
-            if day_of_week == '?':
-                # will run on _a_ day of the week but don't know which, assume worst case
-                age = timedelta(days = -14 - gdoth.GRACE_PERIOD_IN_DAYS)
-            elif day_of_week in WEEKDAYS:
-                # what is the time between the last of these weekdays and today?
-                their_day = WEEKDAYS.index(day_of_week)
-                delta_days = self.difference_between_weekdays(our_day, their_day)
-                age = timedelta(days = -delta_days - 7 - gdoth.GRACE_PERIOD_IN_DAYS)
-            elif len(day_of_week) == 1 and int(day_of_week) in range(7):
-                delta_days = self.difference_between_weekdays(our_day, int(day_of_week))
-                age = timedelta(days = -delta_days - 7 - gdoth.GRACE_PERIOD_IN_DAYS)
+            if components := re.match(r'rate\(([0-9]+) ([a-z]+)\)', schedule):
+                if not components.group(2).startswith('day'): # I'm assuming the unit is day or days
+                    logger.error(f"schedule {schedule} is not in units of days, we can't handle it")
+                    return None
+                number_of_days = int(components.group(1))
+                if not number_of_days > 0: # I'm assuming a positive schedule
+                    logger.error(f"schedule {schedule} isn't positive, which is surprising")
+                    return None
+                age = timedelta(days = -2 * number_of_days - gdoth.GRACE_PERIOD_IN_DAYS)
             else:
-                # format is weekday#week of month
-                their_weekday = int(day_of_week[0])
-                week_of_month = int(day_of_week[2])
-                # find the requested day this month
-                actual_requested_day = self.date_of_requested_weekday_in_month(their_weekday, week_of_month, today.year, today.month)
-                # get the timedelta between that date and today
-                days_until_requested_day_this_month = actual_requested_day - today.day
-                # if the other date is today or in the future, get the equivalent date two months ago
-                if days_until_requested_day_this_month >= 0:
-                    date_in_target_month = today - monthdelta(2)
-                # else get the equivalent date last month
+                logger.error(f"schedule {schedule} didn't match expected format rate(x days)")
+                return None
+        else:
+            if not schedule.startswith('cron'): # I'm assuming that if it isn't a rate, it's a cron
+                logger.error(f"schedule {schedule} isn't a rate or a cron, which we can't handle")
+                return None
+            if components := re.match(r'cron\(([0-9]+) ([0-9]+) (\?|\*) (\*) ([0-6]#[1-4]|[A-Z]{3}|[0-6]|\?) (\*)\)', schedule):
+                # Assuming a restricted subset of https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-create-rule-schedule.html rules
+                # I also assume that you never ask for the fifth weekday of the month, because that's a very odd schedule
+                (minute, hour, day_of_month, month, day_of_week, year) = components.groups()
+                # calculate from midnight as we don't want odd seconds etc
+                today = datetime(now.year, now.month, now.day)
+                our_day = today.isoweekday() % 7 # ISO runs 1-7 Mon-Sun, we want 0-6 Sun-Sat
+                # Because of my assumptions above in the regex, I only need the day of the week here
+                # When we are using Python 3.10+, this should be a match
+                if day_of_week == '?':
+                    # will run on _a_ day of the week but don't know which, assume worst case
+                    age = timedelta(days = -14 - gdoth.GRACE_PERIOD_IN_DAYS)
+                elif day_of_week in WEEKDAYS:
+                    # what is the time between the last of these weekdays and today?
+                    their_day = WEEKDAYS.index(day_of_week)
+                    delta_days = self.difference_between_weekdays(our_day, their_day)
+                    age = timedelta(days = -delta_days - 7 - gdoth.GRACE_PERIOD_IN_DAYS)
+                elif len(day_of_week) == 1 and int(day_of_week) in range(7):
+                    delta_days = self.difference_between_weekdays(our_day, int(day_of_week))
+                    age = timedelta(days = -delta_days - 7 - gdoth.GRACE_PERIOD_IN_DAYS)
                 else:
-                    date_in_target_month = today - monthdelta(1)
-                # find the timedelta from today
-                target_day = self.date_of_requested_weekday_in_month(their_weekday, week_of_month, date_in_target_month.year, date_in_target_month.month)
-                target_date = datetime(date_in_target_month.year, date_in_target_month.month, target_day)
-                difference = target_date - today
-                # subtract the gdoth.GRACE period
-                age = difference - timedelta(days = gdoth.GRACE_PERIOD_IN_DAYS)
+                    # format is weekday#week of month
+                    their_weekday = int(day_of_week[0])
+                    week_of_month = int(day_of_week[2])
+                    # find the requested day this month
+                    actual_requested_day = self.date_of_requested_weekday_in_month(their_weekday, week_of_month, today.year, today.month)
+                    # get the timedelta between that date and today
+                    days_until_requested_day_this_month = actual_requested_day - today.day
+                    # if the other date is today or in the future, get the equivalent date two months ago
+                    if days_until_requested_day_this_month >= 0:
+                        date_in_target_month = today - monthdelta(2)
+                    # else get the equivalent date last month
+                    else:
+                        date_in_target_month = today - monthdelta(1)
+                    # find the timedelta from today
+                    target_day = self.date_of_requested_weekday_in_month(their_weekday, week_of_month, date_in_target_month.year, date_in_target_month.month)
+                    target_date = datetime(date_in_target_month.year, date_in_target_month.month, target_day)
+                    difference = target_date - today
+                    # subtract the gdoth.GRACE period
+                    age = difference - timedelta(days = gdoth.GRACE_PERIOD_IN_DAYS)
+            else:
+                logger.error(f"cron schedule {schedule} could not be parsed")
+                return None
         # we should have a result
-        assert age is not None
-        # it should be longer than the gdoth.GRACE period
-        assert age < timedelta(days = gdoth.GRACE_PERIOD_IN_DAYS)
+        if age is None:
+            logger.error(f"surprisingly got None from parsing schedule {schedule}")
+            return None
         return age
 
 """
