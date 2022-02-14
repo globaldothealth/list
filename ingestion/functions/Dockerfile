@@ -49,7 +49,7 @@ RUN poetry install --no-dev
 FROM python-base as development
 
 RUN apt-get update && apt-get upgrade -y curl \
-      awscli
+      awscli unzip
 
 WORKDIR $PYSETUP_PATH
 
