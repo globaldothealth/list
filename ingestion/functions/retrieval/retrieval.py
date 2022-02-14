@@ -5,7 +5,8 @@ import mimetypes
 import os
 import sys
 import tempfile
-import zipfile
+import operator
+import subprocess
 import importlib
 from chardet import detect
 from pathlib import Path
@@ -103,15 +104,23 @@ def raw_content(url: str, content: bytes, tempdir: str = TEMP_PATH) -> io.BytesI
     if mimetype == "application/zip":
         print("File seems to be a zip file, decompressing it now")
         # Writing the zip file to temp dir.
-        fd, temp_name = tempfile.mkstemp(dir=tempdir)
-        with os.fdopen(fd, 'wb') as temp:
-            temp.write(content)
-            temp.flush()
-            # Opening the zip file, extracting its first file.
-            with zipfile.ZipFile(temp_name, "r") as zf:
-                for name in zf.namelist():
-                    with zf.open(name) as f:
-                        return io.BytesIO(f.read())
+        with tempfile.NamedTemporaryFile(dir=tempdir, delete=False) as f:
+            f.write(content)
+            f.flush()
+        with tempfile.TemporaryDirectory(dir=tempdir) as xf:
+            # extract into temporary folder using unzip
+            try:
+                subprocess.run(["/usr/bin/unzip", "-d", xf, f.name], check=True)
+                largest_file = max(
+                    ((f, f.stat().st_size) for f in Path(xf).iterdir()
+                     if f.is_file()),
+                    key=operator.itemgetter(1)
+                )[0]
+                with largest_file.open() as fp:
+                    content = fp.read().encode("utf-8")
+            except subprocess.CalledProcessError as e:
+                raise ValueError(f"Error in extracting zip file with exception:\n{e}")
+        Path(f.name).unlink(missing_ok=True)
     elif not mimetype:
         print("Could not determine mimetype")
     return io.BytesIO(content)
