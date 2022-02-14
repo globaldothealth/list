@@ -6,7 +6,7 @@ import requests
 
 
 LOCALSTACK_URL = environ.get("AWS_ENDPOINT", "http://localstack:4566")
-BATCH_READY = '"batch": "running"'
+BATCH_READY = '"batch": "available"'
 
 IAM_PROFILE_NAME = "ecsInstanceRole"
 IAM_PROFILE_ARN = "".join(["arn:aws:iam::000000000000:instance-profile/", "ecsInstanceRole"])

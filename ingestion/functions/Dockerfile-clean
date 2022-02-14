@@ -49,7 +49,7 @@ RUN poetry install --no-dev
 FROM python-base as development
 
 RUN apt-get update && apt-get upgrade -y curl \
-      awscli unzip
+      awscli
 
 WORKDIR $PYSETUP_PATH
 
@@ -58,17 +58,16 @@ COPY --from=builder-base $POETRY_HOME $POETRY_HOME
 COPY --from=builder-base $PYSETUP_PATH $PYSETUP_PATH
 ENV PATH="${PATH}:/root/.poetry/bin"
 
-ARG NOTIFY_WEBHOOK_URL
-ENV NOTIFY_WEBHOOK_URL=${NOTIFY_WEBHOOK_URL}
-ENV EPID_INGESTION_ENV "XXXXXXXXXXX"
-ENV EPID_INGESTION_SOURCE_ID "XXXXXXXXXXX"
+ENV AWS_REGION='us-east-1'
+ENV INGESTION_SOURCES_BUCKET='epid-sources-raw'
+ENV GRACE_PERIOD_IN_DAYS='10'
 
 # will become mountpoint of our code
 WORKDIR /app
 
-COPY ./ ./
+COPY clean_old_ingestion_source_files.py poetry.lock pyproject.toml aws_access/ ./
 
 # quicker install as runtime deps are already installed
 RUN poetry install
 
-CMD ["./run.sh"]
+CMD ["poetry", "run", "python3", "./clean_old_ingestion_source_files.py"]

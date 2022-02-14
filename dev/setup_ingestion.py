@@ -69,9 +69,10 @@ class IngestionWrangler(object):
 		counter = 0
 		while counter < WAIT_RETRIES:
 			containers = self.docker_client.containers.list(
+				all = True,
 				filters = {
 					"exited": 0,
-					"name": "setup-localstack_1"
+					"name": "dev-setup-localstack-1"
 				}
 			)
 			if containers:
