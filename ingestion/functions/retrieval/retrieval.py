@@ -22,7 +22,7 @@ logger.setLevel("INFO")
 
 TEMP_PATH = "/tmp"
 ENV_FIELD = "env"
-OUTPUT_BUCKET = "epid-sources-raw"
+OUTPUT_BUCKET = "gdh-sources"
 SOURCE_ID_FIELD = "sourceId"
 PARSING_DATE_RANGE_FIELD = "parsingDateRange"
 TIME_FILEPART_FORMAT = "/%Y/%m/%d/%H%M/"

@@ -46,7 +46,7 @@ BATCH_COMPUTE_ENVIRONMENT_ORDER = [{
 
 DATA_BUCKET_NAME = environ.get("DATA_BUCKET_NAME", "covid-19-data-export")
 CACHE_BUCKET_NAME = environ.get("CACHE_BUCKET_NAME", "covid-19-country-export")
-RETRIEVAL_BUCKET_NAME = environ.get("RETRIEVAL_BUCKET_NAME", "epid-sources-raw")
+RETRIEVAL_BUCKET_NAME = environ.get("RETRIEVAL_BUCKET_NAME", "gdh-sources")
 SES_EMAIL_ADDRESS = environ.get("SES_EMAIL_ADDRESS", "info@global.health")
 ECR_REPOSITORY_NAME = environ.get("ECR_REPOSITORY_NAME", "gdh-ingestor")
 

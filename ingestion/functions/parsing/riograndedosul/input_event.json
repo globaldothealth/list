@@ -1,6 +1,6 @@
 {
     "env": "local",
-    "s3Bucket": "epid-sources-raw",
+    "s3Bucket": "gdh-sources",
     "s3Key": "rgdsbrazil-test-id/content.csv",
     "sourceUrl": "https://ti.saude.rs.gov.br/covid19/download",
     "sourceId": "abc123"

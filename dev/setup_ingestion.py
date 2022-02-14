@@ -21,7 +21,7 @@ AWS_SECRET_ACCESS_KEY = environ.get("AWS_SECRET_ACCESS_KEY", "fake")
 
 BATCH_QUEUE_NAME = environ.get("BATCH_QUEUE_NAME", "ingestion-queue")
 ECR_REPOSITORY_NAME = environ.get("ECR_REPOSITORY_NAME", "gdh-ingestor")
-RETRIEVAL_BUCKET_NAME = environ.get("RETRIEVAL_BUCKET_NAME", "epid-sources-raw")
+RETRIEVAL_BUCKET_NAME = environ.get("RETRIEVAL_BUCKET_NAME", "gdh-sources")
 
 MOCK_SOURCE_DATA_URL = environ.get("MOCK_SOURCE_DATA_SERVICE", "http://mock-source-data")
 MOCK_SOURCE_DATA_PORT = environ.get("MOCK_SOURCE_DATA_PORT", 5001)

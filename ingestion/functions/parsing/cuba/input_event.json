@@ -1,6 +1,6 @@
 {
     "env": "local",
-    "s3Bucket": "epid-sources-raw",
+    "s3Bucket": "gdh-sources",
     "s3Key": "test/cuba/test_content.json",
     "sourceUrl": "https://covid19cubadata.github.io/data/covid19-cuba.json",
     "sourceId": "602e2b2d9ffe9d0039e92063"

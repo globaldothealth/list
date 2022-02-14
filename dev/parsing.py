@@ -17,7 +17,7 @@ AWS_ACCESS_KEY_ID = environ.get("AWS_ACCESS_KEY_ID", "fake")
 AWS_SECRET_ACCESS_KEY = environ.get("AWS_SECRET_ACCESS_KEY", "fake")
 AWS_DEFAULT_REGION = environ.get("AWS_DEFAULT_REGION","us-east-1")
 
-RETRIEVAL_BUCKET_NAME = environ.get("RETRIEVAL_BUCKET_NAME", "epid-sources-raw")
+RETRIEVAL_BUCKET_NAME = environ.get("RETRIEVAL_BUCKET_NAME", "gdh-sources")
 ECR_REPOSITORY_NAME = environ.get("ECR_REPOSITORY_NAME", "gdh-ingestor")
 
 CONTAINER_VCPUS = 1
