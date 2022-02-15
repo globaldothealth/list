@@ -3,6 +3,7 @@ import os
 import sys
 from datetime import datetime
 import csv
+import logging
 
 # Layer code, like parsing_lib, is added to the path by AWS.
 # To test locally (e.g. via pytest), we have to modify sys.path.
@@ -15,6 +16,8 @@ except ImportError:
             os.path.dirname(os.path.abspath(__file__)),
             os.pardir,os.pardir, 'common'))
     import parsing_lib
+
+logger = logging.getLogger(__name__)
 
 # Fixed location, all cases are for Hong Kong.
 _LOCATION = {
@@ -89,7 +92,7 @@ def parse_cases(raw_data_file: str, source_id: str, source_url: str):
             # CSV contains both "Probable" and "Confirmed" cases.
             # We only ingest confirmed cases.
             if row[_CERTAINTY_INDEX] != "Confirmed":
-                print('Skipping probable case')
+                logger.info('Skipping probable case')
                 continue
             case = {
                 "caseReference": {
