@@ -4,6 +4,7 @@ import csv
 import json
 from datetime import datetime
 from pathlib import Path
+import logging
 
 # Layer code, like parsing_lib, is added to the path by AWS.
 # To test locally (e.g. via pytest), we have to modify sys.path.
@@ -18,6 +19,7 @@ except ImportError:
             os.pardir,os.pardir, 'common'))
     import parsing_lib
 
+logger = logging.getLogger(__name__)
 
 TAIWAN_LOCATION = {
     "country": "Taiwan",
@@ -91,7 +93,7 @@ def convert_location(location):
     try:
         return _GEOCODES[location]
     except KeyError:
-        print("Location not found:", location)
+        logger.error("Location not found:", location)
         return None
 
 

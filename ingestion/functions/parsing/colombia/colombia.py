@@ -3,6 +3,7 @@ import sys
 from datetime import datetime
 import csv
 import json
+import logging
 
 # Layer code, like parsing_lib, is added to the path by AWS.
 # To test locally (e.g. via pytest), we have to modify sys.path.
@@ -16,6 +17,7 @@ except ImportError:
             os.pardir, os.pardir, 'common'))
     import parsing_lib
 
+logger = logging.getLogger(__name__)
 
 with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "geocoding_dictionaries.json")) as json_file:
     geocoding_dictionaries = json.load(json_file)
@@ -69,7 +71,7 @@ def get_location(raw_entry):
         return location
 
     except BaseException:
-        print(raw_entry)
+        logger.error(raw_entry)
         return None
 
 
@@ -80,7 +82,7 @@ def get_travel_history_location(raw_entry):
         iso2 = spanish_country_code_dict[country_spanish.lower()]
         return parsing_lib.geocode_country(iso2)
     except BaseException:
-        print(country_spanish)
+        logger.error(country_spanish)
 
 
 def convert_demographics(entry):
