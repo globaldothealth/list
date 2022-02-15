@@ -65,7 +65,8 @@ ENV GRACE_PERIOD_IN_DAYS='10'
 # will become mountpoint of our code
 WORKDIR /app
 
-COPY clean_old_ingestion_source_files.py poetry.lock pyproject.toml aws_access/ ./
+COPY clean_old_ingestion_source_files.py poetry.lock pyproject.toml ./
+COPY ./aws_access/ ./aws_access/
 
 # quicker install as runtime deps are already installed
 RUN poetry install
