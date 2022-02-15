@@ -58,7 +58,7 @@ def convert_location(raw_entry):
         return location
 
     except BaseException:
-        print(raw_entry)
+        logging.error(raw_entry)
         return None
 
 

@@ -3,6 +3,7 @@ import os
 import sys
 from datetime import datetime
 import csv
+import logging
 
 # Layer code, like parsing_lib, is added to the path by AWS.
 # To test locally (e.g. via pytest), we have to modify sys.path.
@@ -15,6 +16,9 @@ except ImportError:
             os.path.dirname(os.path.abspath(__file__)),
             os.pardir,os.pardir, 'common'))
     import parsing_lib
+
+logger = logging.getLogger(__name__)
+
 # Fixed location, all cases are for the canton of Zurich in Switzerland.
 _LOCATION = {
     "country": "Switzerland",
@@ -109,7 +113,7 @@ def parse_cases(raw_data_file: str, source_id: str, source_url: str):
                 for _ in range(num_confirmed_cases):
                     yield case
             except ValueError as ve:
-                print(ve)
+                logger.error(ve)
 
 
 

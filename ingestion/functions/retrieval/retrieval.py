@@ -8,6 +8,7 @@ import tempfile
 import operator
 import subprocess
 import importlib
+import logging
 from chardet import detect
 from pathlib import Path
 
@@ -15,6 +16,8 @@ import boto3
 import requests
 
 from datetime import datetime, timezone, timedelta
+
+logger = logging.getLogger(__name__)
 
 TEMP_PATH = "/tmp"
 ENV_FIELD = "env"
@@ -51,14 +54,14 @@ except ImportError:
 
 
 def extract_event_fields(event):
-    print("Extracting fields from event", event)
+    logger.info("Extracting fields from event", event)
     if any(
             field not in event
             for field
             in [ENV_FIELD, SOURCE_ID_FIELD]):
         error_message = (
             f"Required fields {ENV_FIELD}; {SOURCE_ID_FIELD} not found in input event: {event}")
-        print(error_message)
+        logger.error(error_message)
         raise ValueError(error_message)
     return event[ENV_FIELD], event[SOURCE_ID_FIELD], event.get(
         PARSING_DATE_RANGE_FIELD), event.get(
@@ -71,12 +74,12 @@ def get_source_details(env, source_id, upload_id, api_headers, cookies):
     """
     try:
         source_api_endpoint = f"{common_lib.get_source_api_url(env)}/sources/{source_id}"
-        print(f"Requesting source configuration from {source_api_endpoint}")
+        logging.info(f"Requesting source configuration from {source_api_endpoint}")
         r = requests.get(source_api_endpoint,
                          headers=api_headers, cookies=cookies)
         if r and r.status_code == 200:
             api_json = r.json()
-            print(f"Received source API response: {api_json}")
+            logging.info(f"Received source API response: {api_json}")
             return api_json["origin"]["url"], api_json["format"], api_json.get(
                 "automation", {}).get(
                 "parser", {}).get(
@@ -99,10 +102,10 @@ def get_source_details(env, source_id, upload_id, api_headers, cookies):
 
 def raw_content(url: str, content: bytes, tempdir: str = TEMP_PATH) -> io.BytesIO:
     # Detect the mimetype of a given URL.
-    print(f"Guessing mimetype of {url}")
+    logger.info(f"Guessing mimetype of {url}")
     mimetype, _ = mimetypes.guess_type(url)
     if mimetype == "application/zip":
-        print("File seems to be a zip file, decompressing it now")
+        logger.info("File seems to be a zip file, decompressing it now")
         # Writing the zip file to temp dir.
         with tempfile.NamedTemporaryFile(dir=tempdir, delete=False) as f:
             f.write(content)
@@ -122,7 +125,7 @@ def raw_content(url: str, content: bytes, tempdir: str = TEMP_PATH) -> io.BytesI
                 raise ValueError(f"Error in extracting zip file with exception:\n{e}")
         Path(f.name).unlink(missing_ok=True)
     elif not mimetype:
-        print("Could not determine mimetype")
+        logger.warn("Could not determine mimetype")
     return io.BytesIO(content)
 
 
@@ -138,7 +141,7 @@ def retrieve_content(
             common_lib.complete_with_error(
                 e, env, common_lib.UploadError.SOURCE_CONFIGURATION_ERROR,
                 source_id, upload_id, api_headers, cookies)
-        print(f"Downloading {source_format} content from {url}")
+        logger.info(f"Downloading {source_format} content from {url}")
         if url.startswith("s3://"):
             # strip the prefix
             s3Location = url[5:]
@@ -151,7 +154,7 @@ def retrieve_content(
             r = requests.get(url, headers=headers)
             r.raise_for_status()
             content = r.content
-        print("Download finished")
+        logger.info("Download finished")
 
         key_filename_part = f"content.{source_format.lower()}"
         s3_object_key = (
@@ -168,22 +171,22 @@ def retrieve_content(
         bytesio = raw_content(url, content, tempdir)
         if source_format == "XLSX":
             # do not convert XLSX into another encoding, leave for parsers
-            print("Skipping encoding detection for XLSX")
+            logger.warn("Skipping encoding detection for XLSX")
             fd, outfile_name = tempfile.mkstemp(dir=tempdir)
             with os.fdopen(fd, "wb") as outfile:
                 while content := bytesio.read(READ_CHUNK_BYTES):
                     outfile.write(content)
             return [(outfile_name, s3_object_key)]
 
-        print("Detecting encoding of retrieved content")
+        logger.info("Detecting encoding of retrieved content")
         # Read 2MB to be quite sure about the encoding.
         detected_enc = detect(bytesio.read(2 << 20))
         bytesio.seek(0)
         if detected_enc["encoding"]:
-            print(f"Source encoding is presumably {detected_enc}")
+            logger.info(f"Source encoding is presumably {detected_enc}")
         else:
             detected_enc["encoding"] = DEFAULT_ENCODING
-            print(f"Source encoding detection failed, setting to {DEFAULT_ENCODING}")
+            logger.warn(f"Source encoding detection failed, setting to {DEFAULT_ENCODING}")
         fd, outfile_name = tempfile.mkstemp(dir=tempdir)
         with os.fdopen(fd, "w", encoding="utf-8") as outfile:
             text_stream = codecs.getreader(detected_enc["encoding"])(bytesio)
@@ -210,7 +213,7 @@ def upload_to_s3(
     try:
         s3_client.upload_file(
             file_name, bucket, s3_object_key)
-        print(
+        logger.info(
             f"Uploaded source content to s3://{bucket}/{s3_object_key}")
         os.unlink(file_name)
     except Exception as e:
@@ -234,7 +237,7 @@ def invoke_parser(
         "dateRange": parsing_date_range,
         "auth": auth
     }
-    print(f"Invoking parser ({parser_module})")
+    logger.info(f"Invoking parser ({parser_module})")
     sys.path.append(str(Path(__file__).parent.parent))  # ingestion/functions
     importlib.import_module(parser_module).event_handler(payload)
 
@@ -320,7 +323,7 @@ def run_retrieval(tempdir=TEMP_PATH):
         env, source_id, upload_id, auth_headers, cookies)
 
     if not stable_identifiers:
-        print(f"Source {source_id} does not have stable identifiers\n"
+        logger.info(f"Source {source_id} does not have stable identifiers\n"
               "Ingesting entire dataset and ignoring date filter and date ranges")
         date_filter = {}
         parsing_date_range = {}
