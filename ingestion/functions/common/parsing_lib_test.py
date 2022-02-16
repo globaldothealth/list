@@ -10,6 +10,8 @@ import pytest
 import sys
 import tempfile
 import datetime
+import logging
+
 from contextlib import redirect_stdout
 
 from unittest.mock import MagicMock, patch
@@ -488,6 +490,11 @@ def test_write_to_server_records_input_for_failed_batch_upsert_with_validation_e
 
 
     with redirect_stdout(io.StringIO()) as f:
+        # this handler must be set in here for logger to see the redirected stdout
+        handler = logging.StreamHandler(stream=sys.stdout)
+        handler.setLevel(logging.DEBUG)
+        parsing_lib.logger.addHandler(handler)
+
         numCreated, numUpdated, numError = parsing_lib.write_to_server(
             iter([_PARSED_CASE]),
             "env", _SOURCE_ID, _UPLOAD_ID, {},
