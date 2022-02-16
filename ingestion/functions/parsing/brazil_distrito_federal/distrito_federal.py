@@ -170,7 +170,7 @@ def convert_location(municipality: str):
         location["geometry"] = geometry
     else:
         # In local testing the only unknown administrative districts were empty entries, 'Entorno DF' (== Surroundings of Distrito Federal), and 'Sistema Penitenciário' (== Penitenciary system)
-        logger.warn(f'Unknown administrative district: {municipality}')
+        logger.warning(f'Unknown administrative district: {municipality}')
         location["query"] = "Distrito Federal, Brazil"
     if location:
         return location

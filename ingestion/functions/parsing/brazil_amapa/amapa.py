@@ -65,7 +65,7 @@ def convert_confirmation_method(raw_test: str):
     elif "TESTE" or "ensaio" in raw_test:
         return "Serological test"
     else:
-        logger.warn(f'unknown confirmation method: {raw_test}')
+        logger.warning(f'unknown confirmation method: {raw_test}')
         return "Unknown"
 
 
