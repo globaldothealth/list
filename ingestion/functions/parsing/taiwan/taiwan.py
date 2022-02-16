@@ -4,7 +4,7 @@ import csv
 import json
 from datetime import datetime
 from pathlib import Path
-import logging
+import common.ingestion_logging as logging
 
 # Layer code, like parsing_lib, is added to the path by AWS.
 # To test locally (e.g. via pytest), we have to modify sys.path.
@@ -93,7 +93,7 @@ def convert_location(location):
     try:
         return _GEOCODES[location]
     except KeyError:
-        logger.error("Location not found:", location)
+        logger.error(f"Location not found: {location}")
         return None
 
 

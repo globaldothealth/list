@@ -5,7 +5,7 @@ import copy
 from datetime import datetime
 import json
 from pathlib import Path
-import logging
+import common.ingestion_logging as logging
 
 import pycountry
 
@@ -109,7 +109,7 @@ def convert_location(raw_entry):
             return _PROVINCES[code_province]
         return _CU
     except KeyError:
-        logger.error("Location not found:", raw_entry)
+        logger.error(f"Location not found: {raw_entry}")
     return None
 
 

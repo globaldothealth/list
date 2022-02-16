@@ -13,7 +13,7 @@ import json
 import tempfile
 import requests
 import functools
-import logging
+import common.ingestion_logging as logging
 
 import google
 import google.auth.transport.requests
@@ -117,7 +117,7 @@ def login(email: str):
 
     Returns the cookie of the now logged-in user.
     """
-    logger.info("Logging-in user", email)
+    logger.info(f"Logging-in user {email}")
     endpoint = REGISTRATION_ENDPOINT
     res = requests.post(endpoint, json={
         "email": email,
