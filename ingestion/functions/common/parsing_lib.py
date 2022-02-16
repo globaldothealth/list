@@ -9,7 +9,7 @@ import contextlib
 import time
 from pathlib import Path
 from typing import Callable, Dict, Generator, List
-import logging
+import common.ingestion_logging as logging
 
 import boto3
 import requests
@@ -48,7 +48,8 @@ try:
         GEOCODING_COUNTRIES = json.load(g)
         COUNTRY_ISO2 = sorted(GEOCODING_COUNTRIES.keys())
 except json.decoder.JSONDecodeError as e:
-    logger.error("geocoding_countries.json JSONDecodeError:", e)
+    logger.exception(f"geocoding_countries.json JSONDecodeError: {e}")
+    logging.flushAll()
     sys.exit(1)
 
 s3_client = boto3.client("s3")
@@ -80,12 +81,12 @@ def geocode_country(two_letter_iso_code):
             "geometry": {"latitude": lat, "longitude": lon}
         }
     except KeyError:
-        logger.error("Code not found in country geocoding DB:", two_letter_iso_code)
+        logger.error(f"Code not found in country geocoding DB: {two_letter_iso_code}")
         return None
 
 
 def extract_event_fields(event: Dict):
-    logger.info("Extracting fields from event", event)
+    logger.info(f"Extracting fields from event {event}")
     if any(
         field not in event
         for field
@@ -529,3 +530,4 @@ def run(
         local_data_file.close()
         if os.path.exists(local_data_file_name):
             os.remove(local_data_file_name)
+        logging.flushAll()

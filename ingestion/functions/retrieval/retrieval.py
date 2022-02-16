@@ -54,7 +54,7 @@ except ImportError:
 
 
 def extract_event_fields(event):
-    logger.info("Extracting fields from event", event)
+    logger.info(f"Extracting fields from event {event}")
     if any(
             field not in event
             for field
