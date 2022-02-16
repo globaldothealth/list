@@ -3,17 +3,7 @@ import os
 import sys
 from datetime import datetime
 
-# Layer code, like parsing_lib, is added to the path by AWS.
-# To test locally (e.g. via pytest), we have to modify sys.path.
-# pylint: disable=import-error
-try:
-    import parsing_lib
-except ImportError:
-    sys.path.append(
-        os.path.join(
-            os.path.dirname(os.path.abspath(__file__)),
-            os.pardir,os.pardir, 'common'))
-    import parsing_lib
+import common.parsing_lib as parsing_lib
 
 with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "nationalities.json")) as json_file:
     nationalities = json.load(json_file)
