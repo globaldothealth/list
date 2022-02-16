@@ -314,7 +314,7 @@ def write_to_server(
                     augmented_errors = [add_input_to_error(e) for e in res_json['errors']]
                     reported_error = dict(res_json)
                     reported_error["errors"] = augmented_errors
-                    logger.warning(f"Validation error in batch {batch_num}:", json.dumps(reported_error))
+                    logger.warning(f"Validation error in batch {batch_num}: {json.dumps(reported_error)}")
                     counter["numError"] += len(res_json["errors"])
                 else:
                     logger.warning(f"Validation error in batch {batch_num}: {res.text}")
