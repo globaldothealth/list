@@ -151,7 +151,7 @@ def convert_travel(entry):
 
             travel_countries.append({"location": location})
         else:
-            logger.warn(f"Country code not found for: {country.lower()}")
+            logger.warning(f"Country code not found for: {country.lower()}")
         travel["traveledPrior30Days"] = True
         travel["travel"] = travel_countries
         if travel:
