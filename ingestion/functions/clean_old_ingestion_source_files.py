@@ -26,7 +26,7 @@ def main(endpoint_url=None):
             # expected convention: source_id/year/month/day/hhmm/filename.ext
             components = file_name.split('/')
             if len(components) != 6:
-                logger.warn(f"file name {file_name} does not meet expectations, skipping")
+                logger.warning(f"file name {file_name} does not meet expectations, skipping")
                 continue
             _, their_year, their_month, their_day, _, _ = components
             their_date = datetime(int(their_year), int(their_month), int(their_day))

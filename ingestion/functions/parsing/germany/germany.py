@@ -105,7 +105,7 @@ def convert_location(admin1, admin3_id):
     else:
         # Some entries are still not recognized and will therefore be geocoded at admin1 level. 
         # In e2e testing these were limited to the subdivisions of Berlin which are officially admin level 2 and so where not present in the source data used.
-        logger.warn(f'Unknown administrative district: {admin3_id}')
+        logger.warning(f'Unknown administrative district: {admin3_id}')
         location["query"] = ", ".join([admin1, "Germany"])
     if location:
         return location

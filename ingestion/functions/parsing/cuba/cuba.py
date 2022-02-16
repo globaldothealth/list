@@ -169,7 +169,7 @@ def parse_cases(raw_data_file, source_id, source_url):
         # Get schema_version
         schema_version = json_data['schema-version']
         if schema_version != 7:
-            logger.warn(
+            logger.warning(
                 f'Schema version has been updated from 7 to {schema_version}')
 
         for day in json_data['casos']['dias']:

@@ -125,7 +125,7 @@ def raw_content(url: str, content: bytes, tempdir: str = TEMP_PATH) -> io.BytesI
                 raise ValueError(f"Error in extracting zip file with exception:\n{e}")
         Path(f.name).unlink(missing_ok=True)
     elif not mimetype:
-        logger.warn("Could not determine mimetype")
+        logger.warning("Could not determine mimetype")
     return io.BytesIO(content)
 
 
@@ -171,7 +171,7 @@ def retrieve_content(
         bytesio = raw_content(url, content, tempdir)
         if source_format == "XLSX":
             # do not convert XLSX into another encoding, leave for parsers
-            logger.warn("Skipping encoding detection for XLSX")
+            logger.warning("Skipping encoding detection for XLSX")
             fd, outfile_name = tempfile.mkstemp(dir=tempdir)
             with os.fdopen(fd, "wb") as outfile:
                 while content := bytesio.read(READ_CHUNK_BYTES):
@@ -186,7 +186,7 @@ def retrieve_content(
             logger.info(f"Source encoding is presumably {detected_enc}")
         else:
             detected_enc["encoding"] = DEFAULT_ENCODING
-            logger.warn(f"Source encoding detection failed, setting to {DEFAULT_ENCODING}")
+            logger.warning(f"Source encoding detection failed, setting to {DEFAULT_ENCODING}")
         fd, outfile_name = tempfile.mkstemp(dir=tempdir)
         with os.fdopen(fd, "w", encoding="utf-8") as outfile:
             text_stream = codecs.getreader(detected_enc["encoding"])(bytesio)

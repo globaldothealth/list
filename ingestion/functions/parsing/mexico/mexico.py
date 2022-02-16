@@ -40,12 +40,12 @@ def convert_location(state_code: str, municipality_code: str):
         try:
             query_list.append(_MUNICIPALITIES[state_code + municipality_code])
         except KeyError:
-            logger.warn(f"Municipality code missing: {state_code} {municipality_code}")
+            logger.warning(f"Municipality code missing: {state_code} {municipality_code}")
     if state_code[0] != missing_value_prefix:
         try:
             query_list.append(_STATES[state_code])
         except KeyError:
-            logger.warn(f"State Code Missing: {state_code}")
+            logger.warning(f"State Code Missing: {state_code}")
     query_string = ", ".join(query_list + ["MÉXICO"])
     try:
         municipality_code = state_code + municipality_code

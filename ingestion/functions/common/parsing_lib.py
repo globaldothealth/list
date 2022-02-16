@@ -256,7 +256,7 @@ def write_to_server(
                 res = requests.post(put_api_url, json={"cases": batch},
                                     headers=headers, cookies=cookies)
             except requests.exceptions.ConnectionError:
-                logger.warn(f"Failed to connect to data service, waiting {conn_wait}s")
+                logger.warning(f"Failed to connect to data service, waiting {conn_wait}s")
                 time.sleep(conn_wait)
                 total_conn_wait += conn_wait
                 conn_wait *= 2
@@ -264,10 +264,10 @@ def write_to_server(
             if res.status_code in [200, 207]:  # 207 is used for validation error
                 break
             if res.status_code == 500 and "401" in res.text:
-                logger.warn(f"Request failed, status={res.status_code}, response={res.text}, reauthenticating...")
+                logger.warning(f"Request failed, status={res.status_code}, response={res.text}, reauthenticating...")
                 headers = common_lib.obtain_api_credentials(s3_client)
                 continue
-            logger.warn(f"Request failed, status={res.status_code}, response={res.text}, retrying in {wait} seconds...")
+            logger.warning(f"Request failed, status={res.status_code}, response={res.text}, retrying in {wait} seconds...")
             time.sleep(wait)
             total_wait += wait
             wait *= 2
@@ -314,10 +314,10 @@ def write_to_server(
                     augmented_errors = [add_input_to_error(e) for e in res_json['errors']]
                     reported_error = dict(res_json)
                     reported_error["errors"] = augmented_errors
-                    logger.warn(f"Validation error in batch {batch_num}:", json.dumps(reported_error))
+                    logger.warning(f"Validation error in batch {batch_num}:", json.dumps(reported_error))
                     counter["numError"] += len(res_json["errors"])
                 else:
-                    logger.warn(f"Validation error in batch {batch_num}: {res.text}")
+                    logger.warning(f"Validation error in batch {batch_num}: {res.text}")
             update_status = {
                 "status": "IN_PROGRESS",
                 "summary": {
@@ -515,7 +515,7 @@ def run(
             if status == 200:
                 break
             elif status == 500 and "401" in text:
-                logger.warn("Finalizing upload failed with 401, reauthenticating...")
+                logger.warning("Finalizing upload failed with 401, reauthenticating...")
                 api_creds = common_lib.obtain_api_credentials(s3_client)
                 continue
             else:
