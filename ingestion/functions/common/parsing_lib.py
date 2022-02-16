@@ -43,7 +43,6 @@ CASES_BATCH_SIZE = 250
 
 logger = logging.getLogger(__name__)
 
-
 try:
     with (Path(__file__).parent / "geocoding_countries.json").open() as g:
         GEOCODING_COUNTRIES = json.load(g)
