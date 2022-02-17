@@ -70,6 +70,8 @@ def convert_age(age: str):
             "start": float(age),
             "end": float(age)
         }
+    elif age == "<1":
+        return {"start": 0, "end": 1}
     else:
         only_age = float("".join([i for i in age if not i.isalpha()]))
         # 365.25 is average number of days a year
