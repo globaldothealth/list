@@ -33,7 +33,7 @@ def convert_date(raw_date: str, dataserver=True):
 
     Set dataserver to False in order to return version appropriate for notes.
     """
-    date = datetime.strptime(raw_date.split(' ')[0], "%d/%m/%Y")
+    date = datetime.strptime(raw_date.split(' ')[0], "%Y-%m-%d")
     if not dataserver:
         return date.strftime("%m/%d/%Y")
     return date.strftime("%m/%d/%YZ")
