@@ -1,9 +1,17 @@
 import iso3166
 import json
+import logging
 import ratelimiter
+import sys
+
 from lru import LRU
+
 from src.integration.mapbox_client import mapbox_geocode
 
+h = logging.StreamHandler(sys.stdout)
+logger = logging.getLogger(__name__)
+logger.addHandler(h)
+logger.setLevel(logging.INFO)
 
 class Geocoder:
     Country = 'Country'
@@ -57,17 +65,30 @@ class Geocoder:
         countryName:  The country name, or sub-string thereof, to find.
         Return:  The ISO-3166 two-letter code, or None if the countryName was unfound or ambiguous.
         """
+        logger.debug(f"Getting country code for {countryName}")
+        # workaround a common problem: "United States" is the Mapbox name for US, but the algorithm
+        # below will also find UM (United States Minor Outlying Islands) and fail because the
+        # query is ambiguous.
+        fixups = {
+            'united states': 'US'
+        }
         name = countryName.lower()
+        if fixedCode := fixups.get(name):
+            return fixedCode
+        
         country = None
         for key in Geocoder.INDEX:
             if name in key:
                 if country is not None:
                     # Ambiguous countryName
+                    logger.error(f"Country {countryName} is ambiguous, found both {country} and {Geocoder.INDEX[key]}")
                     return None
                 country = Geocoder.INDEX[key]
 
         if country is not None:
+            logger.debug(f"code for {countryName} is {country.alpha2}")
             return country.alpha2
+        logger.error(f"Country {countryName} not found in iso3166.countries!")
         return None
 
 
