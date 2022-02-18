@@ -1,5 +1,7 @@
+import os
 import unittest
 
+os.environ['ENABLE_FAKE_GEOCODER'] = 'YES'
 from src.app import main
 
 
