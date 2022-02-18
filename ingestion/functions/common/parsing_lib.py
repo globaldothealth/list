@@ -42,6 +42,7 @@ DATE_FORMATS = ["%m/%d/%YZ", "%m/%d/%Y"]
 CASES_BATCH_SIZE = 250
 
 logger = logging.getLogger(__name__)
+logger.setLevel("INFO")
 
 try:
     with (Path(__file__).parent / "geocoding_countries.json").open() as g:

@@ -18,6 +18,7 @@ import requests
 from datetime import datetime, timezone, timedelta
 
 logger = logging.getLogger(__name__)
+logger.setLevel("INFO")
 
 TEMP_PATH = "/tmp"
 ENV_FIELD = "env"
