@@ -15,6 +15,11 @@ app = Flask(__name__)
 
 geocoders = []
 
+h = logging.StreamHandler(sys.stdout)
+logger = logging.getLogger(__name__)
+logger.addHandler(h)
+logger.setLevel(logging.INFO)
+
 if 'ENABLE_FAKE_GEOCODER' in environ:
     faking_it = Blueprint('fake_geocoder', __name__)
     fake_geocoder = FakeGeocoder()
@@ -61,7 +66,9 @@ def index() -> str:
 def geocode():
     query = request.args.get('q', type=str)
     if not query:
+        logger.warning(f"No query supplied in request {request}")
         return "No query supplied", 400
+    logger.info(f"geocoding query {query}")
     options = {}
     resolution = request.args.get('limitToResolution', '[]', type=str)
     listOfResolutions = json.loads(resolution)
@@ -71,28 +78,26 @@ def geocode():
     listOfCountries = json.loads(countries)
     if len(listOfCountries) > 0:
         options['limitToCountry'] = listOfCountries
+    logger.debug(f"options {options}")
     for g in geocoders:
         locations = g.geocode(query, options)
         if len(locations) > 0:
+            logger.debug("responding with locations: {locations}")
             return jsonify(locations)
+    logger.debug("empty response")
     return jsonify([])
 
 
 @app.route("/geocode/suggest")
 def suggest_geocode():
     try:
-        return jsonify(suggester.suggest(request.args))
+        logger.info(f"suggestion based on {request.args}")
+        r = jsonify(suggester.suggest(request.args))
+        logger.info(f"suggestions: {r.get_data()}")
+        return r
     except ValueError:
         return f"Bad limitToResolution value {request.args.get('limitToResolution', str)}", 422
 
 
-def setup_logger():
-    h = logging.StreamHandler(sys.stdout)
-    rootLogger = logging.getLogger()
-    rootLogger.addHandler(h)
-    rootLogger.setLevel(logging.DEBUG)
-
-
 if __name__ == '__main__':
-    setup_logger()
     app.run(host='0.0.0.0', port=8080)
