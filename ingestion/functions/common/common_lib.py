@@ -9,18 +9,23 @@ object.
 
 import os
 import re
+import sys
 import json
 import tempfile
 import requests
 import functools
-import common.ingestion_logging as logging
+from enum import Enum
+from pathlib import Path
 
 import google
 import google.auth.transport.requests
-
-from enum import Enum
-from pathlib import Path
 from google.oauth2 import service_account
+
+try:
+    import ingestion_logging as logging
+except Exception:
+    sys.path.append(Path(__file__).parent)
+    import common.ingestion_logging as logging
 
 E2E_MOCK_SOURCE_URL = os.environ.get("MOCK_SOURCE_DATA_ADDRESS", "")
 REGISTRATION_ENDPOINT = os.environ.get("REGISTRATION_ENDPOINT", "http://localhost:3001/auth/register")
