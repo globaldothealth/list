@@ -4,17 +4,11 @@ import sys
 from datetime import datetime
 import csv
 
-# Layer code, like parsing_lib, is added to the path by AWS.
-# To test locally (e.g. via pytest), we have to modify sys.path.
-# pylint: disable=import-error
-try:
-    import parsing_lib
-except ImportError:
-    sys.path.append(
-        os.path.join(
-            os.path.dirname(os.path.abspath(__file__)),
-            os.pardir,os.pardir, 'common'))
-    import parsing_lib
+import common.ingestion_logging as logging
+import common.parsing_lib as parsing_lib
+
+logger = logging.getLogger(__name__)
+
 # Fixed location, all cases are for the canton of Zurich in Switzerland.
 _LOCATION = {
     "country": "Switzerland",
@@ -109,7 +103,7 @@ def parse_cases(raw_data_file: str, source_id: str, source_url: str):
                 for _ in range(num_confirmed_cases):
                     yield case
             except ValueError as ve:
-                print(ve)
+                logger.error(ve)
 
 
 

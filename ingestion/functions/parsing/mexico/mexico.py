@@ -4,19 +4,10 @@ from datetime import datetime
 import csv
 import json
 
-# Layer code, like parsing_lib, is added to the path by AWS.
-# To test locally (e.g. via pytest), we have to modify sys.path.
-# pylint: disable=import-error
-try:
-    import parsing_lib
-except ImportError:
-    sys.path.append(
-        os.path.join(
-            os.path.dirname(os.path.abspath(__file__)),
-            os.pardir,os.pardir, 'common'))
-    import parsing_lib
+import common.ingestion_logging as logging
+import common.parsing_lib as parsing_lib
 
-
+logger = logging.getLogger(__name__)
 
 with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "dictionaries.json"), encoding='utf-8') as json_file:
     maps = json.load(json_file)
@@ -39,12 +30,12 @@ def convert_location(state_code: str, municipality_code: str):
         try:
             query_list.append(_MUNICIPALITIES[state_code + municipality_code])
         except KeyError:
-            print(f"Municipality code missing: {state_code} {municipality_code}")
+            logger.warning(f"Municipality code missing: {state_code} {municipality_code}")
     if state_code[0] != missing_value_prefix:
         try:
             query_list.append(_STATES[state_code])
         except KeyError:
-            print(f"State Code Missing: {state_code}")
+            logger.warning(f"State Code Missing: {state_code}")
     query_string = ", ".join(query_list + ["MÉXICO"])
     try:
         municipality_code = state_code + municipality_code

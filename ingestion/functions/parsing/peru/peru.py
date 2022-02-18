@@ -4,18 +4,10 @@ from datetime import datetime
 import csv
 import json
 
-# Layer code, like parsing_lib, is added to the path by AWS.
-# To test locally (e.g. via pytest), we have to modify sys.path.
-# pylint: disable=import-error
-try:
-    import parsing_lib
-except ImportError:
-    sys.path.append(
-        os.path.join(
-            os.path.dirname(os.path.abspath(__file__)),
-            os.pardir,os.pardir, 'common'))
-    import parsing_lib
+import common.ingestion_logging as logging
+import common.parsing_lib as parsing_lib
 
+logger = logging.getLogger(__name__)
 
 # To geocode cases for Peru, we load dictionaries to map place names to coordinates. These are from ESRI Peru lookup table
 # Case locations are provided as District, Province, Department. For a subset of cases, only Department is specified.
@@ -83,7 +75,7 @@ def get_location(row, first_dict_places, capital_dict_places):
 
         return location
     except Exception as e:
-        print(place_name)
+        logger.error(place_name)
         return None
 
 

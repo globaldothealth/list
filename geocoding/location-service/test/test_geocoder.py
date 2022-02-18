@@ -83,3 +83,8 @@ class GeocodeTests(unittest.TestCase):
         })
         mapbox_patch.assert_called_once()
         assert feats == feats2
+
+    def test_canFindCodeForUnitedStates(self):
+        geocoder = Geocoder('api_token', FakeAdminsFetcher())
+        code = geocoder.getISO3166Code('United States')
+        assert code == 'US'

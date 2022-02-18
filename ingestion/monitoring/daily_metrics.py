@@ -5,6 +5,7 @@ import operator
 import requests
 import tempfile
 from pathlib import Path
+import logging
 
 import sys
 import boto3
@@ -12,6 +13,7 @@ import boto3
 BUCKET = "covid-19-aggregates"
 WEBHOOK_URL = os.environ.get("SLACK_WEBHOOK_METRICS_URL", None)
 
+logger = logging.getLogger(__name__)
 
 def to_isodate(d):
     mm, dd, yyyy = d.split("-")
@@ -25,7 +27,7 @@ def get_data(s3, bucket, key):
         with open(fout.name) as fp:
             data = json.load(fp)
             if next(iter(data)) != Path(key).stem:  # next(iter(k)) gives first key of k
-                print(f"Bucket key {key} does not match key in file {k0}, aborting.")
+                logger.error(f"Bucket key {key} does not match key in file {k0}, aborting.")
                 sys.exit(1)
     return data
 
@@ -91,12 +93,12 @@ if __name__ == "__main__":
     d1 = get_data(s3, BUCKET, last_day[0])
     d2 = get_data(s3, BUCKET, today[0])
     ret = compare(d1, d2)
-    print(ret)
+    logger.info(ret)
 
     if WEBHOOK_URL:
         response = requests.post(WEBHOOK_URL, json={"text": ret})
         if response.status_code != 200:
-            print(f"Slack notification failed with {response.status_code}: {response.text}")
+            logger.error(f"Slack notification failed with {response.status_code}: {response.text}")
             sys.exit(1)
     if "⚠️" in ret:
         sys.exit(1)  # Trigger CI failure as an additional notification

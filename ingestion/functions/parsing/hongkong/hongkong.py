@@ -4,17 +4,10 @@ import sys
 from datetime import datetime
 import csv
 
-# Layer code, like parsing_lib, is added to the path by AWS.
-# To test locally (e.g. via pytest), we have to modify sys.path.
-# pylint: disable=import-error
-try:
-    import parsing_lib
-except ImportError:
-    sys.path.append(
-        os.path.join(
-            os.path.dirname(os.path.abspath(__file__)),
-            os.pardir,os.pardir, 'common'))
-    import parsing_lib
+import common.ingestion_logging as logging
+import common.parsing_lib as parsing_lib
+
+logger = logging.getLogger(__name__)
 
 # Fixed location, all cases are for Hong Kong.
 _LOCATION = {
@@ -70,6 +63,8 @@ def convert_age(age: str):
             "start": float(age),
             "end": float(age)
         }
+    elif age == "<1":
+        return {"start": 0, "end": 1}
     else:
         only_age = float("".join([i for i in age if not i.isalpha()]))
         # 365.25 is average number of days a year
@@ -89,7 +84,7 @@ def parse_cases(raw_data_file: str, source_id: str, source_url: str):
             # CSV contains both "Probable" and "Confirmed" cases.
             # We only ingest confirmed cases.
             if row[_CERTAINTY_INDEX] != "Confirmed":
-                print('Skipping probable case')
+                logger.info('Skipping probable case')
                 continue
             case = {
                 "caseReference": {

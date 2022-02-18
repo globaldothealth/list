@@ -9,6 +9,7 @@ import contextlib
 import time
 from pathlib import Path
 from typing import Callable, Dict, Generator, List
+import common.ingestion_logging as logging
 
 import boto3
 import requests
@@ -40,13 +41,15 @@ DATE_FORMATS = ["%m/%d/%YZ", "%m/%d/%Y"]
 # usage on the server-side and is known to cause OOMs so increase with caution.
 CASES_BATCH_SIZE = 250
 
+logger = logging.getLogger(__name__)
 
 try:
     with (Path(__file__).parent / "geocoding_countries.json").open() as g:
         GEOCODING_COUNTRIES = json.load(g)
         COUNTRY_ISO2 = sorted(GEOCODING_COUNTRIES.keys())
 except json.decoder.JSONDecodeError as e:
-    print("geocoding_countries.json JSONDecodeError:", e)
+    logger.exception(f"geocoding_countries.json JSONDecodeError: {e}")
+    logging.flushAll()
     sys.exit(1)
 
 s3_client = boto3.client("s3")
@@ -78,12 +81,12 @@ def geocode_country(two_letter_iso_code):
             "geometry": {"latitude": lat, "longitude": lon}
         }
     except KeyError:
-        print("Code not found in country geocoding DB:", two_letter_iso_code)
+        logger.error(f"Code not found in country geocoding DB: {two_letter_iso_code}")
         return None
 
 
 def extract_event_fields(event: Dict):
-    print("Extracting fields from event", event)
+    logger.info(f"Extracting fields from event {event}")
     if any(
         field not in event
         for field
@@ -101,7 +104,7 @@ def extract_event_fields(event: Dict):
 
 def retrieve_raw_data_file(s3_bucket: str, s3_key: str, out_file):
     try:
-        print(f"Retrieving raw data from s3://{s3_bucket}/{s3_key}")
+        logger.info(f"Retrieving raw data from s3://{s3_bucket}/{s3_key}")
         s3_client.download_fileobj(s3_bucket, s3_key, out_file)
     except Exception as e:
         common_lib.complete_with_error(e)
@@ -225,7 +228,7 @@ def write_to_server(
         source_api_url = common_lib.get_source_api_url("local")
     put_api_url = f"{source_api_url}/cases/batchUpsert"
     upload_status_url = f"{source_api_url}/sources/{source_id}/uploads/{upload_id}"
-    print(f"Prod URL: {put_api_url}")
+    logger.info(f"Prod URL: {put_api_url}")
     counter = collections.defaultdict(int)
     counter["batch_num"] = 0
     start_time = time.time()
@@ -243,7 +246,7 @@ def write_to_server(
         total_conn_wait = 0
         wait = 10  # initial wait time in seconds
         conn_wait = 30
-        print(f"Sending {len(batch)} cases, total so far: {counter['total']}")
+        logger.info(f"Sending {len(batch)} cases, total so far: {counter['total']}")
         # Exponential backoff in dev and prod, but not for local testing
         while (
             total_wait <= (MAX_WAIT_TIME if env in ["dev", "prod"] else 0)
@@ -253,7 +256,7 @@ def write_to_server(
                 res = requests.post(put_api_url, json={"cases": batch},
                                     headers=headers, cookies=cookies)
             except requests.exceptions.ConnectionError:
-                print(f"Failed to connect to data service, waiting {conn_wait}s")
+                logger.warning(f"Failed to connect to data service, waiting {conn_wait}s")
                 time.sleep(conn_wait)
                 total_conn_wait += conn_wait
                 conn_wait *= 2
@@ -261,10 +264,10 @@ def write_to_server(
             if res.status_code in [200, 207]:  # 207 is used for validation error
                 break
             if res.status_code == 500 and "401" in res.text:
-                print(f"Request failed, status={res.status_code}, response={res.text}, reauthenticating...")
+                logger.warning(f"Request failed, status={res.status_code}, response={res.text}, reauthenticating...")
                 headers = common_lib.obtain_api_credentials(s3_client)
                 continue
-            print(f"Request failed, status={res.status_code}, response={res.text}, retrying in {wait} seconds...")
+            logger.warning(f"Request failed, status={res.status_code}, response={res.text}, retrying in {wait} seconds...")
             time.sleep(wait)
             total_wait += wait
             wait *= 2
@@ -290,7 +293,7 @@ def write_to_server(
             counter["total"] += len(batch)
             now = time.time()
             cps = int(counter["total"] / (now - start_time))
-            print(f"\tCurrent speed: {cps} cases/sec")
+            logger.info(f"\tCurrent speed: {cps} cases/sec")
             res_json = res.json()
             counter["numCreated"] += res_json["numCreated"]
             counter["numUpdated"] += res_json["numUpdated"]
@@ -311,10 +314,10 @@ def write_to_server(
                     augmented_errors = [add_input_to_error(e) for e in res_json['errors']]
                     reported_error = dict(res_json)
                     reported_error["errors"] = augmented_errors
-                    print(f"Validation error in batch {batch_num}:", json.dumps(reported_error))
+                    logger.warning(f"Validation error in batch {batch_num}: {json.dumps(reported_error)}")
                     counter["numError"] += len(res_json["errors"])
                 else:
-                    print(f"Validation error in batch {batch_num}: {res.text}")
+                    logger.warning(f"Validation error in batch {batch_num}: {res.text}")
             update_status = {
                 "status": "IN_PROGRESS",
                 "summary": {
@@ -340,7 +343,7 @@ def write_to_server(
             count_error=counter["numError"]
         )
         return
-    print(f"sent {counter['total']} cases in {time.time() - start_time} seconds")
+    logger.info(f"sent {counter['total']} cases in {time.time() - start_time} seconds")
     return counter["numCreated"], counter["numUpdated"], counter["numError"]
 
 
@@ -380,7 +383,7 @@ def filter_cases_by_date(
     and date_filter is ignored.
     """
     if date_range:
-        print(f"Filtering cases using date range {date_range}")
+        logger.info(f"Filtering cases using date range {date_range}")
 
         def case_is_within_range(case, start, end):
             confirmed_event = [e for e in case["events"]
@@ -393,7 +396,7 @@ def filter_cases_by_date(
         return (case for case in case_data if case_is_within_range(case, start, end))
 
     elif date_filter:
-        print(f"Filtering cases using date filter {date_filter}")
+        logger.info(f"Filtering cases using date filter {date_filter}")
         now = get_today()
         delta = datetime.timedelta(days=date_filter["numDaysBeforeToday"])
         cutoff_date = now - delta
@@ -459,7 +462,7 @@ def run(
 
     env, source_url, source_id, upload_id, s3_bucket, s3_key, date_filter, date_range, local_auth = extract_event_fields(
         event)
-    print(f"Event fields extracted in parsing_lib.run...env: {env}, source_url: {source_url}, source_id: {source_id}, \
+    logger.info(f"Event fields extracted in parsing_lib.run...env: {env}, source_url: {source_url}, source_id: {source_id}, \
         upload_id: {upload_id}, s3_bucket: {s3_bucket}, s3_key: {s3_key}, date_filter: {date_filter}, date_range: {date_range}, local_auth: {local_auth}")
     api_creds = None
     cookies = None
@@ -484,7 +487,7 @@ def run(
         fd, local_data_file_name = tempfile.mkstemp()
         local_data_file = os.fdopen(fd, "wb")
         retrieve_raw_data_file(s3_bucket, s3_key, local_data_file)
-        print(f"Raw file retrieved at {local_data_file_name}")
+        logger.info(f"Raw file retrieved at {local_data_file_name}")
 
         case_data = parsing_function(
             local_data_file_name, source_id,
@@ -512,7 +515,7 @@ def run(
             if status == 200:
                 break
             elif status == 500 and "401" in text:
-                print("Finalizing upload failed with 401, reauthenticating...")
+                logger.warning("Finalizing upload failed with 401, reauthenticating...")
                 api_creds = common_lib.obtain_api_credentials(s3_client)
                 continue
             else:
@@ -527,3 +530,4 @@ def run(
         local_data_file.close()
         if os.path.exists(local_data_file_name):
             os.remove(local_data_file_name)
+        logging.flushAll()

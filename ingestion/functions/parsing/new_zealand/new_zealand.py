@@ -5,17 +5,7 @@ from datetime import datetime
 import csv
 from pathlib import Path
 
-# Layer code, like parsing_lib, is added to the path by AWS.
-# To test locally (e.g. via pytest), we have to modify sys.path.
-# pylint: disable=import-error
-try:
-    import parsing_lib
-except ImportError:
-    sys.path.append(
-        os.path.join(
-            os.path.dirname(os.path.abspath(__file__)),
-            os.pardir,os.pardir, 'common'))
-    import parsing_lib
+import common.parsing_lib as parsing_lib
 
 _NZ = parsing_lib.geocode_country('NZ')
 _NZ["country"] = "New Zealand"
@@ -55,7 +45,7 @@ def convert_date(raw_date: str):
 
 def convert_location(raw_entry):
     dhb = raw_entry[_DHB]
-    return _GEOCODES[dhb] if 'Managed Isolation' not in dhb else _NZ
+    return _GEOCODES.get(dhb) or _NZ
 
 
 def convert_demographics(entry):
