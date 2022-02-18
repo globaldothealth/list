@@ -8,7 +8,7 @@ def getLogger(module_name):
     if not logger.hasHandlers():
         handler = logging.StreamHandler(stream=sys.stdout)
         handler.setLevel(logging.DEBUG)
-        logger.addHandler()
+        logger.addHandler(handler)
         handlers.add(handler)
     return logger
 
