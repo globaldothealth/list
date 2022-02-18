@@ -41,6 +41,7 @@ _METADATA_BUCKET = "epid-ingestion"
 MIN_SOURCE_ID_LENGTH, MAX_SOURCE_ID_LENGTH = 24, 24
 
 logger = logging.getLogger(__name__)
+logger.setLevel("INFO")
 
 class UploadError(Enum):
     """Upload error categories corresponding to the G.h Source API."""
