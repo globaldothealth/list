@@ -2,6 +2,7 @@
 FROM node:14.17.1
 
 # set the version (this should be set from outside)
+ARG CURATOR_VERSION
 ENV CURATOR_VERSION=${CURATOR_VERSION:-unset}
 # Build the curator service.
 WORKDIR /usr/src/app/verification/curator-service/api
