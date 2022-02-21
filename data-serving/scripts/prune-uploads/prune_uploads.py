@@ -173,7 +173,6 @@ def mark_upload(
     logging.info("\n".join([f"  mark-upload {u} {accept}" for u in upload_ids]))
 
 
-
 def mark_cases_uuid(
     cases: pymongo.collection.Collection,
     sources: pymongo.collection.Collection,
@@ -268,7 +267,7 @@ if __name__ == "__main__":
     parser.add_argument("-r", "--run-hooks",
                         help="Run hooks after prune finishes. Specify 'all' to run all hooks")
     parser.add_argument("--env",
-                        help="Which environment to use for hooks (default: prod)", default="prod")
+                        help="Which environment to use for hooks (default: prod)")
     args = parser.parse_args()
 
     # Prefer command line arguments to environment variables
@@ -276,9 +275,14 @@ if __name__ == "__main__":
         epoch = datetime.fromisoformat(epoch)  # YYYY-MM-DD format
     else:
         epoch = None
+    logging.info(f"Epoch: {epoch}")
 
     threshold = args.threshold or os.environ.get("PRUNE_ERROR_THRESHOLD_PERCENT", 10)
     threshold = int(threshold) / 100
+    logging.info(f"Threshold: {threshold}")
+
+    env = args.env or os.environ.get("ENV", "prod")
+    logging.info(f"Environment: {env}")
 
     if args.dry_run:
         logging.info("Dry run, no changes will be made")
@@ -327,6 +331,6 @@ if __name__ == "__main__":
         sys.exit(0)
 
     if "country_export" in selected_hooks:
-        hooks.country_export.run(ingested_sources, args.env, args.dry_run)
+        hooks.country_export.run(ingested_sources, env, args.dry_run)
     if "aggregate" in selected_hooks:
-        hooks.aggregate.run(ingested_sources, args.env, args.dry_run)
+        hooks.aggregate.run(ingested_sources, env, args.dry_run)
