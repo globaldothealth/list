@@ -25,6 +25,8 @@ import { SnackbarAlert } from '../SnackbarAlert';
 import { useParams } from 'react-router-dom';
 
 import Helmet from 'react-helmet';
+import { getVersion } from '../../redux/app/thunk';
+import { selectVersion } from '../../redux/app/selectors';
 
 interface StylesProps {
     smallHeight: boolean;
@@ -102,6 +104,7 @@ const LandingPage = (): JSX.Element => {
         selectForgotPasswordPopupOpen,
     );
     const { open, message } = useAppSelector(selectSnackbar);
+    const version = useAppSelector(selectVersion);
 
     // Url parameters from reset password link
     const { token, id } = useParams<UrlParams>();
@@ -131,6 +134,11 @@ const LandingPage = (): JSX.Element => {
         localStorage.setItem('searchQuery', lastLocation.search);
     }, [lastLocation]);
 
+    // retrieve the app version from the curator service
+    useEffect(() => {
+        dispatch(getVersion());
+    });
+
     return (
         <>
             <Helmet>
@@ -152,6 +160,9 @@ const LandingPage = (): JSX.Element => {
                     <div className={classes.linksContainer}>
                         <div>
                             <Typography>More information</Typography>
+                            <div className={classes.link}>
+                                Version: {version}
+                            </div>
                             <div className={classes.link}>
                                 <a
                                     href="https://global.health/"
