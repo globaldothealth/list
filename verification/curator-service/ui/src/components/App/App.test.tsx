@@ -59,11 +59,12 @@ describe('<App />', () => {
             config: {},
             headers: {},
         };
-        mockedAxios.get.mockResolvedValueOnce(axiosResponse);
+        mockedAxios.get.mockResolvedValue(axiosResponse);
 
         render(<App />);
-        expect(mockedAxios.get).toHaveBeenCalledTimes(1);
+        expect(mockedAxios.get).toHaveBeenCalledTimes(2);
         expect(mockedAxios.get).toHaveBeenCalledWith('/auth/profile');
+        expect(mockedAxios.get).toHaveBeenCalledWith('/version');
         expect(await screen.findByTestId('profile-menu')).toBeInTheDocument();
     });
 
@@ -76,8 +77,9 @@ describe('<App />', () => {
         };
         mockedAxios.get.mockResolvedValue(axiosResponse);
         render(<App />);
-        expect(mockedAxios.get).toHaveBeenCalledTimes(1);
+        expect(mockedAxios.get).toHaveBeenCalledTimes(2);
         expect(mockedAxios.get).toHaveBeenCalledWith('/auth/profile');
+        expect(mockedAxios.get).toHaveBeenCalledWith('/version');
         expect(screen.queryByTestId('profile-menu')).not.toBeInTheDocument();
     });
 
