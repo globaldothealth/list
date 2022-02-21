@@ -3,6 +3,7 @@ import sys
 from datetime import datetime
 import csv
 import json
+import common.ingestion_logging as logging
 
 # Layer code, like parsing_lib, is added to the path by AWS.
 # To test locally (e.g. via pytest), we have to modify sys.path.
@@ -15,6 +16,8 @@ except ImportError:
             os.path.dirname(os.path.abspath(__file__)),
             os.pardir,os.pardir, 'common'))
     import parsing_lib
+
+logger = logging.getLogger(__name__)
 
 _AGE = "Faixa Etária"
 _GENDER = "Sexo"
@@ -167,7 +170,7 @@ def convert_location(municipality: str):
         location["geometry"] = geometry
     else:
         # In local testing the only unknown administrative districts were empty entries, 'Entorno DF' (== Surroundings of Distrito Federal), and 'Sistema Penitenciário' (== Penitenciary system)
-        print(f'Unknown administrative district: {municipality}')
+        logger.warning(f'Unknown administrative district: {municipality}')
         location["query"] = "Distrito Federal, Brazil"
     if location:
         return location

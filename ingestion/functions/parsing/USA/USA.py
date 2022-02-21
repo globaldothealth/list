@@ -5,6 +5,7 @@ import sys
 from datetime import datetime, timedelta
 from pathlib import Path
 import csv
+import common.ingestion_logging as logging
 
 # Layer code, like parsing_lib, is added to the path by AWS.
 # To test locally (e.g. via pytest), we have to modify sys.path.
@@ -18,6 +19,7 @@ except ImportError:
             os.pardir,os.pardir, 'common'))
     import parsing_lib
     
+logger = logging.getLogger(__name__)
 
 _AGE = "age_group"
 _GENDER = "sex"
@@ -152,7 +154,7 @@ def parse_cases(raw_data_file: str, source_id: str, source_url: str, last_date: 
                 manual_import and last_date and confirmation_date and
                 confirmation_date["$date"] >= last_date
             ):
-                print(f"Skipping too recent case, on or after {last_date}")
+                logger.info(f"Skipping too recent case, on or after {last_date}")
                 continue
             if row[_CONFIRMED] == "Laboratory-confirmed case" and confirmation_date is not None:
                 try:
@@ -191,12 +193,12 @@ def prepare_manual_import(raw_data_file: str, source_url: str, last_date: str = 
     """Prepares JSON file for import to MongoDB"""
     last_date = last_date or (datetime.now() - timedelta(days=2)).date().isoformat()
     if last_date:
-        print(f"Will load cases before {last_date}")
+        logger.info(f"Will load cases before {last_date}")
     from tqdm import tqdm
     source_id = f"{Path(__file__).stem.lower()}-manual-import"
     case_json = Path('cases.json')
     if case_json.exists():
-        print("Existing cases.json found, remove and rerun")
+        logger.error("Existing cases.json found, remove and rerun")
         return None
     with case_json.open('w') as f:
         for c in tqdm(parse_cases(raw_data_file, source_id, source_url, last_date, manual_import=True)):

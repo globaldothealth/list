@@ -36,7 +36,7 @@
     "react-router-last-location": "^2.0.1",
     "react-scripts": "^4.0.3",
     "react-scroll": "^1.8.4",
-    "shortid": "^2.2.15",
+    "shortid": "^2.2.8",
     "typeface-roboto": "^1.1.13",
     "typescript": "^3.9.10",
     "yup": "^0.32.11"

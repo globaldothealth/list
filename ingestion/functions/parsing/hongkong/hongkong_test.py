@@ -145,5 +145,52 @@ class HongKongTest(unittest.TestCase):
                     },
                     "gender": "Female",
                 },
+            }, {
+                "caseReference": {
+                    "sourceId": _SOURCE_ID,
+                    "sourceEntryId": "5",
+                    "sourceUrl": _SOURCE_URL,
+                },
+                "location": {
+                    # "One country, two systems". We only store countries here.
+                    "country": "China",
+                    "administrativeAreaLevel1": "Hong Kong",
+                    "geoResolution": "Admin1",
+                    "name": "Hong Kong",
+                    "geometry": {
+                        "longitude": float("114.15861"),
+                        "latitude": float("22.27833"),
+                    },
+                },
+                "events": [
+                    {
+                        "name": "confirmed",
+                        "dateRange": {
+                            "start": "01/05/2022Z",
+                            "end": "01/05/2022Z",
+                        },
+                    }, {
+                        "name": "onsetSymptoms",
+                        "dateRange": {
+                            "start": "01/01/2022Z",
+                            "end": "01/01/2022Z",
+                        }
+                    }, {
+                        "name": "outcome",
+                        "value": "Recovered",
+                    },
+                ],
+                "symptoms": {
+                    "status": "Symptomatic",
+                },
+                "travelHistory": {"traveledPrior30Days": True},
+                "demographics": {
+                    "ageRange": {
+                        "start": 0,
+                        "end": 1,
+                    },
+                    "gender": "Male",
+                },
             },
+
         ])

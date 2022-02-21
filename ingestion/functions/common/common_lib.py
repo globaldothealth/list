@@ -9,17 +9,23 @@ object.
 
 import os
 import re
+import sys
 import json
 import tempfile
 import requests
 import functools
+from enum import Enum
+from pathlib import Path
 
 import google
 import google.auth.transport.requests
-
-from enum import Enum
-from pathlib import Path
 from google.oauth2 import service_account
+
+try:
+    import ingestion_logging as logging
+except Exception:
+    sys.path.append(Path(__file__).parent)
+    import common.ingestion_logging as logging
 
 E2E_MOCK_SOURCE_URL = os.environ.get("MOCK_SOURCE_DATA_ADDRESS", "")
 REGISTRATION_ENDPOINT = os.environ.get("REGISTRATION_ENDPOINT", "http://localhost:3001/auth/register")
@@ -33,6 +39,9 @@ _ENV_TO_SOURCE_API_URL = {
 _SERVICE_ACCOUNT_CRED_FILE = "covid-19-map-277002-0943eeb6776b.json"
 _METADATA_BUCKET = "epid-ingestion"
 MIN_SOURCE_ID_LENGTH, MAX_SOURCE_ID_LENGTH = 24, 24
+
+logger = logging.getLogger(__name__)
+logger.setLevel("INFO")
 
 class UploadError(Enum):
     """Upload error categories corresponding to the G.h Source API."""
@@ -49,7 +58,7 @@ class UploadError(Enum):
 def create_upload_record(env, source_id, headers, cookies):
     """Creates an upload resource via the G.h Source API."""
     post_api_url = f"{get_source_api_url(env)}/sources/{source_id}/uploads"
-    print(f"Creating upload via {post_api_url}")
+    logger.info(f"Creating upload via {post_api_url}")
     res = requests.post(post_api_url,
                         json={"status": "IN_PROGRESS", "summary": {}},
                         cookies=cookies,
@@ -67,7 +76,7 @@ def finalize_upload(
         count_updated=None, count_error=None, error=None):
     """Records the results of an upload via the G.h Source API."""
     put_api_url = f"{get_source_api_url(env)}/sources/{source_id}/uploads/{upload_id}"
-    print(f"Updating upload via {put_api_url}")
+    logger.info(f"Updating upload via {put_api_url}")
     update = {"summary": {}}
     if error:
         update["status"] = "ERROR"
@@ -99,7 +108,7 @@ def complete_with_error(
     If upload details are provided, updates the indicated upload with the
     provided data.
     """
-    print(exception)
+    logger.error(exception)
     if env and upload_error and source_id and upload_id:
         finalize_upload(env, source_id, upload_id, headers, cookies,
                         error=upload_error,
@@ -114,7 +123,7 @@ def login(email: str):
 
     Returns the cookie of the now logged-in user.
     """
-    print("Logging-in user", email)
+    logger.info(f"Logging-in user {email}")
     endpoint = REGISTRATION_ENDPOINT
     res = requests.post(endpoint, json={
         "email": email,
@@ -133,7 +142,7 @@ def obtain_api_credentials(s3_client):
     try:
         fd, local_creds_file_name = tempfile.mkstemp()
         with os.fdopen(fd) as _:
-            print(
+            logger.info(
                 "Retrieving service account credentials from "
                 f"s3://{_METADATA_BUCKET}/{_SERVICE_ACCOUNT_CRED_FILE}")
             s3_client.download_file(_METADATA_BUCKET,
@@ -147,7 +156,7 @@ def obtain_api_credentials(s3_client):
             credentials.apply(headers)
             return headers
     except Exception as e:
-        print(e)
+        logger.error(e)
         raise e
 
 
