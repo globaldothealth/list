@@ -5,6 +5,7 @@ export default function validateEnv(): Readonly<{
     AWS_ACCESS_KEY_ID: string;
     AWS_SECRET_ACCESS_KEY: string;
     AWS_SERVICE_REGION: string;
+    CURATOR_VERSION: string;
     DATASERVER_URL: string;
     DB_CONNECTION_STRING: string;
     EMAIL_USER_ADDRESS: string;
@@ -20,11 +21,10 @@ export default function validateEnv(): Readonly<{
     SERVICE_ENV: string;
     SESSION_COOKIE_KEY: string;
     STATIC_DIR: string;
-}> &
-    {
-        readonly [varName: string]: string | boolean | number | undefined;
-        // eslint-disable-next-line indent
-    } {
+}> & {
+    readonly [varName: string]: string | boolean | number | undefined;
+    // eslint-disable-next-line indent
+} {
     return cleanEnv(process.env, {
         AFTER_LOGIN_REDIRECT_URL: str({
             desc: 'URL to redirect to after the oauth consent screen',
@@ -43,6 +43,10 @@ export default function validateEnv(): Readonly<{
         AWS_SERVICE_REGION: str({
             desc: 'AWS region in which to interact with services/resources',
             default: 'us-east-1',
+        }),
+        CURATOR_VERSION: str({
+            desc: 'version string to display in UI for bug reports etc.',
+            devDefault: '(local testing)',
         }),
         DATASERVER_URL: url({
             desc: 'URL at which to make requests to the data-service API',
