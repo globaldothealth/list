@@ -566,7 +566,7 @@ describe('Linelist table', function () {
         cy.contains('1-5 of 7').should('exist');
     });
 
-    it('Can sort the data', () => {
+    it.only('Can sort the data', () => {
         cy.addCase({
             country: 'France',
             notes: 'some notes',
@@ -593,7 +593,9 @@ describe('Linelist table', function () {
 
         cy.get('tr').eq(2).contains('td', 'France');
 
-        cy.route('GET', getDefaultQuery()).as('getSortedInDescendingOrder');
+        cy.route('GET', getDefaultQuery(50, 'descending')).as(
+            'getSortedInDescendingOrder',
+        );
         cy.get('#sort-by-select').click();
         cy.get('li').contains('descending').click();
         cy.wait('@getSortedInDescendingOrder');
