@@ -593,7 +593,7 @@ describe('Linelist table', function () {
 
         cy.get('tr').eq(2).contains('td', 'France');
 
-        cy.route('GET', defaultQuery).as('getSortedInDescendingOrder');
+        cy.route('GET', getDefaultQuery()).as('getSortedInDescendingOrder');
         cy.get('#sort-by-select').click();
         cy.get('li').contains('descending').click();
         cy.wait('@getSortedInDescendingOrder');
