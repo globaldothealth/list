@@ -42,10 +42,6 @@ ENV REACT_APP_PUBLIC_MAPBOX_TOKEN "pk.eyJ1IjoiaGVhbHRobWFwIiwiYSI6ImNrYzNjczdmcz
 ENV REACT_APP_POLICY_PUBLIC_ID "89575059"
 ENV REACT_APP_COOKIE_CONSENT_PUBLIC_ID "2070778"
 
-# set the version (this should be set from outside)
-ARG CURATOR_VERSION
-ENV CURATOR_VERSION=${CURATOR_VERSION:-unset}
-
 RUN npm run build
 
 
@@ -70,7 +66,10 @@ COPY --from=builder /usr/src/app/verification/curator-service/ui/build ./fe
 # Set environment variable to serve static files from built UI.
 ENV STATIC_DIR /usr/src/app/fe
 ENV AFTER_LOGIN_REDIRECT_URL /
+# set the version (this should be set from outside)
+ARG CURATOR_VERSION
 ENV CURATOR_VERSION=${CURATOR_VERSION:-unset}
+
 
 # Start service, do not use npm start instead invoke node directly
 # to avoid wrapping the process uselessly and correctly catch SIGTERM and SIGINT.
