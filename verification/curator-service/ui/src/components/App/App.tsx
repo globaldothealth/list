@@ -431,7 +431,7 @@ export default function App(): JSX.Element {
         React.useState<boolean>(false);
     const [activeFilterInput, setActiveFilterInput] =
         React.useState<string>('');
-    const [sortBy, setSortBy] = useState<SortBy>(SortBy.Default);
+    const [sortBy, setSortBy] = useState<SortBy>(SortBy.ConfirmationDate);
     const [sortByOrder, setSortByOrder] = useState<SortByOrder>(
         SortByOrder.Ascending,
     );

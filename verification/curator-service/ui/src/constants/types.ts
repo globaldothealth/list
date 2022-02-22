@@ -1,6 +1,6 @@
 export enum SortBy {
     Default = 'default',
-    ConfirmedDate = 'confirmedDate',
+    ConfirmationDate = 'confirmationDate',
     Country = 'country',
     Admin1 = 'admin1',
     Admin2 = 'admin2',
