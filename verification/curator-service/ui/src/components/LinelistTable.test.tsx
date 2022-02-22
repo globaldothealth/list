@@ -35,6 +35,7 @@ const initialState: RootState = {
         isLoading: false,
         searchQuery: '',
         filterBreadcrumbs: [],
+        version: '1.0',
     },
     filtersReducer: {
         countryList: [],
@@ -161,7 +162,9 @@ describe('<LinelistTable />', () => {
         );
 
         expect(mockedAxios.get).toHaveBeenCalledTimes(1);
-        expect(mockedAxios.get).toHaveBeenCalledWith(`/api/cases`);
+        expect(mockedAxios.get).toHaveBeenCalledWith(
+            `/api/cases/?limit=50&page=1&count_limit=10000&sort_by=default&order=ascending`,
+        );
 
         await waitFor(() => {
             expect(screen.getByText('www.example.com')).toBeInTheDocument();
@@ -315,7 +318,9 @@ describe('<LinelistTable />', () => {
             },
         );
         expect(mockedAxios.get).toHaveBeenCalledTimes(1);
-        expect(mockedAxios.get).toHaveBeenCalledWith(`/api/cases`);
+        expect(mockedAxios.get).toHaveBeenCalledWith(
+            `/api/cases/?limit=50&page=1&count_limit=10000&sort_by=default&order=ascending`,
+        );
 
         await waitFor(() => {
             const row = screen.getByText('www.example.com');
@@ -351,7 +356,8 @@ describe('<LinelistTable />', () => {
         expect(mockedAxios.delete).toHaveBeenCalledTimes(1);
 
         expect(mockedAxios.delete).toHaveBeenCalledWith(
-            '/api/cases/' + cases[0]._id,
+            '/api/cases/?limit=50&page=1&count_limit=10000&sort_by=default&order=ascending/' +
+                cases[0]._id,
         );
 
         // Check table data is reloaded
@@ -423,7 +429,9 @@ describe('<LinelistTable />', () => {
             },
         );
         expect(mockedAxios.get).toHaveBeenCalledTimes(1);
-        expect(mockedAxios.get).toHaveBeenCalledWith(`/api/cases`);
+        expect(mockedAxios.get).toHaveBeenCalledWith(
+            `/api/cases/?limit=50&page=1&count_limit=10000&sort_by=default&order=ascending`,
+        );
 
         await waitFor(() => {
             const row = screen.getByText('www.example.com');
@@ -512,7 +520,9 @@ describe('<LinelistTable />', () => {
             },
         );
         expect(mockedAxios.get).toHaveBeenCalledTimes(1);
-        expect(mockedAxios.get).toHaveBeenCalledWith(`/api/cases`);
+        expect(mockedAxios.get).toHaveBeenCalledWith(
+            `/api/cases/?limit=50&page=1&count_limit=10000&sort_by=default&order=ascending`,
+        );
 
         await waitFor(() => {
             expect(screen.getByText('www.example.com')).toBeInTheDocument();

@@ -1,16 +1,5 @@
 const indexes = [
     {
-        name: 'byConfirmationDateIfListed',
-        key: {
-            list: -1,
-            confirmationDate: -1,
-        },
-        collation: {
-            locale: 'en_US',
-            strength: 2,
-        },
-    },
-    {
         name: 'byCountryAndConfirmationDateIfListed',
         key: {
             list: -1,
@@ -34,10 +23,7 @@ module.exports = {
     async down(db, client) {
         await db.command({
             dropIndexes: 'cases',
-            index: [
-                'byConfirmationDateIfListed',
-                'byCountryAndConfirmationDateIfListed',
-            ],
+            index: ['byCountryAndConfirmationDateIfListed'],
         });
     },
 };

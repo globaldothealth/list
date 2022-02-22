@@ -1,3 +1,5 @@
+import { getDefaultQuery } from '../../utils/helperFunctions';
+
 /* eslint-disable no-undef */
 describe('Linelist table', function () {
     beforeEach(() => {
@@ -441,10 +443,8 @@ describe('Linelist table', function () {
         cy.wait('@getCases');
         cy.wait(550);
         cy.contains('rows').click();
-        cy.route(
-            'GET',
-            '/api/cases/?limit=5&page=1&count_limit=10000&sort_by=default&order=ascending',
-        ).as('get5Cases');
+        console.log(getDefaultQuery(5));
+        cy.route('GET', getDefaultQuery(5)).as('get5Cases');
         cy.get('li').contains('5').click();
         cy.wait('@get5Cases');
         cy.get('input[type="checkbox"]').should('have.length', 6);
@@ -529,10 +529,7 @@ describe('Linelist table', function () {
         cy.visit('/cases');
         cy.wait('@getCases');
         cy.contains('rows').click();
-        cy.route(
-            'GET',
-            '/api/cases/?limit=5&page=1&count_limit=10000&sort_by=default&order=ascending',
-        ).as('getFirstPage');
+        cy.route('GET', getDefaultQuery(5)).as('getFirstPage');
         cy.get('li').contains('5').click();
         cy.wait('@getFirstPage');
 
@@ -558,10 +555,7 @@ describe('Linelist table', function () {
         cy.visit('/cases');
         cy.wait('@getCases');
         cy.contains('rows').click();
-        cy.route(
-            'GET',
-            '/api/cases/?limit=5&page=1&count_limit=10000&sort_by=default&order=ascending',
-        ).as('getFirstPage');
+        cy.route('GET', getDefaultQuery(5)).as('getFirstPage');
         cy.get('li').contains('5').click();
         cy.wait('@getFirstPage');
 
@@ -599,10 +593,7 @@ describe('Linelist table', function () {
 
         cy.get('tr').eq(2).contains('td', 'France');
 
-        cy.route(
-            'GET',
-            '/api/cases/?limit=50&page=1&count_limit=10000&sort_by=default&order=descending',
-        ).as('getSortedInDescendingOrder');
+        cy.route('GET', defaultQuery).as('getSortedInDescendingOrder');
         cy.get('#sort-by-select').click();
         cy.get('li').contains('descending').click();
         cy.wait('@getSortedInDescendingOrder');

@@ -1,3 +1,5 @@
+import { getDefaultQuery } from '../../utils/helperFunctions';
+
 /* eslint-disable no-undef */
 describe('App', function () {
     beforeEach(() => {
@@ -123,10 +125,9 @@ describe('App', function () {
         cy.contains('Italy').should('be.visible');
 
         cy.server();
-        cy.route(
-            'GET',
-            '/api/cases/?limit=50&page=1&count_limit=10000&sort_by=default&order=ascending&q=gender:notProvided',
-        ).as('filterByGender');
+        cy.route('GET', `${getDefaultQuery()}&q=gender:notProvided`).as(
+            'filterByGender',
+        );
 
         cy.get('.filter-button').click();
         cy.get('#gender').click();
