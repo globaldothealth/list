@@ -75,7 +75,7 @@ const PopupSmallScreens = ({ classes }: Props) => {
             <DialogContent dividers>
                 <Typography gutterBottom>
                     For a better experience please visit this website using a
-                    device with a bigger screen
+                    device with a larger screen
                 </Typography>
             </DialogContent>
         </Dialog>
