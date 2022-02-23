@@ -21,7 +21,14 @@ describe('validate', () => {
     });
 
     it('a minimal origin is valid', async () => {
-        return new Origin(minimalModel).validate();
+        const missingLicense = _.cloneDeep(minimalModel);
+        delete missingLicense.license;
+
+        return new Origin(missingLicense).validate((e) => {
+            expect(e).not.toBeNull();
+            if (e)
+                expect(e.name).toBe(Error.ValidationError.name);
+        });
     });
 
     it('a fully specified origin is valid', async () => {
