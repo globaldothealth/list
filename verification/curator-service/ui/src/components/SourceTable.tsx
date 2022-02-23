@@ -24,7 +24,9 @@ import ChipInput from 'material-ui-chip-input';
 
 interface Origin {
     url: string;
-    license?: string;
+    license: string;
+    providerName?: string;
+    providerWebsiteUrl?: string;
 }
 
 interface Field {
@@ -88,10 +90,11 @@ interface TableRow {
     countryCodes: string; // flattened
     // origin
     url: string;
+    license: string;
+    providerName?: string;
+    providerWebsiteUrl?: string;
 
-    license?: string;
     // automation.parser
-
     format?: string;
     awsLambdaArn?: string;
     // automation.schedule
@@ -232,6 +235,8 @@ class SourceTable extends React.Component<Props, SourceTableState> {
             origin: {
                 url: rowData.url,
                 license: rowData.license,
+                providerName: rowData.providerName,
+                providerWebsiteUrl: rowData.providerWebsiteUrl,
             },
             format: rowData.format,
             automation:
@@ -423,6 +428,57 @@ class SourceTable extends React.Component<Props, SourceTableState> {
                                         size="small"
                                         fullWidth
                                         placeholder="License"
+                                        error={
+                                            !this.validateRequired(props.value)
+                                        }
+                                        helperText={
+                                            this.validateRequired(props.value)
+                                                ? ''
+                                                : 'Required field'
+                                        }
+                                        onChange={(event): void =>
+                                            props.onChange(event.target.value)
+                                        }
+                                        defaultValue={props.value}
+                                    />
+                                ),
+                            },
+                            {
+                                title: 'Provider Name',
+                                field: 'providerName',
+                                tooltip:
+                                    'Miskatonic University Department of Medecine',
+                                editComponent: (props): JSX.Element => (
+                                    <TextField
+                                        type="text"
+                                        size="small"
+                                        fullWidth
+                                        placeholder="Provider Name"
+                                        error={
+                                            !this.validateRequired(props.value)
+                                        }
+                                        helperText={
+                                            this.validateRequired(props.value)
+                                                ? ''
+                                                : 'Required field'
+                                        }
+                                        onChange={(event): void =>
+                                            props.onChange(event.target.value)
+                                        }
+                                        defaultValue={props.value}
+                                    />
+                                ),
+                            },
+                            {
+                                title: 'Provider Website',
+                                field: 'providerWebsiteUrl',
+                                tooltip: 'https://medsci.miskatonic.edu/',
+                                editComponent: (props): JSX.Element => (
+                                    <TextField
+                                        type="text"
+                                        size="small"
+                                        fullWidth
+                                        placeholder="Provider Website"
                                         error={
                                             !this.validateRequired(props.value)
                                         }
@@ -658,6 +714,10 @@ class SourceTable extends React.Component<Props, SourceTableState> {
                                                 format: s.format,
                                                 url: s.origin.url,
                                                 license: s.origin.license,
+                                                providerName:
+                                                    s.origin.providerName,
+                                                providerWebsiteUrl:
+                                                    s.origin.providerWebsiteUrl,
                                                 awsLambdaArn:
                                                     s.automation?.parser
                                                         ?.awsLambdaArn,
