@@ -28,6 +28,7 @@ import AutomatedBackfill from '../AutomatedBackfill';
 import AutomatedSourceForm from '../AutomatedSourceForm';
 import BulkCaseForm from '../BulkCaseForm';
 import CaseForm from '../CaseForm';
+import DataAcknowledgments from '../DataAcknowledgments';
 import Drawer from '@material-ui/core/Drawer';
 import EditCase from '../EditCase';
 import GHListLogo from '../GHListLogo';
@@ -360,6 +361,9 @@ function ProfileMenu(props: { user: User }): JSX.Element {
                 >
                     <MenuItem>About Global.health</MenuItem>
                 </a>
+                <Link to="/dataacknowledgments" onClick={handleClose}>
+                    <MenuItem>Data acknowledgments</MenuItem>
+                </Link>
                 <a
                     className={classes.link}
                     rel="noopener noreferrer"
@@ -368,15 +372,6 @@ function ProfileMenu(props: { user: User }): JSX.Element {
                     onClick={handleClose}
                 >
                     <MenuItem>Data dictionary</MenuItem>
-                </a>
-                <a
-                    className={classes.link}
-                    rel="noopener noreferrer"
-                    target="_blank"
-                    href="https://global.health/acknowledgement/"
-                    onClick={handleClose}
-                >
-                    <MenuItem>Data acknowledgments</MenuItem>
                 </a>
                 <a
                     href="https://github.com/globaldothealth/list#globalhealth-list"
@@ -834,6 +829,11 @@ export default function App(): JSX.Element {
                         {user && (
                             <Route path="/profile">
                                 <Profile />
+                            </Route>
+                        )}
+                        {user && (
+                            <Route path="/dataacknowledgments">
+                                <DataAcknowledgments />
                             </Route>
                         )}
                         {user && hasAnyRole(['admin']) && (
