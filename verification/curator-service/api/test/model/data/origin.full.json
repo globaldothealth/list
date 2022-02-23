@@ -1,4 +1,6 @@
 {
     "url": "http://foo.bar",
-    "license": "MIT"
+    "license": "MIT",
+    "providerName": "The Ministry of Sound",
+    "providerWebsiteUrl": "https://www.ministryofsound.example"
 }
