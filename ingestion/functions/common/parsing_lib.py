@@ -1,4 +1,3 @@
-import csv
 import datetime
 import json
 import os
@@ -9,7 +8,6 @@ import contextlib
 import time
 from pathlib import Path
 from typing import Callable, Dict, Generator, List
-import common.ingestion_logging as logging
 
 import boto3
 import requests
@@ -18,6 +16,10 @@ import iso3166
 
 import common_lib
 
+try:
+    import common.ingestion_logging as logging
+except ModuleNotFoundError:
+    import ingestion_logging as logging
 
 ENV_FIELD = "env"
 SOURCE_URL_FIELD = "sourceUrl"
