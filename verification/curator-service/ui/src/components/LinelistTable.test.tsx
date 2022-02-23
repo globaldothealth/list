@@ -356,8 +356,7 @@ describe('<LinelistTable />', () => {
         expect(mockedAxios.delete).toHaveBeenCalledTimes(1);
 
         expect(mockedAxios.delete).toHaveBeenCalledWith(
-            '/api/cases/?limit=50&page=1&count_limit=10000&sort_by=default&order=ascending/' +
-                cases[0]._id,
+            '/api/cases/' + cases[0]._id,
         );
 
         // Check table data is reloaded
