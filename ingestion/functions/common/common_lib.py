@@ -16,6 +16,9 @@ import requests
 import functools
 from enum import Enum
 from pathlib import Path
+from typing import Any
+from functools import reduce
+from typing import Dict
 
 import google
 import google.auth.transport.requests
@@ -177,6 +180,17 @@ def python_module(folder: Path, root: Path):
         return str(modules[0].relative_to(root)).replace('/', '.')[:-3]
     else:
         return None
+
+
+def deep_get(dictionary: Dict[str, Any], keys: str, default=None) -> Any:
+    """
+    Retrieve values from nested dictionaries
+    """
+    return reduce(
+        lambda d, key: d.get(key, default) if isinstance(d, dict) else default,
+        keys.split("."),
+        dictionary,
+    )
 
 
 def get_parser_module(parser):
