@@ -1,6 +1,7 @@
 import os
 import sys
 import json
+import time
 import tempfile
 import logging
 import contextlib
@@ -8,6 +9,9 @@ from pathlib import Path
 
 import boto3
 import pandas as pd
+import botocore
+
+MAX_TRIES = 10
 
 
 def data_files(bucket, prefix="csv", suffix=".csv.gz", endpoint_url=None):
@@ -53,14 +57,28 @@ def completeness_s3(s3_object, endpoint_url=None):
         s3_object.bucket_name
     )
     with tempfile.NamedTemporaryFile() as tmp:
+        tries = 0
+        success = False
         logging.info(f"Downloading {s3_object.key} from {bucket}")
-        try:
-            bucket.download_file(s3_object.key, tmp.name)
-        except Exception as e:
-            logging.error(f"Failed to download with exception {e}")
+        for tries in range(MAX_TRIES):
+            try:
+                bucket.download_file(s3_object.key, tmp.name)
+                success = True
+                break
+            except botocore.exceptions.EndpointConnectionError as e:
+                logging.info(f"Connection error while getting {s3_object}, retrying in {2**tries} seconds ...")
+                logging.info(e)
+            except Exception as e:
+                logging.error(f"Error while getting {s3_object}, aborting")
+                logging.error(e)
+                break
+            time.sleep(2**tries)
+        if success:
+            logging.info(f"Calculating completeness for {s3_object.key}")
+            return completeness_file(tmp.name)
+        else:
+            logging.error(f"Failed to download {s3_object}, {MAX_TRIES} attempts exceeded")
             return None
-        logging.info(f"Calculating completeness for {s3_object.key}")
-        return completeness_file(tmp.name)
 
 
 def upload(data, bucket, endpoint_url=None):
@@ -78,10 +96,11 @@ def upload(data, bucket, endpoint_url=None):
 
 
 def completeness_s3_many(objects, endpoint_url=None):
-    return {
+    _completeness = {
         Path(obj.key).stem.split(".")[0]: completeness_s3(obj, endpoint_url)
         for obj in objects
     }
+    return {k: v for k, v in _completeness.items() if v is not None}
 
 
 def setup_logger():
