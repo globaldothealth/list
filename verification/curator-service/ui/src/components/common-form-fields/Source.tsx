@@ -26,12 +26,16 @@ const TooltipText = () => (
         <ul>
             <li>
                 <strong>New data source:</strong> If this is a new data source
-                you will need to add it to the system along with the root data
-                source name. For example if the raw source was the ""7th July
-                Press Release from Honduras” the source name would be the issuer
-                of the press release e.g. “Honduras ministry of health'. The
-                source name needs to reflect the actually provider of the data,
-                not the method of reporting.
+                you will need to add it to the system along with the data source
+                name, license, and information about the provider. For example
+                if the raw source was the “7th July Press Release from Honduras”
+                the provider name would be the issuer of the press release e.g.
+                “Honduras ministry of health”. The provider name needs to
+                reflect the actual provider of the data, not the method of
+                reporting. The source name can be anything informative to
+                curators. The source URL should be a link to the data you’re
+                uploading, while the provider website URL should link to an
+                informative website.
             </li>
             <li>
                 <strong>Existing data source:</strong> If the URL is an existing
@@ -79,6 +83,9 @@ export default class Source extends React.Component<
 
 interface OriginData {
     url: string;
+    license: string;
+    providerName?: string;
+    providerWebsiteUrl?: string;
 }
 
 interface SourceData {
@@ -95,6 +102,9 @@ interface ListSourcesResponse {
 export interface CaseReferenceForm extends CaseReference {
     inputValue?: string;
     sourceName?: string;
+    sourceLicense?: string;
+    sourceProviderName?: string;
+    sourceProviderUrl?: string;
 }
 
 interface SourceAutocompleteProps {
@@ -106,12 +116,18 @@ interface SourceAutocompleteProps {
 export async function submitSource(opts: {
     name: string;
     url: string;
+    license: string;
     format?: string;
+    providerName?: string;
+    providerWebsiteUrl?: string;
 }): Promise<CaseReference> {
     const newSource = {
         name: opts.name,
         origin: {
             url: opts.url,
+            license: opts.license,
+            providerName: opts.providerName,
+            providerWebsiteUrl: opts.providerWebsiteUrl,
         },
         format: opts.format,
     };
@@ -126,7 +142,7 @@ export async function submitSource(opts: {
 const filter = createFilterOptions<CaseReferenceForm>();
 
 const useStyles = makeStyles(() => ({
-    sourceNameField: {
+    sourceTextField: {
         marginTop: '1em',
     },
 }));
@@ -209,6 +225,9 @@ export function SourcesAutocomplete(
                             sourceId: source._id,
                             sourceUrl: source.origin.url,
                             sourceName: source.name,
+                            sourceLicense: source.origin.license,
+                            sourceProviderName: source.origin.providerName,
+                            sourceProviderUrl: source.origin.providerWebsiteUrl,
                             additionalSources: [] as unknown as [
                                 { sourceUrl: string },
                             ],
@@ -258,6 +277,12 @@ export function SourcesAutocomplete(
                             sourceUrl: newValue,
                             sourceId: '',
                             sourceName: values.caseReference?.sourceName ?? '',
+                            sourceLicense:
+                                values.caseReference?.sourceLicense ?? '',
+                            sourceProviderName:
+                                values.caseReference?.sourceProviderName ?? '',
+                            sourceProviderUrl:
+                                values.caseReference?.sourceProviderUrl ?? '',
                             additionalSources: [] as unknown as [
                                 { sourceUrl: string },
                             ],
@@ -288,6 +313,12 @@ export function SourcesAutocomplete(
                             sourceUrl: params.inputValue,
                             sourceId: '',
                             sourceName: values.caseReference?.sourceName ?? '',
+                            sourceLicense:
+                                values.caseReference?.sourceLicense ?? '',
+                            sourceProviderName:
+                                values.caseReference?.sourceProviderName ?? '',
+                            sourceProviderUrl:
+                                values.caseReference?.sourceProviderUrl ?? '',
                             additionalSources: [] as unknown as [
                                 { sourceUrl: string },
                             ],
@@ -343,12 +374,40 @@ export function SourcesAutocomplete(
                 !options.find((option) => option.sourceUrl === inputValue) && (
                     <>
                         <FastField
-                            className={classes.sourceNameField}
+                            className={classes.sourceTextField}
                             label="Source name"
                             name={`${name}.sourceName`}
                             helperText="Required"
                             type="text"
                             data-testid="sourceName"
+                            component={TextField}
+                            fullWidth
+                        />
+                        <FastField
+                            className={classes.sourceTextField}
+                            label="Source license"
+                            name={`${name}.sourceLicense`}
+                            helperText="Required"
+                            type="text"
+                            data-testid="sourceLicense"
+                            component={TextField}
+                            fullWidth
+                        />
+                        <FastField
+                            className={classes.sourceTextField}
+                            label="Source provider name"
+                            name={`${name}.sourceProviderName`}
+                            type="text"
+                            data-testid="sourceProviderName"
+                            component={TextField}
+                            fullWidth
+                        />
+                        <FastField
+                            className={classes.sourceTextField}
+                            label="Source provider website"
+                            name={`${name}.sourceProviderUrl`}
+                            type="text"
+                            data-testid="sourceProviderUrl"
                             component={TextField}
                             fullWidth
                         />
