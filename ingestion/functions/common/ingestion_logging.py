@@ -5,6 +5,7 @@ handlers = set()
 
 def getLogger(module_name):
     logger = logging.getLogger(module_name)
+    logger.setLevel(logging.DEBUG)
     if not logger.hasHandlers():
         handler = logging.StreamHandler(stream=sys.stdout)
         handler.setLevel(logging.DEBUG)

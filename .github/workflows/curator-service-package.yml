@@ -62,3 +62,5 @@ jobs:
           file: verification/curator-service/Dockerfile
           push: true
           tags: ${{ steps.prep.outputs.tags }}
+          build-args:
+            CURATOR_VERSION=${{ steps.prep.outputs.version }}

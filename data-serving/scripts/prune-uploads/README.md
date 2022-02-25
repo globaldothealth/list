@@ -8,7 +8,7 @@ everything with *list = false*.
 Configuration is via environment variables or via command line arguments.
 When both are specified, the command line arguments take precedence.
 
-This script is usually run automatically on a schedule every day using GitHub Actions.
+This script is usually run automatically on a schedule every day using AWS Batch.
 
 ## Invocation
 
@@ -72,7 +72,7 @@ Remove the -n to actually prune uploads.
 * **-r**, **--run-hooks**=*hook1*[,*hook2*]: Runs hooks after prune finishes. Specify
   *all* to run all hooks configured to run.
 
-* **--env** (default=prod): Specifies which environment to use. This is passed to hooks
+* **ENV** | **--env** (default=prod): Specifies which environment to use. This is passed to hooks
   which can vary behaviour based on this, as with the country export script.
 
 ## How it works

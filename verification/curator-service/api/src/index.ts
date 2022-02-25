@@ -134,7 +134,10 @@ if (env.SERVICE_ENV == 'locale2e') {
         s3ForcePathStyle: true,
     });
 } else {
-    s3Client = new S3({ region: env.AWS_SERVICE_REGION, signatureVersion: 'v4' });
+    s3Client = new S3({
+        region: env.AWS_SERVICE_REGION,
+        signatureVersion: 'v4',
+    });
 }
 
 // Configure Email Client
@@ -183,10 +186,12 @@ const sourcesController = new SourcesController(
     awsEventsClient,
     env.DATASERVER_URL,
 );
-apiRouter.get('/sources',
+apiRouter.get(
+    '/sources',
     authenticateByAPIKey,
     mustHaveAnyRole(['curator']),
-    sourcesController.list);
+    sourcesController.list,
+);
 apiRouter.get(
     '/sources/:id([a-z0-9]{24})',
     authenticateByAPIKey,
@@ -247,10 +252,12 @@ apiRouter.put(
 
 // Configure cases controller proxying to data service.
 const casesController = new CasesController(env.DATASERVER_URL, s3Client);
-apiRouter.get('/cases',
+apiRouter.get(
+    '/cases',
     authenticateByAPIKey,
     mustBeAuthenticated,
-    casesController.list);
+    casesController.list,
+);
 apiRouter.get(
     '/cases/symptoms',
     authenticateByAPIKey,
@@ -343,7 +350,8 @@ apiRouter.get(
     '/users',
     authenticateByAPIKey,
     mustHaveAnyRole(['admin']),
-    usersController.list);
+    usersController.list,
+);
 apiRouter.put(
     '/users/:id',
     authenticateByAPIKey,
@@ -386,6 +394,11 @@ app.get('/health', (req: Request, res: Response) => {
     // couldn't determine if the backend was healthy or not but honestly
     // this is simple enough that it makes sense.
     return res.sendStatus(503);
+});
+
+// version handler.
+app.get('/version', (req: Request, res: Response) => {
+    res.status(200).send(env.CURATOR_VERSION);
 });
 
 // API documentation.

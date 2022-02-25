@@ -22,6 +22,8 @@ describe('<SourceTable />', () => {
         const sourceName = 'source_name';
         const originUrl = 'origin url';
         const format = 'JSON';
+        const providerName = 'provider_name';
+        const providerWebsiteUrl = 'website url';
         const countryCodes = ['US', 'MX', 'CA'];
         const license = 'MIT';
         const recipients = ['foo@bar.com', 'bar@baz.com'];
@@ -36,7 +38,9 @@ describe('<SourceTable />', () => {
                 countryCodes: countryCodes,
                 origin: {
                     url: originUrl,
-                    license: license,
+                    license,
+                    providerName,
+                    providerWebsiteUrl,
                 },
                 automation: {
                     parser: {
@@ -89,6 +93,12 @@ describe('<SourceTable />', () => {
         expect(await screen.findByText(new RegExp(format))).toBeInTheDocument();
         expect(
             await screen.findByText(new RegExp(license)),
+        ).toBeInTheDocument();
+        expect(
+            await screen.findByText(new RegExp(providerName)),
+        ).toBeInTheDocument();
+        expect(
+            await screen.findByText(new RegExp(providerWebsiteUrl)),
         ).toBeInTheDocument();
         expect(
             await screen.findByText(new RegExp(recipients.join('.*'))),
