@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 
-import { useAppSelector } from '../hooks/redux';
+import { useAppDispatch, useAppSelector } from '../hooks/redux';
 import { selectUser } from '../redux/auth/selectors';
 import { Theme, makeStyles, createStyles } from '@material-ui/core/styles';
 import Helmet from 'react-helmet';
@@ -17,6 +17,13 @@ import Typography from '@material-ui/core/Typography';
 import Paper from '@material-ui/core/Paper';
 import Divider from '@material-ui/core/Divider';
 import axios from 'axios';
+import { fetchAcknowledgmentData } from '../redux/acknowledgmentData/thunk';
+
+import {
+    acknowledgmentData,
+    isLoading,
+    acknowledgmentDataError,
+} from '../redux/acknowledgmentData/selectors';
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -70,7 +77,6 @@ const useStyles = makeStyles((theme: Theme) =>
         },
     }),
 );
-
 interface Data {
     country: string;
     license: string;
@@ -87,51 +93,36 @@ function createData(
     return { dataContributor, country, originDataSource, license };
 }
 
-const rows = [];
+// const rows = [];
 
-async function getData() {
-    try {
-        const response = await axios.get('/api/sources', {
-            headers: {
-                'X-API-Key':
-                    '621cc8580577d5075384d795f9fa31fa0a77900778283d1bc61b2f5de7fc585f38ec60f4ccbe8f11c6162a08',
-            },
-        });
-        console.log(response.data.sources);
+// async function getData() {
+//     try {
+//         const response = await axios.get('/api/sources', {
+//             headers: {
+//                 'X-API-Key':
+//                     '621cc8580577d5075384d795f9fa31fa0a77900778283d1bc61b2f5de7fc585f38ec60f4ccbe8f11c6162a08',
+//             },
+//         });
+//         // console.log(response.data.sources);
 
-        response.data.sources?.map((el: any) => {
-            rows.push(
-                createData(
-                    el.name,
-                    el.countryCodes.length > 0 ? el.countryCodes[0] : 'N/A',
-                    el.origin.url,
-                    el.origin.license,
-                ),
-            );
-            console.log(el);
-        });
+//         response.data.sources?.map((el: any) => {
+//             rows.push(
+//                 createData(
+//                     el.name,
+//                     el.countryCodes.length > 0 ? el.countryCodes[0] : 'N/A',
+//                     el.origin.url,
+//                     el.origin.license,
+//                 ),
+//             );
+//             // console.log(el);
+//         });
 
-        return response.data.sources;
-    } catch (error) {
-        console.error(error);
-    }
-}
-getData();
-
-// const rows = [
-//     createData('column 1 text AAAA', 'AAAAAAA', 'sample text', 'XYZ'),
-//     createData('column 1 text BBBB', 'BBBBB', 'sample text', 'XYZ'),
-//     createData('column 1 text CCCC', 'CCCCC', 'sample text', 'XYZ'),
-//     createData('column 1 text DDDD', 'DDDDD', 'sample text', 'XYZ'),
-//     createData('column 1 text EEEE', 'EEEEEE', 'sample text', 'XYZ'),
-//     createData('column 1 text FFFFF', 'FFFFF', 'sample text', 'XYZ'),
-//     createData('column 1 text GGGGG', 'GGGGG', 'sample text', 'XYZ'),
-//     createData('column 1 text HHHHH', 'HHHHHH', 'sample text', 'XYZ'),
-//     createData('column 1 text IIIII', 'IIIII', 'sample text', 'XYZ'),
-//     createData('column 1 text LLLLL', 'LLLLL', 'sample text', 'XYZ'),
-//     createData('column 1 text MMMM', 'MMMMM', 'sample text', 'XYZ'),
-//     createData('column 1 text NNNNN', 'NNNNN', 'sample text', 'XYZ'),
-// ];
+//         return response.data.sources;
+//     } catch (error) {
+//         console.error(error);
+//     }
+// }
+// getData();
 
 function descendingComparator<T>(a: T, b: T, orderBy: keyof T) {
     if (b[orderBy] < a[orderBy]) {
@@ -249,7 +240,30 @@ export default function DataAcknowledgments(): JSX.Element {
     const [selected, setSelected] = React.useState<string[]>([]);
     const [page, setPage] = React.useState(0);
     const [rowsPerPage, setRowsPerPage] = React.useState(5);
+    const dispatch = useAppDispatch();
     const user = useAppSelector(selectUser);
+
+    useEffect(() => {
+        dispatch(fetchAcknowledgmentData());
+    }, [dispatch]);
+
+    const acknowledgmentDataForTable = useAppSelector(acknowledgmentData);
+
+    const rows = [] as string[];
+
+    acknowledgmentDataForTable.map((el) => {
+        console.log(el.name);
+
+        // rows.push(
+        //     createData(
+        //         el.name,
+        //         el.countryCodes.length > 0 ? el.countryCodes[0] : 'N/A',
+        //         el.origin.url,
+        //         el.origin.license,
+        //     ),
+        // );
+        return {};
+    });
 
     const handleRequestSort = (
         event: React.MouseEvent<unknown>,
@@ -259,6 +273,8 @@ export default function DataAcknowledgments(): JSX.Element {
         setOrder(isAsc ? 'desc' : 'asc');
         setOrderBy(property);
     };
+
+    // console.log('acknowledgmentDataForTable', acknowledgmentDataForTable);
 
     const handleClick = (event: React.MouseEvent<unknown>, name: string) => {
         const selectedIndex = selected.indexOf(name);
