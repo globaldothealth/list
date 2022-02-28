@@ -16,6 +16,7 @@ import TableSortLabel from '@material-ui/core/TableSortLabel';
 import Typography from '@material-ui/core/Typography';
 import Paper from '@material-ui/core/Paper';
 import Divider from '@material-ui/core/Divider';
+import axios from 'axios';
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -86,20 +87,51 @@ function createData(
     return { dataContributor, country, originDataSource, license };
 }
 
-const rows = [
-    createData('column 1 text AAAA', 'AAAAAAA', 'sample text', 'XYZ'),
-    createData('column 1 text BBBB', 'BBBBB', 'sample text', 'XYZ'),
-    createData('column 1 text CCCC', 'CCCCC', 'sample text', 'XYZ'),
-    createData('column 1 text DDDD', 'DDDDD', 'sample text', 'XYZ'),
-    createData('column 1 text EEEE', 'EEEEEE', 'sample text', 'XYZ'),
-    createData('column 1 text FFFFF', 'FFFFF', 'sample text', 'XYZ'),
-    createData('column 1 text GGGGG', 'GGGGG', 'sample text', 'XYZ'),
-    createData('column 1 text HHHHH', 'HHHHHH', 'sample text', 'XYZ'),
-    createData('column 1 text IIIII', 'IIIII', 'sample text', 'XYZ'),
-    createData('column 1 text LLLLL', 'LLLLL', 'sample text', 'XYZ'),
-    createData('column 1 text MMMM', 'MMMMM', 'sample text', 'XYZ'),
-    createData('column 1 text NNNNN', 'NNNNN', 'sample text', 'XYZ'),
-];
+const rows = [];
+
+async function getData() {
+    try {
+        const response = await axios.get('/api/sources', {
+            headers: {
+                'X-API-Key':
+                    '6218f6f7dddd3d0035384ad7f3435c124a22dfdd8dd85e28bd636928357b0bd4e4fa18717f2bc620fcfe58e4',
+            },
+        });
+        console.log(response.data.sources);
+
+        response.data.sources?.map((el: any) => {
+            rows.push(
+                createData(
+                    el.name,
+                    el.countryCodes.length > 0 ? el.countryCodes[0] : 'N/A',
+                    el.origin.url,
+                    el.origin.license,
+                ),
+            );
+            console.log(el);
+        });
+
+        return response.data.sources;
+    } catch (error) {
+        console.error(error);
+    }
+}
+getData();
+
+// const rows = [
+//     createData('column 1 text AAAA', 'AAAAAAA', 'sample text', 'XYZ'),
+//     createData('column 1 text BBBB', 'BBBBB', 'sample text', 'XYZ'),
+//     createData('column 1 text CCCC', 'CCCCC', 'sample text', 'XYZ'),
+//     createData('column 1 text DDDD', 'DDDDD', 'sample text', 'XYZ'),
+//     createData('column 1 text EEEE', 'EEEEEE', 'sample text', 'XYZ'),
+//     createData('column 1 text FFFFF', 'FFFFF', 'sample text', 'XYZ'),
+//     createData('column 1 text GGGGG', 'GGGGG', 'sample text', 'XYZ'),
+//     createData('column 1 text HHHHH', 'HHHHHH', 'sample text', 'XYZ'),
+//     createData('column 1 text IIIII', 'IIIII', 'sample text', 'XYZ'),
+//     createData('column 1 text LLLLL', 'LLLLL', 'sample text', 'XYZ'),
+//     createData('column 1 text MMMM', 'MMMMM', 'sample text', 'XYZ'),
+//     createData('column 1 text NNNNN', 'NNNNN', 'sample text', 'XYZ'),
+// ];
 
 function descendingComparator<T>(a: T, b: T, orderBy: keyof T) {
     if (b[orderBy] < a[orderBy]) {
