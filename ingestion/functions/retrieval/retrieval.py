@@ -120,8 +120,7 @@ def raw_content(url: str, content: bytes, tempdir: str = TEMP_PATH) -> io.BytesI
                      if f.is_file()),
                     key=operator.itemgetter(1)
                 )[0]
-                with largest_file.open() as fp:
-                    content = fp.read().encode("utf-8")
+                return largest_file.open("rb")
             except subprocess.CalledProcessError as e:
                 raise ValueError(f"Error in extracting zip file with exception:\n{e}")
         Path(f.name).unlink(missing_ok=True)

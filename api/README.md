@@ -27,7 +27,7 @@ key is visible at your profile page.
 ## Filters
 
 Currently the programmatic access via Python or R supports filtering by country
-only.
+code only. We use [ISO 3166-1](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2) two letter codes.
 
 ## Accessing data (R)
 
@@ -39,7 +39,7 @@ Download the [gdh.r](R/gdh.r) script to a folder, then:
 ```R
 source("gdh.r")
 key <- "API KEY HERE"
-c1 <- get_cases(key, country = "New Zealand")
+c1 <- get_cases(key, country = "NZ")
 ```
 
 This will download the New Zealand case data from the database. Re-downloading
@@ -50,9 +50,9 @@ used in later calls:
 ```R
 source("gdh.r")
 key <- "API KEY HERE"
-c1 <- get_cached_cases(key, country = "New Zealand")
+c1 <- get_cached_cases(key, country = "NZ")
 # use refresh = TRUE to update the cache
-c1 <- get_cached_cases(key, country = "New Zealand", refresh = TRUE)
+c1 <- get_cached_cases(key, country = "NZ", refresh = TRUE)
 ```
 
 ## Accessing data (Python)
@@ -65,7 +65,7 @@ Download the [gdh.py](python/gdh.py) script to a folder, then:
 ```python
 from gdh import get_cases
 key = "API KEY HERE"
-c1 = get_cases(key, country="New Zealand")
+c1 = get_cases(key, country="NZ")
 ```
 
 This will download the New Zealand case data from the database. Re-downloading
@@ -76,9 +76,9 @@ used in later calls:
 ```python
 from gdh import get_cases
 key = "API KEY HERE"
-c1 = get_cached_cases(key, country="New Zealand")
+c1 = get_cached_cases(key, country="NZ")
 # use refresh=True to update the cache
-c1 = get_cached_cases(key, country="New Zealand", refresh=True)
+c1 = get_cached_cases(key, country="NZ", refresh=True)
 ```
 
 [httr]: https://httr.r-lib.org/
