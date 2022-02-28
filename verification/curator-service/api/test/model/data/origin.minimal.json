@@ -1,3 +1,4 @@
 {
-    "url": "http://foo.bar"
+    "url": "http://foo.bar",
+    "license": "GPL3"
 }

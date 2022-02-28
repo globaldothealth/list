@@ -3,6 +3,7 @@ import sys
 from datetime import datetime
 import csv
 import json
+import common.ingestion_logging as logging
 
 # Layer code, like parsing_lib, is added to the path by AWS.
 # To test locally (e.g. via pytest), we have to modify sys.path.
@@ -16,7 +17,7 @@ except ImportError:
             os.pardir,os.pardir, 'common'))
     import parsing_lib
 
-
+logger = logging.getLogger(__name__)
 
 with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "dictionaries.json"), encoding='utf-8') as json_file:
     maps = json.load(json_file)
@@ -39,12 +40,12 @@ def convert_location(state_code: str, municipality_code: str):
         try:
             query_list.append(_MUNICIPALITIES[state_code + municipality_code])
         except KeyError:
-            print(f"Municipality code missing: {state_code} {municipality_code}")
+            logger.warning(f"Municipality code missing: {state_code} {municipality_code}")
     if state_code[0] != missing_value_prefix:
         try:
             query_list.append(_STATES[state_code])
         except KeyError:
-            print(f"State Code Missing: {state_code}")
+            logger.warning(f"State Code Missing: {state_code}")
     query_string = ", ".join(query_list + ["MÉXICO"])
     try:
         municipality_code = state_code + municipality_code
@@ -77,7 +78,7 @@ def convert_gender(raw_gender: str):
         return "Female"
 
 
-def convert_events(date_admitted, hospitalized, icu, date_death):
+def convert_events(date_admitted, hospitalized, icu, date_death, date_symptoms):
     events = [
         {
             "name": "confirmed",
@@ -118,6 +119,16 @@ def convert_events(date_admitted, hospitalized, icu, date_death):
                     "end": convert_date(date_death),
                 },
                 "value": "Death",
+            }
+        )
+    if date_symptoms:
+        events.append(
+            {
+                "name": "onsetSymptoms",
+                "dateRange": {
+                    "start": convert_date(date_symptoms),
+                    "end": convert_date(date_symptoms),
+                }
             }
         )
     return events
@@ -201,6 +212,7 @@ def parse_cases(raw_data_file: str, source_id: str, source_url: str):
                         row["TIPO_PACIENTE"],
                         row["UCI"],
                         row["FECHA_DEF"],
+                        row["FECHA_SINTOMAS"]
                     ),
                     "demographics": convert_demographics(
                         row["SEXO"],

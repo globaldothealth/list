@@ -59,7 +59,8 @@ describe('<AutomatedSourceForm />', () => {
         expect(screen.getByTestId('recipients')).toBeInTheDocument();
         expect(screen.getByTestId('excludeFromLineList')).toBeInTheDocument();
         expect(screen.getByTestId('hasStableIdentifiers')).toBeInTheDocument();
-
+        expect(screen.getByTestId('providerName')).toBeInTheDocument();
+        expect(screen.getByTestId('providerWebsiteUrl')).toBeInTheDocument();
         // Buttons
         expect(screen.getByText(/create source/i)).toBeEnabled();
         expect(screen.getByText(/cancel/i)).toBeEnabled();

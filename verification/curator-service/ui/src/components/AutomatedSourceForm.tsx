@@ -83,6 +83,8 @@ export interface AutomatedSourceFormValues {
     url: string;
     license: string;
     name: string;
+    providerName: string;
+    providerWebsiteUrl: string;
     countryCodes: string[];
     format: string;
     notificationRecipients: string[];
@@ -96,6 +98,8 @@ const AutomatedSourceFormSchema = Yup.object().shape({
     countryCodes: Yup.array().of(Yup.string()).required('Required'),
     format: Yup.string().required('Required'),
     license: Yup.string().required('Required'),
+    providerName: Yup.string(),
+    providerWebsiteUrl: Yup.string(),
     notificationRecipients: Yup.array().of(Yup.string().email()),
     excludeFromLineList: Yup.boolean().required('Required'),
     hasStableIdentifiers: Yup.boolean().required('Required'),
@@ -114,7 +118,12 @@ export default function AutomatedSourceForm(props: Props): JSX.Element {
         const newSource = {
             name: values.name,
             countryCodes: values.countryCodes,
-            origin: { url: values.url, license: values.license },
+            origin: {
+                url: values.url,
+                license: values.license,
+                providerName: values.providerName,
+                providerWebsiteUrl: values.providerWebsiteUrl,
+            },
             format: values.format,
             notificationRecipients: values.notificationRecipients,
             excludeFromLineList: values.excludeFromLineList,
@@ -149,6 +158,8 @@ export default function AutomatedSourceForm(props: Props): JSX.Element {
                             countryCodes: [],
                             format: '',
                             license: '',
+                            providerName: '',
+                            providerWebsiteUrl: '',
                             notificationRecipients: [user.email],
                             excludeFromLineList: false,
                             hasStableIdentifiers: false,
@@ -243,6 +254,26 @@ export default function AutomatedSourceForm(props: Props): JSX.Element {
                                                 name="license"
                                                 type="text"
                                                 data-testid="license"
+                                                component={TextField}
+                                                fullWidth
+                                            />
+                                        </div>
+                                        <div className={classes.formSection}>
+                                            <FastField
+                                                name="providerName"
+                                                label="Data Provider Name"
+                                                type="text"
+                                                data-testid="providerName"
+                                                component={TextField}
+                                                fullWidth
+                                            />
+                                        </div>
+                                        <div className={classes.formSection}>
+                                            <FastField
+                                                name="providerWebsiteUrl"
+                                                label="Data Provider Website"
+                                                type="text"
+                                                data-testid="providerWebsiteUrl"
                                                 component={TextField}
                                                 fullWidth
                                             />

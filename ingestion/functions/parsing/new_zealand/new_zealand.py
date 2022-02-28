@@ -55,7 +55,7 @@ def convert_date(raw_date: str):
 
 def convert_location(raw_entry):
     dhb = raw_entry[_DHB]
-    return _GEOCODES[dhb] if 'Managed Isolation' not in dhb else _NZ
+    return _GEOCODES.get(dhb) or _NZ
 
 
 def convert_demographics(entry):

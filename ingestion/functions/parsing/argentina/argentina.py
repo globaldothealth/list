@@ -3,6 +3,7 @@ import sys
 from datetime import datetime
 import csv
 import json
+import common.ingestion_logging as logging
 
 # Layer code, like parsing_lib, is added to the path by AWS.
 # To test locally (e.g. via pytest), we have to modify sys.path.
@@ -16,6 +17,7 @@ except ImportError:
             os.pardir, os.pardir, 'common'))
     import parsing_lib
 
+logger = logging.getLogger(__name__)
 
 # The location data for Argentinian cases is obtained by using a lookup table (from https://datos.gob.ar/dataset/ign-unidades-territoriales/archivo/ign_01.03.02) which allows for cross-referencing of location down to administrative level 2 and latitude/longitude
 # This data has been collated into several dictionaries: 
@@ -149,7 +151,7 @@ def convert_travel(entry):
 
             travel_countries.append({"location": location})
         else:
-            print(f"Country code not found for: {country.lower()}")
+            logger.warning(f"Country code not found for: {country.lower()}")
         travel["traveledPrior30Days"] = True
         travel["travel"] = travel_countries
         if travel:
@@ -275,19 +277,19 @@ def parse_cases(raw_data_file, source_id, source_url):
                             "end": convert_date(entry['fecha_fallecimiento']),
                         }
                     })
-                elif entry["fecha_internacion"]:
+                if entry["fecha_internacion"]:
                     case["events"].append({
-                        "name": "outcome",
-                        "value": "hospitalAdmission",
+                        "name": "hospitalAdmission",
+                        "value": "Yes",
                         "dateRange": {
                             "start": convert_date(entry['fecha_internacion']),
                             "end": convert_date(entry['fecha_internacion']),
                         }
                     })
-                elif entry["fecha_cui_intensivo"]:
+                if entry["fecha_cui_intensivo"]:
                     case["events"].append({
-                        "name": "outcome",
-                        "value": "icuAdmission",
+                        "name": "icuAdmission",
+                        "value": "Yes",
                         "dateRange": {
                             "start": convert_date(entry['fecha_cui_intensivo']),
                             "end": convert_date(entry['fecha_cui_intensivo']),

@@ -5,6 +5,7 @@ import copy
 from datetime import datetime
 import json
 from pathlib import Path
+import common.ingestion_logging as logging
 
 import pycountry
 
@@ -19,6 +20,8 @@ except ImportError:
             os.path.dirname(os.path.abspath(__file__)),
             os.pardir,os.pardir, 'common'))
     import parsing_lib
+
+logger = logging.getLogger(__name__)
 
 _PROVINCES = {}
 _MUNICIPALITIES = {}
@@ -106,7 +109,7 @@ def convert_location(raw_entry):
             return _PROVINCES[code_province]
         return _CU
     except KeyError:
-        print("Location not found:", raw_entry)
+        logger.error(f"Location not found: {raw_entry}")
     return None
 
 
@@ -166,7 +169,7 @@ def parse_cases(raw_data_file, source_id, source_url):
         # Get schema_version
         schema_version = json_data['schema-version']
         if schema_version != 7:
-            print(
+            logger.warning(
                 f'Schema version has been updated from 7 to {schema_version}')
 
         for day in json_data['casos']['dias']:

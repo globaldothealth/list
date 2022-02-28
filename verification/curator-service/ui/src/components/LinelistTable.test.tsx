@@ -161,9 +161,7 @@ describe('<LinelistTable />', () => {
         );
 
         expect(mockedAxios.get).toHaveBeenCalledTimes(1);
-        expect(mockedAxios.get).toHaveBeenCalledWith(
-            `/api/cases`,
-        );
+        expect(mockedAxios.get).toHaveBeenCalledWith(`/api/cases`);
 
         await waitFor(() => {
             expect(screen.getByText('www.example.com')).toBeInTheDocument();
@@ -317,9 +315,7 @@ describe('<LinelistTable />', () => {
             },
         );
         expect(mockedAxios.get).toHaveBeenCalledTimes(1);
-        expect(mockedAxios.get).toHaveBeenCalledWith(
-            `/api/cases`,
-        );
+        expect(mockedAxios.get).toHaveBeenCalledWith(`/api/cases`);
 
         await waitFor(() => {
             const row = screen.getByText('www.example.com');
@@ -427,9 +423,7 @@ describe('<LinelistTable />', () => {
             },
         );
         expect(mockedAxios.get).toHaveBeenCalledTimes(1);
-        expect(mockedAxios.get).toHaveBeenCalledWith(
-            `/api/cases`,
-        );
+        expect(mockedAxios.get).toHaveBeenCalledWith(`/api/cases`);
 
         await waitFor(() => {
             const row = screen.getByText('www.example.com');
@@ -518,9 +512,7 @@ describe('<LinelistTable />', () => {
             },
         );
         expect(mockedAxios.get).toHaveBeenCalledTimes(1);
-        expect(mockedAxios.get).toHaveBeenCalledWith(
-            `/api/cases`,
-        );
+        expect(mockedAxios.get).toHaveBeenCalledWith(`/api/cases`);
 
         await waitFor(() => {
             expect(screen.getByText('www.example.com')).toBeInTheDocument();

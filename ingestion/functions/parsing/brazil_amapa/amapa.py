@@ -3,6 +3,7 @@ import os
 import sys
 from datetime import datetime
 import csv
+import common.ingestion_logging as logging
 
 # Layer code, like parsing_lib, is added to the path by AWS.
 # To test locally (e.g. via pytest), we have to modify sys.path.
@@ -15,6 +16,8 @@ except ImportError:
             os.path.dirname(os.path.abspath(__file__)),
             os.pardir,os.pardir, 'common'))
     import parsing_lib
+
+logger = logging.getLogger(__name__)
 
 _DATE_CONFIRMED = "Data de Notificação"
 _HEALTHCARE_WORKER = "Profissional de Saúde"
@@ -62,7 +65,7 @@ def convert_confirmation_method(raw_test: str):
     elif "TESTE" or "ensaio" in raw_test:
         return "Serological test"
     else:
-        print(f'unknown confirmation method: {raw_test}')
+        logger.warning(f'unknown confirmation method: {raw_test}')
         return "Unknown"
 
 

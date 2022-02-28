@@ -1149,17 +1149,26 @@ components:
                 name:
                     type: string
                     description: Human readable name of a source
-                    example: Paraguay Ministry of Health and Labor
+                    example: Paraguay
                 origin:
                     type: object
                     properties:
                         url:
                             type: string
                             example: https://opendata.digilugu.ee/opendata_covid19_test_results.csv
-                            description: Source location, can be http, https, or s3 schemes.
+                            description: Source location, can be http, https, or s3 schemes. This must be the link to the source data download.
                         license:
                             type: string
                             example: MIT
+                            description: The license under which we have the right to ingest the data. Ideally a SPDX identifier (https://spdx.org/licenses/).
+                        providerName:
+                            type: string
+                            example: Paraguay Ministry of Public Health and Social Welfare
+                            description: The organisation or individual who collects the data in this source.
+                        providerWebsiteUrl:
+                            type: string
+                            example: https://www.mspbs.gov.py/index.php
+                            description: The provider's website, or where possible their specific site for information about this outbreak (including the source data used here).
                 format:
                     type: string
                     description: Format of the source to be ingested, useful when automated ingestion

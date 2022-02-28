@@ -1,0 +1,57 @@
+[
+  {
+    "_id": {
+      "latitude": 17.7,
+      "longitude": 83.25
+    },
+    "admin1": "Andhra Pradesh",
+    "admin2": "Visakhapatnam",
+    "admin3": "Visakhapatnam",
+    "casecount": 14,
+    "country": "IN"
+  },
+  {
+    "_id": {
+      "latitude": 37.8172678,
+      "longitude": -79.44573100000002
+    },
+    "admin1": "Virginia",
+    "admin2": "Rockbridge County",
+    "admin3": null,
+    "casecount": 1,
+    "country": "US"
+  },
+  {
+    "_id": {
+      "latitude": 48.00644000000007,
+      "longitude": 16.232610000000022
+    },
+    "admin1": null,
+    "admin2": null,
+    "admin3": null,
+    "casecount": 146,
+    "country": "AT"
+  },
+  {
+    "_id": {
+      "latitude": -16.1264,
+      "longitude": -50.2104
+    },
+    "admin1": "Goi\u00e1s",
+    "admin2": "Moss\u00e2medes",
+    "admin3": "Moss\u00e2medes",
+    "casecount": 33,
+    "country": "BR"
+  },
+  {
+    "_id": {
+      "latitude": 37.794594,
+      "longitude": -25.506134
+    },
+    "admin1": "Azores",
+    "admin2": null,
+    "admin3": null,
+    "casecount": 11,
+    "country": "PT"
+  }
+]

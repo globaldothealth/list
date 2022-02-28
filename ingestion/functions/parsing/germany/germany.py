@@ -3,6 +3,7 @@ import sys
 from datetime import datetime
 import csv
 import json
+import common.ingestion_logging as logging
 
 # Layer code, like parsing_lib, is added to the path by AWS.
 # To test locally (e.g. via pytest), we have to modify sys.path.
@@ -16,6 +17,7 @@ except ImportError:
             os.pardir,os.pardir, 'common'))
     import parsing_lib
 
+logger = logging.getLogger(__name__)
 
 _DATE_INDEX = "Meldedatum"
 _AGE_INDEX = "Altersgruppe"
@@ -103,7 +105,7 @@ def convert_location(admin1, admin3_id):
     else:
         # Some entries are still not recognized and will therefore be geocoded at admin1 level. 
         # In e2e testing these were limited to the subdivisions of Berlin which are officially admin level 2 and so where not present in the source data used.
-        print(f'Unknown administrative district: {admin3_id}')
+        logger.warning(f'Unknown administrative district: {admin3_id}')
         location["query"] = ", ".join([admin1, "Germany"])
     if location:
         return location

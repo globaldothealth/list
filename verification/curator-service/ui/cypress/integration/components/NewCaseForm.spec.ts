@@ -57,6 +57,7 @@ describe('New case form', function () {
         cy.get('div[data-testid="caseReference"]').type('www.new-source.com');
         cy.get('input[name="caseReference.sourceName"]').click();
         cy.get('input[name="caseReference.sourceName"]').type('New source');
+        cy.get('input[name="caseReference.sourceLicense"]').type('WTFPL');
         cy.get('div[data-testid="location"]').type('France');
         cy.contains('li', 'France').click();
         cy.get('input[name="confirmedDate"]').type('2020-01-01');
