@@ -93,37 +93,6 @@ function createData(
     return { dataContributor, country, originDataSource, license };
 }
 
-// const rows = [];
-
-// async function getData() {
-//     try {
-//         const response = await axios.get('/api/sources', {
-//             headers: {
-//                 'X-API-Key':
-//                     '621cc8580577d5075384d795f9fa31fa0a77900778283d1bc61b2f5de7fc585f38ec60f4ccbe8f11c6162a08',
-//             },
-//         });
-//         // console.log(response.data.sources);
-
-//         response.data.sources?.map((el: any) => {
-//             rows.push(
-//                 createData(
-//                     el.name,
-//                     el.countryCodes.length > 0 ? el.countryCodes[0] : 'N/A',
-//                     el.origin.url,
-//                     el.origin.license,
-//                 ),
-//             );
-//             // console.log(el);
-//         });
-
-//         return response.data.sources;
-//     } catch (error) {
-//         console.error(error);
-//     }
-// }
-// getData();
-
 function descendingComparator<T>(a: T, b: T, orderBy: keyof T) {
     if (b[orderBy] < a[orderBy]) {
         return -1;
@@ -249,19 +218,17 @@ export default function DataAcknowledgments(): JSX.Element {
 
     const acknowledgmentDataForTable = useAppSelector(acknowledgmentData);
 
-    const rows = [] as string[];
+    const rows = [] as Data[];
 
     acknowledgmentDataForTable.map((el) => {
-        console.log(el.name);
-
-        // rows.push(
-        //     createData(
-        //         el.name,
-        //         el.countryCodes.length > 0 ? el.countryCodes[0] : 'N/A',
-        //         el.origin.url,
-        //         el.origin.license,
-        //     ),
-        // );
+        rows.push(
+            createData(
+                el.name,
+                el.origin.providerName ? el.origin.providerName[0] : 'N/A',
+                el.origin.url,
+                el.origin.license,
+            ),
+        );
         return {};
     });
 
@@ -273,8 +240,6 @@ export default function DataAcknowledgments(): JSX.Element {
         setOrder(isAsc ? 'desc' : 'asc');
         setOrderBy(property);
     };
-
-    // console.log('acknowledgmentDataForTable', acknowledgmentDataForTable);
 
     const handleClick = (event: React.MouseEvent<unknown>, name: string) => {
         const selectedIndex = selected.indexOf(name);

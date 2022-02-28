@@ -10,6 +10,7 @@ const initialState = {
 interface AcknowledgementData {
     name: string;
     origin: {
+        providerName: string;
         url: string;
         license: string;
     };
