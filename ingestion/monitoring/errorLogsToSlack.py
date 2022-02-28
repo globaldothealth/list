@@ -1,64 +1,73 @@
 import json
+import logging
 import os
 import requests
 import re
-from base64 import b64decode
-from gzip import decompress
-from io import StringIO
+import sys
 
-def decode(event):
-    event_data = event["awslogs"]["data"]
-    compressed = b64decode(event_data)
-    uncompressed = decompress(compressed)
-    decoded = json.loads(uncompressed)
+import boto3
 
-    return decoded
 
-def communicate(event):
-    slack_url = os.getenv("SLACK_WEBHOOK")
-    message_header = {'Content-Type': 'application/json'}
-    message = {'text': event}
-    response = requests.post(url=slack_url, data=json.dumps(message), headers=message_header)
-    if response.status_code != 200:
-        raise ValueError(
-            'Request to slack returned an error %s, the response is:\n%s'
-            % (response.status_code, response.text)
+class SlackHandler(logging.Handler):
+    def __init__(self, webhook_url, level=logging.NOTSET):
+        super().__init__(level)
+        self.slack_url = webhook_url
+    
+    def emit(self, record):
+        message_header = {'Content-Type': 'application/json'}
+        message = {'text': f"[{record.levelname}] {record.message}"}
+        response = requests.post(url=self.slack_url, data=json.dumps(message), headers=message_header)
+        if response.status_code != 200:
+            raise ValueError(
+                f"Request to slack returned an error {response.status_code}, the response is:\n{response.text}"
+            )
+
+
+def interpret(message):
+    lower = message.lower()
+    if "'dateRange': {'start':".lower() in lower:
+        return (logger.INFO, f"BACKFILL <@U01F70GPXNW>\n{message}")
+    if "error" in lower:
+        return (logger.ERROR, f"ERROR TYPE: Parser <@U011A0TFM7X> <@U017KLSPEM7>\n{message}")
+    if "timed out" in lower:
+        return (logger.ERROR, f"ERROR TYPE: Time out\n{message}")
+    return (logger.WARN, message)
+
+def setup_logger():
+    logger = logging.getLogger(__name__)
+    logger.setLevel(logging.DEBUG)
+    stdoutHandler = logging.StreamHandler(stream=sys.stdout)
+    stdoutHandler.setLevel(logging.DEBUG)
+    logger.addHandler(stdoutHandler)
+    slackHandler = SlackHandler(os.getenv('SLACK_WEBHOOK'), logging.DEBUG)
+    logger.addHandler(slackHandler)
+    return logger
+
+
+if __name__ == '__main__':
+    logger = setup_logger()
+    logGroup = os.getenv('INGESTION_LOG_GROUP')
+    logStream = os.getenv('INGESTION_LOG_STREAM')
+    if logGroup is None or logStream is None:
+        logger.critical(f"Cannot get messages from log group {logGroup} and stream {logStream}")
+        sys.exit(1)
+    logger.info(f"Output from {logGroup}/{logStream}:")
+    hasMore = True
+    oldNext = None
+    logClient = boto3.client('logs')
+    while hasMore:
+        response = logClient.get_log_events(
+            logGroupName=logGroup,
+            logStreamName=logStream,
+            startFromHead=True,
+            nextToken=oldNext
         )
-
-def define_errortype(decoded):
-    max_memory = False
-    for e in decoded['logEvents']:
-        if "'dateRange': {'start':".lower() in e["message"].lower():
-            communicate("BACKFILL <@U01F70GPXNW>")
-            for e in decoded['logEvents']:
-                communicate(e["message"])
-        if "error" in e["message"].lower():
-            communicate("ERROR TYPE: Parser <@U011A0TFM7X> <@U017KLSPEM7>")
-            print(e["message"])
-            communicate(e["message"])
-            return None
-        if "filtering cases" in e["message"].lower():
-            filter_message = e["message"]
-        if "memory size" in e["message"].lower():
-            memory_use = re.findall(r'\d* MB', e["message"])
-            if len(set(memory_use)) == 1:
-                max_memory = True
-        if "timed out" in e["message"].lower():
-            if max_memory == True:
-                communicate("ERROR TYPE: Time out, max memory reached <@U011A0TFM7X> <@U017KLSPEM7>")
-                print(e["message"])
-                communicate(e["message"])
-                return None
-            else:
-                communicate("ERROR TYPE: Time out, max memory NOT reached <@U01F70GPXNW>")
-                print(filter_message)
-                communicate(filter_message)
-                print(e["message"])
-                communicate(e["message"])
-                return None
-
-def lambda_handler(event, context):
-    decoded = decode(event)
-    print(decoded['logGroup'])
-    communicate(decoded['logGroup'])
-    define_errortype(decoded)
+        newNext = response['nextForwardToken']
+        if (not newNext) or (newNext == oldNext):
+            hasMore = False
+        else:
+            oldNext = newNext
+        for message in [e['message'] for e in response['events']]:
+            (severity, output) = interpret(message)
+            logger.log(severity, output)
+    logger.info(f"End of output from {logGroup}/{logStream}")
