@@ -88,6 +88,33 @@ export default class SourcesController {
     };
 
     /**
+     * Get sources for the acknowledgement table
+     * This is a public endpoint because acknowledgement table needs to
+     * be accessible in iframe
+     */
+    listSourcesForTable = async (
+        req: Request,
+        res: Response,
+    ): Promise<void> => {
+        try {
+            const sources = await Source.find(
+                {},
+                { name: 1, origin: 1, format: 1 },
+            ).sort({ name: 1 });
+
+            res.status(200).json(sources);
+        } catch (err) {
+            if (err.name === 'ValidationError') {
+                res.status(422).json(err);
+                return;
+            }
+
+            res.status(500).json(err);
+            return;
+        }
+    };
+
+    /**
      * Get a single source.
      */
     get = async (req: Request, res: Response): Promise<void> => {

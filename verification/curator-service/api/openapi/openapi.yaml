@@ -128,6 +128,18 @@ paths:
                     $ref: '#/components/responses/422'
                 '500':
                     $ref: '#/components/responses/500'
+    /acknowledgement-sources:
+        get:
+            tags: [Source]
+            summary: Lists sources for acknowledgement table
+            operationId: listSourcesForTable
+            responses:
+                '200':
+                    $ref: '#/components/responses/200AcknowledgementSource'
+                '422':
+                    $ref: '#/components/responses/422'
+                '500':
+                    $ref: '#/components/responses/500'
     /sources/{id}:
         parameters:
             - name: id
@@ -401,13 +413,13 @@ paths:
                   description: Keyword to sort by
                   required: false
                   schema:
-                      type: string                      
+                      type: string
                 - name: order
                   in: query
                   description: Sorting order
                   required: false
                   schema:
-                      type: string                      
+                      type: string
                 - name: q
                   in: query
                   description: The search query
@@ -1223,6 +1235,32 @@ components:
                     type: array
                     items:
                         $ref: '#/components/schemas/Upload'
+        AcknowledgementSource:
+            type: object
+            properties:
+                name:
+                    type: string
+                    description: Human readable name of a source
+                    example: Paraguay
+                origin:
+                    type: object
+                    properties:
+                        url:
+                            type: string
+                            example: https://opendata.digilugu.ee/opendata_covid19_test_results.csv
+                            description: Source location, can be http, https, or s3 schemes. This must be the link to the source data download.
+                        license:
+                            type: string
+                            example: MIT
+                            description: The license under which we have the right to ingest the data. Ideally a SPDX identifier (https://spdx.org/licenses/).
+                format:
+                    type: string
+                    description: Format of the source to be ingested, useful when automated ingestion
+                    enum:
+                        - null
+                        - CSV
+                        - JSON
+                        - XLSX
         SourceArray:
             type: object
             properties:
@@ -1236,6 +1274,10 @@ components:
                     type: integer
             items:
                 $ref: '#/components/schemas/Source'
+        AcknowledgementSourcesArray:
+            type: array
+            items:
+                $ref: '#/components/schemas/AcknowledgementSource'
         Case:
             description: A single line-list case.
             properties:
@@ -1954,6 +1996,12 @@ components:
                 application/json:
                     schema:
                         $ref: '#/components/schemas/Source'
+        '200AcknowledgementSource':
+            description: OK
+            content:
+                application/json:
+                    schema:
+                        $ref: '#/components/schemas/AcknowledgementSourcesArray'
         '200SourceArray':
             description: OK
             content:
