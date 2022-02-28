@@ -94,7 +94,7 @@ async function getData() {
         const response = await axios.get('/api/sources', {
             headers: {
                 'X-API-Key':
-                    '6218f6f7dddd3d0035384ad7f3435c124a22dfdd8dd85e28bd636928357b0bd4e4fa18717f2bc620fcfe58e4',
+                    '621cc8580577d5075384d795f9fa31fa0a77900778283d1bc61b2f5de7fc585f38ec60f4ccbe8f11c6162a08',
             },
         });
         console.log(response.data.sources);
