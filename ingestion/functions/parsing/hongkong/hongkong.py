@@ -21,10 +21,10 @@ logger = logging.getLogger(__name__)
 
 # Fixed location, all cases are for Hong Kong.
 _LOCATION = {
-    # "One country, two systems". We only store countries here.
-    "country": "China",
-    "administrativeAreaLevel1": "Hong Kong",
-    "geoResolution": "Admin1",
+    # We are using ISO codes now which are suitable for both
+    # countries and constituent territories
+    "country": "HK",
+    "geoResolution": "Country",
     "name": "Hong Kong",
     "geometry": {
         "longitude": float("114.15861"),
