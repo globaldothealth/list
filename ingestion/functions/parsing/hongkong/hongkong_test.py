@@ -25,17 +25,7 @@ class HongKongTest(unittest.TestCase):
                     "sourceEntryId": "1",
                     "sourceUrl": _SOURCE_URL,
                 },
-                "location": {
-                    # "One country, two systems". We only store countries here.
-                    "country": "China",
-                    "administrativeAreaLevel1": "Hong Kong",
-                    "geoResolution": "Admin1",
-                    "name": "Hong Kong",
-                    "geometry": {
-                        "longitude": float("114.15861"),
-                        "latitude": float("22.27833"),
-                    },
-                },
+                "location": hongkong._LOCATION,
                 "events": [
                     {
                         "name": "confirmed",
@@ -71,17 +61,7 @@ class HongKongTest(unittest.TestCase):
                     "sourceEntryId": "2",
                     "sourceUrl": _SOURCE_URL,
                 },
-                "location": {
-                    # "One country, two systems". We only store countries here.
-                    "country": "China",
-                    "administrativeAreaLevel1": "Hong Kong",
-                    "geoResolution": "Admin1",
-                    "name": "Hong Kong",
-                    "geometry": {
-                        "longitude": float("114.15861"),
-                        "latitude": float("22.27833"),
-                    },
-                },
+                "location": hongkong._LOCATION,
                 "events": [
                     {
                         "name": "confirmed",
@@ -111,17 +91,7 @@ class HongKongTest(unittest.TestCase):
                     "sourceEntryId": "3",
                     "sourceUrl": _SOURCE_URL,
                 },
-                "location": {
-                    # "One country, two systems". We only store countries here.
-                    "country": "China",
-                    "administrativeAreaLevel1": "Hong Kong",
-                    "geoResolution": "Admin1",
-                    "name": "Hong Kong",
-                    "geometry": {
-                        "longitude": float("114.15861"),
-                        "latitude": float("22.27833"),
-                    },
-                },
+                "location": hongkong._LOCATION,
                 "events": [
                     {
                         "name": "confirmed",
@@ -151,17 +121,7 @@ class HongKongTest(unittest.TestCase):
                     "sourceEntryId": "5",
                     "sourceUrl": _SOURCE_URL,
                 },
-                "location": {
-                    # "One country, two systems". We only store countries here.
-                    "country": "China",
-                    "administrativeAreaLevel1": "Hong Kong",
-                    "geoResolution": "Admin1",
-                    "name": "Hong Kong",
-                    "geometry": {
-                        "longitude": float("114.15861"),
-                        "latitude": float("22.27833"),
-                    },
-                },
+                "location": hongkong._LOCATION,
                 "events": [
                     {
                         "name": "confirmed",
