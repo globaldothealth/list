@@ -65,6 +65,7 @@ import { selectIsLoading } from '../../redux/app/selectors';
 import { getUserProfile, logout } from '../../redux/auth/thunk';
 import { selectUser } from '../../redux/auth/selectors';
 import { User } from '../../api/models/User';
+import PopupSmallScreens from '../PopupSmallScreens';
 
 // to use our custom theme values in typescript we need to define an extension to the ThemeOptions type.
 declare module '@material-ui/core/styles' {
@@ -325,6 +326,7 @@ function ProfileMenu(props: { user: User }): JSX.Element {
 
     return (
         <div>
+            <PopupSmallScreens />
             <IconButton
                 aria-controls="profile-menu"
                 data-testid="profile-menu"
