@@ -21,10 +21,10 @@ logger = logging.getLogger(__name__)
 
 # Fixed location, all cases are for Hong Kong.
 _LOCATION = {
-    # "One country, two systems". We only store countries here.
-    "country": "China",
-    "administrativeAreaLevel1": "Hong Kong",
-    "geoResolution": "Admin1",
+    # We are using ISO codes now which are suitable for both
+    # countries and constituent territories
+    "country": "HK",
+    "geoResolution": "Country",
     "name": "Hong Kong",
     "geometry": {
         "longitude": float("114.15861"),
@@ -76,12 +76,26 @@ def convert_age(age: str):
     elif age == "<1":
         return {"start": 0, "end": 1}
     else:
-        only_age = float("".join([i for i in age if not i.isalpha()]))
+        try:
+            only_age = float("".join([i for i in age if not i.isalpha()]))
+        except ValueError:
+            return None
         # 365.25 is average number of days a year
         return {
             "start": round(only_age / 365.25, 3),
             "end": round(only_age / 365.25, 3)
         }
+
+
+def convert_demographics(gender, age):
+    _gender = convert_gender(gender)
+    _age = convert_age(age)
+    _demographics = {}
+    if _gender:
+        _demographics['gender'] = _gender
+    if _age:
+        _demographics['ageRange'] = _age
+    return _demographics
 
 
 def parse_cases(raw_data_file: str, source_id: str, source_url: str):
@@ -103,10 +117,7 @@ def parse_cases(raw_data_file: str, source_id: str, source_url: str):
                     "sourceUrl": source_url
                 },
                 "location": _LOCATION,
-                "demographics": {
-                    "gender": convert_gender(row[_GENDER_INDEX]),
-                    "ageRange": convert_age(row[_AGE_INDEX]),
-                },
+                "demographics": convert_demographics(row[_GENDER_INDEX], row[_AGE_INDEX]),
                 "events": [
                     {
                         "name": "confirmed",
