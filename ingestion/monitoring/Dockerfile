@@ -34,7 +34,7 @@ RUN apt-get update \
         build-essential
 
 # install poetry - respects $POETRY_VERSION & $POETRY_HOME
-RUN curl -sSL https://install.python-poetry.org/ | python3 -
+RUN curl -sSL https://install.python-poetry.org/ | python3 - --version 1.1.13
 
 # copy project requirement files here to ensure they will be cached.
 WORKDIR $PYSETUP_PATH
