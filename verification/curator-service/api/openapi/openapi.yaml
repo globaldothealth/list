@@ -128,6 +128,57 @@ paths:
                     $ref: '#/components/responses/422'
                 '500':
                     $ref: '#/components/responses/500'
+    /acknowledgment-sources:
+        get:
+            tags: [Source]
+            summary: Lists sources for acknowledgments table
+            operationId: listSourcesForTable
+            parameters:
+                - name: page
+                  in: query
+                  description: The pages of sources to skip before starting to collect the result set
+                  required: false
+                  schema:
+                      type: integer
+                      format: int32
+                      minimum: 1
+                      default: 1
+                - name: limit
+                  in: query
+                  description: The number of sources to return
+                  required: false
+                  schema:
+                      type: integer
+                      format: int32
+                      minimum: 0
+                      maximum: 100
+                      default: 10
+                - name: orderBy
+                  in: query
+                  description: Field to be sorted by
+                  required: false
+                  schema:
+                      type: string
+                      enum:
+                          - dataContributor
+                          - originDataSource
+                          - license
+                - name: order
+                  in: query
+                  description: Sorting order
+                  required: false
+                  schema:
+                      type: string
+                      enum:
+                          - asc
+                          - desc
+            responses:
+                '200':
+                    $ref: '#/components/responses/200AcknowledgmentSource'
+                '422':
+                    $ref: '#/components/responses/422'
+                '500':
+                    $ref: '#/components/responses/500'
     /sources/{id}:
         parameters:
             - name: id
@@ -401,13 +452,13 @@ paths:
                   description: Keyword to sort by
                   required: false
                   schema:
-                      type: string                      
+                      type: string
                 - name: order
                   in: query
                   description: Sorting order
                   required: false
                   schema:
-                      type: string                      
+                      type: string
                 - name: q
                   in: query
                   description: The search query
@@ -1232,6 +1283,29 @@ components:
                     type: array
                     items:
                         $ref: '#/components/schemas/Upload'
+        AcknowledgmentSource:
+            type: object
+            properties:
+                name:
+                    type: string
+                    description: Human readable name of a source
+                    example: Paraguay
+                origin:
+                    type: object
+                    properties:
+                        url:
+                            type: string
+                            example: https://opendata.digilugu.ee/opendata_covid19_test_results.csv
+                            description: Source location, can be http, https, or s3 schemes. This must be the link to the source data download.
+                        license:
+                            type: string
+                            example: MIT
+                            description: The license under which we have the right to ingest the data. Ideally a SPDX identifier (https://spdx.org/licenses/).
+                countryCodes:
+                    type: array
+                    description: An array of country codes that this source relates to
+                    items:
+                        type: string
         SourceArray:
             type: object
             properties:
@@ -1245,6 +1319,17 @@ components:
                     type: integer
             items:
                 $ref: '#/components/schemas/Source'
+        AcknowledgmentSourcesArray:
+            type: object
+            properties:
+                sources:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/AcknowledgmentSource'
+                nextPage:
+                    type: integer
+                total:
+                    type: integer
         Case:
             description: A single line-list case.
             properties:
@@ -1963,6 +2048,12 @@ components:
                 application/json:
                     schema:
                         $ref: '#/components/schemas/Source'
+        '200AcknowledgmentSource':
+            description: OK
+            content:
+                application/json:
+                    schema:
+                        $ref: '#/components/schemas/AcknowledgmentSourcesArray'
         '200SourceArray':
             description: OK
             content:

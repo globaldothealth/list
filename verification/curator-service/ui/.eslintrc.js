@@ -20,25 +20,26 @@ module.exports = {
   },
   extends: defaultRules,
   rules: {
-        'no-bitwise': [
-            'error'
-        ],
-        'linebreak-style': [
-            'error',
-            'unix'
-        ],
-        'quotes': [
-            'error',
-            'single'
-        ],
-        'semi': [
-            'error',
-            'always'
-        ],        
-        '@typescript-eslint/no-redeclare': 'off',
-        '@typescript-eslint/no-unused-expressions': 'off',
-        '@typescript-eslint/no-explicit-any': 'off',
-        '@typescript-eslint/no-non-null-assertion': 'off'
+    'no-bitwise': [
+      'error'
+    ],
+    'linebreak-style': [
+      'error',
+      'unix'
+    ],
+    'quotes': [
+      'error',
+      'single'
+    ],
+    'semi': [
+      'error',
+      'always'
+    ],
+    '@typescript-eslint/no-redeclare': 'off',
+    '@typescript-eslint/no-unused-expressions': 'off',
+    '@typescript-eslint/no-explicit-any': 'off',
+    '@typescript-eslint/no-non-null-assertion': 'off',
+    '@typescript-eslint/explicit-module-boundary-types': 'off'
   },
   overrides: [
     {

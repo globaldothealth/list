@@ -103,7 +103,7 @@ const LandingPage = (): JSX.Element => {
     const forgotPasswordPopupOpen = useAppSelector(
         selectForgotPasswordPopupOpen,
     );
-    const { open, message } = useAppSelector(selectSnackbar);
+    const { isOpen, message } = useAppSelector(selectSnackbar);
     const version = useAppSelector(selectVersion);
 
     // Url parameters from reset password link
@@ -264,7 +264,7 @@ const LandingPage = (): JSX.Element => {
                 )}
 
                 <SnackbarAlert
-                    isOpen={open}
+                    isOpen={isOpen}
                     type="success"
                     message={message}
                     durationMs={5000}
