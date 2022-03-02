@@ -1,3 +1,4 @@
+import argparse
 import json
 import logging
 import os
@@ -60,8 +61,12 @@ def log_messages(cloudwatch_response, logger):
 
 if __name__ == '__main__':
     logger = setup_logger()
-    logGroup = os.getenv('INGESTION_LOG_GROUP')
-    logStream = os.getenv('INGESTION_LOG_STREAM')
+    parser = argparse.ArgumentParser()
+    parser.add_argument("group", help="AWS log group name for the failed parser")
+    parser.add_argument("stream", help="AWS log stream name for the failed parser")
+    args = parser.parse_args()
+    logGroup = args.group
+    logStream = args.stream
     if logGroup is None or logStream is None:
         logger.critical(f"Cannot get messages from log group {logGroup} and stream {logStream}")
         sys.exit(1)
