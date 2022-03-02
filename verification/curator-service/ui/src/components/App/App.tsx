@@ -28,7 +28,7 @@ import AutomatedBackfill from '../AutomatedBackfill';
 import AutomatedSourceForm from '../AutomatedSourceForm';
 import BulkCaseForm from '../BulkCaseForm';
 import CaseForm from '../CaseForm';
-import DataAcknowledgments from '../DataAcknowledgments';
+import AcknowledgmentsPage from '../AcknowledgmentsPage';
 import Drawer from '@material-ui/core/Drawer';
 import EditCase from '../EditCase';
 import GHListLogo from '../GHListLogo';
@@ -612,22 +612,19 @@ export default function App(): JSX.Element {
                         ) : (
                             <span className={classes.spacer}></span>
                         )}
-                        {user && (
-                            <>
-                                <Typography>
-                                    <a
-                                        className={classes.mapLink}
-                                        data-testid="mapLink"
-                                        href="https://map.covid-19.global.health/"
-                                        rel="noopener noreferrer"
-                                        target="_blank"
-                                    >
-                                        G.h Map
-                                    </a>
-                                </Typography>
-                                <ProfileMenu user={user} />{' '}
-                            </>
-                        )}
+
+                        <Typography>
+                            <a
+                                className={classes.mapLink}
+                                data-testid="mapLink"
+                                href="https://map.covid-19.global.health/"
+                                rel="noopener noreferrer"
+                                target="_blank"
+                            >
+                                G.h Map
+                            </a>
+                        </Typography>
+                        {user && <ProfileMenu user={user} />}
                     </Toolbar>
                 </AppBar>
                 {user && (
@@ -788,7 +785,7 @@ export default function App(): JSX.Element {
                 )}
                 <main
                     className={clsx(classes.content, {
-                        [classes.contentShift]: drawerOpen,
+                        [classes.contentShift]: drawerOpen || !user,
                     })}
                 >
                     <div className={classes.drawerHeader} />
@@ -829,11 +826,6 @@ export default function App(): JSX.Element {
                         {user && (
                             <Route path="/profile">
                                 <Profile />
-                            </Route>
-                        )}
-                        {user && (
-                            <Route path="/dataacknowledgments">
-                                <DataAcknowledgments />
                             </Route>
                         )}
                         {user && hasAnyRole(['admin']) && (
@@ -892,6 +884,9 @@ export default function App(): JSX.Element {
                                 }}
                             />
                         )}
+                        <Route exact path="/data-acknowledgments">
+                            <AcknowledgmentsPage />
+                        </Route>
                         <Route exact path="/terms">
                             <TermsOfUse />
                         </Route>

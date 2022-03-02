@@ -1,28 +1,31 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
-
-interface AcknowledgementData {
-    name: string;
-    origin: {
-        providerName: string;
-        url: string;
-        license: string;
-    };
-    format: string;
-}
+import { AcknowledgmentData } from '../../api/models/AcknowledgmentData';
 
 export const fetchAcknowledgmentData = createAsyncThunk<
-    AcknowledgementData[],
-    void,
+    { sources: AcknowledgmentData[]; total: number; nextPage?: number },
+    { page: number; limit: number; orderBy: string; order: 'asc' | 'desc' },
     { rejectValue: string }
->('filters/fetchAcknowledgmentData', async () => {
-    const acknowledgementData = await axios.get('/api/acknowledgement-sources');
+>(
+    'acknowledgment/fetchAcknowledgmentData',
+    async ({ page, limit, orderBy, order }, { rejectWithValue }) => {
+        try {
+            const response = await axios.get(
+                `/api/acknowledgment-sources?page=${page}&limit=${limit}&orderBy=${orderBy}&order=${order}`,
+            );
 
-    if (acknowledgementData.status !== 200) {
-        throw new Error(
-            'Error downloading Acknowledgment Data, please try again',
-        );
-    }
+            if (response.status !== 200 && response.status !== 304) {
+                throw new Error(
+                    'Error while downloading Acknowledgment Data, please try again',
+                );
+            }
 
-    return acknowledgementData.data;
-});
+            return response.data;
+            // eslint-disable-next-line
+        } catch (error: any) {
+            if (!error.response.data.message) throw error;
+
+            return rejectWithValue(error.response.data.message);
+        }
+    },
+);

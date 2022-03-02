@@ -8,8 +8,8 @@ import acknowledgmentDataReducer from './acknowledgmentData/slice';
 export const rootReducer = combineReducers({
     app: appReducer,
     auth: authReducer,
-    filtersReducer,
-    acknowledgmentDataReducer,
+    filters: filtersReducer,
+    acknowledgement: acknowledgmentDataReducer,
 });
 
 const store = configureStore({

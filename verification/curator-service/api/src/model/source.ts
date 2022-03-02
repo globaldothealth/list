@@ -30,10 +30,10 @@ interface ISource {
 
 type ISourceInstanceCreation = mongoose.Model<ISource>;
 
-const validCountryCode = function(cc: string): boolean {
+const validCountryCode = function (cc: string): boolean {
     // use ZZ to represent all countries
-    return (iso.whereAlpha2(cc) !== undefined || cc.toUpperCase() === "ZZ")
-}
+    return iso.whereAlpha2(cc) !== undefined || cc.toUpperCase() === 'ZZ';
+};
 
 const sourceSchema = new mongoose.Schema<
     ISource,
@@ -51,11 +51,11 @@ const sourceSchema = new mongoose.Schema<
     countryCodes: {
         type: [String],
         validate: {
-            validator: function(cc: string[]): boolean {
-                return cc.every(validCountryCode)
-            }
+            validator: function (cc: string[]): boolean {
+                return cc.every(validCountryCode);
+            },
         },
-        message: 'Invalid country code entered'
+        message: 'Invalid country code entered',
     },
     format: String,
     excludeFromLineList: Boolean,

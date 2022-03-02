@@ -128,14 +128,53 @@ paths:
                     $ref: '#/components/responses/422'
                 '500':
                     $ref: '#/components/responses/500'
-    /acknowledgement-sources:
+    /acknowledgment-sources:
         get:
             tags: [Source]
-            summary: Lists sources for acknowledgement table
+            summary: Lists sources for acknowledgments table
             operationId: listSourcesForTable
+            parameters:
+                - name: page
+                  in: query
+                  description: The pages of sources to skip before starting to collect the result set
+                  required: false
+                  schema:
+                      type: integer
+                      format: int32
+                      minimum: 1
+                      default: 1
+                - name: limit
+                  in: query
+                  description: The number of sources to return
+                  required: false
+                  schema:
+                      type: integer
+                      format: int32
+                      minimum: 0
+                      maximum: 100
+                      default: 10
+                - name: orderBy
+                  in: query
+                  description: Field to be sorted by
+                  required: false
+                  schema:
+                      type: string
+                      enum:
+                          - dataContributor
+                          - originDataSource
+                          - license
+                - name: order
+                  in: query
+                  description: Sorting order
+                  required: false
+                  schema:
+                      type: string
+                      enum:
+                          - asc
+                          - desc
             responses:
                 '200':
-                    $ref: '#/components/responses/200AcknowledgementSource'
+                    $ref: '#/components/responses/200AcknowledgmentSource'
                 '422':
                     $ref: '#/components/responses/422'
                 '500':
@@ -1244,7 +1283,7 @@ components:
                     type: array
                     items:
                         $ref: '#/components/schemas/Upload'
-        AcknowledgementSource:
+        AcknowledgmentSource:
             type: object
             properties:
                 name:
@@ -1262,14 +1301,11 @@ components:
                             type: string
                             example: MIT
                             description: The license under which we have the right to ingest the data. Ideally a SPDX identifier (https://spdx.org/licenses/).
-                format:
-                    type: string
-                    description: Format of the source to be ingested, useful when automated ingestion
-                    enum:
-                        - null
-                        - CSV
-                        - JSON
-                        - XLSX
+                countryCodes:
+                    type: array
+                    description: An array of country codes that this source relates to
+                    items:
+                        type: string
         SourceArray:
             type: object
             properties:
@@ -1283,10 +1319,17 @@ components:
                     type: integer
             items:
                 $ref: '#/components/schemas/Source'
-        AcknowledgementSourcesArray:
-            type: array
-            items:
-                $ref: '#/components/schemas/AcknowledgementSource'
+        AcknowledgmentSourcesArray:
+            type: object
+            properties:
+                sources:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/AcknowledgmentSource'
+                nextPage:
+                    type: integer
+                total:
+                    type: integer
         Case:
             description: A single line-list case.
             properties:
@@ -2005,12 +2048,12 @@ components:
                 application/json:
                     schema:
                         $ref: '#/components/schemas/Source'
-        '200AcknowledgementSource':
+        '200AcknowledgmentSource':
             description: OK
             content:
                 application/json:
                     schema:
-                        $ref: '#/components/schemas/AcknowledgementSourcesArray'
+                        $ref: '#/components/schemas/AcknowledgmentSourcesArray'
         '200SourceArray':
             description: OK
             content:

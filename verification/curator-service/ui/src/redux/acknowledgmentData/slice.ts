@@ -1,41 +1,45 @@
 import { createSlice } from '@reduxjs/toolkit';
 import { fetchAcknowledgmentData } from './thunk';
+import { AcknowledgmentData } from '../../api/models/AcknowledgmentData';
 
-const initialState = {
+interface AcknowledgementState {
+    acknowledgmentData: AcknowledgmentData[];
+    isLoading: boolean;
+    error: string | undefined;
+    nextPage: number | undefined;
+    totalSources: number;
+}
+
+const initialState: AcknowledgementState = {
     acknowledgmentData: [],
     isLoading: false,
     error: undefined,
+    nextPage: undefined,
+    totalSources: 0,
 };
-
-interface AcknowledgementData {
-    name: string;
-    origin: {
-        providerName: string;
-        url: string;
-        license: string;
-    };
-    format: string;
-}
-
-interface initialStateTypes {
-    acknowledgmentData: AcknowledgementData[];
-    isLoading: boolean;
-    error: string | unknown;
-}
 
 const slice = createSlice({
     name: 'tableData',
-    initialState: initialState as initialStateTypes,
-    reducers: {},
+    initialState,
+    reducers: {
+        resetError: (state) => {
+            state.error = undefined;
+        },
+    },
     extraReducers: (builder) => {
-        builder.addCase(fetchAcknowledgmentData.fulfilled, (state, action) => {
-            state.acknowledgmentData = action.payload;
-            state.isLoading = false;
-        });
         builder.addCase(fetchAcknowledgmentData.pending, (state) => {
             state.isLoading = true;
             state.error = undefined;
         });
+        builder.addCase(
+            fetchAcknowledgmentData.fulfilled,
+            (state, { payload }) => {
+                state.acknowledgmentData = payload.sources;
+                state.totalSources = payload.total;
+                state.nextPage = payload.nextPage;
+                state.isLoading = false;
+            },
+        );
         builder.addCase(fetchAcknowledgmentData.rejected, (state, action) => {
             state.isLoading = false;
             state.error = action.payload
@@ -44,5 +48,7 @@ const slice = createSlice({
         });
     },
 });
+
+export const { resetError } = slice.actions;
 
 export default slice.reducer;
