@@ -1,8 +1,8 @@
 import { RootState } from '../store';
 
 export const countryList: (state: RootState) => string[] = (state) =>
-    state.filtersReducer.countryList;
+    state.filters.countryList;
 export const isLoading: (state: RootState) => boolean = (state) =>
-    state.filtersReducer.isLoading;
+    state.filters.isLoading;
 export const filterError: (state: RootState) => string | undefined = (state) =>
-    state.filtersReducer.error;
+    state.filters.error;
