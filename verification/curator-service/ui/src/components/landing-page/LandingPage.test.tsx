@@ -44,10 +44,6 @@ describe('<LandingPage />', () => {
             'href',
             'https://raw.githubusercontent.com/globaldothealth/list/main/data-serving/scripts/export-data/data_dictionary.txt',
         );
-        expect(screen.getByText('Data acknowledgments')).toHaveAttribute(
-            'href',
-            'https://global.health/acknowledgement/',
-        );
         expect(screen.getByText('Terms of use')).toHaveAttribute(
             'href',
             'https://global.health/terms-of-use/',

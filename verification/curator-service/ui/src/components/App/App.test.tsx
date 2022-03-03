@@ -17,8 +17,9 @@ const initialLoggedInState: RootState = {
         isLoading: false,
         searchQuery: '',
         filterBreadcrumbs: [],
+        version: '1.0',
     },
-    filtersReducer: {
+    filters: {
         countryList: [],
         error: '',
         isLoading: false,
@@ -41,6 +42,13 @@ const initialLoggedInState: RootState = {
             isOpen: false,
             message: '',
         },
+    },
+    acknowledgement: {
+        acknowledgmentData: [],
+        error: undefined,
+        isLoading: false,
+        totalSources: 0,
+        nextPage: undefined,
     },
 };
 
@@ -108,9 +116,6 @@ describe('<App />', () => {
             'href',
             'https://raw.githubusercontent.com/globaldothealth/list/main/data-serving/scripts/export-data/data_dictionary.txt',
         );
-        expect(
-            await screen.findByTestId('acknowledgmentsButton'),
-        ).toHaveAttribute('href', 'https://global.health/acknowledgement/');
         expect(await screen.findByTestId('termsButton')).toHaveAttribute(
             'href',
             'https://global.health/terms-of-use',

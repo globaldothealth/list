@@ -1,49 +1,38 @@
 import React, { useEffect, useState } from 'react';
 import CloseIcon from '@material-ui/icons/Close';
 import {
-    createStyles,
+    makeStyles,
     useTheme,
     useMediaQuery,
     Dialog,
     DialogTitle,
     IconButton,
     DialogContent,
-    Theme,
     Typography,
-    withStyles,
-    WithStyles,
 } from '@material-ui/core';
 
-type Props = WithStyles<typeof styles> & {
-    rootComponentRef: React.RefObject<HTMLDivElement>;
-    triggerComponentRef: React.RefObject<HTMLButtonElement>;
-    isOpen: boolean;
-    onToggle: () => void;
-};
+const useStyles = makeStyles({
+    dialogContainer: {
+        height: '40%',
+    },
+    dialogTitle: {
+        display: 'flex',
+    },
+    closeButton: {
+        position: 'absolute',
+        right: 8,
+        top: 8,
+    },
+});
 
-const styles = (theme: Theme) =>
-    createStyles({
-        dialogContainer: {
-            height: '40%',
-        },
-        dialogTitle: {
-            display: 'flex',
-        },
-        closeButton: {
-            position: 'absolute',
-            right: 8,
-            top: 8,
-        },
-    });
-
-const PopupSmallScreens = ({ classes }: Props) => {
+export default function PopupSmallScreens() {
     const theme = useTheme();
+    const classes = useStyles();
     const [dialogOpen, setDialogOpen] = useState(false);
 
     /**
     @name matches - value of the current browser window in pixels
      **/
-
     const matches = useMediaQuery(theme.breakpoints.down('md'));
 
     useEffect(() => {
@@ -80,6 +69,4 @@ const PopupSmallScreens = ({ classes }: Props) => {
             </DialogContent>
         </Dialog>
     );
-};
-
-export default withStyles(styles, { withTheme: true })(PopupSmallScreens);
+}

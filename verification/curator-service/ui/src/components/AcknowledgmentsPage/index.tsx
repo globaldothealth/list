@@ -169,7 +169,7 @@ export default function AcknowledgmentsPage(): JSX.Element {
             </Helmet>
             <div className={classes.root}>
                 <Typography variant="h1" className={classes.pageTitle}>
-                    Data Acknowledments
+                    Data Acknowledgments
                 </Typography>
                 <Typography variant="body1" className={classes.pageSubTitle}>
                     We acknowledge the hard work and open-science of the
@@ -181,7 +181,10 @@ export default function AcknowledgmentsPage(): JSX.Element {
                 <Paper className={classes.paper}>
                     {isLoading && (
                         <div className={classes.loaderConrainer}>
-                            <CircularProgress color="primary" />
+                            <CircularProgress
+                                color="primary"
+                                data-cy="loader"
+                            />
                         </div>
                     )}
                     <TableContainer>

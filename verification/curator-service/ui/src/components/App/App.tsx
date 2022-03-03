@@ -66,6 +66,7 @@ import { selectIsLoading } from '../../redux/app/selectors';
 import { getUserProfile, logout } from '../../redux/auth/thunk';
 import { selectUser } from '../../redux/auth/selectors';
 import { User } from '../../api/models/User';
+import PopupSmallScreens from '../PopupSmallScreens';
 
 // to use our custom theme values in typescript we need to define an extension to the ThemeOptions type.
 declare module '@material-ui/core/styles' {
@@ -326,6 +327,7 @@ function ProfileMenu(props: { user: User }): JSX.Element {
 
     return (
         <div>
+            <PopupSmallScreens />
             <IconButton
                 aria-controls="profile-menu"
                 data-testid="profile-menu"
@@ -736,15 +738,13 @@ export default function App(): JSX.Element {
                             >
                                 Data dictionary
                             </a>
-                            <a
-                                href="https://global.health/acknowledgement/"
-                                rel="noopener noreferrer"
-                                target="_blank"
+                            <Link
+                                to="/data-acknowledgments"
                                 className={classes.link}
                                 data-testid="acknowledgmentsButton"
                             >
                                 Data acknowledgments
-                            </a>
+                            </Link>
                             <a
                                 href="https://global.health/terms-of-use"
                                 rel="noopener noreferrer"

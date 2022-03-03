@@ -22,7 +22,7 @@ import PolicyLink from '../PolicyLink';
 import PartnerLogos from './PartnerLogos';
 import { SnackbarAlert } from '../SnackbarAlert';
 
-import { useParams } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 
 import Helmet from 'react-helmet';
 import { getVersion } from '../../redux/app/thunk';
@@ -191,13 +191,9 @@ const LandingPage = (): JSX.Element => {
                                 </a>
                             </div>
                             <div className={classes.link}>
-                                <a
-                                    href="https://global.health/acknowledgement/"
-                                    rel="noopener noreferrer"
-                                    target="_blank"
-                                >
+                                <Link to="/data-acknowledgments">
                                     Data acknowledgments
-                                </a>
+                                </Link>
                             </div>
                             <div className={classes.link}>
                                 <a
