@@ -363,7 +363,7 @@ function ProfileMenu(props: { user: User }): JSX.Element {
                 >
                     <MenuItem>About Global.health</MenuItem>
                 </a>
-                <Link to="/dataacknowledgments" onClick={handleClose}>
+                <Link to="/data-acknowledgments" onClick={handleClose}>
                     <MenuItem>Data acknowledgments</MenuItem>
                 </Link>
                 <a
