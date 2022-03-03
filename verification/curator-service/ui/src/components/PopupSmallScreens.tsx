@@ -25,7 +25,7 @@ const useStyles = makeStyles({
     },
 });
 
-export default function PopupSmallScreens() {
+export default function PopupSmallScreens(): JSX.Element {
     const theme = useTheme();
     const classes = useStyles();
     const [dialogOpen, setDialogOpen] = useState(false);
