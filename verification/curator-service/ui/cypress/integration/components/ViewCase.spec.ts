@@ -1,3 +1,5 @@
+import { getDefaultQuery } from '../../utils/helperFunctions';
+
 /* eslint-disable no-undef */
 describe('View case', function () {
     beforeEach(() => {
@@ -19,7 +21,7 @@ describe('View case', function () {
         });
 
         cy.server();
-        cy.route('GET', '/api/cases').as('getCases');
+        cy.route('GET', getDefaultQuery(50)).as('getCases');
         cy.visit('/');
 
         cy.visit('/cases');
