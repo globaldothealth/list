@@ -433,7 +433,7 @@ export default function App(): JSX.Element {
         React.useState<string>('');
     const [sortBy, setSortBy] = useState<SortBy>(SortBy.ConfirmationDate);
     const [sortByOrder, setSortByOrder] = useState<SortByOrder>(
-        SortByOrder.Ascending,
+        SortByOrder.Descending,
     );
     const classes = useStyles();
 
