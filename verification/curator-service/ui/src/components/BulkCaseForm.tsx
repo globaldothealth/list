@@ -556,6 +556,9 @@ class BulkCaseForm extends React.Component<
                 const newCaseReference = await submitSource({
                     name: values.caseReference.sourceName as string,
                     url: values.caseReference.sourceUrl,
+                    license: values.caseReference.sourceLicense as string,
+                    providerName: values.caseReference.sourceProviderName,
+                    providerWebsiteUrl: values.caseReference.sourceProviderUrl,
                     format: 'CSV',
                 });
                 values.caseReference.sourceId = newCaseReference.sourceId;

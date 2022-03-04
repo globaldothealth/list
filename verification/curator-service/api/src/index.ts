@@ -192,6 +192,7 @@ apiRouter.get(
     mustHaveAnyRole(['curator']),
     sourcesController.list,
 );
+apiRouter.get('/acknowledgment-sources', sourcesController.listSourcesForTable);
 apiRouter.get(
     '/sources/:id([a-z0-9]{24})',
     authenticateByAPIKey,

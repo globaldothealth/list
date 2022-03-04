@@ -45,6 +45,7 @@ describe('Curator', function () {
         cy.get('div[data-testid="caseReference"]').type('www.example.com');
         cy.contains('li', 'www.example.com').click();
         cy.get('input[name="caseReference.sourceName"]').type('Example source');
+        cy.get('input[name="caseReference.sourceLicense"]').type('MPL');
         cy.get('div[data-testid="sourceEntryId"]')
             .click()
             .type('testSourceEntryID123');

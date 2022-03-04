@@ -1,4 +1,4 @@
-import { SnackbarProps } from '@material-ui/core';
+import { SnackbarProps } from './slice';
 import { User } from '../../api/models/User';
 import { RootState } from '../store';
 

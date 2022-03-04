@@ -139,6 +139,7 @@ describe('Bulk upload form', function () {
         cy.get('div[data-testid="caseReference"]').type('www.new-source.com');
         cy.contains('li', 'www.new-source.com').click();
         cy.get('input[name="caseReference.sourceName"]').type('New source');
+        cy.get('input[name="caseReference.sourceLicense"]').type('GPL3');
         const csvFixture = '../fixtures/bulk_data.csv';
         cy.get('input[type="file"]').attachFile(csvFixture);
         cy.server();

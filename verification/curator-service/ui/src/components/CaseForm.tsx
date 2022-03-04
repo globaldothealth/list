@@ -349,6 +349,9 @@ export default function CaseForm(props: Props): JSX.Element {
                 const newCaseReference = await submitSource({
                     name: values.caseReference.sourceName as string,
                     url: values.caseReference.sourceUrl,
+                    license: values.caseReference.sourceLicense as string,
+                    providerName: values.caseReference.sourceProviderName,
+                    providerWebsiteUrl: values.caseReference.sourceProviderUrl,
                 });
                 values.caseReference.sourceId = newCaseReference.sourceId;
             } catch (e) {

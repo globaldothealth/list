@@ -1,0 +1,60 @@
+name: Ingestion error reporter deploy
+
+on:
+  push:
+    branches: [main, '*-stable']
+    paths:
+    - '.github/workflows/ingestion-error-reporter-deploy.yml'
+    - 'ingestion/monitoring/errorLogsToSlack.py'
+    - 'ingestion/monitoring/pyproject.toml'
+    - 'ingestion/monitoring/poetry.lock'
+    # Build whenever a new tag is created.
+    tags:
+      - "*"
+  workflow_dispatch:
+    branches: [main, '*-stable']
+    paths:
+    - '.github/workflows/ingestion-error-reporter-deploy.yml'
+    - 'ingestion/monitoring/errorLogsToSlack.py'
+    - 'ingestion/monitoring/pyproject.toml'
+    - 'ingestion/monitoring/poetry.lock'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: eu-central-1
+
+    - name: Login to Amazon ECR
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v1
+
+    - name: Build, tag, and push image to Amazon ECR (latest)
+      if: ${{ github.ref == 'refs/heads/main' }}
+      working-directory: ingestion/functions
+      env:
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        ECR_REPOSITORY: gdh-ingestor-error-reporter
+        IMAGE_TAG: ${{ github.sha }}
+      run: |
+        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG -t $ECR_REGISTRY/$ECR_REPOSITORY -f Dockerfile-clean .
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
+
+    - name: Build, tag, and push image to Amazon ECR (stable)
+      if: ${{ endsWith(github.ref, '-stable') }}
+      working-directory: ingestion/functions
+      env:
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        ECR_REPOSITORY: gdh-ingestor-error-monitor
+        IMAGE_TAG: ${{ github.sha }}
+      run: |
+        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG -t $ECR_REGISTRY/$ECR_REPOSITORY:stable -f Dockerfile-clean .
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:stable

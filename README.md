@@ -58,13 +58,6 @@ this [data dictionary](data-serving/scripts/export-data/data_dictionary.txt).
 
    ![Data monitoring notifications](https://github.com/globaldothealth/list/actions/workflows/monitoring-notify.yml/badge.svg)
 
-* **Data ingestion**
-
-   ![Prune uploads](https://github.com/globaldothealth/list/actions/workflows/prune-uploads-prod.yml/badge.svg)
-
-   ![Prune uploads (dev)](https://github.com/globaldothealth/list/actions/workflows/prune-uploads-dev.yml/badge.svg)
-
-
 ## Components
 
 - [The data service](data-serving/data-service) in `data-serving/data-service` facilitates CRUD operations with the
