@@ -82,7 +82,7 @@ if __name__ == '__main__':
     log_messages(response, logger)
     oldNext = response['nextForwardToken']
     if oldNext and len(oldNext) > 0:
-        hasMore = true
+        hasMore = True
     while hasMore:
         response = logClient.get_log_events(
             logGroupName=logGroup,
