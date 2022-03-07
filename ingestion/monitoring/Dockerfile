@@ -66,7 +66,9 @@ COPY errorLogsToSlack.py poetry.lock pyproject.toml ./
 # quicker install as runtime deps are already installed
 RUN poetry install
 
-# notice I haven't set the environment variables or args here.
-# the slack webhook should be configured in the job definition,
+# notice I haven't set the environment variable values or args here.
+# the slack webhook and AWS region should be configured in the job definition,
 # and the args should be configured at submission time
+ENV AWS_REGION
+ENV SLACK_WEBHOOK
 CMD ["poetry", "run", "python3", "./errorLogsToSlack.py"]
