@@ -73,7 +73,7 @@ if __name__ == '__main__':
     logger.info(f"Output from {logGroup}/{logStream}:")
     hasMore = False
     oldNext = ''
-    logClient = boto3.client('logs')
+    logClient = boto3.client('logs', region_name=os.getenv('AWS_REGION'))
     response = logClient.get_log_events(
         logGroupName=logGroup,
         logStreamName=logStream,

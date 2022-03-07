@@ -54,6 +54,9 @@ jobs:
         ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         ECR_REPOSITORY: gdh-ingestor-error-monitor
         IMAGE_TAG: ${{ github.sha }}
+        # This is a webhook for a test channel: override it on job submission!
+        SLACK_WEBHOOK: https://hooks.slack.com/services/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
+        AWS_REGION: eu-central-1
       run: |
         docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG -t $ECR_REGISTRY/$ECR_REPOSITORY:stable -f Dockerfile .
         docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
