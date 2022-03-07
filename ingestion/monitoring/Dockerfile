@@ -69,6 +69,6 @@ RUN poetry install
 # notice I haven't set the environment variable values or args here.
 # the slack webhook and AWS region should be configured in the job definition,
 # and the args should be configured at submission time
-ENV AWS_REGION
-ENV SLACK_WEBHOOK
+ENV AWS_REGION $AWS_REGION
+ENV SLACK_WEBHOOK $SLACK_WEBHOOK
 CMD ["poetry", "run", "python3", "./errorLogsToSlack.py"]
