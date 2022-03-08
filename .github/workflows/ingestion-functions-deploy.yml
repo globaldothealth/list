@@ -41,6 +41,7 @@ jobs:
         ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         ECR_REPOSITORY: gdh-ingestor
         IMAGE_TAG: ${{ github.sha }}
+        SLACK_LOGS_WEBHOOK: ${{ secrets.SLACK_WEBHOOK_INGESTION_LOGS }}
       run: |
         docker build --build-arg NOTIFY_WEBHOOK_URL -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG -t $ECR_REGISTRY/$ECR_REPOSITORY .
         docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
@@ -54,6 +55,7 @@ jobs:
         ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         ECR_REPOSITORY: gdh-ingestor
         IMAGE_TAG: ${{ github.sha }}
+        SLACK_LOGS_WEBHOOK: ${{ secrets.SLACK_WEBHOOK_INGESTION_LOGS_TEST }}
       run: |
         docker build --build-arg NOTIFY_WEBHOOK_URL -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG -t $ECR_REGISTRY/$ECR_REPOSITORY:stable .
         docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
