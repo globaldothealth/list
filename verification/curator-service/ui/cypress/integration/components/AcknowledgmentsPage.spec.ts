@@ -27,7 +27,7 @@ describe('<AcknowledgmentsPage />', function () {
         }
     });
 
-    it.only('Should display loading indicator', function () {
+    it('Should display loading indicator', function () {
         cy.server();
         cy.route({
             method: 'GET',
