@@ -90,7 +90,7 @@ paths:
                   description: The UTM zone.
                   schema:
                     type: number
-            reponses:
+            responses:
                 '200':
                     $ref: '#/components/responses/200Position'
                 '400':

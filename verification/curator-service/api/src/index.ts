@@ -375,6 +375,12 @@ apiRouter.get(
     mustHaveAnyRole(['curator']),
     geocodeProxy.suggest,
 );
+apiRouter.get(
+    '/geocode/convertUTM',
+    authenticateByAPIKey,
+    mustHaveAnyRole(['curator']),
+    geocodeProxy.convertUTM,
+);
 apiRouter.post('/geocode/seed', geocodeProxy.seed);
 apiRouter.post('/geocode/clear', geocodeProxy.clear);
 
