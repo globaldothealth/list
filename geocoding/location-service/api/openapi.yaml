@@ -66,6 +66,37 @@ paths:
                     $ref: '#/components/responses/422'
                 '500':
                     $ref: '#/components/responses/500'
+    /geocode/convertUTM:
+        get:
+            tags: [Convert, Geocode]
+            summary: Convert UTM coordinates to latitude/longitude.
+            operationId: convert
+            parameters:
+                - name: n
+                  in: query
+                  description: The northing coordinate (UTMY)
+                  required: true
+                  schema:
+                    type: number
+                - name: e
+                  in: query
+                  description: The easting coordinate (UTMX)
+                  required: true
+                  schema:
+                    type: number
+                - name: z
+                  in: query
+                  required: true
+                  description: The UTM zone.
+                  schema:
+                    type: number
+            reponses:
+                '200':
+                    $ref: '#/components/responses/200Position'
+                '400':
+                    $ref: '#/components/responses/400'
+                '500':
+                    $ref: '#/components/responses/500'
 components:
     schemas:
         Location:
@@ -92,24 +123,26 @@ components:
                 geoResolution:
                     type: string
                 geometry:
-                    type: object
-                    properties:
-                        latitude:
-                            type: number
-                            minimum: -90
-                            maximum: 90
-                        longitude:
-                            type: number
-                            minimum: -180
-                            maximum: 180
-                    required:
-                        - latitude
-                        - longitude
+                    $ref: '#/components/schemas/Position'
         LocationArray:
             description: A list of geo locations
             type: array
             items:
                 $ref: '#/components/schemas/Location'
+        Position:
+            type: object
+            properties:
+                latitude:
+                    type: number
+                    minimum: -90
+                    maximum: 90
+                longitude:
+                    type: number
+                    minimum: -180
+                    maximum: 180
+            required:
+                - latitude
+                - longitude
     responses:
         '200LocationArray':
             description: OK
@@ -117,6 +150,12 @@ components:
                 application/json:
                     schema:
                         $ref: '#/components/schemas/LocationArray'
+        '200Position':
+            description: OK
+            content:
+                application/json:
+                    schema:
+                        $ref: '#components/schemas/Position'
         '200':
             description: OK
         '400':
