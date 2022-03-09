@@ -34,7 +34,7 @@ describe('<AcknowledgmentsPage />', function () {
             url: `/api/acknowledgment-sources?page=1&limit=10&orderBy=dataContributor&order=asc`,
             status: 200,
             response: 'fixture:acknowledgment_data.json',
-            delay: 1000,
+            delay: 3000,
         }).as('fetchSources');
 
         cy.visit('/data-acknowledgments');

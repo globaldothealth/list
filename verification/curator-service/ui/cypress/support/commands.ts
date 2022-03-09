@@ -113,6 +113,7 @@ export function addCase(opts: {
                     date: opts.creationDate,
                 },
             },
+            confirmationDate: opts.creationDate,
         },
     });
 }
