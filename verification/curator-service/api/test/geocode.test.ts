@@ -51,6 +51,24 @@ describe('Geocode', () => {
             'http://location/geocode/suggest?q=Lyon',
         );
     });
+    it('proxies convert calls', async () => {
+        mockedAxios.get.mockResolvedValueOnce({
+            status: 200,
+            statusText: 'OK',
+            data: {
+                latitude: 0.0,
+                longitude: 0.0,
+            },
+        });
+        await curatorRequest
+            .get('/api/geocode/convertUTM?n=12&e=7&z=3')
+            .expect(200)
+            .expect('Content-Type', /json/);
+        expect(mockedAxios.get).toHaveBeenCalledTimes(1);
+        expect(mockedAxios.get).toHaveBeenCalledWith(
+            'http://location/geocode/convertUTM?n=12&e=7&z=3',
+        );
+    });
     it('proxies clear calls', async () => {
         mockedAxios.post.mockResolvedValueOnce({
             status: 200,
