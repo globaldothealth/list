@@ -26,7 +26,7 @@ import { useParams, Link } from 'react-router-dom';
 
 import Helmet from 'react-helmet';
 import { getVersion } from '../../redux/app/thunk';
-import { selectVersion } from '../../redux/app/selectors';
+import { selectVersion, selectEnv } from '../../redux/app/selectors';
 
 interface StylesProps {
     smallHeight: boolean;
@@ -108,7 +108,8 @@ interface StyleProps {
 const MoreInformationLinks = ({
     classes,
     version,
-}: StyleProps & { version: string }) => {
+    env,
+}: StyleProps & { version: string; env: string }) => {
     return (
         <div className={classes.linksContainer}>
             <div>
@@ -125,7 +126,11 @@ const MoreInformationLinks = ({
                 </div>
                 <div className={classes.link}>
                     <a
-                        href="https://map.covid-19.global.health/"
+                        href={
+                            env === 'prod'
+                                ? 'https://map.covid-19.global.health/'
+                                : 'http://dev-map.covid-19.global.health/'
+                        }
                         rel="noopener noreferrer"
                         target="_blank"
                     >
@@ -191,6 +196,7 @@ const LandingPage = (): JSX.Element => {
     );
     const { isOpen, message } = useAppSelector(selectSnackbar);
     const version = useAppSelector(selectVersion);
+    const env = useAppSelector(selectEnv);
 
     // Url parameters from reset password link
     const { token, id } = useParams<UrlParams>();
@@ -223,7 +229,7 @@ const LandingPage = (): JSX.Element => {
     // retrieve the app version from the curator service
     useEffect(() => {
         dispatch(getVersion());
-    });
+    }, [dispatch]);
 
     return (
         <>
@@ -243,7 +249,11 @@ const LandingPage = (): JSX.Element => {
                         global data repository with open access to real-time
                         epidemiological anonymized line list data.
                     </Typography>
-                    <MoreInformationLinks classes={classes} version={version} />
+                    <MoreInformationLinks
+                        classes={classes}
+                        version={version}
+                        env={env}
+                    />
                 </div>
 
                 {registrationScreenOn && !changePasswordScreenOn ? (

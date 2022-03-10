@@ -402,6 +402,11 @@ app.get('/version', (req: Request, res: Response) => {
     res.status(200).send(env.CURATOR_VERSION);
 });
 
+// get current environment
+app.get('/env', (req: Request, res: Response) => {
+    res.status(200).send(env.SERVICE_ENV);
+});
+
 // API documentation.
 const swaggerDocument = YAML.load('./openapi/openapi.yaml');
 app.use(

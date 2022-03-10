@@ -62,7 +62,8 @@ import {
     setFilterBreadcrumbs,
     deleteFilterBreadcrumbs,
 } from '../../redux/app/slice';
-import { selectIsLoading } from '../../redux/app/selectors';
+import { selectIsLoading, selectEnv } from '../../redux/app/selectors';
+import { getEnv } from '../../redux/app/thunk';
 import { getUserProfile, logout } from '../../redux/auth/thunk';
 import { selectUser } from '../../redux/auth/selectors';
 import { User } from '../../api/models/User';
@@ -410,8 +411,14 @@ export default function App(): JSX.Element {
         return null;
     };
 
+    // Get current env
+    useEffect(() => {
+        dispatch(getEnv());
+    }, [dispatch]);
+
     const isLoadingUser = useAppSelector(selectIsLoading);
     const user = useAppSelector(selectUser);
+    const env = useAppSelector(selectEnv);
 
     const showMenu = useMediaQuery(theme.breakpoints.up('sm'));
     const [drawerOpen, setDrawerOpen] = useState<boolean>(false);
@@ -619,7 +626,11 @@ export default function App(): JSX.Element {
                             <a
                                 className={classes.mapLink}
                                 data-testid="mapLink"
-                                href="https://map.covid-19.global.health/"
+                                href={
+                                    env === 'prod'
+                                        ? 'https://map.covid-19.global.health/'
+                                        : 'http://dev-map.covid-19.global.health/'
+                                }
                                 rel="noopener noreferrer"
                                 target="_blank"
                             >

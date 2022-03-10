@@ -38,7 +38,7 @@ describe('<LandingPage />', () => {
         );
         expect(screen.getByText('Global.health map')).toHaveAttribute(
             'href',
-            'https://map.covid-19.global.health/',
+            'http://dev-map.covid-19.global.health/',
         );
         expect(screen.getByText('Data dictionary')).toHaveAttribute(
             'href',

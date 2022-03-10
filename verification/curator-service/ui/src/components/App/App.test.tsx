@@ -18,6 +18,7 @@ const initialLoggedInState: RootState = {
         searchQuery: '',
         filterBreadcrumbs: [],
         version: '1.0',
+        env: 'prod',
     },
     filters: {
         countryList: [],
@@ -70,9 +71,10 @@ describe('<App />', () => {
         mockedAxios.get.mockResolvedValue(axiosResponse);
 
         render(<App />);
-        expect(mockedAxios.get).toHaveBeenCalledTimes(2);
+        expect(mockedAxios.get).toHaveBeenCalledTimes(3);
         expect(mockedAxios.get).toHaveBeenCalledWith('/auth/profile');
         expect(mockedAxios.get).toHaveBeenCalledWith('/version');
+        expect(mockedAxios.get).toHaveBeenCalledWith('/env');
         expect(await screen.findByTestId('profile-menu')).toBeInTheDocument();
     });
 
@@ -85,9 +87,10 @@ describe('<App />', () => {
         };
         mockedAxios.get.mockResolvedValue(axiosResponse);
         render(<App />);
-        expect(mockedAxios.get).toHaveBeenCalledTimes(2);
+        expect(mockedAxios.get).toHaveBeenCalledTimes(3);
         expect(mockedAxios.get).toHaveBeenCalledWith('/auth/profile');
         expect(mockedAxios.get).toHaveBeenCalledWith('/version');
+        expect(mockedAxios.get).toHaveBeenCalledWith('/env');
         expect(screen.queryByTestId('profile-menu')).not.toBeInTheDocument();
     });
 
@@ -110,7 +113,7 @@ describe('<App />', () => {
 
         expect(await screen.findByTestId('mapLink')).toHaveAttribute(
             'href',
-            'https://map.covid-19.global.health/',
+            'http://dev-map.covid-19.global.health/',
         );
         expect(await screen.findByTestId('dictionaryButton')).toHaveAttribute(
             'href',
