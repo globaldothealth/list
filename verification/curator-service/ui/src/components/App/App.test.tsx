@@ -4,6 +4,7 @@ import axios from 'axios';
 import userEvent from '@testing-library/user-event';
 import { render, fireEvent, screen, waitFor, within } from '../util/test-utils';
 import { RootState } from '../../redux/store';
+import { resolve } from 'dns';
 
 jest.mock('axios');
 const mockedAxios = axios as jest.Mocked<typeof axios>;
@@ -113,7 +114,7 @@ describe('<App />', () => {
 
         expect(await screen.findByTestId('mapLink')).toHaveAttribute(
             'href',
-            'https://map.covid-19.global.health/',
+            'https://dev-map.covid-19.global.health/',
         );
         expect(await screen.findByTestId('dictionaryButton')).toHaveAttribute(
             'href',
