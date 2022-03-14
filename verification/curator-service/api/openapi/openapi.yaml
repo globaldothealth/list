@@ -1014,6 +1014,16 @@ paths:
                     $ref: '#/components/responses/400'
                 '500':
                     $ref: '#/components/responses/500'
+    /geocode/countryNames:
+        get:
+            tags: [Geocode]
+            summary: Get a list of all the ISO-3166-1 country codes in use, and the names we accept for those countries.
+            operationId: countryNames
+            responses:
+                '200':
+                    $ref: '#/components/responses/200CountryNames'
+                '500':
+                    $ref: '#/components/responses/500'
     /users:
         get:
             tags: [User]
@@ -1928,6 +1938,9 @@ components:
             type: array
             items:
                 $ref: '#/components/schemas/Location'
+        CountryNames:
+            description: A dictionary where the keys are ISO-3166-1 country codes and the values names used in Global.health for those countries
+            type: object
         BatchCaseUpdateResponse:
             description: Response to batch update cases API requests
             properties:
@@ -2080,6 +2093,12 @@ components:
                 application/json:
                     schema:
                         $ref: '#/components/schemas/Position'
+        '200CountryNames':
+            description: OK
+            content:
+                application/json:
+                    schema:
+                        $ref: '#/components/schemas/CountryNames'
         '201Case':
             description: Created
             content:

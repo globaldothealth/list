@@ -381,6 +381,12 @@ apiRouter.get(
     mustHaveAnyRole(['curator']),
     geocodeProxy.convertUTM,
 );
+apiRouter.get(
+    '/geocode/countryNames',
+    authenticateByAPIKey,
+    mustBeAuthenticated,
+    geocodeProxy.countryNames
+);
 apiRouter.post('/geocode/seed', geocodeProxy.seed);
 apiRouter.post('/geocode/clear', geocodeProxy.clear);
 
