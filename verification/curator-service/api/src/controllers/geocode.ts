@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 
 import axios, { AxiosError } from 'axios';
+import countries from 'i18n-iso-countries';
 import mongoose from 'mongoose';
 
 import { logger } from '../util/logger';
@@ -57,8 +58,14 @@ export default class GeocodeProxy {
         const mongoClient = mongoose.connection.getClient();
         const locationCountryCodes = await mongoClient.db().collection('cases').distinct('location.country');
         const travelHistoryCodes = await mongoClient.db().collection('cases').distinct('travelHistory.travel.location.country');
-        const allCodes = Array.from(new Set(locationCountryCodes.concat(travelHistoryCodes)).values());
-        res.status(200).json({'codes': allCodes});
+        const allCodes = new Set<string>(locationCountryCodes.concat(travelHistoryCodes));
+        const namesMap: {
+            [key: string]: string[] | undefined
+        } = {};
+        allCodes.forEach((code) => {
+            namesMap[code] = countries.getName(code, 'en', { select: 'all' });
+        });
+        res.status(200).json(namesMap);
     }
 
     seed = async (req: Request, res: Response): Promise<void> => {
