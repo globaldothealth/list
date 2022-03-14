@@ -12,7 +12,7 @@ import {
     Switch,
 } from '@material-ui/core';
 import MaterialTable, { QueryResult } from 'material-table';
-import iso from 'iso-3166-1';
+import { nameCountry } from './util/countryNames';
 
 import MuiAlert from '@material-ui/lab/Alert';
 import Paper from '@material-ui/core/Paper';
@@ -286,7 +286,7 @@ class SourceTable extends React.Component<Props, SourceTableState> {
 
     validateCountryCode(cc: string): boolean {
         // use ZZ to represent all countries
-        return iso.whereAlpha2(cc) !== undefined || cc.toUpperCase() === 'ZZ';
+        return nameCountry(cc) !== undefined || cc.toUpperCase() === 'ZZ';
     }
 
     validateCountryCodes(field: string | undefined): boolean {
