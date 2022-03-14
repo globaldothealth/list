@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 
-import axios, { AxiosError } from 'axios';
+import axios, { AxiosError, AxiosResponse } from 'axios';
 import countries from 'i18n-iso-countries';
 import mongoose from 'mongoose';
 
@@ -62,9 +62,24 @@ export default class GeocodeProxy {
         const namesMap: {
             [key: string]: string[] | undefined
         } = {};
-        allCodes.forEach((code) => {
-            namesMap[code] = countries.getName(code, 'en', { select: 'all' });
-        });
+        for (const code of allCodes) {
+            const names = countries.getName(code, 'en', { select: 'all' });
+            // ask the geocoding service what name it uses
+            try {
+                const res = await axios.get<string, AxiosResponse<string>>(
+                    this.locationServiceURL + `/geocode/countryName?c=${code}`
+                )
+                const geocodeName = res.data;
+                if (names.indexOf(geocodeName) < 0) {
+                    names.push(geocodeName);
+                }
+            }
+            catch (err) {
+                // doesn't matter, weird that geocoding service doesn't have this code though
+                logger.warn(`geocoding service doesn't have a name for country code ${code} found in the DB!`);
+            }
+            namesMap[code] = names;
+        }
         res.status(200).json(namesMap);
     }
 
