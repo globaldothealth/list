@@ -1,5 +1,6 @@
 import sys
 import json
+import iso3166
 import logging
 import pymongo
 from flask import Blueprint, Flask, jsonify, request
@@ -124,6 +125,20 @@ def convert_geocode():
         'longitude': longitude,
     }
     return jsonify(position)
+
+@app.route("/geocode/countryName")
+def country_name():
+    code = request.args.get('c', type=str)
+    if not code:
+        logger.warning(f"No country code in request {request}")
+        return "No country code", 400
+    if len(code) != 2:
+        logger.warning(f"Country code {code} is not two characters long in request {request}")
+        return "Bad ISO-3166-1 country code", 400
+    country = iso3166.countries_by_alpha2.get(code)
+    if country is None:
+        return "Unknown country code", 404
+    return country.name, 200
 
 
 if __name__ == '__main__':
