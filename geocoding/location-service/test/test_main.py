@@ -32,3 +32,7 @@ def test_unhealthy_when_mapbox_key_not_set(client):
 def test_does_not_attempt_geocode_with_no_query(client):
     response = client.get("/geocode")
     assert response.status == '400 BAD REQUEST'
+
+def test_searching_for_country_name(client):
+    response = client.get("/geocode/countryName?c=EE")
+    assert response.get_data(as_text=True) == 'Estonia'
