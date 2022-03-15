@@ -9,6 +9,8 @@ describe('Uploads table', function () {
         cy.addSource(
             'New source',
             'www.example.com',
+            'Example',
+            'www.example.com',
             ['IN'],
             [
                 {
@@ -80,6 +82,8 @@ describe('Uploads table', function () {
         });
         cy.addSource(
             'New source',
+            'www.example.com',
+            'Example',
             'www.example.com',
             ['IN'],
             [

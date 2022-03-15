@@ -171,10 +171,10 @@ export function addSource(
             origin: {
                 url: url,
                 license: 'MIT',
-                providerName,
-                providerWebsiteUrl,
+                providerName: providerName ?? 'Example',
+                providerWebsiteUrl: providerWebsiteUrl ?? 'www.example.com',
             },
-            uploads: uploads,
+            uploads: uploads ?? [],
             format: 'JSON',
         },
     });
