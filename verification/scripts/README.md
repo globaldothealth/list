@@ -22,3 +22,10 @@ mongo "mongodb://user:pass@some-connection-string/somedb" \
 
 NOTE: For localhost (during dev) the DB connection string is "mongodb://localhost:27017/covid19" but for the atlas DB you have to use a proper connection string as the data service or curator services are doing on AWS.
 You can go to the web atlas console and generate creds for you, they'll also show you the connection string to use those creds you just created.
+
+## Generating list of country codes
+
+The script `country_codes_map` uses the curator service to generate a list of country codes found in the case data, and any of the names that we would display or parse from ingestion scripts for each country. You need to set two environment variables:
+
+ - `GDOTH_API_BASEURL` is the base URL for the Global.health instance API: e.g. `https://data.covid-19.global.health/`
+ - `GDOTH_API_KEY` is the API key for a user (any user, no specific roles needed) on that instance
