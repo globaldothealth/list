@@ -133,45 +133,6 @@ paths:
             tags: [Source]
             summary: Lists sources for acknowledgments table
             operationId: listSourcesForTable
-            parameters:
-                - name: page
-                  in: query
-                  description: The pages of sources to skip before starting to collect the result set
-                  required: false
-                  schema:
-                      type: integer
-                      format: int32
-                      minimum: 1
-                      default: 1
-                - name: limit
-                  in: query
-                  description: The number of sources to return
-                  required: false
-                  schema:
-                      type: integer
-                      format: int32
-                      minimum: 0
-                      maximum: 100
-                      default: 10
-                - name: orderBy
-                  in: query
-                  description: Field to be sorted by
-                  required: false
-                  schema:
-                      type: string
-                      enum:
-                          - dataContributor
-                          - originDataSource
-                          - license
-                - name: order
-                  in: query
-                  description: Sorting order
-                  required: false
-                  schema:
-                      type: string
-                      enum:
-                          - asc
-                          - desc
             responses:
                 '200':
                     $ref: '#/components/responses/200AcknowledgmentSource'
@@ -1349,6 +1310,10 @@ components:
                 origin:
                     type: object
                     properties:
+                        providerName:
+                            type: string
+                        providerWebsiteUrl:
+                            type: string
                         url:
                             type: string
                             example: https://opendata.digilugu.ee/opendata_covid19_test_results.csv
@@ -1357,11 +1322,6 @@ components:
                             type: string
                             example: MIT
                             description: The license under which we have the right to ingest the data. Ideally a SPDX identifier (https://spdx.org/licenses/).
-                countryCodes:
-                    type: array
-                    description: An array of country codes that this source relates to
-                    items:
-                        type: string
         SourceArray:
             type: object
             properties:
@@ -1376,16 +1336,9 @@ components:
             items:
                 $ref: '#/components/schemas/Source'
         AcknowledgmentSourcesArray:
-            type: object
-            properties:
-                sources:
-                    type: array
-                    items:
-                        $ref: '#/components/schemas/AcknowledgmentSource'
-                nextPage:
-                    type: integer
-                total:
-                    type: integer
+            type: array
+            items:
+                $ref: '#/components/schemas/AcknowledgmentSource'
         Case:
             description: A single line-list case.
             properties:

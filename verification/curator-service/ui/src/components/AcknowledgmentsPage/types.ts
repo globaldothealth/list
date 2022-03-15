@@ -3,8 +3,8 @@ import { useTableStyles } from './styled';
 export interface Data {
     _id: string;
     license: string;
-    originDataSource: string;
-    dataContributor: string;
+    providerName: string;
+    dataSource: string;
 }
 
 export interface HeadCell {
