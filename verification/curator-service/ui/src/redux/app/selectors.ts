@@ -10,3 +10,4 @@ export const selectIsLoading: (state: RootState) => boolean = (state) =>
     state.app.isLoading;
 export const selectVersion: (state: RootState) => string = (state) =>
     state.app.version;
+export const selectEnv: (state: RootState) => string = (state) => state.app.env;

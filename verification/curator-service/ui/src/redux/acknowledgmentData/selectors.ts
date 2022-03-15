@@ -2,7 +2,7 @@
 import { RootState } from '../store';
 
 export const selectAcknowledgmentData = (state: RootState) =>
-    state.acknowledgement.acknowledgmentData;
+    state.acknowledgment.acknowledgmentData;
 export const selectIsLoading = (state: RootState) =>
-    state.acknowledgement.isLoading;
-export const selectError = (state: RootState) => state.acknowledgement.error;
+    state.acknowledgment.isLoading;
+export const selectError = (state: RootState) => state.acknowledgment.error;

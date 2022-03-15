@@ -18,6 +18,7 @@ const initialLoggedInState: RootState = {
         searchQuery: '',
         filterBreadcrumbs: [],
         version: '1.0',
+        env: 'local',
     },
     filters: {
         countryList: [],
@@ -43,12 +44,10 @@ const initialLoggedInState: RootState = {
             message: '',
         },
     },
-    acknowledgement: {
+    acknowledgment: {
         acknowledgmentData: [],
         error: undefined,
         isLoading: false,
-        totalSources: 0,
-        nextPage: undefined,
     },
 };
 
@@ -70,9 +69,10 @@ describe('<App />', () => {
         mockedAxios.get.mockResolvedValue(axiosResponse);
 
         render(<App />);
-        expect(mockedAxios.get).toHaveBeenCalledTimes(2);
+        expect(mockedAxios.get).toHaveBeenCalledTimes(3);
         expect(mockedAxios.get).toHaveBeenCalledWith('/auth/profile');
         expect(mockedAxios.get).toHaveBeenCalledWith('/version');
+        expect(mockedAxios.get).toHaveBeenCalledWith('/env');
         expect(await screen.findByTestId('profile-menu')).toBeInTheDocument();
     });
 
@@ -85,9 +85,10 @@ describe('<App />', () => {
         };
         mockedAxios.get.mockResolvedValue(axiosResponse);
         render(<App />);
-        expect(mockedAxios.get).toHaveBeenCalledTimes(2);
+        expect(mockedAxios.get).toHaveBeenCalledTimes(3);
         expect(mockedAxios.get).toHaveBeenCalledWith('/auth/profile');
         expect(mockedAxios.get).toHaveBeenCalledWith('/version');
+        expect(mockedAxios.get).toHaveBeenCalledWith('/env');
         expect(screen.queryByTestId('profile-menu')).not.toBeInTheDocument();
     });
 
@@ -105,12 +106,21 @@ describe('<App />', () => {
             config: {},
             headers: {},
         };
-        mockedAxios.get.mockResolvedValue(axiosResponse);
-        render(<App />);
+        mockedAxios.get.mockImplementation((url) => {
+            if (url === '/env') {
+                return Promise.resolve({ status: 200, data: 'local' });
+            } else {
+                return Promise.resolve(axiosResponse);
+            }
+        });
+        render(<App />, {
+            initialState: initialLoggedInState,
+            initialRoute: '/cases',
+        });
 
         expect(await screen.findByTestId('mapLink')).toHaveAttribute(
             'href',
-            'https://map.covid-19.global.health/',
+            'http://dev-map.covid-19.global.health/',
         );
         expect(await screen.findByTestId('dictionaryButton')).toHaveAttribute(
             'href',

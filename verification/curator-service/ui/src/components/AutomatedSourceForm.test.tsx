@@ -16,8 +16,10 @@ const initialLoggedInState: RootState = {
         isLoading: false,
         searchQuery: '',
         filterBreadcrumbs: [],
+        version: '1.0',
+        env: 'local',
     },
-    filtersReducer: {
+    filters: {
         countryList: [],
         error: '',
         isLoading: false,
@@ -34,6 +36,11 @@ const initialLoggedInState: RootState = {
             isOpen: false,
             message: '',
         },
+    },
+    acknowledgment: {
+        isLoading: false,
+        error: undefined,
+        acknowledgmentData: [],
     },
 };
 
