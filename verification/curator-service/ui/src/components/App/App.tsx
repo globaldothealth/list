@@ -54,7 +54,7 @@ import clsx from 'clsx';
 import { useLastLocation } from 'react-router-last-location';
 import PolicyLink from '../PolicyLink';
 import { useCookieBanner } from '../../hooks/useCookieBanner';
-import { SortBy, SortByOrder } from '../../constants/types';
+import { SortBy, SortByOrder, MapLink } from '../../constants/types';
 import { URLToSearchQuery } from '../util/searchQuery';
 import { useAppDispatch, useAppSelector } from '../../hooks/redux';
 import {
@@ -626,11 +626,7 @@ export default function App(): JSX.Element {
                             <a
                                 className={classes.mapLink}
                                 data-testid="mapLink"
-                                href={
-                                    env === 'prod'
-                                        ? 'https://map.covid-19.global.health/'
-                                        : 'http://dev-map.covid-19.global.health/'
-                                }
+                                href={MapLink[env]}
                                 rel="noopener noreferrer"
                                 target="_blank"
                             >

@@ -27,6 +27,7 @@ import { useParams, Link } from 'react-router-dom';
 import Helmet from 'react-helmet';
 import { getVersion } from '../../redux/app/thunk';
 import { selectVersion, selectEnv } from '../../redux/app/selectors';
+import { MapLink } from '../../constants/types';
 
 interface StylesProps {
     smallHeight: boolean;
@@ -126,11 +127,7 @@ const MoreInformationLinks = ({
                 </div>
                 <div className={classes.link}>
                     <a
-                        href={
-                            env === 'prod'
-                                ? 'https://map.covid-19.global.health/'
-                                : 'http://dev-map.covid-19.global.health/'
-                        }
+                        href={MapLink[env]}
                         rel="noopener noreferrer"
                         target="_blank"
                     >
