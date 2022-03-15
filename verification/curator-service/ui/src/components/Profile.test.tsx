@@ -48,8 +48,6 @@ const initialLoggedInState: RootState = {
         isLoading: false,
         error: undefined,
         acknowledgmentData: [],
-        totalSources: 0,
-        nextPage: 1,
     },
 };
 
@@ -90,8 +88,6 @@ const loggedInWithApiKeyState: RootState = {
         isLoading: false,
         error: undefined,
         acknowledgmentData: [],
-        totalSources: 0,
-        nextPage: 1,
     },
 };
 
@@ -131,8 +127,6 @@ const noUserInfoState: RootState = {
         isLoading: false,
         error: undefined,
         acknowledgmentData: [],
-        totalSources: 0,
-        nextPage: 1,
     },
 };
 

@@ -41,8 +41,6 @@ const initialLoggedInState: RootState = {
         isLoading: false,
         error: undefined,
         acknowledgmentData: [],
-        totalSources: 0,
-        nextPage: 1,
     },
 };
 

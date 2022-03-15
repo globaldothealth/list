@@ -6,16 +6,12 @@ interface AcknowledgementState {
     acknowledgmentData: AcknowledgmentData[];
     isLoading: boolean;
     error: string | undefined;
-    nextPage: number | undefined;
-    totalSources: number;
 }
 
 const initialState: AcknowledgementState = {
     acknowledgmentData: [],
     isLoading: false,
     error: undefined,
-    nextPage: undefined,
-    totalSources: 0,
 };
 
 const slice = createSlice({
@@ -34,9 +30,7 @@ const slice = createSlice({
         builder.addCase(
             fetchAcknowledgmentData.fulfilled,
             (state, { payload }) => {
-                state.acknowledgmentData = payload.sources;
-                state.totalSources = payload.total;
-                state.nextPage = payload.nextPage;
+                state.acknowledgmentData = payload;
                 state.isLoading = false;
             },
         );

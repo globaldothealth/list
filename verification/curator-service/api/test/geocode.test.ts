@@ -3,6 +3,7 @@ import * as baseUser from './users/base.json';
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import app from '../src/index';
 import axios from 'axios';
+import mongoose from 'mongoose';
 import supertest from 'supertest';
 
 jest.mock('../src/clients/email-client', () => {
@@ -49,6 +50,49 @@ describe('Geocode', () => {
         expect(mockedAxios.get).toHaveBeenCalledTimes(1);
         expect(mockedAxios.get).toHaveBeenCalledWith(
             'http://location/geocode/suggest?q=Lyon',
+        );
+    });
+    it('proxies convert calls', async () => {
+        mockedAxios.get.mockResolvedValueOnce({
+            status: 200,
+            statusText: 'OK',
+            data: {
+                latitude: 0.0,
+                longitude: 0.0,
+            },
+        });
+        await curatorRequest
+            .get('/api/geocode/convertUTM?n=12&e=7&z=3')
+            .expect(200)
+            .expect('Content-Type', /json/);
+        expect(mockedAxios.get).toHaveBeenCalledTimes(1);
+        expect(mockedAxios.get).toHaveBeenCalledWith(
+            'http://location/geocode/convertUTM?n=12&e=7&z=3',
+        );
+    });
+    it('combines proxied and local results for resolving country names', async () => {
+        const mongoClient = mongoose.connection.getClient();
+        // add a not-real-case document
+        await mongoClient.db().collection('cases').insertOne({
+            location: {
+                country: 'EE',
+            },
+        });
+        mockedAxios.get.mockResolvedValueOnce({
+            status: 200,
+            statusText: 'OK',
+            data: 'Ainotse',
+        });
+        const res = await curatorRequest
+            .get('/api/geocode/countryNames')
+            .expect(200)
+            .expect('Content-Type', /json/);
+        expect(res.body.length == 2);
+        expect(res.body[0] === 'Estonia');
+        expect(res.body[1] === 'Ainotse');
+        expect(mockedAxios.get).toHaveBeenCalledTimes(1);
+        expect(mockedAxios.get).toHaveBeenCalledWith(
+            'http://location/geocode/countryName?c=EE',
         );
     });
     it('proxies clear calls', async () => {

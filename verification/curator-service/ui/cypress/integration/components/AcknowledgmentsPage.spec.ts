@@ -23,7 +23,12 @@ describe('<AcknowledgmentsPage />', function () {
         });
 
         for (let i = 0; i < 10; i++) {
-            cy.addSource(countries[i], 'https://test.com');
+            cy.addSource(
+                countries[i],
+                'https://test.com',
+                countries[i],
+                'https://test.com',
+            );
         }
     });
 
@@ -31,7 +36,7 @@ describe('<AcknowledgmentsPage />', function () {
         cy.server();
         cy.route({
             method: 'GET',
-            url: `/api/acknowledgment-sources?page=1&limit=10&orderBy=dataContributor&order=asc`,
+            url: `/api/acknowledgment-sources`,
             status: 200,
             response: 'fixture:acknowledgment_data.json',
             delay: 3000,
@@ -49,15 +54,11 @@ describe('<AcknowledgmentsPage />', function () {
         cy.server();
         cy.route({
             method: 'GET',
-            url: `/api/acknowledgment-sources?page=1&limit=10&orderBy=dataContributor&order=asc`,
-        }).as('fetchSources10');
-        cy.route({
-            method: 'GET',
-            url: `/api/acknowledgment-sources?page=1&limit=5&orderBy=dataContributor&order=asc`,
-        }).as('fetchSources5');
+            url: '/api/acknowledgment-sources',
+        }).as('fetchSources');
 
         cy.visit('/data-acknowledgments');
-        cy.wait('@fetchSources10');
+        cy.wait('@fetchSources');
 
         for (let i = 0; i < 10; i++) {
             cy.contains(countries[i]).should('be.visible');
@@ -65,8 +66,6 @@ describe('<AcknowledgmentsPage />', function () {
 
         cy.get('.MuiSelect-select.MuiTablePagination-select').click();
         cy.get('[data-value=5]').click();
-
-        cy.wait('@fetchSources5');
 
         for (let i = 0; i < 10; i++) {
             if (i < 5) {
@@ -81,28 +80,17 @@ describe('<AcknowledgmentsPage />', function () {
         cy.server();
         cy.route({
             method: 'GET',
-            url: `/api/acknowledgment-sources?page=1&limit=10&orderBy=dataContributor&order=asc`,
-        }).as('fetchSources10');
-        cy.route({
-            method: 'GET',
-            url: `/api/acknowledgment-sources?page=1&limit=5&orderBy=dataContributor&order=asc`,
-        }).as('fetchSources5');
-        cy.route({
-            method: 'GET',
-            url: `/api/acknowledgment-sources?page=1&limit=5&orderBy=dataContributor&order=desc`,
-        }).as('fetchSortedSources');
+            url: `/api/acknowledgment-sources`,
+        }).as('fetchSources');
 
         cy.visit('/data-acknowledgments');
-        cy.wait('@fetchSources10');
+        cy.wait('@fetchSources');
 
         cy.get('.MuiSelect-select.MuiTablePagination-select').click();
         cy.get('[data-value=5]').click();
 
-        cy.wait('@fetchSources5');
-
         // Sort sources
-        cy.contains(/Data contributor/i).click();
-        cy.wait('@fetchSortedSources');
+        cy.contains(/Provider name/i).click();
 
         for (let i = countries.length - 1; i >= 0; i--) {
             if (i >= 5) {
@@ -117,24 +105,14 @@ describe('<AcknowledgmentsPage />', function () {
         cy.server();
         cy.route({
             method: 'GET',
-            url: `/api/acknowledgment-sources?page=1&limit=10&orderBy=dataContributor&order=asc`,
-        }).as('fetchSources10');
-        cy.route({
-            method: 'GET',
-            url: `/api/acknowledgment-sources?page=1&limit=5&orderBy=dataContributor&order=asc`,
-        }).as('fetchSources5');
-        cy.route({
-            method: 'GET',
-            url: `/api/acknowledgment-sources?page=2&limit=5&orderBy=dataContributor&order=asc`,
-        }).as('fetchNextPage');
+            url: `/api/acknowledgment-sources`,
+        }).as('fetchSources');
 
         cy.visit('/data-acknowledgments');
-        cy.wait('@fetchSources10');
+        cy.wait('@fetchSources');
 
         cy.get('.MuiSelect-select.MuiTablePagination-select').click();
         cy.get('[data-value=5]').click();
-
-        cy.wait('@fetchSources5');
 
         // Only first 5 sources should be visible
         for (let i = 0; i < 10; i++) {
@@ -147,7 +125,6 @@ describe('<AcknowledgmentsPage />', function () {
 
         // Go to the next page
         cy.get('[aria-label="Next page"]').click();
-        cy.wait('@fetchNextPage');
 
         // Only last 5 sources should be visible
         for (let i = 0; i < 10; i++) {

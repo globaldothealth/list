@@ -1,5 +1,6 @@
 import sys
 import json
+import iso3166
 import logging
 import pymongo
 from flask import Blueprint, Flask, jsonify, request
@@ -9,6 +10,7 @@ from src.app.admins_fetcher import AdminsFetcher
 from src.app.fake_geocoder import FakeGeocoder
 from src.app.geocoder import Geocoder
 from src.app.geocoder_suggester import GeocodeSuggester
+from src.app.utm_to_latlong import utmToLatLong
 from src.integration.mapbox_client import mapbox_geocode
 
 app = Flask(__name__)
@@ -97,6 +99,46 @@ def suggest_geocode():
         return r
     except ValueError:
         return f"Bad limitToResolution value {request.args.get('limitToResolution', str)}", 422
+
+
+@app.route("/geocode/convertUTM")
+def convert_geocode():
+    northing = request.args.get('n', type=float)
+    if not northing:
+        logger.warning(f"No northing supplied in request {request}")
+        return "No northing supplied", 400
+    easting = request.args.get('e', type=float)
+    if not easting:
+        logger.warning(f"No easting supplied in request {request}")
+        return "No easting supplied", 400
+    zone = request.args.get('z', type=int)
+    if not zone:
+        logger.warning(f"No zone specified in request {request}")
+        return "No zone supplied", 400
+    # now do the conversion!
+    (latitude, longitude) = utmToLatLong(northing, easting, zone)
+    if not latitude or not longitude:
+        logger.error(f"Conversion failed for request {request}")
+        return "Conversion failed", 500
+    position = {
+        'latitude': latitude,
+        'longitude': longitude,
+    }
+    return jsonify(position)
+
+@app.route("/geocode/countryName")
+def country_name():
+    code = request.args.get('c', type=str)
+    if not code:
+        logger.warning(f"No country code in request {request}")
+        return "No country code", 400
+    if len(code) != 2:
+        logger.warning(f"Country code {code} is not two characters long in request {request}")
+        return "Bad ISO-3166-1 country code", 400
+    country = iso3166.countries_by_alpha2.get(code)
+    if country is None:
+        return "Unknown country code", 404
+    return country.name, 200
 
 
 if __name__ == '__main__':

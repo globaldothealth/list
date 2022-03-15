@@ -78,7 +78,7 @@
     "express": "^4.17.1",
     "express-openapi-validator": "^4.9.0",
     "express-session": "^1.17.1",
-    "iso-3166-1": "^2.1.1",
+    "i18n-iso-countries": "^7.3.0",
     "jsonwebtoken": "^8.5.1",
     "jszip": "^3.7.0",
     "lodash": "^4.17.21",
