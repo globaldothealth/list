@@ -6,6 +6,7 @@ import { Source, SourceDocument } from '../model/source';
 import AwsBatchClient from '../clients/aws-batch-client';
 import AwsEventsClient from '../clients/aws-events-client';
 import EmailClient from '../clients/email-client';
+import { logger } from '../util/logger';
 
 /**
  * Email notification that should be sent on any update to a source.
@@ -90,76 +91,22 @@ export default class SourcesController {
     /**
      * Get sources for the acknowledgement table
      * This is a public endpoint because acknowledgement table needs to
-     * be accessible in iframe
+     * be accessible without logging in
      */
-    listSourcesForTable = async (
-        req: Request,
-        res: Response,
-    ): Promise<void> => {
-        const page = Number(req.query.page) ?? 1;
-        const limit = Number(req.query.limit) ?? 10;
-        const orderBy = String(req.query.orderBy);
-        const order = String(req.query.order);
-        if (page < 1) {
-            res.status(422).json({ message: 'page must be > 0' });
-            return;
-        }
-        // Allow for 0 value for fetching all sources
-        if (limit < 0) {
-            res.status(422).json({ message: 'limit must be >= 0' });
-            return;
-        }
-
-        // When limit is set as 0 in the request that means that all data
-        // should be fetched without any limit
-        const skipValue = limit === 0 ? 0 : limit * (page - 1);
-        const limitValue = limit === 0 ? 0 : limit + 1;
-
-        // Map values that come from ui to mongo Schema
-        let sortByKeyword = '';
-        switch (orderBy) {
-            case 'dataContributor':
-                sortByKeyword = 'name';
-                break;
-            case 'originDataSource':
-                sortByKeyword = 'origin.url';
-                break;
-            case 'license':
-                sortByKeyword = 'origin.license';
-                break;
-            default:
-                sortByKeyword = 'name';
-                break;
-        }
-
-        const sourcesQuery = Source.find(
-            {},
-            {
-                name: 1,
-                'origin.url': 1,
-                'origin.license': 1,
-            },
-        ).sort({ [sortByKeyword]: order !== 'undefined' ? order : 'asc' });
-
+    listSourcesForTable = async (req: Request, res: Response) => {
         try {
-            const [sources, total] = await Promise.all([
-                sourcesQuery.skip(skipValue).limit(limitValue),
-                Source.countDocuments({}),
-            ]);
+            const sources = await Source.find(
+                {},
+                {
+                    name: 1,
+                    'origin.providerName': 1,
+                    'origin.providerWebsiteUrl': 1,
+                    'origin.url': 1,
+                    'origin.license': 1,
+                },
+            );
 
-            // If we have more items than limit, add a response param
-            // indicating that there is more to fetch on the next page.
-            if (sources.length === limit + 1) {
-                sources.splice(limit);
-                res.json({
-                    sources,
-                    nextPage: page + 1,
-                    total: total,
-                });
-                return;
-            }
-            // If we fetched all available data, just return it.
-            res.json({ sources, total: total });
+            return res.json(sources);
         } catch (err) {
             if (err.name === 'ValidationError') {
                 res.status(422).json(err);

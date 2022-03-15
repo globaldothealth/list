@@ -34,6 +34,8 @@ declare global {
             addSource: (
                 name: string,
                 url: string,
+                providerName?: string,
+                providerWebsiteUrl?: string,
                 countryCodes?: string[],
                 uploads?: [],
             ) => void;
@@ -155,6 +157,8 @@ export function clearSeededLocations(): void {
 export function addSource(
     name: string,
     url: string,
+    providerName?: string,
+    providerWebsiteUrl?: string,
     countryCodes?: string[],
     uploads?: [],
 ): void {
@@ -167,8 +171,10 @@ export function addSource(
             origin: {
                 url: url,
                 license: 'MIT',
+                providerName: providerName ?? 'Example',
+                providerWebsiteUrl: providerWebsiteUrl ?? 'www.example.com',
             },
-            uploads: uploads,
+            uploads: uploads ?? [],
             format: 'JSON',
         },
     });
