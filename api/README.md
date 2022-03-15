@@ -31,29 +31,36 @@ code only. We use [ISO 3166-1](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2)
 
 ## Accessing data (R)
 
-**Requirements**: To run the script, you should have the [httr] and [readr]
-packages installed. These are included in [tidyverse].
-
-Download the [gdh.r](R/gdh.r) script to a folder, then:
+**Installation**: The R code is provided as a `globaldothealth` package that
+can be installed directly from GitHub using the `devtools` package:
 
 ```R
-source("gdh.r")
+install.packages("devtools")  # if you do not have devtools
+devtools::install_github("globaldothealth/list/api/R")
+```
+
+Then it can be used like any R package:
+
+```R
+library(globaldothealth)
 key <- "API KEY HERE"
 c1 <- get_cases(key, country = "NZ")
 ```
 
 This will download the New Zealand case data from the database. Re-downloading
-datasets can take some time, particularly with large country datasets, so there
-is a `get_cached_cases()` function which caches the data download which can be
-used in later calls:
+datasets can take some time, particularly with large country datasets, so we
+recommend using the `get_cached_cases()` function which caches the data
+download to be used in later calls:
 
 ```R
-source("gdh.r")
+library(globaldothealth)
 key <- "API KEY HERE"
 c1 <- get_cached_cases(key, country = "NZ")
 # use refresh = TRUE to update the cache
 c1 <- get_cached_cases(key, country = "NZ", refresh = TRUE)
 ```
+
+You can also use R's in-built `help()` to access the documentation.
 
 ## Accessing data (Python)
 
