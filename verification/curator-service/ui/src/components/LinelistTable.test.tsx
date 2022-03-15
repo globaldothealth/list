@@ -36,8 +36,9 @@ const initialState: RootState = {
         searchQuery: '',
         filterBreadcrumbs: [],
         version: '1.0',
+        env: 'local',
     },
-    filtersReducer: {
+    filters: {
         countryList: [],
         isLoading: false,
         error: '',
@@ -60,6 +61,13 @@ const initialState: RootState = {
             isOpen: false,
             message: '',
         },
+    },
+    acknowledgment: {
+        isLoading: false,
+        error: undefined,
+        acknowledgmentData: [],
+        totalSources: 0,
+        nextPage: 1,
     },
 };
 

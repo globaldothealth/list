@@ -9,7 +9,7 @@ export const rootReducer = combineReducers({
     app: appReducer,
     auth: authReducer,
     filters: filtersReducer,
-    acknowledgement: acknowledgmentDataReducer,
+    acknowledgment: acknowledgmentDataReducer,
 });
 
 const store = configureStore({

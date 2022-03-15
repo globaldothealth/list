@@ -4,7 +4,6 @@ import axios from 'axios';
 import userEvent from '@testing-library/user-event';
 import { render, fireEvent, screen, waitFor, within } from '../util/test-utils';
 import { RootState } from '../../redux/store';
-import { resolve } from 'dns';
 
 jest.mock('axios');
 const mockedAxios = axios as jest.Mocked<typeof axios>;
@@ -19,7 +18,7 @@ const initialLoggedInState: RootState = {
         searchQuery: '',
         filterBreadcrumbs: [],
         version: '1.0',
-        env: 'prod',
+        env: 'local',
     },
     filters: {
         countryList: [],
@@ -45,7 +44,7 @@ const initialLoggedInState: RootState = {
             message: '',
         },
     },
-    acknowledgement: {
+    acknowledgment: {
         acknowledgmentData: [],
         error: undefined,
         isLoading: false,
@@ -109,8 +108,17 @@ describe('<App />', () => {
             config: {},
             headers: {},
         };
-        mockedAxios.get.mockResolvedValue(axiosResponse);
-        render(<App />);
+        mockedAxios.get.mockImplementation((url) => {
+            if (url === '/env') {
+                return Promise.resolve({ status: 200, data: 'local' });
+            } else {
+                return Promise.resolve(axiosResponse);
+            }
+        });
+        render(<App />, {
+            initialState: initialLoggedInState,
+            initialRoute: '/cases',
+        });
 
         expect(await screen.findByTestId('mapLink')).toHaveAttribute(
             'href',

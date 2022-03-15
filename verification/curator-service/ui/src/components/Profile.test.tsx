@@ -17,8 +17,10 @@ const initialLoggedInState: RootState = {
         isLoading: false,
         searchQuery: '',
         filterBreadcrumbs: [],
+        version: '1.0',
+        env: 'local',
     },
-    filtersReducer: {
+    filters: {
         countryList: [],
         error: '',
         isLoading: false,
@@ -42,6 +44,13 @@ const initialLoggedInState: RootState = {
             message: '',
         },
     },
+    acknowledgment: {
+        isLoading: false,
+        error: undefined,
+        acknowledgmentData: [],
+        totalSources: 0,
+        nextPage: 1,
+    },
 };
 
 const loggedInWithApiKeyState: RootState = {
@@ -49,8 +58,10 @@ const loggedInWithApiKeyState: RootState = {
         isLoading: false,
         searchQuery: '',
         filterBreadcrumbs: [],
+        version: '1.0',
+        env: 'local',
     },
-    filtersReducer: {
+    filters: {
         countryList: [],
         error: '',
         isLoading: false,
@@ -75,6 +86,13 @@ const loggedInWithApiKeyState: RootState = {
             message: '',
         },
     },
+    acknowledgment: {
+        isLoading: false,
+        error: undefined,
+        acknowledgmentData: [],
+        totalSources: 0,
+        nextPage: 1,
+    },
 };
 
 const noUserInfoState: RootState = {
@@ -82,6 +100,8 @@ const noUserInfoState: RootState = {
         isLoading: false,
         searchQuery: '',
         filterBreadcrumbs: [],
+        version: '1.0',
+        env: 'local',
     },
     auth: {
         isLoading: false,
@@ -102,10 +122,17 @@ const noUserInfoState: RootState = {
             message: '',
         },
     },
-    filtersReducer: {
+    filters: {
         countryList: [],
         error: '',
         isLoading: false,
+    },
+    acknowledgment: {
+        isLoading: false,
+        error: undefined,
+        acknowledgmentData: [],
+        totalSources: 0,
+        nextPage: 1,
     },
 };
 
