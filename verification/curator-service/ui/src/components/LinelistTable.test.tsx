@@ -720,7 +720,7 @@ describe('<LinelistTable />', () => {
         expect(screen.getByText(/gender - Female/i)).toBeInTheDocument();
     });
 
-    it('opens FiltersModal when filters breadcrumb is clicked', async () => {
+    it('opens filters dialog when filters breadcrumb is clicked', async () => {
         const breadcrumbs: ChipData[] = [
             { key: 'country', value: 'Peru' },
             { key: 'gender', value: 'Female' },

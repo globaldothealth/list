@@ -1,14 +1,14 @@
 import React from 'react';
-import { render, screen, fireEvent } from './util/test-utils';
-import FiltersModal from './FiltersModal';
+import { render, screen, fireEvent } from '../util/test-utils';
+import FiltersDialog from './index';
 import { MemoryRouter } from 'react-router-dom';
 import { format } from 'date-fns';
 
-describe('<FiltersModal />', () => {
+describe('<FiltersDialog />', () => {
     it('Should render properly', () => {
         render(
             <MemoryRouter>
-                <FiltersModal
+                <FiltersDialog
                     isOpen={true}
                     handleClose={jest.fn()}
                     activeFilterInput=""
@@ -25,7 +25,7 @@ describe('<FiltersModal />', () => {
     it('Should display an error when trying to enter future date', async () => {
         render(
             <MemoryRouter>
-                <FiltersModal
+                <FiltersDialog
                     isOpen={true}
                     handleClose={jest.fn()}
                     activeFilterInput=""
@@ -49,7 +49,7 @@ describe('<FiltersModal />', () => {
         });
         fireEvent.change(dateAfterInput, { target: { value: futureDate } });
 
-        fireEvent.click(screen.getByRole('button', { name: 'Filter' }));
+        fireEvent.click(screen.getByRole('button', { name: 'Apply' }));
 
         expect(
             await screen.findByText(

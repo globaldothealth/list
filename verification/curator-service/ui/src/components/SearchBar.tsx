@@ -15,7 +15,7 @@ import SearchIcon from '@material-ui/icons/Search';
 import clsx from 'clsx';
 import DataGuideDialog from './DataGuideDialog';
 import { useDebounce } from '../hooks/useDebounce';
-import FiltersModal from './FiltersModal';
+import FiltersDialog from './FiltersDialog';
 import { searchQueryToURL, URLToSearchQuery } from './util/searchQuery';
 import { useLocation, useHistory } from 'react-router-dom';
 import { KeyboardEvent, ChangeEvent } from 'react';
@@ -277,7 +277,7 @@ export default function SearchBar({
                 />
             </div>
 
-            <FiltersModal
+            <FiltersDialog
                 isOpen={filtersModalOpen}
                 handleClose={() => setFiltersModalOpen(false)}
                 activeFilterInput={activeFilterInput}
