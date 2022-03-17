@@ -1,4 +1,4 @@
-import { FilterFormValues } from '../FiltersModal';
+import { FilterFormValues } from '../FiltersDialog';
 
 export const searchQueryToURL = (searchQuery: string): string => {
     const searchParams = searchQuery.replace(/\s/g, '+');
