@@ -1,4 +1,5 @@
 import { getDefaultQuery } from '../../utils/helperFunctions';
+import { Outcome } from '../../support/commands';
 
 /* eslint-disable no-undef */
 describe('App', function () {
@@ -138,6 +139,31 @@ describe('App', function () {
 
         cy.contains('Italy').should('be.visible');
         cy.contains('Germany').should('not.be.visible');
+    });
+
+    it('allows the user to search by outcome', function () {
+        cy.login({
+            roles: ['curator'],
+            name: 'testName',
+            email: 'test@example.com',
+        });
+        cy.visit('/');
+        cy.contains('Line list').click();
+
+        cy.addCase({
+            country: 'Peru',
+            outcome: Outcome.Recovered,
+            sourceUrl: 'www.recovered.com',
+        });
+
+        cy.contains('Line list').click();
+
+        cy.get('.filter-button').click();
+        cy.get('#outcome').click();
+        cy.get('[data-value="Recovered"]').click();
+        cy.get('[data-test-id="search-by-filter-button"]').click();
+
+        cy.contains('www.recovered.com');
     });
 
     it('allows the user to search by date and an additional filter', function () {
