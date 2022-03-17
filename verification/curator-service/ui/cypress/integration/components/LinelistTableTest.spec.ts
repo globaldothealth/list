@@ -591,8 +591,8 @@ describe('Linelist table', function () {
         });
         cy.server();
         cy.route('GET', getDefaultQuery(50)).as('getCases');
+        cy.route('GET', '/api/cases').as('getCasesAscending');
 
-        cy.visit('/');
         cy.visit('/cases');
         cy.wait('@getCases');
 
@@ -600,7 +600,7 @@ describe('Linelist table', function () {
 
         cy.get('#sort-by-select').click();
         cy.get('li').contains('ascending').click();
-        cy.wait('@getCases');
+        cy.wait('@getCasesAscending');
 
         cy.get('tr').eq(2).contains('td', 'France');
     });

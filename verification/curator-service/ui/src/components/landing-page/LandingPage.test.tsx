@@ -67,7 +67,7 @@ describe('<LandingPage />', () => {
             screen.getByText(/Participating Institutions:/i),
         ).toBeInTheDocument();
         expect(screen.getByText(/With funding from:/i)).toBeInTheDocument();
-        expect(screen.getAllByAltText(/Partner logo/i)).toHaveLength(10);
+        expect(screen.getAllByAltText(/Partner logo/i)).toHaveLength(11);
     });
 });
 
