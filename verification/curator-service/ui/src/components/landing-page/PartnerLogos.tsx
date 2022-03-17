@@ -6,6 +6,7 @@ import clsx from 'clsx';
 
 import bch from '../assets/partner-logos/bch.png';
 import georgetown from '../assets/partner-logos/georgetown.png';
+import gorgas from '../assets/partner-logos/gorgas.png';
 import hopkins from '../assets/partner-logos/hopkins.png';
 import harvard from '../assets/partner-logos/harvard.png';
 import washington from '../assets/partner-logos/washington.png';
@@ -41,6 +42,10 @@ const useStyles = makeStyles((theme: Theme) => ({
         '&.big': {
             maxWidth: '120px',
         },
+        '&.gray': {
+            WebkitFilter: 'grayscale(100%)',
+            filter: 'grayscale(100%)',
+        },
     },
     title: {
         marginTop: '20px',
@@ -54,6 +59,7 @@ export default function PartnerLogos(): JSX.Element {
     const logos = [
         bch,
         georgetown,
+        gorgas,
         harvard,
         hopkins,
         northeastern,
@@ -67,7 +73,11 @@ export default function PartnerLogos(): JSX.Element {
         <img
             key={idx}
             src={logo}
-            className={clsx({ [classes.logo]: true, big: idx === 1 })}
+            className={clsx({
+                [classes.logo]: true,
+                gray: true,
+                big: idx === 1,
+            })}
             alt="Partner logo"
         />
     ));
