@@ -1,0 +1,50 @@
+name: kubemon
+
+on:
+  push:
+    branches: [main]
+    paths:
+    - '.github/workflows/kubemon.yml'
+    - 'k8s/monitoring/**'
+  pull_request:
+    paths:
+    - '.github/workflows/kubemon.yml'
+    - 'k8s/monitoring/**'
+
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: k8s/monitoring
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python 3.10
+      uses: actions/setup-python@v1
+      with:
+        python-version: '3.10'
+    - name: Set up poetry
+      run: curl -sSL https://install.python-poetry.org | python3 -
+    - name: Install dependencies
+      run: poetry install
+    - name: Run tests
+      run: poetry run pytest
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: eu-central-1
+    - name: Login to Amazon ECR
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v1
+    - name: Build, tag, and push image to Amazon ECR (latest)
+      env:
+        REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        REPO: gdh-kubemon
+        IMAGE_TAG: ${{ github.sha }}
+      run: |
+        docker build -t $REGISTRY/$REPO:$IMAGE_TAG -t $REGISTRY/$REPO .
+        docker push $REGISTRY/$REPO:$IMAGE_TAG
+        docker push $REGISTRY/$REPO:latest
