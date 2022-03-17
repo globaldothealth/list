@@ -22,15 +22,19 @@ import { ObjectId } from 'mongodb';
 // Global variable for newsletter acceptance
 let isNewsletterAccepted: boolean;
 
-async function findUserByAPIKey(apiKey?: string): Promise<Express.User> {
+function userCollection() {
     const mongo = mongoose.connection.getClient().db();
     const users = mongo.collection("users");
+    return users;
+}
+
+async function findUserByAPIKey(apiKey?: string): Promise<Express.User> {
     
     if (!apiKey) {
         throw new Error('No API key');
     }
     const userID = apiKey.slice(0, 24);
-    const user = await users.findOne({ _id: new ObjectId(userID) });
+    const user = await userCollection().findOne({ _id: new ObjectId(userID) });
     if (!user) {
         throw new Error('Invalid API key');
     }
@@ -267,7 +271,7 @@ export class AuthController {
             mustBeAuthenticated,
             async (req: Request, res: Response): Promise<void> => {
                 const theUser = req.user as UserDocument;
-                const currentUser = await User.findById(theUser.id);
+                const currentUser = await userCollection().findOne({ _id: new ObjectId(theUser.id) });
                 if (!currentUser) {
                     // internal server error as you were authenticated but unknown
                     res.status(500).end();
