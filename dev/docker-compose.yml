@@ -18,7 +18,7 @@ services:
       retries: 3
       start_period: 30s
   mongo:
-    image: mongo:5.0.6
+    image: mongo:4.2.15
     restart: always
     init: true
     ports:
