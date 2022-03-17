@@ -483,24 +483,31 @@ export default function FiltersModal({
                                 formik.errors.occupation
                             }
                         />
-                        <TextField
-                            autoFocus={activeFilterInput === 'outcome'}
-                            id="outcome"
-                            label="Outcome"
-                            name="outcome"
-                            type="text"
+                        <FormControl
                             variant="outlined"
+                            className={classes.formControl}
                             size={inputSize}
-                            value={formik.values.outcome || ''}
-                            onChange={formik.handleChange}
-                            error={
-                                formik.touched.outcome &&
-                                Boolean(formik.errors.outcome)
-                            }
-                            helperText={
-                                formik.touched.outcome && formik.errors.outcome
-                            }
-                        />
+                        >
+                            <InputLabel id="outcome-label">Outcome</InputLabel>
+                            {!error && (
+                                <Select
+                                    autoFocus={activeFilterInput === 'outcome'}
+                                    labelId="outcome-label"
+                                    id="outcome"
+                                    name="outcome"
+                                    label="Outcome"
+                                    value={formik.values.outcome || ''}
+                                    onChange={formik.handleChange}
+                                    disabled={loadingState}
+                                >
+                                    <MenuItem value="">None</MenuItem>
+                                    <MenuItem value="Recovered">
+                                        Recovered
+                                    </MenuItem>
+                                    <MenuItem value="Death">Death</MenuItem>
+                                </Select>
+                            )}
+                        </FormControl>
                     </div>
 
                     <div>
