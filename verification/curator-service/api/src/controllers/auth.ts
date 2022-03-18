@@ -5,7 +5,6 @@ import {
 import { Strategy as GoogleStrategy, Profile } from 'passport-google-oauth20';
 import { NextFunction, Request, Response } from 'express';
 import { User, UserDocument } from '../model/user';
-import { Token } from '../model/token';
 import mongoose, { isValidObjectId } from 'mongoose';
 
 import { Router } from 'express';
@@ -22,10 +21,18 @@ import { ObjectId } from 'mongodb';
 // Global variable for newsletter acceptance
 let isNewsletterAccepted: boolean;
 
+function database() {
+    return mongoose.connection.getClient().db();
+}
+
 function userCollection() {
-    const mongo = mongoose.connection.getClient().db();
+    const mongo = database();
     const users = mongo.collection("users");
     return users;
+}
+
+function tokenCollection() {
+    return database().collection("tokens");
 }
 
 // moved this from the User mongoose document: find a permanent home
@@ -470,7 +477,7 @@ export class AuthController {
                     }
 
                     // Check if there is a token in DB already for this user
-                    const token = await Token.findOne({ userId: user._id });
+                    const token = await tokenCollection().findOne({ userId: user._id });
                     if (token) {
                         await token.deleteOne();
                     }
@@ -479,11 +486,11 @@ export class AuthController {
                     const hash = await bcrypt.hash(resetToken, 10);
 
                     // Add new reset token to DB
-                    await new Token({
+                    await tokenCollection().insertOne({
                         userId: user._id,
                         token: hash,
                         createdAt: Date.now(),
-                    }).save();
+                    });
 
                     let url = '';
                     switch (env) {
@@ -539,7 +546,7 @@ export class AuthController {
                     }
 
                     // Check if token exists
-                    const passwordResetToken = await Token.findOne({ userId });
+                    const passwordResetToken = await tokenCollection().findOne({ userId });
                     if (!passwordResetToken) {
                         throw new Error(
                             'Invalid or expired password reset token',
