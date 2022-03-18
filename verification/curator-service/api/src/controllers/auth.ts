@@ -546,16 +546,17 @@ export class AuthController {
 
                     // Hash new password and update user document in DB
                     const hashedPassword = await bcrypt.hash(newPassword, 10);
-                    await User.updateOne(
+                    const users = userCollection();
+                    const result = await users.findOneAndUpdate(
                         { _id: userId },
                         { $set: { password: hashedPassword } },
-                        { new: true },
+                        { returnDocument: "after" },
                     );
 
                     // Send confirmation email to the user
-                    const user = await User.findOne({ _id: userId });
+                    const user = result.value;
 
-                    if (!user) {
+                    if (!result.ok || !user) {
                         throw new Error(
                             'Something went wrong, please try again later',
                         );
