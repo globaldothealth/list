@@ -850,6 +850,7 @@ export class AuthController {
                     ) => void,
                 ): Promise<void> => {
                     try {
+                        const users = userCollection();
                         const response = await axios.get(
                             `https://openidconnect.googleapis.com/v1/userinfo?access_token=${token}`,
                         );
@@ -863,15 +864,22 @@ export class AuthController {
                                 'Supplied bearer token must be scoped for "email"',
                             );
                         }
-                        let user = await User.findOne({ email: email });
+                        let user = await users.findOne({ email: email });
                         if (!user) {
-                            user = await User.create({
+                            const userId = new ObjectId();
+                            const result = await users.insertOne({
+                                _id: userId,
                                 email: email,
                                 googleID: response.data.sub,
                                 roles: [],
                                 // Do not care about names for bearer tokens, they are usually not humans.
                                 name: '',
                             });
+                            if (result.insertedCount == 1) {
+                                user = await users.findOne({ _id: userId });
+                            } else {
+                                return done(null, undefined);
+                            }
                         }
                         return done(null, user);
                     } catch (e) {
