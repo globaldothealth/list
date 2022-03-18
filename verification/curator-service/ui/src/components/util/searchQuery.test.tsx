@@ -4,7 +4,7 @@ import {
     filtersToURL,
     URLToFilters,
 } from './searchQuery';
-import { FilterFormValues } from '../FiltersModal';
+import { FilterFormValues } from '../FiltersDialog';
 
 describe('Search query - string to url', () => {
     it('converts given string to url search parameters', () => {

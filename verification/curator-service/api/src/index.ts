@@ -192,6 +192,7 @@ apiRouter.get(
     mustHaveAnyRole(['curator']),
     sourcesController.list,
 );
+apiRouter.get('/acknowledgment-sources', sourcesController.listSourcesForTable);
 apiRouter.get(
     '/sources/:id([a-z0-9]{24})',
     authenticateByAPIKey,
@@ -374,6 +375,18 @@ apiRouter.get(
     mustHaveAnyRole(['curator']),
     geocodeProxy.suggest,
 );
+apiRouter.get(
+    '/geocode/convertUTM',
+    authenticateByAPIKey,
+    mustHaveAnyRole(['curator']),
+    geocodeProxy.convertUTM,
+);
+apiRouter.get(
+    '/geocode/countryNames',
+    authenticateByAPIKey,
+    mustBeAuthenticated,
+    geocodeProxy.countryNames
+);
 apiRouter.post('/geocode/seed', geocodeProxy.seed);
 apiRouter.post('/geocode/clear', geocodeProxy.clear);
 
@@ -399,6 +412,11 @@ app.get('/health', (req: Request, res: Response) => {
 // version handler.
 app.get('/version', (req: Request, res: Response) => {
     res.status(200).send(env.CURATOR_VERSION);
+});
+
+// get current environment
+app.get('/env', (req: Request, res: Response) => {
+    res.status(200).send(env.SERVICE_ENV);
 });
 
 // API documentation.

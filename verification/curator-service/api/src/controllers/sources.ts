@@ -6,6 +6,7 @@ import { Source, SourceDocument } from '../model/source';
 import AwsBatchClient from '../clients/aws-batch-client';
 import AwsEventsClient from '../clients/aws-events-client';
 import EmailClient from '../clients/email-client';
+import { logger } from '../util/logger';
 
 /**
  * Email notification that should be sent on any update to a source.
@@ -83,6 +84,36 @@ export default class SourcesController {
             res.json({ sources: docs, total: total });
         } catch (e) {
             res.status(422).json(e);
+            return;
+        }
+    };
+
+    /**
+     * Get sources for the acknowledgement table
+     * This is a public endpoint because acknowledgement table needs to
+     * be accessible without logging in
+     */
+    listSourcesForTable = async (req: Request, res: Response) => {
+        try {
+            const sources = await Source.find(
+                {},
+                {
+                    name: 1,
+                    'origin.providerName': 1,
+                    'origin.providerWebsiteUrl': 1,
+                    'origin.url': 1,
+                    'origin.license': 1,
+                },
+            );
+
+            return res.json(sources);
+        } catch (err) {
+            if (err.name === 'ValidationError') {
+                res.status(422).json(err);
+                return;
+            }
+
+            res.status(500).json(err);
             return;
         }
     };

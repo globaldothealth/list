@@ -22,11 +22,12 @@ import PolicyLink from '../PolicyLink';
 import PartnerLogos from './PartnerLogos';
 import { SnackbarAlert } from '../SnackbarAlert';
 
-import { useParams } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 
 import Helmet from 'react-helmet';
 import { getVersion } from '../../redux/app/thunk';
-import { selectVersion } from '../../redux/app/selectors';
+import { selectVersion, selectEnv } from '../../redux/app/selectors';
+import { MapLink } from '../../constants/types';
 
 interface StylesProps {
     smallHeight: boolean;
@@ -48,11 +49,21 @@ const useStyles = makeStyles((theme: Theme) => ({
     body: {
         display: 'flex',
         marginTop: '20px',
+        [theme.breakpoints.down(770)]: {
+            marginBottom: '60px',
+        },
+        [theme.breakpoints.down(460)]: {
+            flexFlow: 'column',
+            rowGap: '30px',
+        },
     },
     description: {
         color: theme.custom.palette.landingPage.descriptionTextColor,
         marginRight: '90px',
         width: '60%',
+        [theme.breakpoints.down(460)]: {
+            width: '100%',
+        },
     },
     linksContainer: {
         width: '40%',
@@ -88,6 +99,83 @@ interface UrlParams {
     token?: string;
     id?: string;
 }
+interface StyleProps {
+    classes: {
+        linksContainer: string;
+        link: string;
+    };
+}
+
+const MoreInformationLinks = ({
+    classes,
+    version,
+    env,
+}: StyleProps & { version: string; env: string }) => {
+    return (
+        <div className={classes.linksContainer}>
+            <div>
+                <Typography>More information</Typography>
+                <div className={classes.link}>Version: {version}</div>
+                <div className={classes.link}>
+                    <a
+                        href="https://global.health/"
+                        rel="noopener noreferrer"
+                        target="_blank"
+                    >
+                        Global.health website
+                    </a>
+                </div>
+                <div className={classes.link}>
+                    <a
+                        href={MapLink[env]}
+                        rel="noopener noreferrer"
+                        target="_blank"
+                    >
+                        Global.health map
+                    </a>
+                </div>
+                <div className={classes.link}>
+                    <a
+                        href="https://raw.githubusercontent.com/globaldothealth/list/main/data-serving/scripts/export-data/data_dictionary.txt"
+                        rel="noopener noreferrer"
+                        target="_blank"
+                    >
+                        Data dictionary
+                    </a>
+                </div>
+                <div className={classes.link}>
+                    <Link to="/data-acknowledgments">Data acknowledgments</Link>
+                </div>
+                <div className={classes.link}>
+                    <a
+                        href="https://global.health/terms-of-use/"
+                        rel="noopener noreferrer"
+                        target="_blank"
+                    >
+                        Terms of use
+                    </a>
+                </div>
+                <div className={classes.link}>
+                    <a
+                        href="https://global.health/privacy/"
+                        rel="noopener noreferrer"
+                        target="_blank"
+                    >
+                        Privacy policy
+                    </a>
+                </div>
+                <PolicyLink
+                    type="cookie-policy"
+                    classes={{
+                        root: classes.link,
+                    }}
+                >
+                    Cookie policy
+                </PolicyLink>
+            </div>
+        </div>
+    );
+};
 
 const LandingPage = (): JSX.Element => {
     const dispatch = useAppDispatch();
@@ -103,8 +191,9 @@ const LandingPage = (): JSX.Element => {
     const forgotPasswordPopupOpen = useAppSelector(
         selectForgotPasswordPopupOpen,
     );
-    const { open, message } = useAppSelector(selectSnackbar);
+    const { isOpen, message } = useAppSelector(selectSnackbar);
     const version = useAppSelector(selectVersion);
+    const env = useAppSelector(selectEnv);
 
     // Url parameters from reset password link
     const { token, id } = useParams<UrlParams>();
@@ -137,7 +226,7 @@ const LandingPage = (): JSX.Element => {
     // retrieve the app version from the curator service
     useEffect(() => {
         dispatch(getVersion());
-    });
+    }, [dispatch]);
 
     return (
         <>
@@ -157,76 +246,11 @@ const LandingPage = (): JSX.Element => {
                         global data repository with open access to real-time
                         epidemiological anonymized line list data.
                     </Typography>
-                    <div className={classes.linksContainer}>
-                        <div>
-                            <Typography>More information</Typography>
-                            <div className={classes.link}>
-                                Version: {version}
-                            </div>
-                            <div className={classes.link}>
-                                <a
-                                    href="https://global.health/"
-                                    rel="noopener noreferrer"
-                                    target="_blank"
-                                >
-                                    Global.health website
-                                </a>
-                            </div>
-                            <div className={classes.link}>
-                                <a
-                                    href="https://map.covid-19.global.health/"
-                                    rel="noopener noreferrer"
-                                    target="_blank"
-                                >
-                                    Global.health map
-                                </a>
-                            </div>
-                            <div className={classes.link}>
-                                <a
-                                    href="https://raw.githubusercontent.com/globaldothealth/list/main/data-serving/scripts/export-data/data_dictionary.txt"
-                                    rel="noopener noreferrer"
-                                    target="_blank"
-                                >
-                                    Data dictionary
-                                </a>
-                            </div>
-                            <div className={classes.link}>
-                                <a
-                                    href="https://global.health/acknowledgement/"
-                                    rel="noopener noreferrer"
-                                    target="_blank"
-                                >
-                                    Data acknowledgments
-                                </a>
-                            </div>
-                            <div className={classes.link}>
-                                <a
-                                    href="https://global.health/terms-of-use/"
-                                    rel="noopener noreferrer"
-                                    target="_blank"
-                                >
-                                    Terms of use
-                                </a>
-                            </div>
-                            <div className={classes.link}>
-                                <a
-                                    href="https://global.health/privacy/"
-                                    rel="noopener noreferrer"
-                                    target="_blank"
-                                >
-                                    Privacy policy
-                                </a>
-                            </div>
-                            <PolicyLink
-                                type="cookie-policy"
-                                classes={{
-                                    root: classes.link,
-                                }}
-                            >
-                                Cookie policy
-                            </PolicyLink>
-                        </div>
-                    </div>
+                    <MoreInformationLinks
+                        classes={classes}
+                        version={version}
+                        env={env}
+                    />
                 </div>
 
                 {registrationScreenOn && !changePasswordScreenOn ? (
@@ -264,7 +288,7 @@ const LandingPage = (): JSX.Element => {
                 )}
 
                 <SnackbarAlert
-                    isOpen={open}
+                    isOpen={isOpen}
                     type="success"
                     message={message}
                     durationMs={5000}

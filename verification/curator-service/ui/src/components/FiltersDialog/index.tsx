@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useHistory } from 'react-router-dom';
 import { useFormik } from 'formik';
-import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import useMediaQuery from '@material-ui/core/useMediaQuery';
-import { filtersToURL, URLToFilters } from './util/searchQuery';
+import { filtersToURL, URLToFilters } from '../util/searchQuery';
 
 import {
     Dialog,
@@ -16,83 +15,23 @@ import {
     FormControl,
     InputLabel,
     OutlinedInput,
+    IconButton,
     // InputAdornment,
     // IconButton,
 } from '@material-ui/core';
 import { Alert } from '@material-ui/lab';
 // import { HelpOutline } from '@material-ui/icons';
 // import { AppTooltip } from './common-form-fields/AppTooltip';
-import { useAppSelector, useAppDispatch } from '../hooks/redux';
-import { fetchCountries } from '../redux/filters/thunk';
+import { useAppSelector, useAppDispatch } from '../../hooks/redux';
+import { fetchCountries } from '../../redux/filters/thunk';
 import {
     countryList,
     isLoading,
     filterError,
-} from '../redux/filters/selectors';
-import { codeForCountry } from './util/countryNames';
-
-const useStyles = makeStyles((theme: Theme) =>
-    createStyles({
-        root: {
-            '& .MuiTextField-root': {
-                margin: theme.spacing(1),
-                width: '25ch',
-
-                '@media (max-height:800px)': {
-                    width: '20ch',
-                },
-            },
-        },
-        dialogContent: {
-            paddingBottom: '24px',
-        },
-        textField: {
-            width: '25ch',
-            margin: theme.spacing(1),
-
-            '@media (max-height:800px)': {
-                width: '20ch',
-            },
-        },
-        formControl: {
-            margin: theme.spacing(1),
-            minWidth: '25ch',
-
-            '@media (max-height:800px)': {
-                minWidth: '20ch',
-            },
-        },
-        searchBtnContainer: {
-            width: '100%',
-            display: 'flex',
-            justifyContent: 'flex-end',
-            marginTop: '2rem',
-
-            '@media (max-height:800px)': {
-                marginTop: '1rem',
-            },
-        },
-        searchBtn: {
-            marginLeft: '0.5rem',
-        },
-        divider: {
-            margin: '2rem auto',
-            height: '1px',
-            width: '90%',
-            backgroundColor: '#ccc',
-
-            '@media (max-height:800px)': {
-                margin: '1rem auto',
-            },
-        },
-        helpIcon: {
-            color: '#ccc',
-        },
-        alertBox: {
-            margin: '0 32px',
-        },
-    }),
-);
+} from '../../redux/filters/selectors';
+import { codeForCountry } from '../util/countryNames';
+import CloseIcon from '@material-ui/icons/Close';
+import { useStyles } from './styled';
 
 interface FiltersModalProps {
     isOpen: boolean;
@@ -128,7 +67,7 @@ interface FilterFormErrors {
     dateconfirmedafter?: string | null;
 }
 
-export default function FiltersModal({
+export default function FiltersDialog({
     isOpen,
     activeFilterInput,
     handleClose,
@@ -147,6 +86,16 @@ export default function FiltersModal({
     // Check screen size
     const isSmallScreen = useMediaQuery('(max-height:800px)');
     const inputSize = isSmallScreen ? 'small' : 'medium';
+
+    const dispatch = useAppDispatch();
+    const loadingState = useAppSelector(isLoading);
+    const error = useAppSelector(filterError);
+
+    useEffect(() => {
+        dispatch(fetchCountries());
+    }, [dispatch]);
+
+    const countries = useAppSelector(countryList);
 
     useEffect(() => {
         const newFilters = URLToFilters(location.search);
@@ -223,7 +172,7 @@ export default function FiltersModal({
         closeAlert(false);
     };
 
-    // COMMENTED OUT UNTIL CONTENT FOR TOOLTIPS IS PROVIDED
+    // COMMENTED OUT AS WE MAY WANT TO ADD TOOLTIPS TO SOME FIELDS IN THE FUTURE
     // const tooltipHelpIcon = (tooltipContent: JSX.Element) => {
     //     return (
     //         <InputAdornment position="end">
@@ -266,19 +215,18 @@ export default function FiltersModal({
     //     </>
     // );
 
-    const dispatch = useAppDispatch();
-    const loadingState = useAppSelector(isLoading);
-    const error = useAppSelector(filterError);
-
-    useEffect(() => {
-        dispatch(fetchCountries());
-    }, [dispatch]);
-
-    const countries = useAppSelector(countryList);
-
     return (
         <Dialog open={isOpen} maxWidth={'xl'} onClose={closeAndResetAlert}>
-            <DialogTitle>Apply filters</DialogTitle>
+            <DialogTitle>
+                Apply filters
+                <IconButton
+                    aria-label="close"
+                    className={classes.closeButton}
+                    onClick={handleClose}
+                >
+                    <CloseIcon />
+                </IconButton>
+            </DialogTitle>
             {showModalAlert && (
                 <Alert
                     severity="info"
@@ -313,9 +261,7 @@ export default function FiltersModal({
                                     disabled={loadingState}
                                     data-testid="country-select"
                                 >
-                                    <MenuItem value="" disabled>
-                                        None
-                                    </MenuItem>
+                                    <MenuItem value="">None</MenuItem>
                                     {countries.map((country: string) => (
                                         <MenuItem
                                             value={codeForCountry(country)}
@@ -369,9 +315,7 @@ export default function FiltersModal({
                                 value={formik.values.verificationstatus || ''}
                                 onChange={formik.handleChange}
                             >
-                                <MenuItem value="" disabled>
-                                    None
-                                </MenuItem>
+                                <MenuItem value="">None</MenuItem>
                                 <MenuItem value="unverified">
                                     Unverified
                                 </MenuItem>
@@ -483,24 +427,31 @@ export default function FiltersModal({
                                 formik.errors.occupation
                             }
                         />
-                        <TextField
-                            autoFocus={activeFilterInput === 'outcome'}
-                            id="outcome"
-                            label="Outcome"
-                            name="outcome"
-                            type="text"
+                        <FormControl
                             variant="outlined"
+                            className={classes.formControl}
                             size={inputSize}
-                            value={formik.values.outcome || ''}
-                            onChange={formik.handleChange}
-                            error={
-                                formik.touched.outcome &&
-                                Boolean(formik.errors.outcome)
-                            }
-                            helperText={
-                                formik.touched.outcome && formik.errors.outcome
-                            }
-                        />
+                        >
+                            <InputLabel id="outcome-label">Outcome</InputLabel>
+                            {!error && (
+                                <Select
+                                    autoFocus={activeFilterInput === 'outcome'}
+                                    labelId="outcome-label"
+                                    id="outcome"
+                                    name="outcome"
+                                    label="Outcome"
+                                    value={formik.values.outcome || ''}
+                                    onChange={formik.handleChange}
+                                    disabled={loadingState}
+                                >
+                                    <MenuItem value="">None</MenuItem>
+                                    <MenuItem value="Recovered">
+                                        Recovered
+                                    </MenuItem>
+                                    <MenuItem value="Death">Death</MenuItem>
+                                </Select>
+                            )}
+                        </FormControl>
                     </div>
 
                     <div>
@@ -691,7 +642,7 @@ export default function FiltersModal({
                             size={inputSize}
                             className={classes.searchBtn}
                         >
-                            Filter
+                            Apply
                         </Button>
                     </div>
                 </form>

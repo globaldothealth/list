@@ -4,6 +4,11 @@ import en from 'i18n-iso-countries/langs/en.json';
 
 countries.registerLocale(en);
 
+export enum Outcome {
+    Recovered = 'Recovered',
+    Death = 'Death',
+}
+
 declare global {
     // One-off Cypress setup.
     // eslint-disable-next-line @typescript-eslint/no-namespace
@@ -24,6 +29,7 @@ declare global {
                 sourceUrl?: any;
                 gender?: string;
                 creationDate?: Date;
+                outcome?: Outcome;
             }) => void;
             login: (opts?: {
                 name: string;
@@ -34,6 +40,8 @@ declare global {
             addSource: (
                 name: string,
                 url: string,
+                providerName?: string,
+                providerWebsiteUrl?: string,
                 countryCodes?: string[],
                 uploads?: [],
             ) => void;
@@ -60,6 +68,7 @@ export function addCase(opts: {
     sourceUrl?: string;
     gender?: string;
     creationDate?: Date;
+    outcome?: Outcome;
 }): void {
     cy.request({
         method: 'POST',
@@ -96,6 +105,10 @@ export function addCase(opts: {
                     },
                     value: opts.methodOfConfirmation,
                 },
+                {
+                    name: 'outcome',
+                    value: opts.outcome,
+                },
             ],
             symptoms: {
                 status: opts.symptomStatus ?? undefined,
@@ -113,6 +126,7 @@ export function addCase(opts: {
                     date: opts.creationDate,
                 },
             },
+            confirmationDate: opts.creationDate,
         },
     });
 }
@@ -154,6 +168,8 @@ export function clearSeededLocations(): void {
 export function addSource(
     name: string,
     url: string,
+    providerName?: string,
+    providerWebsiteUrl?: string,
     countryCodes?: string[],
     uploads?: [],
 ): void {
@@ -166,8 +182,10 @@ export function addSource(
             origin: {
                 url: url,
                 license: 'MIT',
+                providerName: providerName ?? 'Example',
+                providerWebsiteUrl: providerWebsiteUrl ?? 'www.example.com',
             },
-            uploads: uploads,
+            uploads: uploads ?? [],
             format: 'JSON',
         },
     });

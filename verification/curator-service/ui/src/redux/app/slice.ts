@@ -1,13 +1,14 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { ChipData } from '../../components/App/App';
 import { getUserProfile, logout } from '../../redux/auth/thunk';
-import { getVersion } from './thunk';
+import { getVersion, getEnv } from './thunk';
 
 interface AppState {
     isLoading: boolean;
     searchQuery: string;
     filterBreadcrumbs: ChipData[];
     version: string;
+    env: string;
 }
 
 const initialState: AppState = {
@@ -15,6 +16,7 @@ const initialState: AppState = {
     searchQuery: '',
     filterBreadcrumbs: [],
     version: 'loading…',
+    env: 'prod',
 };
 
 const appSlice = createSlice({
@@ -56,6 +58,10 @@ const appSlice = createSlice({
         });
         builder.addCase(logout.fulfilled, (state) => {
             state.isLoading = false;
+        });
+
+        builder.addCase(getEnv.fulfilled, (state, action) => {
+            state.env = action.payload;
         });
     },
 });

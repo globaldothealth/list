@@ -59,7 +59,7 @@ import { nameCountry } from './util/countryNames';
 const DATA_LIMIT = 10000;
 
 // Query sent to API when first loading line list
-const defaultQuery = `/api/cases/?limit=50&page=1&count_limit=${DATA_LIMIT}&sort_by=default&order=ascending`;
+const defaultQuery = `/api/cases/?limit=50&page=1&count_limit=${DATA_LIMIT}&sort_by=confirmationDate&order=ascending`;
 
 interface ListResponse {
     cases: Case[];
@@ -453,13 +453,13 @@ export function SortSelect({
 
     const sortKeywords = [
         {
-            name: 'Creation date ascending',
-            value: SortBy.Default,
+            name: 'Confirmation date ascending',
+            value: SortBy.ConfirmationDate,
             order: SortByOrder.Ascending,
         },
         {
-            name: 'Creation date descending',
-            value: SortBy.Default,
+            name: 'Confirmation date descending',
+            value: SortBy.ConfirmationDate,
             order: SortByOrder.Descending,
         },
     ];

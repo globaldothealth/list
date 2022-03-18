@@ -6,7 +6,7 @@ import {
 import { DateFilterDocument, dateFilterSchema } from './date-filter';
 import { OriginDocument, originSchema } from './origin';
 import { UploadDocument, uploadSchema } from './upload';
-import iso from 'iso-3166-1';
+import countries from 'i18n-iso-countries';
 import mongoose from 'mongoose';
 
 interface ISource {
@@ -32,7 +32,7 @@ type ISourceInstanceCreation = mongoose.Model<ISource>;
 
 const validCountryCode = function(cc: string): boolean {
     // use ZZ to represent all countries
-    return (iso.whereAlpha2(cc) !== undefined || cc.toUpperCase() === "ZZ")
+    return (countries.getName(cc, 'en') !== undefined || cc.toUpperCase() === "ZZ")
 }
 
 const sourceSchema = new mongoose.Schema<

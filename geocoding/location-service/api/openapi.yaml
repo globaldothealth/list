@@ -14,6 +14,8 @@ info:
 tags:
     - name: Geocode
       description: Geolocation of a case
+    - name: Convert
+      description: Converting geocoding-related values
 paths:
     /geocode/seed:
         post:
@@ -66,6 +68,60 @@ paths:
                     $ref: '#/components/responses/422'
                 '500':
                     $ref: '#/components/responses/500'
+    /geocode/convertUTM:
+        get:
+            tags: [Convert]
+            summary: Convert UTM coordinates to latitude/longitude.
+            operationId: convert
+            parameters:
+                - name: n
+                  in: query
+                  description: The northing coordinate (UTMY)
+                  required: true
+                  schema:
+                    type: number
+                - name: e
+                  in: query
+                  description: The easting coordinate (UTMX)
+                  required: true
+                  schema:
+                    type: number
+                - name: z
+                  in: query
+                  required: true
+                  description: The UTM zone.
+                  schema:
+                    type: number
+            responses:
+                '200':
+                    $ref: '#/components/responses/200Position'
+                '400':
+                    $ref: '#/components/responses/400'
+                '500':
+                    $ref: '#/components/responses/500'
+    /geocode/countryName:
+        get:
+            tags: [Convert]
+            summary: Convert ISO-3166-1 2-letter country code to the country's name.
+            operationId: countryName
+            parameters:
+                - name: c
+                  in: query
+                  required: true
+                  description: The ISO-3166-1 country code
+                  example: CR
+                  schema:
+                    type: string
+            responses:
+                '200':
+                    $ref: '#/components/responses/200String'
+                '400':
+                    $ref: '#/components/responses/400'
+                '404':
+                    $ref: '#/components/responses/404'
+                '500':
+                    $ref: '#/components/responses/500'
+                    
 components:
     schemas:
         Location:
@@ -92,24 +148,26 @@ components:
                 geoResolution:
                     type: string
                 geometry:
-                    type: object
-                    properties:
-                        latitude:
-                            type: number
-                            minimum: -90
-                            maximum: 90
-                        longitude:
-                            type: number
-                            minimum: -180
-                            maximum: 180
-                    required:
-                        - latitude
-                        - longitude
+                    $ref: '#/components/schemas/Position'
         LocationArray:
             description: A list of geo locations
             type: array
             items:
                 $ref: '#/components/schemas/Location'
+        Position:
+            type: object
+            properties:
+                latitude:
+                    type: number
+                    minimum: -90
+                    maximum: 90
+                longitude:
+                    type: number
+                    minimum: -180
+                    maximum: 180
+            required:
+                - latitude
+                - longitude
     responses:
         '200LocationArray':
             description: OK
@@ -117,6 +175,18 @@ components:
                 application/json:
                     schema:
                         $ref: '#/components/schemas/LocationArray'
+        '200Position':
+            description: OK
+            content:
+                application/json:
+                    schema:
+                        $ref: '#components/schemas/Position'
+        '200String':
+            description: OK
+            content:
+                application/json:
+                    schema:
+                        type: string
         '200':
             description: OK
         '400':

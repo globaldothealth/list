@@ -128,6 +128,18 @@ paths:
                     $ref: '#/components/responses/422'
                 '500':
                     $ref: '#/components/responses/500'
+    /acknowledgment-sources:
+        get:
+            tags: [Source]
+            summary: Lists sources for acknowledgments table
+            operationId: listSourcesForTable
+            responses:
+                '200':
+                    $ref: '#/components/responses/200AcknowledgmentSource'
+                '422':
+                    $ref: '#/components/responses/422'
+                '500':
+                    $ref: '#/components/responses/500'
     /sources/{id}:
         parameters:
             - name: id
@@ -401,13 +413,13 @@ paths:
                   description: Keyword to sort by
                   required: false
                   schema:
-                      type: string                      
+                      type: string
                 - name: order
                   in: query
                   description: Sorting order
                   required: false
                   schema:
-                      type: string                      
+                      type: string
                 - name: q
                   in: query
                   description: The search query
@@ -932,6 +944,47 @@ paths:
                     $ref: '#/components/responses/422'
                 '500':
                     $ref: '#/components/responses/500'
+    /geocode/convertUTM:
+        get:
+            tags: [Geocode]
+            summary: Convert UTM coordinates to latitude/longitude.
+            operationId: convert
+            parameters:
+                - name: n
+                  in: query
+                  description: The northing coordinate (UTMY)
+                  required: true
+                  schema:
+                    type: number
+                - name: e
+                  in: query
+                  description: The easting coordinate (UTMX)
+                  required: true
+                  schema:
+                    type: number
+                - name: z
+                  in: query
+                  required: true
+                  description: The UTM zone.
+                  schema:
+                    type: number
+            responses:
+                '200':
+                    $ref: '#/components/responses/200Position'
+                '400':
+                    $ref: '#/components/responses/400'
+                '500':
+                    $ref: '#/components/responses/500'
+    /geocode/countryNames:
+        get:
+            tags: [Geocode]
+            summary: Get a list of all the ISO-3166-1 country codes in use, and the names we accept for those countries.
+            operationId: countryNames
+            responses:
+                '200':
+                    $ref: '#/components/responses/200CountryNames'
+                '500':
+                    $ref: '#/components/responses/500'
     /users:
         get:
             tags: [User]
@@ -1065,6 +1118,21 @@ components:
             type: array
             items:
                 $ref: '#/components/schemas/Parser'
+        Position:
+            description: A position on the Earth's surface.
+            type: object
+            properties:
+                latitude:
+                    type: number
+                    minimum: -90
+                    maximum: 90
+                longitude:
+                    type: number
+                    minimum: -180
+                    maximum: 180
+            required:
+                - latitude
+                - longitude
         Upload:
             description: An instance of case data being written to the server.
             type: object
@@ -1232,6 +1300,28 @@ components:
                     type: array
                     items:
                         $ref: '#/components/schemas/Upload'
+        AcknowledgmentSource:
+            type: object
+            properties:
+                name:
+                    type: string
+                    description: Human readable name of a source
+                    example: Paraguay
+                origin:
+                    type: object
+                    properties:
+                        providerName:
+                            type: string
+                        providerWebsiteUrl:
+                            type: string
+                        url:
+                            type: string
+                            example: https://opendata.digilugu.ee/opendata_covid19_test_results.csv
+                            description: Source location, can be http, https, or s3 schemes. This must be the link to the source data download.
+                        license:
+                            type: string
+                            example: MIT
+                            description: The license under which we have the right to ingest the data. Ideally a SPDX identifier (https://spdx.org/licenses/).
         SourceArray:
             type: object
             properties:
@@ -1245,6 +1335,10 @@ components:
                     type: integer
             items:
                 $ref: '#/components/schemas/Source'
+        AcknowledgmentSourcesArray:
+            type: array
+            items:
+                $ref: '#/components/schemas/AcknowledgmentSource'
         Case:
             description: A single line-list case.
             properties:
@@ -1797,6 +1891,9 @@ components:
             type: array
             items:
                 $ref: '#/components/schemas/Location'
+        CountryNames:
+            description: A dictionary where the keys are ISO-3166-1 country codes and the values names used in Global.health for those countries
+            type: object
         BatchCaseUpdateResponse:
             description: Response to batch update cases API requests
             properties:
@@ -1943,6 +2040,18 @@ components:
                 application/json:
                     schema:
                         $ref: '#/components/schemas/OccupationArray'
+        '200Position':
+            description: OK
+            content:
+                application/json:
+                    schema:
+                        $ref: '#/components/schemas/Position'
+        '200CountryNames':
+            description: OK
+            content:
+                application/json:
+                    schema:
+                        $ref: '#/components/schemas/CountryNames'
         '201Case':
             description: Created
             content:
@@ -1963,6 +2072,12 @@ components:
                 application/json:
                     schema:
                         $ref: '#/components/schemas/Source'
+        '200AcknowledgmentSource':
+            description: OK
+            content:
+                application/json:
+                    schema:
+                        $ref: '#/components/schemas/AcknowledgmentSourcesArray'
         '200SourceArray':
             description: OK
             content:

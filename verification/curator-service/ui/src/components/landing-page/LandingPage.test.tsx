@@ -44,10 +44,6 @@ describe('<LandingPage />', () => {
             'href',
             'https://raw.githubusercontent.com/globaldothealth/list/main/data-serving/scripts/export-data/data_dictionary.txt',
         );
-        expect(screen.getByText('Data acknowledgments')).toHaveAttribute(
-            'href',
-            'https://global.health/acknowledgement/',
-        );
         expect(screen.getByText('Terms of use')).toHaveAttribute(
             'href',
             'https://global.health/terms-of-use/',
@@ -71,7 +67,7 @@ describe('<LandingPage />', () => {
             screen.getByText(/Participating Institutions:/i),
         ).toBeInTheDocument();
         expect(screen.getByText(/With funding from:/i)).toBeInTheDocument();
-        expect(screen.getAllByAltText(/Partner logo/i)).toHaveLength(10);
+        expect(screen.getAllByAltText(/Partner logo/i)).toHaveLength(11);
     });
 });
 

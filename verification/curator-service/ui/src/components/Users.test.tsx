@@ -33,6 +33,8 @@ const initialLoggedInState: RootState = {
         isLoading: false,
         searchQuery: '',
         filterBreadcrumbs: [],
+        version: '1.0',
+        env: 'local',
     },
     auth: {
         changePasswordResponse: undefined,
@@ -53,7 +55,12 @@ const initialLoggedInState: RootState = {
             message: '',
         },
     },
-    filtersReducer: { countryList: [], isLoading: false, error: undefined },
+    filters: { countryList: [], isLoading: false, error: undefined },
+    acknowledgment: {
+        isLoading: false,
+        error: undefined,
+        acknowledgmentData: [],
+    },
 };
 
 describe('<Users />', () => {

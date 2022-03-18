@@ -28,6 +28,7 @@ import AutomatedBackfill from '../AutomatedBackfill';
 import AutomatedSourceForm from '../AutomatedSourceForm';
 import BulkCaseForm from '../BulkCaseForm';
 import CaseForm from '../CaseForm';
+import AcknowledgmentsPage from '../AcknowledgmentsPage';
 import Drawer from '@material-ui/core/Drawer';
 import EditCase from '../EditCase';
 import GHListLogo from '../GHListLogo';
@@ -53,7 +54,7 @@ import clsx from 'clsx';
 import { useLastLocation } from 'react-router-last-location';
 import PolicyLink from '../PolicyLink';
 import { useCookieBanner } from '../../hooks/useCookieBanner';
-import { SortBy, SortByOrder } from '../../constants/types';
+import { SortBy, SortByOrder, MapLink } from '../../constants/types';
 import { URLToSearchQuery } from '../util/searchQuery';
 import { useAppDispatch, useAppSelector } from '../../hooks/redux';
 import {
@@ -61,7 +62,8 @@ import {
     setFilterBreadcrumbs,
     deleteFilterBreadcrumbs,
 } from '../../redux/app/slice';
-import { selectIsLoading } from '../../redux/app/selectors';
+import { selectIsLoading, selectEnv } from '../../redux/app/selectors';
+import { getEnv } from '../../redux/app/thunk';
 import { getUserProfile, logout } from '../../redux/auth/thunk';
 import { selectUser } from '../../redux/auth/selectors';
 import { User } from '../../api/models/User';
@@ -362,6 +364,9 @@ function ProfileMenu(props: { user: User }): JSX.Element {
                 >
                     <MenuItem>About Global.health</MenuItem>
                 </a>
+                <Link to="/data-acknowledgments" onClick={handleClose}>
+                    <MenuItem>Data acknowledgments</MenuItem>
+                </Link>
                 <a
                     className={classes.link}
                     rel="noopener noreferrer"
@@ -370,15 +375,6 @@ function ProfileMenu(props: { user: User }): JSX.Element {
                     onClick={handleClose}
                 >
                     <MenuItem>Data dictionary</MenuItem>
-                </a>
-                <a
-                    className={classes.link}
-                    rel="noopener noreferrer"
-                    target="_blank"
-                    href="https://global.health/acknowledgement/"
-                    onClick={handleClose}
-                >
-                    <MenuItem>Data acknowledgments</MenuItem>
                 </a>
                 <a
                     href="https://github.com/globaldothealth/list#globalhealth-list"
@@ -415,8 +411,14 @@ export default function App(): JSX.Element {
         return null;
     };
 
+    // Get current env
+    useEffect(() => {
+        dispatch(getEnv());
+    }, [dispatch]);
+
     const isLoadingUser = useAppSelector(selectIsLoading);
     const user = useAppSelector(selectUser);
+    const env = useAppSelector(selectEnv);
 
     const showMenu = useMediaQuery(theme.breakpoints.up('sm'));
     const [drawerOpen, setDrawerOpen] = useState<boolean>(false);
@@ -433,9 +435,9 @@ export default function App(): JSX.Element {
         React.useState<boolean>(false);
     const [activeFilterInput, setActiveFilterInput] =
         React.useState<string>('');
-    const [sortBy, setSortBy] = useState<SortBy>(SortBy.Default);
+    const [sortBy, setSortBy] = useState<SortBy>(SortBy.ConfirmationDate);
     const [sortByOrder, setSortByOrder] = useState<SortByOrder>(
-        SortByOrder.Ascending,
+        SortByOrder.Descending,
     );
     const classes = useStyles();
 
@@ -619,22 +621,19 @@ export default function App(): JSX.Element {
                         ) : (
                             <span className={classes.spacer}></span>
                         )}
-                        {user && (
-                            <>
-                                <Typography>
-                                    <a
-                                        className={classes.mapLink}
-                                        data-testid="mapLink"
-                                        href="https://map.covid-19.global.health/"
-                                        rel="noopener noreferrer"
-                                        target="_blank"
-                                    >
-                                        G.h Map
-                                    </a>
-                                </Typography>
-                                <ProfileMenu user={user} />{' '}
-                            </>
-                        )}
+
+                        <Typography>
+                            <a
+                                className={classes.mapLink}
+                                data-testid="mapLink"
+                                href={MapLink[env]}
+                                rel="noopener noreferrer"
+                                target="_blank"
+                            >
+                                G.h Map
+                            </a>
+                        </Typography>
+                        {user && <ProfileMenu user={user} />}
                     </Toolbar>
                 </AppBar>
                 {user && (
@@ -746,15 +745,13 @@ export default function App(): JSX.Element {
                             >
                                 Data dictionary
                             </a>
-                            <a
-                                href="https://global.health/acknowledgement/"
-                                rel="noopener noreferrer"
-                                target="_blank"
+                            <Link
+                                to="/data-acknowledgments"
                                 className={classes.link}
                                 data-testid="acknowledgmentsButton"
                             >
                                 Data acknowledgments
-                            </a>
+                            </Link>
                             <a
                                 href="https://global.health/terms-of-use"
                                 rel="noopener noreferrer"
@@ -795,7 +792,7 @@ export default function App(): JSX.Element {
                 )}
                 <main
                     className={clsx(classes.content, {
-                        [classes.contentShift]: drawerOpen,
+                        [classes.contentShift]: drawerOpen || !user,
                     })}
                 >
                     <div className={classes.drawerHeader} />
@@ -894,6 +891,9 @@ export default function App(): JSX.Element {
                                 }}
                             />
                         )}
+                        <Route exact path="/data-acknowledgments">
+                            <AcknowledgmentsPage />
+                        </Route>
                         <Route exact path="/terms">
                             <TermsOfUse />
                         </Route>

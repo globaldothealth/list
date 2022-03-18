@@ -1,0 +1,16 @@
+Package: globaldothealth
+Type: Package
+Title: Access Line List data from Global.health
+Version: 1.0
+Date: 2022-03-15
+Author: Global.health maintainers
+Maintainer: Global.health maintainers <info@global.health>
+Description: Global.health is the first of its kind, easy-to-use global
+  data repository and visualization platform that enables open access to
+  real-time epidemiological anonymized line-list data. 
+License: MIT
+Depends:
+  httr (>= 1.4.0),
+  readr (>= 2.1.0),
+  openssl (>= 2.0.0),
+  tibble (>= 3.1.0)

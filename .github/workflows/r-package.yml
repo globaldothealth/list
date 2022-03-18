@@ -1,0 +1,32 @@
+name: R package
+
+on:
+  push:
+    branches: [main]
+    paths:
+    - '.github/workflows/r-package.yml'
+    - 'api/R/**'
+  pull_request:
+    paths:
+    - '.github/workflows/r-package.yml'
+    - 'api/R/**'
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: api/R
+    steps:
+    - uses: actions/checkout@v2
+    - uses: r-lib/actions/setup-r@v2
+      with:
+        r-version: '4.1'
+    - uses: r-lib/actions/setup-r-dependencies@v2
+      with:
+        extra-packages: rcmdcheck
+        working-directory: api/R
+    - uses: r-lib/actions/check-r-package@v2
+      with:
+        args: 'c("--no-manual", "--as-cran", "--no-examples")'
+        working-directory: api/R
