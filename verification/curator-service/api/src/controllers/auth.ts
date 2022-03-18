@@ -28,6 +28,14 @@ function userCollection() {
     return users;
 }
 
+// moved this from the User mongoose document: find a permanent home
+async function isUserPasswordValid(user: UserDocument, password: string): Promise<boolean> {
+    if (!user.password) return false;
+
+    const compare = await bcrypt.compare(password, user.password);
+    return compare;
+}
+
 async function findUserByAPIKey(apiKey?: string): Promise<Express.User> {
     
     if (!apiKey) {
@@ -374,18 +382,19 @@ export class AuthController {
                 const oldPassword = req.body.oldPassword as string;
                 const newPassword = req.body.newPassword as string;
                 const user = req.user as UserDocument;
-
+                const users = userCollection();
                 if (!user) {
                     return res.sendStatus(403);
                 }
 
                 try {
-                    const currentUser = await User.findById(user.id);
+                    const currentUser = await users.findOne({ _id: user.id });
                     if (!currentUser) {
                         return res.sendStatus(403);
                     }
 
-                    const isValidPassword = await currentUser.isValidPassword(
+                    const isValidPassword = await isUserPasswordValid(
+                        currentUser as UserDocument,
                         oldPassword,
                     );
 
@@ -396,9 +405,10 @@ export class AuthController {
                     }
 
                     const hashedPassword = await bcrypt.hash(newPassword, 10);
-                    await User.findByIdAndUpdate(user.id, {
-                        password: hashedPassword,
-                    });
+                    await users.findOneAndUpdate(
+                        { _id: user.id },
+                        { password: hashedPassword, },
+                    );
 
                     return res
                         .status(200)
