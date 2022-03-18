@@ -35,6 +35,19 @@ async function isUserPasswordValid(user: UserDocument, password: string): Promis
     const compare = await bcrypt.compare(password, user.password);
     return compare;
 }
+// and this
+function userPublicFields(user: UserDocument) {
+    return {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        googleID: user.googleID,
+        roles: user.roles,
+        picture: user.picture,
+        newsletterAccepted: user.newsletterAccepted,
+        apiKey: user.apiKey,
+    };
+}
 
 async function findUserByAPIKey(apiKey?: string): Promise<Express.User> {
     
@@ -652,7 +665,8 @@ export class AuthController {
                 },
                 async (req, email, password, done) => {
                     try {
-                        const user = await User.findOne({ email });
+                        const users = userCollection();
+                        const user = await users.findOne({ email });
 
                         if (user) {
                             return done(null, false, {
@@ -661,15 +675,19 @@ export class AuthController {
                         }
 
                         const hashedPassword = await bcrypt.hash(password, 10);
-                        const newUser = await User.create({
-                            email: email,
+                        const userId = new ObjectId();
+                        const insertResult = await users.insertOne({
+                            _id: userId,
+                            email,
                             password: hashedPassword,
                             name: req.body.name || '',
                             roles: [],
                             newsletterAccepted:
                                 req.body.newsletterAccepted || false,
                         });
-
+                        const newUser = await users.findOne({
+                            _id: userId,
+                        });
                         // Send welcome email
                         await this.emailClient.send(
                             [email],
@@ -689,7 +707,7 @@ export class AuthController {
                             <p>The G.h Team</p>`,
                         );
 
-                        done(null, newUser.publicFields());
+                        done(null, userPublicFields(newUser));
                     } catch (error) {
                         done(error);
                     }
