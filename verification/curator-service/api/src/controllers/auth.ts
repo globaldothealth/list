@@ -724,14 +724,15 @@ export class AuthController {
                 },
                 async (email, password, done) => {
                     try {
-                        const user = await User.findOne({ email });
+                        const user = await userCollection().findOne({ email });
                         if (!user) {
                             return done(null, false, {
                                 message: 'Wrong username or password',
                             });
                         }
 
-                        const isValidPassword = await user.isValidPassword(
+                        const isValidPassword = await isUserPasswordValid(
+                            user,
                             password,
                         );
                         if (!isValidPassword) {
@@ -740,7 +741,7 @@ export class AuthController {
                             });
                         }
 
-                        done(null, user.publicFields());
+                        done(null, userPublicFields(user));
                     } catch (error) {
                         done(error);
                     }
