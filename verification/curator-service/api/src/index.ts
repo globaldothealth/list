@@ -87,11 +87,11 @@ const sess: SessionOptions = {
     // MongoStore implements touch() so we don't need resave.
     // Cf. https://github.com/expressjs/session#resave.
     resave: false,
-    // Chosing false is useful for login sessions which is what we want.
+    // Choosing false is useful for login sessions which is what we want.
     // https://github.com/expressjs/session#saveuninitialized
     saveUninitialized: false,
     store: new MongoStore({
-        mongooseConnection: mongoose.connection,
+        client: mongoose.connection.getClient(),
         secret: env.SESSION_COOKIE_KEY,
     }),
     cookie: {
