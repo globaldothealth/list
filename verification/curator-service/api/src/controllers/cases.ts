@@ -4,6 +4,7 @@ import axios from 'axios';
 import { logger } from '../util/logger';
 import AWS from 'aws-sdk';
 import crypto from 'crypto';
+import mongoose from 'mongoose';
 
 // Don't set client-side timeouts for requests to the data service.
 // TODO: Make this more fine-grained once we fix
@@ -14,6 +15,9 @@ axios.defaults.timeout = 0;
 const defaultInputQuery = '/cases';
 const defaultOutputQuery =
     '/cases/?limit=50&page=1&count_limit=10000&sort_by=default&order=ascending';
+
+const mongoClient = () => mongoose.connection.getClient();
+const users = () => mongoClient().db().collection("users");
 
 /**
  * CasesController mostly forwards case-related requests to the data service.
@@ -62,8 +66,8 @@ export default class CasesController {
         req.body.correlationId = correlationId;
         try {
             const user = req.user as UserDocument;
-            await User.findByIdAndUpdate(
-                user.id,
+            const result = await users().findOneAndUpdate(
+                { _id: user.id },
                 {
                     $push: {
                         downloads: {
@@ -72,16 +76,13 @@ export default class CasesController {
                             query: req.body.query,
                         },
                     },
-                },
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                function (err: any) {
-                    if (err) {
-                        logger.info(`An error occurred: ${err}`);
-                    } else {
-                        logger.info('Document updated');
-                    }
-                },
+                }
             );
+            if (!result.ok) {
+                logger.error(`An error occurred: ${result.lastErrorObject}`);
+            } else {
+                logger.info('Download pushed onto user');
+            }
             axios({
                 method: 'post',
                 url: this.dataServerURL + '/api' + req.url,
