@@ -429,7 +429,7 @@ export class AuthController {
 
                 try {
                     // Check if user with this email address exists
-                    const user = await User.findOne({ email });
+                    const user = await userCollection().findOne({ email });
                     if (!user) {
                         return res.sendStatus(200);
                     }
