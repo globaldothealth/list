@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { User, UserDocument } from '../model/user';
+import { UserDocument } from '../model/user';
 import axios, { AxiosError } from 'axios';
 import { logger } from '../util/logger';
 import AWS from 'aws-sdk';
@@ -68,7 +68,7 @@ export default class CasesController {
         try {
             const user = req.user as UserDocument;
             const result = await users().findOneAndUpdate(
-                { _id: user.id },
+                { _id: new ObjectId(user.id) },
                 {
                     $push: {
                         downloads: {
@@ -260,26 +260,23 @@ export default class CasesController {
                 });
             });
 
-            await User.findByIdAndUpdate(
-                user.id,
-                {
-                    $push: {
-                        downloads: {
-                            timestamp: new Date(),
-                            format: format,
-                            query: country,
-                        },
+            const result = await users().findOneAndUpdate({
+                _id: new ObjectId(user.id),
+            }, {
+                $push: {
+                    downloads: {
+                        timestamp: new Date(),
+                        format: format,
+                        query: country,
                     },
                 },
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                function (err: any) {
-                    if (err) {
-                        logger.info(`An error occurred: ${err}`);
-                    } else {
-                        logger.info('Document updated');
-                    }
-                },
-            );
+            });
+
+            if (result.ok) {
+                logger.info(`added download to user ${user.id}`);
+            } else {
+                logger.error(`error adding download to user ${user.id}: ${result.lastErrorObject}`);
+            }
 
             res.status(200).send({ signedUrl });
         } catch (err) {
