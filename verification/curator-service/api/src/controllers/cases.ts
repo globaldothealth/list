@@ -207,8 +207,9 @@ export default class CasesController {
                 });
             });
 
-            await User.findByIdAndUpdate(
-                user.id,
+            const result = await users().findOneAndUpdate({
+                    _id: new ObjectId(user.id),
+                },
                 {
                     $push: {
                         downloads: {
@@ -216,16 +217,13 @@ export default class CasesController {
                         },
                     },
                 },
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                function (err: any) {
-                    if (err) {
-                        logger.info(`An error occurred: ${err}`);
-                    } else {
-                        logger.info('Document updated');
-                    }
-                },
             );
 
+            if (result.ok) {
+                logger.info(`Download added for user ${user.id}`);
+            } else {
+                logger.error(`Adding download to user ${user.id} failed with error ${result.lastErrorObject}`);
+            }
             res.status(200).send({ signedUrl });
         } catch (err) {
             res.status(500).send(err);
