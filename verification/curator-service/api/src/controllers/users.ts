@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 
-import { User, userRoles } from '../model/user';
+import { User, userRoles, users } from '../model/user';
 
 /**
  * List the users.
@@ -21,11 +21,11 @@ export const list = async (req: Request, res: Response): Promise<void> => {
     }
     try {
         const [docs, total] = await Promise.all([
-            User.find({})
-                .skip(limit * (page - 1))
-                .limit(limit + 1)
-                .lean(),
-            User.countDocuments({}),
+            users().find({}, {
+                skip: limit * (page - 1),
+                limit: limit + 1,
+            }).toArray(),
+            users().countDocuments({}),
         ]);
         // If we have more items than limit, add a response param
         // indicating that there is more to fetch on the next page.
