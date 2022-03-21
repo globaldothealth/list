@@ -1,10 +1,11 @@
 import { Request, Response } from 'express';
 import { User, UserDocument } from '../model/user';
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
 import { logger } from '../util/logger';
 import AWS from 'aws-sdk';
 import crypto from 'crypto';
 import mongoose from 'mongoose';
+import { ObjectId } from 'mongodb';
 
 // Don't set client-side timeouts for requests to the data service.
 // TODO: Make this more fine-grained once we fix
@@ -134,26 +135,22 @@ export default class CasesController {
             logger.info(
                 `Streaming case data in format ${req.body.format} matching query ${req.body.query} for correlation ID ${req.body.correlationId}`,
             );
-            await User.findByIdAndUpdate(
-                user.id,
-                {
-                    $push: {
-                        downloads: {
-                            timestamp: new Date(),
-                            format: req.body.format,
-                            query: req.body.query,
-                        },
+            const result = await users().findOneAndUpdate({
+                _id: new ObjectId(user.id),
+            }, {
+                $push: {
+                    downloads: {
+                        timestamp: new Date(),
+                        format: req.body.format,
+                        query: req.body.query,
                     },
                 },
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                function (err: any) {
-                    if (err) {
-                        logger.info(`An error occurred: ${err}`);
-                    } else {
-                        logger.info('Document updated');
-                    }
-                },
-            );
+            });
+            if (result.ok) {
+                logger.info(`Download added to user ${user.id}`);
+            } else {
+                logger.error(`Error adding download to user ${user.id}: ${result.lastErrorObject}`);
+            }
             axios({
                 method: 'post',
                 url: url,
@@ -170,9 +167,10 @@ export default class CasesController {
                 response.data.pipe(res);
             });
         } catch (err) {
-            logger.error(err);
-            if (err.response?.status && err.response?.data) {
-                res.status(err.response.status).send(err.response.data);
+            const error = err as AxiosError;
+            logger.error(error);
+            if (error.response?.status && error.response?.data) {
+                res.status(error.response.status).send(error.response.data);
                 return;
             }
             res.status(500).send(err);
