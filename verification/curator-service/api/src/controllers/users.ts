@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
+import { ObjectId } from 'mongodb';
 
-import { User, userRoles, users } from '../model/user';
+import { userRoles, users } from '../model/user';
 
 /**
  * List the users.
@@ -54,28 +55,31 @@ export const updateRoles = async (
     res: Response,
 ): Promise<void> => {
     try {
-        const user = await User.findByIdAndUpdate(
-            req.params.id,
-            { roles: req.body.roles },
-            {
-                // Return the udpated object.
-                new: true,
-                runValidators: true,
-            },
-        );
-        if (!user) {
+        const result = await users().findOneAndUpdate({
+            _id: new ObjectId(req.params.id),
+        }, {
+            $set: {
+                roles: req.body.roles,
+            }
+        }, {
+            returnDocument: "after",
+        });
+        if (!result.ok || !result.value) {
             res.status(404).json({
                 message: `user with id ${req.params.id} could not be found`,
             });
             return;
         }
-        res.json(user);
+        res.json(result.value);
     } catch (err) {
-        if (err.name === 'ValidationError') {
-            res.status(422).json(err);
+        const error = err as Error;
+        if (error.name === 'ValidationError') {
+            res.status(422).json(error);
             return;
         }
-        res.status(500).json(err);
+        console.error('updateRoles error');
+        console.error(error);
+        res.status(500).json(error);
         return;
     }
 };
