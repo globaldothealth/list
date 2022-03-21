@@ -4,7 +4,7 @@ import {
 } from 'passport-http-bearer';
 import { Strategy as GoogleStrategy, Profile } from 'passport-google-oauth20';
 import { NextFunction, Request, Response } from 'express';
-import { User, UserDocument } from '../model/user';
+import { User, UserDocument, users } from '../model/user';
 import mongoose, { isValidObjectId } from 'mongoose';
 
 import { Router } from 'express';
@@ -23,12 +23,6 @@ let isNewsletterAccepted: boolean;
 
 function database() {
     return mongoose.connection.getClient().db();
-}
-
-function userCollection() {
-    const mongo = database();
-    const users = mongo.collection("users");
-    return users;
 }
 
 function tokenCollection() {
@@ -62,7 +56,7 @@ async function findUserByAPIKey(apiKey?: string): Promise<Express.User> {
         throw new Error('No API key');
     }
     const userID = apiKey.slice(0, 24);
-    const user = await userCollection().findOne({ _id: new ObjectId(userID) });
+    const user = await users().findOne({ _id: new ObjectId(userID) });
     if (!user) {
         throw new Error('Invalid API key');
     }
@@ -299,7 +293,7 @@ export class AuthController {
             mustBeAuthenticated,
             async (req: Request, res: Response): Promise<void> => {
                 const theUser = req.user as UserDocument;
-                const currentUser = await userCollection().findOne({ _id: new ObjectId(theUser.id) });
+                const currentUser = await users().findOne({ _id: new ObjectId(theUser.id) });
                 if (!currentUser) {
                     // internal server error as you were authenticated but unknown
                     res.status(500).end();
@@ -402,13 +396,12 @@ export class AuthController {
                 const oldPassword = req.body.oldPassword as string;
                 const newPassword = req.body.newPassword as string;
                 const user = req.user as UserDocument;
-                const users = userCollection();
                 if (!user) {
                     return res.sendStatus(403);
                 }
 
                 try {
-                    const currentUser = await users.findOne({ _id: user.id });
+                    const currentUser = await users().findOne({ _id: user.id });
                     if (!currentUser) {
                         return res.sendStatus(403);
                     }
@@ -425,7 +418,7 @@ export class AuthController {
                     }
 
                     const hashedPassword = await bcrypt.hash(newPassword, 10);
-                    await users.findOneAndUpdate(
+                    await users().findOneAndUpdate(
                         { _id: user.id },
                         { password: hashedPassword, },
                     );
@@ -449,7 +442,7 @@ export class AuthController {
 
                 try {
                     // Check if user with this email address exists
-                    const user = await userCollection().findOne({ email });
+                    const user = await users().findOne({ email });
                     if (!user) {
                         return res.sendStatus(200);
                     }
@@ -566,8 +559,7 @@ export class AuthController {
 
                     // Hash new password and update user document in DB
                     const hashedPassword = await bcrypt.hash(newPassword, 10);
-                    const users = userCollection();
-                    const result = await users.findOneAndUpdate(
+                    const result = await users().findOneAndUpdate(
                         { _id: userId },
                         { $set: { password: hashedPassword } },
                         { returnDocument: "after" },
@@ -672,8 +664,7 @@ export class AuthController {
                 },
                 async (req, email, password, done) => {
                     try {
-                        const users = userCollection();
-                        const user = await users.findOne({ email });
+                        const user = await users().findOne({ email });
 
                         if (user) {
                             return done(null, false, {
@@ -683,7 +674,7 @@ export class AuthController {
 
                         const hashedPassword = await bcrypt.hash(password, 10);
                         const userId = new ObjectId();
-                        const insertResult = await users.insertOne({
+                        const insertResult = await users().insertOne({
                             _id: userId,
                             email,
                             password: hashedPassword,
@@ -692,7 +683,7 @@ export class AuthController {
                             newsletterAccepted:
                                 req.body.newsletterAccepted || false,
                         });
-                        const newUser = await users.findOne({
+                        const newUser = await users().findOne({
                             _id: userId,
                         });
                         // Send welcome email
@@ -731,7 +722,7 @@ export class AuthController {
                 },
                 async (email, password, done) => {
                     try {
-                        const user = await userCollection().findOne({ email });
+                        const user = await users().findOne({ email });
                         if (!user) {
                             return done(null, false, {
                                 message: 'Wrong username or password',
@@ -857,7 +848,6 @@ export class AuthController {
                     ) => void,
                 ): Promise<void> => {
                     try {
-                        const users = userCollection();
                         const response = await axios.get(
                             `https://openidconnect.googleapis.com/v1/userinfo?access_token=${token}`,
                         );
@@ -871,10 +861,10 @@ export class AuthController {
                                 'Supplied bearer token must be scoped for "email"',
                             );
                         }
-                        let user = await users.findOne({ email: email });
+                        let user = await users().findOne({ email: email });
                         if (!user) {
                             const userId = new ObjectId();
-                            const result = await users.insertOne({
+                            const result = await users().insertOne({
                                 _id: userId,
                                 email: email,
                                 googleID: response.data.sub,
@@ -883,7 +873,7 @@ export class AuthController {
                                 name: '',
                             });
                             if (result.insertedCount == 1) {
-                                user = await users.findOne({ _id: userId });
+                                user = await users().findOne({ _id: userId });
                             } else {
                                 return done(null, undefined);
                             }

@@ -1,10 +1,9 @@
 import { Request, Response } from 'express';
-import { UserDocument } from '../model/user';
+import { UserDocument, users } from '../model/user';
 import axios, { AxiosError } from 'axios';
 import { logger } from '../util/logger';
 import AWS from 'aws-sdk';
 import crypto from 'crypto';
-import mongoose from 'mongoose';
 import { ObjectId } from 'mongodb';
 
 // Don't set client-side timeouts for requests to the data service.
@@ -16,9 +15,6 @@ axios.defaults.timeout = 0;
 const defaultInputQuery = '/cases';
 const defaultOutputQuery =
     '/cases/?limit=50&page=1&count_limit=10000&sort_by=default&order=ascending';
-
-const mongoClient = () => mongoose.connection.getClient();
-const users = () => mongoClient().db().collection("users");
 
 /**
  * CasesController mostly forwards case-related requests to the data service.

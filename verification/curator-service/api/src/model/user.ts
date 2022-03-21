@@ -84,3 +84,6 @@ export const Session = mongoose.model<mongoose.Document>(
     'Session',
     new mongoose.Schema({}),
 );
+
+const mongoClient = () => mongoose.connection.getClient();
+export const users = () => mongoClient().db().collection("users");
