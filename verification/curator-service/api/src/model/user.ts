@@ -44,10 +44,6 @@ const userSchema = new mongoose.Schema<UserDocument>({
 
 export const User = mongoose.model<UserDocument>('User', userSchema);
 
-export const Session = mongoose.model<mongoose.Document>(
-    'Session',
-    new mongoose.Schema({}),
-);
-
 const mongoClient = () => mongoose.connection.getClient();
 export const users = () => mongoClient().db().collection("users");
+export const sessions = () => mongoClient().db().collection("sessions");

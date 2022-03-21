@@ -1,6 +1,6 @@
 import * as baseUser from './users/base.json';
 
-import { Session, User } from '../src/model/user';
+import { sessions, users } from '../src/model/user';
 
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import app from '../src/index';
@@ -18,14 +18,14 @@ beforeAll(() => {
 });
 
 beforeEach(async () => {
-    await User.deleteMany({});
-    await Session.deleteMany({});
+    await users().deleteMany({});
+    await sessions().deleteMany({});
     jest.clearAllMocks();
 });
 
 afterAll(async () => {
-    await User.deleteMany({});
-    await Session.deleteMany({});
+    await users().deleteMany({});
+    await sessions().deleteMany({});
     return mongoServer.stop();
 });
 
@@ -60,12 +60,12 @@ describe('GET', () => {
 
     it('list should paginate', async () => {
         for (const i of Array.from(Array(14).keys())) {
-            await new User({
+            await users().insertOne({
                 name: 'Alice Smith',
                 email: 'foo@bar.com',
                 googleID: `testGoogleID${i}`,
                 roles: ['curator'],
-            }).save();
+            });
         }
         // Fetch first page as an admin.
         let res = await adminRequest

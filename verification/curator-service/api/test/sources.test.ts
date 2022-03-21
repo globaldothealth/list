@@ -10,7 +10,7 @@ const mockInitialize = jest.fn().mockReturnValue({ send: mockSend });
 
 import * as baseUser from './users/base.json';
 
-import { Session, User } from '../src/model/user';
+import { sessions, users } from '../src/model/user';
 
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import { Case, RestrictedCase } from '../src/model/case';
@@ -55,8 +55,8 @@ beforeEach(async () => {
     jest.clearAllMocks();
     mockSend.mockResolvedValue({});
     await Source.deleteMany({});
-    await User.deleteMany({});
-    await Session.deleteMany({});
+    await users().deleteMany({});
+    await sessions().deleteMany({});
 });
 
 afterEach(async () => {
@@ -65,8 +65,8 @@ afterEach(async () => {
 
 afterAll(async () => {
     await Source.deleteMany({});
-    await User.deleteMany({});
-    await Session.deleteMany({});
+    await users().deleteMany({});
+    await sessions().deleteMany({});
 });
 
 let curatorRequest: any;

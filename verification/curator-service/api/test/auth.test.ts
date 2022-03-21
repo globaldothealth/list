@@ -2,7 +2,7 @@ import * as core from 'express-serve-static-core';
 
 import { AuthController, mustHaveAnyRole } from '../src/controllers/auth';
 import { Request, Response } from 'express';
-import { Session, User } from '../src/model/user';
+import { users, sessions } from '../src/model/user';
 
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import app from '../src/index';
@@ -40,8 +40,8 @@ afterAll(async () => {
 });
 
 afterEach(async () => {
-    await User.deleteMany({});
-    await Session.deleteMany({});
+    await users().deleteMany({});
+    await sessions().deleteMany({});
     jest.clearAllMocks();
 });
 
