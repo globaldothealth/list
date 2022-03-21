@@ -1,5 +1,4 @@
 import mongoose, { Document } from 'mongoose';
-import bcrypt from 'bcrypt';
 
 export const userRoles = ['admin', 'curator'];
 
@@ -17,18 +16,6 @@ export type UserDocument = Document & {
         format?: String,
         query?: String,
     }];
-
-    isValidPassword(password: string): Promise<boolean>;
-    publicFields(): {
-        id: string;
-        name?: string;
-        email: string;
-        googleID: string;
-        roles: string[];
-        picture?: string;
-        newsletterAccepted?: boolean;
-        apiKey?: string;
-    };
 };
 
 const userSchema = new mongoose.Schema<UserDocument>({
@@ -54,29 +41,6 @@ const userSchema = new mongoose.Schema<UserDocument>({
         },
     ],
 });
-
-// Methods
-userSchema.methods.isValidPassword = async function (
-    password: string,
-): Promise<boolean> {
-    if (!this.password) return false;
-
-    const compare = await bcrypt.compare(password, this.password);
-    return compare;
-};
-
-userSchema.methods.publicFields = function () {
-    return {
-        id: this.id,
-        name: this.name,
-        email: this.email,
-        googleID: this.googleID,
-        roles: this.roles,
-        picture: this.picture,
-        newsletterAccepted: this.newsletterAccepted,
-        apiKey: this.apiKey,
-    };
-};
 
 export const User = mongoose.model<UserDocument>('User', userSchema);
 

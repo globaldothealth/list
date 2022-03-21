@@ -37,7 +37,8 @@ async function isUserPasswordValid(user: UserDocument, password: string): Promis
     return compare;
 }
 // and this
-function userPublicFields(user: UserDocument) {
+function userPublicFields(user: UserDocument | null | undefined) {
+    if (!user) return undefined;
     return {
         id: user._id,
         name: user.name,
@@ -644,7 +645,7 @@ export class AuthController {
                     // Cf. https://github.com/jaredhanson/passport/issues/6#issuecomment-4857287
                     // This doesn't work however for now as per, if you hit this bug, you have to manually clear the cookies.
                     // Cf https://github.com/jaredhanson/passport/issues/776
-                    done(null, user?.publicFields() || undefined);
+                    done(null, userPublicFields(user));
                     return;
                 })
                 .catch((e) => {
