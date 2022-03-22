@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { Request, Response } from 'express';
 import { cases, restrictedCases } from '../model/case';
-import { Source, SourceDocument } from '../model/source';
+import { Source, SourceDocument, sources } from '../model/source';
 
 import AwsBatchClient from '../clients/aws-batch-client';
 import AwsEventsClient from '../clients/aws-events-client';
@@ -62,14 +62,16 @@ export default class SourcesController {
               }
             : {};
         try {
-            const [docs, total] = await Promise.all([
-                Source.find(filter)
-                    .sort({ name: 1 })
-                    .skip(limit * (page - 1))
-                    .limit(limit + 1)
-                    .lean(),
-                Source.countDocuments({}),
+            const [cursor, total] = await Promise.all([
+                sources().find(filter,
+                    {
+                        sort: { name: 1 },
+                        skip: limit * (page - 1),
+                        limit: (limit + 1),
+                    }),
+                sources().countDocuments(filter),
             ]);
+            const docs = await cursor.toArray();
             // If we have more items than limit, add a response param
             // indicating that there is more to fetch on the next page.
             if (docs.length == limit + 1) {

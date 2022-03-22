@@ -87,3 +87,6 @@ sourceSchema.methods.toAwsRuleTargetId = function (): string {
 export type SourceDocument = mongoose.Document & ISource;
 
 export const Source = mongoose.model<SourceDocument>('Source', sourceSchema);
+
+const mongoClient = () => mongoose.connection.getClient();
+export const sources = () => mongoClient().db().collection("sources");
