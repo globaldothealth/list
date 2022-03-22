@@ -69,16 +69,27 @@ const sourceSchema = new mongoose.Schema<
     notificationRecipients: [String],
 });
 
+export const awsStatementIdForSource = (source: ISource) => source._id.toHexString();
+
 sourceSchema.methods.toAwsStatementId = function (): string {
     return this._id.toString();
 };
+
+export const awsRuleDescriptionForSource = (source: ISource) => 
+    `Scheduled ingestion rule for source: ${source.name}`;
+
 sourceSchema.methods.toAwsRuleDescription = function (): string {
     return `Scheduled ingestion rule for source: ${this.name}`;
 };
 
+export const awsRuleNameForSource = (source: ISource) => source._id.toHexString();
+
 sourceSchema.methods.toAwsRuleName = function (): string {
     return this._id.toString();
 };
+
+export const awsRuleTargetForSource = (source: ISource) =>
+    `${source._id.toHexString()}_Target`;
 
 sourceSchema.methods.toAwsRuleTargetId = function (): string {
     return `${this._id}_Target`;

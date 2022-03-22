@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { Request, Response } from 'express';
 import { cases, restrictedCases } from '../model/case';
-import { Source, SourceDocument, sources } from '../model/source';
+import { awsRuleDescriptionForSource, awsRuleNameForSource, awsRuleTargetForSource, awsStatementIdForSource, Source, SourceDocument, sources } from '../model/source';
 
 import AwsBatchClient from '../clients/aws-batch-client';
 import AwsEventsClient from '../clients/aws-events-client';
@@ -245,17 +245,28 @@ export default class SourcesController {
      */
     create = async (req: Request, res: Response): Promise<void> => {
         try {
-            const source = new Source(req.body);
-            await source.validate();
-            await this.createAutomationScheduleAwsResources(source);
-            const result = await source.save();
-            res.status(201).json(result);
-        } catch (err) {
-            if (err.name === 'ValidationError') {
-                res.status(422).json(err);
+            const sourceId = new ObjectId();
+            const insertResult = await sources().insertOne({
+                _id: sourceId,
+                ...req.body,
+            });
+            if (!insertResult.result.ok) {
+                // TODO: work out how to get the details of the error
+                res.status(500).json({
+                    message: 'Could not insert source'
+                });
                 return;
             }
-            res.status(500).json(err);
+            await this.createAutomationScheduleAwsResources(sourceId);
+            const source = await sources().findOne({ _id: sourceId });
+            res.status(201).json(source);
+        } catch (err) {
+            const error = err as Error;
+            if (error.name === 'ValidationError') {
+                res.status(422).json(error);
+                return;
+            }
+            res.status(500).json(error);
         }
     };
 
@@ -269,19 +280,24 @@ export default class SourcesController {
      * that it can be invoked by the rule.
      */
     private async createAutomationScheduleAwsResources(
-        source: SourceDocument,
+        sourceId: ObjectId,
     ): Promise<void> {
+        const source = await sources().findOne({ _id: sourceId });
         if (source.automation?.schedule) {
             const createdRuleArn = await this.awsEventsClient.putRule(
-                source.toAwsRuleName(),
-                source.toAwsRuleDescription(),
+                awsRuleNameForSource(source),
+                awsRuleDescriptionForSource(source),
                 source.automation.schedule.awsScheduleExpression,
                 this.batchClient.jobQueueArn,
-                source.toAwsRuleTargetId(),
-                source._id.toString(),
-                source.toAwsStatementId(),
+                awsRuleTargetForSource(source),
+                sourceId.toHexString(),
+                awsStatementIdForSource(source),
             );
-            source.set('automation.schedule.awsRuleArn', createdRuleArn);
+            await sources().updateOne({ _id: sourceId }, {
+                $set: {
+                    'automation.schedule.awsRuleArn': createdRuleArn,
+                }
+            });
             await this.sendNotifications(source, NotificationType.Add);
         }
     }
