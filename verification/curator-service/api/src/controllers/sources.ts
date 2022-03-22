@@ -306,13 +306,14 @@ export default class SourcesController {
      * Delete a single source.
      */
     del = async (req: Request, res: Response): Promise<void> => {
-        const source = await Source.findById(req.params.id);
+        const sourceId = new ObjectId(req.params.id);
+        const source = await sources().findOne( { _id: sourceId });
         if (!source) {
             res.sendStatus(404);
             return;
         }
 
-        const query = { 'caseReference.sourceId': new ObjectId(req.params.id) };
+        const query = { 'caseReference.sourceId': sourceId };
         const count = await cases().countDocuments(query);
         const restrictedCount = await restrictedCases().countDocuments(query);
         if (count + restrictedCount !== 0) {
@@ -324,14 +325,14 @@ export default class SourcesController {
 
         if (source.automation?.schedule?.awsRuleArn) {
             await this.awsEventsClient.deleteRule(
-                source.toAwsRuleName(),
-                source.toAwsRuleTargetId(),
+                awsRuleNameForSource(source),
+                awsRuleTargetForSource(source),
                 this.batchClient.jobQueueArn,
-                source.toAwsStatementId(),
+                awsStatementIdForSource(source),
             );
             await this.sendNotifications(source, NotificationType.Remove);
         }
-        source.remove();
+        sources().deleteOne({ _id: sourceId });
         res.status(204).end();
         return;
     };
