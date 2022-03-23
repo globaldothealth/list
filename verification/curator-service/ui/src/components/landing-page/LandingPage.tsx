@@ -51,9 +51,7 @@ const useStyles = makeStyles((theme: Theme) => ({
         marginTop: '20px',
         [theme.breakpoints.down(770)]: {
             marginBottom: '60px',
-        },
-        [theme.breakpoints.down(460)]: {
-            flexFlow: 'column',
+            flexDirection: 'column',
             rowGap: '30px',
         },
     },
@@ -70,6 +68,11 @@ const useStyles = makeStyles((theme: Theme) => ({
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'flex-end',
+
+        [theme.breakpoints.down(770)]: {
+            width: '100%',
+            alignItems: 'flex-start',
+        },
     },
     link: {
         display: 'block',
