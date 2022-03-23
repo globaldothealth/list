@@ -38,7 +38,7 @@ describe('LandingPage', function () {
         cy.visit('/');
         cy.contains('Welcome to G.h Data.');
         cy.contains('Sign up form');
-        
+
         cy.get('#password').type('tsgasdgasd');
         cy.get('button[data-testid="sign-up-button"]').click();
         cy.contains('one uppercase required!');
@@ -53,7 +53,6 @@ describe('LandingPage', function () {
         cy.get('#password').type('tT$5');
         cy.get('button[data-testid="sign-up-button"]').click();
         cy.contains('Minimum 8 characters required!');
-
     });
 
     it('Validates emails', function () {
@@ -124,7 +123,6 @@ describe('LandingPage', function () {
         cy.get('#password').type('tT$5');
         cy.get('button[data-testid="change-password-button"]').click();
         cy.contains('Minimum 8 characters required!');
-
     });
 
     it('Homepage with logged out user', function () {
@@ -132,7 +130,7 @@ describe('LandingPage', function () {
 
         cy.contains('Create new').should('not.exist');
         cy.contains('Charts').should('not.exist');
-        cy.contains('Line list').should('not.exist');
+        cy.contains('COVID-19 Linelist').should('not.exist');
         cy.contains('Sources').should('not.exist');
         cy.contains('Uploads').should('not.exist');
         cy.contains('Manage users').should('not.exist');
@@ -150,7 +148,7 @@ describe('LandingPage', function () {
 
         cy.contains('Create new').should('not.exist');
         cy.contains('Charts').should('not.exist');
-        cy.contains('Line list');
+        cy.contains('COVID-19 Linelist');
         cy.contains('Sources').should('not.exist');
         cy.contains('Uploads').should('not.exist');
         cy.contains('Manage users').should('not.exist');
@@ -166,7 +164,7 @@ describe('LandingPage', function () {
         cy.visit('/');
 
         cy.contains('Create new').should('not.exist');
-        cy.contains('Line list');
+        cy.contains('COVID-19 Linelist');
         cy.contains('Sources').should('not.exist');
         cy.contains('Uploads').should('not.exist');
         cy.contains('Manage users');

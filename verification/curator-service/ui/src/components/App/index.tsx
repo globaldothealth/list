@@ -492,7 +492,7 @@ export default function App(): JSX.Element {
                     className={classes.appBar}
                 >
                     <Toolbar>
-                        {user && hasAnyRole(['curator']) && (
+                        {user && hasAnyRole(['curator', 'admin']) && (
                             <IconButton
                                 color="primary"
                                 aria-label="toggle drawer"
@@ -540,7 +540,7 @@ export default function App(): JSX.Element {
                         {user && <ProfileMenu user={user} />}
                     </Toolbar>
                 </AppBar>
-                {user && hasAnyRole(['curator']) && (
+                {user && hasAnyRole(['curator', 'admin']) && (
                     <Sidebar drawerOpen={drawerOpen} />
                 )}
                 <main

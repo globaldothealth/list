@@ -111,16 +111,18 @@ const Sidebar = ({ drawerOpen }: SidebarProps): JSX.Element => {
                 <div className={classes.drawerHeader}></div>
                 <Typography className={classes.covidTitle}>COVID-19</Typography>
                 <>
-                    <Fab
-                        variant="extended"
-                        data-testid="create-new-button"
-                        className={classes.createNewButton}
-                        color="secondary"
-                        onClick={openCreateNewPopup}
-                    >
-                        <AddIcon className={classes.createNewIcon} />
-                        Create new
-                    </Fab>
+                    {hasAnyRole(['curator']) && (
+                        <Fab
+                            variant="extended"
+                            data-testid="create-new-button"
+                            className={classes.createNewButton}
+                            color="secondary"
+                            onClick={openCreateNewPopup}
+                        >
+                            <AddIcon className={classes.createNewIcon} />
+                            Create new
+                        </Fab>
+                    )}
                     <Menu
                         anchorEl={createNewButtonAnchorEl}
                         getContentAnchorEl={null}
