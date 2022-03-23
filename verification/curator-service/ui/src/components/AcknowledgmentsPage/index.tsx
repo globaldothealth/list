@@ -104,7 +104,8 @@ export default function AcknowledgmentsPage(): JSX.Element {
                     individual research labs and public health bodies that have
                     made epidemiological data available. A detailed table of
                     acknowledgements for the data used on this platform is
-                    below.
+                    below. (Please note: not all links for external data sources
+                    may be publicly accessible.)
                 </Typography>
                 <Paper className={classes.paper}>
                     {isLoading && (
@@ -194,7 +195,11 @@ export default function AcknowledgmentsPage(): JSX.Element {
                     and diplomacy: GISAID’s innovative contribution to global
                     health. Global Challenges, 1:33-46. DOI:
                     10.1002/gch2.1018PMCID: 31565258 accessible via{' '}
-                    <a href="https://pubmed.ncbi.nlm.nih.gov/31565258/">
+                    <a
+                        href="https://pubmed.ncbi.nlm.nih.gov/31565258/"
+                        target="_blank"
+                        rel="noreferrer"
+                    >
                         https://pubmed.ncbi.nlm.nih.gov/31565258/
                     </a>
                 </Typography>
