@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import clsx from 'clsx';
 
 import GitHubIcon from '@material-ui/icons/GitHub';
 import TwitterIcon from '@material-ui/icons/Twitter';
@@ -7,11 +8,19 @@ import LinkedInIcon from '@material-ui/icons/LinkedIn';
 import { useStyles } from './styled';
 import PolicyLink from '../PolicyLink';
 
-const Footer = (): JSX.Element => {
+interface FooterProps {
+    drawerOpen: boolean;
+}
+
+const Footer = ({ drawerOpen }: FooterProps): JSX.Element => {
     const classes = useStyles();
 
     return (
-        <footer className={classes.root}>
+        <footer
+            className={clsx(classes.root, {
+                [classes.contentShift]: drawerOpen,
+            })}
+        >
             <section className={classes.socialMediaContainer}>
                 <a
                     href="https://www.github.com/globaldothealth"
@@ -83,6 +92,22 @@ const Footer = (): JSX.Element => {
                 >
                     Cookie policy
                 </PolicyLink>
+                <a
+                    href="https://global.health/faqs/"
+                    rel="noopener noreferrer"
+                    target="_blank"
+                    className={classes.link}
+                >
+                    FAQs
+                </a>
+                <a
+                    href="https://github.com/globaldothealth/list/tree/main/api"
+                    rel="noopener noreferrer"
+                    target="_blank"
+                    className={classes.link}
+                >
+                    API
+                </a>
                 <a
                     href="mailto:info@global.health?subject=Feedback regarding Global.health data portal"
                     className={classes.link}

@@ -243,22 +243,22 @@ const useStyles = makeStyles((theme: Theme) => ({
         marginTop: 12,
     },
     content: {
-        flex: '1 0 auto',
+        flexGrow: 1,
         transition: theme.transitions.create(['margin', 'padding'], {
             easing: theme.transitions.easing.sharp,
             duration: theme.transitions.duration.leavingScreen,
         }),
-        marginLeft: -drawerWidth,
-        width: `calc(100% - ${drawerWidth}px)`,
+        marginLeft: 0,
+        padding: '0 24px',
+        width: '100%',
     },
     contentShift: {
         transition: theme.transitions.create(['margin', 'padding'], {
             easing: theme.transitions.easing.easeOut,
             duration: theme.transitions.duration.enteringScreen,
         }),
-        padding: '0 24px',
-        marginLeft: 0,
-        width: '100%',
+        marginLeft: drawerWidth,
+        width: `calc(100% - ${drawerWidth}px)`,
     },
     searchBar: {
         flex: 1,
@@ -545,8 +545,7 @@ export default function App(): JSX.Element {
                 )}
                 <main
                     className={clsx(classes.content, {
-                        [classes.contentShift]:
-                            drawerOpen || !user || !hasAnyRole(['curator']),
+                        [classes.contentShift]: drawerOpen,
                     })}
                 >
                     <div className={classes.drawerHeader} />
@@ -679,7 +678,7 @@ export default function App(): JSX.Element {
                     </Switch>
                 </main>
 
-                {user && <Footer />}
+                {user && <Footer drawerOpen={drawerOpen} />}
             </ThemeProvider>
         </div>
     );

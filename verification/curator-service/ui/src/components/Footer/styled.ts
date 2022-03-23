@@ -6,6 +6,20 @@ export const useStyles = makeStyles((theme: Theme) => ({
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center',
+        marginLeft: 0,
+        width: '100%',
+        transition: theme.transitions.create(['margin', 'padding'], {
+            easing: theme.transitions.easing.sharp,
+            duration: theme.transitions.duration.leavingScreen,
+        }),
+    },
+    contentShift: {
+        marginLeft: 240,
+        width: 'calc(100% - 240px)',
+        transition: theme.transitions.create(['margin', 'padding'], {
+            easing: theme.transitions.easing.easeOut,
+            duration: theme.transitions.duration.enteringScreen,
+        }),
     },
     socialMediaContainer: {
         display: 'flex',
