@@ -16,7 +16,7 @@ module.exports = {
   async up(db, client) {
     await db.command({
       dropIndexes: 'cases',
-      index: indexes[0].name,
+      index: indexes.map((anIndex) => anIndex.name),
     });
   },
 
