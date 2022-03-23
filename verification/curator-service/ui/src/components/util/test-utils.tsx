@@ -5,7 +5,7 @@ import { Provider } from 'react-redux';
 import { Router } from 'react-router-dom';
 import { createMemoryHistory } from 'history';
 import { ThemeProvider } from '@material-ui/core/styles';
-import { theme } from '../App/App';
+import { theme } from '../App';
 // Import your own reducer
 import store, { rootReducer, RootState } from '../../redux/store';
 

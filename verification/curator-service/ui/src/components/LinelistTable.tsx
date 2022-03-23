@@ -48,7 +48,7 @@ import CaseExcludeDialog from './CaseExcludeDialog';
 import CaseIncludeDialog from './CaseIncludeDialog';
 import renderDate, { renderDateRange } from './util/date';
 import { URLToSearchQuery } from './util/searchQuery';
-import { ChipData } from './App/App';
+import { ChipData } from './App';
 import { SortBy, SortByOrder } from '../constants/types';
 import { connect, ConnectedProps } from 'react-redux';
 import { RootState } from '../redux/store';
@@ -1751,7 +1751,7 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                 pageSizeOptions: [5, 10, 20, 50, 100],
                                 paginationPosition: 'top',
                                 toolbar: this.state.numSelectedRows > 0,
-                                maxBodyHeight: 'calc(100vh - 20em)',
+                                maxBodyHeight: 'calc(100vh - 18em)',
                                 headerStyle: {
                                     zIndex: 1,
                                     fontWeight: 'bold',

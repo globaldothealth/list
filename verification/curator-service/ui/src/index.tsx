@@ -3,7 +3,7 @@ import 'typeface-roboto';
 
 import * as serviceWorker from './serviceWorker';
 
-import App from './components/App/App';
+import App from './components/App';
 import { BrowserRouter } from 'react-router-dom';
 import { LastLocationProvider } from 'react-router-last-location';
 import React from 'react';
