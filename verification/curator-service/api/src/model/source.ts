@@ -9,7 +9,7 @@ import { UploadDocument, uploadSchema } from './upload';
 import countries from 'i18n-iso-countries';
 import mongoose from 'mongoose';
 
-interface ISource {
+export interface ISource {
     _id: mongoose.Types.ObjectId;
     name: string;
     countryCodes: string[];
@@ -21,11 +21,6 @@ interface ISource {
     uploads: UploadDocument[];
     dateFilter: DateFilterDocument;
     notificationRecipients: string[];
-
-    toAwsStatementId(): string;
-    toAwsRuleDescription(): string;
-    toAwsRuleName(): string;
-    toAwsRuleTargetId(): string;
 }
 
 type ISourceInstanceCreation = mongoose.Model<ISource>;
@@ -71,29 +66,13 @@ const sourceSchema = new mongoose.Schema<
 
 export const awsStatementIdForSource = (source: ISource) => source._id.toHexString();
 
-sourceSchema.methods.toAwsStatementId = function (): string {
-    return this._id.toString();
-};
-
 export const awsRuleDescriptionForSource = (source: ISource) => 
     `Scheduled ingestion rule for source: ${source.name}`;
 
-sourceSchema.methods.toAwsRuleDescription = function (): string {
-    return `Scheduled ingestion rule for source: ${this.name}`;
-};
-
 export const awsRuleNameForSource = (source: ISource) => source._id.toHexString();
-
-sourceSchema.methods.toAwsRuleName = function (): string {
-    return this._id.toString();
-};
 
 export const awsRuleTargetForSource = (source: ISource) =>
     `${source._id.toHexString()}_Target`;
-
-sourceSchema.methods.toAwsRuleTargetId = function (): string {
-    return `${this._id}_Target`;
-};
 
 export type SourceDocument = mongoose.Document & ISource;
 

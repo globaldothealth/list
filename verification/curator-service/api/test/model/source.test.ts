@@ -1,4 +1,4 @@
-import { Source } from '../../src/model/source';
+import { awsRuleDescriptionForSource, awsRuleNameForSource, awsRuleTargetForSource, awsStatementIdForSource, Source } from '../../src/model/source';
 import fullSource from './data/source.full.json';
 import minimalSource from './data/source.minimal.json';
 
@@ -25,18 +25,18 @@ describe('validate', () => {
 describe('custom instance methods', () => {
     it('toAwsStatementId returns formatted source ID', () => {
         const s = new Source(minimalSource);
-        expect(s.toAwsStatementId()).toContain(s._id.toString());
+        expect(awsStatementIdForSource(s)).toContain(s._id.toString());
     });
     it('toAwsRuleDescription returns formatted source name', () => {
         const s = new Source(minimalSource);
-        expect(s.toAwsRuleDescription()).toContain(s.name);
+        expect(awsRuleDescriptionForSource(s)).toContain(s.name);
     });
     it('toAwsRuleName returns formatted source ID', () => {
         const s = new Source(minimalSource);
-        expect(s.toAwsRuleName()).toContain(s._id.toString());
+        expect(awsRuleNameForSource(s)).toContain(s._id.toString());
     });
     it('toAwsRuleTargetId returns formatted source ID', () => {
         const s = new Source(minimalSource);
-        expect(s.toAwsRuleTargetId()).toContain(s._id.toString());
+        expect(awsRuleTargetForSource(s)).toContain(s._id.toString());
     });
 });

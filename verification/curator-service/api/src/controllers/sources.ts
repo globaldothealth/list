@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { Request, Response } from 'express';
 import { cases, restrictedCases } from '../model/case';
-import { awsRuleDescriptionForSource, awsRuleNameForSource, awsRuleTargetForSource, awsStatementIdForSource, Source, SourceDocument, sources } from '../model/source';
+import { awsRuleDescriptionForSource, awsRuleNameForSource, awsRuleTargetForSource, awsStatementIdForSource, ISource, SourceDocument, sources } from '../model/source';
 
 import AwsBatchClient from '../clients/aws-batch-client';
 import AwsEventsClient from '../clients/aws-events-client';
@@ -138,7 +138,8 @@ export default class SourcesController {
      */
     update = async (req: Request, res: Response): Promise<void> => {
         try {
-            const source = await Source.findById(req.params.id);
+            const sourceId = new ObjectId(req.params.id);
+            let source = await sources().findOne({ _id: sourceId });
             if (!source) {
                 res.status(404).json({
                     message: `source with id ${req.params.id} could not be found`,
@@ -147,24 +148,52 @@ export default class SourcesController {
             }
             // Undefined fields are removed from the request body by openapi
             // validator, if we want to unset the dateFilter we have to pass an
-            // empty object and set it undefined ourselves here.
+            // empty object and unset it ourselves here.
+            const update : { $set: any, $unset?: any } = {
+                $set: {
+                    ...req.body,
+                },
+                $unset: {},
+            };
             if (JSON.stringify(req.body.dateFilter) === '{}') {
-                req.body.dateFilter = undefined;
+                update['$unset']['dateFilter'] = '';
+                delete update['$set']['dateFilter'];
+            };
+            // turn an undefined schedule into a request to remove the schedule
+            let change: 'schedule' | 'name' | 'other' = 'other';
+            if (req.body['automation']) {
+                change = 'schedule';
+                if (!req.body['automation']['schedule']) {
+                    update['$set']['automation']['schedule'] = undefined;
+                    /*
+                     * what gets sent from the client is { automation: { schedule: undefined }}
+                     * what we receive from express is { automation: {}}
+                     * it would be a conflict to try to simultaneously $set automation and
+                     * $unset automation.schedule, so instead $set automation.schedule to
+                     * undefined here.
+                     */
+                }
             }
-            await source.set(req.body).validate();
+            await sources().updateOne({_id: sourceId }, update);
+            source = await sources().findOne({ _id: sourceId });
+            if (req.body['name']) {
+                change = 'name';
+            }
+            
             const emailNotificationType =
-                await this.updateAutomationScheduleAwsResources(source);
-            const result = await source.save();
-
+                await this.updateAutomationScheduleAwsResources(source, change);
+            
+            source = await sources().findOne({ _id: sourceId });
             await this.sendNotifications(source, emailNotificationType);
-            res.json(result);
+            res.json(source);
         } catch (err) {
-            if (err.name === 'ValidationError') {
-                res.status(422).json(err);
+            const error = err as Error;
+            logger.error(error);
+            if (error.name === 'ValidationError') {
+                res.status(422).json(error);
                 return;
             }
-
-            res.status(500).json(err);
+            res.status(500).json(error);
             return;
         }
     };
@@ -184,38 +213,51 @@ export default class SourcesController {
      * about this change.
      */
     private async updateAutomationScheduleAwsResources(
-        source: SourceDocument,
+        source: ISource,
+        change: 'schedule' | 'name' | 'other'
     ): Promise<NotificationType> {
-        if (this.automationScheduleModified(source)) {
+        if (change === 'schedule') {
             if (source.automation?.schedule?.awsScheduleExpression) {
                 const awsRuleArn = await this.awsEventsClient.putRule(
-                    source.toAwsRuleName(),
-                    source.toAwsRuleDescription(),
+                    awsRuleNameForSource(source),
+                    awsRuleDescriptionForSource(source),
                     source.automation.schedule.awsScheduleExpression,
                     this.batchClient.jobQueueArn,
-                    source.toAwsRuleTargetId(),
+                    awsRuleTargetForSource(source),
                     source._id.toString(),
-                    source.toAwsStatementId(),
+                    awsStatementIdForSource(source),
                 );
-                source.set('automation.schedule.awsRuleArn', awsRuleArn);
+                await sources().updateOne({
+                    _id: source._id,
+                }, {
+                    $set: {
+                        'automation.schedule.awsRuleArn': awsRuleArn,
+                    },
+                });
                 return NotificationType.Add;
             } else {
                 await this.awsEventsClient.deleteRule(
-                    source.toAwsRuleName(),
-                    source.toAwsRuleTargetId(),
+                    awsRuleNameForSource(source),
+                    awsRuleTargetForSource(source),
                     this.batchClient.jobQueueArn,
-                    source.toAwsStatementId(),
+                    awsStatementIdForSource(source),
                 );
-                source.set('automation.schedule', undefined);
+                await sources().updateOne({
+                    _id: source._id,
+                }, {
+                    $unset: {
+                        'automation.schedule': '',
+                    },
+                });
                 return NotificationType.Remove;
             }
         } else if (
-            source.isModified('name') &&
+            change === 'name' &&
             source.automation?.schedule?.awsRuleArn
         ) {
             await this.awsEventsClient.putRule(
-                source.toAwsRuleName(),
-                source.toAwsRuleDescription(),
+                awsRuleNameForSource(source),
+                awsRuleDescriptionForSource(source),
             );
             return NotificationType.None;
         }
@@ -370,7 +412,7 @@ export default class SourcesController {
     };
 
     private async sendNotifications(
-        source: SourceDocument,
+        source: ISource,
         type: NotificationType,
     ): Promise<void> {
         if (
@@ -416,8 +458,9 @@ export default class SourcesController {
                 text,
             );
         } catch (err) {
+            const error = err as Error;
             throw {
-                ...err,
+                ...error,
                 name: 'NotificationSendError',
             };
         }
