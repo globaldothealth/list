@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { Request, Response } from 'express';
 import { cases, restrictedCases } from '../model/case';
-import { awsRuleDescriptionForSource, awsRuleNameForSource, awsRuleTargetForSource, awsStatementIdForSource, ISource, SourceDocument, sources } from '../model/source';
+import { awsRuleDescriptionForSource, awsRuleNameForSource, awsRuleTargetForSource, awsStatementIdForSource, ISource, sources } from '../model/source';
 
 import AwsBatchClient from '../clients/aws-batch-client';
 import AwsEventsClient from '../clients/aws-events-client';
@@ -262,24 +262,6 @@ export default class SourcesController {
             return NotificationType.None;
         }
         return NotificationType.None;
-    }
-
-    /**
-     * Determines whether the automation schedule for a given source was modified.
-     *
-     * This helper is necessary to encapsulate oddities with modified paths in
-     * Mongoose. If one field of a subdocument is modified, all fields of the
-     * subdocument will return true for calls to subDoc.isModified('field').
-     *
-     * We use isDirectModified() in combination with modifiedPaths() to produce
-     * an accurate decision.
-     */
-    private automationScheduleModified(source: SourceDocument): boolean {
-        return (
-            source.automation?.modifiedPaths().includes('schedule') ||
-            (source.isDirectModified('automation') &&
-                !source.automation.modifiedPaths().includes('parser'))
-        );
     }
 
     /**
