@@ -1,8 +1,8 @@
 import { Request, Response } from 'express';
-import { Source, SourceDocument, sources } from '../model/source';
+import { ISource, ISource, Source, SourceDocument, sources } from '../model/source';
 
 import EmailClient from '../clients/email-client';
-import { UploadDocument } from '../model/upload';
+import { IUpload, UploadDocument } from '../model/upload';
 
 /**
  * UploadsController handles single uploads, that is a batch of cases sent
@@ -148,8 +148,8 @@ export default class UploadsController {
     };
 
     private async sendErrorNotification(
-        source: SourceDocument,
-        upload: UploadDocument,
+        source: ISource,
+        upload: IUpload,
     ): Promise<void> {
         if (
             source.automation?.schedule &&
