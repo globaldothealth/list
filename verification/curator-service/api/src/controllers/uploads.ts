@@ -1,8 +1,9 @@
 import { Request, Response } from 'express';
-import { ISource, ISource, Source, SourceDocument, sources } from '../model/source';
+import { ISource, Source, sources } from '../model/source';
 
 import EmailClient from '../clients/email-client';
-import { IUpload, UploadDocument } from '../model/upload';
+import { IUpload, uploads } from '../model/upload';
+import { ObjectId } from 'mongodb';
 
 /**
  * UploadsController handles single uploads, that is a batch of cases sent
@@ -17,15 +18,28 @@ export default class UploadsController {
      */
     create = async (req: Request, res: Response): Promise<void> => {
         try {
-            const source = await Source.findById(req.params.sourceId);
+            const sourceId = new ObjectId(req.params.sourceId);
+            const source = await sources().findOne({ _id: sourceId });
             if (!source) {
                 res.status(404).json({
                     message: `Parent resource (source ID ${req.params.sourceId}) not found.`,
                 });
                 return;
             }
-            source.uploads.push(req.body);
-            const updatedSource = await source.save();
+            const upload = {
+                _id: new ObjectId(),
+                ...req.body,
+            };
+            await sources().updateOne({
+                _id: sourceId,
+            }, {
+                $push: {
+                    'uploads': upload,
+                },
+            });
+            const updatedSource = await sources().findOne({
+                _id: sourceId,
+            });
             const result =
                 updatedSource.uploads[updatedSource.uploads.length - 1];
             if (result.status === 'ERROR') {
@@ -34,11 +48,12 @@ export default class UploadsController {
             res.status(201).json(result);
             return;
         } catch (err) {
-            if (err.name === 'ValidationError') {
-                res.status(422).json(err);
+            const error = err as Error;
+            if (error.name === 'ValidationError') {
+                res.status(422).json(error);
                 return;
             }
-            res.status(500).json(err);
+            res.status(500).json(error);
         }
     };
 

@@ -28,3 +28,6 @@ export const uploadSchema = new mongoose.Schema({
 export type UploadDocument = mongoose.Document & IUpload;
 
 export const Upload = mongoose.model<UploadDocument>('Upload', uploadSchema);
+
+const db = () => mongoose.connection.getClient().db();
+export const uploads = () => db().collection("uploads");
