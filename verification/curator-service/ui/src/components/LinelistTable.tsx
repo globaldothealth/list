@@ -114,6 +114,7 @@ interface LinelistTableState {
     includeDialogOpen: boolean;
     isLoading: boolean;
     isDeleting: boolean;
+    diseaseName: string;
 
     selectedVerificationStatus: VerificationStatus;
     searchQuery: string;
@@ -803,6 +804,7 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                 encodeURIComponent(
                     URLToSearchQuery(this.props.location.search),
                 ) ?? '',
+            diseaseName: process.env.REACT_APP_DISEASE_NAME ?? 'COVID-19',
         };
         this.deleteCases = this.deleteCases.bind(this);
         this.setCaseVerification = this.setCaseVerification.bind(this);
@@ -1600,7 +1602,8 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                             <Typography
                                                 className={classes.tableTitle}
                                             >
-                                                COVID-19 Linelist
+                                                {this.state.diseaseName}{' '}
+                                                Linelist
                                             </Typography>
 
                                             <SortSelect

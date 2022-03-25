@@ -89,6 +89,7 @@ kubectl apply -f data.yaml -f curator.yaml -f location.yaml
 ```
 
 To confirm changes occurred, use:
+
 ```shell
 kubectl get pod <POD_NAME> --output=yaml
 ```
@@ -159,6 +160,7 @@ Here is the list of environment variables that should be filled with secrets and
 - `SESSION_COOKIE_KEY`: _(optional)_ Session cookies contain IDs that are encrypted using this key.
 - `REACT_APP_POLICY_PUBLIC_ID`: This is a public ID for Iubenda service that provides legal policies.
 - `REACT_APP_COOKIE_CONSENT_PUBLIC_ID`: This is a public ID for Iubenda service that provides cookie consent banner.
+- `REACT_APP_DISEASE_NAME`: This is a disease name displayed in Curator UI
 
 #### Secrets in production
 
@@ -238,37 +240,37 @@ If you add a service, the packages will be _private_ by default which will make 
 
 Our versioning scheme is 1.MINOR.PATCH, with the following rules
 
-* **MAJOR** version is fixed at 1. It is updated on major incompatible API
+- **MAJOR** version is fixed at 1. It is updated on major incompatible API
   changes, but since we haven't finalized the API yet, this is not updated.
-* **MINOR** version is updated on new codename initial releases. We have
+- **MINOR** version is updated on new codename initial releases. We have
   a regular cadence of releases every few months once we have accumulated an
   agreed upon list of new features.
-* **PATCH** versions add minor functionality and bug fixes on the current
+- **PATCH** versions add minor functionality and bug fixes on the current
   codename release.
 
 Each codename initial release brings significant new functionality and/or UI
 changes. We organise feature requests and record known issues for each release
 by using GitHub milestones:
 
-* Issues targeting the
+- Issues targeting the
   [current](https://github.com/globaldothealth/list/issues?q=is%3Aopen+is%3Aissue+milestone%3AStrongcat)
   release
-* Issues targeting the
+- Issues targeting the
   [next](https://github.com/globaldothealth/list/issues?q=is%3Aopen+is%3Aissue+milestone%3AProxy)
   release
 
 ### Preparing a release
 
 Releases are done on -stable branches. Stable branches are tagged
-as *1.x-stable*, with patch updates being done from the -stable branch.
+as _1.x-stable_, with patch updates being done from the -stable branch.
 **No releases are tagged from main**.
 
 #### 1.x.0 release
 
-* Change the image tag in `aws/{location,curator,data}.yaml`
+- Change the image tag in `aws/{location,curator,data}.yaml`
   files to point to 1.x.0.
-* Update any reference to the previous stable in GitHub workflows
-* Then commit on *main*:
+- Update any reference to the previous stable in GitHub workflows
+- Then commit on _main_:
 
       git commit -a -m 'Release 1.x.0'
       git checkout -b 1.x-stable
@@ -282,7 +284,7 @@ Github actions will automatically build the image, e.g. `ghcr.io/globaldothealth
 For subsequent point releases, changes are usually merged
 from main, unless there are changes that shouldn't be deployed (such as
 a feature that needs more testing). In that case, cherry-pick from main or
-another hotfix branch onto *1.x-stable*. Once you've done that, update the
+another hotfix branch onto _1.x-stable_. Once you've done that, update the
 deployment yaml files with the new version name. Then:
 
     git switch 1.x-stable
@@ -290,8 +292,7 @@ deployment yaml files with the new version name. Then:
     git tag 1.x.0
     git push && git push --tags
 
-**Deploy to production**: `kubectl apply -f curator.yaml -f data.yaml -f
-location.yaml` (should be complete within a minute, check with
+**Deploy to production**: `kubectl apply -f curator.yaml -f data.yaml -f location.yaml` (should be complete within a minute, check with
 `kubectl get pods`)
 
 You can list the existing tags/versions with `git tag` or on the [github repo](https://github.com/globaldothealth/list/releases).

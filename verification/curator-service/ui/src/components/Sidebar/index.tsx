@@ -52,6 +52,8 @@ const Sidebar = ({ drawerOpen }: SidebarProps): JSX.Element => {
         [user],
     );
 
+    const diseaseName = process.env.REACT_APP_DISEASE_NAME ?? 'COVID-1922222';
+
     const menuList = useMemo(
         () =>
             user
@@ -109,7 +111,9 @@ const Sidebar = ({ drawerOpen }: SidebarProps): JSX.Element => {
         >
             <div className={classes.drawerContents}>
                 <div className={classes.drawerHeader}></div>
-                <Typography className={classes.covidTitle}>COVID-19</Typography>
+                <Typography className={classes.covidTitle}>
+                    {diseaseName}
+                </Typography>
                 <>
                     {hasAnyRole(['curator']) && (
                         <Fab
