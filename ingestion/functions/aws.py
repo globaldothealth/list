@@ -13,8 +13,9 @@ import aws_access.globaldothealth_configuration as gdoth
 
 AWS_REGION = gdoth.AWS_REGION
 AWS_IMAGE = {
-    'dev': "612888738066.dkr.ecr.us-east-1.amazonaws.com/gdh-ingestor:latest",
-    'prod': "612888738066.dkr.ecr.us-east-1.amazonaws.com/gdh-ingestor:stable"
+    "dev": "612888738066.dkr.ecr.us-east-1.amazonaws.com/gdh-ingestor:latest",
+    "qa": "612888738066.dkr.ecr.us-east-1.amazonaws.com/gdh-ingestor:latest",
+    "prod": "612888738066.dkr.ecr.us-east-1.amazonaws.com/gdh-ingestor:stable"
 }
 AWS_JOB_ROLE_ARN = "arn:aws:iam::612888738066:role/gdh-ingestion-job-role"
 AWS_EVENT_ROLE_ARN = "arn:aws:iam::612888738066:role/service-role/AWS_Events_Invoke_Batch_Job_Queue_1312384119"
@@ -112,7 +113,7 @@ deregister    Deregister a Batch job definition
             "-e",
             "--env",
             help="Which environment to deploy to",
-            choices=["local", "dev", "prod"],
+            choices=["local", "dev", 'qa', "prod"],
             default="local",
         )
         parser.add_argument(

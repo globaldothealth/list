@@ -3,6 +3,7 @@
 This directory contains the code for the UI of the Global Health Curator Portal accessible here:
 
 - [dev](https://dev-data.covid-19.global.health)
+- [qa](https://qa-data.covid-19.global.health)
 - [prod](https://data.covid-19.global.health)
 - [local dev](http://localhost:3002)
 

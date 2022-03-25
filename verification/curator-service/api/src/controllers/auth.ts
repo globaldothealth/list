@@ -462,6 +462,9 @@ export class AuthController {
                         case 'dev':
                             url = 'https://dev-data.covid-19.global.health';
                             break;
+                        case 'qa':
+                            url = 'https://qa-data.covid-19.global.health';
+                            break;
                         case 'prod':
                             url = 'https://data.covid-19.global.health';
                             break;

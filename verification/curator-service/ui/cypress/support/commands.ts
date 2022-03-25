@@ -4,6 +4,11 @@ import en from 'i18n-iso-countries/langs/en.json';
 
 countries.registerLocale(en);
 
+export enum Outcome {
+    Recovered = 'Recovered',
+    Death = 'Death',
+}
+
 declare global {
     // One-off Cypress setup.
     // eslint-disable-next-line @typescript-eslint/no-namespace
@@ -24,6 +29,7 @@ declare global {
                 sourceUrl?: any;
                 gender?: string;
                 creationDate?: Date;
+                outcome?: Outcome;
             }) => void;
             login: (opts?: {
                 name: string;
@@ -62,6 +68,7 @@ export function addCase(opts: {
     sourceUrl?: string;
     gender?: string;
     creationDate?: Date;
+    outcome?: Outcome;
 }): void {
     cy.request({
         method: 'POST',
@@ -97,6 +104,10 @@ export function addCase(opts: {
                         start: opts.startConfirmedDate || new Date().toJSON(),
                     },
                     value: opts.methodOfConfirmation,
+                },
+                {
+                    name: 'outcome',
+                    value: opts.outcome,
                 },
             ],
             symptoms: {

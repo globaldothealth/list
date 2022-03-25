@@ -251,7 +251,7 @@ def write_to_server(
         logger.info(f"Sending {len(batch)} cases, total so far: {counter['total']}")
         # Exponential backoff in dev and prod, but not for local testing
         while (
-            total_wait <= (MAX_WAIT_TIME if env in ["dev", "prod"] else 0)
+            total_wait <= (MAX_WAIT_TIME if env in ["dev", "qa", "prod"] else 0)
             and total_conn_wait < MAX_CONN_WAIT_TIME
         ):
             try:
