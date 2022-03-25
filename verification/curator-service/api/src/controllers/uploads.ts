@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import { ISource, Source, sources } from '../model/source';
 
 import EmailClient from '../clients/email-client';
-import { IUpload, uploads } from '../model/upload';
+import { IUpload } from '../model/upload';
 import { ObjectId } from 'mongodb';
 
 /**
