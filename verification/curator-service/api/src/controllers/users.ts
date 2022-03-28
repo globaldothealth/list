@@ -1,4 +1,5 @@
 import { Request, Response } from 'express';
+import { ObjectId } from 'mongodb';
 
 import { User, userRoles, users } from '../model/user';
 
@@ -20,13 +21,14 @@ export const list = async (req: Request, res: Response): Promise<void> => {
         return;
     }
     try {
-        const [docs, total] = await Promise.all([
-            User.find({})
-                .skip(limit * (page - 1))
-                .limit(limit + 1)
-                .lean(),
-            User.countDocuments({}),
+        const [docsCursor, total] = await Promise.all([
+            users().find({}, {
+                skip: limit * (page - 1),
+                limit: limit + 1,
+            }),
+            users().countDocuments({}),
         ]);
+        const docs = await docsCursor.toArray();
         // If we have more items than limit, add a response param
         // indicating that there is more to fetch on the next page.
         if (docs.length == limit + 1) {
@@ -54,28 +56,31 @@ export const updateRoles = async (
     res: Response,
 ): Promise<void> => {
     try {
-        const user = await User.findByIdAndUpdate(
-            req.params.id,
-            { roles: req.body.roles },
+        const result = await users().findOneAndUpdate(
+            { _id: new ObjectId(req.params.id) },
+            { $set: { roles: req.body.roles }},
             {
-                // Return the udpated object.
-                new: true,
-                runValidators: true,
+                // Return the updated object.
+                returnDocument: "after",
             },
         );
-        if (!user) {
+        if (!result.ok || !result.value) {
             res.status(404).json({
                 message: `user with id ${req.params.id} could not be found`,
             });
             return;
         }
-        res.json(user);
+        res.json(result.value);
     } catch (err) {
-        if (err.name === 'ValidationError') {
-            res.status(422).json(err);
+        const error = err as Error;
+        // TODO interpret mongodb error: I think validation is code == 121.
+        console.error('error updating roles');
+        console.error(error);
+        if (error.name === 'ValidationError') {
+            res.status(422).json(error);
             return;
         }
-        res.status(500).json(err);
+        res.status(500).json(error);
         return;
     }
 };
