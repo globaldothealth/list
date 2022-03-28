@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 
-import { User, userRoles } from '../model/user';
+import { User, userRoles, users } from '../model/user';
 
 /**
  * List the users.
