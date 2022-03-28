@@ -31,6 +31,7 @@ import swaggerUi from 'swagger-ui-express';
 import validateEnv from './util/validate-env';
 import { logger } from './util/logger';
 import S3 from 'aws-sdk/clients/s3';
+import cors from 'cors';
 
 const app = express();
 
@@ -385,7 +386,7 @@ apiRouter.get(
     '/geocode/countryNames',
     authenticateByAPIKey,
     mustBeAuthenticated,
-    geocodeProxy.countryNames
+    geocodeProxy.countryNames,
 );
 apiRouter.post('/geocode/seed', geocodeProxy.seed);
 apiRouter.post('/geocode/clear', geocodeProxy.clear);
@@ -410,7 +411,7 @@ app.get('/health', (req: Request, res: Response) => {
 });
 
 // version handler.
-app.get('/version', (req: Request, res: Response) => {
+app.get('/version', cors(), (req: Request, res: Response) => {
     res.status(200).send(env.CURATOR_VERSION);
 });
 
