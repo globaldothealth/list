@@ -8,6 +8,7 @@ import AwsEventsClient from '../clients/aws-events-client';
 import EmailClient from '../clients/email-client';
 import { logger } from '../util/logger';
 import { ObjectId } from 'mongodb';
+import { IUpload } from '../model/upload';
 
 /**
  * Email notification that should be sent on any update to a source.
@@ -270,10 +271,21 @@ export default class SourcesController {
     create = async (req: Request, res: Response): Promise<void> => {
         try {
             const sourceId = new ObjectId();
-            const insertResult = await sources().insertOne({
+            const sourceToInsert = {
                 _id: sourceId,
                 ...req.body,
-            });
+            };
+
+            if (sourceToInsert.uploads) {
+                sourceToInsert.uploads = sourceToInsert.uploads.map((u: IUpload) => {
+                    if (u.created) {
+                        u.created = new Date(u.created);
+                    }
+                    return u;
+                });
+            }
+
+            const insertResult = await sources().insertOne(sourceToInsert);
             if (!insertResult.result.ok) {
                 // TODO: work out how to get the details of the error
                 res.status(500).json({
