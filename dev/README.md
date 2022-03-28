@@ -44,10 +44,11 @@ MAPBOX_GEOCODE_RATE_LIMIT_PER_MIN=<Mapbox API rate limit, default = 600>
 REACT_APP_PUBLIC_MAPBOX_TOKEN=<Different Mapbox API token>
 REACT_APP_POLICY_PUBLIC_ID=<Public id for Iubenda service that provides legal policies>
 REACT_APP_COOKIE_CONSENT_PUBLIC_ID=<Public ID for Iubenda service that provides cookie consent banner>
+REACT_APP_DISEASE_NAME=<Disease name displayed in Curator UI>
 LOCALSTACK_API_KEY=<Localstack (mock AWS) API key>
 ```
 
-**Note:** Local end-to-end testing, which uses `parsing.py` with either `run_full_stack.sh`  or `test_full_stack.sh`, requires `LOCALSTACK_API_KEY`
+**Note:** Local end-to-end testing, which uses `parsing.py` with either `run_full_stack.sh` or `test_full_stack.sh`, requires `LOCALSTACK_API_KEY`
 in order to use the paid features of Localstack.
 
 These values are stored in a dedicated secret manager. To request AWS credentials, or for access to
@@ -159,17 +160,19 @@ Services will be accessible and connected to each other.
 Run `./run_full_stack.sh` from `/dev/`.
 
 `docker-compose` will create a number of services, which will wait on each other to guarantee correct timing:
+
 1. A set of AWS mocks (`localstack`) required to replicate cloud infrastructure on a developer machine
 1. A provisioner of those services to replicate cloud infrastructure configuration on AWS mocks (should exit with status code 0)
 1. A provisioner of those services to replicate global.health-specific logic on AWS mocks (should exit with status code 0)
 1. A mock for parser source data and configuration
 
 After this, services will be accessible and connected to each other, and a user can run parsing locally by running a subcommand of `parsing.py`:
-* `list [parsers]`: show which parser(s) are available
-* `describe [parsers]`: provide detailed information about available parser(s)
-* `run [parsers]`: run one/many parser(s)
-* `upload <parser>`: upload a sample data file for a parser
-* `build <parser>`: build a Docker image for a parser
+
+- `list [parsers]`: show which parser(s) are available
+- `describe [parsers]`: provide detailed information about available parser(s)
+- `run [parsers]`: run one/many parser(s)
+- `upload <parser>`: upload a sample data file for a parser
+- `build <parser>`: build a Docker image for a parser
 
 The `list`, `describe`, and `run` subcommands can take any number of parser names and default to targeting all available parsers.
 

@@ -48,7 +48,7 @@ import CaseExcludeDialog from './CaseExcludeDialog';
 import CaseIncludeDialog from './CaseIncludeDialog';
 import renderDate, { renderDateRange } from './util/date';
 import { URLToSearchQuery } from './util/searchQuery';
-import { ChipData } from './App/App';
+import { ChipData } from './App';
 import { SortBy, SortByOrder } from '../constants/types';
 import { connect, ConnectedProps } from 'react-redux';
 import { RootState } from '../redux/store';
@@ -114,6 +114,7 @@ interface LinelistTableState {
     includeDialogOpen: boolean;
     isLoading: boolean;
     isDeleting: boolean;
+    diseaseName: string;
 
     selectedVerificationStatus: VerificationStatus;
     searchQuery: string;
@@ -803,6 +804,7 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                 encodeURIComponent(
                     URLToSearchQuery(this.props.location.search),
                 ) ?? '',
+            diseaseName: process.env.REACT_APP_DISEASE_NAME ?? 'COVID-19',
         };
         this.deleteCases = this.deleteCases.bind(this);
         this.setCaseVerification = this.setCaseVerification.bind(this);
@@ -1600,7 +1602,8 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                             <Typography
                                                 className={classes.tableTitle}
                                             >
-                                                COVID-19 Linelist
+                                                {this.state.diseaseName}{' '}
+                                                Linelist
                                             </Typography>
 
                                             <SortSelect
@@ -1751,7 +1754,7 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                 pageSizeOptions: [5, 10, 20, 50, 100],
                                 paginationPosition: 'top',
                                 toolbar: this.state.numSelectedRows > 0,
-                                maxBodyHeight: 'calc(100vh - 20em)',
+                                maxBodyHeight: 'calc(100vh - 18em)',
                                 headerStyle: {
                                     zIndex: 1,
                                     fontWeight: 'bold',
