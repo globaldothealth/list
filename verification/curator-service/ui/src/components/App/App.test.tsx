@@ -1,4 +1,4 @@
-import App from './App';
+import App from '.';
 import React from 'react';
 import axios from 'axios';
 import userEvent from '@testing-library/user-event';

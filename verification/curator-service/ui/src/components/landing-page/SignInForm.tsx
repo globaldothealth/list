@@ -56,6 +56,7 @@ const useStyles = makeStyles((theme: Theme) => ({
     formFlexContainer: {
         display: 'flex',
         gap: '80px',
+        flexWrap: 'wrap',
     },
 }));
 

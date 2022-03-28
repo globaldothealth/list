@@ -4,7 +4,6 @@ import {
     Avatar,
     CssBaseline,
     Divider,
-    Fab,
     IconButton,
     Menu,
     MenuItem,
@@ -23,26 +22,16 @@ import {
 } from 'react-router-dom';
 import { Theme, makeStyles } from '@material-ui/core/styles';
 
-import AddIcon from '@material-ui/icons/Add';
 import AutomatedBackfill from '../AutomatedBackfill';
 import AutomatedSourceForm from '../AutomatedSourceForm';
 import BulkCaseForm from '../BulkCaseForm';
 import CaseForm from '../CaseForm';
 import AcknowledgmentsPage from '../AcknowledgmentsPage';
-import Drawer from '@material-ui/core/Drawer';
 import EditCase from '../EditCase';
 import GHListLogo from '../GHListLogo';
 import LandingPage from '../landing-page/LandingPage';
-import LinkIcon from '@material-ui/icons/Link';
-import List from '@material-ui/core/List';
-import ListIcon from '@material-ui/icons/List';
-import ListItem from '@material-ui/core/ListItem';
-import ListItemIcon from '@material-ui/core/ListItemIcon';
-import ListItemText from '@material-ui/core/ListItemText';
 import MenuIcon from '@material-ui/icons/Menu';
-import PeopleIcon from '@material-ui/icons/People';
 import Profile from '../Profile';
-import PublishIcon from '@material-ui/icons/Publish';
 import SearchBar from '../SearchBar';
 import SourceTable from '../SourceTable';
 import TermsOfUse from '../TermsOfUse';
@@ -52,7 +41,6 @@ import Users from '../Users';
 import ViewCase from '../ViewCase';
 import clsx from 'clsx';
 import { useLastLocation } from 'react-router-last-location';
-import PolicyLink from '../PolicyLink';
 import { useCookieBanner } from '../../hooks/useCookieBanner';
 import { SortBy, SortByOrder, MapLink } from '../../constants/types';
 import { URLToSearchQuery } from '../util/searchQuery';
@@ -68,6 +56,8 @@ import { getUserProfile, logout } from '../../redux/auth/thunk';
 import { selectUser } from '../../redux/auth/selectors';
 import { User } from '../../api/models/User';
 import PopupSmallScreens from '../PopupSmallScreens';
+import Sidebar from '../Sidebar';
+import Footer from '../Footer';
 
 // to use our custom theme values in typescript we need to define an extension to the ThemeOptions type.
 declare module '@material-ui/core/styles' {
@@ -196,7 +186,7 @@ export const theme = createTheme({
     },
 });
 
-const drawerWidth = 240;
+export const drawerWidth = 240;
 
 const menuStyles = makeStyles((theme) => ({
     link: {
@@ -212,6 +202,8 @@ const menuStyles = makeStyles((theme) => ({
 const useStyles = makeStyles((theme: Theme) => ({
     root: {
         display: 'flex',
+        flexDirection: 'column',
+        height: '100vh',
     },
     buttonLabel: {
         display: 'block',
@@ -235,26 +227,6 @@ const useStyles = makeStyles((theme: Theme) => ({
     hide: {
         display: 'none',
     },
-    drawer: {
-        width: drawerWidth,
-        flexShrink: 0,
-    },
-    drawerPaper: {
-        backgroundColor: '#ECF3F0',
-        border: 'none',
-        width: drawerWidth,
-    },
-    drawerContents: {
-        display: 'flex',
-        flexDirection: 'column',
-        height: '100%',
-        marginLeft: '24px',
-        marginRight: '32px',
-    },
-    drawerHeader: {
-        // necessary for content to be below app bar
-        ...theme.mixins.toolbar,
-    },
     divider: {
         backgroundColor: '#0A7369',
         height: '1px',
@@ -263,42 +235,30 @@ const useStyles = makeStyles((theme: Theme) => ({
         marginTop: '12px',
         width: '100%',
     },
+    drawerHeader: {
+        // necessary for content to be below app bar
+        ...theme.mixins.toolbar,
+    },
     link: {
         marginTop: 12,
     },
-    lastLink: {
-        marginBottom: 24,
-    },
     content: {
         flexGrow: 1,
-        transition: theme.transitions.create('margin', {
+        transition: theme.transitions.create(['margin', 'padding'], {
             easing: theme.transitions.easing.sharp,
             duration: theme.transitions.duration.leavingScreen,
         }),
-        marginLeft: -drawerWidth,
-        paddingLeft: '24px',
+        marginLeft: 0,
+        padding: '0 24px',
         width: '100%',
     },
     contentShift: {
-        transition: theme.transitions.create('margin', {
+        transition: theme.transitions.create(['margin', 'padding'], {
             easing: theme.transitions.easing.easeOut,
             duration: theme.transitions.duration.enteringScreen,
         }),
-        marginLeft: 0,
-        paddingLeft: 0,
+        marginLeft: drawerWidth,
         width: `calc(100% - ${drawerWidth}px)`,
-    },
-    createNewButton: {
-        margin: '12px 0',
-        width: '100%',
-    },
-    createNewIcon: {
-        marginRight: '12px',
-    },
-    covidTitle: {
-        fontSize: '28px',
-        marginLeft: '14px',
-        marginTop: '8px',
     },
     searchBar: {
         flex: 1,
@@ -422,9 +382,6 @@ export default function App(): JSX.Element {
 
     const showMenu = useMediaQuery(theme.breakpoints.up('sm'));
     const [drawerOpen, setDrawerOpen] = useState<boolean>(false);
-    const [createNewButtonAnchorEl, setCreateNewButtonAnchorEl] =
-        useState<Element | null>();
-    const [selectedMenuIndex, setSelectedMenuIndex] = React.useState<number>();
     const [listPage, setListPage] = React.useState<number>(0);
     const [listPageSize, setListPageSize] = React.useState<number>(50);
     const rootRef = React.useRef<HTMLDivElement>(null);
@@ -453,39 +410,6 @@ export default function App(): JSX.Element {
         [user],
     );
 
-    const menuList = React.useMemo(
-        () =>
-            user
-                ? [
-                      {
-                          text: 'Line list',
-                          icon: <ListIcon />,
-                          to: { pathname: '/cases', search: '' },
-                          displayCheck: (): boolean => true,
-                      },
-                      {
-                          text: 'Sources',
-                          icon: <LinkIcon />,
-                          to: '/sources',
-                          displayCheck: (): boolean => hasAnyRole(['curator']),
-                      },
-                      {
-                          text: 'Uploads',
-                          icon: <PublishIcon />,
-                          to: '/uploads',
-                          displayCheck: (): boolean => hasAnyRole(['curator']),
-                      },
-                      {
-                          text: 'Manage users',
-                          icon: <PeopleIcon />,
-                          to: '/users',
-                          displayCheck: (): boolean => hasAnyRole(['admin']),
-                      },
-                  ]
-                : [],
-        [hasAnyRole, user],
-    );
-
     // Update filter breadcrumbs
     useEffect(() => {
         if (!location.pathname.includes('/cases')) {
@@ -503,32 +427,12 @@ export default function App(): JSX.Element {
         //eslint-disable-next-line
     }, [location.search]);
 
-    useEffect(() => {
-        const menuIndex = menuList.findIndex((menuItem) => {
-            const pathname =
-                typeof menuItem.to === 'string'
-                    ? menuItem.to
-                    : menuItem.to.pathname;
-            return pathname === location.pathname;
-        });
-        setSelectedMenuIndex(menuIndex);
-    }, [location.pathname, menuList]);
-
     const getUser = useCallback((): void => {
         dispatch(getUserProfile());
     }, [dispatch]);
 
     const toggleDrawer = (): void => {
         setDrawerOpen(!drawerOpen);
-    };
-
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const openCreateNewPopup = (event: any): void => {
-        setCreateNewButtonAnchorEl(event.currentTarget);
-    };
-
-    const closeCreateNewPopup = (): void => {
-        setCreateNewButtonAnchorEl(undefined);
     };
 
     const onModalClose = (): void => {
@@ -588,7 +492,7 @@ export default function App(): JSX.Element {
                     className={classes.appBar}
                 >
                     <Toolbar>
-                        {user && (
+                        {user && hasAnyRole(['curator', 'admin']) && (
                             <IconButton
                                 color="primary"
                                 aria-label="toggle drawer"
@@ -636,163 +540,12 @@ export default function App(): JSX.Element {
                         {user && <ProfileMenu user={user} />}
                     </Toolbar>
                 </AppBar>
-                {user && (
-                    <Drawer
-                        className={classes.drawer}
-                        variant="persistent"
-                        anchor="left"
-                        open={drawerOpen}
-                        data-testid="sidebar"
-                        classes={{
-                            paper: classes.drawerPaper,
-                        }}
-                    >
-                        <div className={classes.drawerContents}>
-                            <div className={classes.drawerHeader}></div>
-                            <Typography className={classes.covidTitle}>
-                                COVID-19
-                            </Typography>
-                            {hasAnyRole(['curator']) && (
-                                <>
-                                    <Fab
-                                        variant="extended"
-                                        data-testid="create-new-button"
-                                        className={classes.createNewButton}
-                                        color="secondary"
-                                        onClick={openCreateNewPopup}
-                                    >
-                                        <AddIcon
-                                            className={classes.createNewIcon}
-                                        />
-                                        Create new
-                                    </Fab>
-                                    <Menu
-                                        anchorEl={createNewButtonAnchorEl}
-                                        getContentAnchorEl={null}
-                                        keepMounted
-                                        open={Boolean(createNewButtonAnchorEl)}
-                                        onClose={closeCreateNewPopup}
-                                        anchorOrigin={{
-                                            vertical: 'bottom',
-                                            horizontal: 'left',
-                                        }}
-                                    >
-                                        <Link
-                                            to="/cases/new"
-                                            onClick={closeCreateNewPopup}
-                                        >
-                                            <MenuItem>
-                                                New line list case
-                                            </MenuItem>
-                                        </Link>
-                                        <Link
-                                            to="/cases/bulk"
-                                            onClick={closeCreateNewPopup}
-                                        >
-                                            <MenuItem>New bulk upload</MenuItem>
-                                        </Link>
-                                        <Link
-                                            to="/sources/automated"
-                                            onClick={closeCreateNewPopup}
-                                        >
-                                            <MenuItem>
-                                                New automated source
-                                            </MenuItem>
-                                        </Link>
-                                        <Link
-                                            to="/sources/backfill"
-                                            onClick={closeCreateNewPopup}
-                                        >
-                                            <MenuItem>
-                                                New automated source backfill
-                                            </MenuItem>
-                                        </Link>
-                                    </Menu>
-                                </>
-                            )}
-                            <List>
-                                {menuList.map(
-                                    (item, index) =>
-                                        item.displayCheck() && (
-                                            <Link key={item.text} to={item.to}>
-                                                <ListItem
-                                                    button
-                                                    key={item.text}
-                                                    selected={
-                                                        selectedMenuIndex ===
-                                                        index
-                                                    }
-                                                >
-                                                    <ListItemIcon>
-                                                        {item.icon}
-                                                    </ListItemIcon>
-
-                                                    <ListItemText
-                                                        primary={item.text}
-                                                    />
-                                                </ListItem>
-                                            </Link>
-                                        ),
-                                )}
-                            </List>
-                            <div className={classes.spacer}></div>
-                            <div className={classes.divider}></div>
-                            <a
-                                href="https://raw.githubusercontent.com/globaldothealth/list/main/data-serving/scripts/export-data/data_dictionary.txt"
-                                rel="noopener noreferrer"
-                                target="_blank"
-                                data-testid="dictionaryButton"
-                            >
-                                Data dictionary
-                            </a>
-                            <Link
-                                to="/data-acknowledgments"
-                                className={classes.link}
-                                data-testid="acknowledgmentsButton"
-                            >
-                                Data acknowledgments
-                            </Link>
-                            <a
-                                href="https://global.health/terms-of-use"
-                                rel="noopener noreferrer"
-                                target="_blank"
-                                className={classes.link}
-                                data-testid="termsButton"
-                            >
-                                Terms of use
-                            </a>
-                            <a
-                                href="https://global.health/privacy/"
-                                rel="noopener noreferrer"
-                                target="_blank"
-                                className={classes.link}
-                                data-testid="privacypolicybutton"
-                            >
-                                Privacy policy
-                            </a>
-                            <PolicyLink
-                                type="cookie-policy"
-                                classes={{
-                                    root: clsx([classes.link]),
-                                }}
-                            >
-                                Cookie policy
-                            </PolicyLink>
-                            <a
-                                href="mailto:info@global.health?subject=Feedback regarding Global.health data portal"
-                                className={clsx([
-                                    classes.link,
-                                    classes.lastLink,
-                                ])}
-                            >
-                                Feedback
-                            </a>
-                        </div>
-                    </Drawer>
+                {user && hasAnyRole(['curator', 'admin']) && (
+                    <Sidebar drawerOpen={drawerOpen} />
                 )}
                 <main
                     className={clsx(classes.content, {
-                        [classes.contentShift]: drawerOpen || !user,
+                        [classes.contentShift]: drawerOpen,
                     })}
                 >
                     <div className={classes.drawerHeader} />
@@ -924,6 +677,8 @@ export default function App(): JSX.Element {
                         )}
                     </Switch>
                 </main>
+
+                {user && <Footer drawerOpen={drawerOpen} />}
             </ThemeProvider>
         </div>
     );
