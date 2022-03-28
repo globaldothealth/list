@@ -281,6 +281,9 @@ export default class SourcesController {
                     if (u.created) {
                         u.created = new Date(u.created);
                     }
+                    if (u._id) {
+                        u._id = new ObjectId(u._id);
+                    }
                     return u;
                 });
             }
