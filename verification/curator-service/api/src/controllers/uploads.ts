@@ -30,6 +30,9 @@ export default class UploadsController {
                 _id: new ObjectId(),
                 ...req.body,
             };
+            if (upload.created) {
+                upload.created = new Date(upload.created);
+            }
             await sources().updateOne({
                 _id: sourceId,
             }, {
