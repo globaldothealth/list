@@ -45,6 +45,7 @@ REACT_APP_PUBLIC_MAPBOX_TOKEN=<Different Mapbox API token>
 REACT_APP_POLICY_PUBLIC_ID=<Public id for Iubenda service that provides legal policies>
 REACT_APP_COOKIE_CONSENT_PUBLIC_ID=<Public ID for Iubenda service that provides cookie consent banner>
 REACT_APP_DISEASE_NAME=<Disease name displayed in Curator UI>
+REACT_APP_RELEASE_NOTES_URL=<Url where release notes on Github can be found>
 LOCALSTACK_API_KEY=<Localstack (mock AWS) API key>
 ```
 

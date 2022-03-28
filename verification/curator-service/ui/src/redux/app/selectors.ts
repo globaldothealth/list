@@ -1,4 +1,4 @@
-import { ChipData } from '../../components/App/App';
+import { ChipData } from '../../components/App';
 import { RootState } from '../store';
 
 export const selectSearchQuery: (state: RootState) => string = (state) =>
