@@ -66,7 +66,13 @@ describe('<App />', () => {
             config: {},
             headers: {},
         };
-        mockedAxios.get.mockResolvedValue(axiosResponse);
+        mockedAxios.get.mockImplementation((url) => {
+            if (url === '/version') {
+                return Promise.resolve({ status: 200, data: '1.10.1' });
+            } else {
+                return Promise.resolve(axiosResponse);
+            }
+        });
 
         render(<App />);
         expect(mockedAxios.get).toHaveBeenCalledTimes(3);
@@ -83,7 +89,13 @@ describe('<App />', () => {
             config: {},
             headers: {},
         };
-        mockedAxios.get.mockResolvedValue(axiosResponse);
+        mockedAxios.get.mockImplementation((url) => {
+            if (url === '/version') {
+                return Promise.resolve({ status: 200, data: '1.10.1' });
+            } else {
+                return Promise.resolve(axiosResponse);
+            }
+        });
         render(<App />);
         expect(mockedAxios.get).toHaveBeenCalledTimes(3);
         expect(mockedAxios.get).toHaveBeenCalledWith('/auth/profile');
@@ -109,6 +121,8 @@ describe('<App />', () => {
         mockedAxios.get.mockImplementation((url) => {
             if (url === '/env') {
                 return Promise.resolve({ status: 200, data: 'local' });
+            } else if (url === '/version') {
+                return Promise.resolve({ status: 200, data: '1.10.1' });
             } else {
                 return Promise.resolve(axiosResponse);
             }
@@ -149,7 +163,13 @@ describe('<App />', () => {
             config: {},
             headers: {},
         };
-        mockedAxios.get.mockResolvedValueOnce(axiosResponse);
+        mockedAxios.get.mockImplementation((url) => {
+            if (url === '/version') {
+                return Promise.resolve({ status: 200, data: '1.10.1' });
+            } else {
+                return Promise.resolve(axiosResponse);
+            }
+        });
         render(<App />, { initialRoute: '/cases' });
 
         fireEvent.click(await screen.findByTestId('profile-menu'));
@@ -193,7 +213,13 @@ describe('<App />', () => {
             config: {},
             headers: {},
         };
-        mockedAxios.get.mockResolvedValueOnce(axiosResponse);
+        mockedAxios.get.mockImplementation((url) => {
+            if (url === '/version') {
+                return Promise.resolve({ status: 200, data: '1.10.1' });
+            } else {
+                return Promise.resolve(axiosResponse);
+            }
+        });
         render(<App />, {
             initialState: initialLoggedInState,
             initialRoute: '/cases',
@@ -228,7 +254,13 @@ describe('<App />', () => {
             config: {},
             headers: {},
         };
-        mockedAxios.get.mockResolvedValueOnce(axiosResponse);
+        mockedAxios.get.mockImplementation((url) => {
+            if (url === '/version') {
+                return Promise.resolve({ status: 200, data: '1.10.1' });
+            } else {
+                return Promise.resolve(axiosResponse);
+            }
+        });
         render(<App />, {
             initialState: initialLoggedInState,
             initialRoute: '/cases',
@@ -257,7 +289,13 @@ describe('Download dataset', () => {
             config: {},
             headers: {},
         };
-        mockedAxios.get.mockResolvedValueOnce(axiosResponse);
+        mockedAxios.get.mockImplementation((url) => {
+            if (url === '/version') {
+                return Promise.resolve({ status: 200, data: '1.10.1' });
+            } else {
+                return Promise.resolve(axiosResponse);
+            }
+        });
         render(<App />, {
             initialState: initialLoggedInState,
             initialRoute: '/cases',

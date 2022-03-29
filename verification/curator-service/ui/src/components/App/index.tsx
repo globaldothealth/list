@@ -294,6 +294,10 @@ function ProfileMenu(props: { user: User; version: string }): JSX.Element {
         process.env.REACT_APP_RELEASE_NOTES_URL ??
         `https://github.com/globaldothealth/list/releases/tag/${props.version}`;
 
+    console.log(
+        `**********Version*********: ${JSON.stringify(props.version, null, 2)}`,
+    );
+
     return (
         <div>
             <PopupSmallScreens />
@@ -353,16 +357,20 @@ function ProfileMenu(props: { user: User; version: string }): JSX.Element {
                     <MenuItem>View source on Github</MenuItem>
                 </a>
 
-                <Divider className={classes.divider} />
+                {props.version && (
+                    <>
+                        <Divider className={classes.divider} />
 
-                <a
-                    href={releaseNotesUrl}
-                    rel="noopener noreferrer"
-                    target="_blank"
-                    onClick={handleClose}
-                >
-                    <MenuItem>Version: {props.version}</MenuItem>
-                </a>
+                        <a
+                            href={releaseNotesUrl}
+                            rel="noopener noreferrer"
+                            target="_blank"
+                            onClick={handleClose}
+                        >
+                            <MenuItem>Version: {props.version}</MenuItem>
+                        </a>
+                    </>
+                )}
             </Menu>
         </div>
     );
