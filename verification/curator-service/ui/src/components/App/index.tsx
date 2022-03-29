@@ -294,10 +294,6 @@ function ProfileMenu(props: { user: User; version: string }): JSX.Element {
         process.env.REACT_APP_RELEASE_NOTES_URL ??
         `https://github.com/globaldothealth/list/releases/tag/${props.version}`;
 
-    console.log(
-        `**********Version*********: ${JSON.stringify(props.version, null, 2)}`,
-    );
-
     return (
         <div>
             <PopupSmallScreens />
