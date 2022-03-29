@@ -132,8 +132,10 @@ export default class CasesController {
             logger.info(
                 `Streaming case data in format ${req.body.format} matching query ${req.body.query} for correlation ID ${req.body.correlationId}`,
             );
-            await User.findByIdAndUpdate(
-                user.id,
+            const result = await users().findOneAndUpdate(
+                {
+                    _id: new ObjectId(user.id),
+                },
                 {
                     $push: {
                         downloads: {
@@ -143,15 +145,13 @@ export default class CasesController {
                         },
                     },
                 },
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                function (err: any) {
-                    if (err) {
-                        logger.info(`An error occurred: ${err}`);
-                    } else {
-                        logger.info('Document updated');
-                    }
-                },
             );
+
+            if (!result.ok) {
+                logger.error(`Error adding download to user: ${result.lastErrorObject}`);
+            } else {
+                logger.info(`Added download to user ${user.id}`);
+            }
             axios({
                 method: 'post',
                 url: url,
@@ -168,12 +168,13 @@ export default class CasesController {
                 response.data.pipe(res);
             });
         } catch (err) {
-            logger.error(err);
-            if (err.response?.status && err.response?.data) {
-                res.status(err.response.status).send(err.response.data);
+            const error = err as AxiosError;
+            logger.error(error);
+            if (error.response?.status && error.response?.data) {
+                res.status(error.response.status).send(error.response.data);
                 return;
             }
-            res.status(500).send(err);
+            res.status(500).send(error);
         }
     };
 
