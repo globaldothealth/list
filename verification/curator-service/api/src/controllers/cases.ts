@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { User, UserDocument, users } from '../model/user';
+import { UserDocument, users } from '../model/user';
 import axios, { AxiosError } from 'axios';
 import { logger } from '../util/logger';
 import AWS from 'aws-sdk';
@@ -211,7 +211,7 @@ export default class CasesController {
             });
 
             const result = await users().findOneAndUpdate(
-                { _id: user.id },
+                { _id: new ObjectId(user.id) },
                 {
                     $push: {
                         downloads: {
@@ -258,8 +258,8 @@ export default class CasesController {
                 });
             });
 
-            await User.findByIdAndUpdate(
-                user.id,
+            const result = await users().findOneAndUpdate(
+                { _id: new ObjectId(user.id) },
                 {
                     $push: {
                         downloads: {
@@ -269,15 +269,8 @@ export default class CasesController {
                         },
                     },
                 },
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                function (err: any) {
-                    if (err) {
-                        logger.info(`An error occurred: ${err}`);
-                    } else {
-                        logger.info('Document updated');
-                    }
-                },
             );
+            this.logOutcomeOfAppendingDownloadToUser(user.id, result);
 
             res.status(200).send({ signedUrl });
         } catch (err) {
