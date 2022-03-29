@@ -1,9 +1,10 @@
 import { Request, Response } from 'express';
-import { User, UserDocument } from '../model/user';
-import axios from 'axios';
+import { User, UserDocument, users } from '../model/user';
+import axios, { AxiosError } from 'axios';
 import { logger } from '../util/logger';
 import AWS from 'aws-sdk';
 import crypto from 'crypto';
+import { ObjectId } from 'mongodb';
 
 // Don't set client-side timeouts for requests to the data service.
 // TODO: Make this more fine-grained once we fix
@@ -62,8 +63,8 @@ export default class CasesController {
         req.body.correlationId = correlationId;
         try {
             const user = req.user as UserDocument;
-            await User.findByIdAndUpdate(
-                user.id,
+            const result = await users().findOneAndUpdate(
+                { _id: new ObjectId(user.id) },
                 {
                     $push: {
                         downloads: {
@@ -73,15 +74,12 @@ export default class CasesController {
                         },
                     },
                 },
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                function (err: any) {
-                    if (err) {
-                        logger.info(`An error occurred: ${err}`);
-                    } else {
-                        logger.info('Document updated');
-                    }
-                },
             );
+            if (!result.ok) {
+                logger.error(`Error adding download to user: ${result.lastErrorObject}`);
+            } else {
+                logger.info(`Added download to user ${user.id}`);
+            }
             axios({
                 method: 'post',
                 url: this.dataServerURL + '/api' + req.url,
@@ -98,12 +96,13 @@ export default class CasesController {
                 response.data.pipe(res);
             });
         } catch (err) {
-            logger.error(err);
-            if (err.response?.status && err.response?.data) {
-                res.status(err.response.status).send(err.response.data);
+            const error = err as AxiosError;
+            logger.error(error);
+            if (error.response?.status && error.response?.data) {
+                res.status(error.response.status).send(error.response.data);
                 return;
             }
-            res.status(500).send(err);
+            res.status(500).send(error);
         }
     };
 
