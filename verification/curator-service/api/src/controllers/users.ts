@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { ObjectId } from 'mongodb';
 
-import { User, userRoles, users } from '../model/user';
+import { userRoles, users } from '../model/user';
 
 /**
  * List the users.
