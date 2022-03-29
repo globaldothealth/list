@@ -4,7 +4,7 @@ import axios, { AxiosError } from 'axios';
 import { logger } from '../util/logger';
 import AWS from 'aws-sdk';
 import crypto from 'crypto';
-import { ObjectId } from 'mongodb';
+import { FindAndModifyWriteOpResultObject, ObjectId } from 'mongodb';
 
 // Don't set client-side timeouts for requests to the data service.
 // TODO: Make this more fine-grained once we fix
@@ -56,6 +56,14 @@ export default class CasesController {
         }
     };
 
+    private logOutcomeOfAppendingDownloadToUser(userId: string, result: FindAndModifyWriteOpResultObject<any>) {
+        if (!result.ok) {
+            logger.error(`Error adding download to user: ${result.lastErrorObject}`);
+        } else {
+            logger.info(`Added download to user ${userId}`);
+        }
+    }
+
     /** Download forwards the request to the data service and streams the
      * streamed response as an attachment. */
     download = async (req: Request, res: Response): Promise<void> => {
@@ -75,11 +83,8 @@ export default class CasesController {
                     },
                 },
             );
-            if (!result.ok) {
-                logger.error(`Error adding download to user: ${result.lastErrorObject}`);
-            } else {
-                logger.info(`Added download to user ${user.id}`);
-            }
+            this.logOutcomeOfAppendingDownloadToUser(user.id, result);
+
             axios({
                 method: 'post',
                 url: this.dataServerURL + '/api' + req.url,
@@ -147,11 +152,8 @@ export default class CasesController {
                 },
             );
 
-            if (!result.ok) {
-                logger.error(`Error adding download to user: ${result.lastErrorObject}`);
-            } else {
-                logger.info(`Added download to user ${user.id}`);
-            }
+            this.logOutcomeOfAppendingDownloadToUser(user.id, result);
+
             axios({
                 method: 'post',
                 url: url,
@@ -208,8 +210,8 @@ export default class CasesController {
                 });
             });
 
-            await User.findByIdAndUpdate(
-                user.id,
+            const result = await users().findOneAndUpdate(
+                { _id: user.id },
                 {
                     $push: {
                         downloads: {
@@ -217,15 +219,8 @@ export default class CasesController {
                         },
                     },
                 },
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                function (err: any) {
-                    if (err) {
-                        logger.info(`An error occurred: ${err}`);
-                    } else {
-                        logger.info('Document updated');
-                    }
-                },
             );
+            this.logOutcomeOfAppendingDownloadToUser(user.id, result);
 
             res.status(200).send({ signedUrl });
         } catch (err) {
