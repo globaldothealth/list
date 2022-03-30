@@ -4,7 +4,7 @@ import {
 } from 'passport-http-bearer';
 import { Strategy as GoogleStrategy, Profile } from 'passport-google-oauth20';
 import { NextFunction, Request, Response } from 'express';
-import { User, UserDocument } from '../model/user';
+import { User, UserDocument, users } from '../model/user';
 import { Token } from '../model/token';
 import { isValidObjectId } from 'mongoose';
 
@@ -17,6 +17,7 @@ import AwsLambdaClient from '../clients/aws-lambda-client';
 import bcrypt from 'bcrypt';
 import * as crypto from 'crypto';
 import EmailClient from '../clients/email-client';
+import { ObjectId } from 'mongodb';
 
 // Global variable for newsletter acceptance
 let isNewsletterAccepted: boolean;
@@ -26,7 +27,7 @@ async function findUserByAPIKey(apiKey?: string): Promise<Express.User> {
         throw new Error('No API key');
     }
     const userID = apiKey.slice(0, 24);
-    const user = await User.findById(userID);
+    const user = await users().findOne({ _id: new ObjectId(userID) });
     if (!user) {
         throw new Error('Invalid API key');
     }
