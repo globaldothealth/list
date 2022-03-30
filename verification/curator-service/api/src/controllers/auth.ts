@@ -414,7 +414,7 @@ export class AuthController {
 
                 try {
                     // Check if user with this email address exists
-                    const user = await User.findOne({ email });
+                    const user = await users().findOne({ email });
                     if (!user) {
                         return res.sendStatus(200);
                     }
@@ -488,7 +488,8 @@ export class AuthController {
                     );
 
                     return res.sendStatus(200);
-                } catch (error) {
+                } catch (err) {
+                    const error = err as Error;
                     return res
                         .status(500)
                         .json({ message: String(error.message) });
