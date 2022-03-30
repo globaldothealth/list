@@ -299,7 +299,8 @@ export class AuthController {
                     // internal server error as you were authenticated but unknown
                     res.status(500).end();
                 } else {
-                    const currentUser = await User.findById(theUser.id);
+                    const userQuery = { _id: new ObjectId(theUser.id) };
+                    const currentUser = await users().findOne(userQuery);
                     if (!currentUser) {
                         // internal server error as you were authenticated but unknown
                         res.status(500).end();
@@ -307,9 +308,9 @@ export class AuthController {
                     }
                     // prefix the API key with the user ID to make it easier to find users by API key in auth
                     const randomPart = await getRandomString(32);
-                    currentUser.apiKey = `${theUser.id.toString()}${randomPart}`;
-                    await currentUser.save();
-                    res.status(201).json(theUser.apiKey).end();
+                    const apiKey = `${theUser.id.toString()}${randomPart}`;
+                    await users().updateOne({ _id: new ObjectId(theUser.id) }, { $set: { apiKey }});
+                    res.status(201).json(apiKey).end();
                 }
             },
         );
