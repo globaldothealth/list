@@ -72,6 +72,17 @@ export async function isUserPasswordValid(user: UserDocument, password: string):
     return compare;
 }
 
+interface IUserPublicFields {
+    id: string,
+    name?: string,
+    email: string,
+    googleID?: string,
+    roles: [string],
+    picture?: string,
+    newsletterAccepted?: boolean,
+    apiKey?: string,
+};
+
 userSchema.methods.publicFields = function () {
     return {
         id: this.id,
@@ -85,6 +96,19 @@ userSchema.methods.publicFields = function () {
     };
 };
 
+export function userPublicFields(user: UserDocument | undefined): IUserPublicFields | undefined {
+    if (!user) return undefined;
+    return {
+        id: user._id.toHexString(),
+        name: user.name,
+        email: user.email,
+        googleID: user.googleID,
+        roles: user.roles,
+        picture: user.picture,
+        newsletterAccepted: user.newsletterAccepted,
+        apiKey: user.apiKey,
+    };
+}
 export const User = mongoose.model<UserDocument>('User', userSchema);
 
 export const Session = mongoose.model<mongoose.Document>(
