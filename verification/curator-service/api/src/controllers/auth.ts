@@ -535,20 +535,23 @@ export class AuthController {
 
                     // Hash new password and update user document in DB
                     const hashedPassword = await bcrypt.hash(newPassword, 10);
-                    await User.updateOne(
-                        { _id: userId },
+                    const result = await users().findOneAndUpdate(
+                        { _id: new ObjectId(userId) },
                         { $set: { password: hashedPassword } },
-                        { new: true },
+                        { returnDocument: 'after' },
                     );
-
-                    // Send confirmation email to the user
-                    const user = await User.findOne({ _id: userId });
-
-                    if (!user) {
+                    
+                    if (!result.ok) {
+                        logger.error(`error resetting password for user ${userId}`);
+                        logger.error(result.lastErrorObject);
                         throw new Error(
                             'Something went wrong, please try again later',
                         );
                     }
+
+                    // Send confirmation email to the user
+                    const user = result.value;
+
 
                     await this.emailClient.send(
                         [user.email],
@@ -563,7 +566,8 @@ export class AuthController {
                     await passwordResetToken.deleteOne();
 
                     res.sendStatus(200);
-                } catch (error) {
+                } catch (err) {
+                    const error = err as Error;
                     res.status(500).json({ message: String(error.message) });
                 }
             },
