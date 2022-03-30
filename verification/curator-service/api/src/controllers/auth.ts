@@ -327,15 +327,11 @@ export class AuthController {
                     logger.info(
                         `user ID ${req.params.id} API key deletion requested`,
                     );
-                    const user = await User.findByIdAndUpdate(
-                        req.params.id,
-                        { apiKey: undefined },
-                        {
-                            new: false,
-                            runValidators: true,
-                        },
+                    const result = await users().findOneAndUpdate(
+                        { _id: new ObjectId(req.params.id) },
+                        { $unset: { apiKey: '' } },
                     );
-                    if (!user) {
+                    if (!result.ok) {
                         logger.warn(
                             `user with ID ${req.params.id} does not exist`,
                         );
@@ -347,11 +343,12 @@ export class AuthController {
                     logger.info(`API key deleted for user ${req.params.id}`);
                     res.sendStatus(204);
                 } catch (err) {
-                    if (err.name === 'ValidationError') {
-                        res.status(422).json(err);
+                    const error = err as Error;
+                    if (error.name === 'ValidationError') {
+                        res.status(422).json(error);
                         return;
                     }
-                    res.status(500).json(err);
+                    res.status(500).json(error);
                     return;
                 }
             },
