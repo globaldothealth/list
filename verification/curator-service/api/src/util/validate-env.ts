@@ -9,7 +9,6 @@ export default function validateEnv(): Readonly<{
     DATASERVER_URL: string;
     DB_CONNECTION_STRING: string;
     EMAIL_USER_ADDRESS: string;
-    EMAIL_USER_PASSWORD: string;
     ENABLE_LOCAL_AUTH: boolean;
     EVENT_ROLE_ARN: string;
     GOOGLE_OAUTH_CLIENT_ID: string;
@@ -59,10 +58,6 @@ export default function validateEnv(): Readonly<{
         EMAIL_USER_ADDRESS: str({
             desc: 'Address from which to send notification emails.',
             devDefault: 'fake@email.com',
-        }),
-        EMAIL_USER_PASSWORD: str({
-            desc: 'Password of the email address account used to send notification emails.',
-            devDefault: '',
         }),
         ENABLE_LOCAL_AUTH: bool({
             desc: 'Whether to enable local auth strategy for testing',
