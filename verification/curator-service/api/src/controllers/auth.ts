@@ -264,7 +264,7 @@ export class AuthController {
             mustBeAuthenticated,
             async (req: Request, res: Response): Promise<void> => {
                 const theUser = req.user as UserDocument;
-                const currentUser = await User.findById(theUser.id);
+                const currentUser = await users().findOne({ _id: new ObjectId(theUser.id) });
                 if (!currentUser) {
                     // internal server error as you were authenticated but unknown
                     res.status(500).end();
