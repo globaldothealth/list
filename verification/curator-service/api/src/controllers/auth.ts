@@ -4,7 +4,7 @@ import {
 } from 'passport-http-bearer';
 import { Strategy as GoogleStrategy, Profile } from 'passport-google-oauth20';
 import { NextFunction, Request, Response } from 'express';
-import { isUserPasswordValid, User, UserDocument, users } from '../model/user';
+import { isUserPasswordValid, User, UserDocument, userPublicFields, users } from '../model/user';
 import { Token } from '../model/token';
 import { isValidObjectId } from 'mongoose';
 
@@ -612,19 +612,19 @@ export class AuthController {
         // @ts-ignore
         passport.serializeUser((user: UserDocument, done: any) => {
             // Serializes the user id in the cookie, no user info should be in there, just the id.
-            done(null, user.id);
+            done(null, user._id.toHexString());
         });
 
         passport.deserializeUser((id: string, done: any) => {
             // Find the user based on its id in the cookie.
-            User.findById(id)
+            users().findOne({ _id: new ObjectId(id) })
                 .then((user) => {
                     // Invalidate session when user cannot be found.
                     // This means an cookie pointing to an invalid user was sent to us.
                     // Cf. https://github.com/jaredhanson/passport/issues/6#issuecomment-4857287
                     // This doesn't work however for now as per, if you hit this bug, you have to manually clear the cookies.
                     // Cf https://github.com/jaredhanson/passport/issues/776
-                    done(null, user?.publicFields() || undefined);
+                    done(null, userPublicFields(user));
                     return;
                 })
                 .catch((e) => {
