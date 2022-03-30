@@ -65,6 +65,13 @@ userSchema.methods.isValidPassword = async function (
     return compare;
 };
 
+export async function isUserPasswordValid(user: UserDocument, password: string): Promise<boolean> {
+    if (!password) return false;
+    if (!user.password) return false;
+    const compare = await bcrypt.compare(password, user.password);
+    return compare;
+}
+
 userSchema.methods.publicFields = function () {
     return {
         id: this.id,

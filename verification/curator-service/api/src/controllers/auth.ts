@@ -4,7 +4,7 @@ import {
 } from 'passport-http-bearer';
 import { Strategy as GoogleStrategy, Profile } from 'passport-google-oauth20';
 import { NextFunction, Request, Response } from 'express';
-import { User, UserDocument, users } from '../model/user';
+import { isUserPasswordValid, User, UserDocument, users } from '../model/user';
 import { Token } from '../model/token';
 import { isValidObjectId } from 'mongoose';
 
@@ -371,12 +371,14 @@ export class AuthController {
                 }
 
                 try {
-                    const currentUser = await User.findById(user.id);
+                    const userQuery = { _id: new ObjectId(user.id) };
+                    const currentUser = await users().findOne(userQuery);
                     if (!currentUser) {
                         return res.sendStatus(403);
                     }
 
-                    const isValidPassword = await currentUser.isValidPassword(
+                    const isValidPassword = await isUserPasswordValid(
+                        currentUser,
                         oldPassword,
                     );
 
@@ -387,8 +389,10 @@ export class AuthController {
                     }
 
                     const hashedPassword = await bcrypt.hash(newPassword, 10);
-                    await User.findByIdAndUpdate(user.id, {
-                        password: hashedPassword,
+                    await users().updateOne(userQuery, {
+                        $set: {
+                            password: hashedPassword,
+                        }
                     });
 
                     return res
