@@ -7,7 +7,7 @@ import React from 'react';
 import axios from 'axios';
 import range from 'lodash/range';
 import userEvent from '@testing-library/user-event';
-import { ChipData } from './App/App';
+import { ChipData } from './App';
 import { RootState } from '../redux/store';
 import { SortBy, SortByOrder } from '../constants/types';
 

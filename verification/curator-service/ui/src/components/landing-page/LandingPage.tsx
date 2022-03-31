@@ -25,9 +25,9 @@ import { SnackbarAlert } from '../SnackbarAlert';
 import { useParams, Link } from 'react-router-dom';
 
 import Helmet from 'react-helmet';
-import { getVersion } from '../../redux/app/thunk';
 import { selectVersion, selectEnv } from '../../redux/app/selectors';
 import { MapLink } from '../../constants/types';
+import { getReleaseNotesUrl } from '../util/helperFunctions';
 
 interface StylesProps {
     smallHeight: boolean;
@@ -114,11 +114,21 @@ const MoreInformationLinks = ({
     version,
     env,
 }: StyleProps & { version: string; env: string }) => {
+    const releaseNotesUrl = getReleaseNotesUrl(version);
+
     return (
         <div className={classes.linksContainer}>
             <div>
                 <Typography>More information</Typography>
-                <div className={classes.link}>Version: {version}</div>
+                <div className={classes.link}>
+                    <a
+                        href={releaseNotesUrl}
+                        rel="noopener noreferrer"
+                        target="_blank"
+                    >
+                        Version: {version}
+                    </a>
+                </div>
                 <div className={classes.link}>
                     <a
                         href="https://global.health/"
@@ -225,11 +235,6 @@ const LandingPage = (): JSX.Element => {
 
         localStorage.setItem('searchQuery', lastLocation.search);
     }, [lastLocation]);
-
-    // retrieve the app version from the curator service
-    useEffect(() => {
-        dispatch(getVersion());
-    }, [dispatch]);
 
     return (
         <>

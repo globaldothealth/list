@@ -1,4 +1,4 @@
-import { ChipData } from '../../components/App/App';
+import { ChipData } from '../../components/App';
 import { RootState } from '../store';
 
 export const selectSearchQuery: (state: RootState) => string = (state) =>
@@ -11,3 +11,5 @@ export const selectIsLoading: (state: RootState) => boolean = (state) =>
 export const selectVersion: (state: RootState) => string = (state) =>
     state.app.version;
 export const selectEnv: (state: RootState) => string = (state) => state.app.env;
+export const selectDiseaseName: (state: RootState) => string = (state) =>
+    state.app.diseaseName;

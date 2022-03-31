@@ -136,6 +136,7 @@ interface Props
     pageSize: number;
     sortBy: SortBy;
     sortByOrder: SortByOrder;
+    diseaseName: string;
 
     onChangePage: (page: number) => void;
 
@@ -804,7 +805,6 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                 encodeURIComponent(
                     URLToSearchQuery(this.props.location.search),
                 ) ?? '',
-            diseaseName: process.env.REACT_APP_DISEASE_NAME ?? 'COVID-19',
         };
         this.deleteCases = this.deleteCases.bind(this);
         this.setCaseVerification = this.setCaseVerification.bind(this);
@@ -1602,7 +1602,7 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                             <Typography
                                                 className={classes.tableTitle}
                                             >
-                                                {this.state.diseaseName}{' '}
+                                                {this.props.diseaseName}{' '}
                                                 Linelist
                                             </Typography>
 

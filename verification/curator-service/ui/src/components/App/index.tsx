@@ -50,14 +50,20 @@ import {
     setFilterBreadcrumbs,
     deleteFilterBreadcrumbs,
 } from '../../redux/app/slice';
-import { selectIsLoading, selectEnv } from '../../redux/app/selectors';
-import { getEnv } from '../../redux/app/thunk';
+import {
+    selectIsLoading,
+    selectEnv,
+    selectVersion,
+    selectDiseaseName,
+} from '../../redux/app/selectors';
+import { getEnv, getVersion, getDiseaseName } from '../../redux/app/thunk';
 import { getUserProfile, logout } from '../../redux/auth/thunk';
 import { selectUser } from '../../redux/auth/selectors';
 import { User } from '../../api/models/User';
 import PopupSmallScreens from '../PopupSmallScreens';
 import Sidebar from '../Sidebar';
 import Footer from '../Footer';
+import { getReleaseNotesUrl } from '../util/helperFunctions';
 
 // to use our custom theme values in typescript we need to define an extension to the ThemeOptions type.
 declare module '@material-ui/core/styles' {
@@ -271,7 +277,7 @@ const useStyles = makeStyles((theme: Theme) => ({
     },
 }));
 
-function ProfileMenu(props: { user: User }): JSX.Element {
+function ProfileMenu(props: { user: User; version: string }): JSX.Element {
     const dispatch = useAppDispatch();
 
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
@@ -285,6 +291,8 @@ function ProfileMenu(props: { user: User }): JSX.Element {
     };
 
     const classes = menuStyles();
+
+    const releaseNotesUrl = getReleaseNotesUrl(props.version);
 
     return (
         <div>
@@ -344,6 +352,21 @@ function ProfileMenu(props: { user: User }): JSX.Element {
                 >
                     <MenuItem>View source on Github</MenuItem>
                 </a>
+
+                {props.version && (
+                    <>
+                        <Divider className={classes.divider} />
+
+                        <a
+                            href={releaseNotesUrl}
+                            rel="noopener noreferrer"
+                            target="_blank"
+                            onClick={handleClose}
+                        >
+                            <MenuItem>Version: {props.version}</MenuItem>
+                        </a>
+                    </>
+                )}
             </Menu>
         </div>
     );
@@ -371,14 +394,18 @@ export default function App(): JSX.Element {
         return null;
     };
 
-    // Get current env
+    // Get current env, version and disease name
     useEffect(() => {
         dispatch(getEnv());
+        dispatch(getVersion());
+        dispatch(getDiseaseName());
     }, [dispatch]);
 
     const isLoadingUser = useAppSelector(selectIsLoading);
     const user = useAppSelector(selectUser);
     const env = useAppSelector(selectEnv);
+    const appVersion = useAppSelector(selectVersion);
+    const diseaseName = useAppSelector(selectDiseaseName);
 
     const showMenu = useMediaQuery(theme.breakpoints.up('sm'));
     const [drawerOpen, setDrawerOpen] = useState<boolean>(false);
@@ -537,7 +564,9 @@ export default function App(): JSX.Element {
                                 G.h Map
                             </a>
                         </Typography>
-                        {user && <ProfileMenu user={user} />}
+                        {user && (
+                            <ProfileMenu user={user} version={appVersion} />
+                        )}
                     </Toolbar>
                 </AppBar>
                 {user && hasAnyRole(['curator', 'admin']) && (
@@ -570,6 +599,7 @@ export default function App(): JSX.Element {
                                     sortByOrder={sortByOrder}
                                     setSortBy={setSortBy}
                                     setSortByOrder={setSortByOrder}
+                                    diseaseName={diseaseName}
                                 />
                             </Route>
                         )}

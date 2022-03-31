@@ -417,4 +417,23 @@ describe('App', function () {
         cy.get('#small-screens-popup-close-btn').click();
         cy.get('#popup-small-screens').should('not.exist');
     });
+
+    it('Displays version number in profile menu', function () {
+        cy.login({ name: 'Alice Smith', email: 'alice@test.com', roles: [] });
+
+        cy.server();
+        cy.route({
+            method: 'GET',
+            url: `/version`,
+            status: 200,
+            response: '1.10.1',
+        }).as('fetchVersion');
+
+        cy.visit('/');
+        cy.wait('@fetchVersion');
+
+        cy.get('button[data-testid="profile-menu"]').click();
+
+        cy.contains('Version: 1.10.1');
+    });
 });

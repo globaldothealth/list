@@ -10,3 +10,11 @@ export const getEnv = createAsyncThunk('app/getEnv', async () => {
     const response = await axios.get<string>('/env');
     return response.data;
 });
+
+export const getDiseaseName = createAsyncThunk(
+    'app/getDiseaseName',
+    async () => {
+        const response = await axios.get<string>('/diseaseName');
+        return response.data;
+    },
+);

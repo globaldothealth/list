@@ -20,6 +20,7 @@ export default function validateEnv(): Readonly<{
     SERVICE_ENV: string;
     SESSION_COOKIE_KEY: string;
     STATIC_DIR: string;
+    DISEASE_NAME: string;
 }> & {
     readonly [varName: string]: string | boolean | number | undefined;
     // eslint-disable-next-line indent
@@ -102,6 +103,10 @@ export default function validateEnv(): Readonly<{
         STATIC_DIR: str({
             desc: 'Directory to serve static files from',
             devDefault: '',
+        }),
+        DISEASE_NAME: str({
+            desc: 'Name of the disease that should be displayed in Curator UI',
+            devDefault: 'COVID-19',
         }),
     });
 }
