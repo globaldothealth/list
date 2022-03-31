@@ -838,7 +838,7 @@ export class AuthController {
                         }
                         let user = await users().findOne({ email: email });
                         if (!user) {
-                            user = await users().insertOne({
+                            const result = await users().insertOne({
                                 _id: new ObjectId(),
                                 email: email,
                                 googleID: response.data.sub,
@@ -846,6 +846,7 @@ export class AuthController {
                                 // Do not care about names for bearer tokens, they are usually not humans.
                                 name: '',
                             });
+                            user = await users().findOne({ _id: result.insertedId });
                         }
                         return done(null, user);
                     } catch (e) {
