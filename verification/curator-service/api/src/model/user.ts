@@ -4,17 +4,20 @@ import { ObjectId } from 'mongodb';
 
 export const userRoles = ['admin', 'curator'];
 
-export type IUser = {
+interface IUserPublicFields {
+    id: string,
+    name?: string,
+    email: string,
+    googleID?: string,
+    roles: [string],
+    picture?: string,
+    newsletterAccepted?: boolean,
+    apiKey?: string,
+};
+
+export type IUser = IUserPublicFields & {
     _id: ObjectId;
-    id: string;
-    googleID?: string | undefined;
-    name?: string;
-    email: string;
     password?: string;
-    apiKey?: string;
-    roles: [string];
-    picture?: string;
-    newsletterAccepted?: boolean;
     downloads?: [{
         timestamp: Date,
         format?: String,
@@ -48,46 +51,12 @@ const userSchema = new mongoose.Schema<UserDocument>({
     ],
 });
 
-// Methods
-userSchema.methods.isValidPassword = async function (
-    password: string,
-): Promise<boolean> {
-    if (!this.password) return false;
-
-    const compare = await bcrypt.compare(password, this.password);
-    return compare;
-};
-
 export async function isUserPasswordValid(user: UserDocument, password: string): Promise<boolean> {
     if (!password) return false;
     if (!user.password) return false;
     const compare = await bcrypt.compare(password, user.password);
     return compare;
 }
-
-interface IUserPublicFields {
-    id: string,
-    name?: string,
-    email: string,
-    googleID?: string,
-    roles: [string],
-    picture?: string,
-    newsletterAccepted?: boolean,
-    apiKey?: string,
-};
-
-userSchema.methods.publicFields = function () {
-    return {
-        id: this.id,
-        name: this.name,
-        email: this.email,
-        googleID: this.googleID,
-        roles: this.roles,
-        picture: this.picture,
-        newsletterAccepted: this.newsletterAccepted,
-        apiKey: this.apiKey,
-    };
-};
 
 export function userPublicFields(user: UserDocument | undefined): IUserPublicFields | undefined {
     if (!user) return undefined;
