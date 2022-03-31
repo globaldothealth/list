@@ -750,12 +750,14 @@ export class AuthController {
                     try {
                         // Passport got our user profile from google.
                         // Find or create a correpsonding user in our DB.
-                        let user = await User.findOne({
+                        let user = await users().findOne({
                             googleID: googleProfile.id,
                         });
                         const picture = profile.photos?.[0].value;
                         if (!user) {
-                            user = await User.create({
+                            const userId = new ObjectId();
+                            const result = await users().insertOne({
+                                _id: userId,
                                 googleID: googleProfile.id,
                                 name: profile.displayName,
                                 email: (profile.emails || []).map(
@@ -765,6 +767,7 @@ export class AuthController {
                                 picture: picture,
                                 newsletterAccepted: isNewsletterAccepted,
                             });
+                            user = await users().findOne({ _id: result.insertedId });
 
                             try {
                                 // Send welcome email
@@ -795,10 +798,12 @@ export class AuthController {
                             logger.info(
                                 'User has a different picture, updating it',
                             );
-                            user = await User.findOneAndUpdate(
+                            const update = await users().findOneAndUpdate(
                                 { googleID: googleProfile.id },
-                                { picture: picture },
+                                { $set: { picture }},
+                                { returnDocument: 'after'}
                             );
+                            user = update.value;
                         }
 
                         if (
@@ -807,10 +812,12 @@ export class AuthController {
                             isNewsletterAccepted
                         ) {
                             logger.info('Updating newsletter preferences');
-                            user = await User.findOneAndUpdate(
+                            const update = await users().findOneAndUpdate(
                                 { googleID: googleProfile.id },
-                                { newsletterAccepted: true },
+                                { $set: { newsletterAccepted: true } },
+                                { returnDocument: 'after' }
                             );
+                            user = update.value;
                         }
                         cb(undefined, user);
                     } catch (e) {
