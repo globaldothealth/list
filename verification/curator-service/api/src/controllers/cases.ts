@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { UserDocument, users } from '../model/user';
+import { IUser, users } from '../model/user';
 import axios, { AxiosError } from 'axios';
 import { logger } from '../util/logger';
 import AWS from 'aws-sdk';
@@ -70,7 +70,7 @@ export default class CasesController {
         const correlationId = crypto.randomBytes(16).toString('hex');
         req.body.correlationId = correlationId;
         try {
-            const user = req.user as UserDocument;
+            const user = req.user as IUser;
             const result = await users().findOneAndUpdate(
                 { _id: new ObjectId(user.id) },
                 {
@@ -130,7 +130,7 @@ export default class CasesController {
             }
         }
         try {
-            const user = req.user as UserDocument;
+            const user = req.user as IUser;
             const url =
                 this.dataServerURL + '/api' + req.url.replace('Async', '');
             req.body.correlationId = crypto.randomBytes(16).toString('hex');
@@ -199,7 +199,7 @@ export default class CasesController {
                 'attachment; filename ="' + filename + '"',
         };
 
-        const user = req.user as UserDocument;
+        const user = req.user as IUser;
 
         try {
             const signedUrl: string = await new Promise((resolve, reject) => {
@@ -247,7 +247,7 @@ export default class CasesController {
                 'attachment; filename ="' + filename + '"',
         };
 
-        const user = req.user as UserDocument;
+        const user = req.user as IUser;
 
         try {
             const signedUrl: string = await new Promise((resolve, reject) => {
@@ -386,7 +386,7 @@ export default class CasesController {
         try {
             // Limit number of deletes a non-admin can do.
             // Cf. https://github.com/globaldothealth/list/issues/937.
-            if (!(req.user as UserDocument)?.roles?.includes('admin')) {
+            if (!(req.user as IUser)?.roles?.includes('admin')) {
                 req.body['maxCasesThreshold'] = 10000;
             }
             const response = await axios.delete(
@@ -428,7 +428,7 @@ export default class CasesController {
                 this.dataServerURL + '/api' + req.url,
                 {
                     ...req.body,
-                    curator: { email: (req.user as UserDocument).email },
+                    curator: { email: (req.user as IUser).email },
                 },
             );
             res.status(response.status).json(response.data);
@@ -451,7 +451,7 @@ export default class CasesController {
                 this.dataServerURL + '/api' + req.url,
                 {
                     ...req.body,
-                    curator: { email: (req.user as UserDocument).email },
+                    curator: { email: (req.user as IUser).email },
                 },
             );
             res.status(response.status).json(response.data);
@@ -473,7 +473,7 @@ export default class CasesController {
                 this.dataServerURL + '/api/cases/batchUpsert',
                 {
                     ...req.body,
-                    curator: { email: (req.user as UserDocument).email },
+                    curator: { email: (req.user as IUser).email },
                 },
                 { maxContentLength: Infinity },
             );
@@ -500,7 +500,7 @@ export default class CasesController {
                 this.dataServerURL + '/api/cases/batchUpdate',
                 {
                     ...req.body,
-                    curator: { email: (req.user as UserDocument).email },
+                    curator: { email: (req.user as IUser).email },
                 },
                 { maxContentLength: Infinity },
             );
@@ -529,7 +529,7 @@ export default class CasesController {
                 this.dataServerURL + '/api/cases/batchUpdateQuery',
                 {
                     ...req.body,
-                    curator: { email: (req.user as UserDocument).email },
+                    curator: { email: (req.user as IUser).email },
                 },
                 { maxContentLength: Infinity },
             );
@@ -558,7 +558,7 @@ export default class CasesController {
                 this.dataServerURL + '/api/cases/batchStatusChange',
                 {
                     ...req.body,
-                    curator: { email: (req.user as UserDocument).email },
+                    curator: { email: (req.user as IUser).email },
                 },
             );
             res.status(response.status).end();
@@ -582,7 +582,7 @@ export default class CasesController {
                 this.dataServerURL + '/api' + req.url,
                 {
                     ...req.body,
-                    curator: { email: (req.user as UserDocument).email },
+                    curator: { email: (req.user as IUser).email },
                 },
             );
             res.status(response.status).json(response.data);
