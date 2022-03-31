@@ -10,7 +10,7 @@ const mockInitialize = jest.fn().mockReturnValue({ send: mockSend });
 
 import * as baseUser from './users/base.json';
 
-import { Session, User } from '../src/model/user';
+import { Session, users } from '../src/model/user';
 
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import { Case, RestrictedCase } from '../src/model/case';
@@ -55,7 +55,7 @@ beforeEach(async () => {
     jest.clearAllMocks();
     mockSend.mockResolvedValue({});
     await Source.deleteMany({});
-    await User.deleteMany({});
+    await users().deleteMany({});
     await Session.deleteMany({});
 });
 
@@ -65,7 +65,7 @@ afterEach(async () => {
 
 afterAll(async () => {
     await Source.deleteMany({});
-    await User.deleteMany({});
+    await users().deleteMany({});
     await Session.deleteMany({});
 });
 
