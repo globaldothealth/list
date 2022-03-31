@@ -1,9 +1,12 @@
 import mongoose, { Document } from 'mongoose';
 import bcrypt from 'bcrypt';
+import { ObjectId } from 'mongodb';
 
 export const userRoles = ['admin', 'curator'];
 
-export type UserDocument = Document & {
+export type IUser = {
+    _id: ObjectId;
+    id: string;
     googleID?: string | undefined;
     name?: string;
     email: string;
@@ -17,19 +20,9 @@ export type UserDocument = Document & {
         format?: String,
         query?: String,
     }];
-
-    isValidPassword(password: string): Promise<boolean>;
-    publicFields(): {
-        id: string;
-        name?: string;
-        email: string;
-        googleID: string;
-        roles: string[];
-        picture?: string;
-        newsletterAccepted?: boolean;
-        apiKey?: string;
-    };
 };
+
+export type UserDocument = Document & IUser;
 
 const userSchema = new mongoose.Schema<UserDocument>({
     name: String,

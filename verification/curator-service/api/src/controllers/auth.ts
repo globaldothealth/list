@@ -4,7 +4,7 @@ import {
 } from 'passport-http-bearer';
 import { Strategy as GoogleStrategy, Profile } from 'passport-google-oauth20';
 import { NextFunction, Request, Response } from 'express';
-import { isUserPasswordValid, User, UserDocument, userPublicFields, users } from '../model/user';
+import { isUserPasswordValid, IUser, userPublicFields, users } from '../model/user';
 import { Token } from '../model/token';
 import { isValidObjectId } from 'mongoose';
 
@@ -47,7 +47,7 @@ export const authenticateByAPIKey = async (
     try {
         const theKey = req.header('X-API-Key');
         const user = await findUserByAPIKey(theKey);
-        if (user && (user as UserDocument).apiKey === theKey) {
+        if (user && (user as IUser).apiKey === theKey) {
             req.user = user;
             res.status(200);
         } else {
@@ -95,7 +95,7 @@ export const mustBeAuthenticated = (
  * @param requiredRoles The set of roles that the user should have, if any role matches the function returns true.
  */
 const userHasRequiredRole = (
-    user: UserDocument,
+    user: IUser,
     requiredRoles: Set<string>,
 ): boolean => {
     return user.roles?.some((r: string) => requiredRoles.has(r));
@@ -114,7 +114,7 @@ export const mustHaveAnyRole = (requiredRoles: string[]) => {
         const requiredSet = new Set(requiredRoles);
         if (
             req.isAuthenticated() &&
-            userHasRequiredRole(req.user as UserDocument, requiredSet)
+            userHasRequiredRole(req.user as IUser, requiredSet)
         ) {
             // override an upstream 403/401
             res.status(200);
@@ -125,7 +125,7 @@ export const mustHaveAnyRole = (requiredRoles: string[]) => {
                     return next(err);
                 } else if (
                     user &&
-                    userHasRequiredRole(user as UserDocument, requiredSet)
+                    userHasRequiredRole(user as IUser, requiredSet)
                 ) {
                     // override an upstream 403/401
                     res.status(200);
@@ -184,7 +184,7 @@ export class AuthController {
             (req: Request, res: Response, next: NextFunction): void => {
                 passport.authenticate(
                     'register',
-                    (error: Error, user: UserDocument, info: any) => {
+                    (error: Error, user: IUser, info: any) => {
                         if (error) return next(error);
                         if (!user)
                             return res
@@ -206,7 +206,7 @@ export class AuthController {
             (req: Request, res: Response, next: NextFunction): void => {
                 passport.authenticate(
                     'login',
-                    (error: Error, user: UserDocument, info: any) => {
+                    (error: Error, user: IUser, info: any) => {
                         if (error) return next(error);
                         if (!user)
                             return res
@@ -263,7 +263,7 @@ export class AuthController {
             '/profile/apiKey',
             mustBeAuthenticated,
             async (req: Request, res: Response): Promise<void> => {
-                const theUser = req.user as UserDocument;
+                const theUser = req.user as IUser;
                 const currentUser = await users().findOne({ _id: new ObjectId(theUser.id) });
                 if (!currentUser) {
                     // internal server error as you were authenticated but unknown
@@ -294,7 +294,7 @@ export class AuthController {
             '/profile/apiKey',
             mustBeAuthenticated,
             async (req: Request, res: Response): Promise<void> => {
-                const theUser = req.user as UserDocument;
+                const theUser = req.user as IUser;
                 if (!theUser) {
                     // internal server error as you were authenticated but unknown
                     res.status(500).end();
@@ -364,7 +364,7 @@ export class AuthController {
             async (req: Request, res: Response) => {
                 const oldPassword = req.body.oldPassword as string;
                 const newPassword = req.body.newPassword as string;
-                const user = req.user as UserDocument;
+                const user = req.user as IUser;
 
                 if (!user) {
                     return res.sendStatus(403);
@@ -615,7 +615,7 @@ export class AuthController {
     configurePassport(clientID: string, clientSecret: string): void {
         // For some reason typescript doesn't accept mongoose User
         // @ts-ignore
-        passport.serializeUser((user: UserDocument, done: any) => {
+        passport.serializeUser((user: IUser, done: any) => {
             // Serializes the user id in the cookie, no user info should be in there, just the id.
             done(null, user._id.toHexString());
         });
