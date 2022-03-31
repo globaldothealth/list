@@ -649,7 +649,7 @@ export class AuthController {
                 },
                 async (req, email, password, done) => {
                     try {
-                        const user = await User.findOne({ email });
+                        const user = await users().findOne({ email });
 
                         if (user) {
                             return done(null, false, {
@@ -658,7 +658,9 @@ export class AuthController {
                         }
 
                         const hashedPassword = await bcrypt.hash(password, 10);
-                        const newUser = await User.create({
+                        const userId = new ObjectId();
+                        const result = await users().insertOne({
+                            _id: userId,
                             email: email,
                             password: hashedPassword,
                             name: req.body.name || '',
@@ -667,6 +669,8 @@ export class AuthController {
                                 req.body.newsletterAccepted || false,
                         });
 
+                        const newUser = await users().findOne({ _id: result.insertedId });
+                        
                         // Send welcome email
                         await this.emailClient.send(
                             [email],
