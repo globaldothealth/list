@@ -584,11 +584,16 @@ export class AuthController {
             '/register',
             async (req: Request, res: Response): Promise<void> => {
                 const removeGoogleID = req.body.removeGoogleID as boolean;
-                const user = await User.create({
+                const userId = new ObjectId();
+                const result = await users().insertOne({
+                    _id: userId,
                     name: req.body.name,
                     email: req.body.email,
                     roles: req.body.roles,
                     ...(removeGoogleID !== true && { googleID: '42' }),
+                });
+                const user = await users().findOne({
+                    _id: result.insertedId,
                 });
                 req.login(user, (err: Error) => {
                     if (!err) {
