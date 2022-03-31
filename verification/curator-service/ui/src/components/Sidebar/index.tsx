@@ -2,6 +2,7 @@ import React, { useEffect, useState, useMemo, useCallback } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAppSelector } from '../../hooks/redux';
 import { selectUser } from '../../redux/auth/selectors';
+import { selectDiseaseName } from '../../redux/app/selectors';
 
 import Drawer from '@material-ui/core/Drawer';
 import Typography from '@material-ui/core/Typography';
@@ -28,6 +29,7 @@ const Sidebar = ({ drawerOpen }: SidebarProps): JSX.Element => {
     const classes = useStyles();
     const location = useLocation();
 
+    const diseaseName = useAppSelector(selectDiseaseName);
     const [createNewButtonAnchorEl, setCreateNewButtonAnchorEl] =
         useState<Element | null>();
     const [selectedMenuIndex, setSelectedMenuIndex] = React.useState<number>();
@@ -51,8 +53,6 @@ const Sidebar = ({ drawerOpen }: SidebarProps): JSX.Element => {
         },
         [user],
     );
-
-    const diseaseName = process.env.REACT_APP_DISEASE_NAME ?? 'COVID-19';
 
     const menuList = useMemo(
         () =>
