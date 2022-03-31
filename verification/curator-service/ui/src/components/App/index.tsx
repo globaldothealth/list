@@ -63,6 +63,7 @@ import { User } from '../../api/models/User';
 import PopupSmallScreens from '../PopupSmallScreens';
 import Sidebar from '../Sidebar';
 import Footer from '../Footer';
+import { getReleaseNotesUrl } from '../util/helperFunctions';
 
 // to use our custom theme values in typescript we need to define an extension to the ThemeOptions type.
 declare module '@material-ui/core/styles' {
@@ -291,7 +292,7 @@ function ProfileMenu(props: { user: User; version: string }): JSX.Element {
 
     const classes = menuStyles();
 
-    const releaseNotesUrl = `https://github.com/globaldothealth/list/releases/tag/${props.version}`;
+    const releaseNotesUrl = getReleaseNotesUrl(props.version);
 
     return (
         <div>

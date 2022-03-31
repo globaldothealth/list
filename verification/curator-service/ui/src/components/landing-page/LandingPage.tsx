@@ -27,6 +27,7 @@ import { useParams, Link } from 'react-router-dom';
 import Helmet from 'react-helmet';
 import { selectVersion, selectEnv } from '../../redux/app/selectors';
 import { MapLink } from '../../constants/types';
+import { getReleaseNotesUrl } from '../util/helperFunctions';
 
 interface StylesProps {
     smallHeight: boolean;
@@ -113,7 +114,7 @@ const MoreInformationLinks = ({
     version,
     env,
 }: StyleProps & { version: string; env: string }) => {
-    const releaseNotesUrl = `https://github.com/globaldothealth/list/releases/tag/${version}`;
+    const releaseNotesUrl = getReleaseNotesUrl(version);
 
     return (
         <div className={classes.linksContainer}>
