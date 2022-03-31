@@ -41,8 +41,6 @@ ENV REACT_APP_PUBLIC_MAPBOX_TOKEN "pk.eyJ1IjoiaGVhbHRobWFwIiwiYSI6ImNrYzNjczdmcz
 # Set the Iubenda policy and cookie consent IDs. These are public so fine to be checked-in an image.
 ENV REACT_APP_POLICY_PUBLIC_ID "89575059"
 ENV REACT_APP_COOKIE_CONSENT_PUBLIC_ID "2070778"
-ENV REACT_APP_DISEASE_NAME "COVID-19"
-ENV REACT_APP_RELEASE_NOTES_URL "https://github.com/globaldothealth/list/releases/tag/1.10.1"
 
 RUN npm run build
 

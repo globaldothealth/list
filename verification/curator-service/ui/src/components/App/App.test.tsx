@@ -19,6 +19,7 @@ const initialLoggedInState: RootState = {
         filterBreadcrumbs: [],
         version: '1.0',
         env: 'local',
+        diseaseName: 'COVID-19',
     },
     filters: {
         countryList: [],
@@ -69,13 +70,15 @@ describe('<App />', () => {
         mockedAxios.get.mockImplementation((url) => {
             if (url === '/version') {
                 return Promise.resolve({ status: 200, data: '1.10.1' });
+            } else if (url === '/diseaseName') {
+                return Promise.resolve({ status: 200, data: 'COVID-19' });
             } else {
                 return Promise.resolve(axiosResponse);
             }
         });
 
         render(<App />);
-        expect(mockedAxios.get).toHaveBeenCalledTimes(3);
+        expect(mockedAxios.get).toHaveBeenCalledTimes(4);
         expect(mockedAxios.get).toHaveBeenCalledWith('/auth/profile');
         expect(mockedAxios.get).toHaveBeenCalledWith('/version');
         expect(mockedAxios.get).toHaveBeenCalledWith('/env');
@@ -92,12 +95,14 @@ describe('<App />', () => {
         mockedAxios.get.mockImplementation((url) => {
             if (url === '/version') {
                 return Promise.resolve({ status: 200, data: '1.10.1' });
+            } else if (url === '/diseaseName') {
+                return Promise.resolve({ status: 200, data: 'COVID-19' });
             } else {
                 return Promise.resolve(axiosResponse);
             }
         });
         render(<App />);
-        expect(mockedAxios.get).toHaveBeenCalledTimes(3);
+        expect(mockedAxios.get).toHaveBeenCalledTimes(4);
         expect(mockedAxios.get).toHaveBeenCalledWith('/auth/profile');
         expect(mockedAxios.get).toHaveBeenCalledWith('/version');
         expect(mockedAxios.get).toHaveBeenCalledWith('/env');
@@ -123,6 +128,8 @@ describe('<App />', () => {
                 return Promise.resolve({ status: 200, data: 'local' });
             } else if (url === '/version') {
                 return Promise.resolve({ status: 200, data: '1.10.1' });
+            } else if (url === '/diseaseName') {
+                return Promise.resolve({ status: 200, data: 'COVID-19' });
             } else {
                 return Promise.resolve(axiosResponse);
             }
@@ -166,6 +173,8 @@ describe('<App />', () => {
         mockedAxios.get.mockImplementation((url) => {
             if (url === '/version') {
                 return Promise.resolve({ status: 200, data: '1.10.1' });
+            } else if (url === '/diseaseName') {
+                return Promise.resolve({ status: 200, data: 'COVID-19' });
             } else {
                 return Promise.resolve(axiosResponse);
             }
@@ -216,6 +225,8 @@ describe('<App />', () => {
         mockedAxios.get.mockImplementation((url) => {
             if (url === '/version') {
                 return Promise.resolve({ status: 200, data: '1.10.1' });
+            } else if (url === '/diseaseName') {
+                return Promise.resolve({ status: 200, data: 'COVID-19' });
             } else {
                 return Promise.resolve(axiosResponse);
             }
@@ -257,6 +268,8 @@ describe('<App />', () => {
         mockedAxios.get.mockImplementation((url) => {
             if (url === '/version') {
                 return Promise.resolve({ status: 200, data: '1.10.1' });
+            } else if (url === '/diseaseName') {
+                return Promise.resolve({ status: 200, data: 'COVID-19' });
             } else {
                 return Promise.resolve(axiosResponse);
             }
@@ -292,6 +305,8 @@ describe('Download dataset', () => {
         mockedAxios.get.mockImplementation((url) => {
             if (url === '/version') {
                 return Promise.resolve({ status: 200, data: '1.10.1' });
+            } else if (url === '/diseaseName') {
+                return Promise.resolve({ status: 200, data: 'COVID-19' });
             } else {
                 return Promise.resolve(axiosResponse);
             }

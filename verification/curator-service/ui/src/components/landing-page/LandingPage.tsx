@@ -113,9 +113,7 @@ const MoreInformationLinks = ({
     version,
     env,
 }: StyleProps & { version: string; env: string }) => {
-    const releaseNotesUrl =
-        process.env.REACT_APP_RELEASE_NOTES_URL ??
-        `https://github.com/globaldothealth/list/releases/tag/${version}`;
+    const releaseNotesUrl = `https://github.com/globaldothealth/list/releases/tag/${version}`;
 
     return (
         <div className={classes.linksContainer}>

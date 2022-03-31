@@ -415,6 +415,10 @@ app.get('/version', cors(), (req: Request, res: Response) => {
     res.status(200).send(env.CURATOR_VERSION);
 });
 
+app.get('/diseaseName', (req: Request, res: Response) => {
+    res.status(200).send(env.DISEASE_NAME);
+});
+
 // get current environment
 app.get('/env', (req: Request, res: Response) => {
     res.status(200).send(env.SERVICE_ENV);

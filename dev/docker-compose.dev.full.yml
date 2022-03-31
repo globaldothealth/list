@@ -21,6 +21,7 @@ services:
       SESSION_COOKIE_KEY: "fake"
       STATIC_DIR: ""
       ENABLE_LOCAL_AUTH: "true"
+      DISEASE_NAME: "COVID-19"
   data:
     command: "npm run dev"
     volumes:
@@ -42,8 +43,6 @@ services:
       REACT_APP_PUBLIC_MAPBOX_TOKEN: "${REACT_APP_PUBLIC_MAPBOX_TOKEN}"
       REACT_APP_POLICY_PUBLIC_ID: "${REACT_APP_POLICY_PUBLIC_ID}"
       REACT_APP_COOKIE_CONSENT_PUBLIC_ID: "${REACT_APP_COOKIE_CONSENT_PUBLIC_ID}"
-      REACT_APP_DISEASE_NAME: "${REACT_APP_DISEASE_NAME}"
-      REACT_APP_RELEASE_NOTES_URL: "${REACT_APP_RELEASE_NOTES_URL}"
       ENABLE_LOCAL_AUTH: "true"
   localstack:
     image: localstack/localstack-full

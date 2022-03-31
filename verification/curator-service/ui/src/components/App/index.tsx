@@ -54,8 +54,9 @@ import {
     selectIsLoading,
     selectEnv,
     selectVersion,
+    selectDiseaseName,
 } from '../../redux/app/selectors';
-import { getEnv, getVersion } from '../../redux/app/thunk';
+import { getEnv, getVersion, getDiseaseName } from '../../redux/app/thunk';
 import { getUserProfile, logout } from '../../redux/auth/thunk';
 import { selectUser } from '../../redux/auth/selectors';
 import { User } from '../../api/models/User';
@@ -290,9 +291,7 @@ function ProfileMenu(props: { user: User; version: string }): JSX.Element {
 
     const classes = menuStyles();
 
-    const releaseNotesUrl =
-        process.env.REACT_APP_RELEASE_NOTES_URL ??
-        `https://github.com/globaldothealth/list/releases/tag/${props.version}`;
+    const releaseNotesUrl = `https://github.com/globaldothealth/list/releases/tag/${props.version}`;
 
     return (
         <div>
@@ -394,16 +393,18 @@ export default function App(): JSX.Element {
         return null;
     };
 
-    // Get current env and version
+    // Get current env, version and disease name
     useEffect(() => {
         dispatch(getEnv());
         dispatch(getVersion());
+        dispatch(getDiseaseName());
     }, [dispatch]);
 
     const isLoadingUser = useAppSelector(selectIsLoading);
     const user = useAppSelector(selectUser);
     const env = useAppSelector(selectEnv);
     const appVersion = useAppSelector(selectVersion);
+    const diseaseName = useAppSelector(selectDiseaseName);
 
     const showMenu = useMediaQuery(theme.breakpoints.up('sm'));
     const [drawerOpen, setDrawerOpen] = useState<boolean>(false);
@@ -597,6 +598,7 @@ export default function App(): JSX.Element {
                                     sortByOrder={sortByOrder}
                                     setSortBy={setSortBy}
                                     setSortByOrder={setSortByOrder}
+                                    diseaseName={diseaseName}
                                 />
                             </Route>
                         )}

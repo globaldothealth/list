@@ -1,7 +1,7 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { ChipData } from '../../components/App/App';
+import { ChipData } from '../../components/App';
 import { getUserProfile, logout } from '../../redux/auth/thunk';
-import { getVersion, getEnv } from './thunk';
+import { getVersion, getEnv, getDiseaseName } from './thunk';
 
 interface AppState {
     isLoading: boolean;
@@ -9,6 +9,7 @@ interface AppState {
     filterBreadcrumbs: ChipData[];
     version: string;
     env: string;
+    diseaseName: string;
 }
 
 const initialState: AppState = {
@@ -17,6 +18,7 @@ const initialState: AppState = {
     filterBreadcrumbs: [],
     version: 'loading…',
     env: 'prod',
+    diseaseName: '',
 };
 
 const appSlice = createSlice({
@@ -62,6 +64,10 @@ const appSlice = createSlice({
 
         builder.addCase(getEnv.fulfilled, (state, action) => {
             state.env = action.payload;
+        });
+
+        builder.addCase(getDiseaseName.fulfilled, (state, action) => {
+            state.diseaseName = action.payload;
         });
     },
 });

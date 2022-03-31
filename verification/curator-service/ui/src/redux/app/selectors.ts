@@ -11,3 +11,5 @@ export const selectIsLoading: (state: RootState) => boolean = (state) =>
 export const selectVersion: (state: RootState) => string = (state) =>
     state.app.version;
 export const selectEnv: (state: RootState) => string = (state) => state.app.env;
+export const selectDiseaseName: (state: RootState) => string = (state) =>
+    state.app.diseaseName;
