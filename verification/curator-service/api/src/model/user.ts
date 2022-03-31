@@ -1,4 +1,4 @@
-import mongoose, { Document } from 'mongoose';
+import mongoose from 'mongoose';
 import bcrypt from 'bcrypt';
 import { ObjectId } from 'mongodb';
 
@@ -25,40 +25,14 @@ export type IUser = IUserPublicFields & {
     }];
 };
 
-export type UserDocument = Document & IUser;
-
-const userSchema = new mongoose.Schema<UserDocument>({
-    name: String,
-    email: {
-        type: String,
-        required: 'User must have an email',
-    },
-    googleID: String,
-    roles: {
-        type: [String],
-        enum: userRoles,
-    },
-    picture: String,
-    newsletterAccepted: Boolean,
-    password: String,
-    apiKey: String,
-    downloads: [
-        {
-            timestamp: Date,
-            format: String,
-            query: String,
-        },
-    ],
-});
-
-export async function isUserPasswordValid(user: UserDocument, password: string): Promise<boolean> {
+export async function isUserPasswordValid(user: IUser, password: string): Promise<boolean> {
     if (!password) return false;
     if (!user.password) return false;
     const compare = await bcrypt.compare(password, user.password);
     return compare;
 }
 
-export function userPublicFields(user: UserDocument | undefined): IUserPublicFields | undefined {
+export function userPublicFields(user: IUser | undefined): IUserPublicFields | undefined {
     if (!user) return undefined;
     return {
         id: user._id.toHexString(),
@@ -71,8 +45,6 @@ export function userPublicFields(user: UserDocument | undefined): IUserPublicFie
         apiKey: user.apiKey,
     };
 }
-export const User = mongoose.model<UserDocument>('User', userSchema);
-
 export const Session = mongoose.model<mongoose.Document>(
     'Session',
     new mongoose.Schema({}),
