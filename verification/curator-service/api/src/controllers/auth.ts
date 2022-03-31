@@ -836,9 +836,10 @@ export class AuthController {
                                 'Supplied bearer token must be scoped for "email"',
                             );
                         }
-                        let user = await User.findOne({ email: email });
+                        let user = await users().findOne({ email: email });
                         if (!user) {
-                            user = await User.create({
+                            user = await users().insertOne({
+                                _id: new ObjectId(),
                                 email: email,
                                 googleID: response.data.sub,
                                 roles: [],
