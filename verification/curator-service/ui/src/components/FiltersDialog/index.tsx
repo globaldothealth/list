@@ -232,8 +232,6 @@ export default function FiltersDialog({
         return `${year}-${month}-${day}`;
     };
 
-    console.log(getMaxDate());
-
     return (
         <Dialog open={isOpen} maxWidth={'xl'} onClose={closeAndResetAlert}>
             <DialogTitle>
