@@ -20,7 +20,12 @@ import { GeocodeOptions, Geocoder, Resolution } from '../geocoding/geocoder';
 import { NextFunction, Request, Response } from 'express';
 import parseSearchQuery, { ParsingError } from '../util/search';
 import { SortByOrder, getSortByKeyword, SortBy } from '../util/case';
-import { denormalizeFields, denormalizeEventsHeaders, parseDownloadedCase, removeBlankHeader } from '../util/case';
+import {
+    denormalizeFields,
+    denormalizeEventsHeaders,
+    parseDownloadedCase,
+    removeBlankHeader,
+} from '../util/case';
 
 import { logger } from '../util/logger';
 import stringify from 'csv-stringify/lib/sync';
@@ -43,7 +48,9 @@ export class CasesController {
     init() {
         this.csvHeaders = denormalizeEventsHeaders(caseFields);
         this.csvHeaders = removeBlankHeader(this.csvHeaders);
-        this.csvHeaders.sort((a, b) => a.localeCompare(b, undefined, {sensitivity: 'base'}));
+        this.csvHeaders.sort((a, b) =>
+            a.localeCompare(b, undefined, { sensitivity: 'base' }),
+        );
         return this;
     }
 
@@ -190,10 +197,10 @@ export class CasesController {
                 while (doc != null) {
                     delete doc.restrictedNotes;
                     const normalizedDoc = denormalizeFields(doc);
-                    if (!(doc.hasOwnProperty('notes'))) {
+                    if (!doc.hasOwnProperty('notes')) {
                         normalizedDoc.notes = '';
                     }
-                    if (!(doc.hasOwnProperty('SGTF'))) {
+                    if (!doc.hasOwnProperty('SGTF')) {
                         normalizedDoc.SGTF = 'NA';
                     }
                     res.write(JSON.stringify(normalizedDoc));
@@ -1075,26 +1082,16 @@ export const casesMatchingSearchQuery = (opts: {
                 casesQuery.where(f.path).exists(true);
                 countQuery.where(f.path).exists(true);
             } else if (f.dateOperator) {
-                casesQuery.and([
-                    {
-                        'events.name': 'confirmed',
+                casesQuery.where({
+                    [f.path]: {
+                        [f.dateOperator]: f.values[0],
                     },
-                    {
-                        'events.dateRange.start': {
-                            [f.dateOperator]: f.values[0],
-                        },
+                });
+                countQuery.where({
+                    [f.path]: {
+                        [f.dateOperator]: f.values[0],
                     },
-                ]);
-                countQuery.and([
-                    {
-                        'events.name': 'confirmed',
-                    },
-                    {
-                        'events.dateRange.start': {
-                            [f.dateOperator]: f.values[0],
-                        },
-                    },
-                ]);
+                });
             } else if (
                 f.path === 'demographics.gender' &&
                 f.values[0] === 'notProvided'
