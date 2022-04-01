@@ -215,6 +215,25 @@ export default function FiltersDialog({
     //     </>
     // );
 
+    const getMaxDate = () => {
+        const currentDate = new Date();
+        const year = currentDate.getFullYear();
+        let month: number | string = currentDate.getMonth() + 1;
+        let day: number | string = currentDate.getDate();
+
+        if (month < 10) {
+            month = `0${month}`;
+        }
+
+        if (day < 10) {
+            day = `0${day}`;
+        }
+
+        return `${year}-${month}-${day}`;
+    };
+
+    console.log(getMaxDate());
+
     return (
         <Dialog open={isOpen} maxWidth={'xl'} onClose={closeAndResetAlert}>
             <DialogTitle>
@@ -483,7 +502,9 @@ export default function FiltersDialog({
                             type="date"
                             variant="outlined"
                             // This makes sure that only 4 digits can be entered as a year
-                            InputProps={{ inputProps: { max: '9999-12-31' } }}
+                            InputProps={{
+                                inputProps: { max: getMaxDate() },
+                            }}
                             size={inputSize}
                             InputLabelProps={{ shrink: true }}
                             value={formik.values.dateconfirmedbefore || ''}
@@ -507,7 +528,9 @@ export default function FiltersDialog({
                             type="date"
                             variant="outlined"
                             // This makes sure that only 4 digits can be entered as a year
-                            InputProps={{ inputProps: { max: '9999-12-31' } }}
+                            InputProps={{
+                                inputProps: { max: getMaxDate() },
+                            }}
                             size={inputSize}
                             InputLabelProps={{ shrink: true }}
                             value={formik.values.dateconfirmedafter || ''}
