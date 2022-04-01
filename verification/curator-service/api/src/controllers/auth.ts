@@ -5,7 +5,7 @@ import {
 import { Strategy as GoogleStrategy, Profile } from 'passport-google-oauth20';
 import { NextFunction, Request, Response } from 'express';
 import { isUserPasswordValid, IUser, userPublicFields, users } from '../model/user';
-import { Token, tokens } from '../model/token';
+import { tokens } from '../model/token';
 import { isValidObjectId } from 'mongoose';
 
 import { Router } from 'express';
@@ -517,7 +517,7 @@ export class AuthController {
                     }
 
                     // Check if token exists
-                    const passwordResetToken = await Token.findOne({ userId });
+                    const passwordResetToken = await tokens().findOne({ userId });
                     if (!passwordResetToken) {
                         throw new Error(
                             'Invalid or expired password reset token',
