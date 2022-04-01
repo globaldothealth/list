@@ -1,6 +1,6 @@
 import * as baseUser from './users/base.json';
 
-import { Session, users } from '../src/model/user';
+import { sessions, users } from '../src/model/user';
 
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import app from '../src/index';
@@ -70,12 +70,12 @@ afterAll(async () => {
 
 beforeEach(async () => {
     await users().deleteMany({});
-    await Session.deleteMany({});
+    await sessions().deleteMany({});
 });
 
 afterAll(async () => {
     await users().deleteMany({});
-    await Session.deleteMany({});
+    await sessions().deleteMany({});
 });
 
 describe('Cases', () => {

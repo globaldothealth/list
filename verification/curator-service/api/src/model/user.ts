@@ -45,10 +45,7 @@ export function userPublicFields(user: IUser | undefined): IUserPublicFields | u
         apiKey: user.apiKey,
     };
 }
-export const Session = mongoose.model<mongoose.Document>(
-    'Session',
-    new mongoose.Schema({}),
-);
 
 const db = () => mongoose.connection.getClient().db();
 export const users = () => db().collection('users');
+export const sessions = () => db().collection('sessions');
