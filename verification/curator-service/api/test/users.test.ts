@@ -1,6 +1,6 @@
 import * as baseUser from './users/base.json';
 
-import { Session, users } from '../src/model/user';
+import { sessions, users } from '../src/model/user';
 
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import app from '../src/index';
@@ -19,13 +19,13 @@ beforeAll(() => {
 
 beforeEach(async () => {
     await users().deleteMany({});
-    await Session.deleteMany({});
+    await sessions().deleteMany({});
     jest.clearAllMocks();
 });
 
 afterAll(async () => {
     await users().deleteMany({});
-    await Session.deleteMany({});
+    await sessions().deleteMany({});
     return mongoServer.stop();
 });
 

@@ -3,7 +3,7 @@ const mockInitialize = jest.fn().mockReturnValue({ send: mockSend });
 
 import * as baseUser from './users/base.json';
 
-import { Session, users } from '../src/model/user';
+import { sessions, users } from '../src/model/user';
 
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import { Source } from '../src/model/source';
@@ -39,7 +39,7 @@ beforeEach(async () => {
     await Source.deleteMany({});
     await Upload.deleteMany({});
     await users().deleteMany({});
-    await Session.deleteMany({});
+    await sessions().deleteMany({});
 
     jest.clearAllMocks();
 });
@@ -48,7 +48,7 @@ afterAll(async () => {
     await Source.deleteMany({});
     await Upload.deleteMany({});
     await users().deleteMany({});
-    await Session.deleteMany({});
+    await sessions().deleteMany({});
 });
 
 let curatorRequest: any;
