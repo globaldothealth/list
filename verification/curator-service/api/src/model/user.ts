@@ -1,6 +1,6 @@
-import mongoose from 'mongoose';
 import bcrypt from 'bcrypt';
 import { ObjectId } from 'mongodb';
+import db from './database';
 
 export const userRoles = ['admin', 'curator'];
 
@@ -46,6 +46,5 @@ export function userPublicFields(user: IUser | undefined): IUserPublicFields | u
     };
 }
 
-const db = () => mongoose.connection.getClient().db();
 export const users = () => db().collection('users');
 export const sessions = () => db().collection('sessions');
