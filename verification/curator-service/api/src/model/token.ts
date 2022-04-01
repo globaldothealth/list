@@ -1,10 +1,15 @@
+import { ObjectId } from 'mongodb';
 import { Schema, Document, model } from 'mongoose';
+import db from './database';
 
-export type TokenDocument = Document & {
-    userId: Schema.Types.ObjectId;
+export interface IToken {
+    _id: ObjectId;
+    userId: ObjectId;
     token: string;
-    createtAt: Date;
-};
+    createAt: Date;
+}
+
+export type TokenDocument = Document & IToken;
 
 const tokenSchema = new Schema<TokenDocument>({
     userId: {
@@ -24,3 +29,4 @@ const tokenSchema = new Schema<TokenDocument>({
 });
 
 export const Token = model<TokenDocument>('Token', tokenSchema);
+export const tokens = () => db().collection('tokens');
