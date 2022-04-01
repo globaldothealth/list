@@ -5,7 +5,7 @@ export interface IToken {
     _id: ObjectId;
     userId: ObjectId;
     token: string;
-    createAt: Date;
+    createdAt: Date;
 }
 
 export const tokens = () => db().collection('tokens');
