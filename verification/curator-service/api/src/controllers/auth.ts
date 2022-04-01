@@ -445,14 +445,14 @@ export class AuthController {
                     const query = { userId: user._id };
                     const token = await tokens().findOne(query);
                     if (token) {
-                        await token().deleteOne(query);
+                        await tokens().deleteOne(query);
                     }
 
                     const resetToken = crypto.randomBytes(32).toString('hex');
                     const hash = await bcrypt.hash(resetToken, 10);
 
                     // Add new reset token to DB
-                    await token().insertOne({
+                    await tokens().insertOne({
                         _id: new ObjectId(),
                         userId: user._id,
                         token: hash,
