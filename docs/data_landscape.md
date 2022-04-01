@@ -40,7 +40,7 @@ Country specific (country-) and full (data-) export files in various formats
 Map is a static site exported to an S3 bucket
 
 * dev-covid-19.global.health (only one of dev/dev-map is used, in us-east-2)
-* dev-map.covid-19.global.health
+* eu-dev-map.covid-19.global.health
 * map.covid-19.global.health
 * dev-react-map.covid-19.global.health (us-east-2, should move to dev-map)
 * react-map.covid-19.global.health (should move to map.covid-19.global.health)

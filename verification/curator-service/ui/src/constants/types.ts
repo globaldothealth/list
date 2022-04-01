@@ -19,9 +19,9 @@ interface IMapLink {
 
 // Link to the map application based on current env
 export const MapLink: IMapLink = {
-    local: 'http://dev-map.covid-19.global.health/',
-    locale2e: 'http://dev-map.covid-19.global.health/',
-    dev: 'http://dev-map.covid-19.global.health/',
+    local: 'http://eu-dev-map.covid-19.global.health/',
+    locale2e: 'http://eu-dev-map.covid-19.global.health/',
+    dev: 'http://eu-dev-map.covid-19.global.health/',
     qa: 'http://qa-map.covid-19.global.health',
     prod: 'https://map.covid-19.global.health/',
 };
