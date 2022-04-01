@@ -5,7 +5,7 @@ import {
 import { Strategy as GoogleStrategy, Profile } from 'passport-google-oauth20';
 import { NextFunction, Request, Response } from 'express';
 import { isUserPasswordValid, IUser, userPublicFields, users } from '../model/user';
-import { Token } from '../model/token';
+import { Token, tokens } from '../model/token';
 import { isValidObjectId } from 'mongoose';
 
 import { Router } from 'express';
@@ -442,20 +442,22 @@ export class AuthController {
                     }
 
                     // Check if there is a token in DB already for this user
-                    const token = await Token.findOne({ userId: user._id });
+                    const query = { userId: user._id };
+                    const token = await tokens().findOne(query);
                     if (token) {
-                        await token.deleteOne();
+                        await token().deleteOne(query);
                     }
 
                     const resetToken = crypto.randomBytes(32).toString('hex');
                     const hash = await bcrypt.hash(resetToken, 10);
 
                     // Add new reset token to DB
-                    await new Token({
+                    await token().insertOne({
+                        _id: new ObjectId(),
                         userId: user._id,
                         token: hash,
                         createdAt: Date.now(),
-                    }).save();
+                    });
 
                     let url = '';
                     switch (env) {
