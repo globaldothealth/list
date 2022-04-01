@@ -482,6 +482,8 @@ export default function FiltersDialog({
                             name="dateconfirmedbefore"
                             type="date"
                             variant="outlined"
+                            // This makes sure that only 4 digits can be entered as a year
+                            InputProps={{ inputProps: { max: '9999-12-31' } }}
                             size={inputSize}
                             InputLabelProps={{ shrink: true }}
                             value={formik.values.dateconfirmedbefore || ''}
@@ -504,6 +506,8 @@ export default function FiltersDialog({
                             name="dateconfirmedafter"
                             type="date"
                             variant="outlined"
+                            // This makes sure that only 4 digits can be entered as a year
+                            InputProps={{ inputProps: { max: '9999-12-31' } }}
                             size={inputSize}
                             InputLabelProps={{ shrink: true }}
                             value={formik.values.dateconfirmedafter || ''}

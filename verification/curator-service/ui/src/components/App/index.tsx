@@ -354,7 +354,7 @@ function ProfileMenu(props: { user: User; version: string }): JSX.Element {
                 </a>
 
                 {props.version && (
-                    <>
+                    <div>
                         <Divider className={classes.divider} />
 
                         <a
@@ -365,7 +365,7 @@ function ProfileMenu(props: { user: User; version: string }): JSX.Element {
                         >
                             <MenuItem>Version: {props.version}</MenuItem>
                         </a>
-                    </>
+                    </div>
                 )}
             </Menu>
         </div>
