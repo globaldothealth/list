@@ -1,12 +1,11 @@
-import axios from 'axios';
 import { Request, Response } from 'express';
-import { Case, CaseDocument, RestrictedCase } from '../model/case';
+import { cases, restrictedCases } from '../model/case';
 import { Source, SourceDocument } from '../model/source';
 
 import AwsBatchClient from '../clients/aws-batch-client';
 import AwsEventsClient from '../clients/aws-events-client';
 import EmailClient from '../clients/email-client';
-import { logger } from '../util/logger';
+import { ObjectId } from 'mongodb';
 
 /**
  * Email notification that should be sent on any update to a source.
@@ -295,9 +294,9 @@ export default class SourcesController {
             return;
         }
 
-        const query = { 'caseReference.sourceId': source._id };
-        const count = await Case.count(query);
-        const restrictedCount = await RestrictedCase.count(query);
+        const query = { 'caseReference.sourceId': source._id.toHexString() };
+        const count = await cases().count(query);
+        const restrictedCount = await restrictedCases().count(query);
         if (count + restrictedCount !== 0) {
             res.status(403).json({
                 message: 'Source still has cases and cannot be deleted.',

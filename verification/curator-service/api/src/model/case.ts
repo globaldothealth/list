@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
 import { ObjectId } from 'mongodb';
+import db from './database';
 
 /*
  * This is a minimal case schema to support some source-related behaviour.
@@ -25,15 +26,17 @@ export const caseSchema = new mongoose.Schema(
     }
 );
 
-type CaseReferenceDocument = mongoose.Document & {
-    /** Foreign key to the sources collection. */
-    sourceId: string;
+export type ICase = {
+    _id: ObjectId;
+    caseReference: {
+        sourceId: string,
+    },
 };
 
-export type CaseDocument = mongoose.Document & {
-    _id: ObjectId;
-    caseReference: CaseReferenceDocument;
-};
+export type CaseDocument = mongoose.Document & ICase;
+
+export const cases = () => db().collection('cases');
+export const restrictedCases = () => db().collection('restrictedcases');
 
 export const Case = mongoose.model<CaseDocument>('Case', caseSchema);
 export const RestrictedCase = mongoose.model<CaseDocument>(
