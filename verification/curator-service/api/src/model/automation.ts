@@ -1,4 +1,4 @@
-import { ParserDocument, parserSchema } from './parser';
+import { IParser, parserSchema } from './parser';
 import { RegexParsingDocument, regexParsingSchema } from './regex-parsing';
 import { ScheduleDocument, scheduleSchema } from './schedule';
 
@@ -20,7 +20,7 @@ export const automationSchema = new mongoose.Schema({
 });
 
 export type AutomationDocument = mongoose.Document & {
-    parser: ParserDocument;
+    parser: IParser;
     regexParsing: RegexParsingDocument;
     schedule: ScheduleDocument;
 };
