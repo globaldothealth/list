@@ -1,6 +1,6 @@
-# Global Health Curator Service
+# Global.health Curator Service
 
-This package contains the Node JS express server responsible for serving the API calls for the curators to interact with the Global Health ingestion system.
+This package contains the Node JS express server responsible for serving the API calls for the curators to interact with the Global.health ingestion system.
 
 It handles CRUD of cases, ingestion sources, users and offers a geocoding service.
 
@@ -82,7 +82,7 @@ This server depends on:
 
 - AWS Cloud Watch when setting-up automated ingestion sources.
 - AWS Lambda when triggering archival of sources data.
-- Global Health Data Service (`/data-serving/data-service`) to store CRUD case data.
+- Global.health Data Service (`/data-serving/data-service`) to store CRUD case data.
 - Mapbox geocoding service when doing geocoding.
 - MongoDB for about everything.
 - Google OAuth 2.0 for authentication.
