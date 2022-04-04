@@ -7,9 +7,9 @@ used in the Global.health ingestion system.
 
 The objective of the ingestion system is to facilitate a semi-automated
 workflow accomplishing the retrieval of epidemiological source data, the
-parsing thereof to the standard Global Health data format, and the persisting
-of both raw content and parsed case records for use by the Global Health
-community. For more information on Global Health, refer to the
+parsing thereof to the standard Global.health data format, and the persisting
+of both raw content and parsed case records for use by the Global.health
+community. For more information on Global.health, refer to the
 [top-level README](https://github.com/globaldothealth/list/blob/main/README.md).
 
 The structure of ingestion is roughly as shown below:
@@ -20,7 +20,7 @@ At a high-level:
 
 1. **Actuation** is done by an AWS EventBridge Events Scheduled Rule (one for
 each source). The scheduled rule is defined, alongside the remainder of source
-configuration, via the Global Health
+configuration, via the Global.health
 [curator UI](../../verification/curator-service/ui/)
 sources page.
 2. **Retrieval** is performed by a combined
@@ -32,7 +32,7 @@ configuration, retrieved from the
 
    **Parsing** is performed by custom, per-source
 [parsing functions](./parsing/) that are called from the retrieval function, and convert of raw source
-content stored in S3 to the Global Health format. Converted data is written to the
+content stored in S3 to the Global.health format. Converted data is written to the
 central [data service](../../data-serving/data-service/) (for now, proxied via
 the curator API, which offers an exposed, authenticated endpoint).
 

@@ -1,6 +1,6 @@
 # Global.health Curator Portal UI
 
-This directory contains the code for the UI of the Global Health Curator Portal accessible here:
+This directory contains the code for the UI of the Global.health Curator Portal accessible here:
 
 - [dev](https://dev-data.covid-19.global.health)
 - [qa](https://qa-data.covid-19.global.health)

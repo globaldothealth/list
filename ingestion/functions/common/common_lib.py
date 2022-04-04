@@ -141,7 +141,7 @@ def login(email: str):
 
 def obtain_api_credentials(s3_client):
     """
-    Creates HTTP headers credentialed for access to the Global Health Source API.
+    Creates HTTP headers credentialed for access to the Global.health Source API.
     """
     try:
         fd, local_creds_file_name = tempfile.mkstemp()
