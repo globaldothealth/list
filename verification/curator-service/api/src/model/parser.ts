@@ -10,5 +10,3 @@ export const parserSchema = new mongoose.Schema({
 export type IParser = {
     awsLambdaArn: string;
 }
-
-export type ParserDocument = mongoose.Document & IParser;
