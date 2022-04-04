@@ -13,7 +13,7 @@ import * as baseUser from './users/base.json';
 import { sessions, users } from '../src/model/user';
 
 import { MongoMemoryServer } from 'mongodb-memory-server';
-import { Case, RestrictedCase } from '../src/model/case';
+import { cases, restrictedCases } from '../src/model/case';
 import { Source } from '../src/model/source';
 import app from '../src/index';
 import axios from 'axios';
@@ -552,11 +552,11 @@ describe('DELETE', () => {
             origin: { url: 'http://foo.bar', license: 'MIT' },
             format: 'JSON',
         }).save();
-        const aCase = await new Case({
+        const aCase = await cases().insertOne({
             caseReference: {
-                sourceId: source._id,
+                sourceId: source._id.toHexString(),
             },
-        }).save();
+        });
         await curatorRequest.delete(`/api/sources/${source.id}`).expect(403);
         expect(mockDeleteRule).not.toHaveBeenCalled();
     });
@@ -566,11 +566,11 @@ describe('DELETE', () => {
             origin: { url: 'http://foo.bar', license: 'MIT' },
             format: 'JSON',
         }).save();
-        const aCase = await new RestrictedCase({
+        const aCase = await restrictedCases().insertOne({
             caseReference: {
-                sourceId: source._id,
+                sourceId: source._id.toHexString(),
             },
-        }).save();
+        });
         await curatorRequest.delete(`/api/sources/${source.id}`).expect(403);
         expect(mockDeleteRule).not.toHaveBeenCalled();
     });
