@@ -25,9 +25,6 @@ const useStyles = makeStyles((theme: Theme) => ({
     checkboxRoot: {
         display: 'block',
     },
-    required: {
-        color: theme.palette.error.main,
-    },
     inpputField: {
         display: 'block',
         width: '240px',
@@ -53,14 +50,10 @@ const useStyles = makeStyles((theme: Theme) => ({
         display: 'flex',
         justifyContent: 'flex-end',
     },
-    labelRequired: {
-        color: theme.palette.error.main,
-    },
     title: {
         margin: '10px 0',
     },
     googleButton: {
-        // margin: '35px 0 0 0',
         fontWeight: 400,
     },
     googleButtonContainer: {
@@ -126,11 +119,11 @@ export default function SignUpForm({
             },
         ),
         password: Yup.string()
-            .matches(lowercaseRegex, 'one lowercase required!')
-            .matches(uppercaseRegex, 'one uppercase required!')
-            .matches(numericRegex, 'one number required!')
-            .min(8, 'Minimum 8 characters required!')
-            .required('Required!'),
+            .matches(lowercaseRegex, 'One lowercase required')
+            .matches(uppercaseRegex, 'One uppercase required')
+            .matches(numericRegex, 'One number required')
+            .min(8, 'Minimum 8 characters required')
+            .required('This field is required'),
         passwordConfirmation: Yup.string().test(
             'passwords-match',
             'Passwords must match',
@@ -373,7 +366,6 @@ export default function SignUpForm({
                                 >
                                     Privacy Policy
                                 </a>{' '}
-                                <span className={classes.labelRequired}>*</span>
                             </Typography>
                         }
                     />
