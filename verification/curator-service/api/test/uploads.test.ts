@@ -8,7 +8,7 @@ import { sessions, users } from '../src/model/user';
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import { Source } from '../src/model/source';
 import { Upload } from '../src/model/upload';
-import { UploadSummary } from '../src/model/upload-summary';
+import { IUploadSummary } from '../src/model/upload-summary';
 import _ from 'lodash';
 import app from '../src/index';
 import fullSource from './model/data/source.full.json';
@@ -134,7 +134,7 @@ describe('GET', () => {
         sourceWithNoChanges.uploads = [
             new Upload({
                 status: 'SUCCESS',
-                summary: new UploadSummary({}),
+                summary: {},
             }),
         ];
         await sourceWithNoChanges.save();
@@ -143,7 +143,7 @@ describe('GET', () => {
         sourceWithCreatedUploads.uploads = [
             new Upload({
                 status: 'SUCCESS',
-                summary: new UploadSummary({ numCreated: 3 }),
+                summary: { numCreated: 3 },
                 created: new Date(2020, 2, 1),
             }),
         ];
@@ -153,7 +153,7 @@ describe('GET', () => {
         sourceWithUpdatedUploads.uploads = [
             new Upload({
                 status: 'SUCCESS',
-                summary: new UploadSummary({ numUpdated: 3 }),
+                summary: { numUpdated: 3 },
                 created: new Date(2020, 2, 2),
             }),
         ];
@@ -181,12 +181,12 @@ describe('GET', () => {
         source1.uploads = [
             new Upload({
                 status: 'ERROR',
-                summary: new UploadSummary(),
+                summary: {},
                 created: new Date(2020, 2, 1),
             }),
             new Upload({
                 status: 'SUCCESS',
-                summary: new UploadSummary({ numCreated: 3, numError: 1 }),
+                summary: { numCreated: 3, numError: 1 },
                 created: new Date(2020, 2, 6),
             }),
         ];
@@ -197,12 +197,12 @@ describe('GET', () => {
         source2.uploads = [
             new Upload({
                 status: 'SUCCESS',
-                summary: new UploadSummary({ numUpdated: 3 }),
+                summary: { numUpdated: 3 },
                 created: new Date(2020, 2, 5),
             }),
             new Upload({
                 status: 'ERROR',
-                summary: new UploadSummary(),
+                summary: {},
                 created: new Date(2020, 2, 3),
             }),
         ];
@@ -213,12 +213,12 @@ describe('GET', () => {
         source3.uploads = [
             new Upload({
                 status: 'SUCCESS',
-                summary: new UploadSummary({ numCreated: 3 }),
+                summary: { numCreated: 3 },
                 created: new Date(2020, 2, 3),
             }),
             new Upload({
                 status: 'SUCCESS',
-                summary: new UploadSummary({ numCreated: 3 }),
+                summary: { numCreated: 3 },
                 created: new Date(2020, 2, 4),
             }),
         ];
@@ -228,7 +228,7 @@ describe('GET', () => {
         sourceNoChanges.uploads = [
             new Upload({
                 status: 'SUCCESS',
-                summary: new UploadSummary(),
+                summary: {},
                 created: new Date(2020, 2, 7),
             }),
         ];
