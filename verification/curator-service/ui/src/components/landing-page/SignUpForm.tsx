@@ -70,6 +70,10 @@ const useStyles = makeStyles((theme: Theme) => ({
             marginTop: '30px',
         },
     },
+    requiredText: {
+        fontSize: '14px',
+        margin: '10px 0',
+    },
 }));
 
 interface FormValues {
@@ -176,7 +180,7 @@ export default function SignUpForm({
                             variant="outlined"
                             id="email"
                             name="email"
-                            label="Email"
+                            label="Email *"
                             value={formik.values.email}
                             onChange={formik.handleChange}
                             error={
@@ -195,7 +199,7 @@ export default function SignUpForm({
                             variant="outlined"
                             id="confirmEmail"
                             name="confirmEmail"
-                            label="Confirm Email"
+                            label="Confirm Email *"
                             value={formik.values.confirmEmail}
                             onChange={formik.handleChange}
                             error={
@@ -219,7 +223,9 @@ export default function SignUpForm({
                                 Boolean(formik.errors.password)
                             }
                         >
-                            <InputLabel htmlFor="password">Password</InputLabel>
+                            <InputLabel htmlFor="password">
+                                Password *
+                            </InputLabel>
                             <OutlinedInput
                                 fullWidth
                                 id="password"
@@ -263,7 +269,7 @@ export default function SignUpForm({
                             }
                         >
                             <InputLabel htmlFor="passwordConfirmation">
-                                Repeat password
+                                Repeat password *
                             </InputLabel>
                             <OutlinedInput
                                 fullWidth
@@ -366,6 +372,7 @@ export default function SignUpForm({
                                 >
                                     Privacy Policy
                                 </a>{' '}
+                                *
                             </Typography>
                         }
                     />
@@ -394,6 +401,9 @@ export default function SignUpForm({
                         }
                     />
                 </FormGroup>
+                <Typography className={classes.requiredText}>
+                    * Required fields
+                </Typography>
                 <Button
                     disabled={disabled}
                     type="submit"
