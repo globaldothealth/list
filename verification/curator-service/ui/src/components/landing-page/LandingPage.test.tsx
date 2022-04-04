@@ -130,7 +130,7 @@ describe('<SignInForm />', () => {
         });
     });
 
-    it('displays verification errors when both email, password and agreement checkbox are empty', async () => {
+    it('displays verification errors when both email and password are empty', async () => {
         render(<SignInForm setRegistrationScreenOn={() => false} />);
 
         userEvent.click(screen.getByTestId('sign-in-button'));
@@ -151,10 +151,10 @@ describe('<SignUpForm />', () => {
             />,
         );
         expect(screen.getByText(/Sign up form/)).toBeInTheDocument();
-        expect(screen.getByLabelText('Email')).toBeInTheDocument();
-        expect(screen.getByLabelText('Confirm Email')).toBeInTheDocument();
-        expect(screen.getByLabelText('Password')).toBeInTheDocument();
-        expect(screen.getByLabelText('Repeat password')).toBeInTheDocument();
+        expect(screen.getByLabelText('Email *')).toBeInTheDocument();
+        expect(screen.getByLabelText('Confirm Email *')).toBeInTheDocument();
+        expect(screen.getByLabelText('Password *')).toBeInTheDocument();
+        expect(screen.getByLabelText('Repeat password *')).toBeInTheDocument();
     });
 
     test('checks emails match', async () => {
@@ -165,8 +165,11 @@ describe('<SignUpForm />', () => {
             />,
         );
 
-        userEvent.type(screen.getByLabelText('Email'), 'test@email.com');
-        userEvent.type(screen.getByLabelText(/Confirm Email/), 'xxx@email.com');
+        userEvent.type(screen.getByLabelText('Email *'), 'test@email.com');
+        userEvent.type(
+            screen.getByLabelText(/Confirm Email */),
+            'xxx@email.com',
+        );
         userEvent.click(screen.getByTestId('sign-up-button'));
 
         await waitFor(() => {
@@ -182,8 +185,8 @@ describe('<SignUpForm />', () => {
             />,
         );
 
-        userEvent.type(screen.getByLabelText('Password'), '12345');
-        userEvent.type(screen.getByLabelText(/Repeat password/), '6789');
+        userEvent.type(screen.getByLabelText('Password *'), '12345');
+        userEvent.type(screen.getByLabelText(/Repeat password */), '6789');
         userEvent.click(screen.getByTestId('sign-up-button'));
 
         await waitFor(() => {
@@ -201,13 +204,13 @@ describe('<SignUpForm />', () => {
             />,
         );
 
-        userEvent.type(screen.getByLabelText('Email'), 'test@email.com');
+        userEvent.type(screen.getByLabelText('Email *'), 'test@email.com');
         userEvent.type(
-            screen.getByLabelText(/Confirm Email/),
+            screen.getByLabelText(/Confirm Email */),
             'test@email.com',
         );
-        userEvent.type(screen.getByLabelText('Password'), '12345');
-        userEvent.type(screen.getByLabelText(/Repeat password/), '12345');
+        userEvent.type(screen.getByLabelText('Password *'), '12345');
+        userEvent.type(screen.getByLabelText(/Repeat password */), '12345');
         userEvent.click(screen.getByTestId('sign-up-button'));
 
         await waitFor(() => {
@@ -225,9 +228,9 @@ describe('<SignUpForm />', () => {
             />,
         );
 
-        userEvent.type(screen.getByLabelText('Email'), 'test@email.com');
-        userEvent.type(screen.getByLabelText('Password'), '12345');
-        userEvent.type(screen.getByLabelText(/Repeat password/), '12345');
+        userEvent.type(screen.getByLabelText('Email *'), 'test@email.com');
+        userEvent.type(screen.getByLabelText('Password *'), '12345');
+        userEvent.type(screen.getByLabelText(/Repeat password */), '12345');
         userEvent.click(screen.getAllByRole('checkbox')[0]);
         userEvent.click(screen.getByTestId('sign-up-button'));
 
@@ -244,7 +247,7 @@ describe('<SignUpForm />', () => {
             />,
         );
 
-        userEvent.type(screen.getByLabelText('Email'), 'incorrectemail');
+        userEvent.type(screen.getByLabelText('Email *'), 'incorrectemail');
         userEvent.click(screen.getByTestId('sign-up-button'));
 
         await waitFor(() => {
@@ -262,17 +265,19 @@ describe('<SignUpForm />', () => {
             />,
         );
 
-        userEvent.type(screen.getByLabelText('Email'), 'test@email.com');
+        userEvent.type(screen.getByLabelText('Email *'), 'test@email.com');
         userEvent.type(
-            screen.getByLabelText(/Confirm Email/),
+            screen.getByLabelText(/Confirm Email */),
             'test@email.com',
         );
-        userEvent.type(screen.getByLabelText(/Repeat password/), '12345');
+        userEvent.type(screen.getByLabelText(/Repeat password */), '12345');
         userEvent.click(screen.getAllByRole('checkbox')[0]);
         userEvent.click(screen.getByTestId('sign-up-button'));
 
         await waitFor(() => {
-            expect(screen.getByText(/Required!/i)).toBeInTheDocument();
+            expect(
+                screen.getByText(/This field is required/i),
+            ).toBeInTheDocument();
             expect(
                 screen.getByText(/Passwords must match/i),
             ).toBeInTheDocument();
@@ -291,7 +296,7 @@ describe('<SignUpForm />', () => {
 
         await waitFor(() => {
             const errorMessages = screen.getAllByText(/required/i);
-            expect(errorMessages).toHaveLength(3);
+            expect(errorMessages).toHaveLength(4);
         });
     });
 });
