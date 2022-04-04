@@ -4,23 +4,17 @@ import { ISchedule, scheduleSchema } from './schedule';
 
 import mongoose from 'mongoose';
 
-export const automationParsingValidator = {
-    validator: (
-        automation: mongoose.LeanDocument<AutomationDocument>,
-    ): boolean => {
-        return !(automation.parser != null && automation.regexParsing != null);
-    },
-    message: 'At most one of parser or regexParsing may be supplied.',
-};
-
 export const automationSchema = new mongoose.Schema({
     parser: parserSchema,
     regexParsing: regexParsingSchema,
     schedule: scheduleSchema,
 });
 
-export type AutomationDocument = mongoose.Document & {
+export type IAutomation = {
     parser: IParser;
     regexParsing: IRegexParsing;
     schedule: ISchedule;
+    // TODO remove this when source is no longer a Mongoose document
+    modifiedPaths: () => [string];
 };
+

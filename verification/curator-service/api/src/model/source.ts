@@ -1,6 +1,5 @@
 import {
-    AutomationDocument,
-    automationParsingValidator,
+    IAutomation,
     automationSchema,
 } from './automation';
 import { IDateFilter, dateFilterSchema } from './date-filter';
@@ -17,7 +16,7 @@ interface ISource {
     format: string;
     excludeFromLineList: boolean;
     hasStableIdentifiers: boolean;
-    automation: AutomationDocument;
+    automation: IAutomation;
     uploads: UploadDocument[];
     dateFilter: IDateFilter;
     notificationRecipients: string[];
@@ -60,10 +59,7 @@ const sourceSchema = new mongoose.Schema<
     format: String,
     excludeFromLineList: Boolean,
     hasStableIdentifiers: Boolean,
-    automation: {
-        type: automationSchema,
-        validate: automationParsingValidator,
-    },
+    automation: automationSchema,
     uploads: [uploadSchema],
     dateFilter: dateFilterSchema,
     notificationRecipients: [String],
