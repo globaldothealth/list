@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 
-import { sources, Source, ISource } from '../model/source';
+import { sources, ISource } from '../model/source';
 import EmailClient from '../clients/email-client';
 import { IUpload } from '../model/upload';
 import { ObjectId } from 'mongodb';
