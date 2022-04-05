@@ -15,6 +15,7 @@ import fullSource from './model/data/source.full.json';
 import minimalSource from './model/data/source.minimal.json';
 import minimalUpload from './model/data/upload.minimal.json';
 import supertest from 'supertest';
+import { ObjectId } from 'mongodb';
 
 jest.mock('../src/clients/email-client', () => {
     return jest.fn().mockImplementation(() => {
@@ -132,30 +133,34 @@ describe('GET', () => {
 
         const sourceWithNoChanges = new Source(fullSource);
         sourceWithNoChanges.uploads = [
-            new Upload({
+            {
+                _id: new ObjectId(),
+                created: new Date(),
                 status: 'SUCCESS',
                 summary: {},
-            }),
+            },
         ];
         await sourceWithNoChanges.save();
 
         const sourceWithCreatedUploads = new Source(fullSource);
         sourceWithCreatedUploads.uploads = [
-            new Upload({
+            {
+                _id: new ObjectId(),
                 status: 'SUCCESS',
                 summary: { numCreated: 3 },
                 created: new Date(2020, 2, 1),
-            }),
+            },
         ];
         await sourceWithCreatedUploads.save();
 
         const sourceWithUpdatedUploads = new Source(fullSource);
         sourceWithUpdatedUploads.uploads = [
-            new Upload({
+            {
+                _id: new ObjectId(),
                 status: 'SUCCESS',
                 summary: { numUpdated: 3 },
                 created: new Date(2020, 2, 2),
-            }),
+            },
         ];
         await sourceWithUpdatedUploads.save();
 
@@ -179,58 +184,65 @@ describe('GET', () => {
         const source1 = new Source(fullSource);
         source1.name = 'source1';
         source1.uploads = [
-            new Upload({
+            {
+                _id: new ObjectId(),
                 status: 'ERROR',
                 summary: {},
                 created: new Date(2020, 2, 1),
-            }),
-            new Upload({
+            },
+            {
+                _id: new ObjectId(),
                 status: 'SUCCESS',
                 summary: { numCreated: 3, numError: 1 },
                 created: new Date(2020, 2, 6),
-            }),
+            },
         ];
         await source1.save();
 
         const source2 = new Source(fullSource);
         source2.name = 'source2';
         source2.uploads = [
-            new Upload({
+            {
+                _id: new ObjectId(),
                 status: 'SUCCESS',
                 summary: { numUpdated: 3 },
                 created: new Date(2020, 2, 5),
-            }),
-            new Upload({
+            },
+            {
+                _id: new ObjectId(),
                 status: 'ERROR',
                 summary: {},
                 created: new Date(2020, 2, 3),
-            }),
+            },
         ];
         await source2.save();
 
         const source3 = new Source(fullSource);
         source3.name = 'source3';
         source3.uploads = [
-            new Upload({
+            {
+                _id: new ObjectId(),
                 status: 'SUCCESS',
                 summary: { numCreated: 3 },
                 created: new Date(2020, 2, 3),
-            }),
-            new Upload({
+            },
+            {
+                _id: new ObjectId(),
                 status: 'SUCCESS',
                 summary: { numCreated: 3 },
                 created: new Date(2020, 2, 4),
-            }),
+            },
         ];
         await source3.save();
 
         const sourceNoChanges = new Source(fullSource);
         sourceNoChanges.uploads = [
-            new Upload({
+            {
+                _id: new ObjectId(),
                 status: 'SUCCESS',
                 summary: {},
                 created: new Date(2020, 2, 7),
-            }),
+            },
         ];
         await sourceNoChanges.save();
 
@@ -287,7 +299,10 @@ describe('POST', () => {
     });
     it('should return 201 with created upload for valid input', async () => {
         const source = await new Source(minimalSource).save();
-        const upload = new Upload(minimalUpload);
+        const upload = {
+            _id: new ObjectId(),
+            ...minimalUpload
+        };
 
         const res = await curatorRequest
             .post(`/api/sources/${source._id}/uploads`)
@@ -302,7 +317,10 @@ describe('POST', () => {
 
     it('should send a notification email if status is error and recipients defined', async () => {
         const source = await new Source(fullSource).save();
-        const upload = new Upload(minimalUpload);
+        const upload = {
+            _id: new ObjectId(),
+            ...minimalUpload
+        };
         upload.status = 'ERROR';
         await curatorRequest
             .post(`/api/sources/${source._id}/uploads`)
@@ -317,7 +335,10 @@ describe('POST', () => {
     });
     it('should not send a notification email if status not error', async () => {
         const source = await new Source(fullSource).save();
-        const upload = new Upload(minimalUpload); // Status is SUCCESS.
+        const upload = {
+            _id: new ObjectId(),
+            ...minimalUpload
+        }; // Status is SUCCESS.
         await curatorRequest
             .post(`/api/sources/${source._id}/uploads`)
             .send(upload)
@@ -329,7 +350,10 @@ describe('POST', () => {
         const noSchedule = _.cloneDeep(fullSource);
         delete noSchedule.automation.schedule;
         const source = await new Source(noSchedule).save();
-        const upload = new Upload(minimalUpload); // Status is SUCCESS.
+        const upload = {
+            _id: new ObjectId(),
+            ...minimalUpload
+        }; // Status is SUCCESS.
         upload.status = 'ERROR';
         await curatorRequest
             .post(`/api/sources/${source._id}/uploads`)
