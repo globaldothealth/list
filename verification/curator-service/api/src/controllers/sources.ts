@@ -124,7 +124,7 @@ export default class SourcesController {
      * Get a single source.
      */
     get = async (req: Request, res: Response): Promise<void> => {
-        const doc = await Source.findById(req.params.id);
+        const doc = await sources().findOne({ _id: new ObjectId(req.params.id) });
         if (!doc) {
             res.status(404).json({
                 message: `source with id ${req.params.id} could not be found`,
