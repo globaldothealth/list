@@ -25,7 +25,3 @@ export type IUpload = {
     summary: IUploadSummary,
     created: Date,
 };
-
-export type UploadDocument = mongoose.Document & IUpload;
-
-export const Upload = mongoose.model<UploadDocument>('Upload', uploadSchema);

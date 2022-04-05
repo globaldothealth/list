@@ -7,8 +7,6 @@ import { sessions, users } from '../src/model/user';
 
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import { Source } from '../src/model/source';
-import { Upload } from '../src/model/upload';
-import { IUploadSummary } from '../src/model/upload-summary';
 import _ from 'lodash';
 import app from '../src/index';
 import fullSource from './model/data/source.full.json';
@@ -38,7 +36,6 @@ afterAll(async () => {
 
 beforeEach(async () => {
     await Source.deleteMany({});
-    await Upload.deleteMany({});
     await users().deleteMany({});
     await sessions().deleteMany({});
 
@@ -47,7 +44,6 @@ beforeEach(async () => {
 
 afterAll(async () => {
     await Source.deleteMany({});
-    await Upload.deleteMany({});
     await users().deleteMany({});
     await sessions().deleteMany({});
 });
