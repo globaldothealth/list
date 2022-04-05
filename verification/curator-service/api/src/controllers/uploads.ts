@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 
-import { Source, SourceDocument } from '../model/source';
+import { Source, ISource } from '../model/source';
 import EmailClient from '../clients/email-client';
 import { IUpload } from '../model/upload';
 
@@ -148,7 +148,7 @@ export default class UploadsController {
     };
 
     private async sendErrorNotification(
-        source: SourceDocument,
+        source: ISource,
         upload: IUpload,
     ): Promise<void> {
         if (

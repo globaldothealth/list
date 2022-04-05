@@ -10,7 +10,7 @@ import mongoose from 'mongoose';
 import { ObjectId } from 'mongodb';
 import db from './database';
 
-interface ISource {
+export interface ISource {
     _id: ObjectId;
     name: string;
     countryCodes: string[];
