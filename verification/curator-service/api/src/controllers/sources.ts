@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { cases, restrictedCases } from '../model/case';
-import { Source, SourceDocument } from '../model/source';
+import { awsRuleDescriptionForSource, awsRuleNameForSource, awsRuleTargetIdForSource, awsStatementIdForSource, Source, SourceDocument } from '../model/source';
 
 import AwsBatchClient from '../clients/aws-batch-client';
 import AwsEventsClient from '../clients/aws-events-client';
@@ -187,22 +187,22 @@ export default class SourcesController {
         if (this.automationScheduleModified(source)) {
             if (source.automation?.schedule?.awsScheduleExpression) {
                 const awsRuleArn = await this.awsEventsClient.putRule(
-                    source.toAwsRuleName(),
-                    source.toAwsRuleDescription(),
+                    awsRuleNameForSource(source),
+                    awsRuleDescriptionForSource(source),
                     source.automation.schedule.awsScheduleExpression,
                     this.batchClient.jobQueueArn,
-                    source.toAwsRuleTargetId(),
+                    awsRuleTargetIdForSource(source),
                     source._id.toString(),
-                    source.toAwsStatementId(),
+                    awsStatementIdForSource(source),
                 );
                 source.set('automation.schedule.awsRuleArn', awsRuleArn);
                 return NotificationType.Add;
             } else {
                 await this.awsEventsClient.deleteRule(
-                    source.toAwsRuleName(),
-                    source.toAwsRuleTargetId(),
+                    awsRuleNameForSource(source),
+                    awsRuleTargetIdForSource(source),
                     this.batchClient.jobQueueArn,
-                    source.toAwsStatementId(),
+                    awsStatementIdForSource(source),
                 );
                 source.set('automation.schedule', undefined);
                 return NotificationType.Remove;
@@ -212,8 +212,8 @@ export default class SourcesController {
             source.automation?.schedule?.awsRuleArn
         ) {
             await this.awsEventsClient.putRule(
-                source.toAwsRuleName(),
-                source.toAwsRuleDescription(),
+                awsRuleNameForSource(source),
+                awsRuleDescriptionForSource(source),
             );
             return NotificationType.None;
         }
@@ -271,13 +271,13 @@ export default class SourcesController {
     ): Promise<void> {
         if (source.automation?.schedule) {
             const createdRuleArn = await this.awsEventsClient.putRule(
-                source.toAwsRuleName(),
-                source.toAwsRuleDescription(),
+                awsRuleNameForSource(source),
+                awsRuleDescriptionForSource(source),
                 source.automation.schedule.awsScheduleExpression,
                 this.batchClient.jobQueueArn,
-                source.toAwsRuleTargetId(),
+                awsRuleTargetIdForSource(source),
                 source._id.toString(),
-                source.toAwsStatementId(),
+                awsStatementIdForSource(source),
             );
             source.set('automation.schedule.awsRuleArn', createdRuleArn);
             await this.sendNotifications(source, NotificationType.Add);
@@ -306,10 +306,10 @@ export default class SourcesController {
 
         if (source.automation?.schedule?.awsRuleArn) {
             await this.awsEventsClient.deleteRule(
-                source.toAwsRuleName(),
-                source.toAwsRuleTargetId(),
+                awsRuleNameForSource(source),
+                awsRuleTargetIdForSource(source),
                 this.batchClient.jobQueueArn,
-                source.toAwsStatementId(),
+                awsStatementIdForSource(source),
             );
             await this.sendNotifications(source, NotificationType.Remove);
         }

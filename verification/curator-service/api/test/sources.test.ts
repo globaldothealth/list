@@ -14,7 +14,7 @@ import { sessions, users } from '../src/model/user';
 
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import { cases, restrictedCases } from '../src/model/case';
-import { Source } from '../src/model/source';
+import { awsRuleDescriptionForSource, awsRuleNameForSource, awsRuleTargetIdForSource, awsStatementIdForSource, Source } from '../src/model/source';
 import app from '../src/index';
 import axios from 'axios';
 import supertest from 'supertest';
@@ -272,13 +272,13 @@ describe('PUT', () => {
             .expect('Content-Type', /json/);
         expect(res.body.automation.schedule.awsRuleArn).toBeDefined();
         expect(mockPutRule).toHaveBeenCalledWith(
-            source.toAwsRuleName(),
-            source.toAwsRuleDescription(),
+            awsRuleNameForSource(source),
+            awsRuleDescriptionForSource(source),
             scheduleExpression,
             undefined,
-            source.toAwsRuleTargetId(),
+            awsRuleTargetIdForSource(source),
             source._id.toString(),
-            source.toAwsStatementId(),
+            awsStatementIdForSource(source),
         );
     });
     it('should send a notification email if automation added and recipients defined', async () => {
@@ -366,7 +366,7 @@ describe('PUT', () => {
             .expect('Content-Type', /json/);
         expect(mockPutRule).toHaveBeenCalledWith(
             source._id.toString(),
-            source.set('name', newName).toAwsRuleDescription(),
+            awsRuleDescriptionForSource(source.set('name', newName)),
         );
     });
     it('cannot update an nonexistent source', (done) => {
@@ -480,13 +480,13 @@ describe('POST', () => {
         const createdSource = new Source(res.body);
         expect(createdSource.automation.schedule.awsRuleArn).toBeDefined();
         expect(mockPutRule).toHaveBeenCalledWith(
-            createdSource.toAwsRuleName(),
-            createdSource.toAwsRuleDescription(),
+            awsRuleNameForSource(createdSource),
+            awsRuleDescriptionForSource(createdSource),
             scheduleExpression,
             undefined,
-            createdSource.toAwsRuleTargetId(),
+            awsRuleTargetIdForSource(createdSource),
             createdSource._id.toString(),
-            createdSource.toAwsStatementId(),
+            awsStatementIdForSource(createdSource),
         );
     });
     it('should send a notification email if automation and recipients defined', async () => {
@@ -588,10 +588,10 @@ describe('DELETE', () => {
         }).save();
         await curatorRequest.delete(`/api/sources/${source.id}`).expect(204);
         expect(mockDeleteRule).toHaveBeenCalledWith(
-            source.toAwsRuleName(),
-            source.toAwsRuleTargetId(),
+            awsRuleNameForSource(source),
+            awsRuleTargetIdForSource(source),
             undefined,
-            source.toAwsStatementId(),
+            awsStatementIdForSource(source),
         );
     });
     it('should send a notification email if source contains ruleArn and recipients', async () => {
