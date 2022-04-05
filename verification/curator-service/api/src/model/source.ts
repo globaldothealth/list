@@ -4,7 +4,7 @@ import {
 } from './automation';
 import { IDateFilter, dateFilterSchema } from './date-filter';
 import { IOrigin, originSchema } from './origin';
-import { UploadDocument, uploadSchema } from './upload';
+import { IUpload, uploadSchema } from './upload';
 import countries from 'i18n-iso-countries';
 import mongoose from 'mongoose';
 
@@ -17,7 +17,7 @@ interface ISource {
     excludeFromLineList: boolean;
     hasStableIdentifiers: boolean;
     automation: IAutomation;
-    uploads: UploadDocument[];
+    uploads: IUpload[];
     dateFilter: IDateFilter;
     notificationRecipients: string[];
 

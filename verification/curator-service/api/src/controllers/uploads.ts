@@ -1,8 +1,8 @@
 import { Request, Response } from 'express';
-import { Source, SourceDocument } from '../model/source';
 
+import { Source, SourceDocument } from '../model/source';
 import EmailClient from '../clients/email-client';
-import { UploadDocument } from '../model/upload';
+import { IUpload } from '../model/upload';
 
 /**
  * UploadsController handles single uploads, that is a batch of cases sent
@@ -64,14 +64,18 @@ export default class UploadsController {
                 });
                 return;
             }
-            await upload.set(req.body).validate();
+            const uploadIndex = source.uploads.indexOf(upload);
+            Object.assign(upload, req.body);
+
+            await source.set({ [`uploads.${uploadIndex}`]: upload }).validate();
             const result = await source.save();
             if (upload.status === 'ERROR') {
                 this.sendErrorNotification(result, upload);
             }
             res.json(result);
         } catch (err) {
-            if (err.name === 'ValidationError') {
+            const error = err as Error;
+            if (error.name === 'ValidationError') {
                 res.status(422).json(err);
                 return;
             }
@@ -145,7 +149,7 @@ export default class UploadsController {
 
     private async sendErrorNotification(
         source: SourceDocument,
-        upload: UploadDocument,
+        upload: IUpload,
     ): Promise<void> {
         if (
             source.automation?.schedule &&
