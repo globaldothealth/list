@@ -41,10 +41,6 @@ export default class UploadsController {
                 },
                 { returnDocument: 'after' },
             );
-            if (!result.ok) {
-                console.error('not ok');
-                console.error(result.lastErrorObject);
-            }
             const updatedSource = result.value;
             const update =
                 updatedSource.uploads[updatedSource.uploads.length - 1];
