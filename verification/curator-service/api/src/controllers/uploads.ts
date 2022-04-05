@@ -1,8 +1,9 @@
 import { Request, Response } from 'express';
 
-import { Source, ISource } from '../model/source';
+import { sources, Source, ISource } from '../model/source';
 import EmailClient from '../clients/email-client';
 import { IUpload } from '../model/upload';
+import { ObjectId } from 'mongodb';
 
 /**
  * UploadsController handles single uploads, that is a batch of cases sent
@@ -17,21 +18,40 @@ export default class UploadsController {
      */
     create = async (req: Request, res: Response): Promise<void> => {
         try {
-            const source = await Source.findById(req.params.sourceId);
+            const sourceId = new ObjectId(req.params.sourceId);
+            const source = await sources().findOne({ _id: sourceId });
             if (!source) {
                 res.status(404).json({
                     message: `Parent resource (source ID ${req.params.sourceId}) not found.`,
                 });
                 return;
             }
-            source.uploads.push(req.body);
-            const updatedSource = await source.save();
-            const result =
-                updatedSource.uploads[updatedSource.uploads.length - 1];
-            if (result.status === 'ERROR') {
-                this.sendErrorNotification(updatedSource, result);
+            const upload = req.body;
+            if (!upload._id) {
+                upload._id = new ObjectId();
+            } else {
+                upload._id = new ObjectId(upload._id);
             }
-            res.status(201).json(result);
+            const result = await sources().findOneAndUpdate(
+                { _id: sourceId },
+                {
+                    $push: {
+                        uploads: upload,
+                    }
+                },
+                { returnDocument: 'after' },
+            );
+            if (!result.ok) {
+                console.error('not ok');
+                console.error(result.lastErrorObject);
+            }
+            const updatedSource = result.value;
+            const update =
+                updatedSource.uploads[updatedSource.uploads.length - 1];
+            if (update.status === 'ERROR') {
+                this.sendErrorNotification(updatedSource, update);
+            }
+            res.status(201).json(updatedSource);
             return;
         } catch (err) {
             if (err.name === 'ValidationError') {
