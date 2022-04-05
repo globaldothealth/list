@@ -307,7 +307,7 @@ describe('POST', () => {
             .expect(201);
         const dbSource = await Source.findById(source._id);
 
-        expect(res.body._id).toEqual(upload._id.toString());
+        expect(res.body._id).toEqual(source._id.toHexString());
         expect(dbSource?.uploads.map((u) => u._id)).toContainEqual(upload._id);
     });
 
