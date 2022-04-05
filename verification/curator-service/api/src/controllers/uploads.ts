@@ -129,8 +129,8 @@ export default class UploadsController {
               ]
             : [];
         try {
-            const [uploads, total] = await Promise.all([
-                Source.aggregate([
+            const [uploadsCursor, totalCursor] = await Promise.all([
+                sources().aggregate([
                     { $unwind: '$uploads' },
                     ...changesOnlyMatcher,
                     { $sort: { 'uploads.created': -1, name: -1 } },
@@ -145,11 +145,15 @@ export default class UploadsController {
                         },
                     },
                 ]),
-                Source.aggregate([
+                sources().aggregate([
                     { $unwind: '$uploads' },
                     ...changesOnlyMatcher,
                     { $count: 'total' },
                 ]),
+            ]);
+            const [uploads, total] = await Promise.all([
+                uploadsCursor.toArray(),
+                totalCursor.toArray(),
             ]);
             // If we have more items than limit, add a response param
             // indicating that there is more to fetch on the next page.
