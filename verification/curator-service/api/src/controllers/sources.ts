@@ -95,18 +95,20 @@ export default class SourcesController {
      */
     listSourcesForTable = async (req: Request, res: Response) => {
         try {
-            const sources = await Source.find(
+            const theSources = await sources().find(
                 {},
                 {
-                    name: 1,
-                    'origin.providerName': 1,
-                    'origin.providerWebsiteUrl': 1,
-                    'origin.url': 1,
-                    'origin.license': 1,
+                    projection: {
+                        name: 1,
+                        'origin.providerName': 1,
+                        'origin.providerWebsiteUrl': 1,
+                        'origin.url': 1,
+                        'origin.license': 1,
+                    },
                 },
             );
 
-            return res.json(sources);
+            return res.json(theSources);
         } catch (err) {
             if (err.name === 'ValidationError') {
                 res.status(422).json(err);
