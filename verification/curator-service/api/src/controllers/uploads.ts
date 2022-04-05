@@ -64,7 +64,8 @@ export default class UploadsController {
      */
     update = async (req: Request, res: Response): Promise<void> => {
         try {
-            const source = await Source.findById(req.params.sourceId);
+            const sourceId = new ObjectId(req.params.sourceId);
+            const source = await sources().findOne({ _id: sourceId });
             if (!source) {
                 res.status(404).json({
                     message: `Parent resource (source ID ${req.params.sourceId}) not found.`,
@@ -72,7 +73,7 @@ export default class UploadsController {
                 return;
             }
             const upload = source.uploads.find(
-                (u) => u._id.toString() === req.params.id,
+                (u: IUpload) => u._id.toString() === req.params.id,
             );
             if (!upload) {
                 res.status(404).json({
@@ -83,12 +84,19 @@ export default class UploadsController {
             const uploadIndex = source.uploads.indexOf(upload);
             Object.assign(upload, req.body);
 
-            await source.set({ [`uploads.${uploadIndex}`]: upload }).validate();
-            const result = await source.save();
+            const result = await sources().findOneAndUpdate(
+                { _id: sourceId },
+                {
+                    $set: {
+                        [`uploads.${uploadIndex}`]: upload,
+                    },
+                },
+                { returnDocument: 'after' },
+            );
             if (upload.status === 'ERROR') {
-                this.sendErrorNotification(result, upload);
+                this.sendErrorNotification(result.value, upload);
             }
-            res.json(result);
+            res.json(result.value);
         } catch (err) {
             const error = err as Error;
             if (error.name === 'ValidationError') {
