@@ -14,7 +14,7 @@ import { sessions, users } from '../src/model/user';
 
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import { cases, restrictedCases } from '../src/model/case';
-import { awsRuleDescriptionForSource, awsRuleNameForSource, awsRuleTargetIdForSource, awsStatementIdForSource, Source } from '../src/model/source';
+import { awsRuleDescriptionForSource, awsRuleNameForSource, awsRuleTargetIdForSource, awsStatementIdForSource, Source, sources } from '../src/model/source';
 import app from '../src/index';
 import axios from 'axios';
 import supertest from 'supertest';
@@ -466,7 +466,7 @@ describe('POST', () => {
             .send(source)
             .expect('Content-Type', /json/)
             .expect(201);
-        const createdSource = new Source(res.body);
+        const createdSource = await sources().findOne({ name: 'some_name' });
         expect(createdSource.automation.schedule.awsRuleArn).toBeDefined();
         expect(mockPutRule).toHaveBeenCalledWith(
             awsRuleNameForSource(createdSource),
