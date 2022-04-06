@@ -291,13 +291,14 @@ export default class SourcesController {
      * Delete a single source.
      */
     del = async (req: Request, res: Response): Promise<void> => {
-        const source = await Source.findById(req.params.id);
+        const sourceId = new ObjectId(req.params.id);
+        const source = await sources().findOne({ _id: sourceId });
         if (!source) {
             res.sendStatus(404);
             return;
         }
 
-        const query = { 'caseReference.sourceId': source._id.toHexString() };
+        const query = { 'caseReference.sourceId': sourceId.toHexString() };
         const count = await cases().count(query);
         const restrictedCount = await restrictedCases().count(query);
         if (count + restrictedCount !== 0) {
@@ -316,7 +317,7 @@ export default class SourcesController {
             );
             await this.sendNotifications(source, NotificationType.Remove);
         }
-        source.remove();
+        sources().deleteOne({ _id: sourceId });
         res.status(204).end();
         return;
     };
