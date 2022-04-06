@@ -54,7 +54,7 @@ afterAll(async () => {
 beforeEach(async () => {
     jest.clearAllMocks();
     mockSend.mockResolvedValue({});
-    await Source.deleteMany({});
+    await sources().deleteMany({});
     await users().deleteMany({});
     await sessions().deleteMany({});
 });
@@ -64,7 +64,7 @@ afterEach(async () => {
 });
 
 afterAll(async () => {
-    await Source.deleteMany({});
+    await sources().deleteMany({});
     await users().deleteMany({});
     await sessions().deleteMany({});
 });
