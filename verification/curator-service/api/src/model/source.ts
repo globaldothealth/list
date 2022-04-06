@@ -70,7 +70,7 @@ export const awsRuleNameForSource = (source: ISource) => source._id.toHexString(
 
 export const awsRuleTargetIdForSource = (source: ISource) => `${source._id.toHexString()}_Target`;
 
-export type SourceDocument = mongoose.Document & ISource;
+type SourceDocument = mongoose.Document & ISource;
 
 export const Source = mongoose.model<SourceDocument>('Source', sourceSchema);
 export const sources = () => db().collection('sources');
