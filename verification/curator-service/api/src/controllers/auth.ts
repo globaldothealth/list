@@ -4,7 +4,12 @@ import {
 } from 'passport-http-bearer';
 import { Strategy as GoogleStrategy, Profile } from 'passport-google-oauth20';
 import { NextFunction, Request, Response } from 'express';
-import { isUserPasswordValid, IUser, userPublicFields, users } from '../model/user';
+import {
+    isUserPasswordValid,
+    IUser,
+    userPublicFields,
+    users,
+} from '../model/user';
 import { tokens } from '../model/token';
 import { isValidObjectId } from 'mongoose';
 
@@ -264,7 +269,9 @@ export class AuthController {
             mustBeAuthenticated,
             async (req: Request, res: Response): Promise<void> => {
                 const theUser = req.user as IUser;
-                const currentUser = await users().findOne({ _id: new ObjectId(theUser.id) });
+                const currentUser = await users().findOne({
+                    _id: new ObjectId(theUser.id),
+                });
                 if (!currentUser) {
                     // internal server error as you were authenticated but unknown
                     res.status(500).end();
@@ -309,7 +316,10 @@ export class AuthController {
                     // prefix the API key with the user ID to make it easier to find users by API key in auth
                     const randomPart = await getRandomString(32);
                     const apiKey = `${theUser.id.toString()}${randomPart}`;
-                    await users().updateOne({ _id: new ObjectId(theUser.id) }, { $set: { apiKey }});
+                    await users().updateOne(
+                        { _id: new ObjectId(theUser.id) },
+                        { $set: { apiKey } },
+                    );
                     res.status(201).json(apiKey).end();
                 }
             },
@@ -392,7 +402,7 @@ export class AuthController {
                     await users().updateOne(userQuery, {
                         $set: {
                             password: hashedPassword,
-                        }
+                        },
                     });
 
                     return res
@@ -517,7 +527,9 @@ export class AuthController {
                     }
 
                     // Check if token exists
-                    const passwordResetToken = await tokens().findOne({ userId });
+                    const passwordResetToken = await tokens().findOne({
+                        userId,
+                    });
                     if (!passwordResetToken) {
                         throw new Error(
                             'Invalid or expired password reset token',
@@ -542,9 +554,11 @@ export class AuthController {
                         { $set: { password: hashedPassword } },
                         { returnDocument: 'after' },
                     );
-                    
+
                     if (!result.ok) {
-                        logger.error(`error resetting password for user ${userId}`);
+                        logger.error(
+                            `error resetting password for user ${userId}`,
+                        );
                         logger.error(result.lastErrorObject);
                         throw new Error(
                             'Something went wrong, please try again later',
@@ -553,7 +567,6 @@ export class AuthController {
 
                     // Send confirmation email to the user
                     const user = result.value;
-
 
                     await this.emailClient.send(
                         [user.email],
@@ -619,12 +632,13 @@ export class AuthController {
         // @ts-ignore
         passport.serializeUser((user: IUser, done: any) => {
             // Serializes the user id in the cookie, no user info should be in there, just the id.
-            done(null, user._id.toHexString());
+            done(null, user.id);
         });
 
         passport.deserializeUser((id: string, done: any) => {
             // Find the user based on its id in the cookie.
-            users().findOne({ _id: new ObjectId(id) })
+            users()
+                .findOne({ _id: new ObjectId(id) })
                 .then((user) => {
                     // Invalidate session when user cannot be found.
                     // This means an cookie pointing to an invalid user was sent to us.
@@ -671,7 +685,9 @@ export class AuthController {
                                 req.body.newsletterAccepted || false,
                         });
 
-                        const newUser = await users().findOne({ _id: result.insertedId });
+                        const newUser = await users().findOne({
+                            _id: result.insertedId,
+                        });
 
                         // Send welcome email
                         await this.emailClient.send(
@@ -692,7 +708,7 @@ export class AuthController {
                             <p>The G.h Team</p>`,
                         );
 
-                        done(null, newUser.publicFields());
+                        done(null, userPublicFields(newUser));
                     } catch (error) {
                         done(error);
                     }
@@ -769,7 +785,9 @@ export class AuthController {
                                 picture: picture,
                                 newsletterAccepted: isNewsletterAccepted,
                             });
-                            user = await users().findOne({ _id: result.insertedId });
+                            user = await users().findOne({
+                                _id: result.insertedId,
+                            });
 
                             try {
                                 // Send welcome email
@@ -802,8 +820,8 @@ export class AuthController {
                             );
                             const update = await users().findOneAndUpdate(
                                 { googleID: googleProfile.id },
-                                { $set: { picture }},
-                                { returnDocument: 'after'}
+                                { $set: { picture } },
+                                { returnDocument: 'after' },
                             );
                             user = update.value;
                         }
@@ -817,7 +835,7 @@ export class AuthController {
                             const update = await users().findOneAndUpdate(
                                 { googleID: googleProfile.id },
                                 { $set: { newsletterAccepted: true } },
-                                { returnDocument: 'after' }
+                                { returnDocument: 'after' },
                             );
                             user = update.value;
                         }
@@ -865,7 +883,9 @@ export class AuthController {
                                 // Do not care about names for bearer tokens, they are usually not humans.
                                 name: '',
                             });
-                            user = await users().findOne({ _id: result.insertedId });
+                            user = await users().findOne({
+                                _id: result.insertedId,
+                            });
                         }
                         return done(null, user);
                     } catch (e) {

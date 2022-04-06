@@ -10,6 +10,13 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import store from './redux/store';
 import { Provider } from 'react-redux';
+import TagManager from 'react-gtm-module';
+
+const tagManagerArgs = {
+    gtmId: 'GTM-WHCJVVH',
+};
+
+TagManager.initialize(tagManagerArgs);
 
 ReactDOM.render(
     <React.StrictMode>

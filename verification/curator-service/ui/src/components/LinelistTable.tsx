@@ -54,6 +54,7 @@ import { connect, ConnectedProps } from 'react-redux';
 import { RootState } from '../redux/store';
 import Helmet from 'react-helmet';
 import { nameCountry } from './util/countryNames';
+import { sendCustomGtmEvent } from './util/helperFunctions';
 
 // Limit number of data that can be displayed or downloaded to avoid long execution times of mongo queries
 const DATA_LIMIT = 10000;
@@ -539,6 +540,8 @@ export function DownloadButton(): JSX.Element {
                         },
                     });
 
+                    sendCustomGtmEvent('full_dataset_download');
+
                     window.location.href = response.data.signedUrl;
                 } catch (err) {
                     alert(
@@ -559,6 +562,11 @@ export function DownloadButton(): JSX.Element {
                         headers: {
                             'Content-Type': 'application/json',
                         },
+                    });
+
+                    sendCustomGtmEvent('filtered_dataset_download', {
+                        download_format: formatType,
+                        query: searchQuery,
                     });
 
                     // Check for S3 signed URL

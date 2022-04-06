@@ -32,6 +32,7 @@ import {
 import { codeForCountry } from '../util/countryNames';
 import CloseIcon from '@material-ui/icons/Close';
 import { useStyles } from './styled';
+import { sendCustomGtmEvent } from '../util/helperFunctions';
 
 interface FiltersModalProps {
     isOpen: boolean;
@@ -143,6 +144,9 @@ export default function FiltersDialog({
             handleSetModalAlert();
             handleClose();
             const searchQuery = filtersToURL(values);
+
+            sendCustomGtmEvent('filters_applied', { query: searchQuery });
+
             history.push({ pathname: '/cases', search: searchQuery });
         },
     });

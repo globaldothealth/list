@@ -20,6 +20,7 @@ import FormGroup from '@material-ui/core/FormGroup';
 import Checkbox from '@material-ui/core/Checkbox';
 import Typography from '@material-ui/core/Typography';
 import GoogleButton from 'react-google-button';
+import { sendCustomGtmEvent } from '../util/helperFunctions';
 
 const useStyles = makeStyles((theme: Theme) => ({
     checkboxRoot: {
@@ -328,6 +329,13 @@ export default function SignUpForm({
                                             'isAgreementChecked',
                                         );
                                     } else {
+                                        sendCustomGtmEvent('sign_up', {
+                                            newsletter_accepted:
+                                                formik.values
+                                                    .isNewsletterChecked,
+                                            method: 'google',
+                                        });
+
                                         window.location.href = `${
                                             process.env.REACT_APP_LOGIN_URL ??
                                             ''
