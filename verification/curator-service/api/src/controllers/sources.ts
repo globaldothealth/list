@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { cases, restrictedCases } from '../model/case';
-import { awsRuleDescriptionForSource, awsRuleNameForSource, awsRuleTargetIdForSource, awsStatementIdForSource, ISource, Source, SourceDocument, sources } from '../model/source';
+import { awsRuleDescriptionForSource, awsRuleNameForSource, awsRuleTargetIdForSource, awsStatementIdForSource, ISource, sources } from '../model/source';
 
 import AwsBatchClient from '../clients/aws-batch-client';
 import AwsEventsClient from '../clients/aws-events-client';
@@ -263,11 +263,17 @@ export default class SourcesController {
      */
     create = async (req: Request, res: Response): Promise<void> => {
         try {
-            const source = new Source(req.body);
-            await source.validate();
+            const sourceId = new ObjectId();
+            await sources().insertOne({
+                _id: sourceId,
+                ...req.body,
+            });
+            // now get the source back from mongo, in case any triggers changed anything
+            const source = await sources().findOne({
+                _id: sourceId,
+            });
             await this.createAutomationScheduleAwsResources(source);
-            const result = await source.save();
-            res.status(201).json(result);
+            res.status(201).json(source);
         } catch (err) {
             if (err.name === 'ValidationError') {
                 res.status(422).json(err);
@@ -287,7 +293,7 @@ export default class SourcesController {
      * that it can be invoked by the rule.
      */
     private async createAutomationScheduleAwsResources(
-        source: SourceDocument,
+        source: ISource,
     ): Promise<void> {
         if (source.automation?.schedule) {
             const createdRuleArn = await this.awsEventsClient.putRule(
@@ -299,8 +305,16 @@ export default class SourcesController {
                 source._id.toString(),
                 awsStatementIdForSource(source),
             );
-            source.set('automation.schedule.awsRuleArn', createdRuleArn);
-            await this.sendNotifications(source, NotificationType.Add);
+            const result = await sources().findOneAndUpdate({
+                _id: source._id,
+            }, {
+                $set: {
+                    'automation.schedule.awsRuleArn': createdRuleArn,
+                }
+            }, {
+                returnDocument: 'after',
+            });
+            await this.sendNotifications(result.value, NotificationType.Add);
         }
     }
 
