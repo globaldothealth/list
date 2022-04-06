@@ -378,17 +378,6 @@ describe('PUT', () => {
             })
             .expect(404, done);
     });
-    it('should not update to an invalid source', async () => {
-        const source = await new Source({
-            name: 'test-source',
-            origin: { url: 'http://foo.bar', license: 'MIT' },
-            format: 'JSON',
-        }).save();
-        return curatorRequest
-            .put(`/api/sources/${source.id}`)
-            .send({ name: '' })
-            .expect(422, /Enter a name/);
-    });
     it('should be able to set a parser without schedule', async () => {
         const source = await new Source({
             name: 'test-source',

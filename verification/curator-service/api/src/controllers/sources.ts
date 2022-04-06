@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { cases, restrictedCases } from '../model/case';
-import { awsRuleDescriptionForSource, awsRuleNameForSource, awsRuleTargetIdForSource, awsStatementIdForSource, Source, SourceDocument, sources } from '../model/source';
+import { awsRuleDescriptionForSource, awsRuleNameForSource, awsRuleTargetIdForSource, awsStatementIdForSource, ISource, Source, SourceDocument, sources } from '../model/source';
 
 import AwsBatchClient from '../clients/aws-batch-client';
 import AwsEventsClient from '../clients/aws-events-client';
@@ -139,33 +139,48 @@ export default class SourcesController {
      */
     update = async (req: Request, res: Response): Promise<void> => {
         try {
-            const source = await Source.findById(req.params.id);
-            if (!source) {
+            const sourceId = new ObjectId(req.params.id);
+            const originalSource = await sources().findOne({ _id: sourceId });
+            if (!originalSource) {
                 res.status(404).json({
                     message: `source with id ${req.params.id} could not be found`,
                 });
                 return;
             }
+            let update = {
+                $set: {
+                    ...req.body
+                },
+                $unset: {},
+            };
             // Undefined fields are removed from the request body by openapi
             // validator, if we want to unset the dateFilter we have to pass an
             // empty object and set it undefined ourselves here.
             if (JSON.stringify(req.body.dateFilter) === '{}') {
-                req.body.dateFilter = undefined;
+                update['$unset'] = {
+                    dateFilter: 1
+                };
+                delete update['$set'].dateFilter;
             }
-            await source.set(req.body).validate();
+            const updatedSource = await sources().findOneAndUpdate(
+                { _id: sourceId },
+                update,
+                { returnDocument: 'after' },
+            );
             const emailNotificationType =
-                await this.updateAutomationScheduleAwsResources(source);
-            const result = await source.save();
-
-            await this.sendNotifications(source, emailNotificationType);
-            res.json(result);
+                await this.updateAutomationScheduleAwsResources(originalSource, updatedSource.value);
+            const finalSource = await sources().findOne({ _id: sourceId });
+                
+            await this.sendNotifications(finalSource, emailNotificationType);
+            res.json(finalSource);
         } catch (err) {
-            if (err.name === 'ValidationError') {
-                res.status(422).json(err);
+            const error = err as Error;
+            if (error.name === 'ValidationError') {
+                res.status(422).json(error);
                 return;
             }
 
-            res.status(500).json(err);
+            res.status(500).json(error);
             return;
         }
     };
@@ -185,38 +200,44 @@ export default class SourcesController {
      * about this change.
      */
     private async updateAutomationScheduleAwsResources(
-        source: SourceDocument,
+        originalSource: ISource,
+        updatedSource: ISource,
     ): Promise<NotificationType> {
-        if (this.automationScheduleModified(source)) {
-            if (source.automation?.schedule?.awsScheduleExpression) {
+        const findOne = { _id: updatedSource._id };
+        if (this.automationScheduleModified(originalSource, updatedSource)) {
+            if (updatedSource.automation?.schedule?.awsScheduleExpression) {
                 const awsRuleArn = await this.awsEventsClient.putRule(
-                    awsRuleNameForSource(source),
-                    awsRuleDescriptionForSource(source),
-                    source.automation.schedule.awsScheduleExpression,
+                    awsRuleNameForSource(updatedSource),
+                    awsRuleDescriptionForSource(updatedSource),
+                    updatedSource.automation.schedule.awsScheduleExpression,
                     this.batchClient.jobQueueArn,
-                    awsRuleTargetIdForSource(source),
-                    source._id.toString(),
-                    awsStatementIdForSource(source),
+                    awsRuleTargetIdForSource(updatedSource),
+                    updatedSource._id.toHexString(),
+                    awsStatementIdForSource(updatedSource),
                 );
-                source.set('automation.schedule.awsRuleArn', awsRuleArn);
+                await sources().findOneAndUpdate(findOne, {
+                    $set: { 'automation.schedule.awsRuleArn': awsRuleArn },
+                });
                 return NotificationType.Add;
             } else {
                 await this.awsEventsClient.deleteRule(
-                    awsRuleNameForSource(source),
-                    awsRuleTargetIdForSource(source),
+                    awsRuleNameForSource(updatedSource),
+                    awsRuleTargetIdForSource(updatedSource),
                     this.batchClient.jobQueueArn,
-                    awsStatementIdForSource(source),
+                    awsStatementIdForSource(updatedSource),
                 );
-                source.set('automation.schedule', undefined);
+                await sources().findOneAndUpdate(findOne, {
+                    $unset: { 'automation.schedule' : 1 },
+                });
                 return NotificationType.Remove;
             }
         } else if (
-            source.isModified('name') &&
-            source.automation?.schedule?.awsRuleArn
+            (originalSource.name !== updatedSource.name) &&
+            updatedSource.automation?.schedule?.awsRuleArn
         ) {
             await this.awsEventsClient.putRule(
-                awsRuleNameForSource(source),
-                awsRuleDescriptionForSource(source),
+                awsRuleNameForSource(updatedSource),
+                awsRuleDescriptionForSource(updatedSource),
             );
             return NotificationType.None;
         }
@@ -225,19 +246,15 @@ export default class SourcesController {
 
     /**
      * Determines whether the automation schedule for a given source was modified.
-     *
-     * This helper is necessary to encapsulate oddities with modified paths in
-     * Mongoose. If one field of a subdocument is modified, all fields of the
-     * subdocument will return true for calls to subDoc.isModified('field').
-     *
-     * We use isDirectModified() in combination with modifiedPaths() to produce
-     * an accurate decision.
      */
-    private automationScheduleModified(source: SourceDocument): boolean {
+    private automationScheduleModified(originalSource: ISource, updatedSource: ISource): boolean {
+        const scheduleModified = JSON.stringify(originalSource.automation?.schedule) !== JSON.stringify(updatedSource.automation?.schedule);
+        const automationModified = JSON.stringify(originalSource.automation) !== JSON.stringify(updatedSource.automation);
+        const parserModified = JSON.stringify(originalSource.automation?.parser) !== JSON.stringify(originalSource.automation?.parser);
         return (
-            source.automation?.modifiedPaths().includes('schedule') ||
-            (source.isDirectModified('automation') &&
-                !source.automation.modifiedPaths().includes('parser'))
+            scheduleModified ||
+            (automationModified &&
+                !parserModified)
         );
     }
 
@@ -355,12 +372,12 @@ export default class SourcesController {
     };
 
     private async sendNotifications(
-        source: SourceDocument,
+        source: ISource,
         type: NotificationType,
     ): Promise<void> {
+        const recipients = source?.notificationRecipients ?? [];
         if (
-            !source.notificationRecipients ||
-            source.notificationRecipients.length === 0 ||
+            (recipients.length === 0) ||
             type === NotificationType.None
         ) {
             return;
@@ -396,7 +413,7 @@ export default class SourcesController {
 
         try {
             await this.emailClient.send(
-                source.notificationRecipients,
+                recipients,
                 subject,
                 text,
             );
