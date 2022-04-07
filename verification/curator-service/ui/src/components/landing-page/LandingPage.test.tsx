@@ -167,7 +167,7 @@ describe('<SignUpForm />', () => {
 
         userEvent.type(screen.getByLabelText('Email *'), 'test@email.com');
         userEvent.type(
-            screen.getByLabelText(/Confirm Email */),
+            screen.getByLabelText(/Confirm Email \*/),
             'xxx@email.com',
         );
         userEvent.click(screen.getByTestId('sign-up-button'));

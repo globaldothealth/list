@@ -34,7 +34,7 @@ describe('LandingPage', function () {
         cy.get('input').should('have.length', 2);
     });
 
-    it.only('Checks if the password validation works well in the SignUp page', function () {
+    it('Checks if the password validation works well in the SignUp page', function () {
         cy.visit('/');
         cy.contains('Welcome to G.h Data.');
         cy.contains('Sign up form');
