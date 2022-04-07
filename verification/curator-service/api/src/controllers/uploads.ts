@@ -72,7 +72,7 @@ export default class UploadsController {
                 });
                 return;
             }
-            const upload = source.uploads.find(
+            const upload = source.uploads?.find(
                 (u: IUpload) => u._id.toString() === req.params.id,
             );
             if (!upload) {
