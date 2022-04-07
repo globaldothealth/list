@@ -1,11 +1,10 @@
 import {
-    AutomationDocument,
-    automationParsingValidator,
+    IAutomation,
     automationSchema,
 } from './automation';
-import { DateFilterDocument, dateFilterSchema } from './date-filter';
-import { OriginDocument, originSchema } from './origin';
-import { UploadDocument, uploadSchema } from './upload';
+import { IDateFilter, dateFilterSchema } from './date-filter';
+import { IOrigin, originSchema } from './origin';
+import { IUpload, uploadSchema } from './upload';
 import countries from 'i18n-iso-countries';
 import mongoose from 'mongoose';
 
@@ -13,13 +12,13 @@ interface ISource {
     _id: mongoose.Types.ObjectId;
     name: string;
     countryCodes: string[];
-    origin: OriginDocument;
+    origin: IOrigin;
     format: string;
     excludeFromLineList: boolean;
     hasStableIdentifiers: boolean;
-    automation: AutomationDocument;
-    uploads: UploadDocument[];
-    dateFilter: DateFilterDocument;
+    automation: IAutomation;
+    uploads: IUpload[];
+    dateFilter: IDateFilter;
     notificationRecipients: string[];
 
     toAwsStatementId(): string;
@@ -60,10 +59,7 @@ const sourceSchema = new mongoose.Schema<
     format: String,
     excludeFromLineList: Boolean,
     hasStableIdentifiers: Boolean,
-    automation: {
-        type: automationSchema,
-        validate: automationParsingValidator,
-    },
+    automation: automationSchema,
     uploads: [uploadSchema],
     dateFilter: dateFilterSchema,
     notificationRecipients: [String],

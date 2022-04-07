@@ -1,6 +1,7 @@
-import { UploadSummaryDocument, uploadSummarySchema } from './upload-summary';
+import { IUploadSummary, uploadSummarySchema } from './upload-summary';
 
 import mongoose from 'mongoose';
+import { ObjectId } from 'mongodb';
 
 export const uploadSchema = new mongoose.Schema({
     status: {
@@ -18,11 +19,13 @@ export const uploadSchema = new mongoose.Schema({
     },
 });
 
-export type UploadDocument = mongoose.Document & {
-    _id: mongoose.Types.ObjectId;
-    status: string;
-    summary: UploadSummaryDocument;
-    created: Date;
+export type IUpload = {
+    _id: ObjectId,
+    status: string,
+    summary: IUploadSummary,
+    created: Date,
 };
+
+export type UploadDocument = mongoose.Document & IUpload;
 
 export const Upload = mongoose.model<UploadDocument>('Upload', uploadSchema);

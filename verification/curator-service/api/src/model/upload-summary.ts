@@ -12,14 +12,9 @@ export const uploadSummarySchema = new mongoose.Schema(
     },
 );
 
-export type UploadSummaryDocument = mongoose.Document & {
-    numCreated: number;
-    numUpdated: number;
-    numError: number;
-    error: string;
+export type IUploadSummary = {
+    numCreated?: number;
+    numUpdated?: number;
+    numError?: number;
+    error?: string;
 };
-
-export const UploadSummary = mongoose.model<UploadSummaryDocument>(
-    'UploadSummary',
-    uploadSummarySchema,
-);

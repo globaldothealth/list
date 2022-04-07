@@ -22,7 +22,7 @@ export const scheduleSchema = new mongoose.Schema({
     },
 });
 
-export type ScheduleDocument = mongoose.Document & {
+export type ISchedule = {
     awsRuleArn: string;
     awsScheduleExpression: string;
 };

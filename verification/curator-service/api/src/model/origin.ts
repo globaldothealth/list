@@ -16,9 +16,12 @@ export const originSchema = new mongoose.Schema(
     { _id: false },
 );
 
-export type OriginDocument = mongoose.Document & {
+export type IOrigin = {
     url: string;
     license: string;
-    providerName: string;
-    providerWebsiteUrl: string;
+    providerName?: string;
+    providerWebsiteUrl?: string;
 };
+
+export type OriginDocument = mongoose.Document & IOrigin;
+

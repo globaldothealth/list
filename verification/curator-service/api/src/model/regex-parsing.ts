@@ -27,6 +27,6 @@ export const regexParsingSchema = new mongoose.Schema({
     },
 });
 
-export type RegexParsingDocument = mongoose.Document & {
-    fields: [Field];
+export type IRegexParsing = {
+    fields: [Field],
 };

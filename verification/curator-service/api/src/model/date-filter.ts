@@ -18,12 +18,7 @@ export const dateFilterSchema = new mongoose.Schema(
     { _id: false },
 );
 
-export type DateFilterDocument = mongoose.Document & {
+export type IDateFilter = {
     numDaysBeforeToday: number;
     op: string;
 };
-
-export const DateFilter = mongoose.model<DateFilterDocument>(
-    'DateFilter',
-    dateFilterSchema,
-);
