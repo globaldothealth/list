@@ -186,7 +186,7 @@ describe('<SignUpForm />', () => {
         );
 
         userEvent.type(screen.getByLabelText('Password *'), '12345');
-        userEvent.type(screen.getByLabelText(/Repeat password */), '6789');
+        userEvent.type(screen.getByLabelText(/Repeat password \*/), '6789');
         userEvent.click(screen.getByTestId('sign-up-button'));
 
         await waitFor(() => {
@@ -206,11 +206,11 @@ describe('<SignUpForm />', () => {
 
         userEvent.type(screen.getByLabelText('Email *'), 'test@email.com');
         userEvent.type(
-            screen.getByLabelText(/Confirm Email */),
+            screen.getByLabelText(/Confirm Email \*/),
             'test@email.com',
         );
         userEvent.type(screen.getByLabelText('Password *'), '12345');
-        userEvent.type(screen.getByLabelText(/Repeat password */), '12345');
+        userEvent.type(screen.getByLabelText(/Repeat password \*/), '12345');
         userEvent.click(screen.getByTestId('sign-up-button'));
 
         await waitFor(() => {
@@ -230,7 +230,7 @@ describe('<SignUpForm />', () => {
 
         userEvent.type(screen.getByLabelText('Email *'), 'test@email.com');
         userEvent.type(screen.getByLabelText('Password *'), '12345');
-        userEvent.type(screen.getByLabelText(/Repeat password */), '12345');
+        userEvent.type(screen.getByLabelText(/Repeat password \*/), '12345');
         userEvent.click(screen.getAllByRole('checkbox')[0]);
         userEvent.click(screen.getByTestId('sign-up-button'));
 
@@ -267,10 +267,10 @@ describe('<SignUpForm />', () => {
 
         userEvent.type(screen.getByLabelText('Email *'), 'test@email.com');
         userEvent.type(
-            screen.getByLabelText(/Confirm Email */),
+            screen.getByLabelText(/Confirm Email \*/),
             'test@email.com',
         );
-        userEvent.type(screen.getByLabelText(/Repeat password */), '12345');
+        userEvent.type(screen.getByLabelText(/Repeat password \*/), '12345');
         userEvent.click(screen.getAllByRole('checkbox')[0]);
         userEvent.click(screen.getByTestId('sign-up-button'));
 
