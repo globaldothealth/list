@@ -63,7 +63,7 @@ import { User } from '../../api/models/User';
 import PopupSmallScreens from '../PopupSmallScreens';
 import Sidebar from '../Sidebar';
 import Footer from '../Footer';
-import { getReleaseNotesUrl } from '../util/helperFunctions';
+import { getReleaseNotesUrl, hasAnyRole } from '../util/helperFunctions';
 
 // to use our custom theme values in typescript we need to define an extension to the ThemeOptions type.
 declare module '@material-ui/core/styles' {
@@ -427,16 +427,6 @@ export default function App(): JSX.Element {
 
     const savedSearchQuery = localStorage.getItem('searchQuery');
 
-    const hasAnyRole = useCallback(
-        (requiredRoles: string[]): boolean => {
-            if (!user) {
-                return false;
-            }
-            return user?.roles?.some((r: string) => requiredRoles.includes(r));
-        },
-        [user],
-    );
-
     // Update filter breadcrumbs
     useEffect(() => {
         if (!location.pathname.includes('/cases')) {
@@ -477,7 +467,7 @@ export default function App(): JSX.Element {
     useEffect(() => {
         if (!user) return;
 
-        setDrawerOpen(hasAnyRole(['curator', 'admin']) && showMenu);
+        setDrawerOpen(hasAnyRole(user, ['curator', 'admin']) && showMenu);
         //eslint-disable-next-line
     }, [user]);
 
@@ -519,7 +509,7 @@ export default function App(): JSX.Element {
                     className={classes.appBar}
                 >
                     <Toolbar>
-                        {user && hasAnyRole(['curator', 'admin']) && (
+                        {user && hasAnyRole(user, ['curator', 'admin']) && (
                             <IconButton
                                 color="primary"
                                 aria-label="toggle drawer"
@@ -569,7 +559,7 @@ export default function App(): JSX.Element {
                         )}
                     </Toolbar>
                 </AppBar>
-                {user && hasAnyRole(['curator', 'admin']) && (
+                {user && hasAnyRole(user, ['curator', 'admin']) && (
                     <Sidebar drawerOpen={drawerOpen} />
                 )}
                 <main
@@ -603,12 +593,12 @@ export default function App(): JSX.Element {
                                 />
                             </Route>
                         )}
-                        {hasAnyRole(['curator']) && (
+                        {hasAnyRole(user, ['curator']) && (
                             <Route exact path="/sources">
                                 <SourceTable />
                             </Route>
                         )}
-                        {hasAnyRole(['curator']) && (
+                        {hasAnyRole(user, ['curator']) && (
                             <Route exact path="/uploads">
                                 <UploadsTable />
                             </Route>
@@ -618,36 +608,36 @@ export default function App(): JSX.Element {
                                 <Profile />
                             </Route>
                         )}
-                        {user && hasAnyRole(['admin']) && (
+                        {user && hasAnyRole(user, ['admin']) && (
                             <Route path="/users">
                                 <Users onUserChange={getUser} />
                             </Route>
                         )}{' '}
-                        {user && hasAnyRole(['curator']) && (
+                        {user && hasAnyRole(user, ['curator']) && (
                             <Route path="/sources/automated">
                                 <AutomatedSourceForm
                                     onModalClose={onModalClose}
                                 />
                             </Route>
                         )}
-                        {user && hasAnyRole(['curator']) && (
+                        {user && hasAnyRole(user, ['curator']) && (
                             <Route path="/cases/bulk">
                                 <BulkCaseForm onModalClose={onModalClose} />
                             </Route>
                         )}
-                        {user && hasAnyRole(['curator']) && (
+                        {user && hasAnyRole(user, ['curator']) && (
                             <Route path="/sources/backfill">
                                 <AutomatedBackfill
                                     onModalClose={onModalClose}
                                 />
                             </Route>
                         )}
-                        {user && hasAnyRole(['curator']) && (
+                        {user && hasAnyRole(user, ['curator']) && (
                             <Route path="/cases/new">
                                 <CaseForm onModalClose={onModalClose} />
                             </Route>
                         )}
-                        {user && hasAnyRole(['curator']) && (
+                        {user && hasAnyRole(user, ['curator']) && (
                             <Route
                                 path="/cases/edit/:id"
                                 render={({ match }) => {
@@ -667,7 +657,9 @@ export default function App(): JSX.Element {
                                     return (
                                         <ViewCase
                                             id={match.params.id}
-                                            enableEdit={hasAnyRole(['curator'])}
+                                            enableEdit={hasAnyRole(user, [
+                                                'curator',
+                                            ])}
                                             onModalClose={onModalClose}
                                         />
                                     );

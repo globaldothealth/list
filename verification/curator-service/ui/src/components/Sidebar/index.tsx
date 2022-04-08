@@ -18,6 +18,7 @@ import ListIcon from '@material-ui/icons/List';
 import LinkIcon from '@material-ui/icons/Link';
 import PublishIcon from '@material-ui/icons/Publish';
 import PeopleIcon from '@material-ui/icons/People';
+import { hasAnyRole } from '../util/helperFunctions';
 
 import { useStyles } from './styled';
 
@@ -44,16 +45,6 @@ const Sidebar = ({ drawerOpen }: SidebarProps): JSX.Element => {
         setCreateNewButtonAnchorEl(undefined);
     };
 
-    const hasAnyRole = useCallback(
-        (requiredRoles: string[]): boolean => {
-            if (!user) {
-                return false;
-            }
-            return user?.roles?.some((r: string) => requiredRoles.includes(r));
-        },
-        [user],
-    );
-
     const menuList = useMemo(
         () =>
             user
@@ -68,23 +59,26 @@ const Sidebar = ({ drawerOpen }: SidebarProps): JSX.Element => {
                           text: 'Sources',
                           icon: <LinkIcon />,
                           to: '/sources',
-                          displayCheck: (): boolean => hasAnyRole(['curator']),
+                          displayCheck: (): boolean =>
+                              hasAnyRole(user, ['curator']),
                       },
                       {
                           text: 'Uploads',
                           icon: <PublishIcon />,
                           to: '/uploads',
-                          displayCheck: (): boolean => hasAnyRole(['curator']),
+                          displayCheck: (): boolean =>
+                              hasAnyRole(user, ['curator']),
                       },
                       {
                           text: 'Manage users',
                           icon: <PeopleIcon />,
                           to: '/users',
-                          displayCheck: (): boolean => hasAnyRole(['admin']),
+                          displayCheck: (): boolean =>
+                              hasAnyRole(user, ['admin']),
                       },
                   ]
                 : [],
-        [hasAnyRole, user],
+        [user],
     );
 
     useEffect(() => {
@@ -115,7 +109,7 @@ const Sidebar = ({ drawerOpen }: SidebarProps): JSX.Element => {
                     {diseaseName}
                 </Typography>
                 <>
-                    {hasAnyRole(['curator']) && (
+                    {hasAnyRole(user, ['curator']) && (
                         <Fab
                             variant="extended"
                             data-testid="create-new-button"
