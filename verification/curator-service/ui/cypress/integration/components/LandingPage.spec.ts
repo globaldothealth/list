@@ -41,18 +41,18 @@ describe('LandingPage', function () {
 
         cy.get('#password').type('tsgasdgasd');
         cy.get('button[data-testid="sign-up-button"]').click();
-        cy.contains('one uppercase required!');
+        cy.contains(/one uppercase required/i);
         cy.contains('Passwords must match');
 
         cy.get('#password').focus().clear();
         cy.get('#password').type('tsgasdgGasd');
         cy.get('button[data-testid="sign-up-button"]').click();
-        cy.contains('one number required!');
+        cy.contains(/one number required/i);
 
         cy.get('#password').focus().clear();
         cy.get('#password').type('tT$5');
         cy.get('button[data-testid="sign-up-button"]').click();
-        cy.contains('Minimum 8 characters required!');
+        cy.contains(/Minimum 8 characters required/i);
     });
 
     it('Validates emails', function () {
