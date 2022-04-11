@@ -16,7 +16,6 @@ import { nameCountry } from './util/countryNames';
 
 import MuiAlert from '@material-ui/lab/Alert';
 import Paper from '@material-ui/core/Paper';
-import ParsersAutocomplete from './ParsersAutocomplete';
 import SourceRetrievalButton from './SourceRetrievalButton';
 import TextField from '@material-ui/core/TextField';
 import axios from 'axios';
@@ -27,30 +26,6 @@ interface Origin {
     license: string;
     providerName?: string;
     providerWebsiteUrl?: string;
-}
-
-interface Field {
-    name: string;
-    regex: string;
-}
-
-interface RegexParsing {
-    fields: [Field];
-}
-
-interface Parser {
-    awsLambdaArn: string;
-}
-
-interface Schedule {
-    awsRuleArn?: string;
-    awsScheduleExpression: string;
-}
-
-interface Automation {
-    parser?: Parser;
-    schedule?: Schedule;
-    regexParsing?: RegexParsing;
 }
 
 interface DateFilter {
@@ -64,7 +39,6 @@ interface Source {
     countryCodes: string[];
     format?: string;
     origin: Origin;
-    automation?: Automation;
     dateFilter?: DateFilter;
     notificationRecipients?: string[];
     excludeFromLineList?: boolean;
@@ -96,10 +70,6 @@ interface TableRow {
 
     // automation.parser
     format?: string;
-    awsLambdaArn?: string;
-    // automation.schedule
-    awsRuleArn?: string;
-    awsScheduleExpression?: string;
     dateFilter?: DateFilter;
     notificationRecipients?: string[];
     excludeFromLineList?: boolean;
@@ -177,8 +147,7 @@ class SourceTable extends React.Component<Props, SourceTableState> {
                     this.validateRequired(newRowData.name) &&
                     this.validateRequired(newRowData.url) &&
                     this.validateRequired(newRowData.license) &&
-                    this.validateCountryCodes(newRowData.countryCodes) &&
-                    this.validateAutomationFields(newRowData)
+                    this.validateCountryCodes(newRowData.countryCodes)
                 )
             ) {
                 return reject();
@@ -239,23 +208,6 @@ class SourceTable extends React.Component<Props, SourceTableState> {
                 providerWebsiteUrl: rowData.providerWebsiteUrl,
             },
             format: rowData.format,
-            automation:
-                rowData.awsScheduleExpression || rowData.awsLambdaArn
-                    ? {
-                          parser: rowData.awsLambdaArn
-                              ? {
-                                    awsLambdaArn: rowData.awsLambdaArn,
-                                }
-                              : undefined,
-                          schedule: rowData.awsScheduleExpression
-                              ? {
-                                    awsRuleArn: rowData.awsRuleArn,
-                                    awsScheduleExpression:
-                                        rowData.awsScheduleExpression,
-                                }
-                              : undefined,
-                      }
-                    : undefined,
             dateFilter:
                 rowData.dateFilter?.numDaysBeforeToday || rowData.dateFilter?.op
                     ? rowData.dateFilter
@@ -268,18 +220,7 @@ class SourceTable extends React.Component<Props, SourceTableState> {
 
     /**
      * Validates fields comprising the source.automation object.
-     *
-     * Rule ARN isn't necessarily present, because it isn't supplied in create
-     * requests. It might be present for updates, and if so, the schedule
-     * expression field must be present.
      */
-    validateAutomationFields(rowData: TableRow): boolean {
-        return (
-            !rowData.awsRuleArn ||
-            this.validateRequired(rowData.awsScheduleExpression)
-        );
-    }
-
     validateRequired(field: string | undefined): boolean {
         return field?.trim() !== '';
     }
@@ -516,25 +457,6 @@ class SourceTable extends React.Component<Props, SourceTableState> {
                                 ),
                             },
                             {
-                                title: 'AWS Schedule Expression',
-                                field: 'awsScheduleExpression',
-                            },
-                            {
-                                title: 'AWS Rule ARN',
-                                field: 'awsRuleArn',
-                                editable: 'never',
-                            },
-                            {
-                                title: 'Parser function',
-                                field: 'awsLambdaArn',
-                                editComponent: (props): JSX.Element => (
-                                    <ParsersAutocomplete
-                                        defaultValue={props.value || ''}
-                                        onChange={props.onChange}
-                                    />
-                                ),
-                            },
-                            {
                                 title: 'Date filtering',
                                 field: 'dateFilter',
                                 render: (rowData): JSX.Element =>
@@ -718,15 +640,6 @@ class SourceTable extends React.Component<Props, SourceTableState> {
                                                     s.origin.providerName,
                                                 providerWebsiteUrl:
                                                     s.origin.providerWebsiteUrl,
-                                                awsLambdaArn:
-                                                    s.automation?.parser
-                                                        ?.awsLambdaArn,
-                                                awsRuleArn:
-                                                    s.automation?.schedule
-                                                        ?.awsRuleArn,
-                                                awsScheduleExpression:
-                                                    s.automation?.schedule
-                                                        ?.awsScheduleExpression,
                                                 dateFilter: s.dateFilter,
                                                 notificationRecipients:
                                                     s.notificationRecipients,

@@ -10,7 +10,6 @@ import { NextFunction, Request, Response } from 'express';
 import session, { SessionOptions } from 'express-session';
 
 import AwsBatchClient from './clients/aws-batch-client';
-import AwsEventsClient from './clients/aws-events-client';
 import AwsLambdaClient from './clients/aws-lambda-client';
 import CasesController from './controllers/cases';
 import EmailClient from './clients/email-client';
@@ -119,13 +118,6 @@ const awsLambdaClient = new AwsLambdaClient(
     env.LOCALSTACK_URL,
     env.AWS_SERVICE_REGION,
 );
-const awsEventsClient = new AwsEventsClient(
-    env.SERVICE_ENV,
-    env.LOCALSTACK_URL,
-    env.AWS_SERVICE_REGION,
-    awsBatchClient,
-    env.EVENT_ROLE_ARN,
-);
 
 let s3Client;
 if (env.SERVICE_ENV == 'locale2e') {
@@ -184,7 +176,6 @@ const apiRouter = express.Router();
 const sourcesController = new SourcesController(
     emailClient,
     awsBatchClient,
-    awsEventsClient,
     env.DATASERVER_URL,
 );
 apiRouter.get(

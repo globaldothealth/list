@@ -27,9 +27,6 @@ describe('<SourceTable />', () => {
         const countryCodes = ['US', 'MX', 'CA'];
         const license = 'MIT';
         const recipients = ['foo@bar.com', 'bar@baz.com'];
-        const awsLambdaArn = 'arn:aws:lambda:a:b:functions:c';
-        const awsRuleArn = 'arn:aws:events:a:b:rule/c';
-        const awsScheduleExpression = 'rate(2 hours)';
         const sources = [
             {
                 _id: sourceId,
@@ -41,15 +38,6 @@ describe('<SourceTable />', () => {
                     license,
                     providerName,
                     providerWebsiteUrl,
-                },
-                automation: {
-                    parser: {
-                        awsLambdaArn: awsLambdaArn,
-                    },
-                    schedule: {
-                        awsRuleArn: awsRuleArn,
-                        awsScheduleExpression: awsScheduleExpression,
-                    },
                 },
                 dateFilter: {
                     numDaysBeforeToday: 666,
@@ -104,18 +92,7 @@ describe('<SourceTable />', () => {
             await screen.findByText(new RegExp(recipients.join('.*'))),
         ).toBeInTheDocument();
         expect(
-            await screen.findByText(new RegExp(awsLambdaArn)),
-        ).toBeInTheDocument();
-        expect(
-            await screen.findByText(new RegExp(awsRuleArn)),
-        ).toBeInTheDocument();
-        expect(
             await screen.findByText('Only parse data from 666 day(s) ago'),
-        ).toBeInTheDocument();
-        expect(
-            await screen.findByText(
-                new RegExp(awsScheduleExpression.replace(/(?=[()])/g, '\\')),
-            ),
         ).toBeInTheDocument();
     });
 
@@ -130,15 +107,6 @@ describe('<SourceTable />', () => {
                 origin: {
                     url: 'origin url',
                     license: 'origin license',
-                },
-                automation: {
-                    parser: {
-                        awsLambdaArn: 'arn:aws:lambda:a:b:functions:c',
-                    },
-                    schedule: {
-                        awsRuleArn: 'arn:aws:events:a:b:rule/c',
-                        awsScheduleExpression: 'rate(2 hours)',
-                    },
                 },
             },
         ];
@@ -185,15 +153,6 @@ describe('<SourceTable />', () => {
                 origin: {
                     url: 'origin url',
                     license: 'origin license',
-                },
-                automation: {
-                    parser: {
-                        awsLambdaArn: 'arn:aws:lambda:a:b:functions:c',
-                    },
-                    schedule: {
-                        awsRuleArn: 'arn:aws:events:a:b:rule/c',
-                        awsScheduleExpression: 'rate(2 hours)',
-                    },
                 },
             },
         ];
@@ -266,14 +225,6 @@ describe('<SourceTable />', () => {
                     url: 'origin url',
                     license: 'origin license',
                 },
-                automation: {
-                    parser: {
-                        awsLambdaArn: 'lambda arn',
-                    },
-                    schedule: {
-                        awsRuleArn: 'rule arn',
-                    },
-                },
             },
         ];
         const axiosResponse = {
@@ -307,14 +258,6 @@ describe('<SourceTable />', () => {
                 origin: {
                     url: 'new source url',
                     license: 'origin license',
-                },
-                automation: {
-                    parser: {
-                        awsLambdaArn: 'lambda arn',
-                    },
-                    schedule: {
-                        awsRuleArn: 'rule arn',
-                    },
                 },
             },
         ];
@@ -364,14 +307,6 @@ describe('<SourceTable />', () => {
                     url: 'origin url',
                     license: 'origin license',
                 },
-                automation: {
-                    parser: {
-                        awsLambdaArn: 'lambda arn',
-                    },
-                    schedule: {
-                        awsRuleArn: 'rule arn',
-                    },
-                },
                 excludeFromLineList: false,
                 hasStableIdentifiers: false,
             },
@@ -407,14 +342,6 @@ describe('<SourceTable />', () => {
                 origin: {
                     url: 'origin url',
                     license: 'origin license',
-                },
-                automation: {
-                    parser: {
-                        awsLambdaArn: 'lambda arn',
-                    },
-                    schedule: {
-                        awsRuleArn: 'rule arn',
-                    },
                 },
                 excludeFromLineList: true,
                 hasStableIdentifiers: true,
@@ -461,19 +388,11 @@ describe('<SourceTable />', () => {
         const sources = [
             {
                 _id: 'abc123',
-                name: 'source_name',
+                name: 'old_source_name',
                 countryCodes: ['US', 'CA', 'MX'],
                 origin: {
                     url: 'origin url',
                     license: 'origin license',
-                },
-                automation: {
-                    parser: {
-                        awsLambdaArn: 'lambda arn',
-                    },
-                    schedule: {
-                        awsRuleArn: 'origin rule arn',
-                    },
                 },
             },
         ];
@@ -502,20 +421,12 @@ describe('<SourceTable />', () => {
         const editedSources = [
             {
                 _id: 'abc123',
-                name: 'source_name',
+                name: 'new_source_name',
                 countryCodes: ['US', 'CA', 'MX'],
                 format: 'format',
                 origin: {
                     url: 'origin url',
                     license: 'origin license',
-                },
-                automation: {
-                    parser: {
-                        awsLambdaArn: 'lambda arn',
-                    },
-                    schedule: {
-                        awsRuleArn: 'new rule arn',
-                    },
                 },
             },
         ];
@@ -550,9 +461,9 @@ describe('<SourceTable />', () => {
 
         // Check table data is reloaded
         expect(mockedAxios.get).toHaveBeenCalledTimes(1);
-        const editedRow = await screen.findByText('new rule arn');
+        const editedRow = await screen.findByText('new_source_name');
         expect(editedRow).toBeInTheDocument();
-        const oldRow = screen.queryByText('origin rule arn');
+        const oldRow = screen.queryByText('old_source_name');
         expect(oldRow).not.toBeInTheDocument();
     });
 });

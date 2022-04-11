@@ -3,7 +3,6 @@ import { cases, restrictedCases } from '../model/case';
 import { awsRuleDescriptionForSource, awsRuleNameForSource, awsRuleTargetIdForSource, awsStatementIdForSource, ISource, sources } from '../model/source';
 
 import AwsBatchClient from '../clients/aws-batch-client';
-import AwsEventsClient from '../clients/aws-events-client';
 import EmailClient from '../clients/email-client';
 import { ObjectId } from 'mongodb';
 import { logger } from '../util/logger';
@@ -35,7 +34,6 @@ export default class SourcesController {
     constructor(
         private readonly emailClient: EmailClient,
         private readonly batchClient: AwsBatchClient,
-        private readonly awsEventsClient: AwsEventsClient,
         private readonly dataServerURL: string,
     ) {}
 
@@ -180,11 +178,8 @@ export default class SourcesController {
                 logger.error(`error updating source with ID ${req.params.id}`);
                 logger.error(updatedSource.lastErrorObject);
             }
-            const emailNotificationType =
-                await this.updateAutomationScheduleAwsResources(originalSource, updatedSource.value);
+
             const finalSource = await sources().findOne({ _id: sourceId });
-                
-            await this.sendNotifications(finalSource, emailNotificationType);
             res.json(finalSource);
         } catch (err) {
             const error = err as Error;
@@ -199,81 +194,6 @@ export default class SourcesController {
             return;
         }
     };
-
-    /**
-     * Performs updates on AWS assets corresponding to the provided source,
-     * based on the content of the update operation.
-     *
-     * Note that, because Mongoose document validation is currently used for all
-     * of our APIs, and we're performing partial updates (as opposed to
-     * overwrites) by default, the condition in which a validated field is
-     * updated to be empty is unreachable.
-     *
-     * TODO: Allow deleting schema-validated fields in update operations.
-     *
-     * @returns Indication of what kind of email notification, if any, should be sent to interested curators
-     * about this change.
-     */
-    private async updateAutomationScheduleAwsResources(
-        originalSource: ISource,
-        updatedSource: ISource,
-    ): Promise<NotificationType> {
-        const findOne = { _id: updatedSource._id };
-        if (this.automationScheduleModified(originalSource, updatedSource)) {
-            if (updatedSource.automation?.schedule?.awsScheduleExpression) {
-                const awsRuleArn = await this.awsEventsClient.putRule(
-                    awsRuleNameForSource(updatedSource),
-                    awsRuleDescriptionForSource(updatedSource),
-                    updatedSource.automation.schedule.awsScheduleExpression,
-                    this.batchClient.jobQueueArn,
-                    awsRuleTargetIdForSource(updatedSource),
-                    updatedSource._id.toHexString(),
-                    awsStatementIdForSource(updatedSource),
-                );
-                await sources().findOneAndUpdate(findOne, {
-                    $set: { 'automation.schedule.awsRuleArn': awsRuleArn },
-                });
-                return NotificationType.Add;
-            } else {
-                await this.awsEventsClient.deleteRule(
-                    awsRuleNameForSource(updatedSource),
-                    awsRuleTargetIdForSource(updatedSource),
-                    this.batchClient.jobQueueArn,
-                    awsStatementIdForSource(updatedSource),
-                );
-                await sources().findOneAndUpdate(findOne, {
-                    $unset: { 'automation.schedule' : 1 },
-                });
-                return NotificationType.Remove;
-            }
-        } else if (
-            (originalSource.name !== updatedSource.name) &&
-            updatedSource.automation?.schedule?.awsRuleArn
-        ) {
-            await this.awsEventsClient.putRule(
-                awsRuleNameForSource(updatedSource),
-                awsRuleDescriptionForSource(updatedSource),
-            );
-            return NotificationType.None;
-        }
-        return NotificationType.None;
-    }
-
-    /**
-     * Determines whether the automation schedule for a given source was modified.
-     */
-    private automationScheduleModified(originalSource: ISource, updatedSource: ISource): boolean {
-        const scheduleModified = JSON.stringify(originalSource.automation?.schedule) !== JSON.stringify(updatedSource.automation?.schedule);
-        const automationModified = JSON.stringify(originalSource.automation) !== JSON.stringify(updatedSource.automation);
-        const parserModified = JSON.stringify(originalSource.automation?.parser) !== JSON.stringify(updatedSource.automation?.parser);
-        const automationScheduleModified = (
-            scheduleModified ||
-            (automationModified &&
-                !parserModified)
-        );
-        logger.info(`automation schedule modified for source ${updatedSource._id.toHexString()}: ${automationScheduleModified}`);
-        return automationScheduleModified;
-    }
 
     /**
      * Create a single source.
@@ -298,7 +218,6 @@ export default class SourcesController {
             const source = await sources().findOne({
                 _id: sourceId,
             });
-            await this.createAutomationScheduleAwsResources(source);
             res.status(201).json(source);
         } catch (err) {
             const error = err as Error;
@@ -311,41 +230,6 @@ export default class SourcesController {
             res.status(500).json(err);
         }
     };
-
-    /**
-     * Performs creation of AWS assets corresponding to the provided source,
-     * based on the content of the create operation.
-     *
-     * If an automation schedule is present, a CloudWatch scheduled rule will
-     * be created with a target of the global retrieval function. A resource-
-     * based permission will be added to the global retrieval function such
-     * that it can be invoked by the rule.
-     */
-    private async createAutomationScheduleAwsResources(
-        source: ISource,
-    ): Promise<void> {
-        if (source.automation?.schedule) {
-            const createdRuleArn = await this.awsEventsClient.putRule(
-                awsRuleNameForSource(source),
-                awsRuleDescriptionForSource(source),
-                source.automation.schedule.awsScheduleExpression,
-                this.batchClient.jobQueueArn,
-                awsRuleTargetIdForSource(source),
-                source._id.toString(),
-                awsStatementIdForSource(source),
-            );
-            const result = await sources().findOneAndUpdate({
-                _id: source._id,
-            }, {
-                $set: {
-                    'automation.schedule.awsRuleArn': createdRuleArn,
-                }
-            }, {
-                returnDocument: 'after',
-            });
-            await this.sendNotifications(result.value, NotificationType.Add);
-        }
-    }
 
     /**
      * Delete a single source.
@@ -368,15 +252,6 @@ export default class SourcesController {
             return;
         }
 
-        if (source.automation?.schedule?.awsRuleArn) {
-            await this.awsEventsClient.deleteRule(
-                awsRuleNameForSource(source),
-                awsRuleTargetIdForSource(source),
-                this.batchClient.jobQueueArn,
-                awsStatementIdForSource(source),
-            );
-            await this.sendNotifications(source, NotificationType.Remove);
-        }
         sources().deleteOne({ _id: sourceId });
         res.status(204).end();
         return;
@@ -414,57 +289,4 @@ export default class SourcesController {
         return;
     };
 
-    private async sendNotifications(
-        source: ISource,
-        type: NotificationType,
-    ): Promise<void> {
-        const recipients = source?.notificationRecipients ?? [];
-        if (
-            (recipients.length === 0) ||
-            type === NotificationType.None
-        ) {
-            return;
-        }
-        let subject: string;
-        let text: string;
-        switch (type) {
-            case NotificationType.Add:
-                subject = `Automation added for source: ${source.name}`;
-                text = `Automation was configured for the following source in G.h List;
-                    \n
-                    \tID: ${source._id}
-                    \tName: ${source.name}
-                    \tURL: ${source.origin.url}
-                    \tFormat: ${source.format}
-                    \tSchedule: ${source.automation.schedule.awsScheduleExpression}
-                    \tParser: ${source.automation.parser?.awsLambdaArn}`;
-                break;
-            case NotificationType.Remove:
-                subject = `Automation removed for source: ${source.name}`;
-                text = `Automation was removed for the following source in G.h List.
-                    \n
-                    \tID: ${source._id}
-                    \tName: ${source.name}
-                    \tURL: ${source.origin.url}
-                    \tFormat: ${source.format}`;
-                break;
-            default:
-                throw new Error(
-                    `Invalid notification type trigger for source event: ${type}`,
-                );
-        }
-
-        try {
-            await this.emailClient.send(
-                recipients,
-                subject,
-                text,
-            );
-        } catch (err) {
-            throw {
-                ...err,
-                name: 'NotificationSendError',
-            };
-        }
-    }
 }
