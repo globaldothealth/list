@@ -19,14 +19,10 @@ describe('Sources table', function () {
 
         cy.get('button[title="Edit"]').click();
         cy.get('input[placeholder="Name"]').clear().type('Edited source');
-        cy.get('input[placeholder="Parsers"]')
-            .clear()
-            .type('arn:aws:lambda:eu-central-1:612888738066:function:test-func');
         cy.get('button[title="Save"]').click();
 
         cy.contains('Example source').should('not.exist');
         cy.contains('Edited source');
-        cy.contains('arn:aws:lambda:eu-central-1:612888738066:function:test-func');
     });
 
     it('Can update date filters', function () {
