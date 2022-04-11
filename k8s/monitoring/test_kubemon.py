@@ -12,7 +12,7 @@ from kubernetes.client import (
 from kubemon import (
     last_status,
     is_service,
-    is_pending,
+    is_not_ready,
     summary,
 )
 
@@ -68,8 +68,8 @@ def test_last_status():
 @pytest.mark.parametrize(
     "pod,expected", [(podReady, False), (podNotReady, True), (podNotRelevant, False)]
 )
-def test_is_pending(pod, expected):
-    assert is_pending(pod) == expected
+def test_is_not_ready(pod, expected):
+    assert is_not_ready(pod) == expected
 
 
 @pytest.mark.parametrize(

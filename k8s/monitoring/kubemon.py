@@ -16,18 +16,42 @@ NOTE:
 
 import os
 import sys
+import base64
 import logging
 import datetime
 from typing import Any
+from pathlib import Path
 
 import requests
 import kubernetes
 
-logger = logging.getLogger(__name__)
+
+def setup_logger():
+    h = logging.StreamHandler(sys.stdout)
+    rootLogger = logging.getLogger()
+    rootLogger.addHandler(h)
+    rootLogger.setLevel(logging.INFO)
+
 
 SERVICES = ["curator", "data", "location"]
-
 SLACK_WEBHOOK_URL = os.getenv("SLACK_WEBHOOK_URL")
+
+
+def ensure_kubeconfig_exists():
+    if (
+        kubeconfig_path := Path.home() / ".kube" / "config"
+    ).exists() and kubeconfig_path.stat().st_size > 0:
+        logging.info("Using existing ~/.kube/config")
+    elif KUBECONFIG_VALUE := os.getenv("KUBECONFIG_VALUE"):
+        logging.info("Writing base64 encoded KUBECONFIG_VALUE to ~/.kube/config")
+        (Path.home() / ".kube").mkdir(exist_ok=True)
+        logging.info(kubeconfig_path)
+        kubeconfig_path.write_text(base64.b64decode(KUBECONFIG_VALUE).decode("utf-8"))
+    elif os.getenv("ENV") == "test":
+        logging.info("Skipping kubernetes configuration in testing")
+    else:
+        logging.error("Neither ~/.kube/config or KUBECONFIG_VALUE exists, aborting")
+        sys.exit(1)
 
 
 def last_status(pod: dict[str, Any]) -> (str, datetime.datetime):
@@ -48,8 +72,8 @@ def get_pods() -> list[dict[str, Any]]:
     return filter(is_service, v1.list_pod_for_all_namespaces(watch=False).items)
 
 
-def is_pending(pod: dict[str, Any]) -> bool:
-    "Returns whether a pod is pending"
+def is_not_ready(pod: dict[str, Any]) -> bool:
+    "Returns whether a pod is not ready"
     return last_status(pod)[0] != "Ready"
 
 
@@ -64,16 +88,17 @@ def notify(text: str):
     text = text.strip()
     if text:
         text = "⚠ Some pods are stuck in pending!\n" + text
-        print(text)
+        logging.info(text)
     if SLACK_WEBHOOK_URL and text:
         response = requests.post(SLACK_WEBHOOK_URL, json={"text": text})
         if response.status_code != 200:
-            logger.error(
+            logging.error(
                 f"Slack notification failed with {response.status_code}: {response.text}"
             )
             sys.exit(1)
 
 
 if __name__ == "__main__":
+    ensure_kubeconfig_exists()
     config = kubernetes.config.load_config()
-    notify("\n".join(map(summary, filter(is_pending, get_pods()))))
+    notify("\n".join(map(summary, filter(is_not_ready, get_pods()))))
