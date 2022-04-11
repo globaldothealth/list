@@ -6,6 +6,7 @@ import AwsBatchClient from '../clients/aws-batch-client';
 import AwsEventsClient from '../clients/aws-events-client';
 import EmailClient from '../clients/email-client';
 import { ObjectId } from 'mongodb';
+import { logger } from '../util/logger';
 
 /**
  * Email notification that should be sent on any update to a source.
@@ -95,7 +96,7 @@ export default class SourcesController {
      */
     listSourcesForTable = async (req: Request, res: Response) => {
         try {
-            const theSources = await sources().find(
+            const sourcesCursor = await sources().find(
                 {},
                 {
                     projection: {
@@ -107,15 +108,14 @@ export default class SourcesController {
                     },
                 },
             );
-
+            const theSources = await sourcesCursor.toArray();
             return res.json(theSources);
         } catch (err) {
-            if (err.name === 'ValidationError') {
-                res.status(422).json(err);
-                return;
-            }
+            const error = err as Error;
+            logger.error('error from acknowledgements');
+            logger.error(error);
 
-            res.status(500).json(err);
+            res.status(500).json(error);
             return;
         }
     };
@@ -263,11 +263,17 @@ export default class SourcesController {
      */
     create = async (req: Request, res: Response): Promise<void> => {
         try {
+            logger.info('inserting new source');
             const sourceId = new ObjectId();
-            await sources().insertOne({
+            const result = await sources().insertOne({
                 _id: sourceId,
                 ...req.body,
             });
+            logger.info(`inserted count: ${result.insertedCount}`);
+            if (!result.result.ok) {
+                logger.error('error inserting source');
+            }
+            logger.info('inserted source');
             // now get the source back from mongo, in case any triggers changed anything
             const source = await sources().findOne({
                 _id: sourceId,
@@ -275,7 +281,10 @@ export default class SourcesController {
             await this.createAutomationScheduleAwsResources(source);
             res.status(201).json(source);
         } catch (err) {
-            if (err.name === 'ValidationError') {
+            const error = err as Error;
+            logger.error('error inserting source');
+            logger.error(error);
+            if (error.name === 'ValidationError') {
                 res.status(422).json(err);
                 return;
             }
