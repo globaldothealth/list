@@ -380,7 +380,7 @@ describe('POST', () => {
             .expect(201);
         const dbSource = await sources().findOne({ _id: source._id });
 
-        expect(res.body._id).toEqual(source._id.toHexString());
+        expect(res.body._id).toEqual(upload._id.toHexString());
         expect(dbSource?.uploads.map((u: IUpload) => u._id)).toContainEqual(upload._id);
     });
 
