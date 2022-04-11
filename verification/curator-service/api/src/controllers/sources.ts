@@ -7,6 +7,7 @@ import AwsEventsClient from '../clients/aws-events-client';
 import EmailClient from '../clients/email-client';
 import { ObjectId } from 'mongodb';
 import { logger } from '../util/logger';
+import { stronglyTypeUpload } from './uploads';
 
 /**
  * Email notification that should be sent on any update to a source.
@@ -147,6 +148,9 @@ export default class SourcesController {
                 });
                 return;
             }
+            if (req.body.uploads) {
+                req.body.uploads = req.body.uploads.map(stronglyTypeUpload);
+            }
             let update = {
                 $set: {
                     ...req.body
@@ -265,6 +269,9 @@ export default class SourcesController {
         try {
             logger.info('inserting new source');
             const sourceId = new ObjectId();
+            if (req.body.uploads) {
+                req.body.uploads = req.body.uploads.map(stronglyTypeUpload);
+            }
             const result = await sources().insertOne({
                 _id: sourceId,
                 ...req.body,

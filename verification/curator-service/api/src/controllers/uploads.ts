@@ -11,7 +11,7 @@ type MaybeUpload = {
     created?: string | Date;
 };
 
-const stronglyTypeUpload = (u:MaybeUpload) => {
+export const stronglyTypeUpload = (u:MaybeUpload) => {
     const upload = { ...u };
     if (!u._id) {
         upload._id = new ObjectId();
