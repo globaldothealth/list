@@ -140,9 +140,11 @@ export default class SourcesController {
      */
     update = async (req: Request, res: Response): Promise<void> => {
         try {
+            logger.info(`updating source with ID ${req.params.id}`);
             const sourceId = new ObjectId(req.params.id);
             const originalSource = await sources().findOne({ _id: sourceId });
             if (!originalSource) {
+                logger.eror(`source with id ${req.params.id} could not be found`);
                 res.status(404).json({
                     message: `source with id ${req.params.id} could not be found`,
                 });
@@ -150,6 +152,9 @@ export default class SourcesController {
             }
             if (req.body.uploads) {
                 req.body.uploads = req.body.uploads.map(stronglyTypeUpload);
+            }
+            if (req.body._id) {
+                delete req.body._id;
             }
             let update = {
                 $set: {
@@ -171,6 +176,10 @@ export default class SourcesController {
                 update,
                 { returnDocument: 'after' },
             );
+            if(!updatedSource.ok) {
+                logger.error(`error updating source with ID ${req.params.id}`);
+                logger.error(updatedSource.lastErrorObject);
+            }
             const emailNotificationType =
                 await this.updateAutomationScheduleAwsResources(originalSource, updatedSource.value);
             const finalSource = await sources().findOne({ _id: sourceId });
@@ -179,7 +188,9 @@ export default class SourcesController {
             res.json(finalSource);
         } catch (err) {
             const error = err as Error;
-            if (error.name === 'ValidationError') {
+            logger.error(`error updating source with ID ${req.params.id}`);
+            logger.error(error);
+        if (error.name === 'ValidationError') {
                 res.status(422).json(error);
                 return;
             }
