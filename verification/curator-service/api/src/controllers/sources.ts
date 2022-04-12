@@ -265,12 +265,14 @@ export default class SourcesController {
     private automationScheduleModified(originalSource: ISource, updatedSource: ISource): boolean {
         const scheduleModified = JSON.stringify(originalSource.automation?.schedule) !== JSON.stringify(updatedSource.automation?.schedule);
         const automationModified = JSON.stringify(originalSource.automation) !== JSON.stringify(updatedSource.automation);
-        const parserModified = JSON.stringify(originalSource.automation?.parser) !== JSON.stringify(originalSource.automation?.parser);
-        return (
+        const parserModified = JSON.stringify(originalSource.automation?.parser) !== JSON.stringify(updatedSource.automation?.parser);
+        const automationScheduleModified = (
             scheduleModified ||
             (automationModified &&
                 !parserModified)
         );
+        logger.info(`automation schedule modified for source ${updatedSource._id.toHexString()}: ${automationScheduleModified}`);
+        return automationScheduleModified;
     }
 
     /**
