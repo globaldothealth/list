@@ -144,7 +144,7 @@ export default class SourcesController {
             const sourceId = new ObjectId(req.params.id);
             const originalSource = await sources().findOne({ _id: sourceId });
             if (!originalSource) {
-                logger.eror(`source with id ${req.params.id} could not be found`);
+                logger.error(`source with id ${req.params.id} could not be found`);
                 res.status(404).json({
                     message: `source with id ${req.params.id} could not be found`,
                 });
@@ -190,7 +190,7 @@ export default class SourcesController {
             const error = err as Error;
             logger.error(`error updating source with ID ${req.params.id}`);
             logger.error(error);
-        if (error.name === 'ValidationError') {
+            if (error.name === 'ValidationError') {
                 res.status(422).json(error);
                 return;
             }
