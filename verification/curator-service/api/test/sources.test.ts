@@ -15,7 +15,7 @@ import { sessions, users } from '../src/model/user';
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import { cases, restrictedCases } from '../src/model/case';
 import { awsRuleDescriptionForSource, awsRuleNameForSource, awsRuleTargetIdForSource, awsStatementIdForSource, ISource, sources } from '../src/model/source';
-import app from '../src/index';
+import makeApp from '../src/index';
 import axios from 'axios';
 import supertest from 'supertest';
 import { ObjectId } from 'mongodb';
@@ -30,9 +30,11 @@ jest.mock('../src/clients/aws-batch-client', () => {
 });
 
 let mongoServer: MongoMemoryServer;
+let app: any;
 
-beforeAll(() => {
+beforeAll(async () => {
     mongoServer = new MongoMemoryServer();
+    app = await makeApp();
 });
 
 afterAll(async () => {

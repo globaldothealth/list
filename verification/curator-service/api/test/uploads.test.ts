@@ -8,7 +8,7 @@ import { sessions, users } from '../src/model/user';
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import { ISource, sources } from '../src/model/source';
 import _ from 'lodash';
-import app from '../src/index';
+import makeApp from '../src/index';
 import fullSource from './model/data/source.full.json';
 import minimalSource from './model/data/source.minimal.json';
 import minimalUpload from './model/data/upload.minimal.json';
@@ -26,9 +26,11 @@ jest.mock('../src/clients/email-client', () => {
 });
 
 let mongoServer: MongoMemoryServer;
+let app: any;
 
-beforeAll(() => {
+beforeAll(async () => {
     mongoServer = new MongoMemoryServer();
+    app = await makeApp();
 });
 
 afterAll(async () => {

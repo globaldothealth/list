@@ -1,8 +1,8 @@
 import { Request, Response } from 'express';
 
-import axios, { AxiosError, AxiosResponse } from 'axios';
+import axios, { AxiosResponse } from 'axios';
 import countries from 'i18n-iso-countries';
-import mongoose from 'mongoose';
+import db from '../model/database';
 
 import { logger } from '../util/logger';
 
@@ -55,9 +55,9 @@ export default class GeocodeProxy {
      * @param res Express response
      */
     countryNames = async (req: Request, res: Response): Promise<void> => {
-        const mongoClient = mongoose.connection.getClient();
-        const locationCountryCodes = await mongoClient.db().collection('cases').distinct('location.country');
-        const travelHistoryCodes = await mongoClient.db().collection('cases').distinct('travelHistory.travel.location.country');
+        const database = db();
+        const locationCountryCodes = await database.collection('cases').distinct('location.country');
+        const travelHistoryCodes = await database.collection('cases').distinct('travelHistory.travel.location.country');
         const allCodes = new Set<string>(locationCountryCodes.concat(travelHistoryCodes));
         const namesMap: {
             [key: string]: string[] | undefined

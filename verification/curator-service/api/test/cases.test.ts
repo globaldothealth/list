@@ -3,7 +3,7 @@ import * as baseUser from './users/base.json';
 import { sessions, users } from '../src/model/user';
 
 import { MongoMemoryServer } from 'mongodb-memory-server';
-import app from '../src/index';
+import makeApp from '../src/index';
 import axios from 'axios';
 import supertest from 'supertest';
 
@@ -60,8 +60,11 @@ afterEach(() => {
     jest.clearAllMocks();
 });
 
+let app: any;
+
 beforeAll(async () => {
     mongoServer = new MongoMemoryServer();
+    app = await makeApp();
 });
 
 afterAll(async () => {
