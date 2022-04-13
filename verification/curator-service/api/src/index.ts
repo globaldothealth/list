@@ -31,6 +31,7 @@ import validateEnv from './util/validate-env';
 import { logger } from './util/logger';
 import S3 from 'aws-sdk/clients/s3';
 import cors from 'cors';
+import { connectToDatabase } from './model/database';
 
 const app = express();
 
@@ -57,26 +58,7 @@ app.set('port', env.PORT);
 // MONGO_URL is provided by the in memory version of jest-mongodb.
 // DB_CONNECTION_STRING is what we use in prod.
 const mongoURL = process.env.MONGO_URL || env.DB_CONNECTION_STRING;
-logger.info(
-    'Connecting to MongoDB instance',
-    // Print only after username and password to not log them.
-    mongoURL.substring(mongoURL.indexOf('@')),
-);
-
-mongoose
-    .connect(mongoURL, {
-        useCreateIndex: true,
-        useNewUrlParser: true,
-        useUnifiedTopology: true,
-        useFindAndModify: false,
-    })
-    .then(() => {
-        logger.info('Connected to the database');
-    })
-    .catch((e) => {
-        logger.error('Failed to connect to DB', e);
-        process.exit(1);
-    });
+connectToDatabase(mongoURL);
 
 // Store session info in MongoDB.
 const MongoStore = mongo(session);
