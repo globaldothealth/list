@@ -1,29 +1,26 @@
-import mongoose from 'mongoose';
+import { MongoClient } from 'mongodb';
 import { logger } from '../util/logger';
 
-export function connectToDatabase(mongoURL: string) {
+let mongo : MongoClient;
+
+export async function connectToDatabase(mongoURL: string) {
     logger.info(
         'Connecting to MongoDB instance',
         // Print only after username and password to not log them.
         mongoURL.substring(mongoURL.indexOf('@'))
     );
 
-    mongoose
-        .connect(mongoURL, {
-            useCreateIndex: true,
-            useNewUrlParser: true,
-            useUnifiedTopology: true,
-            useFindAndModify: false,
-        })
-        .then(() => {
-            logger.info('Connected to the database');
-        })
-        .catch((e) => {
-            logger.error('Failed to connect to DB', e);
-            process.exit(1);
-        });
+    try {
+        mongo = new MongoClient(mongoURL);
+        await mongo.connect();
+        logger.info('Connected to database');
+    }
+    catch (e) {
+        logger.error('Cannot connect to database', e);
+        process.exit(1);
+    }
 }
 
-export const mongoClient = () => mongoose.connection.getClient();
+export const mongoClient = () => mongo;
 
-export default () => mongoose.connection.getClient().db();
+export default () => mongoClient().db();

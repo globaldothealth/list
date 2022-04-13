@@ -5,7 +5,7 @@ import { Request, Response } from 'express';
 import { sessions, users } from '../src/model/user';
 
 import { MongoMemoryServer } from 'mongodb-memory-server';
-import app from '../src/index';
+import makeApp from '../src/index';
 import axios from 'axios';
 import bodyParser from 'body-parser';
 import express from 'express';
@@ -30,9 +30,11 @@ jest.mock('../src/clients/aws-lambda-client', () => {
 jest.mock('axios');
 const mockedAxios = axios as jest.Mocked<typeof axios>;
 let mongoServer: MongoMemoryServer;
+let app:any;
 
-beforeAll(() => {
+beforeAll(async () => {
     mongoServer = new MongoMemoryServer();
+    app = await makeApp();
 });
 
 afterAll(async () => {
