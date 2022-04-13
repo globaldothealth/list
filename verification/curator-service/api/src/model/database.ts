@@ -24,4 +24,6 @@ export function connectToDatabase(mongoURL: string) {
         });
 }
 
+export const mongoClient = () => mongoose.connection.getClient();
+
 export default () => mongoose.connection.getClient().db();

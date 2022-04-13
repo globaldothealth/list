@@ -23,7 +23,6 @@ import cookieParser from 'cookie-parser';
 import dotenv from 'dotenv';
 import express from 'express';
 import mongo from 'connect-mongo';
-import mongoose from 'mongoose';
 import passport from 'passport';
 import path from 'path';
 import swaggerUi from 'swagger-ui-express';
@@ -31,7 +30,7 @@ import validateEnv from './util/validate-env';
 import { logger } from './util/logger';
 import S3 from 'aws-sdk/clients/s3';
 import cors from 'cors';
-import { connectToDatabase } from './model/database';
+import db, { connectToDatabase, mongoClient } from './model/database';
 
 const app = express();
 
@@ -73,7 +72,7 @@ const sess: SessionOptions = {
     // https://github.com/expressjs/session#saveuninitialized
     saveUninitialized: false,
     store: new MongoStore({
-        mongooseConnection: mongoose.connection,
+        client: mongoClient(),
         secret: env.SESSION_COOKIE_KEY,
     }),
     cookie: {
@@ -370,17 +369,20 @@ apiRouter.get('/excludedCaseIds', casesController.listExcludedCaseIds);
 app.use('/api', apiRouter);
 
 // Basic health check handler.
-app.get('/health', (req: Request, res: Response) => {
-    // 0: disconnected, 1: connected, 2: connecting, 3: disconnecting.
-    // https://mongoosejs.com/docs/api.html#connection_Connection-readyState
-    if (mongoose.connection.readyState == 1) {
+app.get('/health', async (req: Request, res: Response) => {
+    try {
+        await db().command({ ping: 1 });
         res.sendStatus(200);
-        return;
     }
-    // Unavailable, this is wrong as per HTTP RFC, 503 would mean that we
-    // couldn't determine if the backend was healthy or not but honestly
-    // this is simple enough that it makes sense.
-    return res.sendStatus(503);
+    catch (err) {
+        const error = err as Error;
+        logger.error('error pinging db for health check');
+        logger.error(error);
+        // Unavailable, this is wrong as per HTTP RFC, 503 would mean that we
+        // couldn't determine if the backend was healthy or not but honestly
+        // this is simple enough that it makes sense.
+        return res.sendStatus(503);
+    }
 });
 
 // version handler.
