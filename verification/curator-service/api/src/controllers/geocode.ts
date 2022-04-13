@@ -56,8 +56,18 @@ export default class GeocodeProxy {
      */
     countryNames = async (req: Request, res: Response): Promise<void> => {
         const database = db();
-        const locationCountryCodes = await database.collection('cases').distinct('location.country');
-        const travelHistoryCodes = await database.collection('cases').distinct('travelHistory.travel.location.country');
+        const locationCountryCodes = await database.collection('cases').distinct('location.country', {}, {
+            collation: {
+                locale: 'en_US',
+                strength: 2,
+            }
+        });
+        const travelHistoryCodes = await database.collection('cases').distinct('travelHistory.travel.location.country', {}, {
+            collation: {
+                locale: 'en_US',
+                strength: 2,
+            }
+        });
         const allCodes = new Set<string>(locationCountryCodes.concat(travelHistoryCodes));
         const namesMap: {
             [key: string]: string[] | undefined
