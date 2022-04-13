@@ -38,7 +38,7 @@
     "@types/express-session": "^1.17.0",
     "@types/jest": "^27.0.2",
     "@types/lodash": "^4.14.161",
-    "@types/mongodb": "^3.6.20",
+    "@types/mongodb": "^4.0.7",
     "@types/node": "^14.11.1",
     "@types/nodemailer": "^6.4.0",
     "@types/passport": "^1.0.4",
