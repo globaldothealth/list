@@ -32,13 +32,6 @@ import S3 from 'aws-sdk/clients/s3';
 import cors from 'cors';
 import db, { connectToDatabase, mongoClient } from './model/database';
 
-makeApp().then(() => {
-    logger.info('App running');
-})
-.catch((e) => {
-    logger.error('App not running', e);
-});
-
 async function makeApp() {
     const app = express();
 
