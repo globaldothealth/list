@@ -6,7 +6,6 @@ import { Strategy as GoogleStrategy, Profile } from 'passport-google-oauth20';
 import { NextFunction, Request, Response } from 'express';
 import { isUserPasswordValid, IUser, userPublicFields, users } from '../model/user';
 import { tokens } from '../model/token';
-import { isValidObjectId } from 'mongoose';
 
 import { Router } from 'express';
 import axios from 'axios';
@@ -511,7 +510,7 @@ export class AuthController {
 
                 try {
                     // Validate user id
-                    const isValidId = isValidObjectId(userId);
+                    const isValidId = ObjectId.isValid(userId);
                     if (!isValidId) {
                         throw new Error('Invalid user id');
                     }
