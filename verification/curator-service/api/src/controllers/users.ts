@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import { ObjectId } from 'mongodb';
 
 import { userRoles, users } from '../model/user';
+import { logger } from '../util/logger';
 
 /**
  * List the users.
@@ -22,10 +23,13 @@ export const list = async (req: Request, res: Response): Promise<void> => {
     }
     try {
         const [docsCursor, total] = await Promise.all([
-            users().find({}, {
-                skip: limit * (page - 1),
-                limit: limit + 1,
-            }),
+            users().find(
+                {},
+                {
+                    skip: limit * (page - 1),
+                    limit: limit + 1,
+                },
+            ),
             users().countDocuments({}),
         ]);
         const docs = await docsCursor.toArray();
@@ -58,10 +62,10 @@ export const updateRoles = async (
     try {
         const result = await users().findOneAndUpdate(
             { _id: new ObjectId(req.params.id) },
-            { $set: { roles: req.body.roles }},
+            { $set: { roles: req.body.roles } },
             {
                 // Return the updated object.
-                returnDocument: "after",
+                returnDocument: 'after',
             },
         );
         if (!result.ok || !result.value) {
@@ -74,8 +78,7 @@ export const updateRoles = async (
     } catch (err) {
         const error = err as Error;
         // TODO interpret mongodb error: I think validation is code == 121.
-        console.error('error updating roles');
-        console.error(error);
+        logger.error('error updating roles', error);
         if (error.name === 'ValidationError') {
             res.status(422).json(error);
             return;

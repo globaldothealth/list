@@ -13,6 +13,7 @@ export async function connectToDatabase(mongoURL: string) {
     try {
         mongo = await MongoClient.connect(mongoURL);
         logger.info('Connected to database');
+        return mongo;
     } catch (e) {
         logger.error('Cannot connect to database', e);
         process.exit(1);
