@@ -40,7 +40,7 @@ async function makeApp() {
         express.urlencoded({
             limit: '50mb',
             extended: true,
-        })
+        }),
     );
 
     dotenv.config();
@@ -90,13 +90,13 @@ async function makeApp() {
         env.SERVICE_ENV,
         env.LOCALSTACK_URL,
         env.JOB_QUEUE_ARN,
-        env.AWS_SERVICE_REGION
+        env.AWS_SERVICE_REGION,
     );
     // Configure connection to AWS services.
     const awsLambdaClient = new AwsLambdaClient(
         env.SERVICE_ENV,
         env.LOCALSTACK_URL,
-        env.AWS_SERVICE_REGION
+        env.AWS_SERVICE_REGION,
     );
 
     let s3Client;
@@ -119,7 +119,7 @@ async function makeApp() {
         env.AWS_ACCESS_KEY_ID,
         env.AWS_SECRET_ACCESS_KEY,
         env.AWS_SERVICE_REGION,
-        env.EMAIL_USER_ADDRESS
+        env.EMAIL_USER_ADDRESS,
     ).initialize();
 
     // Configure auth controller
@@ -127,11 +127,11 @@ async function makeApp() {
         env.SERVICE_ENV,
         env.AFTER_LOGIN_REDIRECT_URL,
         awsLambdaClient,
-        emailClient
+        emailClient,
     );
     authController.configurePassport(
         env.GOOGLE_OAUTH_CLIENT_ID,
-        env.GOOGLE_OAUTH_CLIENT_SECRET
+        env.GOOGLE_OAUTH_CLIENT_SECRET,
     );
 
     if (env.ENABLE_LOCAL_AUTH) {
@@ -146,7 +146,7 @@ async function makeApp() {
         OpenApiValidatorMiddleware({
             apiSpec: './openapi/openapi.yaml',
             validateResponses: true,
-        })
+        }),
     );
 
     // Configure curator API routes.
@@ -162,44 +162,47 @@ async function makeApp() {
         '/sources',
         authenticateByAPIKey,
         mustHaveAnyRole(['curator']),
-        sourcesController.list
+        sourcesController.list,
     );
-    apiRouter.get('/acknowledgment-sources', sourcesController.listSourcesForTable);
+    apiRouter.get(
+        '/acknowledgment-sources',
+        sourcesController.listSourcesForTable,
+    );
     apiRouter.get(
         '/sources/:id([a-z0-9]{24})',
         authenticateByAPIKey,
         mustHaveAnyRole(['curator']),
-        sourcesController.get
+        sourcesController.get,
     );
     apiRouter.post(
         '/sources',
         authenticateByAPIKey,
         mustHaveAnyRole(['curator']),
-        sourcesController.create
+        sourcesController.create,
     );
     apiRouter.put(
         '/sources/:id([a-z0-9]{24})',
         authenticateByAPIKey,
         mustHaveAnyRole(['curator']),
-        sourcesController.update
+        sourcesController.update,
     );
     apiRouter.delete(
         '/sources/:id([a-z0-9]{24})',
         authenticateByAPIKey,
         mustHaveAnyRole(['curator']),
-        sourcesController.del
+        sourcesController.del,
     );
     apiRouter.post(
         '/sources/:id([a-z0-9]{24})/retrieve',
         authenticateByAPIKey,
         mustHaveAnyRole(['curator']),
-        sourcesController.retrieve
+        sourcesController.retrieve,
     );
     apiRouter.get(
         '/sources/parsers',
         authenticateByAPIKey,
         mustHaveAnyRole(['curator']),
-        sourcesController.listParsers
+        sourcesController.listParsers,
     );
 
     // Configure uploads controller.
@@ -208,19 +211,19 @@ async function makeApp() {
         '/sources/uploads',
         authenticateByAPIKey,
         mustHaveAnyRole(['curator']),
-        uploadsController.list
+        uploadsController.list,
     );
     apiRouter.post(
         '/sources/:sourceId([a-z0-9]{24})/uploads',
         authenticateByAPIKey,
         mustHaveAnyRole(['curator']),
-        uploadsController.create
+        uploadsController.create,
     );
     apiRouter.put(
         '/sources/:sourceId([a-z0-9]{24})/uploads/:id([a-z0-9]{24})',
         authenticateByAPIKey,
         mustHaveAnyRole(['curator']),
-        uploadsController.update
+        uploadsController.update,
     );
 
     // Configure cases controller proxying to data service.
@@ -229,93 +232,101 @@ async function makeApp() {
         '/cases',
         authenticateByAPIKey,
         mustBeAuthenticated,
-        casesController.list
+        casesController.list,
     );
     apiRouter.get(
         '/cases/symptoms',
         authenticateByAPIKey,
         mustHaveAnyRole(['curator']),
-        casesController.listSymptoms
+        casesController.listSymptoms,
     );
     apiRouter.get(
         '/cases/placesOfTransmission',
         authenticateByAPIKey,
         mustHaveAnyRole(['curator']),
-        casesController.listPlacesOfTransmission
+        casesController.listPlacesOfTransmission,
     );
     apiRouter.get(
         '/cases/occupations',
         authenticateByAPIKey,
         mustHaveAnyRole(['curator']),
-        casesController.listOccupations
+        casesController.listOccupations,
     );
     apiRouter.get(
         '/cases/:id([a-z0-9]{24})',
         authenticateByAPIKey,
         mustBeAuthenticated,
-        casesController.get
+        casesController.get,
     );
     apiRouter.post(
         '/cases/getDownloadLink',
         authenticateByAPIKey,
         mustBeAuthenticated,
-        casesController.getDownloadLink
+        casesController.getDownloadLink,
     );
-    apiRouter.post('/cases', mustHaveAnyRole(['curator']), casesController.create);
+    apiRouter.post(
+        '/cases',
+        mustHaveAnyRole(['curator']),
+        casesController.create,
+    );
     apiRouter.post(
         '/cases/download',
         authenticateByAPIKey,
         mustBeAuthenticated,
-        casesController.download
+        casesController.download,
     );
     apiRouter.post(
         '/cases/downloadAsync',
         authenticateByAPIKey,
         mustBeAuthenticated,
-        casesController.downloadAsync
+        casesController.downloadAsync,
     );
     apiRouter.post(
         '/cases/batchUpsert',
         authenticateByAPIKey,
         mustHaveAnyRole(['curator']),
-        casesController.batchUpsert
+        casesController.batchUpsert,
     );
-    apiRouter.put('/cases', mustHaveAnyRole(['curator']), casesController.upsert);
+    apiRouter.put(
+        '/cases',
+        mustHaveAnyRole(['curator']),
+        casesController.upsert,
+    );
     apiRouter.post(
         '/cases/batchUpdate',
         authenticateByAPIKey,
         mustHaveAnyRole(['curator']),
-        casesController.batchUpdate
+        casesController.batchUpdate,
     );
     apiRouter.post(
         '/cases/batchUpdateQuery',
         authenticateByAPIKey,
         mustHaveAnyRole(['curator']),
-        casesController.batchUpdateQuery
+        casesController.batchUpdateQuery,
     );
     apiRouter.post(
         '/cases/batchStatusChange',
         authenticateByAPIKey,
         mustHaveAnyRole(['curator']),
-        casesController.batchStatusChange
+        casesController.batchStatusChange,
     );
     apiRouter.put(
         '/cases/:id([a-z0-9]{24})',
         authenticateByAPIKey,
         mustHaveAnyRole(['curator']),
-        casesController.update
+        casesController.update,
     );
     apiRouter.delete(
         '/cases',
         authenticateByAPIKey,
         mustHaveAnyRole(['curator', 'admin']),
-        casesController.batchDel
+        casesController.batchDel,
     );
     apiRouter.delete(
         '/cases/:id([a-z0-9]{24})',
         authenticateByAPIKey,
         mustHaveAnyRole(['curator']),
-        casesController.del
+        casesController.del,
     );
 
     // Configure users controller.
@@ -323,19 +334,19 @@ async function makeApp() {
         '/users',
         authenticateByAPIKey,
         mustHaveAnyRole(['admin']),
-        usersController.list
+        usersController.list,
     );
     apiRouter.put(
         '/users/:id',
         authenticateByAPIKey,
         mustHaveAnyRole(['admin']),
-        usersController.updateRoles
+        usersController.updateRoles,
     );
     apiRouter.get(
         '/users/roles',
         authenticateByAPIKey,
         mustHaveAnyRole(['admin']),
-        usersController.listRoles
+        usersController.listRoles,
     );
 
     const geocodeProxy = new GeocodeProxy(env.LOCATION_SERVICE_URL);
@@ -345,19 +356,19 @@ async function makeApp() {
         '/geocode/suggest',
         authenticateByAPIKey,
         mustHaveAnyRole(['curator']),
-        geocodeProxy.suggest
+        geocodeProxy.suggest,
     );
     apiRouter.get(
         '/geocode/convertUTM',
         authenticateByAPIKey,
         mustHaveAnyRole(['curator']),
-        geocodeProxy.convertUTM
+        geocodeProxy.convertUTM,
     );
     apiRouter.get(
         '/geocode/countryNames',
         authenticateByAPIKey,
         mustBeAuthenticated,
-        geocodeProxy.countryNames
+        geocodeProxy.countryNames,
     );
     apiRouter.post('/geocode/seed', geocodeProxy.seed);
     apiRouter.post('/geocode/clear', geocodeProxy.clear);
@@ -372,8 +383,7 @@ async function makeApp() {
         try {
             await db().command({ ping: 1 });
             res.sendStatus(200);
-        }
-        catch (err) {
+        } catch (err) {
             const error = err as Error;
             logger.error('error pinging db for health check');
             logger.error(error);
@@ -407,8 +417,9 @@ async function makeApp() {
             // Hide the useless "SWAGGER" black bar at the top.
             customCss: '.swagger-ui .topbar { display: none }',
             // Make it look nicer.
-            customCssUrl: 'https://cdn.jsdelivr.net/npm/swagger-ui-themes@3.0.1/themes/3.x/theme-material.css',
-        })
+            customCssUrl:
+                'https://cdn.jsdelivr.net/npm/swagger-ui-themes@3.0.1/themes/3.x/theme-material.css',
+        }),
     );
 
     // Register error handler to format express validator errors otherwise
@@ -419,13 +430,13 @@ async function makeApp() {
             req: Request,
             res: Response,
             // eslint-disable-next-line @typescript-eslint/no-unused-vars
-            next: NextFunction
+            next: NextFunction,
         ) => {
             res.status(err.status || 500).json({
                 message: err.message,
                 errors: err.errors,
             });
-        }
+        },
     );
 
     // Serve static UI content if static directory was specified.
