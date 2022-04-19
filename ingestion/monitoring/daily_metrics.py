@@ -110,12 +110,12 @@ if __name__ == "__main__":
 
     slack_message = ""
 
-    if is_latest_file_current(latest_s3_day):
+    if is_latest_file_current(latest_s3_day[1]):
         last_days_data = get_data(s3, BUCKET, second_latest_s3_day[0])
         todays_data = get_data(s3, BUCKET, latest_s3_day[0])
         slack_message = compare_daily_counts(last_days_data, todays_data)
     else:
-        slack_message = f"No case count file in S3 for today. The latest file is dated {latest_s3_day}"
+        slack_message = f"No case count file in S3 for today. The latest file is dated {latest_s3_day[1]}"
 
     logger.info(slack_message)
     send_slack_message(slack_message)
