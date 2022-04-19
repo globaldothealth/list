@@ -30,10 +30,23 @@ import validateEnv from './util/validate-env';
 import { logger } from './util/logger';
 import S3 from 'aws-sdk/clients/s3';
 import cors from 'cors';
-import db, { connectToDatabase, mongoClient } from './model/database';
+import db, { connectToDatabase } from './model/database';
+import winston from 'winston';
+import expressWinston from 'express-winston';
 
 async function makeApp() {
     const app = express();
+    // log all non-200 responses: this needs to come _before_ any middleware or routers
+    app.use(
+        expressWinston.logger({
+            transports: [new winston.transports.Console()],
+            format: winston.format.json(),
+            /* don't log user info. We don't get user cookies or passwords in this service, so it's just
+             * belt-and-braces to ensure we don't log the API key if it was forwarded from the curator service.
+             */
+            headerBlacklist: ['X-Api-Key'],
+        }),
+    );
 
     app.use(express.json({ limit: '50mb', type: 'application/json' }));
     app.use(
@@ -58,7 +71,7 @@ async function makeApp() {
     // MONGO_URL is provided by the in memory version of jest-mongodb.
     // DB_CONNECTION_STRING is what we use in prod.
     const mongoURL = process.env.MONGO_URL || env.DB_CONNECTION_STRING;
-    await connectToDatabase(mongoURL);
+    const mongoClient = await connectToDatabase(mongoURL);
 
     // Store session info in MongoDB.
     // Configure authentication.
@@ -72,7 +85,7 @@ async function makeApp() {
         // https://github.com/expressjs/session#saveuninitialized
         saveUninitialized: false,
         store: MongoStore.create({
-            client: mongoClient(),
+            client: mongoClient,
         }),
         cookie: {
             sameSite: 'strict',
@@ -450,6 +463,14 @@ async function makeApp() {
             res.sendFile(path.join(env.STATIC_DIR, 'index.html'));
         });
     }
+
+    // report errors in the pipeline - this has to come after all other middleware and routers
+    app.use(
+        expressWinston.errorLogger({
+            transports: [new winston.transports.Console()],
+            format: winston.format.json(),
+        }),
+    );
     return app;
 }
 
