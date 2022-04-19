@@ -1,38 +1,45 @@
 import bcrypt from 'bcrypt';
-import { ObjectId } from 'mongodb';
+import { ObjectId, Collection } from 'mongodb';
 import db from './database';
 
 export const userRoles = ['admin', 'curator'];
 
 interface IUserPublicFields {
-    id: string,
-    name?: string,
-    email: string,
-    googleID?: string,
-    roles: [string],
-    picture?: string,
-    newsletterAccepted?: boolean,
-    apiKey?: string,
-};
+    id: string;
+    name?: string;
+    email: string;
+    googleID?: string;
+    roles: string[];
+    picture?: string;
+    newsletterAccepted?: boolean;
+    apiKey?: string;
+}
 
 export type IUser = IUserPublicFields & {
     _id: ObjectId;
     password?: string;
-    downloads?: [{
-        timestamp: Date,
-        format?: String,
-        query?: String,
-    }];
+    downloads?: [
+        {
+            timestamp: Date;
+            format?: string;
+            query?: string;
+        },
+    ];
 };
 
-export async function isUserPasswordValid(user: IUser, password: string): Promise<boolean> {
+export async function isUserPasswordValid(
+    user: IUser,
+    password: string,
+): Promise<boolean> {
     if (!password) return false;
     if (!user.password) return false;
     const compare = await bcrypt.compare(password, user.password);
     return compare;
 }
 
-export function userPublicFields(user: IUser | undefined): IUserPublicFields | undefined {
+export function userPublicFields(
+    user: IUser | undefined,
+): IUserPublicFields | undefined {
     if (!user) return undefined;
     return {
         id: user._id.toHexString(),
@@ -46,5 +53,5 @@ export function userPublicFields(user: IUser | undefined): IUserPublicFields | u
     };
 }
 
-export const users = () => db().collection('users');
+export const users = () => db().collection('users') as Collection<IUser>;
 export const sessions = () => db().collection('sessions');

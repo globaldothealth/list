@@ -11,7 +11,7 @@ type MaybeUpload = {
     created?: string | Date;
 };
 
-export const stronglyTypeUpload = (u:MaybeUpload) => {
+export const stronglyTypeUpload = (u: MaybeUpload) => {
     const upload = { ...u };
     if (!u._id) {
         upload._id = new ObjectId();
@@ -25,8 +25,8 @@ export const stronglyTypeUpload = (u:MaybeUpload) => {
     if (typeof u.created === 'string') {
         upload.created = new Date(u.created);
     }
-    return upload;
-}
+    return upload as IUpload;
+};
 
 /**
  * UploadsController handles single uploads, that is a batch of cases sent
@@ -57,11 +57,11 @@ export default class UploadsController {
                 {
                     $push: {
                         uploads: upload,
-                    }
+                    },
                 },
                 { returnDocument: 'after' },
             );
-            const updatedSource = result.value;
+            const updatedSource = result.value!;
             const update =
                 updatedSource.uploads[updatedSource.uploads.length - 1];
             if (update.status === 'ERROR') {
@@ -71,7 +71,9 @@ export default class UploadsController {
             return;
         } catch (err) {
             const error = err as Error;
-            logger.error(`unable to add upload to source ${req.params.sourceId}`);
+            logger.error(
+                `unable to add upload to source ${req.params.sourceId}`,
+            );
             logger.error(error);
             if (error.name === 'ValidationError') {
                 res.status(422).json(error);
@@ -88,10 +90,14 @@ export default class UploadsController {
     update = async (req: Request, res: Response): Promise<void> => {
         try {
             const sourceId = new ObjectId(req.params.sourceId);
-            logger.info(`updating upload ${req.params.id} for source ${req.params.sourceId}`);
+            logger.info(
+                `updating upload ${req.params.id} for source ${req.params.sourceId}`,
+            );
             const source = await sources().findOne({ _id: sourceId });
             if (!source) {
-                logger.error(`updating upload for source ${sourceId} failed as the source can't be found`);
+                logger.error(
+                    `updating upload for source ${sourceId} failed as the source can't be found`,
+                );
                 res.status(404).json({
                     message: `Parent resource (source ID ${req.params.sourceId}) not found.`,
                 });
@@ -101,7 +107,9 @@ export default class UploadsController {
                 (u: IUpload) => u._id.toString() === req.params.id,
             );
             if (!upload) {
-                logger.error(`Upload with ID ${req.params.id} not found in source ${req.params.sourceId}.`);
+                logger.error(
+                    `Upload with ID ${req.params.id} not found in source ${req.params.sourceId}.`,
+                );
                 res.status(404).json({
                     message: `Upload with ID ${req.params.id} not found in source ${req.params.sourceId}.`,
                 });
@@ -120,12 +128,14 @@ export default class UploadsController {
                 { returnDocument: 'after' },
             );
             if (upload.status === 'ERROR') {
-                this.sendErrorNotification(result.value, upload);
+                this.sendErrorNotification(result.value!, upload);
             }
             res.json(result.value);
         } catch (err) {
             const error = err as Error;
-            logger.error(`error updating upload ${req.params.id} in source ${req.params.sourceId}.`);
+            logger.error(
+                `error updating upload ${req.params.id} in source ${req.params.sourceId}.`,
+            );
             logger.error(error);
             if (error.name === 'ValidationError') {
                 res.status(422).json(err);

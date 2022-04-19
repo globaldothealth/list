@@ -1,6 +1,13 @@
 import { Request, Response } from 'express';
 import { cases, restrictedCases } from '../model/case';
-import { awsRuleDescriptionForSource, awsRuleNameForSource, awsRuleTargetIdForSource, awsStatementIdForSource, ISource, sources } from '../model/source';
+import {
+    awsRuleDescriptionForSource,
+    awsRuleNameForSource,
+    awsRuleTargetIdForSource,
+    awsStatementIdForSource,
+    ISource,
+    sources,
+} from '../model/source';
 
 import AwsBatchClient from '../clients/aws-batch-client';
 import EmailClient from '../clients/email-client';
@@ -62,7 +69,7 @@ export default class SourcesController {
         try {
             const [docsCursor, total] = await Promise.all([
                 sources().find(filter, {
-                    sort: { name: 1},
+                    sort: { name: 1 },
                     skip: limit * (page - 1),
                     limit: limit + 1,
                 }),
@@ -123,7 +130,9 @@ export default class SourcesController {
      * Get a single source.
      */
     get = async (req: Request, res: Response): Promise<void> => {
-        const doc = await sources().findOne({ _id: new ObjectId(req.params.id) });
+        const doc = await sources().findOne({
+            _id: new ObjectId(req.params.id),
+        });
         if (!doc) {
             res.status(404).json({
                 message: `source with id ${req.params.id} could not be found`,
@@ -142,7 +151,9 @@ export default class SourcesController {
             const sourceId = new ObjectId(req.params.id);
             const originalSource = await sources().findOne({ _id: sourceId });
             if (!originalSource) {
-                logger.error(`source with id ${req.params.id} could not be found`);
+                logger.error(
+                    `source with id ${req.params.id} could not be found`,
+                );
                 res.status(404).json({
                     message: `source with id ${req.params.id} could not be found`,
                 });
@@ -154,9 +165,9 @@ export default class SourcesController {
             if (req.body._id) {
                 delete req.body._id;
             }
-            let update = {
+            const update = {
                 $set: {
-                    ...req.body
+                    ...req.body,
                 },
                 $unset: {},
             };
@@ -165,7 +176,7 @@ export default class SourcesController {
             // empty object and set it undefined ourselves here.
             if (JSON.stringify(req.body.dateFilter) === '{}') {
                 update['$unset'] = {
-                    dateFilter: 1
+                    dateFilter: 1,
                 };
                 delete update['$set'].dateFilter;
             }
@@ -174,12 +185,25 @@ export default class SourcesController {
                 update,
                 { returnDocument: 'after' },
             );
-            if(!updatedSource.ok) {
-                logger.error(`error updating source with ID ${req.params.id}`);
-                logger.error(updatedSource.lastErrorObject);
+            if (!updatedSource.ok) {
+                logger.error(
+                    `error updating source with ID ${req.params.id}`,
+                    updatedSource.lastErrorObject,
+                );
             }
+<<<<<<< HEAD
 
             const finalSource = await sources().findOne({ _id: sourceId });
+=======
+            const emailNotificationType =
+                await this.updateAutomationScheduleAwsResources(
+                    originalSource,
+                    updatedSource.value!,
+                );
+            const finalSource = await sources().findOne({ _id: sourceId });
+
+            await this.sendNotifications(finalSource!, emailNotificationType);
+>>>>>>> 3e6ec868 (Update mongodb version and fix type errors #2559)
             res.json(finalSource);
         } catch (err) {
             const error = err as Error;
@@ -196,6 +220,92 @@ export default class SourcesController {
     };
 
     /**
+<<<<<<< HEAD
+=======
+     * Performs updates on AWS assets corresponding to the provided source,
+     * based on the content of the update operation.
+     *
+     * Note that, because Mongoose document validation is currently used for all
+     * of our APIs, and we're performing partial updates (as opposed to
+     * overwrites) by default, the condition in which a validated field is
+     * updated to be empty is unreachable.
+     *
+     * TODO: Allow deleting schema-validated fields in update operations.
+     *
+     * @returns Indication of what kind of email notification, if any, should be sent to interested curators
+     * about this change.
+     */
+    private async updateAutomationScheduleAwsResources(
+        originalSource: ISource,
+        updatedSource: ISource,
+    ): Promise<NotificationType> {
+        const findOne = { _id: updatedSource._id };
+        if (this.automationScheduleModified(originalSource, updatedSource)) {
+            if (updatedSource.automation?.schedule?.awsScheduleExpression) {
+                const awsRuleArn = await this.awsEventsClient.putRule(
+                    awsRuleNameForSource(updatedSource),
+                    awsRuleDescriptionForSource(updatedSource),
+                    updatedSource.automation.schedule.awsScheduleExpression,
+                    this.batchClient.jobQueueArn,
+                    awsRuleTargetIdForSource(updatedSource),
+                    updatedSource._id.toHexString(),
+                    awsStatementIdForSource(updatedSource),
+                );
+                await sources().findOneAndUpdate(findOne, {
+                    $set: { 'automation.schedule.awsRuleArn': awsRuleArn },
+                });
+                return NotificationType.Add;
+            } else {
+                await this.awsEventsClient.deleteRule(
+                    awsRuleNameForSource(updatedSource),
+                    awsRuleTargetIdForSource(updatedSource),
+                    this.batchClient.jobQueueArn,
+                    awsStatementIdForSource(updatedSource),
+                );
+                await sources().findOneAndUpdate(findOne, {
+                    $unset: { 'automation.schedule': 1 },
+                });
+                return NotificationType.Remove;
+            }
+        } else if (
+            originalSource.name !== updatedSource.name &&
+            updatedSource.automation?.schedule?.awsRuleArn
+        ) {
+            await this.awsEventsClient.putRule(
+                awsRuleNameForSource(updatedSource),
+                awsRuleDescriptionForSource(updatedSource),
+            );
+            return NotificationType.None;
+        }
+        return NotificationType.None;
+    }
+
+    /**
+     * Determines whether the automation schedule for a given source was modified.
+     */
+    private automationScheduleModified(
+        originalSource: ISource,
+        updatedSource: ISource,
+    ): boolean {
+        const scheduleModified =
+            JSON.stringify(originalSource.automation?.schedule) !==
+            JSON.stringify(updatedSource.automation?.schedule);
+        const automationModified =
+            JSON.stringify(originalSource.automation) !==
+            JSON.stringify(updatedSource.automation);
+        const parserModified =
+            JSON.stringify(originalSource.automation?.parser) !==
+            JSON.stringify(updatedSource.automation?.parser);
+        const automationScheduleModified =
+            scheduleModified || (automationModified && !parserModified);
+        logger.info(
+            `automation schedule modified for source ${updatedSource._id.toHexString()}: ${automationScheduleModified}`,
+        );
+        return automationScheduleModified;
+    }
+
+    /**
+>>>>>>> 3e6ec868 (Update mongodb version and fix type errors #2559)
      * Create a single source.
      */
     create = async (req: Request, res: Response): Promise<void> => {
@@ -209,8 +319,8 @@ export default class SourcesController {
                 _id: sourceId,
                 ...req.body,
             });
-            logger.info(`inserted count: ${result.insertedCount}`);
-            if (!result.result.ok) {
+            logger.info(`insert acknowledged: ${result.acknowledged}`);
+            if (!result.acknowledged) {
                 logger.error('error inserting source');
             }
             logger.info('inserted source');
@@ -218,6 +328,10 @@ export default class SourcesController {
             const source = await sources().findOne({
                 _id: sourceId,
             });
+<<<<<<< HEAD
+=======
+            await this.createAutomationScheduleAwsResources(source!);
+>>>>>>> 3e6ec868 (Update mongodb version and fix type errors #2559)
             res.status(201).json(source);
         } catch (err) {
             const error = err as Error;
@@ -232,6 +346,48 @@ export default class SourcesController {
     };
 
     /**
+<<<<<<< HEAD
+=======
+     * Performs creation of AWS assets corresponding to the provided source,
+     * based on the content of the create operation.
+     *
+     * If an automation schedule is present, a CloudWatch scheduled rule will
+     * be created with a target of the global retrieval function. A resource-
+     * based permission will be added to the global retrieval function such
+     * that it can be invoked by the rule.
+     */
+    private async createAutomationScheduleAwsResources(
+        source: ISource,
+    ): Promise<void> {
+        if (source.automation?.schedule) {
+            const createdRuleArn = await this.awsEventsClient.putRule(
+                awsRuleNameForSource(source),
+                awsRuleDescriptionForSource(source),
+                source.automation.schedule.awsScheduleExpression,
+                this.batchClient.jobQueueArn,
+                awsRuleTargetIdForSource(source),
+                source._id.toString(),
+                awsStatementIdForSource(source),
+            );
+            const result = await sources().findOneAndUpdate(
+                {
+                    _id: source._id,
+                },
+                {
+                    $set: {
+                        'automation.schedule.awsRuleArn': createdRuleArn,
+                    },
+                },
+                {
+                    returnDocument: 'after',
+                },
+            );
+            await this.sendNotifications(result.value!, NotificationType.Add);
+        }
+    }
+
+    /**
+>>>>>>> 3e6ec868 (Update mongodb version and fix type errors #2559)
      * Delete a single source.
      */
     del = async (req: Request, res: Response): Promise<void> => {

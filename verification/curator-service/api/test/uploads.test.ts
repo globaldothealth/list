@@ -73,18 +73,18 @@ describe('unauthenticated access', () => {
 describe('GET', () => {
     it('should list all uploads', async () => {
         const id1 = new ObjectId();
-        const source1Body : ISource = {
+        const source1Body: ISource = {
             _id: id1,
-            ...fullSource
+            ...fullSource,
         } as unknown as ISource;
         source1Body.uploads[0]._id = new ObjectId();
 
         await sources().insertOne(source1Body);
 
         const id2 = new ObjectId();
-        const source2Body : ISource = {
+        const source2Body: ISource = {
             _id: id2,
-            ...fullSource
+            ...fullSource,
         } as unknown as ISource;
         source2Body.uploads[0]._id = new ObjectId();
 
@@ -97,14 +97,14 @@ describe('GET', () => {
 
         expect(res.body.uploads).toHaveLength(2);
 
-        const source = await sources().findOne({_id: id1});
+        const source = (await sources().findOne({ _id: id1 })) as ISource;
         expect(res.body.uploads[0].upload._id).toEqual(
             source.uploads[0]._id.toHexString(),
         );
         expect(res.body.uploads[0].sourceName).toEqual(source.name);
         expect(res.body.uploads[0].sourceUrl).toEqual(source.origin.url);
 
-        const source2 = await sources().findOne({_id: id2});
+        const source2 = (await sources().findOne({ _id: id2 })) as ISource;
         expect(res.body.uploads[1].upload._id).toEqual(
             source2.uploads[0]._id.toHexString(),
         );
@@ -112,10 +112,15 @@ describe('GET', () => {
         expect(res.body.uploads[1].sourceUrl).toEqual(source2.origin.url);
     });
     it('list should paginate', async () => {
-        await sources().insertMany(Array.from(Array(15)).map(() => ({
-            _id: new ObjectId(),
-            ...fullSource
-        })));
+        await sources().insertMany(
+            Array.from(Array(15)).map(
+                () =>
+                    ({
+                        _id: new ObjectId(),
+                        ...fullSource,
+                    } as unknown as ISource),
+            ),
+        );
         // Fetch first page.
         let res = await curatorRequest
             .get('/api/sources/uploads?page=1&limit=10')
@@ -154,17 +159,17 @@ describe('GET', () => {
             uploads: [
                 {
                     _id: uploadErrorID,
-                    status: "ERROR",
+                    status: 'ERROR',
                     summary: {
                         numCreated: 0,
                         numUpdated: 0,
                         numError: 0,
-                        error: "INTERNAL_ERROR",
+                        error: 'INTERNAL_ERROR',
                     },
-                    created: new Date(2020,2,3),
-                }
+                    created: new Date(2020, 2, 3),
+                },
             ],
-        };
+        } as unknown as ISource;
         await sources().insertOne(sourceWithError);
 
         const sourceWithNoChangesId = new ObjectId();
@@ -180,7 +185,7 @@ describe('GET', () => {
                     summary: {},
                 },
             ],
-        };
+        } as unknown as ISource;
         await sources().insertOne(sourceWithNoChanges);
 
         const sourceWithCreatedUploadsId = new ObjectId();
@@ -196,7 +201,7 @@ describe('GET', () => {
                     created: new Date(2020, 2, 1),
                 },
             ],
-        };
+        } as unknown as ISource;
         await sources().insertOne(sourceWithCreatedUploads);
 
         const sourceWithUpdatedUploadsId = new ObjectId();
@@ -212,7 +217,7 @@ describe('GET', () => {
                     created: new Date(2020, 2, 2),
                 },
             ],
-        };
+        } as unknown as ISource;
         await sources().insertOne(sourceWithUpdatedUploads);
 
         const res = await curatorRequest
@@ -251,7 +256,7 @@ describe('GET', () => {
                     created: new Date(2020, 2, 6),
                 },
             ],
-        };
+        } as unknown as ISource;
         await sources().insertOne(source1);
 
         const sourceId2 = new ObjectId();
@@ -273,7 +278,7 @@ describe('GET', () => {
                     created: new Date(2020, 2, 3),
                 },
             ],
-        };
+        } as unknown as ISource;
         await sources().insertOne(source2);
 
         const sourceId3 = new ObjectId();
@@ -295,7 +300,7 @@ describe('GET', () => {
                     created: new Date(2020, 2, 4),
                 },
             ],
-        };
+        } as unknown as ISource;
         await sources().insertOne(source3);
 
         const sourceNoChangesId = new ObjectId();
@@ -310,7 +315,7 @@ describe('GET', () => {
                     created: new Date(2020, 2, 7),
                 },
             ],
-        };
+        } as unknown as ISource;
         await sources().insertOne(sourceNoChanges);
 
         const res = await curatorRequest
@@ -368,11 +373,11 @@ describe('POST', () => {
         const source = {
             _id: new ObjectId(),
             ...minimalSource,
-        };
+        } as unknown as ISource;
         await sources().insertOne(source);
         const upload = {
             _id: new ObjectId(),
-            ...minimalUpload
+            ...minimalUpload,
         };
 
         const res = await curatorRequest
@@ -383,18 +388,20 @@ describe('POST', () => {
         const dbSource = await sources().findOne({ _id: source._id });
 
         expect(res.body._id).toEqual(upload._id.toHexString());
-        expect(dbSource?.uploads.map((u: IUpload) => u._id)).toContainEqual(upload._id);
+        expect(dbSource?.uploads.map((u: IUpload) => u._id)).toContainEqual(
+            upload._id,
+        );
     });
 
     it('should send a notification email if status is error and recipients defined', async () => {
         const source = {
             _id: new ObjectId(),
             ...fullSource,
-        };
+        } as unknown as ISource;
         await sources().insertOne(source);
         const upload = {
             _id: new ObjectId(),
-            ...minimalUpload
+            ...minimalUpload,
         };
         upload.status = 'ERROR';
         await curatorRequest
@@ -412,11 +419,11 @@ describe('POST', () => {
         const source = {
             _id: new ObjectId(),
             ...fullSource,
-        };
+        } as unknown as ISource;
         await sources().insertOne(source);
         const upload = {
             _id: new ObjectId(),
-            ...minimalUpload
+            ...minimalUpload,
         }; // Status is SUCCESS.
         await curatorRequest
             .post(`/api/sources/${source._id}/uploads`)
@@ -426,16 +433,17 @@ describe('POST', () => {
         expect(mockSend).not.toHaveBeenCalled();
     });
     it('should not send a notification email if no schedule configured', async () => {
-        const noSchedule = _.cloneDeep(fullSource);
-        delete noSchedule.automation.schedule;
+        const ns = _.cloneDeep(fullSource) as any;
+        delete ns.automation.schedule;
+        const noSchedule = ns as unknown as ISource;
         const source = {
-            _id: new ObjectId(),
             ...noSchedule,
+            _id: new ObjectId(),
         };
         await sources().insertOne(source);
         const upload = {
             _id: new ObjectId(),
-            ...minimalUpload
+            ...minimalUpload,
         }; // Status is SUCCESS.
         upload.status = 'ERROR';
         await curatorRequest
@@ -480,10 +488,14 @@ describe('PUT', () => {
         const source = {
             _id: new ObjectId(),
             ...minimalSource,
-        };
+        } as unknown as ISource;
         await sources().insertOne(source);
         return curatorRequest
-            .put(`/api/sources/${source._id}/uploads/${new ObjectId().toHexString()}`)
+            .put(
+                `/api/sources/${
+                    source._id
+                }/uploads/${new ObjectId().toHexString()}`,
+            )
             .send(minimalUpload)
             .expect(404);
     });
@@ -495,9 +507,9 @@ describe('PUT', () => {
                 {
                     _id: new ObjectId(),
                     ...fullSource.uploads[0],
-                }
-            ]
-        };
+                },
+            ],
+        } as unknown as ISource;
         await sources().insertOne(source);
         const newSummary = {
             numCreated: 123456,
@@ -505,7 +517,9 @@ describe('PUT', () => {
         };
 
         const res = await curatorRequest
-            .put(`/api/sources/${source._id.toHexString()}/uploads/${source.uploads[0]._id.toHexString()}`)
+            .put(
+                `/api/sources/${source._id.toHexString()}/uploads/${source.uploads[0]._id.toHexString()}`,
+            )
             .send({
                 summary: newSummary,
             })
@@ -527,11 +541,13 @@ describe('PUT', () => {
                     status: 'SUCCESS',
                 },
             ],
-        };
+        } as unknown as ISource;
         await sources().insertOne(successSource);
 
         await curatorRequest
-            .put(`/api/sources/${successSource._id}/uploads/${successSource.uploads[0]._id}`)
+            .put(
+                `/api/sources/${successSource._id}/uploads/${successSource.uploads[0]._id}`,
+            )
             .send({
                 status: 'ERROR',
             })
@@ -554,9 +570,9 @@ describe('PUT', () => {
                     ...fullSource.uploads[0],
                 },
             ],
-        };
+        } as unknown as ISource;
         await sources().insertOne(source);
-        
+
         await curatorRequest
             .put(`/api/sources/${source._id}/uploads/${source.uploads[0]._id}`)
             .send({
@@ -568,21 +584,24 @@ describe('PUT', () => {
         expect(mockSend).not.toHaveBeenCalled();
     });
     it('should not send a notification email if schedule not configured', async () => {
-        const noSchedule = {
+        const ns = {
             _id: new ObjectId(),
             ...fullSource,
             uploads: [
                 {
                     _id: new ObjectId(),
                     ...fullSource.uploads[0],
-                }
-            ]
-        };
-        delete noSchedule.automation.schedule;
+                },
+            ],
+        } as any;
+        delete ns.automation.schedule;
+        const noSchedule = ns as unknown as ISource;
         await sources().insertOne(noSchedule);
 
         await curatorRequest
-            .put(`/api/sources/${noSchedule._id}/uploads/${noSchedule.uploads[0]._id}`)
+            .put(
+                `/api/sources/${noSchedule._id}/uploads/${noSchedule.uploads[0]._id}`,
+            )
             .send({
                 status: 'ERROR',
             })

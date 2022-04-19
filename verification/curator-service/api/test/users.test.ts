@@ -1,6 +1,6 @@
 import * as baseUser from './users/base.json';
 
-import { sessions, users } from '../src/model/user';
+import { IUser, sessions, users } from '../src/model/user';
 
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import makeApp from '../src/index';
@@ -68,7 +68,7 @@ describe('GET', () => {
                 email: 'foo@bar.com',
                 googleID: `testGoogleID${i}`,
                 roles: ['curator'],
-            });
+            } as IUser);
         }
         // Fetch first page as an admin.
         let res = await adminRequest
