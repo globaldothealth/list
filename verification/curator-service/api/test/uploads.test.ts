@@ -6,9 +6,7 @@ import * as baseUser from './users/base.json';
 import { sessions, users } from '../src/model/user';
 
 import { MongoMemoryServer } from 'mongodb-memory-server';
-import { Source } from '../src/model/source';
-import { Upload } from '../src/model/upload';
-import { IUploadSummary } from '../src/model/upload-summary';
+import { ISource, sources } from '../src/model/source';
 import _ from 'lodash';
 import app from '../src/index';
 import fullSource from './model/data/source.full.json';
@@ -16,6 +14,7 @@ import minimalSource from './model/data/source.minimal.json';
 import minimalUpload from './model/data/upload.minimal.json';
 import supertest from 'supertest';
 import { ObjectId } from 'mongodb';
+import { IUpload } from '../src/model/upload';
 
 jest.mock('../src/clients/email-client', () => {
     return jest.fn().mockImplementation(() => {
@@ -37,8 +36,7 @@ afterAll(async () => {
 });
 
 beforeEach(async () => {
-    await Source.deleteMany({});
-    await Upload.deleteMany({});
+    await sources().deleteMany({});
     await users().deleteMany({});
     await sessions().deleteMany({});
 
@@ -46,8 +44,7 @@ beforeEach(async () => {
 });
 
 afterAll(async () => {
-    await Source.deleteMany({});
-    await Upload.deleteMany({});
+    await sources().deleteMany({});
     await users().deleteMany({});
     await sessions().deleteMany({});
 });
@@ -73,8 +70,23 @@ describe('unauthenticated access', () => {
 
 describe('GET', () => {
     it('should list all uploads', async () => {
-        const source = await new Source(fullSource).save();
-        const source2 = await new Source(fullSource).save();
+        const id1 = new ObjectId();
+        const source1Body: ISource = {
+            _id: id1,
+            ...fullSource,
+        } as unknown as ISource;
+        source1Body.uploads[0]._id = new ObjectId();
+
+        await sources().insertOne(source1Body);
+
+        const id2 = new ObjectId();
+        const source2Body: ISource = {
+            _id: id2,
+            ...fullSource,
+        } as unknown as ISource;
+        source2Body.uploads[0]._id = new ObjectId();
+
+        await sources().insertOne(source2Body);
 
         const res = await curatorRequest
             .get('/api/sources/uploads')
@@ -82,20 +94,27 @@ describe('GET', () => {
             .expect(200);
 
         expect(res.body.uploads).toHaveLength(2);
+
+        const source = await sources().findOne({ _id: id1 });
         expect(res.body.uploads[0].upload._id).toEqual(
-            source.uploads[0]._id.toString(),
+            source.uploads[0]._id.toHexString(),
         );
         expect(res.body.uploads[0].sourceName).toEqual(source.name);
         expect(res.body.uploads[0].sourceUrl).toEqual(source.origin.url);
+
+        const source2 = await sources().findOne({ _id: id2 });
         expect(res.body.uploads[1].upload._id).toEqual(
-            source2.uploads[0]._id.toString(),
+            source2.uploads[0]._id.toHexString(),
         );
         expect(res.body.uploads[1].sourceName).toEqual(source2.name);
         expect(res.body.uploads[1].sourceUrl).toEqual(source2.origin.url);
     });
     it('list should paginate', async () => {
-        Array.from(Array(15)).forEach(
-            async () => await new Source(fullSource).save(),
+        await sources().insertMany(
+            Array.from(Array(15)).map(() => ({
+                _id: new ObjectId(),
+                ...fullSource,
+            })),
         );
         // Fetch first page.
         let res = await curatorRequest
@@ -127,42 +146,74 @@ describe('GET', () => {
         expect(res.body.total).toEqual(15);
     });
     it('should filter for changes only', async () => {
-        const sourceWithError = new Source(fullSource);
-        sourceWithError.uploads[0].created = new Date(2020, 2, 3);
-        await sourceWithError.save();
+        const sourceWithErrorId = new ObjectId();
+        const uploadErrorID = new ObjectId();
+        const sourceWithError = {
+            _id: sourceWithErrorId,
+            ...fullSource,
+            uploads: [
+                {
+                    _id: uploadErrorID,
+                    status: 'ERROR',
+                    summary: {
+                        numCreated: 0,
+                        numUpdated: 0,
+                        numError: 0,
+                        error: 'INTERNAL_ERROR',
+                    },
+                    created: new Date(2020, 2, 3),
+                },
+            ],
+        };
+        await sources().insertOne(sourceWithError);
 
-        const sourceWithNoChanges = new Source(fullSource);
-        sourceWithNoChanges.uploads = [
-            {
-                _id: new ObjectId(),
-                created: new Date(),
-                status: 'SUCCESS',
-                summary: {},
-            },
-        ];
-        await sourceWithNoChanges.save();
+        const sourceWithNoChangesId = new ObjectId();
+        const uploadNoChangesId = new ObjectId();
+        const sourceWithNoChanges = {
+            _id: sourceWithNoChangesId,
+            ...fullSource,
+            uploads: [
+                {
+                    _id: uploadNoChangesId,
+                    created: new Date(),
+                    status: 'SUCCESS',
+                    summary: {},
+                },
+            ],
+        };
+        await sources().insertOne(sourceWithNoChanges);
 
-        const sourceWithCreatedUploads = new Source(fullSource);
-        sourceWithCreatedUploads.uploads = [
-            {
-                _id: new ObjectId(),
-                status: 'SUCCESS',
-                summary: { numCreated: 3 },
-                created: new Date(2020, 2, 1),
-            },
-        ];
-        await sourceWithCreatedUploads.save();
+        const sourceWithCreatedUploadsId = new ObjectId();
+        const uploadCreatedId = new ObjectId();
+        const sourceWithCreatedUploads = {
+            _id: sourceWithCreatedUploadsId,
+            ...fullSource,
+            uploads: [
+                {
+                    _id: uploadCreatedId,
+                    status: 'SUCCESS',
+                    summary: { numCreated: 3 },
+                    created: new Date(2020, 2, 1),
+                },
+            ],
+        };
+        await sources().insertOne(sourceWithCreatedUploads);
 
-        const sourceWithUpdatedUploads = new Source(fullSource);
-        sourceWithUpdatedUploads.uploads = [
-            {
-                _id: new ObjectId(),
-                status: 'SUCCESS',
-                summary: { numUpdated: 3 },
-                created: new Date(2020, 2, 2),
-            },
-        ];
-        await sourceWithUpdatedUploads.save();
+        const sourceWithUpdatedUploadsId = new ObjectId();
+        const uploadUpdatedId = new ObjectId();
+        const sourceWithUpdatedUploads = {
+            _id: sourceWithUpdatedUploadsId,
+            ...fullSource,
+            uploads: [
+                {
+                    _id: uploadUpdatedId,
+                    status: 'SUCCESS',
+                    summary: { numUpdated: 3 },
+                    created: new Date(2020, 2, 2),
+                },
+            ],
+        };
+        await sources().insertOne(sourceWithUpdatedUploads);
 
         const res = await curatorRequest
             .get('/api/sources/uploads?changes_only=true')
@@ -171,80 +222,96 @@ describe('GET', () => {
 
         expect(res.body.uploads).toHaveLength(3);
         expect(res.body.uploads[0].upload._id).toEqual(
-            sourceWithError.uploads[0]._id.toString(),
+            uploadErrorID.toHexString(),
         );
         expect(res.body.uploads[1].upload._id).toEqual(
-            sourceWithUpdatedUploads.uploads[0]._id.toString(),
+            uploadUpdatedId.toHexString(),
         );
         expect(res.body.uploads[2].upload._id).toEqual(
-            sourceWithCreatedUploads.uploads[0]._id.toString(),
+            uploadCreatedId.toHexString(),
         );
     });
     it('should sort by created date then source name', async () => {
-        const source1 = new Source(fullSource);
-        source1.name = 'source1';
-        source1.uploads = [
-            {
-                _id: new ObjectId(),
-                status: 'ERROR',
-                summary: {},
-                created: new Date(2020, 2, 1),
-            },
-            {
-                _id: new ObjectId(),
-                status: 'SUCCESS',
-                summary: { numCreated: 3, numError: 1 },
-                created: new Date(2020, 2, 6),
-            },
-        ];
-        await source1.save();
+        const sourceId1 = new ObjectId();
+        const source1 = {
+            _id: sourceId1,
+            ...fullSource,
+            name: 'source1',
+            uploads: [
+                {
+                    _id: new ObjectId(),
+                    status: 'ERROR',
+                    summary: {},
+                    created: new Date(2020, 2, 1),
+                },
+                {
+                    _id: new ObjectId(),
+                    status: 'SUCCESS',
+                    summary: { numCreated: 3, numError: 1 },
+                    created: new Date(2020, 2, 6),
+                },
+            ],
+        };
+        await sources().insertOne(source1);
 
-        const source2 = new Source(fullSource);
-        source2.name = 'source2';
-        source2.uploads = [
-            {
-                _id: new ObjectId(),
-                status: 'SUCCESS',
-                summary: { numUpdated: 3 },
-                created: new Date(2020, 2, 5),
-            },
-            {
-                _id: new ObjectId(),
-                status: 'ERROR',
-                summary: {},
-                created: new Date(2020, 2, 3),
-            },
-        ];
-        await source2.save();
+        const sourceId2 = new ObjectId();
+        const source2 = {
+            _id: sourceId2,
+            ...fullSource,
+            name: 'source2',
+            uploads: [
+                {
+                    _id: new ObjectId(),
+                    status: 'SUCCESS',
+                    summary: { numUpdated: 3 },
+                    created: new Date(2020, 2, 5),
+                },
+                {
+                    _id: new ObjectId(),
+                    status: 'ERROR',
+                    summary: {},
+                    created: new Date(2020, 2, 3),
+                },
+            ],
+        };
+        await sources().insertOne(source2);
 
-        const source3 = new Source(fullSource);
-        source3.name = 'source3';
-        source3.uploads = [
-            {
-                _id: new ObjectId(),
-                status: 'SUCCESS',
-                summary: { numCreated: 3 },
-                created: new Date(2020, 2, 3),
-            },
-            {
-                _id: new ObjectId(),
-                status: 'SUCCESS',
-                summary: { numCreated: 3 },
-                created: new Date(2020, 2, 4),
-            },
-        ];
-        await source3.save();
+        const sourceId3 = new ObjectId();
+        const source3 = {
+            _id: sourceId3,
+            ...fullSource,
+            name: 'source3',
+            uploads: [
+                {
+                    _id: new ObjectId(),
+                    status: 'SUCCESS',
+                    summary: { numCreated: 3 },
+                    created: new Date(2020, 2, 3),
+                },
+                {
+                    _id: new ObjectId(),
+                    status: 'SUCCESS',
+                    summary: { numCreated: 3 },
+                    created: new Date(2020, 2, 4),
+                },
+            ],
+        };
+        await sources().insertOne(source3);
 
-        const sourceNoChanges = new Source(fullSource);
-        sourceNoChanges.uploads = [
-            {
-                _id: new ObjectId(),
-                status: 'SUCCESS',
-                summary: {},
-                created: new Date(2020, 2, 7),
-            },
-        ];
-        await sourceNoChanges.save();
+        const sourceNoChangesId = new ObjectId();
+        const sourceNoChanges = {
+            _id: sourceNoChangesId,
+            ...fullSource,
+            uploads: [
+                {
+                    _id: new ObjectId(),
+                    status: 'SUCCESS',
+                    summary: {},
+                    created: new Date(2020, 2, 7),
+                },
+            ],
+        };
+        await sources().insertOne(sourceNoChanges);
 
         const res = await curatorRequest
             .get('/api/sources/uploads?page=1&limit=5&changes_only=true')
@@ -253,19 +320,19 @@ describe('GET', () => {
 
         expect(res.body.uploads).toHaveLength(5);
         expect(res.body.uploads[0].upload._id).toEqual(
-            source1.uploads[1]._id.toString(),
+            source1.uploads[1]._id.toHexString(),
         );
         expect(res.body.uploads[1].upload._id).toEqual(
-            source2.uploads[0]._id.toString(),
+            source2.uploads[0]._id.toHexString(),
         );
         expect(res.body.uploads[2].upload._id).toEqual(
-            source3.uploads[1]._id.toString(),
+            source3.uploads[1]._id.toHexString(),
         );
         expect(res.body.uploads[3].upload._id).toEqual(
-            source3.uploads[0]._id.toString(),
+            source3.uploads[0]._id.toHexString(),
         );
         expect(res.body.uploads[4].upload._id).toEqual(
-            source2.uploads[1]._id.toString(),
+            source2.uploads[1]._id.toHexString(),
         );
     });
     it('rejects negative page param', (done) => {
@@ -298,10 +365,14 @@ describe('POST', () => {
             .expect(404);
     });
     it('should return 201 with created upload for valid input', async () => {
-        const source = await new Source(minimalSource).save();
+        const source = {
+            _id: new ObjectId(),
+            ...minimalSource,
+        };
+        await sources().insertOne(source);
         const upload = {
             _id: new ObjectId(),
-            ...minimalUpload
+            ...minimalUpload,
         };
 
         const res = await curatorRequest
@@ -309,17 +380,23 @@ describe('POST', () => {
             .send(upload)
             .expect('Content-Type', /json/)
             .expect(201);
-        const dbSource = await Source.findById(source._id);
+        const dbSource = await sources().findOne({ _id: source._id });
 
-        expect(res.body._id).toEqual(upload._id.toString());
-        expect(dbSource?.uploads.map((u) => u._id)).toContainEqual(upload._id);
+        expect(res.body._id).toEqual(upload._id.toHexString());
+        expect(dbSource?.uploads.map((u: IUpload) => u._id)).toContainEqual(
+            upload._id,
+        );
     });
 
     it('should send a notification email if status is error and recipients defined', async () => {
-        const source = await new Source(fullSource).save();
+        const source = {
+            _id: new ObjectId(),
+            ...fullSource,
+        };
+        await sources().insertOne(source);
         const upload = {
             _id: new ObjectId(),
-            ...minimalUpload
+            ...minimalUpload,
         };
         upload.status = 'ERROR';
         await curatorRequest
@@ -334,10 +411,14 @@ describe('POST', () => {
         );
     });
     it('should not send a notification email if status not error', async () => {
-        const source = await new Source(fullSource).save();
+        const source = {
+            _id: new ObjectId(),
+            ...fullSource,
+        };
+        await sources().insertOne(source);
         const upload = {
             _id: new ObjectId(),
-            ...minimalUpload
+            ...minimalUpload,
         }; // Status is SUCCESS.
         await curatorRequest
             .post(`/api/sources/${source._id}/uploads`)
@@ -349,10 +430,14 @@ describe('POST', () => {
     it('should not send a notification email if no schedule configured', async () => {
         const noSchedule = _.cloneDeep(fullSource);
         delete noSchedule.automation.schedule;
-        const source = await new Source(noSchedule).save();
+        const source = {
+            _id: new ObjectId(),
+            ...noSchedule,
+        };
+        await sources().insertOne(source);
         const upload = {
             _id: new ObjectId(),
-            ...minimalUpload
+            ...minimalUpload,
         }; // Status is SUCCESS.
         upload.status = 'ERROR';
         await curatorRequest
@@ -394,38 +479,69 @@ describe('PUT', () => {
             .expect(400);
     });
     it('should return 404 if upload ID not found', async () => {
-        const source = await new Source(minimalSource).save();
+        const source = {
+            _id: new ObjectId(),
+            ...minimalSource,
+        };
+        await sources().insertOne(source);
         return curatorRequest
-            .put(`/api/sources/${source._id}/uploads/123456789012345678901234`)
+            .put(
+                `/api/sources/${
+                    source._id
+                }/uploads/${new ObjectId().toHexString()}`,
+            )
             .send(minimalUpload)
             .expect(404);
     });
     it('should return 200 with updated upload for valid input', async () => {
-        const source = await new Source(fullSource).save();
+        const source = {
+            _id: new ObjectId(),
+            ...fullSource,
+            uploads: [
+                {
+                    _id: new ObjectId(),
+                    ...fullSource.uploads[0],
+                },
+            ],
+        };
+        await sources().insertOne(source);
         const newSummary = {
             numCreated: 123456,
             numUpdated: 789,
         };
 
         const res = await curatorRequest
-            .put(`/api/sources/${source._id}/uploads/${source.uploads[0]._id}`)
+            .put(
+                `/api/sources/${source._id.toHexString()}/uploads/${source.uploads[0]._id.toHexString()}`,
+            )
             .send({
                 summary: newSummary,
             })
             .expect('Content-Type', /json/)
             .expect(200);
-        const dbSource = await Source.findById(source._id);
+        const dbSource = await sources().findOne({ _id: source._id });
 
         expect(res.body.uploads[0].summary).toEqual(newSummary);
         expect(dbSource?.uploads[0].summary).toMatchObject(newSummary);
     });
     it('should send a notification email if updated status is error and recipients defined', async () => {
-        const successSource = _.cloneDeep(fullSource);
-        successSource.uploads[0].status = 'SUCCESS';
-        const source = await new Source(successSource).save();
+        const successSource = {
+            _id: new ObjectId(),
+            ...fullSource,
+            uploads: [
+                {
+                    _id: new ObjectId(),
+                    ...fullSource.uploads[0],
+                    status: 'SUCCESS',
+                },
+            ],
+        };
+        await sources().insertOne(successSource);
 
         await curatorRequest
-            .put(`/api/sources/${source._id}/uploads/${source.uploads[0]._id}`)
+            .put(
+                `/api/sources/${successSource._id}/uploads/${successSource.uploads[0]._id}`,
+            )
             .send({
                 status: 'ERROR',
             })
@@ -433,13 +549,23 @@ describe('PUT', () => {
             .expect(200);
 
         expect(mockSend).toHaveBeenCalledWith(
-            expect.arrayContaining(source.notificationRecipients),
+            expect.arrayContaining(successSource.notificationRecipients),
             expect.anything(),
             expect.anything(),
         );
     });
     it('should not send a notification email if updated status is not error', async () => {
-        const source = await new Source(fullSource).save();
+        const source = {
+            _id: new ObjectId(),
+            ...fullSource,
+            uploads: [
+                {
+                    _id: new ObjectId(),
+                    ...fullSource.uploads[0],
+                },
+            ],
+        };
+        await sources().insertOne(source);
 
         await curatorRequest
             .put(`/api/sources/${source._id}/uploads/${source.uploads[0]._id}`)
@@ -452,12 +578,23 @@ describe('PUT', () => {
         expect(mockSend).not.toHaveBeenCalled();
     });
     it('should not send a notification email if schedule not configured', async () => {
-        const noSchedule = _.cloneDeep(fullSource);
+        const noSchedule = {
+            _id: new ObjectId(),
+            ...fullSource,
+            uploads: [
+                {
+                    _id: new ObjectId(),
+                    ...fullSource.uploads[0],
+                },
+            ],
+        };
         delete noSchedule.automation.schedule;
-        const source = await new Source(noSchedule).save();
+        await sources().insertOne(noSchedule);
 
         await curatorRequest
-            .put(`/api/sources/${source._id}/uploads/${source.uploads[0]._id}`)
+            .put(
+                `/api/sources/${noSchedule._id}/uploads/${noSchedule.uploads[0]._id}`,
+            )
             .send({
                 status: 'ERROR',
             })

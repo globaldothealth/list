@@ -3,6 +3,7 @@ import { useLocation, useHistory } from 'react-router-dom';
 import { useFormik } from 'formik';
 import useMediaQuery from '@material-ui/core/useMediaQuery';
 import { filtersToURL, URLToFilters } from '../util/searchQuery';
+import { hasAnyRole } from '../util/helperFunctions';
 
 import {
     Dialog,
@@ -29,6 +30,7 @@ import {
     isLoading,
     filterError,
 } from '../../redux/filters/selectors';
+import { selectUser } from '../../redux/auth/selectors';
 import { codeForCountry } from '../util/countryNames';
 import CloseIcon from '@material-ui/icons/Close';
 import { useStyles } from './styled';
@@ -91,6 +93,7 @@ export default function FiltersDialog({
     const dispatch = useAppDispatch();
     const loadingState = useAppSelector(isLoading);
     const error = useAppSelector(filterError);
+    const user = useAppSelector(selectUser);
 
     useEffect(() => {
         dispatch(fetchCountries());
@@ -548,107 +551,116 @@ export default function FiltersDialog({
                         />
                     </div>
 
-                    <div className={classes.divider} />
+                    {hasAnyRole(user, ['curator']) && (
+                        <>
+                            <div className={classes.divider} />
 
-                    <div>
-                        <TextField
-                            autoFocus={activeFilterInput === 'curatoremail'}
-                            id="curatoremail"
-                            label="Curator email"
-                            name="curatoremail"
-                            type="text"
-                            variant="outlined"
-                            size={inputSize}
-                            value={formik.values.curatoremail || ''}
-                            onChange={formik.handleChange}
-                            error={
-                                formik.touched.curatoremail &&
-                                Boolean(formik.errors.curatoremail)
-                            }
-                            helperText={
-                                formik.touched.curatoremail &&
-                                formik.errors.curatoremail
-                            }
-                        />
-                        <TextField
-                            autoFocus={activeFilterInput === 'caseid'}
-                            id="caseid"
-                            label="Case ID"
-                            name="caseid"
-                            type="text"
-                            variant="outlined"
-                            size={inputSize}
-                            value={formik.values.caseid || ''}
-                            onChange={formik.handleChange}
-                            error={
-                                formik.touched.caseid &&
-                                Boolean(formik.errors.caseid)
-                            }
-                            helperText={
-                                formik.touched.caseid && formik.errors.caseid
-                            }
-                        />
-                        <TextField
-                            autoFocus={activeFilterInput === 'sourceurl'}
-                            id="sourceurl"
-                            label="Source URL"
-                            name="sourceurl"
-                            type="text"
-                            variant="outlined"
-                            size={inputSize}
-                            value={formik.values.sourceurl || ''}
-                            onChange={formik.handleChange}
-                            error={
-                                formik.touched.sourceurl &&
-                                Boolean(formik.errors.sourceurl)
-                            }
-                            helperText={
-                                formik.touched.sourceurl &&
-                                formik.errors.sourceurl
-                            }
-                        />
-                    </div>
+                            <div>
+                                <TextField
+                                    autoFocus={
+                                        activeFilterInput === 'curatoremail'
+                                    }
+                                    id="curatoremail"
+                                    label="Curator email"
+                                    name="curatoremail"
+                                    type="text"
+                                    variant="outlined"
+                                    size={inputSize}
+                                    value={formik.values.curatoremail || ''}
+                                    onChange={formik.handleChange}
+                                    error={
+                                        formik.touched.curatoremail &&
+                                        Boolean(formik.errors.curatoremail)
+                                    }
+                                    helperText={
+                                        formik.touched.curatoremail &&
+                                        formik.errors.curatoremail
+                                    }
+                                />
+                                <TextField
+                                    autoFocus={activeFilterInput === 'caseid'}
+                                    id="caseid"
+                                    label="Case ID"
+                                    name="caseid"
+                                    type="text"
+                                    variant="outlined"
+                                    size={inputSize}
+                                    value={formik.values.caseid || ''}
+                                    onChange={formik.handleChange}
+                                    error={
+                                        formik.touched.caseid &&
+                                        Boolean(formik.errors.caseid)
+                                    }
+                                    helperText={
+                                        formik.touched.caseid &&
+                                        formik.errors.caseid
+                                    }
+                                />
+                                <TextField
+                                    autoFocus={
+                                        activeFilterInput === 'sourceurl'
+                                    }
+                                    id="sourceurl"
+                                    label="Source URL"
+                                    name="sourceurl"
+                                    type="text"
+                                    variant="outlined"
+                                    size={inputSize}
+                                    value={formik.values.sourceurl || ''}
+                                    onChange={formik.handleChange}
+                                    error={
+                                        formik.touched.sourceurl &&
+                                        Boolean(formik.errors.sourceurl)
+                                    }
+                                    helperText={
+                                        formik.touched.sourceurl &&
+                                        formik.errors.sourceurl
+                                    }
+                                />
+                            </div>
 
-                    <div>
-                        <TextField
-                            autoFocus={activeFilterInput === 'uploadid'}
-                            id="uploadid"
-                            label="Upload ID"
-                            name="uploadid"
-                            type="text"
-                            variant="outlined"
-                            size={inputSize}
-                            value={formik.values.uploadid || ''}
-                            onChange={formik.handleChange}
-                            error={
-                                formik.touched.uploadid &&
-                                Boolean(formik.errors.uploadid)
-                            }
-                            helperText={
-                                formik.touched.uploadid &&
-                                formik.errors.uploadid
-                            }
-                        />
-                        <TextField
-                            autoFocus={activeFilterInput === 'sourceid'}
-                            id="sourceid"
-                            label="Source ID"
-                            name="sourceid"
-                            type="text"
-                            variant="outlined"
-                            size={inputSize}
-                            value={formik.values.sourceid || ''}
-                            onChange={formik.handleChange}
-                            error={
-                                formik.touched.sourceid &&
-                                Boolean(formik.errors.sourceid)
-                            }
-                            helperText={
-                                formik.touched.sourceid &&
-                                formik.errors.sourceid
-                            }
-                        />
-                    </div>
+                            <div>
+                                <TextField
+                                    autoFocus={activeFilterInput === 'uploadid'}
+                                    id="uploadid"
+                                    label="Upload ID"
+                                    name="uploadid"
+                                    type="text"
+                                    variant="outlined"
+                                    size={inputSize}
+                                    value={formik.values.uploadid || ''}
+                                    onChange={formik.handleChange}
+                                    error={
+                                        formik.touched.uploadid &&
+                                        Boolean(formik.errors.uploadid)
+                                    }
+                                    helperText={
+                                        formik.touched.uploadid &&
+                                        formik.errors.uploadid
+                                    }
+                                />
+                                <TextField
+                                    autoFocus={activeFilterInput === 'sourceid'}
+                                    id="sourceid"
+                                    label="Source ID"
+                                    name="sourceid"
+                                    type="text"
+                                    variant="outlined"
+                                    size={inputSize}
+                                    value={formik.values.sourceid || ''}
+                                    onChange={formik.handleChange}
+                                    error={
+                                        formik.touched.sourceid &&
+                                        Boolean(formik.errors.sourceid)
+                                    }
+                                    helperText={
+                                        formik.touched.sourceid &&
+                                        formik.errors.sourceid
+                                    }
+                                />
+                            </div>
+                        </>
+                    )}
 
                     <div className={classes.searchBtnContainer}>
                         <Button

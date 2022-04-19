@@ -1,8 +1,32 @@
 import { Request, Response } from 'express';
 
-import { Source, SourceDocument } from '../model/source';
+import { sources, ISource } from '../model/source';
 import EmailClient from '../clients/email-client';
 import { IUpload } from '../model/upload';
+import { ObjectId } from 'mongodb';
+import { logger } from '../util/logger';
+
+type MaybeUpload = {
+    _id?: string | ObjectId;
+    created?: string | Date;
+};
+
+export const stronglyTypeUpload = (u: MaybeUpload) => {
+    const upload = { ...u };
+    if (!u._id) {
+        upload._id = new ObjectId();
+    }
+    if (typeof u._id === 'string') {
+        upload._id = new ObjectId(u._id);
+    }
+    if (!u.created) {
+        upload.created = new Date();
+    }
+    if (typeof u.created === 'string') {
+        upload.created = new Date(u.created);
+    }
+    return upload;
+};
 
 /**
  * UploadsController handles single uploads, that is a batch of cases sent
@@ -13,32 +37,49 @@ export default class UploadsController {
 
     /**
      * Creates a new upload for the source present in the req.params.sourceId.
-     * The source with the added upload is sent in the response.
+     * The added upload is sent in the response.
      */
     create = async (req: Request, res: Response): Promise<void> => {
         try {
-            const source = await Source.findById(req.params.sourceId);
+            const sourceId = new ObjectId(req.params.sourceId);
+            logger.info(`creating new upload on source ${sourceId}`);
+            const source = await sources().findOne({ _id: sourceId });
             if (!source) {
+                logger.error(`requested upload for unknown source ${sourceId}`);
                 res.status(404).json({
                     message: `Parent resource (source ID ${req.params.sourceId}) not found.`,
                 });
                 return;
             }
-            source.uploads.push(req.body);
-            const updatedSource = await source.save();
-            const result =
+            const upload = stronglyTypeUpload(req.body);
+            const result = await sources().findOneAndUpdate(
+                { _id: sourceId },
+                {
+                    $push: {
+                        uploads: upload,
+                    },
+                },
+                { returnDocument: 'after' },
+            );
+            const updatedSource = result.value;
+            const update =
                 updatedSource.uploads[updatedSource.uploads.length - 1];
-            if (result.status === 'ERROR') {
-                this.sendErrorNotification(updatedSource, result);
+            if (update.status === 'ERROR') {
+                this.sendErrorNotification(updatedSource, update);
             }
-            res.status(201).json(result);
+            res.status(201).json(update);
             return;
         } catch (err) {
-            if (err.name === 'ValidationError') {
-                res.status(422).json(err);
+            const error = err as Error;
+            logger.error(
+                `unable to add upload to source ${req.params.sourceId}`,
+            );
+            logger.error(error);
+            if (error.name === 'ValidationError') {
+                res.status(422).json(error);
                 return;
             }
-            res.status(500).json(err);
+            res.status(500).json(error);
         }
     };
 
@@ -48,33 +89,54 @@ export default class UploadsController {
      */
     update = async (req: Request, res: Response): Promise<void> => {
         try {
-            const source = await Source.findById(req.params.sourceId);
+            const sourceId = new ObjectId(req.params.sourceId);
+            logger.info(
+                `updating upload ${req.params.id} for source ${req.params.sourceId}`,
+            );
+            const source = await sources().findOne({ _id: sourceId });
             if (!source) {
+                logger.error(
+                    `updating upload for source ${sourceId} failed as the source can't be found`,
+                );
                 res.status(404).json({
                     message: `Parent resource (source ID ${req.params.sourceId}) not found.`,
                 });
                 return;
             }
-            const upload = source.uploads.find(
-                (u) => u._id.toString() === req.params.id,
+            const upload = source.uploads?.find(
+                (u: IUpload) => u._id.toString() === req.params.id,
             );
             if (!upload) {
+                logger.error(
+                    `Upload with ID ${req.params.id} not found in source ${req.params.sourceId}.`,
+                );
                 res.status(404).json({
-                    message: `Upload with ID ${req.params.id}) not found in source ${req.params.sourceId}.`,
+                    message: `Upload with ID ${req.params.id} not found in source ${req.params.sourceId}.`,
                 });
                 return;
             }
             const uploadIndex = source.uploads.indexOf(upload);
             Object.assign(upload, req.body);
 
-            await source.set({ [`uploads.${uploadIndex}`]: upload }).validate();
-            const result = await source.save();
+            const result = await sources().findOneAndUpdate(
+                { _id: sourceId },
+                {
+                    $set: {
+                        [`uploads.${uploadIndex}`]: upload,
+                    },
+                },
+                { returnDocument: 'after' },
+            );
             if (upload.status === 'ERROR') {
-                this.sendErrorNotification(result, upload);
+                this.sendErrorNotification(result.value, upload);
             }
-            res.json(result);
+            res.json(result.value);
         } catch (err) {
             const error = err as Error;
+            logger.error(
+                `error updating upload ${req.params.id} in source ${req.params.sourceId}.`,
+            );
+            logger.error(error);
             if (error.name === 'ValidationError') {
                 res.status(422).json(err);
                 return;
@@ -105,8 +167,8 @@ export default class UploadsController {
               ]
             : [];
         try {
-            const [uploads, total] = await Promise.all([
-                Source.aggregate([
+            const [uploadsCursor, totalCursor] = await Promise.all([
+                sources().aggregate([
                     { $unwind: '$uploads' },
                     ...changesOnlyMatcher,
                     { $sort: { 'uploads.created': -1, name: -1 } },
@@ -121,11 +183,15 @@ export default class UploadsController {
                         },
                     },
                 ]),
-                Source.aggregate([
+                sources().aggregate([
                     { $unwind: '$uploads' },
                     ...changesOnlyMatcher,
                     { $count: 'total' },
                 ]),
+            ]);
+            const [uploads, total] = await Promise.all([
+                uploadsCursor.toArray(),
+                totalCursor.toArray(),
             ]);
             // If we have more items than limit, add a response param
             // indicating that there is more to fetch on the next page.
@@ -148,7 +214,7 @@ export default class UploadsController {
     };
 
     private async sendErrorNotification(
-        source: SourceDocument,
+        source: ISource,
         upload: IUpload,
     ): Promise<void> {
         if (

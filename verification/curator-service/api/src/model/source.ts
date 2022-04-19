@@ -1,15 +1,12 @@
-import {
-    IAutomation,
-    automationSchema,
-} from './automation';
-import { IDateFilter, dateFilterSchema } from './date-filter';
-import { IOrigin, originSchema } from './origin';
-import { IUpload, uploadSchema } from './upload';
-import countries from 'i18n-iso-countries';
-import mongoose from 'mongoose';
+import { IAutomation } from './automation';
+import { IDateFilter } from './date-filter';
+import { IOrigin } from './origin';
+import { IUpload } from './upload';
+import { ObjectId } from 'mongodb';
+import db from './database';
 
-interface ISource {
-    _id: mongoose.Types.ObjectId;
+export interface ISource {
+    _id: ObjectId;
     name: string;
     countryCodes: string[];
     origin: IOrigin;
@@ -20,66 +17,18 @@ interface ISource {
     uploads: IUpload[];
     dateFilter: IDateFilter;
     notificationRecipients: string[];
-
-    toAwsStatementId(): string;
-    toAwsRuleDescription(): string;
-    toAwsRuleName(): string;
-    toAwsRuleTargetId(): string;
 }
 
-type ISourceInstanceCreation = mongoose.Model<ISource>;
+export const awsStatementIdForSource = (source: ISource) =>
+    source._id.toHexString();
 
-const validCountryCode = function(cc: string): boolean {
-    // use ZZ to represent all countries
-    return (countries.getName(cc, 'en') !== undefined || cc.toUpperCase() === "ZZ")
-}
+export const awsRuleDescriptionForSource = (source: ISource) =>
+    `Scheduled ingestion rule for source: ${source.name}`;
 
-const sourceSchema = new mongoose.Schema<
-    ISource,
-    ISourceInstanceCreation,
-    ISource
->({
-    name: {
-        type: String,
-        required: [true, 'Enter a name'],
-    },
-    origin: {
-        type: originSchema,
-        required: [true, 'Enter an origin'],
-    },
-    countryCodes: {
-        type: [String],
-        validate: {
-            validator: function(cc: string[]): boolean {
-                return cc.every(validCountryCode)
-            }
-        },
-        message: 'Invalid country code entered'
-    },
-    format: String,
-    excludeFromLineList: Boolean,
-    hasStableIdentifiers: Boolean,
-    automation: automationSchema,
-    uploads: [uploadSchema],
-    dateFilter: dateFilterSchema,
-    notificationRecipients: [String],
-});
+export const awsRuleNameForSource = (source: ISource) =>
+    source._id.toHexString();
 
-sourceSchema.methods.toAwsStatementId = function (): string {
-    return this._id.toString();
-};
-sourceSchema.methods.toAwsRuleDescription = function (): string {
-    return `Scheduled ingestion rule for source: ${this.name}`;
-};
+export const awsRuleTargetIdForSource = (source: ISource) =>
+    `${source._id.toHexString()}_Target`;
 
-sourceSchema.methods.toAwsRuleName = function (): string {
-    return this._id.toString();
-};
-
-sourceSchema.methods.toAwsRuleTargetId = function (): string {
-    return `${this._id}_Target`;
-};
-
-export type SourceDocument = mongoose.Document & ISource;
-
-export const Source = mongoose.model<SourceDocument>('Source', sourceSchema);
+export const sources = () => db().collection('sources');

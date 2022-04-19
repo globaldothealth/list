@@ -14,30 +14,25 @@ import { sessions, users } from '../src/model/user';
 
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import { cases, restrictedCases } from '../src/model/case';
-import { Source } from '../src/model/source';
+import {
+    awsRuleDescriptionForSource,
+    awsRuleNameForSource,
+    awsRuleTargetIdForSource,
+    awsStatementIdForSource,
+    ISource,
+    sources,
+} from '../src/model/source';
 import app from '../src/index';
 import axios from 'axios';
 import supertest from 'supertest';
+import { ObjectId } from 'mongodb';
 
 jest.mock('axios');
 const mockedAxios = axios as jest.Mocked<typeof axios>;
 
-jest.mock('../src/clients/aws-events-client', () => {
-    return jest.fn().mockImplementation(() => {
-        return { deleteRule: mockDeleteRule, putRule: mockPutRule };
-    });
-});
 jest.mock('../src/clients/aws-batch-client', () => {
     return jest.fn().mockImplementation(() => {
         return { doRetrieval: mockDoRetrieval };
-    });
-});
-jest.mock('../src/clients/email-client', () => {
-    return jest.fn().mockImplementation(() => {
-        return {
-            initialize: mockInitialize,
-            send: mockSend,
-        };
     });
 });
 
@@ -54,7 +49,7 @@ afterAll(async () => {
 beforeEach(async () => {
     jest.clearAllMocks();
     mockSend.mockResolvedValue({});
-    await Source.deleteMany({});
+    await sources().deleteMany({});
     await users().deleteMany({});
     await sessions().deleteMany({});
 });
@@ -64,7 +59,7 @@ afterEach(async () => {
 });
 
 afterAll(async () => {
-    await Source.deleteMany({});
+    await sources().deleteMany({});
     await users().deleteMany({});
     await sessions().deleteMany({});
 });
@@ -86,55 +81,61 @@ describe('unauthenticated access', () => {
 
 describe('GET', () => {
     it('list should return 200', async () => {
-        const source1 = await new Source({
+        const id1 = new ObjectId();
+        await sources().insertOne({
+            _id: id1,
             name: 'test-source',
             origin: { url: 'http://foo.bar', license: 'MIT' },
             format: 'JSON',
-        }).save();
-        const source2 = await new Source({
+        });
+        const id2 = new ObjectId();
+        await sources().insertOne({
+            _id: id2,
             name: 'another-source',
             origin: { url: 'http://foo.bar', license: 'MIT' },
             format: 'JSON',
-        }).save();
+        });
         const res = await curatorRequest
             .get('/api/sources')
             .expect(200)
             .expect('Content-Type', /json/);
         expect(res.body.sources).toHaveLength(2);
         // Ordered by name.
-        expect(res.body.sources[0]._id).toEqual(source2.id);
-        expect(res.body.sources[1]._id).toEqual(source1.id);
+        expect(res.body.sources[0]._id).toEqual(id2.toHexString());
+        expect(res.body.sources[1]._id).toEqual(id1.toHexString());
         // No continuation expected.
         expect(res.body.nextPage).toBeUndefined();
     });
     it('list should filter by url if supplied', async () => {
-        const relevantSource = await new Source({
+        const relevantId = new ObjectId();
+        await sources().insertOne({
+            _id: relevantId,
             name: 'test-source',
             origin: { url: 'http://foo.bar', license: 'MIT' },
             format: 'JSON',
-        }).save();
-        await new Source({
+        });
+        await sources().insertOne({
             name: 'test-source',
             origin: { url: 'http://bar.baz', license: 'MIT' },
             format: 'JSON',
-        }).save();
+        });
 
         const res = await curatorRequest
             .get('/api/sources?url=foo')
             .expect(200)
             .expect('Content-Type', /json/);
 
-        expect(await relevantSource.collection.countDocuments()).toEqual(2);
+        expect(await sources().countDocuments()).toEqual(2);
         expect(res.body.sources).toHaveLength(1);
-        expect(res.body.sources[0]._id).toEqual(relevantSource.id);
+        expect(res.body.sources[0]._id).toEqual(relevantId.toHexString());
     });
     it('list should paginate', async () => {
         for (const i of Array.from(Array(15).keys())) {
-            await new Source({
+            await sources().insertOne({
                 name: `test-source-${i}`,
                 origin: { url: 'http://foo.bar', license: 'MIT' },
                 format: 'JSON',
-            }).save();
+            });
         }
         // Fetch first page.
         let res = await curatorRequest
@@ -172,28 +173,32 @@ describe('GET', () => {
         curatorRequest.get('/api/sources?page=1&limit=-2').expect(400, done);
     });
     it('one existing item should return 200', async () => {
-        const source = await new Source({
+        const id = new ObjectId();
+        await sources().insertOne({
+            _id: id,
             name: 'test-source',
             origin: { url: 'http://foo.bar', license: 'MIT' },
             format: 'JSON',
-        }).save();
+        });
         const res = await curatorRequest
-            .get(`/api/sources/${source.id}`)
+            .get(`/api/sources/${id.toHexString()}`)
             .expect(200)
             .expect('Content-Type', /json/);
-        expect(res.body._id).toEqual(source.id);
+        expect(res.body._id).toEqual(id.toHexString());
     });
 });
 
 describe('PUT', () => {
     it('should update a source', async () => {
-        const source = await new Source({
+        const id = new ObjectId();
+        await sources().insertOne({
+            _id: id,
             name: 'test-source',
             origin: { url: 'http://foo.bar', license: 'MIT' },
             format: 'JSON',
-        }).save();
+        });
         const res = await curatorRequest
-            .put(`/api/sources/${source.id}`)
+            .put(`/api/sources/${id.toHexString()}`)
             .send({ name: 'new name' })
             .expect(200)
             .expect('Content-Type', /json/);
@@ -204,13 +209,15 @@ describe('PUT', () => {
         expect(mockPutRule).not.toHaveBeenCalled();
     });
     it('should update a source line list exclusion', async () => {
-        const source = await new Source({
+        const id = new ObjectId();
+        await sources().insertOne({
+            _id: id,
             name: 'test-source',
             origin: { url: 'http://foo.bar', license: 'MIT' },
             format: 'JSON',
-        }).save();
+        });
         const res = await curatorRequest
-            .put(`/api/sources/${source.id}`)
+            .put(`/api/sources/${id.toHexString()}`)
             .send({ excludeFromLineList: true })
             .expect(200)
             .expect('Content-Type', /json/);
@@ -221,13 +228,15 @@ describe('PUT', () => {
         expect(mockPutRule).not.toHaveBeenCalled();
     });
     it('should update date filtering of a source', async () => {
-        const source = await new Source({
+        const id = new ObjectId();
+        await sources().insertOne({
+            _id: id,
             name: 'test-source',
             origin: { url: 'http://foo.bar', license: 'MIT' },
             format: 'JSON',
-        }).save();
+        });
         let res = await curatorRequest
-            .put(`/api/sources/${source.id}`)
+            .put(`/api/sources/${id.toHexString()}`)
             .send({
                 dateFilter: {
                     numDaysBeforeToday: 3,
@@ -243,7 +252,7 @@ describe('PUT', () => {
         });
         // Now clear the date filter.
         res = await curatorRequest
-            .put(`/api/sources/${source.id}`)
+            .put(`/api/sources/${id.toHexString()}`)
             .send({
                 dateFilter: {},
             })
@@ -254,121 +263,6 @@ describe('PUT', () => {
 
         expect(mockPutRule).not.toHaveBeenCalledTimes(2);
     });
-    it('should create an AWS rule with target if provided schedule expression', async () => {
-        const source = await new Source({
-            name: 'test-source',
-            origin: { url: 'http://foo.bar', license: 'MIT' },
-            format: 'JSON',
-        }).save();
-        const scheduleExpression = 'rate(1 hour)';
-        const res = await curatorRequest
-            .put(`/api/sources/${source.id}`)
-            .send({
-                automation: {
-                    schedule: { awsScheduleExpression: scheduleExpression },
-                },
-            })
-            .expect(200)
-            .expect('Content-Type', /json/);
-        expect(res.body.automation.schedule.awsRuleArn).toBeDefined();
-        expect(mockPutRule).toHaveBeenCalledWith(
-            source.toAwsRuleName(),
-            source.toAwsRuleDescription(),
-            scheduleExpression,
-            undefined,
-            source.toAwsRuleTargetId(),
-            source._id.toString(),
-            source.toAwsStatementId(),
-        );
-    });
-    it('should send a notification email if automation added and recipients defined', async () => {
-        const recipients = ['foo@bar.com'];
-        const source = await new Source({
-            name: 'test-source',
-            origin: { url: 'http://foo.bar', license: 'MIT' },
-            format: 'JSON',
-            notificationRecipients: recipients,
-        }).save();
-        await curatorRequest
-            .put(`/api/sources/${source.id}`)
-            .send({
-                automation: {
-                    schedule: { awsScheduleExpression: 'rate(1 hour)' },
-                },
-            })
-            .expect(200)
-            .expect('Content-Type', /json/);
-
-        expect(mockSend).toHaveBeenCalledWith(
-            expect.arrayContaining(recipients),
-            expect.anything(),
-            expect.anything(),
-        );
-    });
-    it('should send a notification email if automation removed', async () => {
-        const source = await new Source({
-            name: 'test-source',
-            origin: { url: 'http://foo.bar', license: 'MIT' },
-            format: 'JSON',
-            automation: {
-                schedule: { awsScheduleExpression: 'rate(1 hour)' },
-            },
-            notificationRecipients: ['foo@bar.com'],
-        }).save();
-        const recipients = ['foo@bar.com'];
-        await curatorRequest
-            .put(`/api/sources/${source.id}`)
-            .send({ automation: { schedule: undefined } })
-            .expect(200)
-            .expect('Content-Type', /json/);
-        expect(mockSend).toHaveBeenCalledWith(
-            expect.arrayContaining(recipients),
-            expect.anything(),
-            expect.anything(),
-        );
-    });
-    it('should not send a notification email if automation unchanged', async () => {
-        const source = await new Source({
-            name: 'test-source',
-            origin: { url: 'http://foo.bar', license: 'MIT' },
-            format: 'JSON',
-            automation: {
-                schedule: { awsScheduleExpression: 'rate(1 hour)' },
-            },
-            notificationRecipients: ['foo@bar.com'],
-        }).save();
-        await curatorRequest
-            .put(`/api/sources/${source.id}`)
-            .send({ format: 'CSV' })
-            .expect(200)
-            .expect('Content-Type', /json/);
-        expect(mockSend).not.toHaveBeenCalled();
-    });
-    it('should update AWS rule description on source rename', async () => {
-        const source = await new Source({
-            name: 'test-source',
-            origin: { url: 'http://foo.bar', license: 'MIT' },
-            format: 'JSON',
-            automation: {
-                schedule: {
-                    awsRuleArn: 'arn:aws:events:a:b:rule/c',
-                    awsScheduleExpression: 'rate(1 hour)',
-                },
-            },
-        }).save();
-        const newName = 'name2';
-        await curatorRequest
-            .put(`/api/sources/${source.id}`)
-            .send({
-                name: newName,
-            })
-            .expect(200)
-            .expect('Content-Type', /json/);
-        expect(mockPutRule).toHaveBeenCalledWith(
-            source._id.toString(),
-            source.set('name', newName).toAwsRuleDescription(),
-        );
-    });
     it('cannot update an nonexistent source', (done) => {
         curatorRequest
             .put('/api/sources/5ea86423bae6982635d2e1f8')
@@ -377,58 +271,6 @@ describe('PUT', () => {
                 origin: { url: 'http://foo.bar', license: 'MIT' },
             })
             .expect(404, done);
-    });
-    it('should not update to an invalid source', async () => {
-        const source = await new Source({
-            name: 'test-source',
-            origin: { url: 'http://foo.bar', license: 'MIT' },
-            format: 'JSON',
-        }).save();
-        return curatorRequest
-            .put(`/api/sources/${source.id}`)
-            .send({ name: '' })
-            .expect(422, /Enter a name/);
-    });
-    it('should be able to set a parser without schedule', async () => {
-        const source = await new Source({
-            name: 'test-source',
-            origin: { url: 'http://foo.bar', license: 'MIT' },
-            format: 'JSON',
-        }).save();
-        await curatorRequest
-            .put(`/api/sources/${source.id}`)
-            .send({
-                automation: {
-                    parser: {
-                        awsLambdaArn:
-                            'arn:aws:batch:eu-central-1:612888738066:job-definition:some-def',
-                    },
-                },
-            })
-            .expect(200, /arn/);
-    });
-    it('should return error if sending email notification fails, and still store the change', async () => {
-        const recipients = ['foo@bar.com'];
-        const source = await new Source({
-            name: 'test-source',
-            origin: { url: 'http://foo.bar', license: 'MIT' },
-            format: 'JSON',
-            notificationRecipients: recipients,
-        }).save();
-        mockSend.mockReset();
-        mockSend.mockRejectedValue({});
-        await curatorRequest
-            .put(`/api/sources/${source.id}`)
-            .send({
-                automation: {
-                    schedule: { awsScheduleExpression: 'rate(1 hour)' },
-                },
-            })
-            .expect(500, /NotificationSendError/);
-        const updatedSourceRes = await curatorRequest
-            .get(`/api/sources/${source.id}`)
-            .expect(200);
-        expect(updatedSourceRes.body.automation).toBeDefined();
     });
 });
 
@@ -462,69 +304,6 @@ describe('POST', () => {
         expect(res.body.excludeFromLineList).toBeTruthy();
         expect(mockPutRule).not.toHaveBeenCalled();
     });
-    it('should create an AWS rule with target if provided schedule expression', async () => {
-        const scheduleExpression = 'rate(1 hour)';
-        const source = {
-            name: 'some_name',
-            origin: { url: 'http://what.ever', license: 'MIT' },
-            format: 'JSON',
-            automation: {
-                schedule: { awsScheduleExpression: scheduleExpression },
-            },
-        };
-        const res = await curatorRequest
-            .post('/api/sources')
-            .send(source)
-            .expect('Content-Type', /json/)
-            .expect(201);
-        const createdSource = new Source(res.body);
-        expect(createdSource.automation.schedule.awsRuleArn).toBeDefined();
-        expect(mockPutRule).toHaveBeenCalledWith(
-            createdSource.toAwsRuleName(),
-            createdSource.toAwsRuleDescription(),
-            scheduleExpression,
-            undefined,
-            createdSource.toAwsRuleTargetId(),
-            createdSource._id.toString(),
-            createdSource.toAwsStatementId(),
-        );
-    });
-    it('should send a notification email if automation and recipients defined', async () => {
-        const recipients = ['foo@bar.com'];
-        const source = {
-            name: 'some_name',
-            origin: { url: 'http://what.ever', license: 'MIT' },
-            format: 'JSON',
-            automation: {
-                schedule: { awsScheduleExpression: 'rate(1 hour)' },
-            },
-            notificationRecipients: recipients,
-        };
-        await curatorRequest
-            .post('/api/sources')
-            .send(source)
-            .expect('Content-Type', /json/)
-            .expect(201);
-        expect(mockSend).toHaveBeenCalledWith(
-            expect.arrayContaining(recipients),
-            expect.anything(),
-            expect.anything(),
-        );
-    });
-    it('should not send a notification email if automation not defined', async () => {
-        const source = {
-            name: 'some_name',
-            origin: { url: 'http://what.ever', license: 'MIT' },
-            format: 'JSON',
-            notificationRecipients: ['foo@bar.com'],
-        };
-        await curatorRequest
-            .post('/api/sources')
-            .send(source)
-            .expect('Content-Type', /json/)
-            .expect(201);
-        expect(mockSend).not.toHaveBeenCalled();
-    });
     it('should not create an incomplete source', async () => {
         await curatorRequest.post('/api/sources').send({}).expect(400);
     });
@@ -538,92 +317,53 @@ describe('POST', () => {
 
 describe('DELETE', () => {
     it('should delete a source', async () => {
-        const source = await new Source({
+        const id = new ObjectId();
+        await sources().insertOne({
+            _id: id,
             name: 'test-source',
             origin: { url: 'http://foo.bar', license: 'MIT' },
             format: 'JSON',
-        }).save();
-        await curatorRequest.delete(`/api/sources/${source.id}`).expect(204);
+        });
+        await curatorRequest
+            .delete(`/api/sources/${id.toHexString()}`)
+            .expect(204);
         expect(mockDeleteRule).not.toHaveBeenCalled();
     });
     it('should not delete a source where a case exists', async () => {
-        const source = await new Source({
+        const id = new ObjectId();
+        await sources().insertOne({
+            _id: id,
             name: 'test-source',
             origin: { url: 'http://foo.bar', license: 'MIT' },
             format: 'JSON',
-        }).save();
+        });
         const aCase = await cases().insertOne({
             caseReference: {
-                sourceId: source._id.toHexString(),
+                sourceId: id.toHexString(),
             },
         });
-        await curatorRequest.delete(`/api/sources/${source.id}`).expect(403);
+        await curatorRequest
+            .delete(`/api/sources/${id.toHexString()}`)
+            .expect(403);
         expect(mockDeleteRule).not.toHaveBeenCalled();
     });
     it('should not delete a source where a restricted case exists', async () => {
-        const source = await new Source({
+        const id = new ObjectId();
+        await sources().insertOne({
+            _id: id,
             name: 'test-source',
             origin: { url: 'http://foo.bar', license: 'MIT' },
             format: 'JSON',
-        }).save();
+        });
         const aCase = await restrictedCases().insertOne({
             caseReference: {
-                sourceId: source._id.toHexString(),
+                sourceId: id.toHexString(),
             },
         });
-        await curatorRequest.delete(`/api/sources/${source.id}`).expect(403);
+        await curatorRequest
+            .delete(`/api/sources/${id.toHexString()}`)
+            .expect(403);
         expect(mockDeleteRule).not.toHaveBeenCalled();
-    });
-    it('should delete corresponding AWS rule (et al.) if source contains ruleArn', async () => {
-        const source = await new Source({
-            name: 'test-source',
-            origin: { url: 'http://foo.bar', license: 'MIT' },
-            format: 'JSON',
-            automation: {
-                schedule: {
-                    awsRuleArn: 'arn:aws:events:a:b:rule/c',
-                    awsScheduleExpression: 'rate(1 hour)',
-                },
-            },
-        }).save();
-        await curatorRequest.delete(`/api/sources/${source.id}`).expect(204);
-        expect(mockDeleteRule).toHaveBeenCalledWith(
-            source.toAwsRuleName(),
-            source.toAwsRuleTargetId(),
-            undefined,
-            source.toAwsStatementId(),
-        );
-    });
-    it('should send a notification email if source contains ruleArn and recipients', async () => {
-        const recipients = ['foo@bar.com'];
-        const source = await new Source({
-            name: 'test-source',
-            origin: { url: 'http://foo.bar', license: 'MIT' },
-            format: 'JSON',
-            automation: {
-                schedule: {
-                    awsRuleArn: 'arn:aws:events:a:b:rule/c',
-                    awsScheduleExpression: 'rate(1 hour)',
-                },
-            },
-            notificationRecipients: recipients,
-        }).save();
-        await curatorRequest.delete(`/api/sources/${source.id}`).expect(204);
-        expect(mockSend).toHaveBeenCalledWith(
-            expect.arrayContaining(recipients),
-            expect.anything(),
-            expect.anything(),
-        );
-    });
-    it('should not send a notification email if source did not have automation rule', async () => {
-        const source = await new Source({
-            name: 'test-source',
-            origin: { url: 'http://foo.bar', license: 'MIT' },
-            format: 'JSON',
-            notificationRecipients: ['foo@bar.com'],
-        }).save();
-        await curatorRequest.delete(`/api/sources/${source.id}`).expect(204);
-        expect(mockSend).not.toHaveBeenCalled();
     });
     it('should not be able to delete a non existent source', (done) => {
         curatorRequest

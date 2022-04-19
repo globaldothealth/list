@@ -19,18 +19,20 @@ describe('Sources table', function () {
 
         cy.get('button[title="Edit"]').click();
         cy.get('input[placeholder="Name"]').clear().type('Edited source');
-        cy.get('input[placeholder="Parsers"]')
-            .clear()
-            .type('arn:aws:lambda:eu-central-1:612888738066:function:test-func');
         cy.get('button[title="Save"]').click();
 
         cy.contains('Example source').should('not.exist');
         cy.contains('Edited source');
-        cy.contains('arn:aws:lambda:eu-central-1:612888738066:function:test-func');
     });
 
     it('Can update date filters', function () {
-        cy.addSource('Example source', 'www.example.com');
+        cy.addSource(
+            'Example source',
+            'www.example.com',
+            'Example',
+            'www.example.com',
+            ['US', 'CA', 'MX'],
+        );
         cy.visit('/');
         cy.visit('/sources');
         cy.contains('Example source');
@@ -59,7 +61,14 @@ describe('Sources table', function () {
     });
 
     it('Can delete a source', function () {
-        cy.addSource('Example source', 'www.example.com');
+        cy.addSource(
+            'Example source',
+            'www.example.com',
+            'Example',
+            'www.example.com',
+            ['US', 'CA', 'MX'],
+        );
+        cy.visit('/');
         cy.visit('/');
         cy.visit('/sources');
         cy.contains('Example source');

@@ -1,42 +1,45 @@
-import { Source } from '../../src/model/source';
-import fullSource from './data/source.full.json';
+import { ObjectId } from 'mongodb';
+import {
+    awsRuleDescriptionForSource,
+    awsRuleNameForSource,
+    awsRuleTargetIdForSource,
+    awsStatementIdForSource,
+    sources,
+    ISource,
+} from '../../src/model/source';
 import minimalSource from './data/source.minimal.json';
 
-describe('validate', () => {
-    it('minimal model should be valid', () => {
-        const s = new Source(minimalSource);
-
-        return s.validate();
+describe('helper functions', () => {
+    it('awsStatementIdForSource returns formatted source ID', () => {
+        const s = {
+            _id: new ObjectId(),
+            ...minimalSource,
+        };
+        expect(awsStatementIdForSource(s as ISource)).toContain(
+            s._id.toString(),
+        );
     });
-    it('full model should be valid', () => {
-        const s = new Source(fullSource);
-
-        return s.validate();
+    it('awsRuleDescriptionForSource returns formatted source name', () => {
+        const s = {
+            _id: new ObjectId(),
+            ...minimalSource,
+        };
+        expect(awsRuleDescriptionForSource(s as ISource)).toContain(s.name);
     });
-    it('incomplete model should be invalid', () => {
-        const errors = new Source({}).validateSync();
-
-        expect(errors).toBeDefined();
-        expect(errors?.toString()).toMatch('Enter a name');
-        expect(errors?.toString()).toMatch('Enter an origin');
+    it('awsRuleNameForSource returns formatted source ID', () => {
+        const s = {
+            _id: new ObjectId(),
+            ...minimalSource,
+        };
+        expect(awsRuleNameForSource(s as ISource)).toContain(s._id.toString());
     });
-});
-
-describe('custom instance methods', () => {
-    it('toAwsStatementId returns formatted source ID', () => {
-        const s = new Source(minimalSource);
-        expect(s.toAwsStatementId()).toContain(s._id.toString());
-    });
-    it('toAwsRuleDescription returns formatted source name', () => {
-        const s = new Source(minimalSource);
-        expect(s.toAwsRuleDescription()).toContain(s.name);
-    });
-    it('toAwsRuleName returns formatted source ID', () => {
-        const s = new Source(minimalSource);
-        expect(s.toAwsRuleName()).toContain(s._id.toString());
-    });
-    it('toAwsRuleTargetId returns formatted source ID', () => {
-        const s = new Source(minimalSource);
-        expect(s.toAwsRuleTargetId()).toContain(s._id.toString());
+    it('awsRuleTargetIdForSource returns formatted source ID', () => {
+        const s = {
+            _id: new ObjectId(),
+            ...minimalSource,
+        };
+        expect(awsRuleTargetIdForSource(s as ISource)).toContain(
+            s._id.toString(),
+        );
     });
 });
