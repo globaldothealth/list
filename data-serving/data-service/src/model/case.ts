@@ -26,7 +26,6 @@ import _ from 'lodash';
 import mongoose from 'mongoose';
 import { ExclusionDataDocument, exclusionDataSchema } from './exclusion-data';
 import { dateFieldInfo } from './date';
-import { AgeBucket } from './age-bucket';
 
 const requiredDateField = {
     ...dateFieldInfo,
@@ -170,42 +169,8 @@ export function caseWithDenormalisedConfirmationDate(aCase: CaseDocument) {
     return aCase;
 }
 
-/* Turn an age range in demographic info into age buckets */
-
-async function bucketAgeRange(aCase: CaseDocument) {
-    // there should be a small number of these age ranges, so fetch all
-    const ageBuckets = await AgeBucket.find({});
-    if (aCase.demographics?.ageRange?.start && aCase.demographics?.ageRange?.end) {
-        const caseStart = aCase.demographics?.ageRange?.start;
-        const caseEnd = aCase.demographics?.ageRange?.end;
-        const matchingBuckets = ageBuckets.filter((b) => {
-            const bRangeWithinCaseRange = (b.start <= caseStart && b.end >= caseEnd);
-            const bContainsCaseStart = (b.start <= caseStart && b.end >= caseStart);
-            const bContainsCaseEnd = (b.start <= caseEnd && b.end >= caseEnd);
-            const bWithinCaseRange = (b.start >= caseStart && b.end <= caseEnd);
-            const matches = (
-                bRangeWithinCaseRange ||
-                bContainsCaseStart    ||
-                bContainsCaseEnd      ||
-                bWithinCaseRange
-            );
-            return matches;
-        });
-        aCase.demographics.ageBuckets = matchingBuckets.map((b) => (b._id));
-    }
-}
-
-async function caseWithBucketedAge(aCase: CaseDocument) {
-    await bucketAgeRange(aCase);
-    return aCase;
-}
-
 caseSchema.pre('save', async function(this: CaseDocument) {
     denormaliseConfirmationDate(this);
-});
-
-caseSchema.pre('save', async function(this: CaseDocument) {
-    await bucketAgeRange(this);
 });
 
 caseSchema.pre('validate', async function(this: CaseDocument) {
