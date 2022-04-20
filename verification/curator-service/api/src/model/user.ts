@@ -1,5 +1,5 @@
 import bcrypt from 'bcrypt';
-import { ObjectId } from 'mongodb';
+import { ObjectId, Collection } from 'mongodb';
 import db from './database';
 
 export const userRoles = ['admin', 'curator'];
@@ -9,7 +9,7 @@ interface IUserPublicFields {
     name?: string;
     email: string;
     googleID?: string;
-    roles: [string];
+    roles: string[];
     picture?: string;
     newsletterAccepted?: boolean;
     apiKey?: string;
@@ -53,5 +53,5 @@ export function userPublicFields(
     };
 }
 
-export const users = () => db().collection('users');
+export const users = () => db().collection('users') as Collection<IUser>;
 export const sessions = () => db().collection('sessions');

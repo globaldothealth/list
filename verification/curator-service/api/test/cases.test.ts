@@ -3,7 +3,7 @@ import * as baseUser from './users/base.json';
 import { sessions, users } from '../src/model/user';
 
 import { MongoMemoryServer } from 'mongodb-memory-server';
-import app from '../src/index';
+import makeApp from '../src/index';
 import axios from 'axios';
 import supertest from 'supertest';
 
@@ -60,8 +60,11 @@ afterEach(() => {
     jest.clearAllMocks();
 });
 
+let app: any;
+
 beforeAll(async () => {
     mongoServer = new MongoMemoryServer();
+    app = await makeApp();
 });
 
 afterAll(async () => {
@@ -203,9 +206,7 @@ describe('Cases', () => {
             .expect(200)
             .expect('Content-Type', /json/);
         expect(mockedAxios.put).toHaveBeenCalledTimes(1);
-        expect(
-            mockedAxios.put,
-        ).toHaveBeenCalledWith(
+        expect(mockedAxios.put).toHaveBeenCalledWith(
             'http://localhost:3000/api/cases/5e99f21a1c9d440000ceb088',
             { age: '42', ...creatorMetadata },
         );

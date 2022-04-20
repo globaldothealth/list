@@ -2,7 +2,7 @@ import { IAutomation } from './automation';
 import { IDateFilter } from './date-filter';
 import { IOrigin } from './origin';
 import { IUpload } from './upload';
-import { ObjectId } from 'mongodb';
+import { Collection, ObjectId } from 'mongodb';
 import db from './database';
 
 export interface ISource {
@@ -31,4 +31,4 @@ export const awsRuleNameForSource = (source: ISource) =>
 export const awsRuleTargetIdForSource = (source: ISource) =>
     `${source._id.toHexString()}_Target`;
 
-export const sources = () => db().collection('sources');
+export const sources = () => db().collection('sources') as Collection<ISource>;

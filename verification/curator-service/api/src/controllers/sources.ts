@@ -186,8 +186,10 @@ export default class SourcesController {
                 { returnDocument: 'after' },
             );
             if (!updatedSource.ok) {
-                logger.error(`error updating source with ID ${req.params.id}`);
-                logger.error(updatedSource.lastErrorObject);
+                logger.error(
+                    `error updating source with ID ${req.params.id}`,
+                    updatedSource.lastErrorObject,
+                );
             }
 
             const finalSource = await sources().findOne({ _id: sourceId });
@@ -220,8 +222,8 @@ export default class SourcesController {
                 _id: sourceId,
                 ...req.body,
             });
-            logger.info(`inserted count: ${result.insertedCount}`);
-            if (!result.result.ok) {
+            logger.info(`insert acknowledged: ${result.acknowledged}`);
+            if (!result.acknowledged) {
                 logger.error('error inserting source');
             }
             logger.info('inserted source');

@@ -1,9 +1,9 @@
 import * as baseUser from './users/base.json';
 
 import { MongoMemoryServer } from 'mongodb-memory-server';
-import app from '../src/index';
+import makeApp from '../src/index';
 import axios from 'axios';
-import mongoose from 'mongoose';
+import db from '../src/model/database';
 import supertest from 'supertest';
 
 jest.mock('../src/clients/email-client', () => {
@@ -20,8 +20,11 @@ afterEach(() => {
     jest.clearAllMocks();
 });
 
+let app: any;
+
 beforeAll(async () => {
     mongoServer = new MongoMemoryServer();
+    app = await makeApp();
 });
 
 afterAll(async () => {
@@ -71,13 +74,14 @@ describe('Geocode', () => {
         );
     });
     it('combines proxied and local results for resolving country names', async () => {
-        const mongoClient = mongoose.connection.getClient();
         // add a not-real-case document
-        await mongoClient.db().collection('cases').insertOne({
-            location: {
-                country: 'EE',
-            },
-        });
+        await db()
+            .collection('cases')
+            .insertOne({
+                location: {
+                    country: 'EE',
+                },
+            });
         mockedAxios.get.mockResolvedValueOnce({
             status: 200,
             statusText: 'OK',

@@ -1,4 +1,4 @@
-import { ObjectId } from 'mongodb';
+import { Collection, ObjectId } from 'mongodb';
 import db from './database';
 
 /*
@@ -9,9 +9,9 @@ import db from './database';
 export type ICase = {
     _id: ObjectId;
     caseReference: {
-        sourceId: string,
-    },
+        sourceId: string;
+    };
 };
 
-export const cases = () => db().collection('cases');
+export const cases = () => db().collection('cases') as Collection<ICase>;
 export const restrictedCases = () => db().collection('restrictedcases');

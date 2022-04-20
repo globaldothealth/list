@@ -25,7 +25,7 @@ export const stronglyTypeUpload = (u: MaybeUpload) => {
     if (typeof u.created === 'string') {
         upload.created = new Date(u.created);
     }
-    return upload;
+    return upload as IUpload;
 };
 
 /**
@@ -61,7 +61,7 @@ export default class UploadsController {
                 },
                 { returnDocument: 'after' },
             );
-            const updatedSource = result.value;
+            const updatedSource = result.value!;
             const update =
                 updatedSource.uploads[updatedSource.uploads.length - 1];
             if (update.status === 'ERROR') {
@@ -128,7 +128,7 @@ export default class UploadsController {
                 { returnDocument: 'after' },
             );
             if (upload.status === 'ERROR') {
-                this.sendErrorNotification(result.value, upload);
+                this.sendErrorNotification(result.value!, upload);
             }
             res.json(result.value);
         } catch (err) {

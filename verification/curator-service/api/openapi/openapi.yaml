@@ -1959,6 +1959,13 @@ components:
                     $ref: '#/components/schemas/Date'
                 sideEffects:
                     $ref: '#/components/schemas/SymptomArray'
+        Error:
+            description: An error response
+            properties:
+                message:
+                    description: A description of the error that occurred
+                    example: User with ID 1235abcd453 was not found
+                    type: string
     responses:
         '200':
             description: OK
@@ -2150,8 +2157,16 @@ components:
             description: Malformed request
         '403':
             description: Forbidden
+            content:
+                application/json:
+                    schema:
+                        $ref: '#/components/schemas/Error'
         '404':
             description: Not found
+            content:
+                application/json:
+                    schema:
+                        $ref: '#/components/schemas/Error'
         '422':
             description: Unprocessable entity
         '500':
