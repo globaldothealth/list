@@ -37,7 +37,7 @@ export const demographicsSchema = new mongoose.Schema(
 
 export type DemographicsDocument = mongoose.Document & {
     ageBuckets: ObjectId[];
-    ageRange?: Range<number>;
+    ageRange: Range<number>;
     gender: string;
     occupation: string;
     nationalities: [string];
