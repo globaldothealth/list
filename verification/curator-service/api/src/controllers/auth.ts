@@ -633,7 +633,7 @@ export class AuthController {
         // @ts-ignore
         passport.serializeUser((user: IUser, done: any) => {
             // Serializes the user id in the cookie, no user info should be in there, just the id.
-            done(null, user._id.toHexString());
+            done(null, user._id);
         });
 
         passport.deserializeUser((id: string, done: any) => {
@@ -746,7 +746,7 @@ export class AuthController {
                             });
                         }
 
-                        done(null, userPublicFields(user));
+                        done(null, user);
                     } catch (error) {
                         done(error);
                     }

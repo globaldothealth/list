@@ -75,11 +75,13 @@ describe('Geocode', () => {
     });
     it('combines proxied and local results for resolving country names', async () => {
         // add a not-real-case document
-        await db().collection('cases').insertOne({
-            location: {
-                country: 'EE',
-            },
-        });
+        await db()
+            .collection('cases')
+            .insertOne({
+                location: {
+                    country: 'EE',
+                },
+            });
         mockedAxios.get.mockResolvedValueOnce({
             status: 200,
             statusText: 'OK',

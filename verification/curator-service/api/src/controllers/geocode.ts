@@ -15,9 +15,7 @@ export default class GeocodeProxy {
 
     suggest = async (req: Request, res: Response): Promise<void> => {
         try {
-            const response = await axios.get(
-                this.locationServiceURL + req.url,
-            );
+            const response = await axios.get(this.locationServiceURL + req.url);
             res.status(response.status).json(response.data);
             return;
         } catch (err) {
@@ -32,9 +30,7 @@ export default class GeocodeProxy {
 
     convertUTM = async (req: Request, res: Response): Promise<void> => {
         try {
-            const response = await axios.get(
-                this.locationServiceURL + req.url,
-            );
+            const response = await axios.get(this.locationServiceURL + req.url);
             res.status(response.status).json(response.data);
             return;
         } catch (err) {
@@ -44,7 +40,7 @@ export default class GeocodeProxy {
                 return;
             }
         }
-    }
+    };
 
     /**
      * This is the only "meaty" method on this controller. It does proxy the
@@ -56,42 +52,55 @@ export default class GeocodeProxy {
      */
     countryNames = async (req: Request, res: Response): Promise<void> => {
         const database = db();
-        const locationCountryCodes = await database.collection('cases').distinct('location.country', {}, {
-            collation: {
-                locale: 'en_US',
-                strength: 2,
-            }
-        });
-        const travelHistoryCodes = await database.collection('cases').distinct('travelHistory.travel.location.country', {}, {
-            collation: {
-                locale: 'en_US',
-                strength: 2,
-            }
-        });
-        const allCodes = new Set<string>(locationCountryCodes.concat(travelHistoryCodes));
+        const locationCountryCodes = await database
+            .collection('cases')
+            .distinct(
+                'location.country',
+                {},
+                {
+                    collation: {
+                        locale: 'en_US',
+                        strength: 2,
+                    },
+                },
+            );
+        const travelHistoryCodes = await database.collection('cases').distinct(
+            'travelHistory.travel.location.country',
+            {},
+            {
+                collation: {
+                    locale: 'en_US',
+                    strength: 2,
+                },
+            },
+        );
+        const allCodes = new Set<string>(
+            locationCountryCodes.concat(travelHistoryCodes),
+        );
         const namesMap: {
-            [key: string]: string[] | undefined
+            [key: string]: string[] | undefined;
         } = {};
         for (const code of allCodes) {
             const names = countries.getName(code, 'en', { select: 'all' });
             // ask the geocoding service what name it uses
             try {
                 const res = await axios.get<string, AxiosResponse<string>>(
-                    this.locationServiceURL + `/geocode/countryName?c=${code}`
-                )
+                    this.locationServiceURL + `/geocode/countryName?c=${code}`,
+                );
                 const geocodeName = res.data;
                 if (names.indexOf(geocodeName) < 0) {
                     names.push(geocodeName);
                 }
-            }
-            catch (err) {
+            } catch (err) {
                 // doesn't matter, weird that geocoding service doesn't have this code though
-                logger.warn(`geocoding service doesn't have a name for country code ${code} found in the DB!`);
+                logger.warn(
+                    `geocoding service doesn't have a name for country code ${code} found in the DB!`,
+                );
             }
             namesMap[code] = names;
         }
         res.status(200).json(namesMap);
-    }
+    };
 
     seed = async (req: Request, res: Response): Promise<void> => {
         const response = await axios.post(

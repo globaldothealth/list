@@ -9,4 +9,3 @@ export type IAutomation = {
     // TODO remove this when source is no longer a Mongoose document
     modifiedPaths: () => [string];
 };
-

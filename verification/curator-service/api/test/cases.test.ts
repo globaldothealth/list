@@ -206,9 +206,7 @@ describe('Cases', () => {
             .expect(200)
             .expect('Content-Type', /json/);
         expect(mockedAxios.put).toHaveBeenCalledTimes(1);
-        expect(
-            mockedAxios.put,
-        ).toHaveBeenCalledWith(
+        expect(mockedAxios.put).toHaveBeenCalledWith(
             'http://localhost:3000/api/cases/5e99f21a1c9d440000ceb088',
             { age: '42', ...creatorMetadata },
         );

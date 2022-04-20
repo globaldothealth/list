@@ -1,6 +1,7 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { User } from '../../api/models/User';
 import axios from 'axios';
+import { sendCustomGtmEvent } from '../../components/util/helperFunctions';
 
 export const signInWithEmailAndPassword = createAsyncThunk<
     User,
@@ -30,6 +31,11 @@ export const signUpWithEmailAndPassword = createAsyncThunk<
 >('auth/signUpWithEmailAndPassword', async (data, { rejectWithValue }) => {
     try {
         const response = await axios.post<User>('/auth/signup', data);
+
+        sendCustomGtmEvent('sign_up', {
+            newsletter_accepted: data.newsletterAccepted,
+            method: 'email',
+        });
 
         return response.data;
     } catch (error) {

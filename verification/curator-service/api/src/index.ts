@@ -169,7 +169,7 @@ async function makeApp() {
     const sourcesController = new SourcesController(
         emailClient,
         awsBatchClient,
-        env.DATASERVER_URL
+        env.DATASERVER_URL,
     );
     apiRouter.get(
         '/sources',
