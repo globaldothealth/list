@@ -1,3 +1,4 @@
+import { AgeBucket } from '../../src/model/age-bucket';
 import { Case, RestrictedCase } from '../../src/model/case';
 import { CaseRevision } from '../../src/model/case-revision';
 import { Demographics } from '../../src/model/demographics';
@@ -26,6 +27,11 @@ const minimalRequest = {
     ...curatorMetadata,
 };
 
+const fullRequest = {
+    ...fullCase,
+    ...curatorMetadata,
+};
+
 const invalidRequest = {
     ...minimalRequest,
     demographics: { ageRange: { start: 400 } },
@@ -43,10 +49,25 @@ function stringParser(res: request.Response) {
     });
 }
 
+async function createAgeBuckets() {
+    await new AgeBucket({
+        start: 0,
+        end: 0,
+    }).save();
+    for (let start = 1; start <= 116; start += 5) {
+        const end = start + 4;
+        await new AgeBucket({
+            start,
+            end,
+        }).save();
+    }
+}
+
 beforeAll(async () => {
     mockLocationServer.listen();
     mongoServer = new MongoMemoryServer();
     global.Date.now = jest.fn(() => new Date('2020-12-12T12:12:37Z').getTime());
+    await createAgeBuckets();
 });
 
 beforeEach(async () => {
@@ -63,6 +84,7 @@ afterEach(() => {
 afterAll(async () => {
     mockLocationServer.close();
     global.Date.now = realDate;
+    await AgeBucket.deleteMany({});
     return mongoServer.stop();
 });
 
@@ -515,6 +537,22 @@ describe('POST', () => {
 
         expect(await Case.collection.countDocuments()).toEqual(0);
         expect(res.body._id).not.toHaveLength(0);
+    });
+    it('create with valid input should write age buckets', async () => {
+        /*
+         * The idea is that the age bucketing done in #2670 should improve the privacy of the application
+         * without changing the API. You still tell us what the age range of the case is, and we map that
+         * onto the buckets supported in the application and store those.
+         */
+        const res = await request(app)
+            .post('/api/cases')
+            .send(fullRequest)
+            .expect('Content-Type', /json/)
+            .expect(201);
+        expect(await Case.collection.countDocuments()).toEqual(1);
+        // case has age range 50-59, which matches our buckets 46-50, 51-55, 56-60
+        const theCase = await Case.findOne({});
+        expect(theCase?.demographics.ageBuckets.length).toEqual(3);
     });
     it('batch upsert with no body should return 415', () => {
         return request(app).post('/api/cases/batchUpsert').expect(415);

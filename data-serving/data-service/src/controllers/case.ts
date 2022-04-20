@@ -5,7 +5,6 @@ import {
     RestrictedCase,
 } from '../model/case';
 import { EventDocument } from '../model/event';
-import { GenomeSequenceDocument } from '../model/genome-sequence';
 import caseFields from '../model/fields.json';
 import { Source } from '../model/source';
 import {
