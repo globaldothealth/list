@@ -483,6 +483,22 @@ describe('POST', () => {
         // case has range 40-50, should be bucketed into 36-40, 41-45, 46-50
         expect(theCase!.demographics.ageBuckets).toHaveLength(3);
     })
+    it('GETting the PUT case should return an age range', async () => {
+        const theCase = await request(app)
+            .post('/api/cases')
+            .send(minimalRequest)
+            .expect('Content-Type', /json/)
+            .expect(201);
+
+        const res = await request(app)
+            .get(`/api/cases/${theCase.body._id}`)
+            .expect('Content-Type', /json/)
+            .expect(200);
+        expect(res.body[0].demographics.ageRange).toEqual({
+            start: 36,
+            end: 50,
+        });
+    });
     it('create many cases with valid input should return 201 OK', async () => {
         const res = await request(app)
             .post('/api/cases?num_cases=3')
