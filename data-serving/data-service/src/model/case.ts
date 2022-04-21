@@ -1,5 +1,5 @@
 import { CaseReferenceDocument, caseReferenceSchema } from './case-reference';
-import { DemographicsDocument, demographicsSchema } from './demographics';
+import { DemographicsDocument, DemographicsDTO, demographicsSchema } from './demographics';
 import { EventDocument, eventSchema } from './event';
 import {
     GenomeSequenceDocument,
@@ -26,6 +26,15 @@ import _ from 'lodash';
 import mongoose from 'mongoose';
 import { ExclusionDataDocument, exclusionDataSchema } from './exclusion-data';
 import { dateFieldInfo } from './date';
+
+/*
+ * There are separate types for case for data storage (the mongoose document) and
+ * for data transfer (CaseDTO). The DTO only has an age range, and is what the cases
+ * controller receives and transmits over the network. The mongoose document has both an age
+ * range and age buckets, and is what gets written to the database. The end goal is that the
+ * mongoose document only has age buckets, and that the cases controller converts between the
+ * two so that outside you only see a single age range.
+ */
 
 const requiredDateField = {
     ...dateFieldInfo,
@@ -127,11 +136,9 @@ caseSchema.methods.equalsJSON = function (jsonCase: any): boolean {
     );
 };
 
-export type CaseDocument = mongoose.Document & {
-    _id: ObjectId;
+export type ICase = {
     caseReference: CaseReferenceDocument;
     confirmationDate: Date;
-    demographics: DemographicsDocument;
     events: [EventDocument];
     exclusionData: ExclusionDataDocument;
     genomeSequences: [GenomeSequenceDocument];
@@ -149,7 +156,15 @@ export type CaseDocument = mongoose.Document & {
     travelHistory: TravelHistoryDocument;
     vaccines: [VaccineDocument];
     variant: VariantDocument;
+};
 
+export type CaseDTO = ICase & {
+    demographics?: DemographicsDTO;
+};
+
+export type CaseDocument = mongoose.Document & ICase & {
+    _id: ObjectId;
+    demographics: DemographicsDocument;
     // TODO: Type request Cases.
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     equalsJSON(jsonCase: any): boolean;

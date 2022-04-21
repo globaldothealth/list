@@ -1,11 +1,11 @@
 import {
     Case,
     CaseDocument,
+    CaseDTO,
     caseWithDenormalisedConfirmationDate,
     RestrictedCase,
 } from '../model/case';
 import { EventDocument } from '../model/event';
-import { GenomeSequenceDocument } from '../model/genome-sequence';
 import caseFields from '../model/fields.json';
 import { Source } from '../model/source';
 import {
@@ -30,12 +30,31 @@ import {
 import { logger } from '../util/logger';
 import stringify from 'csv-stringify/lib/sync';
 import _ from 'lodash';
+import { AgeBucket } from '../model/age-bucket';
 
 class GeocodeNotFoundError extends Error {}
 
 class InvalidParamError extends Error {}
 
 type BatchValidationErrors = { index: number; message: string }[];
+
+const caseFromDTO = async (receivedCase: CaseDTO) => {
+    const aCase = new Case(receivedCase);
+    if (receivedCase.demographics?.ageRange) {
+        // won't be many age buckets, so fetch all of them.
+        const allBuckets = await AgeBucket.find({});
+        const caseStart = receivedCase.demographics?.ageRange.start;
+        const caseEnd = receivedCase.demographics?.ageRange.end;
+        const matchingBucketIDs = allBuckets.filter(b => {
+            const bucketContainsStart = (b.start <= caseStart && b.end >= caseStart);
+            const bucketContainsEnd = (b.start <= caseEnd && b.end >= caseEnd);
+            const bucketWithinCaseRange = (b.start > caseStart && b.end < caseEnd);
+            return bucketContainsStart || bucketContainsEnd || bucketWithinCaseRange;
+        }).map((b) => (b._id));
+        aCase.demographics.ageBuckets = matchingBucketIDs;
+    }
+    return aCase;
+}
 
 export class CasesController {
     private csvHeaders: string[];
@@ -336,7 +355,8 @@ export class CasesController {
         const numCases = Number(req.query.num_cases) || 1;
         try {
             await this.geocode(req);
-            let c = new Case(req.body);
+            const receivedCase = req.body as CaseDTO;
+            let c = await caseFromDTO(receivedCase);
             let restrictedCases = false;
             if (c.caseReference.sourceId) {
                 const s = await Source.find({ _id: c.caseReference.sourceId });

@@ -16,6 +16,7 @@ import {
     handlers,
 } from '../mocks/handlers';
 import fs from 'fs';
+import { AgeBucket } from '../../src/model/age-bucket';
 
 let mongoServer: MongoMemoryServer;
 
@@ -43,9 +44,24 @@ function stringParser(res: request.Response) {
     });
 }
 
+async function createAgeBuckets() {
+    await new AgeBucket({
+        start: 0,
+        end: 0,
+    }).save();
+    for (let start = 1; start <= 116; start += 5) {
+        const end = start + 4;
+        await new AgeBucket({
+            start,
+            end,
+        }).save();
+    }
+}
+
 beforeAll(async () => {
     mockLocationServer.listen();
     mongoServer = new MongoMemoryServer();
+    await createAgeBuckets();
     global.Date.now = jest.fn(() => new Date('2020-12-12T12:12:37Z').getTime());
 });
 
@@ -61,6 +77,7 @@ afterEach(() => {
 });
 
 afterAll(async () => {
+    await AgeBucket.deleteMany({});
     mockLocationServer.close();
     global.Date.now = realDate;
     return mongoServer.stop();
@@ -456,6 +473,16 @@ describe('POST', () => {
             .expect(201);
         expect(await Case.collection.countDocuments()).toEqual(1);
     });
+    it('create with valid input should bucket the age range', async () => {
+        await request(app)
+            .post('/api/cases')
+            .send(minimalRequest)
+            .expect('Content-Type', /json/)
+            .expect(201);
+        const theCase = await Case.findOne({});
+        // case has range 40-50, should be bucketed into 36-40, 41-45, 46-50
+        expect(theCase!.demographics.ageBuckets).toHaveLength(3);
+    })
     it('create many cases with valid input should return 201 OK', async () => {
         const res = await request(app)
             .post('/api/cases?num_cases=3')
