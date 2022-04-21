@@ -2,6 +2,15 @@ import { Range } from './range';
 import mongoose from 'mongoose';
 import { ObjectId } from 'mongodb';
 
+/*
+ * There are separate types for demographics for data storage (the mongoose document) and
+ * for data transfer (DemographicsDTO). The DTO only has an age range, and is what the cases
+ * controller receives and transmits over the network. The mongoose document has both an age
+ * range and age buckets, and is what gets written to the database. The end goal is that the
+ * mongoose document only has age buckets, and that the cases controller converts between the
+ * two so that outside you only see a single age range.
+ */
+
 export const demographicsSchema = new mongoose.Schema(
     {
         /*
@@ -35,13 +44,16 @@ export const demographicsSchema = new mongoose.Schema(
     { _id: false },
 );
 
-export type DemographicsDocument = mongoose.Document & {
-    ageBuckets: ObjectId[];
-    ageRange: Range<number>;
+export type DemographicsDTO = {
+    ageRange?: Range<number>;
     gender: string;
     occupation: string;
     nationalities: [string];
     ethnicity: string;
+}
+
+export type DemographicsDocument = mongoose.Document & DemographicsDTO & {
+    ageBuckets: ObjectId[];
 };
 
 export const Demographics = mongoose.model<DemographicsDocument>(
