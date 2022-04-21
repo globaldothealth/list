@@ -56,6 +56,25 @@ const caseFromDTO = async (receivedCase: CaseDTO) => {
     return aCase;
 }
 
+const dtoFromCase = async (storedCase: LeanDocument<CaseDocument>) => {
+    const dto = storedCase as unknown as CaseDTO;
+    if (storedCase.demographics.ageBuckets) {
+        const ageBuckets = await Promise.all(storedCase.demographics.ageBuckets.map((bucketId) => {
+            return AgeBucket.findById(bucketId).lean()
+        }));
+        const minimumAge = Math.min(...(ageBuckets.map(b => b!.start)));
+        const maximumAge = Math.max(...(ageBuckets.map(b => b!.end)));
+        dto.demographics = {
+            ...dto.demographics!,
+            ageRange: {
+                start: minimumAge,
+                end: maximumAge,
+            }
+        }
+    }
+    return dto;
+}
+
 export class CasesController {
     private csvHeaders: string[];
     constructor(private readonly geocoders: Geocoder[]) {
@@ -96,7 +115,7 @@ export class CasesController {
             delete aCase.restrictedNotes;
         });
 
-        res.json(c);
+        res.json(await Promise.all(c.map(aCase => dtoFromCase(aCase))));
     };
 
     /**
