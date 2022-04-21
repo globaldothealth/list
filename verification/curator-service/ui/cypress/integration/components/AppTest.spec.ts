@@ -119,16 +119,16 @@ describe('App', function () {
             });
         }
 
+        cy.intercept(
+            'GET',
+            getDefaultQuery({ query: 'gender:notProvided' }),
+        ).as('filterByGender');
+
         cy.visit('/');
         cy.contains('Line list').click();
 
         cy.contains('Germany').should('be.visible');
         cy.contains('Italy').should('be.visible');
-
-        cy.server();
-        cy.route('GET', `${getDefaultQuery()}&q=gender:notProvided`).as(
-            'filterByGender',
-        );
 
         cy.get('.filter-button').click();
         cy.get('#gender').click();
@@ -138,7 +138,7 @@ describe('App', function () {
         cy.wait('@filterByGender');
 
         cy.contains('Italy').should('be.visible');
-        cy.contains('Germany').should('not.be.visible');
+        cy.contains('Germany').should('not.exist');
     });
 
     it('allows the user to search by outcome', function () {
@@ -421,13 +421,7 @@ describe('App', function () {
     it('Displays version number in profile menu', function () {
         cy.login({ name: 'Alice Smith', email: 'alice@test.com', roles: [] });
 
-        cy.server();
-        cy.route({
-            method: 'GET',
-            url: `/version`,
-            status: 200,
-            response: '1.10.1',
-        }).as('fetchVersion');
+        cy.intercept('GET', '/version', '1.10.1').as('fetchVersion');
 
         cy.visit('/');
         cy.wait('@fetchVersion');

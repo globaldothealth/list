@@ -32,12 +32,14 @@ describe('Curator', function () {
             geoResolution: 'Country',
         });
 
-        const sidebar = cy.get('div[data-testid="sidebar"] .MuiDrawer-paperAnchorDockedLeft');
+        const sidebar = cy.get(
+            'div[data-testid="sidebar"] .MuiDrawer-paperAnchorDockedLeft',
+        );
         sidebar.then((sidebar) => {
             if (sidebar.css('visibility') == 'hidden') {
-            cy.get('button[aria-label="toggle drawer"]').click();
+                cy.get('button[aria-label="toggle drawer"]').click();
             }
-          });
+        });
 
         // Input full case.
         cy.get('button[data-testid="create-new-button"]').click();
@@ -165,8 +167,9 @@ describe('Curator', function () {
         cy.get('div[data-testid="pathogens"]').type('Ebola');
         cy.contains('li', 'Ebola').click();
         cy.get('textarea[name="notes"]').type('test notes\non new line');
-        cy.server();
-        cy.route('POST', '/api/cases?num_cases=1').as('addCase');
+
+        cy.intercept('POST', '/api/cases?num_cases=1').as('addCase');
+
         cy.get('button[data-testid="submit"]').click();
         cy.wait('@addCase');
 

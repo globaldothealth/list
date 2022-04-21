@@ -10,5 +10,5 @@
     "execTimeout": 70000,
     "requestTimeout": 70000,
     "responseTimeout": 70000,
-    "numTestsKeptInMemory": 5
+    "numTestsKeptInMemory": 15
 }

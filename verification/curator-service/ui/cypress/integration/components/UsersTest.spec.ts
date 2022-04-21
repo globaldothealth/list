@@ -11,7 +11,7 @@ describe('Manage users page', function () {
             roles: ['curator'],
         });
         cy.login({ name: 'Alice', email: 'alice@test.com', roles: ['admin'] });
-        cy.visit('/')
+        cy.visit('/');
         cy.visit('/users');
 
         cy.contains('Alice');
@@ -33,8 +33,8 @@ describe('Manage users page', function () {
             roles: ['curator'],
         });
         cy.login({ name: 'Alice', email: 'alice@test.com', roles: ['admin'] });
-        cy.visit('/')
-        cy.visit('/users')
+        cy.visit('/');
+        cy.visit('/users');
         cy.contains('Bob');
         cy.get('div[data-testid="Bob-select-roles"]').contains('curator');
         cy.get('div[data-testid="Bob-select-roles"]')
@@ -42,9 +42,8 @@ describe('Manage users page', function () {
             .should('not.exist');
 
         // Select new roles
-        cy.server();
-        cy.route('PUT', '/api/users/*').as('updateUser');
-        cy.route('GET', '/api/users/*').as('getUsers');
+        cy.intercept('PUT', '/api/users/*').as('updateUser');
+        cy.intercept('GET', '/api/users/*').as('getUsers');
         cy.get('div[data-testid="Bob-select-roles"]').click();
         cy.get('li[data-value="admin"]').click();
         cy.wait('@updateUser');
@@ -60,7 +59,7 @@ describe('Manage users page', function () {
             .should('not.exist');
 
         // Roles are maintained on refresh
-        cy.visit('/')
+        cy.visit('/');
         cy.visit('/users');
         cy.get('div[data-testid="Bob-select-roles"]').contains('admin');
         cy.get('div[data-testid="Bob-select-roles"]')
@@ -70,12 +69,11 @@ describe('Manage users page', function () {
 
     it('Updated roles propagate to other pages', function () {
         cy.login({ name: 'Alice', email: 'alice@test.com', roles: ['admin'] });
-        cy.visit('/')
+        cy.visit('/');
         cy.visit('/users');
 
         // Select new role
-        cy.server();
-        cy.route('PUT', '/api/users/*').as('updateUser');
+        cy.intercept('PUT', '/api/users/*').as('updateUser');
         cy.get('div[data-testid="Alice-select-roles"]').click();
         cy.get('li[data-value="curator"]').click();
         cy.wait('@updateUser');
@@ -85,7 +83,7 @@ describe('Manage users page', function () {
         cy.contains('Line list');
 
         // Profile page is updated
-        cy.visit('/')
+        cy.visit('/');
         cy.visit('/profile');
         cy.contains('admin');
         cy.contains('curator');

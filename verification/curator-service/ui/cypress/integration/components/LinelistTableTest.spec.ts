@@ -141,8 +141,8 @@ describe('Linelist table', function () {
         cy.get('input[type="checkbox"]').should('have.length', 4);
         cy.get('input[type="checkbox"]').eq(1).click();
         cy.get('input[type="checkbox"]').eq(3).click();
-        cy.server();
-        cy.route('DELETE', `/api/cases`).as('deleteCases');
+
+        cy.intercept('DELETE', `/api/cases`).as('deleteCases');
         cy.get('button[title="Delete selected rows"]').click();
         cy.contains('Are you sure you want to delete 2 cases?');
         cy.contains('Yes').click();
@@ -174,8 +174,8 @@ describe('Linelist table', function () {
         cy.get('input[type="checkbox"]').eq(1).click();
         cy.get('input[type="checkbox"]').eq(2).click();
         cy.get('input[type="checkbox"]').eq(3).click();
-        cy.server();
-        cy.route('POST', `/api/cases/batchStatusChange`).as('excludeCases');
+
+        cy.intercept('POST', `/api/cases/batchStatusChange`).as('excludeCases');
         cy.get('button[title="Exclude selected rows"]').click();
         cy.contains('Are you sure you want to exclude selected cases?');
         cy.get('textarea[name="note"]').type('test reason');
@@ -208,8 +208,8 @@ describe('Linelist table', function () {
         cy.get('input[type="checkbox"]').eq(1).click();
         cy.get('input[type="checkbox"]').eq(2).click();
         cy.get('input[type="checkbox"]').eq(3).click();
-        cy.server();
-        cy.route('POST', `/api/cases/batchStatusChange`).as('excludeCases');
+
+        cy.intercept('POST', `/api/cases/batchStatusChange`).as('excludeCases');
         cy.get('button[title="Exclude selected rows"]').click();
         cy.contains('Are you sure you want to exclude selected cases?');
         cy.get('textarea[name="note"]').type('test reason');
@@ -225,8 +225,8 @@ describe('Linelist table', function () {
         cy.get('input[type="checkbox"]').eq(1).click();
         cy.get('input[type="checkbox"]').eq(2).click();
         cy.get('input[type="checkbox"]').eq(3).click();
-        cy.server();
-        cy.route('POST', `/api/cases/batchStatusChange`).as('includeCases');
+
+        cy.intercept('POST', `/api/cases/batchStatusChange`).as('includeCases');
         cy.get('button[title="Unverify selected rows"]').click();
         cy.contains('Are you sure you want to reinclude selected cases?');
         cy.contains('Yes').click();
@@ -250,8 +250,8 @@ describe('Linelist table', function () {
         cy.visit('/');
         cy.visit('/cases');
         cy.get('svg[data-testid="unverified-svg"]').should('have.length', 3);
-        cy.server();
-        cy.route('POST', `/api/cases/batchStatusChange`).as('updateCases');
+
+        cy.intercept('POST', `/api/cases/batchStatusChange`).as('updateCases');
 
         // Three row checkboxes and a header checkbox
         cy.get('input[type="checkbox"]').should('have.length', 4);
@@ -285,19 +285,22 @@ describe('Linelist table', function () {
         cy.addCase({
             country: 'United Kingdom',
         });
-        cy.server();
-        cy.route('GET', getDefaultQuery(50)).as('getCasesDefault');
-        cy.route('GET', getDefaultQuery(5)).as('getCases');
-        cy.route('GET', `${getDefaultQuery(5)}&q=country:FR`).as(
-            'getFilteredCases',
+
+        cy.intercept('GET', getDefaultQuery({ limit: 50 })).as(
+            'getCasesDefault',
         );
-        cy.route('GET', getDefaultQuery(10)).as('get10Cases');
+        cy.intercept('GET', getDefaultQuery({ limit: 5 })).as('getCases');
+        cy.intercept(
+            'GET',
+            `${getDefaultQuery({ limit: 5, query: 'country:FR' })}`,
+        ).as('getFilteredCases');
+        cy.intercept('GET', getDefaultQuery({ limit: 10 })).as('get10Cases');
         cy.visit('/');
         cy.visit('/cases');
         cy.wait('@getCasesDefault');
         cy.get('svg[data-testid="unverified-svg"]').should('have.length', 9);
         cy.contains('rows').click();
-        cy.get('li').contains('5').click();
+        cy.get('[data-value="5"').click();
         cy.wait('@getCases');
         cy.contains('Filter').click();
         cy.get('#country').click();
@@ -309,7 +312,7 @@ describe('Linelist table', function () {
         cy.contains('Select all 7 rows').click();
 
         // Mark them verified.
-        cy.route('POST', `/api/cases/batchStatusChange`).as('updateCases');
+        cy.intercept('POST', `/api/cases/batchStatusChange`).as('updateCases');
         cy.get('button[title="Verify selected rows"]').click();
         cy.wait('@updateCases');
         cy.wait('@getFilteredCases');
@@ -327,7 +330,7 @@ describe('Linelist table', function () {
         cy.get('svg[data-testid="unverified-svg"]').should('have.length', 2);
 
         cy.contains('rows').click();
-        cy.get('li').contains('5').click();
+        cy.get('[data-value="5"').click();
         cy.wait('@getCases');
         cy.contains('Filter').click();
         cy.get('#country').click();
@@ -440,16 +443,16 @@ describe('Linelist table', function () {
                 notes: 'some notes',
             });
         }
-        cy.server();
-        cy.route('GET', getDefaultQuery(50)).as('getCases');
+
+        cy.intercept('GET', getDefaultQuery({ limit: 50 })).as('getCases');
         cy.visit('/');
         cy.visit('/cases');
         cy.wait('@getCases');
         cy.wait(550);
         cy.contains('rows').click();
-        console.log(getDefaultQuery(5));
-        cy.route('GET', getDefaultQuery(5)).as('get5Cases');
-        cy.get('li').contains('5').click();
+
+        cy.intercept('GET', getDefaultQuery({ limit: 5 })).as('get5Cases');
+        cy.get('[data-value="5"').click();
         cy.wait('@get5Cases');
         cy.get('input[type="checkbox"]').should('have.length', 6);
         cy.contains('1 row selected').should('not.exist');
@@ -488,14 +491,14 @@ describe('Linelist table', function () {
         cy.addCase({
             country: 'United Kingdom',
         });
-        cy.server();
-        cy.route('GET', getDefaultQuery(50)).as('getCases');
+
+        cy.intercept('GET', getDefaultQuery({ limit: 50 })).as('getCases');
         cy.visit('/');
         cy.visit('/cases');
         cy.wait('@getCases');
         cy.wait(550);
         cy.contains('rows').click();
-        cy.get('li').contains('5').click();
+        cy.get('[data-value="5"').click();
         cy.contains('Filter').click();
         cy.get('#country').click();
         cy.get('[data-value="FR"]').click();
@@ -503,8 +506,8 @@ describe('Linelist table', function () {
         cy.wait(550);
         cy.get('input[type="checkbox"]').eq(0).click();
         cy.contains('Select all 7 rows').click();
-        cy.server();
-        cy.route('DELETE', `/api/cases`).as('deleteCases');
+
+        cy.intercept('DELETE', `/api/cases`).as('deleteCases');
         cy.get('button[title="Delete selected rows"]').click();
         cy.contains('Are you sure you want to delete 7 cases?');
         cy.contains('Yes').click();
@@ -527,14 +530,14 @@ describe('Linelist table', function () {
                 sourceUrl: 'foo.bar',
             });
         }
-        cy.server();
-        cy.route('GET', getDefaultQuery(50)).as('getCases');
+
+        cy.intercept('GET', getDefaultQuery({ limit: 50 })).as('getCases');
         cy.visit('/');
         cy.visit('/cases');
         cy.wait('@getCases');
         cy.contains('rows').click();
-        cy.route('GET', getDefaultQuery(5)).as('getFirstPage');
-        cy.get('li').contains('5').click();
+        cy.intercept('GET', getDefaultQuery({ limit: 5 })).as('getFirstPage');
+        cy.get('[data-value="5"').click();
         cy.wait('@getFirstPage');
 
         cy.contains('chevron_right').click();
@@ -553,14 +556,14 @@ describe('Linelist table', function () {
                 sourceUrl: 'foo.bar',
             });
         }
-        cy.server();
-        cy.route('GET', getDefaultQuery(50)).as('getCases');
+
+        cy.intercept('GET', getDefaultQuery({ limit: 50 })).as('getCases');
         cy.visit('/');
         cy.visit('/cases');
         cy.wait('@getCases');
         cy.contains('rows').click();
-        cy.route('GET', getDefaultQuery(5)).as('getFirstPage');
-        cy.get('li').contains('5').click();
+        cy.intercept('GET', getDefaultQuery({ limit: 5 })).as('getFirstPage');
+        cy.get('[data-value="5"]').contains('5').click();
         cy.wait('@getFirstPage');
 
         cy.contains('chevron_right').click();
@@ -589,9 +592,9 @@ describe('Linelist table', function () {
             sourceUrl: 'foo.bar',
             creationDate: new Date(2021, 7, 12),
         });
-        cy.server();
-        cy.route('GET', getDefaultQuery(50)).as('getCases');
-        cy.route('GET', '/api/cases').as('getCasesAscending');
+
+        cy.intercept('GET', getDefaultQuery({ limit: 50 })).as('getCases');
+        cy.intercept('GET', '/api/cases').as('getCasesAscending');
 
         cy.visit('/cases');
         cy.wait('@getCases');

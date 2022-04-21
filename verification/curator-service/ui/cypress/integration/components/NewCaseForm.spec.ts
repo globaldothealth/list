@@ -4,6 +4,7 @@ describe('New case form', function () {
         cy.task('clearSourcesDB', {});
         cy.task('clearCasesDB', {});
         cy.login();
+        cy.intercept('GET', '/auth/profile').as('getProfile');
     });
 
     afterEach(() => {
@@ -20,7 +21,10 @@ describe('New case form', function () {
         });
         cy.addSource('Test source', 'www.example.com');
 
-        cy.visit('/')
+        cy.visit('/');
+
+        cy.wait('@getProfile');
+
         cy.visit('/cases/new');
         cy.contains('Create new COVID-19 line list case');
         cy.get('div[data-testid="caseReference"]').type('www.example.com');
@@ -28,8 +32,8 @@ describe('New case form', function () {
         cy.get('div[data-testid="location"]').type('France');
         cy.contains('li', 'France').click();
         cy.get('input[name="confirmedDate"]').type('2020-01-01');
-        cy.server();
-        cy.route('POST', '/api/cases?num_cases=1').as('addCase');
+
+        cy.intercept('POST', '/api/cases?num_cases=1').as('addCase');
         cy.get('button[data-testid="submit"]').click();
         cy.wait('@addCase');
         cy.request({ method: 'GET', url: '/api/cases' }).then((resp) => {
@@ -51,7 +55,9 @@ describe('New case form', function () {
             geoResolution: 'Country',
         });
 
-        cy.visit('/')
+        cy.visit('/');
+        cy.wait('@getProfile');
+
         cy.visit('/cases/new');
         cy.contains('Create new COVID-19 line list case');
         cy.get('div[data-testid="caseReference"]').type('www.new-source.com');
@@ -61,8 +67,8 @@ describe('New case form', function () {
         cy.get('div[data-testid="location"]').type('France');
         cy.contains('li', 'France').click();
         cy.get('input[name="confirmedDate"]').type('2020-01-01');
-        cy.server();
-        cy.route('POST', '/api/cases?num_cases=1').as('addCase');
+
+        cy.intercept('POST', '/api/cases?num_cases=1').as('addCase');
         cy.get('button[data-testid="submit"]').click();
         cy.wait('@addCase');
         cy.request({ method: 'GET', url: '/api/cases' }).then((resp) => {
@@ -74,7 +80,7 @@ describe('New case form', function () {
             cy.contains('France');
             cy.contains('2020-01-01');
 
-            cy.visit('/')
+            cy.visit('/');
             cy.visit('/sources');
             cy.contains('www.new-source.com');
             cy.contains('New source');
@@ -90,7 +96,9 @@ describe('New case form', function () {
         });
         cy.addSource('Test source', 'www.example.com');
 
-        cy.visit('/')
+        cy.visit('/');
+        cy.wait('@getProfile');
+
         cy.visit('/cases/new');
         cy.contains('Create new COVID-19 line list case');
         cy.get('div[data-testid="caseReference"]').type('www.example.com');
@@ -99,8 +107,8 @@ describe('New case form', function () {
         cy.contains('li', 'France').click();
         cy.get('input[name="confirmedDate"]').type('2020-01-01');
         cy.get('input[name="numCases"]').clear().type('3');
-        cy.server();
-        cy.route('POST', '/api/cases?num_cases=3').as('addCases');
+
+        cy.intercept('POST', '/api/cases?num_cases=3').as('addCases');
         cy.get('button[data-testid="submit"]').click();
         cy.wait('@addCases');
         cy.url().should('eq', 'http://localhost:3002/cases');
@@ -111,7 +119,7 @@ describe('New case form', function () {
     });
 
     it('Can submit events without dates', function () {
-        cy.visit('/')
+        cy.visit('/');
         cy.visit('/cases');
         cy.contains('No records to display');
         cy.seedLocation({
@@ -122,7 +130,9 @@ describe('New case form', function () {
         });
         cy.addSource('Test source', 'www.example.com');
 
-        cy.visit('/')
+        cy.visit('/');
+        cy.wait('@getProfile');
+
         cy.visit('/cases/new');
         cy.get('div[data-testid="caseReference"]').type('www.example.com');
         cy.contains('li', 'www.example.com').click();
@@ -139,8 +149,8 @@ describe('New case form', function () {
         // ICU admission without a date.
         cy.get('div[data-testid="admittedToIcu"]').click();
         cy.get('li[data-value="Yes"').click();
-        cy.server();
-        cy.route('POST', '/api/cases?num_cases=1').as('addCase');
+
+        cy.intercept('POST', '/api/cases?num_cases=1').as('addCase');
         cy.get('button[data-testid="submit"]').click();
         cy.wait('@addCase');
 
@@ -164,7 +174,9 @@ describe('New case form', function () {
         });
         cy.addSource('Test source', 'www.example.com');
 
-        cy.visit('/')
+        cy.visit('/');
+        cy.wait('@getProfile');
+
         cy.visit('/cases/new');
         cy.contains('Create new COVID-19 line list case');
         cy.get('div[data-testid="caseReference"]').type('www.example.com');
@@ -193,8 +205,8 @@ describe('New case form', function () {
         cy.get('li[data-value="Unknown"').click();
         cy.get('div[data-testid="travelHistory[0].location"]').type('France');
         cy.contains('li', 'France').click();
-        cy.server();
-        cy.route('POST', '/api/cases?num_cases=1').as('addCase');
+
+        cy.intercept('POST', '/api/cases?num_cases=1').as('addCase');
         cy.get('button[data-testid="submit"]').click();
         cy.wait('@addCase');
         cy.request({ method: 'GET', url: '/api/cases' }).then((resp) => {
@@ -246,7 +258,9 @@ describe('New case form', function () {
             symptoms: ['fever', 'cough'],
         });
 
-        cy.visit('/')
+        cy.visit('/');
+        cy.wait('@getProfile');
+
         cy.visit('/cases/new');
         cy.contains('Create new COVID-19 line list case');
         cy.get('div[data-testid="caseReference"]').type('www.example.com');
@@ -273,8 +287,8 @@ describe('New case form', function () {
         cy.contains('Hotel');
         cy.get('span:contains("Gym")').click();
         cy.get('span:contains("Hospital")').click();
-        cy.server();
-        cy.route('POST', '/api/cases?num_cases=1').as('addCase');
+
+        cy.intercept('POST', '/api/cases?num_cases=1').as('addCase');
         cy.get('button[data-testid="submit"]').click();
         cy.wait('@addCase');
         cy.request({ method: 'GET', url: '/api/cases' }).then((resp) => {
@@ -301,11 +315,13 @@ describe('New case form', function () {
             geoResolution: 'Country',
         });
         cy.addSource('Test source', 'www.example.com');
-        cy.visit('/')
+        cy.visit('/');
         cy.visit('/cases');
         cy.contains('No records to display');
 
-        cy.visit('/')
+        cy.visit('/');
+        cy.wait('@getProfile');
+
         cy.visit('/cases/new');
         cy.get('div[data-testid="caseReference"]').type('www.example.com');
         cy.contains('li', 'www.example.com').click();
@@ -313,13 +329,11 @@ describe('New case form', function () {
         cy.contains('France');
         cy.contains('li', 'France').click();
         cy.get('input[name="confirmedDate"]').type('2020-01-01');
-        cy.server();
+
         // Force server to return error
-        cy.route({
-            method: 'POST',
-            url: '/api/cases?num_cases=1',
-            status: 422,
-            response: { message: 'nope' },
+        cy.intercept('POST', '/api/cases?num_cases=1', {
+            statusCode: 422,
+            body: { message: 'nope' },
         }).as('addCase');
         cy.get('button[data-testid="submit"]').click();
         cy.wait('@addCase');
@@ -330,7 +344,9 @@ describe('New case form', function () {
     });
 
     it('Can change source URL without changing source name', function () {
-        cy.visit('/')
+        cy.visit('/');
+        cy.wait('@getProfile');
+
         cy.visit('/cases/new');
 
         cy.get('div[data-testid="caseReference"]').type('www.example.com');
@@ -345,14 +361,18 @@ describe('New case form', function () {
     });
 
     it('Check for required fields', function () {
-        cy.visit('/')
+        cy.visit('/');
+        cy.wait('@getProfile');
+
         cy.visit('/cases/new');
 
         cy.get('p:contains("Required")').should('have.length', 3);
     });
 
     it('Shows checkbox on field completion', function () {
-        cy.visit('/')
+        cy.visit('/');
+        cy.wait('@getProfile');
+
         cy.visit('/cases/new');
         cy.get('svg[data-testid="check-icon"]').should('not.exist');
         cy.get('div[data-testid="gender"]').click();
@@ -361,7 +381,9 @@ describe('New case form', function () {
     });
 
     it('Shows error icon on field submission error', function () {
-        cy.visit('/')
+        cy.visit('/');
+        cy.wait('@getProfile');
+
         cy.visit('/cases/new');
         cy.get('svg[data-testid="error-icon"]').should('not.exist');
         cy.get('svg[data-testid="check-icon"]').should('not.exist');
@@ -372,7 +394,10 @@ describe('New case form', function () {
 
     it('Can specify geocode manually', function () {
         cy.addSource('Test source', 'www.example.com');
+
         cy.visit('/');
+        cy.wait('@getProfile');
+
         cy.visit('/cases/new');
         cy.contains('Create new COVID-19 line list case');
         cy.get('div[data-testid="caseReference"]').type('www.example.com');
@@ -386,8 +411,8 @@ describe('New case form', function () {
         cy.get('input[name="location.geometry.latitude"]').type('12.34');
         cy.get('input[name="location.geometry.longitude"]').type('45.67');
         cy.get('input[name="confirmedDate"]').type('2020-01-01');
-        cy.server();
-        cy.route('POST', '/api/cases?num_cases=1').as('addCase');
+
+        cy.intercept('POST', '/api/cases?num_cases=1').as('addCase');
         cy.get('button[data-testid="submit"]').click();
         cy.wait('@addCase');
         cy.request({ method: 'GET', url: '/api/cases' }).then((resp) => {

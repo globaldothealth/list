@@ -37,8 +37,9 @@ describe('Bulk upload form', function () {
         cy.contains('li', 'www.bulksource.com').click();
         const csvFixture = '../fixtures/bulk_data_with_all_fields.csv';
         cy.get('input[type="file"]').attachFile(csvFixture);
-        cy.server();
-        cy.route('POST', '/api/cases/batchUpsert').as('batchUpsert');
+
+        cy.intercept('POST', '/api/cases/batchUpsert').as('batchUpsert');
+
         cy.get('button[data-testid="submit"]').click();
         cy.wait('@batchUpsert');
 
@@ -47,8 +48,9 @@ describe('Bulk upload form', function () {
         cy.contains(
             'bulk_data_with_all_fields.csv uploaded. 1 new case added.',
         );
-        cy.server();
-        cy.route('get', '/api/cases/*').as('viewCase');
+
+        cy.intercept('GET', '/api/cases/*').as('viewCase');
+
         cy.contains('td', 'Male').click({ force: true });
         cy.wait('@viewCase');
 
@@ -111,8 +113,9 @@ describe('Bulk upload form', function () {
         cy.contains('li', 'www.bulksource.com').click();
         const csvFixture = '../fixtures/bulk_data.csv';
         cy.get('input[type="file"]').attachFile(csvFixture);
-        cy.server();
-        cy.route('POST', '/api/cases/batchUpsert').as('batchUpsert');
+
+        cy.intercept('POST', '/api/cases/batchUpsert').as('batchUpsert');
+
         cy.get('button[data-testid="submit"]').click();
         cy.wait('@batchUpsert');
 
@@ -142,9 +145,10 @@ describe('Bulk upload form', function () {
         cy.get('input[name="caseReference.sourceLicense"]').type('GPL3');
         const csvFixture = '../fixtures/bulk_data.csv';
         cy.get('input[type="file"]').attachFile(csvFixture);
-        cy.server();
-        cy.route('POST', '/api/sources').as('addSource');
-        cy.route('POST', '/api/cases/batchUpsert').as('batchUpsert');
+
+        cy.intercept('POST', '/api/sources').as('addSource');
+        cy.intercept('POST', '/api/cases/batchUpsert').as('batchUpsert');
+
         cy.get('button[data-testid="submit"]').click();
         cy.wait('@addSource');
         cy.wait('@batchUpsert');
@@ -179,8 +183,9 @@ describe('Bulk upload form', function () {
         cy.contains('li', 'www.bulksource.com').click();
         const csvFixture = '../fixtures/bulk_data.csv';
         cy.get('input[type="file"]').attachFile(csvFixture);
-        cy.server();
-        cy.route('POST', '/api/cases/batchUpsert').as('batchUpsert');
+
+        cy.intercept('POST', '/api/cases/batchUpsert').as('batchUpsert');
+
         cy.get('button[data-testid="submit"]').click();
         cy.wait('@batchUpsert');
 
@@ -196,8 +201,9 @@ describe('Bulk upload form', function () {
         cy.contains('li', 'www.bulksource.com').click();
         const updatedCsvFixture = '../fixtures/updated_bulk_data.csv';
         cy.get('input[type="file"]').attachFile(updatedCsvFixture);
-        cy.server();
-        cy.route('POST', '/api/cases/batchUpsert').as('batchUpsert');
+
+        cy.intercept('POST', '/api/cases/batchUpsert').as('batchUpsert');
+
         cy.get('button[data-testid="submit"]').click();
         cy.wait('@batchUpsert');
 
@@ -207,8 +213,8 @@ describe('Bulk upload form', function () {
         cy.contains('Female');
 
         // Check both upload ids are present
-        cy.server();
-        cy.route('get', '/api/cases/*').as('viewCase');
+        cy.intercept('get', '/api/cases/*').as('viewCase');
+
         cy.contains('td', 'Female').click({ force: true });
         cy.wait('@viewCase');
         cy.contains('Data upload IDs')
@@ -231,8 +237,9 @@ describe('Bulk upload form', function () {
         cy.contains('li', 'www.bulksource.com').click();
         const csvFixture = '../fixtures/bulk_data_with_case_count.csv';
         cy.get('input[type="file"]').attachFile(csvFixture);
-        cy.server();
-        cy.route('POST', '/api/cases/batchUpsert').as('batchUpsert');
+
+        cy.intercept('POST', '/api/cases/batchUpsert').as('batchUpsert');
+
         cy.get('button[data-testid="submit"]').click();
         cy.wait('@batchUpsert');
 
@@ -256,8 +263,9 @@ describe('Bulk upload form', function () {
         cy.contains('li', 'www.bulksource.com').click();
         const csvFixture = '../fixtures/bad_bulk_data.csv';
         cy.get('input[type="file"]').attachFile(csvFixture);
-        cy.server();
-        cy.route('POST', '/api/cases/batchUpsert').as('batchUpsert');
+
+        cy.intercept('POST', '/api/cases/batchUpsert').as('batchUpsert');
+
         cy.get('button[data-testid="submit"]').click();
         cy.wait('@batchUpsert');
         cy.contains(
@@ -297,8 +305,9 @@ describe('Bulk upload form', function () {
         cy.contains('li', 'www.bulksource.com').click();
         const csvFixture = '../fixtures/no_header.csv';
         cy.get('input[type="file"]').attachFile(csvFixture);
-        cy.server();
-        cy.route('POST', '/api/cases/batchUpsert').as('batchUpsert');
+
+        cy.intercept('POST', '/api/cases/batchUpsert').as('batchUpsert');
+
         cy.get('button[data-testid="submit"]').click();
         cy.wait('@batchUpsert');
         cy.contains(

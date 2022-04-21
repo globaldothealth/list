@@ -20,8 +20,7 @@ describe('View case', function () {
             nationalities: ['Andorrean', 'French'],
         });
 
-        cy.server();
-        cy.route('GET', getDefaultQuery(50)).as('getCases');
+        cy.intercept('GET', getDefaultQuery({ limit: 50 })).as('getCases');
         cy.visit('/');
 
         cy.visit('/cases');

@@ -21,6 +21,8 @@ describe('Automated source form', function () {
         const license = 'WTFPL';
         const otherEmail = 'other.curator9001@gmail.com';
 
+        cy.intercept('POST', '/api/sources').as('createSource');
+
         cy.visit('/');
         cy.get('button[data-testid="create-new-button"]').click();
         cy.contains('li', 'New automated source').click();
@@ -31,8 +33,7 @@ describe('Automated source form', function () {
         cy.get('div[data-testid="recipients"]').type(otherEmail);
         cy.get('div[data-testid="format"]').click();
         cy.get(`li[data-value=${format}`).click();
-        cy.server();
-        cy.route('POST', '/api/sources').as('createSource');
+
         cy.get('button[data-testid="submit"]').click();
         cy.wait('@createSource');
 
@@ -61,13 +62,13 @@ describe('Automated source form', function () {
         cy.get('li[data-value="JSON"').click();
 
         // Force server to return error
-        cy.server();
-        cy.route({
-            method: 'POST',
-            url: '/api/sources',
-            status: 422,
-            response: { message: 'nope' },
+        cy.intercept('POST', '/api/sources', {
+            statusCode: 422,
+            body: {
+                message: 'nope',
+            },
         }).as('createSource');
+
         cy.get('button[data-testid="submit"]').click();
         cy.wait('@createSource');
         cy.contains('nope');

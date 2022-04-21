@@ -32,9 +32,9 @@ describe('Edit case', function () {
             cy.get('div[data-testid="gender"]').click();
             cy.get('li[data-value="Female"]').click();
             cy.get('input[name="age"]').type('21');
+
             // Submit the changes.
-            cy.server();
-            cy.route('PUT', `/api/cases/*`).as('editCase');
+            cy.intercept('PUT', `/api/cases/*`).as('editCase');
             cy.get('button[data-testid="submit"]').click();
             cy.wait('@editCase');
 

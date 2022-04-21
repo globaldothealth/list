@@ -33,13 +33,8 @@ describe('<AcknowledgmentsPage />', function () {
     });
 
     it('Should display loading indicator', function () {
-        cy.server();
-        cy.route({
-            method: 'GET',
-            url: `/api/acknowledgment-sources`,
-            status: 200,
-            response: 'fixture:acknowledgment_data.json',
-            delay: 3000,
+        cy.intercept('GET', '/api/acknowledgment-sources', {
+            delay: 2000,
         }).as('fetchSources');
 
         cy.visit('/data-acknowledgments');
@@ -47,15 +42,11 @@ describe('<AcknowledgmentsPage />', function () {
 
         cy.get('[data-cy="loader"]').should('be.visible');
         cy.wait('@fetchSources');
-        cy.get('[data-cy="loader"]').should('not.be.visible');
+        cy.get('[data-cy="loader"]').should('not.exist');
     });
 
     it('Can change number of rows per page', function () {
-        cy.server();
-        cy.route({
-            method: 'GET',
-            url: '/api/acknowledgment-sources',
-        }).as('fetchSources');
+        cy.intercept('GET', '/api/acknowledgment-sources').as('fetchSources');
 
         cy.visit('/data-acknowledgments');
         cy.wait('@fetchSources');
@@ -71,17 +62,13 @@ describe('<AcknowledgmentsPage />', function () {
             if (i < 5) {
                 cy.contains(countries[i]).should('be.visible');
             } else {
-                cy.contains(countries[i]).should('not.be.visible');
+                cy.contains(countries[i]).should('not.exist');
             }
         }
     });
 
     it('Can sort', function () {
-        cy.server();
-        cy.route({
-            method: 'GET',
-            url: `/api/acknowledgment-sources`,
-        }).as('fetchSources');
+        cy.intercept('GET', '/api/acknowledgment-sources').as('fetchSources');
 
         cy.visit('/data-acknowledgments');
         cy.wait('@fetchSources');
@@ -96,17 +83,13 @@ describe('<AcknowledgmentsPage />', function () {
             if (i >= 5) {
                 cy.contains(countries[i]).should('be.visible');
             } else {
-                cy.contains(countries[i]).should('not.be.visible');
+                cy.contains(countries[i]).should('not.exist');
             }
         }
     });
 
     it('Can toggle between pages', function () {
-        cy.server();
-        cy.route({
-            method: 'GET',
-            url: `/api/acknowledgment-sources`,
-        }).as('fetchSources');
+        cy.intercept('GET', '/api/acknowledgment-sources').as('fetchSources');
 
         cy.visit('/data-acknowledgments');
         cy.wait('@fetchSources');
@@ -119,7 +102,7 @@ describe('<AcknowledgmentsPage />', function () {
             if (i < 5) {
                 cy.contains(countries[i]).should('be.visible');
             } else {
-                cy.contains(countries[i]).should('not.be.visible');
+                cy.contains(countries[i]).should('not.exist');
             }
         }
 
@@ -129,7 +112,7 @@ describe('<AcknowledgmentsPage />', function () {
         // Only last 5 sources should be visible
         for (let i = 0; i < 10; i++) {
             if (i < 5) {
-                cy.contains(countries[i]).should('not.be.visible');
+                cy.contains(countries[i]).should('not.exist');
             } else {
                 cy.contains(countries[i]).should('be.visible');
             }
