@@ -75,6 +75,8 @@ const dtoFromCase = async (storedCase: LeanDocument<CaseDocument>) => {
             }
         }
     }
+    delete dto.restrictedNotes;
+
     return dto;
 }
 
@@ -334,9 +336,8 @@ export class CasesController {
                 countQuery,
             ]);
 
-            docs.forEach((aDoc: LeanDocument<CaseDocument>) => {
-                delete aDoc.restrictedNotes;
-            });
+            const dtos = await Promise.all(docs.map(dtoFromCase));
+
             logger.info('got results');
             // total is actually stored in a count index in mongo, so the query is fast.
             // however to maintain existing behaviour, only return the count limit
@@ -345,7 +346,7 @@ export class CasesController {
             // indicating that there is more to fetch on the next page.
             if (total > limit * page) {
                 res.json({
-                    cases: docs,
+                    cases: dtos,
                     nextPage: page + 1,
                     total: reportedTotal,
                 });
@@ -354,7 +355,7 @@ export class CasesController {
             }
             // If we fetched all available data, just return it.
             logger.info('Got one page of results');
-            res.json({ cases: docs, total: reportedTotal });
+            res.json({ cases: dtos, total: reportedTotal });
         } catch (e) {
             if (e instanceof ParsingError) {
                 logger.error(`Parsing error ${e.message}`);
