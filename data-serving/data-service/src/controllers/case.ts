@@ -39,7 +39,7 @@ class InvalidParamError extends Error {}
 type BatchValidationErrors = { index: number; message: string }[];
 
 const caseFromDTO = async (receivedCase: CaseDTO) => {
-    const aCase = new Case(receivedCase);
+    const aCase = receivedCase as unknown as LeanDocument<CaseDocument>;
     if (receivedCase.demographics?.ageRange) {
         // won't be many age buckets, so fetch all of them.
         const allBuckets = await AgeBucket.find({});
@@ -57,18 +57,21 @@ const caseFromDTO = async (receivedCase: CaseDTO) => {
 }
 
 const dtoFromCase = async (storedCase: LeanDocument<CaseDocument>) => {
-    const dto = storedCase as unknown as CaseDTO;
-    if (storedCase.demographics.ageBuckets) {
+    let dto = storedCase as unknown as CaseDTO;
+    if (storedCase.demographics.ageBuckets && storedCase.demographics.ageBuckets.length > 0) {
         const ageBuckets = await Promise.all(storedCase.demographics.ageBuckets.map((bucketId) => {
             return AgeBucket.findById(bucketId).lean()
         }));
         const minimumAge = Math.min(...(ageBuckets.map(b => b!.start)));
         const maximumAge = Math.max(...(ageBuckets.map(b => b!.end)));
-        dto.demographics = {
-            ...dto.demographics!,
-            ageRange: {
-                start: minimumAge,
-                end: maximumAge,
+        dto = {
+            ...dto,
+            demographics: {
+                ...dto.demographics!,
+                ageRange: {
+                    start: minimumAge,
+                    end: maximumAge,
+                }
             }
         }
     }
@@ -375,7 +378,7 @@ export class CasesController {
         try {
             await this.geocode(req);
             const receivedCase = req.body as CaseDTO;
-            let c = await caseFromDTO(receivedCase);
+            let c = new Case(await caseFromDTO(receivedCase));
             let restrictedCases = false;
             if (c.caseReference.sourceId) {
                 const s = await Source.find({ _id: c.caseReference.sourceId });
@@ -608,9 +611,10 @@ export class CasesController {
                 });
                 return;
             }
-            c.set(req.body);
+            const caseDetails = await caseFromDTO(req.body);
+            c.set(caseDetails);
             await c.save();
-            res.json(c);
+            res.json(await dtoFromCase(c));
         } catch (err) {
             if (err.name === 'ValidationError') {
                 res.status(422).json(err);

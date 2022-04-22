@@ -483,7 +483,7 @@ describe('POST', () => {
         // case has range 40-50, should be bucketed into 36-40, 41-45, 46-50
         expect(theCase!.demographics.ageBuckets).toHaveLength(3);
     })
-    it('GETting the PUT case should return an age range', async () => {
+    it('GETting the POSTed case should return an age range', async () => {
         const theCase = await request(app)
             .post('/api/cases')
             .send(minimalRequest)
@@ -1390,6 +1390,27 @@ describe('PUT', () => {
             .expect(200);
 
         expect(res.body.notes).toEqual(newNotes);
+    });
+    it('update present item with new age range should change the age buckets', async () => {
+        const c = new Case(minimalCase);
+        await c.save();
+
+        const newAgeRange = {
+            start: 6,
+            end: 7,
+        };
+        const res = await request(app)
+            .put(`/api/cases/${c._id}`)
+            .send({
+                ...curatorMetadata,
+                demographics: {
+                    ageRange: newAgeRange,
+                },
+            })
+            .expect('Content-Type', /json/)
+            .expect(200);
+        expect(res.body.demographics.ageRange.start).toEqual(6);
+        expect(res.body.demographics.ageRange.end).toEqual(10);
     });
     it('update present item with unknown travel locations should be 200 OK', async () => {
         const c = new Case(minimalCase);
