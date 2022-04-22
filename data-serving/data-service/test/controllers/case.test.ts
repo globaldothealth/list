@@ -223,6 +223,18 @@ describe('GET', () => {
                 .expect(200, /got it at work/)
                 .expect('Content-Type', /json/);
         });
+        it('should use age buckets in results', async () => {
+            const c = new Case(minimalCase);
+            const aBucket = await AgeBucket.findOne({});
+            c.demographics.ageBuckets = [aBucket!._id];
+            await c.save();
+            const res = await request(app)
+                .get(`/api/cases?page=1&limit=10`)
+                .expect(200)
+                .expect('Content-Type', /json/);
+            expect(res.body.cases[0].demographics.ageRange.start).toEqual(aBucket!.start);
+            expect(res.body.cases[0].demographics.ageRange.end).toEqual(aBucket!.end);
+        });
         it('should ignore the restricted collection', async () => {
             const r = new RestrictedCase(minimalCase);
             await r.save();
