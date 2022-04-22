@@ -113,6 +113,15 @@ describe('GET', () => {
         const res = await request(app).get(`/api/cases/${c._id}`).expect(200);
         expect(res.body[0].restrictedNotes).toBeUndefined();
     });
+    it('should convert age bucket to age range', async () => {
+        const c = new Case(minimalCase);
+        const bucket = await AgeBucket.findOne({});
+        c.demographics.ageBuckets = [bucket!._id];
+        await c.save();
+        const res = await request(app).get(`/api/cases/${c._id}`).expect(200);
+        expect(res.body[0].demographics.ageRange.start).toEqual(bucket!.start);
+        expect(res.body[0].demographics.ageRange.end).toEqual(bucket!.end);
+    });
     describe('list', () => {
         it('should return 200 OK', () => {
             return request(app)
