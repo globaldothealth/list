@@ -74,6 +74,8 @@ const dtoFromCase = async (storedCase: LeanDocument<CaseDocument>) => {
                 }
             }
         }
+        // although the type system can't see it, there's an ageBuckets property on the demographics DTO now
+        delete (dto as unknown as { demographics: { ageBuckets?: [ObjectId] }}).demographics.ageBuckets;
     }
     delete dto.restrictedNotes;
 
