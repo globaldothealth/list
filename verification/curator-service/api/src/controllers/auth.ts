@@ -199,7 +199,7 @@ export class AuthController {
                             if (err) return next(err);
                         });
 
-                        res.status(200).json(user);
+                        return res.status(200).json(user);
                     },
                 )(req, res, next);
             },
@@ -633,7 +633,8 @@ export class AuthController {
         // @ts-ignore
         passport.serializeUser((user: IUser, done: any) => {
             // Serializes the user id in the cookie, no user info should be in there, just the id.
-            done(null, user._id);
+            // _id needed for configureLocalAuth
+            done(null, user.id || user._id);
         });
 
         passport.deserializeUser((id: string, done: any) => {
@@ -710,9 +711,9 @@ export class AuthController {
                             <p>The G.h Team</p>`,
                         );
 
-                        done(null, userPublicFields(newUser));
+                        return done(null, userPublicFields(newUser));
                     } catch (error) {
-                        done(error);
+                        return done(error);
                     }
                 },
             ),
