@@ -1,4 +1,4 @@
-//@ts-nocheck
+// @ts-nocheck
 
 interface GetDefaultQueryArgs {
     limit?: number;

@@ -697,7 +697,7 @@ function CaseDetails(props: CaseDetailsProps): JSX.Element {
                                 />
                             ))}
                             <VariantRows
-                                variant={props.c.variant}
+                                variant={props.c.variant ?? { name: '' }}
                                 SGTF={props.c.SGTF}
                             />
                         </Grid>

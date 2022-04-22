@@ -95,7 +95,7 @@ interface TableRow {
         date: string;
         note: string;
     };
-    nationalities?: string[];
+    nationalities?: string;
 }
 
 interface LinelistTableState {
@@ -114,7 +114,6 @@ interface LinelistTableState {
     includeDialogOpen: boolean;
     isLoading: boolean;
     isDeleting: boolean;
-    diseaseName: string;
 
     selectedVerificationStatus: VerificationStatus;
     searchQuery: string;
@@ -1534,7 +1533,7 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                                         nationalitiesRender(
                                                             c.demographics
                                                                 ?.nationalities,
-                                                        ),
+                                                        ) ?? '',
                                                     outcome: c.events.find(
                                                         (event) =>
                                                             event.name ===
@@ -1825,10 +1824,12 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                               ? 'Unselect'
                                               : 'Select'
                                       } all rows across pages`,
-                                                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
                                                         onClick: async (
-                                                            _: unknown,
-                                                            rows: TableRow[],
+                                                            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                                                            event: any,
+                                                            data:
+                                                                | TableRow
+                                                                | TableRow[],
                                                         ): Promise<void> => {
                                                             const shouldSelectAll =
                                                                 this.state
@@ -1859,13 +1860,16 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                                   'curator',
                                               ),
                                               tooltip: 'Verify selected rows',
-                                              // eslint-disable-next-line @typescript-eslint/no-explicit-any
                                               onClick: async (
-                                                  _: unknown,
-                                                  rows: TableRow[],
+                                                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                                                  event: any,
+                                                  data: TableRow | TableRow[],
                                               ): Promise<void> => {
+                                                  if (!Array.isArray(data))
+                                                      return;
+
                                                   this.changeVerificationStatus(
-                                                      rows,
+                                                      data,
                                                       VerificationStatus.Verified,
                                                   );
                                               },
@@ -1878,13 +1882,16 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                                   'curator',
                                               ),
                                               tooltip: 'Unverify selected rows',
-                                              // eslint-disable-next-line @typescript-eslint/no-explicit-any
                                               onClick: async (
-                                                  _: unknown,
-                                                  rows: TableRow[],
+                                                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                                                  event: any,
+                                                  data: TableRow | TableRow[],
                                               ): Promise<void> => {
+                                                  if (!Array.isArray(data))
+                                                      return;
+
                                                   this.changeVerificationStatus(
-                                                      rows,
+                                                      data,
                                                       VerificationStatus.Unverified,
                                                   );
                                               },

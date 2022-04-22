@@ -15,8 +15,9 @@
     "module": "esnext",
     "isolatedModules": true,
     "noEmit": true,
-    "jsx": "react",
+    "jsx": "react-jsx",
     "noFallthroughCasesInSwitch": true,
+    "useUnknownInCatchVariables": false
   },
   "include": [
     "src"
