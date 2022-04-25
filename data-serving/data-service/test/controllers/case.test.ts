@@ -881,6 +881,31 @@ describe('POST', () => {
                 fs.unlinkSync(destination);
             });
         });
+        it('should use the age buckets in the download', async () => {
+            const destination = './test_buckets.csv';
+            const fileStream = fs.createWriteStream(destination);
+
+            const c = new Case(minimalCase);
+            await c.save();
+
+            const responseStream = request(app)
+                .post('/api/cases/download')
+                .send({ format: 'csv' })
+                .expect('Content-Type', 'text/csv')
+                .expect(200)
+                .parse(stringParser);
+
+            responseStream.pipe(fileStream);
+            responseStream.on('finish', () => {
+                const text: string = fs
+                    .readFileSync(destination)
+                    .toString('utf-8');
+                expect(text).toContain('35');
+                expect(text).toContain('50');
+
+                fs.unlinkSync(destination);
+            });
+        });
         it('should exclude restricted cases', async () => {
             const destination = './test_exclude_restricted_cases.csv';
             const fileStream = fs.createWriteStream(destination);

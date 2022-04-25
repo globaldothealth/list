@@ -221,7 +221,8 @@ export class CasesController {
                 doc = await cursor.next();
                 while (doc != null) {
                     delete doc.restrictedNotes;
-                    const parsedCase = parseDownloadedCase(doc);
+                    const caseDTO = await dtoFromCase(doc);
+                    const parsedCase = parseDownloadedCase(caseDTO);
                     const stringifiedCase = stringify([parsedCase], {
                         header: false,
                         columns: this.csvHeaders,

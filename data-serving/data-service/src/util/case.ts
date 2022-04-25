@@ -1,4 +1,4 @@
-import { CaseDocument } from '../model/case';
+import { CaseDocument, CaseDTO } from '../model/case';
 import { CaseReferenceDocument } from '../model/case-reference';
 import { DemographicsDocument } from '../model/demographics';
 import { EventDocument } from '../model/event';
@@ -59,7 +59,7 @@ export const parseCaseEvents = (
 /**
  * Converts case to fulfill CSV file structure requirements.
  */
-export const parseDownloadedCase = (caseDocument: CaseDocument) => {
+export const parseDownloadedCase = (caseDocument: CaseDTO) => {
     const { demographics, symptoms } = caseDocument;
 
     const parsedDemographics = demographics?.nationalities

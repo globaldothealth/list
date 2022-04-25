@@ -35,7 +35,7 @@ describe('Case', () => {
             demographics: {
                 nationalities: [],
             },
-        } as CaseDocument);
+        } as CaseDTO);
 
         expect(res.events).toEqual({
             onsetSymptoms: {
