@@ -15,3 +15,12 @@ From the data-service root, run:
 2. Generate the CSV fields list
    `pushd ../scripts/prepare_fields_list; npm run populate-fields; popd`
 3. re-build the data service (`npm run dev` watches the source so will do this automatically)
+
+# Age bucketing
+
+To prevent reidentification of individual cases, we use bucketed age ranges for infants (<1 year old) and then five year ranges.
+This bucketing is done in the data service: age ranges are converted to age buckets when you write through the API (PUT/POST/upsert/batchUpsert),
+then the bucketed age range is returned in API requests (GET or download).
+
+This could have been done using mongoose hooks but we don't want to rely on mongoose for much longer (already removed from the curator service),
+so instead all transformations are done by the cases controller.
