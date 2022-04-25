@@ -1590,14 +1590,6 @@ components:
                                 type: integer
                                 format: int32
                                 minimum: 0
-                notes:
-                    type: string
-                    description: >
-                        Anything that does not fit in a schema but worth mentioning about
-                        the case
-                    example: >
-                        Case travelled to meet their family in their hometown, got infected
-                        at a party there.
                 revisionMetadata:
                     type: object
                     description: Various revisions of this case over time

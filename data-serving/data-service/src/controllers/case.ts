@@ -78,6 +78,7 @@ const dtoFromCase = async (storedCase: LeanDocument<CaseDocument>) => {
         delete (dto as unknown as { demographics: { ageBuckets?: [ObjectId] }}).demographics.ageBuckets;
     }
     delete dto.restrictedNotes;
+    delete dto.notes;
 
     return dto;
 }
@@ -117,9 +118,10 @@ export class CasesController {
             return;
         }
 
-        // don't export restricted notes
+        // don't export any note
         c.forEach((aCase: LeanDocument<CaseDocument>) => {
             delete aCase.restrictedNotes;
+            delete aCase.notes;
         });
 
         res.json(await Promise.all(c.map(aCase => dtoFromCase(aCase))));
@@ -242,10 +244,8 @@ export class CasesController {
                 doc = await cursor.next();
                 while (doc != null) {
                     delete doc.restrictedNotes;
+                    delete doc.notes;
                     const normalizedDoc = denormalizeFields(doc);
-                    if (!doc.hasOwnProperty('notes')) {
-                        normalizedDoc.notes = '';
-                    }
                     if (!doc.hasOwnProperty('SGTF')) {
                         normalizedDoc.SGTF = 'NA';
                     }
@@ -340,7 +340,6 @@ export class CasesController {
             ]);
 
             const dtos = await Promise.all(docs.map(dtoFromCase));
-
             logger.info('got results');
             // total is actually stored in a count index in mongo, so the query is fast.
             // however to maintain existing behaviour, only return the count limit

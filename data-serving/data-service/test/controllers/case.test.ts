@@ -114,6 +114,13 @@ describe('GET', () => {
         const res = await request(app).get(`/api/cases/${c._id}`).expect(200);
         expect(res.body[0].restrictedNotes).toBeUndefined();
     });
+    it('should not show the notes for a case', async () => {
+        const c = new Case(minimalCase);
+        c.notes = 'I want to tell you a secret';
+        await c.save();
+        const res = await request(app).get(`/api/cases/${c._id}`).expect(200);
+        expect(res.body[0].notes).toBeUndefined();
+    });
     it('should convert age bucket to age range', async () => {
         const c = new Case(minimalCase);
         const bucket = await AgeBucket.findOne({});
@@ -200,41 +207,21 @@ describe('GET', () => {
                 .expect(200);
             expect(res.body.cases).toHaveLength(1);
         });
-        it('should query results', async () => {
-            // Simulate index creation used in unit tests, in production they are
-            // setup by the migrations and such indexes are not present by
-            // default in the in memory mongo spawned by unit tests.
-            await mongoose.connection.collection('cases').createIndex({
-                notes: 'text',
-            });
-
-            const c = new Case(minimalCase);
-            c.notes = 'got it at work';
-            await c.save();
-            // Search for non-matching notes.
-            const res = await request(app)
-                .get('/api/cases?page=1&limit=10&q=home')
-                .expect(200)
-                .expect('Content-Type', /json/);
-            expect(res.body.cases).toHaveLength(0);
-            expect(res.body.total).toEqual(0);
-            // Search for matching notes.
-            await request(app)
-                .get(`/api/cases?page=1&limit=10&q=${encodeURI('at work')}`)
-                .expect(200, /got it at work/)
-                .expect('Content-Type', /json/);
-        });
         it('should use age buckets in results', async () => {
             const c = new Case(minimalCase);
             const aBucket = await AgeBucket.findOne({});
             c.demographics.ageBuckets = [aBucket!._id];
             await c.save();
             const res = await request(app)
-                .get(`/api/cases?page=1&limit=10`)
+                .get('/api/cases?page=1&limit=10')
                 .expect(200)
                 .expect('Content-Type', /json/);
-            expect(res.body.cases[0].demographics.ageRange.start).toEqual(aBucket!.start);
-            expect(res.body.cases[0].demographics.ageRange.end).toEqual(aBucket!.end);
+            expect(res.body.cases[0].demographics.ageRange.start).toEqual(
+                aBucket!.start,
+            );
+            expect(res.body.cases[0].demographics.ageRange.end).toEqual(
+                aBucket!.end,
+            );
         });
         it('should ignore the restricted collection', async () => {
             const r = new RestrictedCase(minimalCase);
@@ -264,6 +251,14 @@ describe('GET', () => {
             const res = await request(app).get('/api/cases').expect(200);
             expect(res.body.cases).toHaveLength(1);
             expect(res.body.cases[0].restrictedNotes).toBeUndefined();
+        });
+        it('should strip out notes', async () => {
+            const c = new Case(minimalCase);
+            c.notes = 'Can you keep a secret?';
+            await c.save();
+            const res = await request(app).get('/api/cases').expect(200);
+            expect(res.body.cases).toHaveLength(1);
+            expect(res.body.cases[0].notes).toBeUndefined();
         });
         describe('keywords', () => {
             beforeEach(async () => {
@@ -504,7 +499,7 @@ describe('POST', () => {
         const theCase = await Case.findOne({});
         // case has range 40-50, should be bucketed into 36-40, 41-45, 46-50
         expect(theCase!.demographics.ageBuckets).toHaveLength(3);
-    })
+    });
     it('GETting the POSTed case should return an age range', async () => {
         const theCase = await request(app)
             .post('/api/cases')
@@ -1596,11 +1591,11 @@ describe('PUT', () => {
             .send({
                 ...curatorMetadata,
                 cases: [
-                    { 
+                    {
                         _id: c._id,
                         demographics: {
                             ageRange,
-                        }
+                        },
                     },
                 ],
             })

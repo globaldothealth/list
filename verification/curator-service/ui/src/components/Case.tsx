@@ -148,7 +148,6 @@ export interface Case {
     travelHistory: TravelHistory;
     genomeSequences: GenomeSequence[];
     pathogens: Pathogen[];
-    notes: string;
     revisionMetadata: RevisionMetadata;
     exclusionData?: ExclusionData;
     variant?: Variant;
