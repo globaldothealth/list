@@ -1557,6 +1557,35 @@ describe('PUT', () => {
         expect(cases[0].notes).toEqual(newNotes);
         expect(cases[1].notes).toEqual(newNotes2);
     });
+    it('update many items should update the age buckets', async () => {
+        const c = new Case(minimalCase);
+        await c.save();
+
+        const ageRange = {
+            start: 1,
+            end: 9,
+        };
+
+        const res = await request(app)
+            .post('/api/cases/batchUpdate')
+            .send({
+                ...curatorMetadata,
+                cases: [
+                    { 
+                        _id: c._id,
+                        demographics: {
+                            ageRange,
+                        }
+                    },
+                ],
+            })
+            .expect('Content-Type', /json/)
+            .expect(200);
+
+        expect(res.body.numModified).toEqual(1);
+        const cases = await Case.find();
+        expect(cases[0].demographics.ageBuckets).toHaveLength(2);
+    });
     it('update many items without locations in travel history should return 200 OK', async () => {
         const c = new Case(minimalCase);
         await c.save();

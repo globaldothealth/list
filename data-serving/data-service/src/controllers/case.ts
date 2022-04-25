@@ -644,11 +644,11 @@ export class CasesController {
             return;
         }
         try {
-            const unrestrictedCases: CaseDocument[] = [];
-            const restrictedCases: CaseDocument[] = [];
+            const unrestrictedCases: LeanDocument<CaseDocument>[] = [];
+            const restrictedCases: LeanDocument<CaseDocument>[] = [];
 
             for (const c in req.body.cases) {
-                const caseDoc = req.body.cases[c] as CaseDocument;
+                const caseDoc = await caseFromDTO(req.body.cases[c] as CaseDTO);
                 let aCase = await Case.findOne({ _id: caseDoc._id });
                 if (aCase) {
                     unrestrictedCases.push(caseDoc);
