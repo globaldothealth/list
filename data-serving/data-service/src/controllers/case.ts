@@ -721,19 +721,22 @@ export class CasesController {
                 req.body.caseReference?.sourceEntryId &&
                 c
             ) {
-                c.set(req.body);
+                const update = await caseFromDTO(req.body as CaseDTO);
+                c.set(update);
                 const result = await c.save();
                 res.status(200).json(result);
                 return;
             } else {
                 // Geocode new cases.
                 await this.geocode(req);
-                const c = new Case(req.body);
+                const update = await caseFromDTO(req.body as CaseDTO);
+                const c = new Case(update);
                 const result = await c.save();
                 res.status(201).json(result);
                 return;
             }
-        } catch (err) {
+        } catch (e) {
+            const err = e as Error;
             if (err instanceof GeocodeNotFoundError) {
                 res.status(404).json({ message: err.message });
             }

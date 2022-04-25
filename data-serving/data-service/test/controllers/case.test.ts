@@ -1720,6 +1720,37 @@ describe('PUT', () => {
         expect(res.body.notes).toEqual(newNotes);
         expect(await c.collection.countDocuments()).toEqual(1);
     });
+    it('upsert present item should update the age buckets', async () => {
+        const c = new Case(minimalCase);
+        const sourceId = '5ea86423bae6982635d2e1f8';
+        const entryId = 'def456';
+        c.set('caseReference.sourceId', sourceId);
+        c.set('caseReference.sourceEntryId', entryId);
+        await c.save();
+
+        const ageRange = {
+            start: 12,
+            end: 13,
+        };
+        await request(app)
+            .put('/api/cases')
+            .send({
+                caseReference: {
+                    sourceId: sourceId,
+                    sourceEntryId: entryId,
+                    sourceUrl: 'cdc.gov',
+                },
+                demographics: {
+                    ageRange,
+                },
+                ...curatorMetadata,
+            })
+            .expect('Content-Type', /json/)
+            .expect(200);
+
+        const updatedCase = await Case.findOne({});
+        expect(updatedCase?.demographics.ageBuckets).toHaveLength(1);
+    });
     it('upsert present item should result in update metadata', async () => {
         const c = new Case(minimalCase);
         const sourceId = '5ea86423bae6982635d2e1f8';
