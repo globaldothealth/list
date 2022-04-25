@@ -23,6 +23,8 @@ const defaultOutputQuery =
 export default class CasesController {
     constructor(
         private readonly dataServerURL: string,
+        private readonly completeDataBucket: string,
+        private readonly countryDataBucket: string,
         private readonly s3Client: AWS.S3,
     ) {}
 
@@ -200,7 +202,7 @@ export default class CasesController {
         const filename = `gh_${year}-${month}-${day}.tar`;
 
         const params = {
-            Bucket: 'covid-19-data-export',
+            Bucket: this.completeDataBucket,
             Key: 'latest/latestdata-csv.tar',
             Expires: 5 * 60,
             ResponseContentDisposition:
@@ -248,7 +250,7 @@ export default class CasesController {
         const filename = `${country}.${format}.gz`;
         const filepath = `${format}/${filename}`;
         const params = {
-            Bucket: 'covid-19-country-export',
+            Bucket: this.countryDataBucket,
             Key: filepath,
             Expires: 5 * 60,
             ResponseContentDisposition:
@@ -305,7 +307,7 @@ export default class CasesController {
         const filepath = `${format}/${country}.${format}.gz`;
         const contains = await this.s3Client
             .headObject({
-                Bucket: 'covid-19-country-export',
+                Bucket: this.countryDataBucket,
                 Key: filepath,
             })
             .promise()

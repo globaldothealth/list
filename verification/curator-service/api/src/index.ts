@@ -240,7 +240,11 @@ async function makeApp() {
     );
 
     // Configure cases controller proxying to data service.
-    const casesController = new CasesController(env.DATASERVER_URL, s3Client);
+    const casesController = new CasesController(
+        env.DATASERVER_URL,
+        env.COMPLETE_DATA_BUCKET,
+        env.COUNTRY_DATA_BUCKET,
+        s3Client);
     apiRouter.get(
         '/cases',
         authenticateByAPIKey,
