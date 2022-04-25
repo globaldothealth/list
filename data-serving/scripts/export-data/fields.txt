@@ -21,7 +21,6 @@ location.geometry.longitude
 location.name
 location.place
 location.query
-notes
 pathogens
 preexistingConditions.hasPreexistingConditions
 preexistingConditions.values
