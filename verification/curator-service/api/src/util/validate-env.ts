@@ -5,6 +5,8 @@ export default function validateEnv(): Readonly<{
     AWS_ACCESS_KEY_ID: string;
     AWS_SECRET_ACCESS_KEY: string;
     AWS_SERVICE_REGION: string;
+    COMPLETE_DATA_BUCKET: string;
+    COUNTRY_DATA_BUCKET: string;
     CURATOR_VERSION: string;
     DATASERVER_URL: string;
     DB_CONNECTION_STRING: string;
@@ -43,6 +45,14 @@ export default function validateEnv(): Readonly<{
         AWS_SERVICE_REGION: str({
             desc: 'AWS region in which to interact with services/resources',
             default: 'eu-central-1',
+        }),
+        COMPLETE_DATA_BUCKET: str({
+            desc: 'S3 bucket containing case data by country',
+            devDefault: 'covid-19-data-export-dev-eu',
+        }),
+        COUNTRY_DATA_BUCKET: str({
+            desc: 'S3 bucket containing case data by country',
+            devDefault: 'covid-19-country-export-dev-eu',
         }),
         CURATOR_VERSION: str({
             desc: 'version string to display in UI for bug reports etc.',
