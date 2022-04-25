@@ -235,12 +235,6 @@ function CaseDetails(props: CaseDetailsProps): JSX.Element {
                     >
                         vaccines
                     </Button>
-                    <Button
-                        variant="text"
-                        onClick={(): void => scrollTo('notes')}
-                    >
-                        notes
-                    </Button>
                 </nav>
             )}
             <div
@@ -719,20 +713,6 @@ function CaseDetails(props: CaseDetailsProps): JSX.Element {
                                     index={i}
                                 />
                             ))}
-                        </Grid>
-                    </Scroll.Element>
-                </Paper>
-                <Paper className={classes.paper} variant="outlined" square>
-                    <Scroll.Element name="notes" className={classes.casebox}>
-                        <Typography
-                            className={classes.sectionTitle}
-                            variant="overline"
-                        >
-                            Notes
-                        </Typography>
-                        <Grid container className={classes.grid}>
-                            <RowHeader title="Notes" />
-                            <RowContent content={props.c.notes} />
                         </Grid>
                     </Scroll.Element>
                 </Paper>

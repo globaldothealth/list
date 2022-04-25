@@ -816,10 +816,6 @@ components:
                                 type: integer
                                 format: int32
                                 minimum: 0
-                notes:
-                    type: string
-                restrictedNotes:
-                    type: string
                 revisionMetadata:
                     type: object
                     properties:

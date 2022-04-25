@@ -56,7 +56,7 @@ describe('View case', function () {
             cy.visit('/');
             cy.visit(`cases/view/${resp.body.cases[0]._id}`);
             cy.contains('France');
-            cy.contains('some notes');
+            cy.should('not.contain', 'some notes');
             cy.contains('www.example.com');
             cy.contains('PCR test');
             cy.contains('French');

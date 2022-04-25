@@ -120,8 +120,6 @@ caseSchema.methods.equalsJSON = function (jsonCase: any): boolean {
         _.isEqual(thisJson.exclusionData, other.exclusionData) &&
         _.isEqual(thisJson.genomeSequences, other.genomeSequences) &&
         _.isEqual(thisJson.location, other.location) &&
-        _.isEqual(thisJson.notes, other.notes) &&
-        _.isEqual(thisJson.restrictedNotes, other.restrictedNotes) &&
         _.isEqual(thisJson.pathogens, other.pathogens) &&
         _.isEqual(
             thisJson.preexistingConditions,
@@ -145,7 +143,7 @@ export type ICase = {
     importedCase: unknown;
     location: LocationDocument;
     revisionMetadata: RevisionMetadataDocument;
-    notes: string;
+    notes?: string;
     restrictedNotes?: string;
     pathogens: [PathogenDocument];
     list: boolean;
