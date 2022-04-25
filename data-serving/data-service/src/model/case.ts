@@ -23,7 +23,7 @@ import { VariantDocument, variantSchema } from './variant';
 
 import { ObjectId } from 'mongodb';
 import _ from 'lodash';
-import mongoose from 'mongoose';
+import mongoose, { LeanDocument } from 'mongoose';
 import { ExclusionDataDocument, exclusionDataSchema } from './exclusion-data';
 import { dateFieldInfo } from './date';
 
@@ -172,14 +172,14 @@ export type CaseDocument = mongoose.Document & ICase & {
 
 /* Denormalise the confirmation date before saving or updating any case object */
 
-function denormaliseConfirmationDate(aCase: CaseDocument) {
+function denormaliseConfirmationDate(aCase: CaseDocument | LeanDocument<CaseDocument>) {
     const confirmationEvents = _.filter(aCase.events, (e) => e.name === 'confirmed');
     if (confirmationEvents.length) {
         aCase.confirmationDate = confirmationEvents[0].dateRange.start;
     }
 }
 
-export function caseWithDenormalisedConfirmationDate(aCase: CaseDocument) {
+export function caseWithDenormalisedConfirmationDate(aCase: CaseDocument | LeanDocument<CaseDocument>) {
     denormaliseConfirmationDate(aCase);
     return aCase;
 }
