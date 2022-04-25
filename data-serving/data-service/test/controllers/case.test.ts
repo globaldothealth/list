@@ -17,6 +17,7 @@ import {
 } from '../mocks/handlers';
 import fs from 'fs';
 import { AgeBucket } from '../../src/model/age-bucket';
+import { ObjectId } from 'mongodb';
 
 let mongoServer: MongoMemoryServer;
 
@@ -704,6 +705,28 @@ describe('POST', () => {
 
         expect(res.body.numCreated).toBe(1); // Case was created.
         expect(res.body.numUpdated).toBe(0); // No case was updated.
+    });
+    it('batch upsert should set the age buckets', async () => {
+        const caseID = new ObjectId();
+
+        const res = await request(app)
+            .post('/api/cases/batchUpsert')
+            .send({
+                cases: [
+                    {
+                        _id: caseID,
+                        ...fullCase,
+                    },
+                ],
+                ...curatorMetadata,
+            })
+            .expect(200);
+
+        expect(res.body.numCreated).toBe(1); // A new case was created.
+        expect(res.body.numUpdated).toBe(0); // No case was updated.
+
+        const updatedCaseInDb = await Case.findById(caseID);
+        expect(updatedCaseInDb?.demographics.ageBuckets).toHaveLength(3);
     });
     it('geocodes everything that is necessary', async () => {
         seedFakeGeocodes('Canada', {

@@ -536,9 +536,9 @@ export class CasesController {
             } = this.filterCasesBySourceRestricted(cases);
             logger.info('batchUpsert: preparing bulk write');
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            const upsertLambda = (c: any) => {
+            const upsertLambda = async (c: any) => {
                 delete c.caseCount;
-                c = caseWithDenormalisedConfirmationDate(c as CaseDocument);
+                c = caseWithDenormalisedConfirmationDate(await caseFromDTO(c as CaseDTO));
                 if (
                     c.caseReference?.sourceId &&
                     c.caseReference?.sourceEntryId
@@ -564,11 +564,11 @@ export class CasesController {
                 }
             };
             const unrestrictedBulkWriteResult = await Case.bulkWrite(
-                unrestrictedCases.map(upsertLambda),
+                await Promise.all(unrestrictedCases.map(upsertLambda)),
                 { ordered: false },
             );
             const restrictedBulkWriteResult = await RestrictedCase.bulkWrite(
-                restrictedCases.map(upsertLambda),
+                await Promise.all(restrictedCases.map(upsertLambda)),
                 { ordered: false },
             );
             logger.info('batchUpsert: finished bulk write');
@@ -586,7 +586,8 @@ export class CasesController {
                 errors,
             });
             return;
-        } catch (err) {
+        } catch (e) {
+            const err = e as Error;
             if (err.name === 'ValidationError') {
                 res.status(422).json(err);
                 return;
