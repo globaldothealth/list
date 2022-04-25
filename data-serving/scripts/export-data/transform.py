@@ -37,6 +37,7 @@ __OMIT = [
     "revisionMetadata.creationMetadata.curator",
     "revisionMetadata.editMetadata.curator",
     "events",
+    "notes",
     "travelHistory.travel",
 ]
 
@@ -219,8 +220,6 @@ def age_range(case_buckets: str, buckets: [dict[str, Any]]) -> (int, int):
 def convert_row(row: dict[str, Any], buckets: [dict[str, Any]]) -> Optional[dict[str, Any]]:
     if "ObjectId" not in row["_id"]:
         return None
-    if type(row.get("notes")) == str:
-        row["notes"] = row["notes"].replace("\n", ", ")
     for arr_field in __ARRAYS:
         if row.get(arr_field):
             row[arr_field] = convert_string_list(row[arr_field])
