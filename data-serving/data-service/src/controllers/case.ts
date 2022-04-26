@@ -58,7 +58,7 @@ const caseFromDTO = async (receivedCase: CaseDTO) => {
 
 const dtoFromCase = async (storedCase: LeanDocument<CaseDocument>) => {
     let dto = storedCase as unknown as CaseDTO;
-    if (storedCase.demographics.ageBuckets && storedCase.demographics.ageBuckets.length > 0) {
+    if (storedCase.demographics && storedCase.demographics.ageBuckets && storedCase.demographics.ageBuckets.length > 0) {
         const ageBuckets = await Promise.all(storedCase.demographics.ageBuckets.map((bucketId) => {
             return AgeBucket.findById(bucketId).lean()
         }));
