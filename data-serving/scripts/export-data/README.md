@@ -37,7 +37,7 @@ during the build phase:
 You will need write access to S3. Alternatively, you can setup localstack to
 have a mock S3 environment. To run a hypothetical export for Antarctica:
 
-    docker run -e 'COUNTRY=Antarctica' -e 'CONN=xx' country-export
+    docker run -e 'COUNTRY=Antarctica' -e 'CONN=xx' -e 'BUCKET=yyy' country-export
 
 ## Setting up exports
 
