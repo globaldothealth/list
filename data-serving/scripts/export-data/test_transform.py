@@ -77,6 +77,19 @@ _TRAVEL_parsed = {
     "travelHistory.travel.methods": "Ship,Raft",
 }
 
+_BUCKETS = [
+    {
+        "_id": "001",
+        "start": 20,
+        "end": 24,
+    },
+    {
+        "_id": "002",
+        "start": 25,
+        "end": 29,
+    }
+]
+
 
 def _read_csv(fn):
     with open(fn) as f:
@@ -107,7 +120,7 @@ def test_convert_travel():
 def test_transform_output_match(fmt):
     expected = Path(f'test_transform_mongoexport_expected.{fmt}').read_text()
     with redirect_stdout(io.StringIO()) as f:
-        T.transform('test_transform_mongoexport.csv', '-', [fmt])
+        T.transform('test_transform_mongoexport.csv', '-', [fmt], "test_age_buckets.json")
     # use str.splitlines to ignore line endings
 
     expected_lines = expected.splitlines()
@@ -120,13 +133,44 @@ def test_transform_output_match(fmt):
 
 def test_transform_empty(tmp_path):
     output = f"{tmp_path}/empty"
-    T.transform('test_transform_mongoexport_header.csv', output, ['csv'])
+    T.transform('test_transform_mongoexport_header.csv', output, ['csv'], "test_age_buckets.json")
     assert not Path(f"{output}.csv.gz").exists()
 
 
 def test_transform_creates_output(tmp_path):
     formats = ['csv', 'tsv', 'json']
     output = f"{tmp_path}/output"
-    T.transform('test_transform_mongoexport.csv', output, formats)
+    T.transform('test_transform_mongoexport.csv', output, formats, "test_age_buckets.json")
     for fmt in formats:
         assert Path(f"{output}.{fmt}.gz").exists()
+
+
+def test_transform_buckets_age_ranges():
+    expected = Path(f'test_transform_mongoexport_bucketed_ages_expected.csv').read_text()
+    with redirect_stdout(io.StringIO()) as f:
+        T.transform('test_transform_mongoexport_bucketed_ages.csv', '-', ['csv'], 'test_age_buckets.json')
+
+    expected_lines = expected.splitlines()
+    actual_lines = f.getvalue().splitlines()
+
+    lines_to_compare = zip(expected_lines, actual_lines)
+    for line_pair in lines_to_compare:
+        assert line_pair[0] == line_pair[1]
+
+
+def test_age_bucket_conversion():
+    case_buckets_json = "[\"001\", \"002\"]"
+    (start, end) = T.age_range(case_buckets_json, _BUCKETS)
+    assert start == 20
+    assert end == 29
+
+
+def test_age_bucket_row_conversion():
+    row = {
+        "_id": "ObjectId(abc123)",
+        "travelHistory.traveledPrior30Days": "false",
+        "demographics.ageBuckets": "[\"001\"]"
+    }
+    converted_row = T.convert_row(row, _BUCKETS)
+    assert converted_row["demographics.ageRange.start"] == 20
+    assert converted_row["demographics.ageRange.end"] == 24

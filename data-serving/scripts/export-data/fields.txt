@@ -5,8 +5,7 @@ caseReference.sourceId
 caseReference.sourceUrl
 caseReference.uploadIds
 caseReference.verificationStatus
-demographics.ageRange.end
-demographics.ageRange.start
+demographics.ageBuckets
 demographics.ethnicity
 demographics.gender
 demographics.nationalities
