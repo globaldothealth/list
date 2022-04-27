@@ -164,7 +164,6 @@ describe('Curator', function () {
         cy.contains('li', 'Bartonella').click();
         cy.get('div[data-testid="pathogens"]').type('Ebola');
         cy.contains('li', 'Ebola').click();
-        cy.get('textarea[name="notes"]').type('test notes\non new line');
         cy.server();
         cy.route('POST', '/api/cases?num_cases=1').as('addCase');
         cy.get('button[data-testid="submit"]').click();
@@ -278,10 +277,6 @@ describe('Curator', function () {
             // Pathogens.
             cy.contains('Bartonella');
             cy.contains('Ebola');
-            cy.get('textarea[name="notes"]').should(
-                'have.value',
-                'test notes\non new line',
-            );
             // Transmission.
             cy.contains('Airborne infection');
             cy.contains('Test route');
@@ -316,7 +311,6 @@ describe('Curator', function () {
             cy.contains('www.example.com');
             cy.contains('testSourceEntryID123');
             cy.contains('superuser@test.com');
-            cy.contains('test notes on new line');
             cy.contains('VERIFIED');
             // Demographics.
             cy.contains('21');

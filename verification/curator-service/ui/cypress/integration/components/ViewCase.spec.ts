@@ -27,7 +27,7 @@ describe('View case', function () {
         cy.visit('/cases');
         cy.wait('@getCases');
 
-        cy.get('input[id="search-field"]').type('travel{enter}');
+        cy.get('input[id="search-field"]').type('Andorrean{enter}');
 
         cy.get('body').then(($body) => {
             if ($body.find('.iubenda-cs-accept-btn').length) {
@@ -36,10 +36,10 @@ describe('View case', function () {
         });
 
         cy.contains('France').click();
-        cy.contains('travelled')
+        cy.contains('Andorrean')
             .should('have.attr', 'class')
             .and('equal', 'highlighted');
-        cy.get('.highlighted').children('mark').contains('travel');
+        cy.get('.highlighted').children('mark').contains('Andorrean');
     });
 
     // View of a full case is covered in the curator test.
