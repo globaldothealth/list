@@ -22,7 +22,7 @@
   "license": "MIT",
   "config": {
     "mongodbMemoryServer": {
-      "version": "latest"
+      "version": "5.0.8"
     }
   },
   "devDependencies": {
