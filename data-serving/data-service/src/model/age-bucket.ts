@@ -17,6 +17,7 @@ export const ageBucketSchema = new mongoose.Schema({
 export type AgeBucketDocument = mongoose.Document & Range<number>;
 
 export const AgeBucket = mongoose.model<AgeBucketDocument>(
-    'AgeBuckets',
+    'AgeBucket',
     ageBucketSchema,
+    'ageBuckets'
 );
