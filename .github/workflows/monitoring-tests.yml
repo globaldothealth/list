@@ -17,7 +17,7 @@ on:
 
 jobs:
   monitoring-tests:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     defaults:
       run:
         working-directory: ingestion/monitoring
