@@ -2,7 +2,7 @@ name: Ingestion functions deploy
 
 on:
   push:
-    branches: [main, '*-stable', 'main-eu']
+    branches: [main, '*-stable']
     paths:
     - '.github/workflows/ingestion-functions-deploy.yml'
     - 'ingestion/functions/**'
@@ -11,7 +11,7 @@ on:
     tags:
       - "*"
   workflow_dispatch:
-    branches: [main, '*-stable', 'main-eu']
+    branches: [main, '*-stable']
     paths:
     - '.github/workflows/ingestion-functions-deploy.yml'
     - 'ingestion/functions/**'
