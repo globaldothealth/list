@@ -1,7 +1,9 @@
-import { Chip, makeStyles } from '@material-ui/core';
+import { Chip } from '@mui/material';
+
+import makeStyles from '@mui/styles/makeStyles';
 
 import CaseFormValues from './CaseFormValues';
-import ChipInput from 'material-ui-chip-input';
+import ChipInput from '../ChipInput';
 import FieldTitle from '../common-form-fields/FieldTitle';
 import { StyledTooltip } from './StyledTooltip';
 import { FormikAutocomplete } from '../common-form-fields/FormikFields';
@@ -39,7 +41,7 @@ const TooltipText = () => (
 );
 
 export default function Transmission(): JSX.Element {
-    const { setFieldValue, setTouched, initialValues, values } =
+    const { setFieldValue, initialValues, values } =
         useFormikContext<CaseFormValues>();
     const [commonPlacesOfTransmission, setCommonPlacesOfTransmission] =
         React.useState([]);
@@ -116,20 +118,21 @@ export default function Transmission(): JSX.Element {
                 />
             </div>
             <ChipInput
-                fullWidth
-                alwaysShowPlaceholder
-                placeholder="Contacted case IDs"
-                defaultValue={initialValues.transmissionLinkedCaseIds}
-                onBlur={(): void =>
-                    setTouched({ transmissionLinkedCaseIds: true })
-                }
-                onChange={(values): void => {
-                    setFieldValue(
-                        'transmissionLinkedCaseIds',
-                        values ?? undefined,
-                    );
-                }}
-            ></ChipInput>
+                // fullWidth
+                // alwaysShowPlaceholder
+                // placeholder="Contacted case IDs"
+                // defaultValue={initialValues.transmissionLinkedCaseIds}
+                // onBlur={(): void =>
+                //     setTouched({ transmissionLinkedCaseIds: true })
+                // }
+                // onChange={(values): void => {
+                //     setFieldValue(
+                //         'transmissionLinkedCaseIds',
+                //         values ?? undefined,
+                //     );
+                // }}
+                values={['sample']}
+            />
         </Scroll.Element>
     );
 }

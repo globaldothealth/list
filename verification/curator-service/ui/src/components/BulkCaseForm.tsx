@@ -1,11 +1,7 @@
 import * as Yup from 'yup';
 
-import {
-    Button,
-    CircularProgress,
-    Typography,
-    withStyles,
-} from '@material-ui/core';
+import { Button, CircularProgress, Typography } from '@mui/material';
+import withStyles from '@mui/styles/withStyles';
 import {
     Case,
     CaseReference,
@@ -18,17 +14,19 @@ import { Form, Formik } from 'formik';
 import Papa, { ParseLocalConfig, ParseResult } from 'papaparse';
 import { RouteComponentProps, withRouter } from 'react-router-dom';
 import Source, { submitSource } from './common-form-fields/Source';
-import { Theme, createStyles } from '@material-ui/core/styles';
+import { Theme } from '@mui/material/styles';
 
-import Alert from '@material-ui/lab/Alert';
+import { WithStyles } from '@mui/styles';
+import createStyles from '@mui/styles/createStyles';
+
+import Alert from '@mui/material/Alert';
 import AppModal from './AppModal';
 import BulkCaseFormValues from './bulk-case-form-fields/BulkCaseFormValues';
 import CaseValidationError from './bulk-case-form-fields/CaseValidationError';
 import FileUpload from './bulk-case-form-fields/FileUpload';
-import { Paper } from '@material-ui/core';
+import { Paper } from '@mui/material';
 import React from 'react';
 import ValidationErrorList from './bulk-case-form-fields/ValidationErrorList';
-import { WithStyles } from '@material-ui/core/styles/withStyles';
 import axios from 'axios';
 import { toUTCDate } from './util/date';
 import { codeForCountry } from './util/countryNames';

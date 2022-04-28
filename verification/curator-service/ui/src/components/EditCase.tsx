@@ -2,8 +2,8 @@ import React, { useEffect, useState } from 'react';
 
 import { Case } from './Case';
 import CaseForm from './CaseForm';
-import { LinearProgress } from '@material-ui/core';
-import MuiAlert from '@material-ui/lab/Alert';
+import { LinearProgress } from '@mui/material';
+import MuiAlert from '@mui/material/Alert';
 import axios from 'axios';
 
 interface Props {

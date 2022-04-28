@@ -5,13 +5,13 @@ import {
     InputAdornment,
     TextField,
     Theme,
-    makeStyles,
-    withStyles,
-} from '@material-ui/core';
-import CloseIcon from '@material-ui/icons/Close';
-import FilterListIcon from '@material-ui/icons/FilterList';
-import HelpIcon from '@material-ui/icons/HelpOutline';
-import SearchIcon from '@material-ui/icons/Search';
+} from '@mui/material';
+import makeStyles from '@mui/styles/makeStyles';
+import withStyles from '@mui/styles/withStyles';
+import CloseIcon from '@mui/icons-material/Close';
+import FilterListIcon from '@mui/icons-material/FilterList';
+import HelpIcon from '@mui/icons-material/HelpOutline';
+import SearchIcon from '@mui/icons-material/Search';
 import clsx from 'clsx';
 import DataGuideDialog from './DataGuideDialog';
 import { useDebounce } from '../hooks/useDebounce';
@@ -267,6 +267,7 @@ export default function SearchBar({
                                                 search: '',
                                             });
                                         }}
+                                        size="large"
                                     >
                                         <CloseIcon />
                                     </IconButton>

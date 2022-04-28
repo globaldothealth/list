@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useHistory } from 'react-router-dom';
 import { useFormik } from 'formik';
-import useMediaQuery from '@material-ui/core/useMediaQuery';
+import useMediaQuery from '@mui/material/useMediaQuery';
 import { filtersToURL, URLToFilters } from '../util/searchQuery';
 import { hasAnyRole } from '../util/helperFunctions';
 
@@ -19,9 +19,9 @@ import {
     IconButton,
     // InputAdornment,
     // IconButton,
-} from '@material-ui/core';
-import { Alert } from '@material-ui/lab';
-// import { HelpOutline } from '@material-ui/icons';
+} from '@mui/material';
+import { Alert } from '@mui/material';
+// import { HelpOutline } from '@mui/icons-material';
 // import { AppTooltip } from './common-form-fields/AppTooltip';
 import { useAppSelector, useAppDispatch } from '../../hooks/redux';
 import { fetchCountries } from '../../redux/filters/thunk';
@@ -32,7 +32,7 @@ import {
 } from '../../redux/filters/selectors';
 import { selectUser } from '../../redux/auth/selectors';
 import { codeForCountry } from '../util/countryNames';
-import CloseIcon from '@material-ui/icons/Close';
+import CloseIcon from '@mui/icons-material/Close';
 import { useStyles } from './styled';
 
 interface FiltersModalProps {
@@ -243,6 +243,7 @@ export default function FiltersDialog({
                     aria-label="close"
                     className={classes.closeButton}
                     onClick={handleClose}
+                    size="large"
                 >
                     <CloseIcon />
                 </IconButton>

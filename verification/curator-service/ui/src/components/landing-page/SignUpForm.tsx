@@ -4,21 +4,22 @@ import * as Yup from 'yup';
 import { useAppDispatch } from '../../hooks/redux';
 import { signUpWithEmailAndPassword } from '../../redux/auth/thunk';
 
-import { makeStyles, Theme } from '@material-ui/core/styles';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
-import FormHelperText from '@material-ui/core/FormHelperText';
-import FormControl from '@material-ui/core/FormControl';
-import InputLabel from '@material-ui/core/InputLabel';
-import OutlinedInput from '@material-ui/core/OutlinedInput';
-import InputAdornment from '@material-ui/core/InputAdornment';
-import IconButton from '@material-ui/core/IconButton';
-import Visibility from '@material-ui/icons/Visibility';
-import VisibilityOff from '@material-ui/icons/VisibilityOff';
-import TextField from '@material-ui/core/TextField';
-import Button from '@material-ui/core/Button';
-import FormGroup from '@material-ui/core/FormGroup';
-import Checkbox from '@material-ui/core/Checkbox';
-import Typography from '@material-ui/core/Typography';
+import { Theme } from '@mui/material/styles';
+import makeStyles from '@mui/styles/makeStyles';
+import FormControlLabel from '@mui/material/FormControlLabel';
+import FormHelperText from '@mui/material/FormHelperText';
+import FormControl from '@mui/material/FormControl';
+import InputLabel from '@mui/material/InputLabel';
+import OutlinedInput from '@mui/material/OutlinedInput';
+import InputAdornment from '@mui/material/InputAdornment';
+import IconButton from '@mui/material/IconButton';
+import Visibility from '@mui/icons-material/Visibility';
+import VisibilityOff from '@mui/icons-material/VisibilityOff';
+import TextField from '@mui/material/TextField';
+import Button from '@mui/material/Button';
+import FormGroup from '@mui/material/FormGroup';
+import Checkbox from '@mui/material/Checkbox';
+import Typography from '@mui/material/Typography';
 import GoogleButton from 'react-google-button';
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -66,7 +67,7 @@ const useStyles = makeStyles((theme: Theme) => ({
         flexWrap: 'wrap',
     },
     passwordBlockContainer: {
-        [theme.breakpoints.down(649)]: {
+        [theme.breakpoints.down('sm')]: {
             marginTop: '30px',
         },
     },
@@ -242,6 +243,7 @@ export default function SignUpForm({
                                                 )
                                             }
                                             edge="end"
+                                            size="large"
                                         >
                                             {passwordVisible ? (
                                                 <Visibility />
@@ -291,6 +293,7 @@ export default function SignUpForm({
                                                 )
                                             }
                                             edge="end"
+                                            size="large"
                                         >
                                             {passwordConfirmationVisible ? (
                                                 <Visibility />

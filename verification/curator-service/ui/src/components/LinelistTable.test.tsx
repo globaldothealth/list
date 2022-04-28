@@ -37,6 +37,7 @@ const initialState: RootState = {
         filterBreadcrumbs: [],
         version: '1.0',
         env: 'local',
+        diseaseName: 'COVID-19',
     },
     filters: {
         countryList: [],
@@ -161,6 +162,7 @@ describe('<LinelistTable />', () => {
                 sortByOrder={SortByOrder.Descending}
                 setSortBy={jest.fn()}
                 setSortByOrder={jest.fn()}
+                diseaseName="COVID-19"
             />,
             {
                 initialState,
@@ -242,6 +244,7 @@ describe('<LinelistTable />', () => {
                 sortByOrder={SortByOrder.Descending}
                 setSortBy={jest.fn()}
                 setSortByOrder={jest.fn()}
+                diseaseName="COVID-19"
             />,
 
             {
@@ -317,6 +320,7 @@ describe('<LinelistTable />', () => {
                 sortByOrder={SortByOrder.Descending}
                 setSortBy={jest.fn()}
                 setSortByOrder={jest.fn()}
+                diseaseName="COVID-19"
             />,
 
             {
@@ -427,6 +431,7 @@ describe('<LinelistTable />', () => {
                 sortByOrder={SortByOrder.Descending}
                 setSortBy={jest.fn()}
                 setSortByOrder={jest.fn()}
+                diseaseName="COVID-19"
             />,
 
             {
@@ -507,6 +512,7 @@ describe('<LinelistTable />', () => {
                 sortByOrder={SortByOrder.Descending}
                 setSortBy={jest.fn()}
                 setSortByOrder={jest.fn()}
+                diseaseName="COVID-19"
             />,
             {
                 initialState: {
@@ -589,6 +595,7 @@ describe('<LinelistTable />', () => {
                 sortByOrder={SortByOrder.Descending}
                 setSortBy={jest.fn()}
                 setSortByOrder={jest.fn()}
+                diseaseName="COVID-19"
             />,
 
             {
@@ -661,6 +668,7 @@ describe('<LinelistTable />', () => {
                 sortByOrder={SortByOrder.Descending}
                 setSortBy={jest.fn()}
                 setSortByOrder={jest.fn()}
+                diseaseName="COVID-19"
             />,
 
             {
@@ -703,6 +711,7 @@ describe('<LinelistTable />', () => {
                 sortByOrder={SortByOrder.Descending}
                 setSortBy={jest.fn()}
                 setSortByOrder={jest.fn()}
+                diseaseName="COVID-19"
             />,
             {
                 initialState: {
@@ -741,6 +750,7 @@ describe('<LinelistTable />', () => {
                 sortByOrder={SortByOrder.Descending}
                 setSortBy={jest.fn()}
                 setSortByOrder={jest.fn()}
+                diseaseName="COVID-19"
             />,
             {
                 initialState: {

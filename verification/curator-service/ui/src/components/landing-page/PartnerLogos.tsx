@@ -1,7 +1,8 @@
 import React from 'react';
-import { Typography } from '@material-ui/core';
-import { Theme, makeStyles } from '@material-ui/core/styles';
-import useMediaQuery from '@material-ui/core/useMediaQuery';
+import { Typography } from '@mui/material';
+import { Theme } from '@mui/material/styles';
+import makeStyles from '@mui/styles/makeStyles';
+import useMediaQuery from '@mui/material/useMediaQuery';
 import clsx from 'clsx';
 
 import bch from '../assets/partner-logos/bch.png';

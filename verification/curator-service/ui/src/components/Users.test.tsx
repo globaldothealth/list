@@ -35,6 +35,7 @@ const initialLoggedInState: RootState = {
         filterBreadcrumbs: [],
         version: '1.0',
         env: 'local',
+        diseaseName: 'COVID-19',
     },
     auth: {
         changePasswordResponse: undefined,
@@ -184,7 +185,7 @@ describe('<Users />', () => {
             headers: {},
         };
 
-        jest.mock('@material-ui/core/styles');
+        jest.mock('@mui/material/styles');
 
         mockGetAxios(axiosResponse);
         const mockCallback = jest.fn();

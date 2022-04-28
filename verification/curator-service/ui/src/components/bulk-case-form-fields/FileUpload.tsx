@@ -1,6 +1,7 @@
 import React from 'react';
 import { RequiredHelperText } from '../common-form-fields/FormikFields';
-import { makeStyles, Button, Typography } from '@material-ui/core';
+import { Button, Typography } from '@mui/material';
+import makeStyles from '@mui/styles/makeStyles';
 import { useFormikContext } from 'formik';
 
 const useStyles = makeStyles(() => ({

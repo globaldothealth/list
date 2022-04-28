@@ -1,6 +1,9 @@
-import { Autocomplete, createFilterOptions } from '@material-ui/lab';
+import { Autocomplete } from '@mui/material';
+import { createFilterOptions } from '@mui/material/useAutocomplete';
 import { FastField, Field, useFormikContext } from 'formik';
-import { Typography, makeStyles } from '@material-ui/core';
+import { Typography } from '@mui/material';
+
+import makeStyles from '@mui/styles/makeStyles';
 
 import BulkCaseFormValues from '../bulk-case-form-fields/BulkCaseFormValues';
 import CaseFormValues from '../new-case-form-fields/CaseFormValues';
@@ -9,7 +12,7 @@ import FieldTitle from './FieldTitle';
 import React from 'react';
 import { RequiredHelperText } from './FormikFields';
 import Scroll from 'react-scroll';
-import { TextField } from 'formik-material-ui';
+import { TextField } from 'formik-mui';
 import { StyledTooltip } from '../new-case-form-fields/StyledTooltip';
 import axios from 'axios';
 import { throttle } from 'lodash';
@@ -248,12 +251,12 @@ export function SourcesAutocomplete(
         <React.Fragment>
             <Autocomplete
                 itemType="CaseReferenceForm"
-                getOptionLabel={(option: CaseReferenceForm): string =>
+                getOptionLabel={(option: string | CaseReferenceForm): string =>
                     // option is a string if the user typed a URL and did not
                     // select a dropdown value.
                     typeof option === 'string' ? option : option.sourceUrl
                 }
-                getOptionSelected={(
+                isOptionEqualToValue={(
                     option: CaseReferenceForm,
                     value: CaseReferenceForm,
                 ): boolean => {
@@ -358,7 +361,10 @@ export function SourcesAutocomplete(
                         ></RequiredHelperText>
                     </div>
                 )}
-                renderOption={(option: CaseReferenceForm): React.ReactNode => {
+                renderOption={(
+                    props,
+                    option: CaseReferenceForm,
+                ): React.ReactNode => {
                     return (
                         <span>
                             <Typography variant="body2">

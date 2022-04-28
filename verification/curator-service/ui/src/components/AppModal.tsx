@@ -1,16 +1,12 @@
-import {
-    AppBar,
-    IconButton,
-    Modal,
-    Toolbar,
-    Typography,
-} from '@material-ui/core';
+import { AppBar, IconButton, Modal, Toolbar, Typography } from '@mui/material';
 import React, { ReactNode } from 'react';
-import { Theme, createStyles } from '@material-ui/core/styles';
+import { Theme } from '@mui/material/styles';
 
-import CloseIcon from '@material-ui/icons/Close';
-import { WithStyles } from '@material-ui/core/styles/withStyles';
-import { withStyles } from '@material-ui/core';
+import { WithStyles } from '@mui/styles';
+import createStyles from '@mui/styles/createStyles';
+
+import CloseIcon from '@mui/icons-material/Close';
+import withStyles from '@mui/styles/withStyles';
 
 const styles = (theme: Theme) =>
     createStyles({
@@ -53,6 +49,7 @@ class AppModal extends React.Component<Props, Record<string, unknown>> {
                                     aria-label="close overlay"
                                     onClick={this.props.onModalClose}
                                     edge="start"
+                                    size="large"
                                 >
                                     <CloseIcon />
                                 </IconButton>

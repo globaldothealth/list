@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import CloseIcon from '@material-ui/icons/Close';
+import CloseIcon from '@mui/icons-material/Close';
 import {
-    makeStyles,
     useTheme,
     useMediaQuery,
     Dialog,
@@ -9,7 +8,9 @@ import {
     IconButton,
     DialogContent,
     Typography,
-} from '@material-ui/core';
+} from '@mui/material';
+
+import makeStyles from '@mui/styles/makeStyles';
 
 const useStyles = makeStyles({
     dialogContainer: {
@@ -33,7 +34,7 @@ export default function PopupSmallScreens(): JSX.Element {
     /**
     @name matches - value of the current browser window in pixels
      **/
-    const matches = useMediaQuery(theme.breakpoints.down('md'));
+    const matches = useMediaQuery(theme.breakpoints.down('lg'));
 
     useEffect(() => {
         setDialogOpen(matches);
@@ -57,6 +58,7 @@ export default function PopupSmallScreens(): JSX.Element {
                     onClick={handleClose}
                     className={classes.closeButton}
                     id="small-screens-popup-close-btn"
+                    size="large"
                 >
                     <CloseIcon />
                 </IconButton>

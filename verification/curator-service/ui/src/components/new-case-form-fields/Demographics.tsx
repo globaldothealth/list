@@ -6,13 +6,13 @@ import {
 } from '../common-form-fields/FormikFields';
 
 import CaseFormValues from './CaseFormValues';
-import { Chip } from '@material-ui/core';
+import { Chip } from '@mui/material';
 import FieldTitle from '../common-form-fields/FieldTitle';
 import Scroll from 'react-scroll';
-import { TextField } from 'formik-material-ui';
+import { TextField } from 'formik-mui';
 import { StyledTooltip } from './StyledTooltip';
 import axios from 'axios';
-import { makeStyles } from '@material-ui/core/styles';
+import makeStyles from '@mui/styles/makeStyles';
 
 const styles = makeStyles(() => ({
     fieldRow: {

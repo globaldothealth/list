@@ -1,15 +1,17 @@
 import React, { useEffect } from 'react';
-import {
-    Box,
-    createStyles,
-    Portal,
-    Theme,
-    Typography,
-    withStyles,
-    WithStyles,
-} from '@material-ui/core';
-import CloseIcon from '@material-ui/icons/Close';
+import { Box, Portal, Theme, Typography } from '@mui/material';
+import { WithStyles } from '@mui/styles';
+import createStyles from '@mui/styles/createStyles';
+import withStyles from '@mui/styles/withStyles';
+import CloseIcon from '@mui/icons-material/Close';
 import Draggable, { ControlPosition } from 'react-draggable';
+
+// As per this issue from react-draggable library: https://github.com/react-grid-layout/react-draggable/pull/648
+declare module 'react-draggable' {
+    export interface DraggableProps {
+        children: React.ReactNode;
+    }
+}
 
 type Props = WithStyles<typeof styles> & {
     rootComponentRef: React.RefObject<HTMLDivElement>;

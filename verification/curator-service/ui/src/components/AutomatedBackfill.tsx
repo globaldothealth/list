@@ -1,16 +1,16 @@
 import React from 'react';
 import * as Yup from 'yup';
 
-import { Button, CircularProgress, Typography } from '@material-ui/core';
+import { Button, CircularProgress, Typography } from '@mui/material';
 import { Form, Formik } from 'formik';
 import Source, { CaseReferenceForm } from './common-form-fields/Source';
 
 import AppModal from './AppModal';
 import { DateField } from './common-form-fields/FormikFields';
-import MuiAlert from '@material-ui/lab/Alert';
-import { Paper } from '@material-ui/core';
+import MuiAlert from '@mui/material/Alert';
+import { Paper } from '@mui/material';
 import axios from 'axios';
-import { makeStyles } from '@material-ui/core/styles';
+import makeStyles from '@mui/styles/makeStyles';
 import { useInterval } from '../hooks/useInterval';
 
 /**

@@ -1,27 +1,28 @@
 import * as Yup from 'yup';
 
-import { Button, LinearProgress, Typography } from '@material-ui/core';
+import { Button, LinearProgress, Typography } from '@mui/material';
 import { Case, VerificationStatus } from './Case';
 import { Form, Formik } from 'formik';
 import { GenomeSequence, Travel } from './new-case-form-fields/CaseFormValues';
-import { Paper, makeStyles } from '@material-ui/core';
+import { Paper } from '@mui/material';
+import makeStyles from '@mui/styles/makeStyles';
 import Source, { submitSource } from './common-form-fields/Source';
-import { green, grey, red } from '@material-ui/core/colors';
+import { green, grey, red } from '@mui/material/colors';
 
 import AppModal from './AppModal';
 import CaseFormValues from './new-case-form-fields/CaseFormValues';
-import CheckCircleIcon from '@material-ui/icons/CheckCircle';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import Demographics from './new-case-form-fields/Demographics';
-import ErrorIcon from '@material-ui/icons/Error';
+import ErrorIcon from '@mui/icons-material/Error';
 import Events from './new-case-form-fields/Events';
 import GenomeSequences from './new-case-form-fields/GenomeSequences';
 import LocationForm from './new-case-form-fields/LocationForm';
-import MuiAlert from '@material-ui/lab/Alert';
+import MuiAlert from '@mui/material/Alert';
 import Notes from './new-case-form-fields/Notes';
 import NumCases from './new-case-form-fields/NumCases';
 import Pathogens from './new-case-form-fields/Pathogens';
 import PreexistingConditions from './new-case-form-fields/PreexistingConditions';
-import RadioButtonUncheckedIcon from '@material-ui/icons/RadioButtonUnchecked';
+import RadioButtonUncheckedIcon from '@mui/icons-material/RadioButtonUnchecked';
 import React from 'react';
 import Scroll from 'react-scroll';
 import Symptoms from './new-case-form-fields/Symptoms';
@@ -35,8 +36,8 @@ import { hasKey } from './Utils';
 import shortId from 'shortid';
 import { toUTCDate } from './util/date';
 import { useHistory } from 'react-router-dom';
-import useMediaQuery from '@material-ui/core/useMediaQuery';
-import { useTheme } from '@material-ui/core/styles';
+import useMediaQuery from '@mui/material/useMediaQuery';
+import { useTheme } from '@mui/material/styles';
 import { codeForCountry, nameCountry } from './util/countryNames';
 
 const useStyles = makeStyles((theme) => ({

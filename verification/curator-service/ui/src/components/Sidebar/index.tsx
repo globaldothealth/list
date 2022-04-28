@@ -4,20 +4,20 @@ import { useAppSelector } from '../../hooks/redux';
 import { selectUser } from '../../redux/auth/selectors';
 import { selectDiseaseName } from '../../redux/app/selectors';
 
-import Drawer from '@material-ui/core/Drawer';
-import Typography from '@material-ui/core/Typography';
-import Fab from '@material-ui/core/Fab';
-import Menu from '@material-ui/core/Menu';
-import MenuItem from '@material-ui/core/MenuItem';
-import List from '@material-ui/core/List';
-import ListItem from '@material-ui/core/ListItem';
-import ListItemIcon from '@material-ui/core/ListItemIcon';
-import ListItemText from '@material-ui/core/ListItemText';
-import AddIcon from '@material-ui/icons/Add';
-import ListIcon from '@material-ui/icons/List';
-import LinkIcon from '@material-ui/icons/Link';
-import PublishIcon from '@material-ui/icons/Publish';
-import PeopleIcon from '@material-ui/icons/People';
+import Drawer from '@mui/material/Drawer';
+import Typography from '@mui/material/Typography';
+import Fab from '@mui/material/Fab';
+import Menu from '@mui/material/Menu';
+import MenuItem from '@mui/material/MenuItem';
+import List from '@mui/material/List';
+import ListItem from '@mui/material/ListItem';
+import ListItemIcon from '@mui/material/ListItemIcon';
+import ListItemText from '@mui/material/ListItemText';
+import AddIcon from '@mui/icons-material/Add';
+import ListIcon from '@mui/icons-material/List';
+import LinkIcon from '@mui/icons-material/Link';
+import PublishIcon from '@mui/icons-material/Publish';
+import PeopleIcon from '@mui/icons-material/People';
 import { hasAnyRole } from '../util/helperFunctions';
 
 import { useStyles } from './styled';
@@ -123,7 +123,6 @@ const Sidebar = ({ drawerOpen }: SidebarProps): JSX.Element => {
                     )}
                     <Menu
                         anchorEl={createNewButtonAnchorEl}
-                        getContentAnchorEl={null}
                         keepMounted
                         open={Boolean(createNewButtonAnchorEl)}
                         onClose={closeCreateNewPopup}

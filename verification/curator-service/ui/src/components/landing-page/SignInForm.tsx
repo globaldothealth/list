@@ -5,18 +5,19 @@ import { useAppDispatch } from '../../hooks/redux';
 import { signInWithEmailAndPassword } from '../../redux/auth/thunk';
 import { setForgotPasswordPopupOpen } from '../../redux/auth/slice';
 
-import { makeStyles, Theme } from '@material-ui/core/styles';
-import FormHelperText from '@material-ui/core/FormHelperText';
-import FormControl from '@material-ui/core/FormControl';
-import InputLabel from '@material-ui/core/InputLabel';
-import OutlinedInput from '@material-ui/core/OutlinedInput';
-import InputAdornment from '@material-ui/core/InputAdornment';
-import IconButton from '@material-ui/core/IconButton';
-import Visibility from '@material-ui/icons/Visibility';
-import VisibilityOff from '@material-ui/icons/VisibilityOff';
-import TextField from '@material-ui/core/TextField';
-import Button from '@material-ui/core/Button';
-import Typography from '@material-ui/core/Typography';
+import { Theme } from '@mui/material/styles';
+import makeStyles from '@mui/styles/makeStyles';
+import FormHelperText from '@mui/material/FormHelperText';
+import FormControl from '@mui/material/FormControl';
+import InputLabel from '@mui/material/InputLabel';
+import OutlinedInput from '@mui/material/OutlinedInput';
+import InputAdornment from '@mui/material/InputAdornment';
+import IconButton from '@mui/material/IconButton';
+import Visibility from '@mui/icons-material/Visibility';
+import VisibilityOff from '@mui/icons-material/VisibilityOff';
+import TextField from '@mui/material/TextField';
+import Button from '@mui/material/Button';
+import Typography from '@mui/material/Typography';
 import GoogleButton from 'react-google-button';
 import ForgotPasswordForm from './ForgotPasswordForm';
 
@@ -162,6 +163,7 @@ export default function SignInForm({
                                                 )
                                             }
                                             edge="end"
+                                            size="large"
                                         >
                                             {passwordVisible ? (
                                                 <Visibility />

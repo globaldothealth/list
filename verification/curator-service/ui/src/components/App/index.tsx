@@ -10,7 +10,7 @@ import {
     Toolbar,
     Typography,
     useMediaQuery,
-} from '@material-ui/core';
+} from '@mui/material';
 import LinelistTable, { DownloadButton } from '../LinelistTable';
 import {
     Link,
@@ -20,7 +20,9 @@ import {
     useHistory,
     useLocation,
 } from 'react-router-dom';
-import { Theme, makeStyles } from '@material-ui/core/styles';
+import { Theme } from '@mui/material/styles';
+
+import makeStyles from '@mui/styles/makeStyles';
 
 import AutomatedBackfill from '../AutomatedBackfill';
 import AutomatedSourceForm from '../AutomatedSourceForm';
@@ -30,17 +32,15 @@ import AcknowledgmentsPage from '../AcknowledgmentsPage';
 import EditCase from '../EditCase';
 import GHListLogo from '../GHListLogo';
 import LandingPage from '../landing-page/LandingPage';
-import MenuIcon from '@material-ui/icons/Menu';
+import MenuIcon from '@mui/icons-material/Menu';
 import Profile from '../Profile';
 import SearchBar from '../SearchBar';
 import SourceTable from '../SourceTable';
 import TermsOfUse from '../TermsOfUse';
-import { createTheme, ThemeProvider } from '@material-ui/core/styles';
 import UploadsTable from '../UploadsTable';
 import Users from '../Users';
 import ViewCase from '../ViewCase';
 import clsx from 'clsx';
-import { useLastLocation } from 'react-router-last-location';
 import { useCookieBanner } from '../../hooks/useCookieBanner';
 import { SortBy, SortByOrder, MapLink } from '../../constants/types';
 import { URLToSearchQuery } from '../util/searchQuery';
@@ -64,135 +64,7 @@ import PopupSmallScreens from '../PopupSmallScreens';
 import Sidebar from '../Sidebar';
 import Footer from '../Footer';
 import { getReleaseNotesUrl, hasAnyRole } from '../util/helperFunctions';
-
-// to use our custom theme values in typescript we need to define an extension to the ThemeOptions type.
-declare module '@material-ui/core/styles' {
-    interface Theme {
-        custom: {
-            palette: {
-                button: {
-                    buttonCaption: string;
-                    customizeButtonColor: string;
-                };
-                tooltip: {
-                    backgroundColor: string;
-                    textColor: string;
-                };
-                appBar: {
-                    backgroundColor: string;
-                };
-                landingPage: {
-                    descriptionTextColor: string;
-                };
-            };
-        };
-    }
-    // allow configuration using `createTheme`
-    interface ThemeOptions {
-        custom?: {
-            palette?: {
-                button?: {
-                    buttonCaption?: string;
-                    customizeButtonColor?: string;
-                };
-                tooltip?: {
-                    backgroundColor?: string;
-                    textColor?: string;
-                };
-                appBar?: {
-                    backgroundColor?: string;
-                };
-                landingPage?: {
-                    descriptionTextColor?: string;
-                };
-            };
-        };
-    }
-}
-
-export const theme = createTheme({
-    palette: {
-        background: {
-            default: '#ecf3f0',
-            paper: '#fff',
-        },
-        primary: {
-            main: '#0E7569',
-            contrastText: '#fff',
-        },
-        secondary: {
-            main: '#00C6AF',
-            contrastText: '#fff',
-        },
-        error: {
-            main: '#FD685B',
-            contrastText: '#454545',
-        },
-    },
-    typography: {
-        fontFamily: 'Mabry Pro, sans-serif',
-    },
-    shape: {
-        borderRadius: 4,
-    },
-    overrides: {
-        MuiListItem: {
-            root: {
-                color: '#5D5D5D',
-                borderRadius: '4px',
-                '&$selected': {
-                    backgroundColor: '#0E75691A',
-                    color: '#0E7569',
-                },
-            },
-        },
-        MuiAppBar: {
-            colorPrimary: {
-                backgroundColor: '#ECF3F0',
-            },
-        },
-        MuiCheckbox: {
-            colorSecondary: {
-                '&$checked': {
-                    color: '#31A497',
-                },
-            },
-        },
-        MuiTablePagination: {
-            root: {
-                border: 'unset',
-                fontFamily: 'Inter',
-                '& .MuiTablePagination-input': {
-                    fontFamily: 'Inter',
-                },
-                '&&& .MuiTypography-root': {
-                    fontFamily: 'Inter',
-                    fontSize: '14px',
-                },
-            },
-        },
-    },
-    custom: {
-        palette: {
-            button: {
-                buttonCaption: '#ECF3F0',
-                customizeButtonColor: '#ECF3F0',
-            },
-            tooltip: {
-                backgroundColor: '#FEEFC3',
-                textColor: 'rgba(0, 0, 0, 0.87)',
-            },
-            appBar: {
-                backgroundColor: '#31A497',
-            },
-            landingPage: {
-                descriptionTextColor: '#838D89',
-            },
-        },
-    },
-});
-
-export const drawerWidth = 240;
+import { theme } from '../../theme/theme';
 
 const menuStyles = makeStyles((theme) => ({
     link: {
@@ -263,8 +135,8 @@ const useStyles = makeStyles((theme: Theme) => ({
             easing: theme.transitions.easing.easeOut,
             duration: theme.transitions.duration.enteringScreen,
         }),
-        marginLeft: drawerWidth,
-        width: `calc(100% - ${drawerWidth}px)`,
+        marginLeft: theme.drawerWidth,
+        width: `calc(100% - ${theme.drawerWidth}px)`,
     },
     searchBar: {
         flex: 1,
@@ -302,6 +174,7 @@ function ProfileMenu(props: { user: User; version: string }): JSX.Element {
                 data-testid="profile-menu"
                 aria-haspopup="true"
                 onClick={handleClick}
+                size="large"
             >
                 <Avatar alt={props.user.email} src={props.user.picture} />
             </IconButton>
@@ -412,7 +285,6 @@ export default function App(): JSX.Element {
     const [listPage, setListPage] = React.useState<number>(0);
     const [listPageSize, setListPageSize] = React.useState<number>(50);
     const rootRef = React.useRef<HTMLDivElement>(null);
-    const lastLocation = useLastLocation();
     const history = useHistory();
     const location = useLocation<LocationState>();
     const [filtersModalOpen, setFiltersModalOpen] =
@@ -453,11 +325,13 @@ export default function App(): JSX.Element {
     };
 
     const onModalClose = (): void => {
-        if (lastLocation) {
-            history.goBack();
-        } else {
-            history.push('/cases');
-        }
+        // @TODO
+        // if (lastLocation) {
+        //     history.goBack();
+        // } else {
+        //     history.push('/cases');
+        // }
+        history.push('/cases');
     };
 
     useEffect(() => {
@@ -500,208 +374,193 @@ export default function App(): JSX.Element {
 
     return (
         <div className={classes.root} ref={rootRef}>
-            <ThemeProvider theme={theme}>
-                <CookieBanner />
-                <CssBaseline />
-                <AppBar
-                    position="fixed"
-                    elevation={0}
-                    className={classes.appBar}
-                >
-                    <Toolbar>
-                        {user && hasAnyRole(user, ['curator', 'admin']) && (
-                            <IconButton
-                                color="primary"
-                                aria-label="toggle drawer"
-                                onClick={toggleDrawer}
-                                edge="start"
-                                className={classes.menuButton}
-                                data-testid="toggle-sidebar"
-                            >
-                                <MenuIcon />
-                            </IconButton>
-                        )}
-                        <GHListLogo />
-                        {location.pathname === '/cases' && user ? (
-                            <>
-                                <div className={classes.searchBar}>
-                                    <SearchBar
-                                        rootComponentRef={rootRef}
-                                        filtersModalOpen={filtersModalOpen}
-                                        setFiltersModalOpen={
-                                            setFiltersModalOpen
-                                        }
-                                        activeFilterInput={activeFilterInput}
-                                        setActiveFilterInput={
-                                            setActiveFilterInput
-                                        }
-                                    />
-                                </div>
-                                <DownloadButton />
-                            </>
-                        ) : (
-                            <span className={classes.spacer}></span>
-                        )}
-
-                        <Typography>
-                            <a
-                                className={classes.mapLink}
-                                data-testid="mapLink"
-                                href={MapLink[env]}
-                                rel="noopener noreferrer"
-                                target="_blank"
-                            >
-                                G.h Map
-                            </a>
-                        </Typography>
-                        {user && (
-                            <ProfileMenu user={user} version={appVersion} />
-                        )}
-                    </Toolbar>
-                </AppBar>
-                {user && hasAnyRole(user, ['curator', 'admin']) && (
-                    <Sidebar drawerOpen={drawerOpen} />
-                )}
-                <main
-                    className={clsx(classes.content, {
-                        [classes.contentShift]: drawerOpen,
-                    })}
-                >
-                    <div className={classes.drawerHeader} />
-                    <Switch>
-                        <Redirect
-                            from="/:url*(/+)"
-                            to={location.pathname.slice(0, -1)}
-                        />
-                        {user && (
-                            <Route exact path="/cases">
-                                <LinelistTable
-                                    page={listPage}
-                                    pageSize={listPageSize}
-                                    onChangePage={setListPage}
-                                    onChangePageSize={setListPageSize}
-                                    handleBreadcrumbDelete={
-                                        handleFilterBreadcrumbDelete
-                                    }
+            <CookieBanner />
+            <CssBaseline />
+            <AppBar position="fixed" elevation={0} className={classes.appBar}>
+                <Toolbar>
+                    {user && hasAnyRole(user, ['curator', 'admin']) && (
+                        <IconButton
+                            color="primary"
+                            aria-label="toggle drawer"
+                            onClick={toggleDrawer}
+                            edge="start"
+                            className={classes.menuButton}
+                            data-testid="toggle-sidebar"
+                            size="large"
+                        >
+                            <MenuIcon />
+                        </IconButton>
+                    )}
+                    <GHListLogo />
+                    {location.pathname === '/cases' && user ? (
+                        <>
+                            <div className={classes.searchBar}>
+                                <SearchBar
+                                    rootComponentRef={rootRef}
+                                    filtersModalOpen={filtersModalOpen}
                                     setFiltersModalOpen={setFiltersModalOpen}
+                                    activeFilterInput={activeFilterInput}
                                     setActiveFilterInput={setActiveFilterInput}
-                                    sortBy={sortBy}
-                                    sortByOrder={sortByOrder}
-                                    setSortBy={setSortBy}
-                                    setSortByOrder={setSortByOrder}
-                                    diseaseName={diseaseName}
                                 />
-                            </Route>
-                        )}
-                        {hasAnyRole(user, ['curator']) && (
-                            <Route exact path="/sources">
-                                <SourceTable />
-                            </Route>
-                        )}
-                        {hasAnyRole(user, ['curator']) && (
-                            <Route exact path="/uploads">
-                                <UploadsTable />
-                            </Route>
-                        )}
-                        {user && (
-                            <Route path="/profile">
-                                <Profile />
-                            </Route>
-                        )}
-                        {user && hasAnyRole(user, ['admin']) && (
-                            <Route path="/users">
-                                <Users onUserChange={getUser} />
-                            </Route>
-                        )}{' '}
-                        {user && hasAnyRole(user, ['curator']) && (
-                            <Route path="/sources/automated">
-                                <AutomatedSourceForm
-                                    onModalClose={onModalClose}
-                                />
-                            </Route>
-                        )}
-                        {user && hasAnyRole(user, ['curator']) && (
-                            <Route path="/cases/bulk">
-                                <BulkCaseForm onModalClose={onModalClose} />
-                            </Route>
-                        )}
-                        {user && hasAnyRole(user, ['curator']) && (
-                            <Route path="/sources/backfill">
-                                <AutomatedBackfill
-                                    onModalClose={onModalClose}
-                                />
-                            </Route>
-                        )}
-                        {user && hasAnyRole(user, ['curator']) && (
-                            <Route path="/cases/new">
-                                <CaseForm onModalClose={onModalClose} />
-                            </Route>
-                        )}
-                        {user && hasAnyRole(user, ['curator']) && (
-                            <Route
-                                path="/cases/edit/:id"
-                                render={({ match }) => {
-                                    return (
-                                        <EditCase
-                                            id={match.params.id}
-                                            onModalClose={onModalClose}
-                                        />
-                                    );
-                                }}
-                            />
-                        )}
-                        {user && (
-                            <Route
-                                path="/cases/view/:id"
-                                render={({ match }): JSX.Element => {
-                                    return (
-                                        <ViewCase
-                                            id={match.params.id}
-                                            enableEdit={hasAnyRole(user, [
-                                                'curator',
-                                            ])}
-                                            onModalClose={onModalClose}
-                                        />
-                                    );
-                                }}
-                            />
-                        )}
-                        <Route exact path="/data-acknowledgments">
-                            <AcknowledgmentsPage />
-                        </Route>
-                        <Route exact path="/terms">
-                            <TermsOfUse />
-                        </Route>
-                        <Route
-                            exact
-                            path="/reset-password/:token/:id"
-                            component={LandingPage}
-                        />
-                        <Route exact path="/">
-                            {user ? (
-                                <Redirect
-                                    to={{
-                                        pathname: '/cases',
-                                        search: savedSearchQuery || '',
-                                    }}
-                                />
-                            ) : isLoadingUser ? (
-                                <></>
-                            ) : (
-                                <LandingPage />
-                            )}
-                        </Route>
-                        {/* Redirect any unavailable URLs to / after the user has loaded. */}
-                        {!isLoadingUser && (
-                            <Route path="/">
-                                <Redirect to="/" />
-                            </Route>
-                        )}
-                    </Switch>
-                </main>
+                            </div>
+                            <DownloadButton />
+                        </>
+                    ) : (
+                        <span className={classes.spacer}></span>
+                    )}
 
-                {user && <Footer drawerOpen={drawerOpen} />}
-            </ThemeProvider>
+                    <Typography>
+                        <a
+                            className={classes.mapLink}
+                            data-testid="mapLink"
+                            href={MapLink[env]}
+                            rel="noopener noreferrer"
+                            target="_blank"
+                        >
+                            G.h Map
+                        </a>
+                    </Typography>
+                    {user && <ProfileMenu user={user} version={appVersion} />}
+                </Toolbar>
+            </AppBar>
+            {user && hasAnyRole(user, ['curator', 'admin']) && (
+                <Sidebar drawerOpen={drawerOpen} />
+            )}
+            <main
+                className={clsx(classes.content, {
+                    [classes.contentShift]: drawerOpen,
+                })}
+            >
+                <div className={classes.drawerHeader} />
+                <Switch>
+                    <Redirect
+                        from="/:url*(/+)"
+                        to={location.pathname.slice(0, -1)}
+                    />
+                    {user && (
+                        <Route exact path="/cases">
+                            <LinelistTable
+                                page={listPage}
+                                pageSize={listPageSize}
+                                onChangePage={setListPage}
+                                onChangePageSize={setListPageSize}
+                                handleBreadcrumbDelete={
+                                    handleFilterBreadcrumbDelete
+                                }
+                                setFiltersModalOpen={setFiltersModalOpen}
+                                setActiveFilterInput={setActiveFilterInput}
+                                sortBy={sortBy}
+                                sortByOrder={sortByOrder}
+                                setSortBy={setSortBy}
+                                setSortByOrder={setSortByOrder}
+                                diseaseName={diseaseName}
+                            />
+                        </Route>
+                    )}
+                    {hasAnyRole(user, ['curator']) && (
+                        <Route exact path="/sources">
+                            <SourceTable />
+                        </Route>
+                    )}
+                    {hasAnyRole(user, ['curator']) && (
+                        <Route exact path="/uploads">
+                            <UploadsTable />
+                        </Route>
+                    )}
+                    {user && (
+                        <Route path="/profile">
+                            <Profile />
+                        </Route>
+                    )}
+                    {user && hasAnyRole(user, ['admin']) && (
+                        <Route path="/users">
+                            <Users onUserChange={getUser} />
+                        </Route>
+                    )}{' '}
+                    {user && hasAnyRole(user, ['curator']) && (
+                        <Route path="/sources/automated">
+                            <AutomatedSourceForm onModalClose={onModalClose} />
+                        </Route>
+                    )}
+                    {user && hasAnyRole(user, ['curator']) && (
+                        <Route path="/cases/bulk">
+                            <BulkCaseForm onModalClose={onModalClose} />
+                        </Route>
+                    )}
+                    {user && hasAnyRole(user, ['curator']) && (
+                        <Route path="/sources/backfill">
+                            <AutomatedBackfill onModalClose={onModalClose} />
+                        </Route>
+                    )}
+                    {user && hasAnyRole(user, ['curator']) && (
+                        <Route path="/cases/new">
+                            <CaseForm onModalClose={onModalClose} />
+                        </Route>
+                    )}
+                    {user && hasAnyRole(user, ['curator']) && (
+                        <Route
+                            path="/cases/edit/:id"
+                            render={({ match }) => {
+                                return (
+                                    <EditCase
+                                        id={match.params.id}
+                                        onModalClose={onModalClose}
+                                    />
+                                );
+                            }}
+                        />
+                    )}
+                    {user && (
+                        <Route
+                            path="/cases/view/:id"
+                            render={({ match }): JSX.Element => {
+                                return (
+                                    <ViewCase
+                                        id={match.params.id}
+                                        enableEdit={hasAnyRole(user, [
+                                            'curator',
+                                        ])}
+                                        onModalClose={onModalClose}
+                                    />
+                                );
+                            }}
+                        />
+                    )}
+                    <Route exact path="/data-acknowledgments">
+                        <AcknowledgmentsPage />
+                    </Route>
+                    <Route exact path="/terms">
+                        <TermsOfUse />
+                    </Route>
+                    <Route
+                        exact
+                        path="/reset-password/:token/:id"
+                        component={LandingPage}
+                    />
+                    <Route exact path="/">
+                        {user ? (
+                            <Redirect
+                                to={{
+                                    pathname: '/cases',
+                                    search: savedSearchQuery || '',
+                                }}
+                            />
+                        ) : isLoadingUser ? (
+                            <></>
+                        ) : (
+                            <LandingPage />
+                        )}
+                    </Route>
+                    {/* Redirect any unavailable URLs to / after the user has loaded. */}
+                    {!isLoadingUser && (
+                        <Route path="/">
+                            <Redirect to="/" />
+                        </Route>
+                    )}
+                </Switch>
+            </main>
+
+            {user && <Footer drawerOpen={drawerOpen} />}
         </div>
     );
 }

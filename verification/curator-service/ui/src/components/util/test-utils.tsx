@@ -4,10 +4,19 @@ import { configureStore } from '@reduxjs/toolkit';
 import { Provider } from 'react-redux';
 import { Router } from 'react-router-dom';
 import { createMemoryHistory } from 'history';
-import { ThemeProvider } from '@material-ui/core/styles';
-import { theme } from '../App';
+import {
+    ThemeProvider,
+    Theme,
+    StyledEngineProvider,
+} from '@mui/material/styles';
+import { theme } from '../../theme/theme';
 // Import your own reducer
 import store, { rootReducer, RootState } from '../../redux/store';
+
+declare module '@mui/styles/defaultTheme' {
+    // eslint-disable-next-line @typescript-eslint/no-empty-interface
+    interface DefaultTheme extends Theme {}
+}
 
 interface CustomOptions {
     initialState?: RootState;
@@ -33,9 +42,11 @@ function render(ui: ReactElement, options?: CustomOptions) {
         return (
             <Provider store={store}>
                 <Router history={history}>
-                    <ThemeProvider theme={theme}>
-                        {props.children}
-                    </ThemeProvider>
+                    <StyledEngineProvider injectFirst>
+                        <ThemeProvider theme={theme}>
+                            {props.children}
+                        </ThemeProvider>
+                    </StyledEngineProvider>
                 </Router>
             </Provider>
         );

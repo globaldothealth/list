@@ -1,15 +1,14 @@
 import MaterialTable, { QueryResult } from 'material-table';
-import { Paper, TablePagination, Typography } from '@material-ui/core';
+import { Paper, TablePagination, Typography } from '@mui/material';
 import React, { RefObject } from 'react';
-import {
-    Theme,
-    WithStyles,
-    createStyles,
-    withStyles,
-} from '@material-ui/core/styles';
+import { Theme } from '@mui/material/styles';
+
+import { WithStyles } from '@mui/styles';
+import createStyles from '@mui/styles/createStyles';
+import withStyles from '@mui/styles/withStyles';
 
 import { Link } from 'react-router-dom';
-import MuiAlert from '@material-ui/lab/Alert';
+import MuiAlert from '@mui/material/Alert';
 import axios from 'axios';
 import renderDate from './util/date';
 

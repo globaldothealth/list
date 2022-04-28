@@ -1,18 +1,20 @@
 import React from 'react';
 import { Field, useFormikContext } from 'formik';
-import { Typography, makeStyles } from '@material-ui/core';
+import { Typography } from '@mui/material';
 
-import AddIcon from '@material-ui/icons/Add';
-import { Autocomplete } from '@material-ui/lab';
-import Button from '@material-ui/core/Button';
+import makeStyles from '@mui/styles/makeStyles';
+
+import AddIcon from '@mui/icons-material/Add';
+import { Autocomplete } from '@mui/material';
+import Button from '@mui/material/Button';
 import CaseFormValues from './CaseFormValues';
 import FieldTitle from '../common-form-fields/FieldTitle';
 import { Location as Loc } from '../Case';
 import Location from './Location';
-import LocationOnIcon from '@material-ui/icons/LocationOn';
+import LocationOnIcon from '@mui/icons-material/LocationOn';
 import { RequiredHelperText } from '../common-form-fields/FormikFields';
 import Scroll from 'react-scroll';
-import { TextField } from 'formik-material-ui';
+import { TextField } from 'formik-mui';
 import { StyledTooltip } from './StyledTooltip';
 import axios from 'axios';
 import { hasKey } from '../Utils';
@@ -71,7 +73,6 @@ function LocationForm(): JSX.Element {
             {!values.location && (
                 <Button
                     variant="outlined"
-                    color="default"
                     id="add-location"
                     startIcon={<AddIcon />}
                     onClick={() => setFieldValue('location', {})}
@@ -212,7 +213,7 @@ export function PlacesAutocomplete(
                     )}
                 </>
             )}
-            renderOption={(option: Loc): React.ReactNode => {
+            renderOption={(props, option: Loc, state): React.ReactNode => {
                 return (
                     <span className={classes.suggestion}>
                         <LocationOnIcon className={classes.icon} />

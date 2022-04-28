@@ -6,7 +6,7 @@ import {
     DialogContent,
     DialogContentText,
     DialogTitle,
-} from '@material-ui/core';
+} from '@mui/material';
 
 interface Props {
     isOpen: boolean;

@@ -5,12 +5,12 @@ import {
 } from '../common-form-fields/FormikFields';
 
 import CaseFormValues from './CaseFormValues';
-import { Chip } from '@material-ui/core';
+import { Chip } from '@mui/material';
 import FieldTitle from '../common-form-fields/FieldTitle';
 import { StyledTooltip } from './StyledTooltip';
 import Scroll from 'react-scroll';
 import axios from 'axios';
-import { makeStyles } from '@material-ui/core';
+import makeStyles from '@mui/styles/makeStyles';
 import { useFormikContext } from 'formik';
 
 const useStyles = makeStyles(() => ({

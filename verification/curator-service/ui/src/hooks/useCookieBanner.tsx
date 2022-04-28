@@ -1,4 +1,4 @@
-import { useTheme, Theme } from '@material-ui/core/styles';
+import { useTheme, Theme } from '@mui/material/styles';
 
 const POLICY_ID = process.env.REACT_APP_POLICY_PUBLIC_ID;
 const SITE_ID = process.env.REACT_APP_COOKIE_CONSENT_PUBLIC_ID;

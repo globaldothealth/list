@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { Button, CircularProgress } from '@material-ui/core';
-import CloudDownloadIcon from '@material-ui/icons/CloudDownloadOutlined';
-import MuiAlert from '@material-ui/lab/Alert';
+import { Button, CircularProgress } from '@mui/material';
+import CloudDownloadIcon from '@mui/icons-material/CloudDownloadOutlined';
+import MuiAlert from '@mui/material/Alert';
 
 import axios from 'axios';
 

@@ -3,21 +3,16 @@ import * as Yup from 'yup';
 import { useAppSelector } from '../hooks/redux';
 import { selectUser } from '../redux/auth/selectors';
 
-import {
-    Button,
-    Paper,
-    Typography,
-    makeStyles,
-    Theme,
-} from '@material-ui/core';
+import { Button, Paper, Typography, Theme } from '@mui/material';
+import makeStyles from '@mui/styles/makeStyles';
 import { FastField, Form, Formik } from 'formik';
 
 import AppModal from './AppModal';
-import ChipInput from 'material-ui-chip-input';
+import ChipInput from './ChipInput';
 import FieldTitle from './common-form-fields/FieldTitle';
-import MuiAlert from '@material-ui/lab/Alert';
+import MuiAlert from '@mui/material/Alert';
 import { SelectField } from './common-form-fields/FormikFields';
-import { TextField, CheckboxWithLabel } from 'formik-material-ui';
+import { TextField, CheckboxWithLabel } from 'formik-mui';
 import axios from 'axios';
 import { useHistory } from 'react-router-dom';
 
@@ -223,29 +218,30 @@ export default function AutomatedSourceForm(props: Props): JSX.Element {
                                         </div>
                                         <div className={classes.formSection}>
                                             <ChipInput
-                                                classes={{
-                                                    helperText:
-                                                        classes.errorHelper,
-                                                }}
+                                                // classes={{
+                                                //     helperText:
+                                                //         classes.errorHelper,
+                                                // }}
                                                 data-testid="countryCodes"
-                                                helperText={
-                                                    errors.countryCodes
-                                                        ? 'Values must be valid country codes'
-                                                        : undefined
-                                                }
-                                                fullWidth
-                                                alwaysShowPlaceholder
-                                                placeholder="Two letter ISO-3166-1 country codes (or ZZ for world)"
-                                                defaultValue={
-                                                    initialValues.countryCodes
-                                                }
-                                                onChange={(values): void =>
-                                                    setFieldValue(
-                                                        'countryCodes',
-                                                        values ?? undefined,
-                                                    )
-                                                }
-                                            ></ChipInput>
+                                                // helperText={
+                                                //     errors.countryCodes
+                                                //         ? 'Values must be valid country codes'
+                                                //         : undefined
+                                                // }
+                                                // fullWidth
+                                                // alwaysShowPlaceholder
+                                                // placeholder="Two letter ISO-3166-1 country codes (or ZZ for world)"
+                                                // defaultValue={
+                                                //     initialValues.countryCodes
+                                                // }
+                                                values={['sample']}
+                                                // onChange={(values): void =>
+                                                //     setFieldValue(
+                                                //         'countryCodes',
+                                                //         values ?? undefined,
+                                                //     )
+                                                // }
+                                            />
                                         </div>
                                         <div className={classes.formSection}>
                                             <FastField
@@ -314,29 +310,30 @@ export default function AutomatedSourceForm(props: Props): JSX.Element {
                                         </div>
                                         <div className={classes.formSection}>
                                             <ChipInput
-                                                classes={{
-                                                    helperText:
-                                                        classes.errorHelper,
-                                                }}
+                                                // classes={{
+                                                //     helperText:
+                                                //         classes.errorHelper,
+                                                // }}
                                                 data-testid="recipients"
-                                                helperText={
-                                                    errors.notificationRecipients
-                                                        ? 'Values must be valid email addresses'
-                                                        : undefined
-                                                }
-                                                fullWidth
-                                                alwaysShowPlaceholder
-                                                placeholder="Notification recipient emails"
-                                                defaultValue={
-                                                    initialValues.notificationRecipients
-                                                }
-                                                onChange={(values): void =>
-                                                    setFieldValue(
-                                                        'notificationRecipients',
-                                                        values ?? undefined,
-                                                    )
-                                                }
-                                            ></ChipInput>
+                                                // helperText={
+                                                //     errors.notificationRecipients
+                                                //         ? 'Values must be valid email addresses'
+                                                //         : undefined
+                                                // }
+                                                // fullWidth
+                                                // alwaysShowPlaceholder
+                                                // placeholder="Notification recipient emails"
+                                                // defaultValue={
+                                                //     initialValues.notificationRecipients
+                                                // }
+                                                values={['sample']}
+                                                // onChange={(values): void =>
+                                                //     setFieldValue(
+                                                //         'notificationRecipients',
+                                                //         values ?? undefined,
+                                                //     )
+                                                // }
+                                            />
                                         </div>
                                     </Paper>
                                 </Form>

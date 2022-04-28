@@ -1,5 +1,5 @@
-import { makeStyles, Theme } from '@material-ui/core/styles';
-import { drawerWidth } from '../App';
+import { Theme } from '@mui/material/styles';
+import makeStyles from '@mui/styles/makeStyles';
 
 export const useStyles = makeStyles((theme: Theme) => ({
     link: {
@@ -14,13 +14,13 @@ export const useStyles = makeStyles((theme: Theme) => ({
         width: '100%',
     },
     drawer: {
-        width: drawerWidth,
+        width: theme.drawerWidth,
         flexShrink: 0,
     },
     drawerPaper: {
         backgroundColor: '#ECF3F0',
         border: 'none',
-        width: drawerWidth,
+        width: theme.drawerWidth,
     },
     drawerContents: {
         display: 'flex',

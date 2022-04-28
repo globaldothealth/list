@@ -16,29 +16,30 @@ import {
     TablePagination,
     Theme,
     Typography,
-    makeStyles,
-    withStyles,
     LinearProgress,
     InputLabel,
     FormHelperText,
     FormControl,
     Select,
     Tooltip,
-} from '@material-ui/core';
-import { createStyles } from '@material-ui/core/styles';
-import { WithStyles } from '@material-ui/core/styles/withStyles';
+    SelectChangeEvent,
+} from '@mui/material';
+import makeStyles from '@mui/styles/makeStyles';
+import withStyles from '@mui/styles/withStyles';
+import { WithStyles } from '@mui/styles';
+import createStyles from '@mui/styles/createStyles';
 import MaterialTable, { MTableToolbar, QueryResult } from 'material-table';
-import Chip from '@material-ui/core/Chip';
+import Chip from '@mui/material/Chip';
 
 import { Case, VerificationStatus } from './Case';
-import CircularProgress from '@material-ui/core/CircularProgress';
-import DeleteIcon from '@material-ui/icons/DeleteOutline';
-import EditIcon from '@material-ui/icons/EditOutlined';
-import NotInterestedIcon from '@material-ui/icons/NotInterested';
+import CircularProgress from '@mui/material/CircularProgress';
+import DeleteIcon from '@mui/icons-material/DeleteOutline';
+import EditIcon from '@mui/icons-material/EditOutlined';
+import NotInterestedIcon from '@mui/icons-material/NotInterested';
 import { Link } from 'react-router-dom';
-import MoreVertIcon from '@material-ui/icons/MoreVert';
-import MuiAlert from '@material-ui/lab/Alert';
-import SaveAltIcon from '@material-ui/icons/SaveAlt';
+import MoreVertIcon from '@mui/icons-material/MoreVert';
+import MuiAlert from '@mui/material/Alert';
+import SaveAltIcon from '@mui/icons-material/SaveAlt';
 import { ReactComponent as VerifiedIcon } from './assets/verified_icon.svg';
 import { ReactComponent as UnverifiedIcon } from './assets/unverified_icon.svg';
 import { ReactComponent as ExcludedIcon } from './assets/excluded_icon.svg';
@@ -348,6 +349,7 @@ function RowMenu(props: {
                 data-testid="row menu"
                 onClick={handleClick}
                 color="inherit"
+                size="large"
             >
                 <MoreVertIcon />
             </IconButton>
@@ -469,12 +471,7 @@ export function SortSelect({
         return `${value}|${order}`;
     };
 
-    const handleChange = (
-        event: React.ChangeEvent<{
-            value: unknown;
-            name?: string | undefined;
-        }>,
-    ) => {
+    const handleChange = (event: SelectChangeEvent) => {
         const value = event.target.value as string;
         if (!value) return;
 
@@ -612,9 +609,7 @@ export function DownloadButton(): JSX.Element {
         }
     }, [location.search]);
 
-    const handleFileFormatChange = (
-        event: React.ChangeEvent<{ value: unknown }>,
-    ) => {
+    const handleFileFormatChange = (event: SelectChangeEvent) => {
         if (
             event.target.value === 'csv' ||
             event.target.value === 'tsv' ||
@@ -1660,7 +1655,7 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
 
                                             <TablePagination
                                                 {...props}
-                                                onChangeRowsPerPage={(
+                                                onRowsPerPageChange={(
                                                     event,
                                                 ): void => {
                                                     const newPage = 0;
@@ -1684,7 +1679,7 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                                         newPageSize,
                                                     );
                                                 }}
-                                                onChangePage={(
+                                                onPageChange={(
                                                     event,
                                                     newPage: number,
                                                 ): void => {
@@ -1818,12 +1813,12 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                                             </Button>
                                                         ),
                                                         tooltip: `
-                                      ${
-                                          this.state.totalNumRows ===
-                                          this.state.numSelectedRows
-                                              ? 'Unselect'
-                                              : 'Select'
-                                      } all rows across pages`,
+                                  ${
+                                      this.state.totalNumRows ===
+                                      this.state.numSelectedRows
+                                          ? 'Unselect'
+                                          : 'Select'
+                                  } all rows across pages`,
                                                         onClick: async (
                                                             // eslint-disable-next-line @typescript-eslint/no-explicit-any
                                                             event: any,

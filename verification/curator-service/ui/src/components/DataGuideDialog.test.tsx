@@ -1,6 +1,6 @@
 import React from 'react';
 import { screen, fireEvent, render, waitFor } from './util/test-utils';
-import { Button } from '@material-ui/core';
+import { Button } from '@mui/material';
 import DataGuideDialog from './DataGuideDialog';
 
 const SearchGuideTestCase = ({ defaultOpen = false }): JSX.Element => {

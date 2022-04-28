@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from 'react';
-import { Paper, Typography } from '@material-ui/core';
-import { Theme, makeStyles } from '@material-ui/core/styles';
-import { useLastLocation } from 'react-router-last-location';
-import useMediaQuery from '@material-ui/core/useMediaQuery';
+import { useEffect, useState } from 'react';
+import { Typography, Paper } from '@mui/material';
+import { styled, Theme } from '@mui/material/styles';
+import { makeStyles } from '@mui/styles';
+import useMediaQuery from '@mui/material/useMediaQuery';
 import { useAppDispatch, useAppSelector } from '../../hooks/redux';
 import {
     selectIsLoading,
@@ -15,8 +15,8 @@ import { resetError, toggleSnackbar } from '../../redux/auth/slice';
 import SignInForm from './SignInForm';
 import SignUpForm from './SignUpForm';
 import ChangePasswordForm from './ChangePasswordForm';
-import Alert from '@material-ui/lab/Alert';
-import LinearProgress from '@material-ui/core/LinearProgress';
+import Alert from '@mui/material/Alert';
+import LinearProgress from '@mui/material/LinearProgress';
 
 import PolicyLink from '../PolicyLink';
 import PartnerLogos from './PartnerLogos';
@@ -29,27 +29,34 @@ import { selectVersion, selectEnv } from '../../redux/app/selectors';
 import { MapLink } from '../../constants/types';
 import { getReleaseNotesUrl } from '../util/helperFunctions';
 
+interface UrlParams {
+    token?: string;
+    id?: string;
+}
+
 interface StylesProps {
     smallHeight: boolean;
 }
 
-const useStyles = makeStyles((theme: Theme) => ({
-    paper: {
-        position: 'absolute',
-        top: (props: StylesProps) => (props.smallHeight ? '64px' : '50%'),
-        left: '50%',
-        transform: (props: StylesProps) =>
-            props.smallHeight ? 'translate(-50%, 0)' : 'translate(-50%, -50%)',
+const StyledPaper = styled(Paper, {
+    shouldForwardProp: (prop) => prop !== 'smallHeight',
+})<StylesProps>(({ smallHeight }) => ({
+    position: 'absolute',
+    top: smallHeight ? '64px' : '50%',
+    left: '50%',
+    transform: smallHeight ? 'translate(-50%, 0)' : 'translate(-50%, -50%)',
 
-        height: 'auto',
-        maxWidth: '100%',
-        padding: '45px',
-        width: '1000px',
-    },
+    height: 'auto',
+    maxWidth: '100%',
+    padding: '45px',
+    width: '1000px',
+}));
+
+const useStyles = makeStyles((theme: Theme) => ({
     body: {
         display: 'flex',
         marginTop: '20px',
-        [theme.breakpoints.down(770)]: {
+        [theme.breakpoints.down('sm')]: {
             marginBottom: '60px',
             flexDirection: 'column',
             rowGap: '30px',
@@ -59,7 +66,7 @@ const useStyles = makeStyles((theme: Theme) => ({
         color: theme.custom.palette.landingPage.descriptionTextColor,
         marginRight: '90px',
         width: '60%',
-        [theme.breakpoints.down(460)]: {
+        [theme.breakpoints.down('sm')]: {
             width: '100%',
         },
     },
@@ -69,7 +76,7 @@ const useStyles = makeStyles((theme: Theme) => ({
         flexDirection: 'column',
         alignItems: 'flex-end',
 
-        [theme.breakpoints.down(770)]: {
+        [theme.breakpoints.down('sm')]: {
             width: '100%',
             alignItems: 'flex-start',
         },
@@ -98,10 +105,6 @@ const useStyles = makeStyles((theme: Theme) => ({
     },
 }));
 
-interface UrlParams {
-    token?: string;
-    id?: string;
-}
 interface StyleProps {
     classes: {
         linksContainer: string;
@@ -194,8 +197,7 @@ const LandingPage = (): JSX.Element => {
     const dispatch = useAppDispatch();
 
     const smallHeight = useMediaQuery('(max-height:1050px)');
-    const classes = useStyles({ smallHeight });
-    const lastLocation = useLastLocation();
+    const classes = useStyles();
     const [registrationScreenOn, setRegistrationScreenOn] = useState(true);
     const [changePasswordScreenOn, setChangePasswordScreenOn] = useState(false);
 
@@ -230,18 +232,19 @@ const LandingPage = (): JSX.Element => {
     }, [dispatch, registrationScreenOn]);
 
     // Store searchQuery in localStorage to apply filters after going through login process
-    useEffect(() => {
-        if (!lastLocation || lastLocation.search === '') return;
+    // @TODO
+    // useEffect(() => {
+    //     if (!lastLocation || lastLocation.search === '') return;
 
-        localStorage.setItem('searchQuery', lastLocation.search);
-    }, [lastLocation]);
+    //     localStorage.setItem('searchQuery', lastLocation.search);
+    // }, [lastLocation]);
 
     return (
         <>
             <Helmet>
                 <title>Global.health | Data</title>
             </Helmet>
-            <Paper classes={{ root: classes.paper }}>
+            <StyledPaper smallHeight={smallHeight}>
                 <Typography variant="h4">
                     Detailed line list data to power your research
                 </Typography>
@@ -306,7 +309,7 @@ const LandingPage = (): JSX.Element => {
                 />
 
                 <PartnerLogos />
-            </Paper>
+            </StyledPaper>
         </>
     );
 };

@@ -1,22 +1,22 @@
 import React from 'react';
-import { Autocomplete, createFilterOptions } from '@material-ui/lab';
+import { Autocomplete } from '@mui/material';
+import { createFilterOptions } from '@mui/material/useAutocomplete';
 import { FastField, Field, useFormikContext } from 'formik';
 
 import { AutomatedSourceFormValues } from '../AutomatedSourceForm';
 import BulkCaseFormValues from '../bulk-case-form-fields/BulkCaseFormValues';
 import CaseFormValues from '../new-case-form-fields/CaseFormValues';
-import DateFnsUtils from '@date-io/date-fns';
-import FormControl from '@material-ui/core/FormControl';
-import { FormHelperText } from '@material-ui/core';
-import InputLabel from '@material-ui/core/InputLabel';
-import { KeyboardDatePicker } from 'formik-material-ui-pickers';
-import MenuItem from '@material-ui/core/MenuItem';
-import { MuiPickersUtilsProvider } from '@material-ui/pickers';
-import { Select } from 'formik-material-ui';
-import { TextField } from 'formik-material-ui';
+import FormControl from '@mui/material/FormControl';
+import { FormHelperText } from '@mui/material';
+import InputLabel from '@mui/material/InputLabel';
+import { DesktopDatePicker } from 'formik-mui-lab';
+import MenuItem from '@mui/material/MenuItem';
+import AdapterDateFns from '@mui/lab/AdapterDateFns';
+import LocalizationProvider from '@mui/lab/LocalizationProvider';
+import { Select, TextField } from 'formik-mui';
 import axios from 'axios';
 import { hasKey } from '../Utils';
-import { makeStyles } from '@material-ui/core';
+import makeStyles from '@mui/styles/makeStyles';
 
 const useStyles = makeStyles(() => ({
     fieldRow: {
@@ -184,7 +184,7 @@ export function DateField(props: DateFieldProps): JSX.Element {
     const classes = useStyles();
     return (
         <div className={classes.fieldRow}>
-            <MuiPickersUtilsProvider utils={DateFnsUtils}>
+            <LocalizationProvider dateAdapter={AdapterDateFns}>
                 {/* Don't use FastField here */}
                 <Field
                     className={classes.field}
@@ -199,10 +199,10 @@ export function DateField(props: DateFieldProps): JSX.Element {
                         props.initialFocusedDate ?? '',
                     )}
                     invalidDateMessage="Invalid date format (YYYY/MM/DD)"
-                    component={KeyboardDatePicker}
+                    component={DesktopDatePicker}
                     helperText="YYYY/MM/DD"
                 />
-            </MuiPickersUtilsProvider>
+            </LocalizationProvider>
             {props.required && (
                 <RequiredHelperText name={props.name}></RequiredHelperText>
             )}

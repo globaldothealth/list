@@ -16,17 +16,18 @@ import {
     setResetPasswordEmailSent,
 } from '../../redux/auth/slice';
 
-import { makeStyles, Theme } from '@material-ui/core/styles';
-import TextField from '@material-ui/core/TextField';
-import Button from '@material-ui/core/Button';
-import Alert from '@material-ui/lab/Alert';
-import LinearProgress from '@material-ui/core/LinearProgress';
+import { Theme } from '@mui/material/styles';
+import makeStyles from '@mui/styles/makeStyles';
+import TextField from '@mui/material/TextField';
+import Button from '@mui/material/Button';
+import Alert from '@mui/material/Alert';
+import LinearProgress from '@mui/material/LinearProgress';
 import {
     Dialog,
     DialogContent,
     DialogContentText,
     DialogTitle,
-} from '@material-ui/core';
+} from '@mui/material';
 
 const useStyles = makeStyles((theme: Theme) => ({
     checkboxRoot: {

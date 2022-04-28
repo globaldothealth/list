@@ -1,5 +1,5 @@
 import React from 'react';
-import { IconButton, Tooltip } from '@material-ui/core';
+import { IconButton, Tooltip } from '@mui/material';
 import { ReactComponent as VerificationHeaderSvg } from './assets/verification_header.svg';
 
 interface ColumnHeaderProps {
@@ -13,7 +13,7 @@ const VerificationStatusHeader: React.FC<ColumnHeaderProps> = ({
             title="Verification status: Verified, Unverified or Excluded"
             onClick={onClickAction}
         >
-            <IconButton>
+            <IconButton size="large">
                 <VerificationHeaderSvg />
             </IconButton>
         </Tooltip>

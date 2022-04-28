@@ -1,9 +1,9 @@
 import React from 'react';
 import { FastField, FieldArray, useFormikContext } from 'formik';
 
-import AddCircleIcon from '@material-ui/icons/AddCircle';
-import Button from '@material-ui/core/Button';
-import CancelIcon from '@material-ui/icons/Cancel';
+import AddCircleIcon from '@mui/icons-material/AddCircle';
+import Button from '@mui/material/Button';
+import CancelIcon from '@mui/icons-material/Cancel';
 import CaseFormValues from './CaseFormValues';
 import {
     DateField,
@@ -12,8 +12,8 @@ import {
 import FieldTitle from '../common-form-fields/FieldTitle';
 import { StyledTooltip } from './StyledTooltip';
 import Scroll from 'react-scroll';
-import { TextField } from 'formik-material-ui';
-import { makeStyles } from '@material-ui/core';
+import { TextField } from 'formik-mui';
+import makeStyles from '@mui/styles/makeStyles';
 import shortId from 'shortid';
 import { VaccineSideEffects } from './Symptoms';
 

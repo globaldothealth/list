@@ -1,9 +1,11 @@
-import { Theme, createStyles } from '@material-ui/core/styles';
+import { Theme } from '@mui/material/styles';
 
-import HelpOutlineIcon from '@material-ui/icons/HelpOutline';
+import { WithStyles } from '@mui/styles';
+import createStyles from '@mui/styles/createStyles';
+
+import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import React from 'react';
-import { WithStyles } from '@material-ui/core/styles/withStyles';
-import { withStyles } from '@material-ui/core';
+import withStyles from '@mui/styles/withStyles';
 import { AppTooltip } from './AppTooltip';
 
 const styles = (theme: Theme) =>
@@ -34,7 +36,7 @@ function FieldTitle(props: FieldTitleProps): JSX.Element {
             {props.tooltip && (
                 <AppTooltip
                     arrow
-                    interactive={props.interactive}
+                    disableInteractive={props.interactive === false}
                     title={props.tooltip || ''}
                     maxwidth={props.widetooltip ? '40vw' : 'auto'}
                 >

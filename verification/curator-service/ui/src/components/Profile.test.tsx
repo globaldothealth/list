@@ -19,6 +19,7 @@ const initialLoggedInState: RootState = {
         filterBreadcrumbs: [],
         version: '1.0',
         env: 'local',
+        diseaseName: 'COVID-19',
     },
     filters: {
         countryList: [],
@@ -58,6 +59,7 @@ const loggedInWithApiKeyState: RootState = {
         filterBreadcrumbs: [],
         version: '1.0',
         env: 'local',
+        diseaseName: 'COVID-19',
     },
     filters: {
         countryList: [],
@@ -98,6 +100,7 @@ const noUserInfoState: RootState = {
         filterBreadcrumbs: [],
         version: '1.0',
         env: 'local',
+        diseaseName: 'COVID-19',
     },
     auth: {
         isLoading: false,

@@ -17,20 +17,21 @@ import { resetError, resetChangePasswordResponse } from '../redux/auth/slice';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 
-import { Theme, makeStyles } from '@material-ui/core/styles';
-import FormHelperText from '@material-ui/core/FormHelperText';
-import FormControl from '@material-ui/core/FormControl';
-import InputLabel from '@material-ui/core/InputLabel';
-import OutlinedInput from '@material-ui/core/OutlinedInput';
-import InputAdornment from '@material-ui/core/InputAdornment';
-import IconButton from '@material-ui/core/IconButton';
-import Visibility from '@material-ui/icons/Visibility';
-import VisibilityOff from '@material-ui/icons/VisibilityOff';
-import Button from '@material-ui/core/Button';
-import Typography from '@material-ui/core/Typography';
-import { Chip, Tooltip } from '@material-ui/core';
-import Alert from '@material-ui/lab/Alert';
-import LinearProgress from '@material-ui/core/LinearProgress';
+import { Theme } from '@mui/material/styles';
+import makeStyles from '@mui/styles/makeStyles';
+import FormHelperText from '@mui/material/FormHelperText';
+import FormControl from '@mui/material/FormControl';
+import InputLabel from '@mui/material/InputLabel';
+import OutlinedInput from '@mui/material/OutlinedInput';
+import InputAdornment from '@mui/material/InputAdornment';
+import IconButton from '@mui/material/IconButton';
+import Visibility from '@mui/icons-material/Visibility';
+import VisibilityOff from '@mui/icons-material/VisibilityOff';
+import Button from '@mui/material/Button';
+import Typography from '@mui/material/Typography';
+import { Chip, Tooltip } from '@mui/material';
+import Alert from '@mui/material/Alert';
+import LinearProgress from '@mui/material/LinearProgress';
 import { SnackbarAlert } from './SnackbarAlert';
 import Helmet from 'react-helmet';
 
@@ -229,6 +230,7 @@ export function ChangePasswordFormInProfile(): JSX.Element {
                                         )
                                     }
                                     edge="end"
+                                    size="large"
                                 >
                                     {passwordVisible ? (
                                         <Visibility />
@@ -271,6 +273,7 @@ export function ChangePasswordFormInProfile(): JSX.Element {
                                         setPasswordVisible(!passwordVisible)
                                     }
                                     edge="end"
+                                    size="large"
                                 >
                                     {passwordVisible ? (
                                         <Visibility />
@@ -315,6 +318,7 @@ export function ChangePasswordFormInProfile(): JSX.Element {
                                         )
                                     }
                                     edge="end"
+                                    size="large"
                                 >
                                     {passwordConfirmationVisible ? (
                                         <Visibility />

@@ -1,13 +1,13 @@
-import { Divider, MenuItem } from '@material-ui/core';
-import { Select, TextField } from 'formik-material-ui';
+import { Divider, MenuItem } from '@mui/material';
+import { Select, TextField } from 'formik-mui';
 
 import { FastField } from 'formik';
-import FormControl from '@material-ui/core/FormControl';
+import FormControl from '@mui/material/FormControl';
 import { Geometry } from '../Case';
-import InputLabel from '@material-ui/core/InputLabel';
+import InputLabel from '@mui/material/InputLabel';
 import React from 'react';
 import StaticMap from '../StaticMap';
-import { makeStyles } from '@material-ui/core/styles';
+import makeStyles from '@mui/styles/makeStyles';
 
 const styles = makeStyles(() => ({
     root: {

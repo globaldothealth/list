@@ -3,7 +3,7 @@ import FieldTitle from '../common-form-fields/FieldTitle';
 import { StyledTooltip } from './StyledTooltip';
 import React from 'react';
 import Scroll from 'react-scroll';
-import { TextField } from 'formik-material-ui';
+import { TextField } from 'formik-mui';
 
 const TooltipText = () => (
     <StyledTooltip>

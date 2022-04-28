@@ -1,7 +1,7 @@
 import CaseValidationError from './CaseValidationError';
-import ErrorIcon from '@material-ui/icons/Error';
+import ErrorIcon from '@mui/icons-material/Error';
 import React from 'react';
-import { makeStyles } from '@material-ui/core';
+import makeStyles from '@mui/styles/makeStyles';
 
 interface ValidateErrorListProps {
     errors: CaseValidationError[];

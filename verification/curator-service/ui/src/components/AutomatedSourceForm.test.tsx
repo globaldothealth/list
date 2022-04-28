@@ -18,6 +18,7 @@ const initialLoggedInState: RootState = {
         filterBreadcrumbs: [],
         version: '1.0',
         env: 'local',
+        diseaseName: 'COVID-19',
     },
     filters: {
         countryList: [],

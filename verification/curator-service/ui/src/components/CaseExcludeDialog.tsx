@@ -7,8 +7,8 @@ import {
     DialogContentText,
     DialogTitle,
     TextField,
-} from '@material-ui/core';
-import { Form, Formik, FormikProps, FormikValues } from 'formik';
+} from '@mui/material';
+import { useFormik } from 'formik';
 
 interface Props {
     isOpen: boolean;
@@ -22,60 +22,61 @@ export const CaseExcludeDialog = ({
     onClose,
     onSubmit,
     caseIds,
-}: Props): JSX.Element => (
-    <Dialog
-        open={isOpen}
-        onClose={onClose}
-        // Stops the click being propagated to the table which
-        // would trigger the onRowClick action.
-        onClick={(e): void => e.stopPropagation()}
-    >
-        <Formik initialValues={{ note: '' }} onSubmit={onSubmit}>
-            {({
-                values,
-                touched,
-                handleChange,
-            }: FormikProps<FormikValues>): JSX.Element => (
-                <Form>
-                    <DialogTitle>
-                        Are you sure you want to exclude selected cases?
-                    </DialogTitle>
-                    <DialogContent>
-                        <DialogContentText>
-                            The following cases will be ignored in the ingestion
-                            process:
-                            <ul>
-                                {caseIds.map((id) => (
-                                    <li key={id}>{id}</li>
-                                ))}
-                            </ul>
-                            <TextField
-                                name="note"
-                                placeholder="Please specify reason for exclusion"
-                                multiline
-                                fullWidth
-                                value={values.note}
-                                onChange={handleChange}
-                                error={touched.note && !values.note}
-                            />
-                        </DialogContentText>
-                    </DialogContent>
-                    <DialogActions>
-                        <Button onClick={onClose} color="primary" autoFocus>
-                            Cancel
-                        </Button>
-                        <Button
-                            type="submit"
-                            color="primary"
-                            disabled={!values.note}
-                        >
-                            Yes
-                        </Button>
-                    </DialogActions>
-                </Form>
-            )}
-        </Formik>
-    </Dialog>
-);
+}: Props): JSX.Element => {
+    const formik = useFormik({
+        initialValues: {
+            note: '',
+        },
+        onSubmit: onSubmit,
+    });
+
+    return (
+        <Dialog
+            open={isOpen}
+            onClose={onClose}
+            // Stops the click being propagated to the table which
+            // would trigger the onRowClick action.
+            onClick={(e): void => e.stopPropagation()}
+        >
+            <form onSubmit={formik.handleSubmit}>
+                <DialogTitle>
+                    Are you sure you want to exclude selected cases?
+                </DialogTitle>
+                <DialogContent>
+                    <DialogContentText>
+                        The following cases will be ignored in the ingestion
+                        process:
+                        <ul>
+                            {caseIds.map((id) => (
+                                <li key={id}>{id}</li>
+                            ))}
+                        </ul>
+                        <TextField
+                            name="note"
+                            placeholder="Please specify reason for exclusion"
+                            multiline
+                            fullWidth
+                            value={formik.values.note}
+                            onChange={formik.handleChange}
+                            error={formik.touched.note && !formik.values.note}
+                        />
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={onClose} color="primary" autoFocus>
+                        Cancel
+                    </Button>
+                    <Button
+                        type="submit"
+                        color="primary"
+                        disabled={!formik.values.note}
+                    >
+                        Yes
+                    </Button>
+                </DialogActions>
+            </form>
+        </Dialog>
+    );
+};
 
 export default CaseExcludeDialog;

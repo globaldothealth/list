@@ -1,6 +1,6 @@
-import { Theme, ThemeOptions } from '@material-ui/core/styles/createMuiTheme';
+import { Theme, DeprecatedThemeOptions } from '@mui/material/styles';
 
-declare module '@material-ui/core/styles/createMuiTheme' {
+declare module '@mui/material/styles/createMuiTheme' {
     interface Theme {
         custom: {
             palette: {
@@ -22,7 +22,7 @@ declare module '@material-ui/core/styles/createMuiTheme' {
         };
     }
     // allow configuration using `createMuiTheme`
-    interface ThemeOptions {
+    interface DeprecatedThemeOptions {
         custom?: {
             palette?: {
                 button?: {

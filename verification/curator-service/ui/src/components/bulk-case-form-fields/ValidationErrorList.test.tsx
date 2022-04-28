@@ -1,7 +1,6 @@
-import { render, wait } from '@testing-library/react';
+import { render } from '@testing-library/react';
 
 import CaseValidationError from './CaseValidationError';
-import React from 'react';
 import ValidationErrorList from './ValidationErrorList';
 
 const exampleApiResponse =

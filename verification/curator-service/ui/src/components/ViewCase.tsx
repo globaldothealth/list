@@ -1,11 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import {
-    Button,
-    Grid,
-    LinearProgress,
-    Paper,
-    Typography,
-} from '@material-ui/core';
+import { Button, Grid, LinearProgress, Paper, Typography } from '@mui/material';
 import {
     Case,
     GenomeSequence,
@@ -16,25 +10,25 @@ import {
     VerificationStatus,
 } from './Case';
 import AppModal from './AppModal';
-import EditIcon from '@material-ui/icons/EditOutlined';
+import EditIcon from '@mui/icons-material/EditOutlined';
 import { Link } from 'react-router-dom';
-import MuiAlert from '@material-ui/lab/Alert';
+import MuiAlert from '@mui/material/Alert';
 import Scroll from 'react-scroll';
 import StaticMap from './StaticMap';
 import axios from 'axios';
 import createHref from './util/links';
-import { makeStyles } from '@material-ui/core';
+import makeStyles from '@mui/styles/makeStyles';
 import renderDate, { renderDateRange } from './util/date';
 import shortId from 'shortid';
-import useMediaQuery from '@material-ui/core/useMediaQuery';
-import { useTheme } from '@material-ui/core/styles';
+import useMediaQuery from '@mui/material/useMediaQuery';
+import { useTheme } from '@mui/material/styles';
 import Highlighter from 'react-highlight-words';
 import { useSelector } from 'react-redux';
 import {
     selectSearchQuery,
     selectFilterBreadcrumbs,
 } from '../redux/app/selectors';
-import Chip from '@material-ui/core/Chip';
+import Chip from '@mui/material/Chip';
 import { nameCountry } from './util/countryNames';
 
 const styles = makeStyles((theme) => ({

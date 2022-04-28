@@ -6,20 +6,20 @@ import {
     TablePagination,
     Theme,
     Typography,
-    WithStyles,
-    createStyles,
-    withStyles,
     Switch,
-} from '@material-ui/core';
+} from '@mui/material';
+import { WithStyles } from '@mui/styles';
+import createStyles from '@mui/styles/createStyles';
+import withStyles from '@mui/styles/withStyles';
 import MaterialTable, { QueryResult } from 'material-table';
 import { nameCountry } from './util/countryNames';
 
-import MuiAlert from '@material-ui/lab/Alert';
-import Paper from '@material-ui/core/Paper';
+import MuiAlert from '@mui/material/Alert';
+import Paper from '@mui/material/Paper';
 import SourceRetrievalButton from './SourceRetrievalButton';
-import TextField from '@material-ui/core/TextField';
+import TextField from '@mui/material/TextField';
 import axios from 'axios';
-import ChipInput from 'material-ui-chip-input';
+import ChipInput from './ChipInput';
 
 interface Origin {
     url: string;
@@ -448,11 +448,12 @@ class SourceTable extends React.Component<Props, SourceTableState> {
                                         : '',
                                 editComponent: (props): JSX.Element => (
                                     <ChipInput
-                                        defaultValue={props.value || []}
-                                        onChange={(value: string[]): void =>
-                                            props.onChange(value)
-                                        }
-                                        placeholder="Email address(es)"
+                                        values={['sample']}
+                                        // defaultValue={props.value || []}
+                                        // onChange={(value: string[]): void =>
+                                        //     props.onChange(value)
+                                        // }
+                                        // placeholder="Email address(es)"
                                     />
                                 ),
                             },

@@ -1,6 +1,6 @@
-import Tooltip from '@material-ui/core/Tooltip';
-import { withStyles } from '@material-ui/core';
-import { Theme } from '@material-ui/core/styles';
+import Tooltip from '@mui/material/Tooltip';
+import withStyles from '@mui/styles/withStyles';
+import { Theme } from '@mui/material/styles';
 
 interface Widetooltip {
     maxwidth: 'auto' | '40vw';

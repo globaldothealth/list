@@ -6,16 +6,16 @@ import {
 } from '../common-form-fields/FormikFields';
 import { FieldArray, useFormikContext } from 'formik';
 
-import AddCircleIcon from '@material-ui/icons/AddCircle';
-import Button from '@material-ui/core/Button';
-import CancelIcon from '@material-ui/icons/Cancel';
+import AddCircleIcon from '@mui/icons-material/AddCircle';
+import Button from '@mui/material/Button';
+import CancelIcon from '@mui/icons-material/Cancel';
 import CaseFormValues from './CaseFormValues';
 import FieldTitle from '../common-form-fields/FieldTitle';
 import Location from './Location';
 import { PlacesAutocomplete } from './LocationForm';
 import { StyledTooltip } from './StyledTooltip';
 import Scroll from 'react-scroll';
-import { makeStyles } from '@material-ui/core';
+import makeStyles from '@mui/styles/makeStyles';
 import shortId from 'shortid';
 
 const useStyles = makeStyles(() => ({
