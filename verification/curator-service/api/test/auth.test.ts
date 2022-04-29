@@ -273,18 +273,6 @@ describe('api keys', () => {
         await request.get('/auth/profile/apiKey').expect(200);
     });
 
-    it('does not find an API key where none has been set', async () => {
-        const request = supertest.agent(app);
-        await request
-            .post('/auth/register')
-            .send({
-                name: 'test-curator',
-                email: 'foo@bar.com',
-            })
-            .expect(200, /test-curator/);
-        await request.get('/auth/profile/apiKey').expect(404);
-    });
-
     it('lets the user get their profile by API key', async () => {
         const request = supertest.agent(app);
         await request

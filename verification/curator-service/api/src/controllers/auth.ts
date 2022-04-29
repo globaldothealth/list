@@ -38,6 +38,11 @@ async function findUserByAPIKey(apiKey?: string): Promise<Express.User> {
     return user as Express.User;
 }
 
+async function getRandomString(bytes: number): Promise<string> {
+    const randomValues = await crypto.randomBytes(bytes);
+    return randomValues.toString('hex');
+}
+
 /**
  * authenticateByAPIKey is a middleware that checks whether the user has a valid API key in their request.
  * If they do, then attach the user object to the request and continue; if not then
@@ -285,11 +290,6 @@ export class AuthController {
             },
         );
 
-        async function getRandomString(bytes: number): Promise<string> {
-            const randomValues = await crypto.randomBytes(bytes);
-            return randomValues.toString('hex');
-        }
-
         /**
          * Create a new api key for the logged-in user.
          * @note This API cannot be authenticated by API key. If you believe your API key
@@ -305,7 +305,8 @@ export class AuthController {
                     // internal server error as you were authenticated but unknown
                     res.status(500).end();
                 } else {
-                    const userQuery = { _id: new ObjectId(theUser.id) };
+                    const userID = new ObjectId(theUser.id);
+                    const userQuery = { _id: userID };
                     const currentUser = await users().findOne(userQuery);
                     if (!currentUser) {
                         // internal server error as you were authenticated but unknown
@@ -313,10 +314,9 @@ export class AuthController {
                         return;
                     }
                     // prefix the API key with the user ID to make it easier to find users by API key in auth
-                    const randomPart = await getRandomString(32);
-                    const apiKey = `${theUser.id.toString()}${randomPart}`;
+                    const apiKey = await this.generateAPIKey(userID);
                     await users().updateOne(
-                        { _id: new ObjectId(theUser.id) },
+                        { _id: userID },
                         { $set: { apiKey } },
                     );
                     res.status(201).json(apiKey).end();
@@ -590,6 +590,12 @@ export class AuthController {
         );
     }
 
+    private async generateAPIKey(userID: ObjectId) {
+        const randomPart = await getRandomString(32);
+        const apiKey = `${userID.toString()}${randomPart}`;
+        return apiKey;
+    }
+
     /**
      * configureLocalAuth will get or create the user present in the request.
      */
@@ -606,6 +612,7 @@ export class AuthController {
                     name: req.body.name,
                     email: req.body.email,
                     roles: req.body.roles,
+                    apiKey: await this.generateAPIKey(userId),
                     ...(removeGoogleID !== true && { googleID: '42' }),
                 } as IUser);
                 const user = (await users().findOne({
