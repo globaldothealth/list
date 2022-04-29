@@ -13,13 +13,6 @@ on:
     tags:
       - "*"
   workflow_dispatch:
-    branches: [main, '*-stable']
-    paths:
-    - '.github/workflows/ingestion-cleanup-deploy.yml'
-    - 'ingestion/functions/**'
-    - '!ingestion/functions/README.md'
-    - '!ingestion/functions/parsing/**'
-    - '!ingestion/functions/retrieval/**'
 
 jobs:
   deploy:

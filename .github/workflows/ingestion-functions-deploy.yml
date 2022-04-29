@@ -11,11 +11,6 @@ on:
     tags:
       - "*"
   workflow_dispatch:
-    branches: [main, '*-stable']
-    paths:
-    - '.github/workflows/ingestion-functions-deploy.yml'
-    - 'ingestion/functions/**'
-    - '!ingestion/functions/README.md'
 
 jobs:
   deploy:

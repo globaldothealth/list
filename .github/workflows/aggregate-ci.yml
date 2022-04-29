@@ -11,9 +11,6 @@ on:
     - '.github/workflows/aggregate-ci.yml'
     - 'data-serving/scripts/aggregate/aggregate/**'
   workflow_dispatch:
-    paths:
-    - '.github/workflows/aggregate-ci.yml'
-    - 'data-serving/scripts/aggregate/aggregate/**'
 
 jobs:
   ci:

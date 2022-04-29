@@ -12,11 +12,6 @@ on:
     tags:
       - "*"
   workflow_dispatch:
-    branches: [main, '*-stable']
-    paths:
-      - ".github/workflows/curator-service-package.yml"
-      - "verification/curator-service/**"
-      - "!verification/curator-service/auth.md"
   pull_request:
     paths:
       - ".github/workflows/curator-service-package.yml"
