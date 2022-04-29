@@ -13,10 +13,6 @@ on:
     - 'ingestion/functions/**'
     - '!ingestion/functions/README.md'
   workflow_dispatch:
-    paths:
-    - '.github/workflows/ingestion-functions-python.yml'
-    - 'ingestion/functions/**'
-    - '!ingestion/functions/README.md'
 
 jobs:
   ci:

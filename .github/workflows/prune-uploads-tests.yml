@@ -13,10 +13,6 @@ on:
     - 'data-serving/scripts/prune-uploads/**'
     - '!data-serving/scripts/prune-uploads/README.md'
   workflow_dispatch:
-    paths:
-    - '.github/workflows/prune-uploads-tests.yml'
-    - 'data-serving/scripts/prune-uploads/**'
-    - '!data-serving/scripts/prune-uploads/README.md'
 
 jobs:
   tests:

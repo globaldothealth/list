@@ -13,10 +13,6 @@ on:
     - 'data-serving/scripts/export-data/*.py'
     - 'data-serving/scripts/export-data/*.sh'
   workflow_dispatch:
-    paths:
-    - '.github/workflows/export-tests.yml'
-    - 'data-serving/scripts/export-data/*.py'
-    - 'data-serving/scripts/export-data/*.sh'
 
 jobs:
   ci:

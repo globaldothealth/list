@@ -11,10 +11,6 @@ on:
     tags:
       - "*"
   workflow_dispatch:
-    branches: [main, '*-stable']
-    paths:
-      - ".github/workflows/data-service-package.yml"
-      - "data-serving/data-service/**"
   pull_request:
     paths:
       - ".github/workflows/data-service-package.yml"

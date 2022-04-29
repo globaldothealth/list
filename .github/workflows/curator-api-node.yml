@@ -10,10 +10,6 @@ on:
       - ".github/workflows/curator-api-node.yml"
       - "verification/curator-service/api/**"
   workflow_dispatch:
-    branches: [main, '*-stable']
-    paths:
-      - ".github/workflows/curator-api-node.yml"
-      - "verification/curator-service/api/**"
   pull_request:
     paths:
       - ".github/workflows/curator-api-node.yml"

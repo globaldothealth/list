@@ -17,12 +17,6 @@ on:
       - "data-serving/data-service/**"
       - "data-serving/samples/**"
   workflow_dispatch:
-    paths:
-      - ".github/workflows/integration-tests.yml"
-      - "dev/docker-compose.yml"
-      - "verification/curator-service/**"
-      - "data-serving/data-service/**"
-      - "data-serving/samples/**"
 
 jobs:
   integration-tests:

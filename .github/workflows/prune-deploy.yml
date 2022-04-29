@@ -8,11 +8,6 @@ on:
     - 'data-serving/scripts/prune-uploads/**'
     - '!data-serving/scripts/prune-uploads/README.md'
   workflow_dispatch:
-    branches: [main]
-    paths:
-    - '.github/workflows/prune-deploy.yml'
-    - 'data-serving/scripts/prune-uploads/**'
-    - '!data-serving/scripts/prune-uploads/README.md'
 
 jobs:
   deploy:

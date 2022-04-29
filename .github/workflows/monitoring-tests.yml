@@ -11,9 +11,6 @@ on:
     - '.github/workflows/monitoring-tests.yml'
     - 'ingestion/monitoring/**'
   workflow_dispatch:
-    paths:
-    - '.github/workflows/monitoring-tests.yml'
-    - 'ingestion/monitoring/**'
 
 jobs:
   monitoring-tests:

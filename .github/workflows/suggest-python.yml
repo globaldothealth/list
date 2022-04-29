@@ -11,9 +11,6 @@ on:
     - '.github/workflows/suggest-python.yml'
     - 'suggest/acronyms/**'
   workflow_dispatch:
-    paths:
-    - '.github/workflows/suggest-python.yml'
-    - 'suggest/acronyms/**'
 
 jobs:
   ci:
