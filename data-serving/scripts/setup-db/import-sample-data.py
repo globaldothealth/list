@@ -65,12 +65,16 @@ def api_key_for_generated_curator(base_url: str) -> str:
         'email': f'robot_{time.time()}@global.health',
         'roles': ['curator'],
     }
-    response = requests.post(register_user_endpoint, json=user)
-    if response.ok:
-        return response.json()['apiKey']
-    else:
-        print(f'Failure registering test user: {response.text}')
-        sys.exit(1)
+    try:
+        response = requests.post(register_user_endpoint, json=user)
+        if response.ok:
+            return response.json()['apiKey']
+        else:
+            print(f'Failure registering test user: {response.text}')
+            sys.exit(1)
+    except (requests.ConnectionError, requests.ConnectTimeout, requests.HTTPError, requests.ReadTimeout, requests.Timeout) as e:
+            print(f'Error {e} registering a curator at {base_url}')
+            sys.exit(1)
 
 
 def main():
@@ -83,8 +87,7 @@ def main():
     You can set an API key using the environment variable $GH_API_KEY. If you do not, then
     this script will register a new curator user and use their API key; this only works in
     local testing."""
-    if not (base_url := os.getenv('GH_BASE_URL')):
-        base_url = 'http://localhost:3001'
+    base_url = os.getenv('GH_BASE_URL', 'http://localhost:3001')
     if not (api_key := os.getenv('GH_API_KEY')):
         api_key = api_key_for_generated_curator(base_url)
     batch_upsert_endpoint = f"{base_url}/api/cases/batchUpsert"
@@ -97,16 +100,20 @@ def main():
         request_headers = {
             'X-Api-Key': api_key
         }
-        response = requests.post(batch_upsert_endpoint, json=request_body, headers=request_headers)
-        if response.ok:
-            report = response.json()
-            print(f"Success response from API. {report['numCreated']} cases created, {report['numUpdated']} updated.")
-            if errors := report.get('errors'):
-                print(f"Errors: {errors}")
-            sys.exit(0)
-        else:
-            print("Unsuccessful in importing sample cases")
-            print(response.text)
+        try:
+            response = requests.post(batch_upsert_endpoint, json=request_body, headers=request_headers)
+            if response.ok:
+                report = response.json()
+                print(f"Success response from API. {report['numCreated']} cases created, {report['numUpdated']} updated.")
+                if errors := report.get('errors'):
+                    print(f"Errors: {errors}")
+                sys.exit(0)
+            else:
+                print("Unsuccessful in importing sample cases")
+                print(response.text)
+                sys.exit(1)
+        except (requests.ConnectionError, requests.ConnectTimeout, requests.HTTPError, requests.ReadTimeout, requests.Timeout) as e:
+            print(f'Error {e} upserting sample cases to {base_url}')
             sys.exit(1)
 
 if __name__ == '__main__':
