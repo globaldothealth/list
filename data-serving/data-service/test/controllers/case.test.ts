@@ -3,6 +3,7 @@ import { CaseRevision } from '../../src/model/case-revision';
 import { Demographics } from '../../src/model/demographics';
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import { Source } from '../../src/model/source';
+import { PathogenDocument } from '../../src/model/pathogen';
 import app from './../../src/index';
 import fullCase from './../model/data/case.full.json';
 import minimalCase from './../model/data/case.minimal.json';
@@ -310,7 +311,7 @@ describe('GET', () => {
             it('Search for matching country and something else that does not match', async () => {
                 const res = await request(app)
                     .get(
-                        '/api/cases?page=1&limit=1&q=country%3ADE%occupation%3Anope',
+                        '/api/cases?page=1&limit=1&q=country%3ADE%20occupation%3Anope',
                     )
                     .expect(200)
                     .expect('Content-Type', /json/);
@@ -589,7 +590,9 @@ describe('POST', () => {
 
         const changedCaseWithEntryId = new Case(fullCase);
         await changedCaseWithEntryId.save();
-        changedCaseWithEntryId.notes = 'new notes';
+        changedCaseWithEntryId.pathogens = [
+            { id: '304', name: 'Pneumonia' } as PathogenDocument,
+        ];
 
         const unchangedCaseWithEntryId = new Case(fullCase);
         unchangedCaseWithEntryId.caseReference.sourceEntryId =
@@ -633,7 +636,9 @@ describe('POST', () => {
         const changedCaseWithEntryId = new Case(fullCase);
         await changedCaseWithEntryId.save();
         changedCaseWithEntryId.caseReference.uploadIds = newUploadIds;
-        changedCaseWithEntryId.notes = 'new notes';
+        changedCaseWithEntryId.pathogens = [
+            { id: '304', name: 'Pneumonia' } as PathogenDocument,
+        ];
 
         const unchangedCaseWithEntryId = new Case(fullCase);
         unchangedCaseWithEntryId.caseReference.sourceEntryId =
@@ -767,7 +772,9 @@ describe('POST', () => {
     it('batch upsert should result in create and update metadata', async () => {
         const existingCase = new Case(fullCase);
         await existingCase.save();
-        existingCase.notes = 'new notes';
+        existingCase.pathogens = [
+            { id: '104', name: 'Pneumonia' } as PathogenDocument,
+        ];
 
         const res = await request(app)
             .post('/api/cases/batchUpsert')
@@ -798,7 +805,9 @@ describe('POST', () => {
     it('batch upsert should result in case revisions of existing cases', async () => {
         const existingCase = new Case(fullCase);
         await existingCase.save();
-        existingCase.notes = 'new notes';
+        existingCase.pathogens = [
+            { id: '104', name: 'Pneumonia' } as PathogenDocument,
+        ];
 
         const res = await request(app)
             .post('/api/cases/batchUpsert')

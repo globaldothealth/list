@@ -39,31 +39,46 @@ class InvalidParamError extends Error {}
 type BatchValidationErrors = { index: number; message: string }[];
 
 const caseFromDTO = async (receivedCase: CaseDTO) => {
-    const aCase = receivedCase as unknown as LeanDocument<CaseDocument>;
+    const aCase = (receivedCase as unknown) as LeanDocument<CaseDocument>;
     if (receivedCase.demographics?.ageRange) {
         // won't be many age buckets, so fetch all of them.
         const allBuckets = await AgeBucket.find({});
         const caseStart = receivedCase.demographics?.ageRange.start;
         const caseEnd = receivedCase.demographics?.ageRange.end;
-        const matchingBucketIDs = allBuckets.filter(b => {
-            const bucketContainsStart = (b.start <= caseStart && b.end >= caseStart);
-            const bucketContainsEnd = (b.start <= caseEnd && b.end >= caseEnd);
-            const bucketWithinCaseRange = (b.start > caseStart && b.end < caseEnd);
-            return bucketContainsStart || bucketContainsEnd || bucketWithinCaseRange;
-        }).map((b) => (b._id));
+        const matchingBucketIDs = allBuckets
+            .filter((b) => {
+                const bucketContainsStart =
+                    b.start <= caseStart && b.end >= caseStart;
+                const bucketContainsEnd =
+                    b.start <= caseEnd && b.end >= caseEnd;
+                const bucketWithinCaseRange =
+                    b.start > caseStart && b.end < caseEnd;
+                return (
+                    bucketContainsStart ||
+                    bucketContainsEnd ||
+                    bucketWithinCaseRange
+                );
+            })
+            .map((b) => b._id);
         aCase.demographics.ageBuckets = matchingBucketIDs;
     }
     return aCase;
-}
+};
 
 const dtoFromCase = async (storedCase: LeanDocument<CaseDocument>) => {
-    let dto = storedCase as unknown as CaseDTO;
-    if (storedCase.demographics && storedCase.demographics.ageBuckets && storedCase.demographics.ageBuckets.length > 0) {
-        const ageBuckets = await Promise.all(storedCase.demographics.ageBuckets.map((bucketId) => {
-            return AgeBucket.findById(bucketId).lean()
-        }));
-        const minimumAge = Math.min(...(ageBuckets.map(b => b!.start)));
-        const maximumAge = Math.max(...(ageBuckets.map(b => b!.end)));
+    let dto = (storedCase as unknown) as CaseDTO;
+    if (
+        storedCase.demographics &&
+        storedCase.demographics.ageBuckets &&
+        storedCase.demographics.ageBuckets.length > 0
+    ) {
+        const ageBuckets = await Promise.all(
+            storedCase.demographics.ageBuckets.map((bucketId) => {
+                return AgeBucket.findById(bucketId).lean();
+            }),
+        );
+        const minimumAge = Math.min(...ageBuckets.map((b) => b!.start));
+        const maximumAge = Math.max(...ageBuckets.map((b) => b!.end));
         dto = {
             ...dto,
             demographics: {
@@ -71,17 +86,19 @@ const dtoFromCase = async (storedCase: LeanDocument<CaseDocument>) => {
                 ageRange: {
                     start: minimumAge,
                     end: maximumAge,
-                }
-            }
-        }
+                },
+            },
+        };
         // although the type system can't see it, there's an ageBuckets property on the demographics DTO now
-        delete (dto as unknown as { demographics: { ageBuckets?: [ObjectId] }}).demographics.ageBuckets;
+        delete ((dto as unknown) as {
+            demographics: { ageBuckets?: [ObjectId] };
+        }).demographics.ageBuckets;
     }
     delete dto.restrictedNotes;
     delete dto.notes;
 
     return dto;
-}
+};
 
 export class CasesController {
     private csvHeaders: string[];
@@ -124,7 +141,7 @@ export class CasesController {
             delete aCase.notes;
         });
 
-        res.json(await Promise.all(c.map(aCase => dtoFromCase(aCase))));
+        res.json(await Promise.all(c.map((aCase) => dtoFromCase(aCase))));
     };
 
     /**
@@ -538,7 +555,9 @@ export class CasesController {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const upsertLambda = async (c: any) => {
                 delete c.caseCount;
-                c = caseWithDenormalisedConfirmationDate(await caseFromDTO(c as CaseDTO));
+                c = caseWithDenormalisedConfirmationDate(
+                    await caseFromDTO(c as CaseDTO),
+                );
                 if (
                     c.caseReference?.sourceId &&
                     c.caseReference?.sourceEntryId
@@ -1099,7 +1118,9 @@ export const casesMatchingSearchQuery = (opts: {
 }): any => {
     // set data limit to 10K by default
     const countLimit = opts.limit ? opts.limit : 10000;
+    console.log(`Search query: ${opts.searchQuery}`);
     const parsedSearch = parseSearchQuery(opts.searchQuery);
+    console.log(`Parsed search (full text?): ${parsedSearch.fullTextSearch}`);
     const queryOpts = parsedSearch.fullTextSearch
         ? {
               $text: { $search: parsedSearch.fullTextSearch },
