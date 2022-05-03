@@ -381,7 +381,8 @@ export class CasesController {
                 res.status(422).json({ message: e.message });
                 return;
             }
-            logger.error(`non-parsing error for query ${req.query}`);
+            logger.error(`non-parsing error for query:`);
+            logger.error(req.query);
             logger.error(e);
             res.status(500).json(e);
             return;
