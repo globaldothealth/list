@@ -9,7 +9,7 @@ describe('Curator', function () {
         cy.clearSeededLocations();
     });
 
-    it.only('Can Create, edit and view a full case', function () {
+    it('Can Create, edit and view a full case', function () {
         cy.visit('/');
         cy.visit('/cases');
         cy.contains('No records to display');
