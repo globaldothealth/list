@@ -51,7 +51,7 @@ describe('Curator', function () {
             .type('testSourceEntryID123');
         cy.get('div[data-testid="gender"]').click();
         cy.get('li[data-value="Female"').click();
-        cy.get('input[name="age"]').type('21');
+        // TODO UI for age entry needs redesign
         cy.get('div[data-testid="ethnicity"]').click().type('Asian');
         cy.get('div[data-testid="nationalities"]').type('Afghan');
         cy.contains('li', 'Afghan').click();
@@ -177,7 +177,7 @@ describe('Curator', function () {
             cy.get('svg[data-testid="verified-svg"').should('exist');
             cy.contains('www.example.com');
             cy.contains('Female');
-            cy.contains('21');
+            // TODO UI for demographics.age needs redesigning
             cy.contains('Germany');
             cy.contains('2020-01-01');
             cy.contains('Recovered');
@@ -207,7 +207,7 @@ describe('Curator', function () {
 
             // Demographics.
             cy.get('input[name="gender"]').should('have.value', 'Female');
-            cy.get('input[name="age"]').should('have.value', '21');
+            // TODO UI for demographics.age needs redesign
             cy.get('div[data-testid="occupation"]').within(() => {
                 cy.get('input[type="text"]').should('have.value', 'Accountant');
             });
@@ -303,8 +303,7 @@ describe('Curator', function () {
             cy.contains('No records to display').should('not.exist');
             cy.contains('Male');
             // What's untouched should stay as is.
-            cy.contains('21');
-
+            // TODO UI for demographics.age needs redesigning
             // View full details about the case
             cy.contains('td', 'www.example.com').click({ force: true });
             // Case data.
@@ -313,7 +312,7 @@ describe('Curator', function () {
             cy.contains('superuser@test.com');
             cy.contains('VERIFIED');
             // Demographics.
-            cy.contains('21');
+            // TODO UI for demographics.age needs redesigning
             cy.contains('Male');
             cy.contains('Test occupation');
             cy.contains('Afghan, Albanian');
