@@ -63,7 +63,7 @@ describe('Bulk upload form', function () {
         cy.contains('VERIFIED');
 
         // Demographics
-        cy.contains('42-43');
+        cy.contains('41-45');
         cy.contains('Male');
         cy.contains('Accountant');
         cy.contains('Bangladeshi');
@@ -125,7 +125,7 @@ describe('Bulk upload form', function () {
         cy.contains('Alberta');
         cy.contains('Banff');
         cy.contains('Male');
-        cy.contains('42');
+        cy.contains('41-45');
     });
 
     it('Can upload CSV with new source', function () {
@@ -158,7 +158,7 @@ describe('Bulk upload form', function () {
         cy.contains('Alberta');
         cy.contains('Banff');
         cy.contains('Male');
-        cy.contains('42');
+        cy.contains('41-45');
 
         cy.visit('/sources');
         cy.contains('www.new-source.com');
