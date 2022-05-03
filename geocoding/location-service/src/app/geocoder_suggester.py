@@ -37,7 +37,10 @@ class GeocodeSuggester:
         for g in self.geocoders:
             suggestions = g.geocode(request['q'], opts)
             if len(suggestions) > 0:
-                logger.debug("geocoder {g} suggests {suggestions}")
-                return suggestions
+                logger.debug(f"geocoder {g} suggests {suggestions}")
+                filtered_suggestions = [s for s in suggestions if s['country'] is not None]
+                if len(filtered_suggestions) < len(suggestions):
+                    logger.debug(f"filtered response is {filtered_suggestions}")
+                return filtered_suggestions
         logger.debug(f"No suggestions for query {request['q']}")
         return []
