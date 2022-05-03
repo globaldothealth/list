@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 
-import axios, { AxiosResponse } from 'axios';
+import axios, { AxiosError, AxiosResponse } from 'axios';
 import countries from 'i18n-iso-countries';
 import db from '../model/database';
 
@@ -18,7 +18,8 @@ export default class GeocodeProxy {
             const response = await axios.get(this.locationServiceURL + req.url);
             res.status(response.status).json(response.data);
             return;
-        } catch (err) {
+        } catch (e) {
+            const err = e as AxiosError;
             logger.error(err);
             if (err.response?.status && err.response?.data) {
                 res.status(err.response.status).send(err.response.data);
