@@ -220,18 +220,21 @@ export class CasesController {
             }
 
             const date = new Date().toISOString().slice(0, 10);
-            const query = req.body.query.replace(/[:\s]/g, '_');
-            const filename = `gh_${date}_${query}`;
+            const request_description = req.body.query ? req.body.query.replace(/[:\s]/g, '_') : 'requested_cases';
+            const filename = `gh_${date}_${request_description}`;
 
             let doc: CaseDocument;
 
-            if (req.body.format == 'csv' || req.body.format == 'tsv') {
-                res.setHeader('Content-Type', `text/${req.body.format}`);
+            // assume default format is CSV
+            const format = req.body.format ?? 'csv';
+
+            if (format == 'csv' || format == 'tsv') {
+                res.setHeader('Content-Type', `text/${format}`);
                 res.setHeader(
                     'Content-Disposition',
-                    `attachment; filename="${filename}.${req.body.format}"`,
+                    `attachment; filename="${filename}.${format}"`,
                 );
-                const delimiter: string = req.body.format == 'tsv' ? '\t' : ',';
+                const delimiter: string = format == 'tsv' ? '\t' : ',';
 
                 const columnsString = this.csvHeaders.join(delimiter);
                 res.write(columnsString);
@@ -251,7 +254,7 @@ export class CasesController {
                     doc = await cursor.next();
                 }
                 res.end();
-            } else if (req.body.format == 'json') {
+            } else if (format == 'json') {
                 res.setHeader('Content-Type', 'application/json');
                 res.setHeader(
                     'Content-Disposition',
@@ -275,10 +278,9 @@ export class CasesController {
                 res.write(']');
                 res.end();
             } else {
-                logger.error(`Invalid format requested ${req.body.format}`);
-                res.status(400).json(
-                    `Invalid format requested ${req.body.format}`,
-                );
+                const message = `Invalid format requested ${format}`;
+                logger.error(message);
+                res.status(400).json(message);
                 return;
             }
         } catch (err) {
