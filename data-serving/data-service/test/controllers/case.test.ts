@@ -624,6 +624,37 @@ describe('POST', () => {
         const updatedCaseInDb = await Case.findById(changedCaseWithEntryId._id);
         expect(updatedCaseInDb?.notes).toEqual(changedCaseWithEntryId.notes);
     });
+    it('batch upsert with same case twice should not update anything', async () => {
+        const newCaseWithEntryId = new Case(minimalCase);
+        newCaseWithEntryId.caseReference.sourceEntryId = 'newId';
+
+        const res = await request(app)
+            .post('/api/cases/batchUpsert')
+            .send({
+                cases: [
+                    newCaseWithEntryId,
+                ],
+                ...curatorMetadata,
+            })
+            .expect(200);
+
+        expect(res.body.numCreated).toBe(1); // Exactly one case created.
+        expect(res.body.numUpdated).toBe(0); // No case was updated.
+
+        const secondRes = await request(app)
+            .post('/api/cases/batchUpsert')
+            .send({
+                cases: [
+                    newCaseWithEntryId, // same case again!
+                ],
+                ...curatorMetadata,
+            })
+            .expect(200);
+
+        expect(secondRes.body.numCreated).toBe(0); // No case created this time.
+        expect(res.body.numUpdated).toBe(0); // No case was updated either.
+    });
+
     it('batch upsert should add uploadId to field array', async () => {
         const newUploadIds = ['012301234567890123456789'];
 
