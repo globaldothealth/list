@@ -59,6 +59,12 @@ const TooltipText = () => (
                 <strong>Age:</strong> Enter the age of the case.
                 <ul>
                     <li>
+                        To reduce the risk of identifying an individual from
+                        their case record, the age will automatically be
+                        converted into one or more bucketed groups: infants
+                        (&lt;1 year), 1-5 years, 6-10 years, and so on.
+                    </li>
+                    <li>
                         If a range is provided enter in the min and max fields.
                     </li>
                     <li>
@@ -66,7 +72,7 @@ const TooltipText = () => (
                     </li>
                     <li>
                         Note: If the data source provides an age range such as
-                        65{'>'} or 65+ tthen set the minimum age value as 65 and
+                        65{'>'} or 65+ then set the minimum age value as 65 and
                         the maximum age value to 120 (the maximum allowed age
                         value).
                     </li>
