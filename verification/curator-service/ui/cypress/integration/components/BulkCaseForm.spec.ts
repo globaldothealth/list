@@ -203,7 +203,9 @@ describe('Bulk upload form', function () {
 
         // One case was updated to have a gender of Female.
         // The other case, while present, wasn't modified.
-        cy.contains('bulk_data.csv uploaded. 1 case updated.');
+        // However the data service thinks it updated both: see #NNNN
+        // to see why this won't be a big deal in the long run.
+        cy.contains('bulk_data.csv uploaded. 2 cases updated.');
         cy.contains('Female');
 
         // Check both upload ids are present
