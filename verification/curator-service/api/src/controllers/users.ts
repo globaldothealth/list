@@ -89,6 +89,34 @@ export const updateRoles = async (
 };
 
 /**
+ * Delete a user
+ */
+export const deleteUser = async (
+    req: Request,
+    res: Response,
+): Promise<void> => {
+    try {
+        const result = await users().deleteOne(
+            { _id: new ObjectId(req.params.id) },
+        );
+        console.log(result);
+        if (result.deletedCount !== 1) {
+            res.status(404).json({
+                message: `user with id ${req.params.id} could not be found`,
+            });
+            return;
+        }
+        res.status(204).end();
+        return;
+    } catch (err) {
+        const error = err as Error;
+        logger.error('error in deleting user', error);
+        res.status(500).json(error);
+        return;
+    }
+};
+
+/**
  * List the roles defined in the system.
  */
 export const listRoles = (req: Request, res: Response): void => {

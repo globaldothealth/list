@@ -1056,6 +1056,21 @@ paths:
                     $ref: '#/components/responses/422'
                 '500':
                     $ref: '#/components/responses/500'
+        delete:
+            tags: [User]
+            summary: Deletes a user
+            operationId: deleteUser
+            responses:
+                '204':
+                    $ref: '#/components/responses/204'
+                '401':
+                    $ref: '#/components/responses/401'
+                '403':
+                    $ref: '#/components/responses/403'
+                '404':
+                    $ref: '#/components/responses/404'
+                '500':
+                    $ref: '#/components/responses/500'
     /users/roles:
         get:
             tags: [User]
