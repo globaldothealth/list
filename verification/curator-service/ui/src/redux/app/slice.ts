@@ -5,7 +5,6 @@ import { getVersion, getEnv, getDiseaseName } from './thunk';
 
 interface AppState {
     isLoading: boolean;
-    searchQuery: string;
     filterBreadcrumbs: ChipData[];
     version: string;
     env: string;
@@ -14,7 +13,6 @@ interface AppState {
 
 const initialState: AppState = {
     isLoading: false,
-    searchQuery: '',
     filterBreadcrumbs: [],
     version: 'loading…',
     env: 'prod',
@@ -25,9 +23,6 @@ const appSlice = createSlice({
     name: 'app',
     initialState,
     reducers: {
-        setSearchQuery: (state, action: PayloadAction<string>) => {
-            state.searchQuery = action.payload;
-        },
         setFilterBreadcrumbs: (state, action: PayloadAction<ChipData[]>) => {
             state.filterBreadcrumbs = action.payload;
         },
@@ -73,7 +68,7 @@ const appSlice = createSlice({
 });
 
 // actions
-export const { setSearchQuery, setFilterBreadcrumbs, deleteFilterBreadcrumbs } =
+export const { setFilterBreadcrumbs, deleteFilterBreadcrumbs } =
     appSlice.actions;
 
 // reducer

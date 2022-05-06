@@ -2,7 +2,7 @@ import React from 'react';
 import { render, screen, waitFor } from './util/test-utils';
 import userEvent from '@testing-library/user-event';
 import Profile from './Profile';
-import { RootState } from '../redux/store';
+import { RootState, initialLoggedInState } from '../redux/store';
 import { rest } from 'msw';
 import { setupServer } from 'msw/node';
 
@@ -12,64 +12,10 @@ beforeAll(() => server.listen());
 afterEach(() => server.resetHandlers());
 afterAll(() => server.close());
 
-const initialLoggedInState: RootState = {
-    app: {
-        isLoading: false,
-        searchQuery: '',
-        filterBreadcrumbs: [],
-        version: '1.0',
-        env: 'local',
-        diseaseName: 'COVID-19',
-    },
-    filters: {
-        countryList: [],
-        error: '',
-        isLoading: false,
-    },
-    auth: {
-        isLoading: false,
-        error: undefined,
-        changePasswordResponse: undefined,
-        user: {
-            _id: '1',
-            googleID: '42',
-            name: 'Alice Smith',
-            email: 'foo@bar.com',
-            roles: ['admin', 'curator'],
-        },
-        forgotPasswordPopupOpen: false,
-        passwordReset: false,
-        resetPasswordEmailSent: false,
-        snackbar: {
-            isOpen: false,
-            message: '',
-        },
-    },
-    acknowledgment: {
-        isLoading: false,
-        error: undefined,
-        acknowledgmentData: [],
-    },
-};
-
 const loggedInWithApiKeyState: RootState = {
-    app: {
-        isLoading: false,
-        searchQuery: '',
-        filterBreadcrumbs: [],
-        version: '1.0',
-        env: 'local',
-        diseaseName: 'COVID-19',
-    },
-    filters: {
-        countryList: [],
-        error: '',
-        isLoading: false,
-    },
+    ...initialLoggedInState,
     auth: {
-        isLoading: false,
-        error: undefined,
-        changePasswordResponse: undefined,
+        ...initialLoggedInState.auth,
         user: {
             _id: '1',
             googleID: '42',
@@ -78,34 +24,13 @@ const loggedInWithApiKeyState: RootState = {
             roles: ['admin', 'curator'],
             apiKey: 'An API Key',
         },
-        forgotPasswordPopupOpen: false,
-        passwordReset: false,
-        resetPasswordEmailSent: false,
-        snackbar: {
-            isOpen: false,
-            message: '',
-        },
-    },
-    acknowledgment: {
-        isLoading: false,
-        error: undefined,
-        acknowledgmentData: [],
     },
 };
 
 const noUserInfoState: RootState = {
-    app: {
-        isLoading: false,
-        searchQuery: '',
-        filterBreadcrumbs: [],
-        version: '1.0',
-        env: 'local',
-        diseaseName: 'COVID-19',
-    },
+    ...initialLoggedInState,
     auth: {
-        isLoading: false,
-        error: undefined,
-        changePasswordResponse: undefined,
+        ...initialLoggedInState.auth,
         user: {
             _id: '',
             googleID: '',
@@ -113,23 +38,6 @@ const noUserInfoState: RootState = {
             email: '',
             roles: [],
         },
-        forgotPasswordPopupOpen: false,
-        passwordReset: false,
-        resetPasswordEmailSent: false,
-        snackbar: {
-            isOpen: false,
-            message: '',
-        },
-    },
-    filters: {
-        countryList: [],
-        error: '',
-        isLoading: false,
-    },
-    acknowledgment: {
-        isLoading: false,
-        error: undefined,
-        acknowledgmentData: [],
     },
 };
 

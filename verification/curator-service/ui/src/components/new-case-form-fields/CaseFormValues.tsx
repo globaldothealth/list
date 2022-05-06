@@ -1,5 +1,5 @@
 import { CaseReferenceForm } from '../common-form-fields/Source';
-import { Location as Loc } from '../Case';
+import { Location as Loc } from '../../api/models/Case';
 
 /**
  * CaseFormValues defines all the values contained in the manual case entry form.

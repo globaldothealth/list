@@ -1,49 +1,7 @@
 import React from 'react';
 import AutomatedSourceForm from './AutomatedSourceForm';
 import { screen, render } from './util/test-utils';
-import { RootState } from '../redux/store';
-
-const user = {
-    _id: 'testUser',
-    googleID: '42',
-    name: 'Alice Smith',
-    email: 'foo@bar.com',
-    roles: ['admin', 'curator'],
-};
-
-const initialLoggedInState: RootState = {
-    app: {
-        isLoading: false,
-        searchQuery: '',
-        filterBreadcrumbs: [],
-        version: '1.0',
-        env: 'local',
-        diseaseName: 'COVID-19',
-    },
-    filters: {
-        countryList: [],
-        error: '',
-        isLoading: false,
-    },
-    auth: {
-        isLoading: false,
-        error: undefined,
-        changePasswordResponse: undefined,
-        user,
-        forgotPasswordPopupOpen: false,
-        passwordReset: false,
-        resetPasswordEmailSent: false,
-        snackbar: {
-            isOpen: false,
-            message: '',
-        },
-    },
-    acknowledgment: {
-        isLoading: false,
-        error: undefined,
-        acknowledgmentData: [],
-    },
-};
+import { initialLoggedInState } from '../redux/store';
 
 describe('<AutomatedSourceForm />', () => {
     it('renders form', async () => {

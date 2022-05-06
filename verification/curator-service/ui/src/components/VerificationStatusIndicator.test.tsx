@@ -1,5 +1,5 @@
 import React from 'react';
-import { VerificationStatus } from './Case';
+import { VerificationStatus } from '../api/models/Case';
 import VerificationStatusIndicator from './VerificationStatusIndicator';
 import { render } from '@testing-library/react';
 

@@ -31,7 +31,7 @@ import createStyles from '@mui/styles/createStyles';
 import MaterialTable, { MTableToolbar, QueryResult } from 'material-table';
 import Chip from '@mui/material/Chip';
 
-import { Case, VerificationStatus } from './Case';
+import { Case, VerificationStatus } from '../api/models/Case';
 import CircularProgress from '@mui/material/CircularProgress';
 import DeleteIcon from '@mui/icons-material/DeleteOutline';
 import EditIcon from '@mui/icons-material/EditOutlined';
@@ -481,11 +481,12 @@ export function SortSelect({
 
     return (
         <>
-            <FormControl className={classes.formControl}>
+            <FormControl size="small" className={classes.formControl}>
                 <InputLabel id="sort-by-label">Sort by</InputLabel>
                 <Select
                     id="sort-by-select"
                     labelId="sort-by-label"
+                    label="Sort by"
                     name="sortBy"
                     value={parseSelectValues(sortBy, sortByOrder)}
                     onChange={handleChange}

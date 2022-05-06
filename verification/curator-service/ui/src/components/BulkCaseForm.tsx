@@ -9,7 +9,7 @@ import {
     PreexistingConditions,
     Symptoms,
     VerificationStatus,
-} from './Case';
+} from '../api/models/Case';
 import { Form, Formik } from 'formik';
 import Papa, { ParseLocalConfig, ParseResult } from 'papaparse';
 import { RouteComponentProps, withRouter } from 'react-router-dom';

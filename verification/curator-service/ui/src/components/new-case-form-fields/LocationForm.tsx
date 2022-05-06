@@ -9,7 +9,7 @@ import { Autocomplete } from '@mui/material';
 import Button from '@mui/material/Button';
 import CaseFormValues from './CaseFormValues';
 import FieldTitle from '../common-form-fields/FieldTitle';
-import { Location as Loc } from '../Case';
+import { Location as Loc } from '../../api/models/Case';
 import Location from './Location';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import { RequiredHelperText } from '../common-form-fields/FormikFields';

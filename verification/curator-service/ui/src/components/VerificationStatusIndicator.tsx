@@ -4,7 +4,7 @@ import { Tooltip } from '@mui/material';
 import { ReactComponent as UnverifiedIcon } from './assets/unverified_icon.svg';
 import { ReactComponent as VerifiedIcon } from './assets/verified_icon.svg';
 import { ReactComponent as ExcludedIcon } from './assets/excluded_icon.svg';
-import { VerificationStatus } from './Case';
+import { VerificationStatus } from '../api/models/Case';
 import renderDate from './util/date';
 
 interface Props {

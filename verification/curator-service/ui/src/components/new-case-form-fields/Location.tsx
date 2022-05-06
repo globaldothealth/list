@@ -3,7 +3,7 @@ import { Select, TextField } from 'formik-mui';
 
 import { FastField } from 'formik';
 import FormControl from '@mui/material/FormControl';
-import { Geometry } from '../Case';
+import { Geometry } from '../../api/models/Case';
 import InputLabel from '@mui/material/InputLabel';
 import React from 'react';
 import StaticMap from '../StaticMap';

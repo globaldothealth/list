@@ -3,7 +3,7 @@ import React from 'react';
 import axios from 'axios';
 import userEvent from '@testing-library/user-event';
 import { render, fireEvent, screen, waitFor, within } from '../util/test-utils';
-import { RootState } from '../../redux/store';
+import { initialLoggedInState } from '../../redux/store';
 
 jest.mock('axios');
 const mockedAxios = axios as jest.Mocked<typeof axios>;
@@ -11,46 +11,6 @@ const mockedAxios = axios as jest.Mocked<typeof axios>;
 beforeEach(() => {
     jest.clearAllMocks();
 });
-
-const initialLoggedInState: RootState = {
-    app: {
-        isLoading: false,
-        searchQuery: '',
-        filterBreadcrumbs: [],
-        version: '1.0',
-        env: 'local',
-        diseaseName: 'COVID-19',
-    },
-    filters: {
-        countryList: [],
-        error: '',
-        isLoading: false,
-    },
-    auth: {
-        isLoading: false,
-        error: undefined,
-        changePasswordResponse: undefined,
-        user: {
-            _id: '1',
-            googleID: '42',
-            name: 'Alice Smith',
-            email: 'foo@bar.com',
-            roles: ['admin', 'curator'],
-        },
-        forgotPasswordPopupOpen: false,
-        passwordReset: false,
-        resetPasswordEmailSent: false,
-        snackbar: {
-            isOpen: false,
-            message: '',
-        },
-    },
-    acknowledgment: {
-        acknowledgmentData: [],
-        error: undefined,
-        isLoading: false,
-    },
-};
 
 describe('<App />', () => {
     it('renders without crashing when logged in', async () => {

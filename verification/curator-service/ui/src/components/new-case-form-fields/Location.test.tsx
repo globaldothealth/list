@@ -1,6 +1,6 @@
 import { Form, Formik } from 'formik';
 
-import { Location as Loc } from '../Case';
+import { Location as Loc } from '../../api/models/Case';
 import Location from './Location';
 import React from 'react';
 import { render } from '@testing-library/react';

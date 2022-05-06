@@ -185,6 +185,7 @@ export default function SearchBar({
         <>
             <div className={classes.searchRoot}>
                 <StyledSearchTextField
+                    size="small"
                     error={searchError}
                     helperText={
                         searchError &&

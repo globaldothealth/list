@@ -3,7 +3,7 @@ import { screen, fireEvent, render, within, waitFor } from './util/test-utils';
 import React from 'react';
 import Users from './Users';
 import axios from 'axios';
-import { RootState } from '../redux/store';
+import { initialLoggedInState } from '../redux/store';
 
 jest.mock('axios');
 const mockedAxios = axios as jest.Mocked<typeof axios>;
@@ -27,42 +27,6 @@ function mockGetAxios(getUsersResponse: any): void {
         }
     });
 }
-
-const initialLoggedInState: RootState = {
-    app: {
-        isLoading: false,
-        searchQuery: '',
-        filterBreadcrumbs: [],
-        version: '1.0',
-        env: 'local',
-        diseaseName: 'COVID-19',
-    },
-    auth: {
-        changePasswordResponse: undefined,
-        isLoading: false,
-        error: undefined,
-        user: {
-            _id: 'abc123',
-            googleID: '42',
-            name: 'Alice Smith',
-            email: 'foo@bar.com',
-            roles: ['admin'],
-        },
-        forgotPasswordPopupOpen: false,
-        passwordReset: false,
-        resetPasswordEmailSent: false,
-        snackbar: {
-            isOpen: false,
-            message: '',
-        },
-    },
-    filters: { countryList: [], isLoading: false, error: undefined },
-    acknowledgment: {
-        isLoading: false,
-        error: undefined,
-        acknowledgmentData: [],
-    },
-};
 
 describe('<Users />', () => {
     test('lists users', async () => {

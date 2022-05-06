@@ -1,8 +1,6 @@
 import { ChipData } from '../../components/App';
 import { RootState } from '../store';
 
-export const selectSearchQuery: (state: RootState) => string = (state) =>
-    state.app.searchQuery;
 export const selectFilterBreadcrumbs: (state: RootState) => ChipData[] = (
     state,
 ) => state.app.filterBreadcrumbs;

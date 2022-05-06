@@ -1,4 +1,4 @@
-import { Geometry } from './Case';
+import { Geometry } from '../api/models/Case';
 import React from 'react';
 
 export default function StaticMap(props: { geometry: Geometry }): JSX.Element {

@@ -31,7 +31,7 @@ export const URLToSearchQuery = (url: string): string => {
             searchQuery += `${key}:${value} `;
         });
 
-        return searchQuery.trim();
+        return encodeURIComponent(searchQuery.trim());
     } else {
         return url.replace('?q=', '').replace(/[+]/g, ' ');
     }

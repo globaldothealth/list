@@ -12,6 +12,7 @@ import {
     useMediaQuery,
 } from '@mui/material';
 import LinelistTable, { DownloadButton } from '../LinelistTable';
+import NewLinelistTable from '../NewLinelistTable';
 import {
     Link,
     Redirect,
@@ -42,11 +43,10 @@ import Users from '../Users';
 import ViewCase from '../ViewCase';
 import clsx from 'clsx';
 import { useCookieBanner } from '../../hooks/useCookieBanner';
-import { SortBy, SortByOrder, MapLink } from '../../constants/types';
-import { URLToSearchQuery } from '../util/searchQuery';
+import { MapLink } from '../../constants/types';
+import { URLToSearchQuery, searchQueryToURL } from '../util/searchQuery';
 import { useAppDispatch, useAppSelector } from '../../hooks/redux';
 import {
-    setSearchQuery,
     setFilterBreadcrumbs,
     deleteFilterBreadcrumbs,
 } from '../../redux/app/slice';
@@ -54,7 +54,6 @@ import {
     selectIsLoading,
     selectEnv,
     selectVersion,
-    selectDiseaseName,
 } from '../../redux/app/selectors';
 import { getEnv, getVersion, getDiseaseName } from '../../redux/app/thunk';
 import { getUserProfile, logout } from '../../redux/auth/thunk';
@@ -65,6 +64,8 @@ import Sidebar from '../Sidebar';
 import Footer from '../Footer';
 import { getReleaseNotesUrl, hasAnyRole } from '../util/helperFunctions';
 import { theme } from '../../theme/theme';
+import { setSearchQuery } from '../../redux/linelistTable/slice';
+import { selectSearchQuery } from '../../redux/linelistTable/selectors';
 
 const menuStyles = makeStyles((theme) => ({
     link: {
@@ -278,12 +279,10 @@ export default function App(): JSX.Element {
     const user = useAppSelector(selectUser);
     const env = useAppSelector(selectEnv);
     const appVersion = useAppSelector(selectVersion);
-    const diseaseName = useAppSelector(selectDiseaseName);
+    const searchQuery = useAppSelector(selectSearchQuery);
 
     const showMenu = useMediaQuery(theme.breakpoints.up('sm'));
     const [drawerOpen, setDrawerOpen] = useState<boolean>(false);
-    const [listPage, setListPage] = React.useState<number>(0);
-    const [listPageSize, setListPageSize] = React.useState<number>(50);
     const rootRef = React.useRef<HTMLDivElement>(null);
     const history = useHistory();
     const location = useLocation<LocationState>();
@@ -291,10 +290,6 @@ export default function App(): JSX.Element {
         React.useState<boolean>(false);
     const [activeFilterInput, setActiveFilterInput] =
         React.useState<string>('');
-    const [sortBy, setSortBy] = useState<SortBy>(SortBy.ConfirmationDate);
-    const [sortByOrder, setSortByOrder] = useState<SortByOrder>(
-        SortByOrder.Descending,
-    );
     const classes = useStyles();
 
     const savedSearchQuery = localStorage.getItem('searchQuery');
@@ -325,13 +320,10 @@ export default function App(): JSX.Element {
     };
 
     const onModalClose = (): void => {
-        // @TODO
-        // if (lastLocation) {
-        //     history.goBack();
-        // } else {
-        //     history.push('/cases');
-        // }
-        history.push('/cases');
+        history.push({
+            pathname: '/cases',
+            search: searchQuery,
+        });
     };
 
     useEffect(() => {
@@ -365,9 +357,11 @@ export default function App(): JSX.Element {
         });
     };
 
+    // When user is redirected from map to this app we have to parse url search query
     useEffect(() => {
         if (location.pathname.includes('/cases/view')) return;
-        dispatch(setSearchQuery(URLToSearchQuery(location.search)));
+
+        dispatch(setSearchQuery(location.search));
 
         //eslint-disable-next-line
     }, [location.search]);
@@ -439,7 +433,7 @@ export default function App(): JSX.Element {
                     />
                     {user && (
                         <Route exact path="/cases">
-                            <LinelistTable
+                            {/* <LinelistTable
                                 page={listPage}
                                 pageSize={listPageSize}
                                 onChangePage={setListPage}
@@ -454,7 +448,8 @@ export default function App(): JSX.Element {
                                 setSortBy={setSortBy}
                                 setSortByOrder={setSortByOrder}
                                 diseaseName={diseaseName}
-                            />
+                            /> */}
+                            <NewLinelistTable />
                         </Route>
                     )}
                     {hasAnyRole(user, ['curator']) && (

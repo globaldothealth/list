@@ -155,4 +155,5 @@ export interface Case {
     SGTF?: string;
     isSourceExcluded?: boolean;
     vaccines: Vaccine[];
+    confirmationDate: Date;
 }

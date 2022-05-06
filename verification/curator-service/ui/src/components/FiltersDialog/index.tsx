@@ -17,12 +17,8 @@ import {
     InputLabel,
     OutlinedInput,
     IconButton,
-    // InputAdornment,
-    // IconButton,
 } from '@mui/material';
 import { Alert } from '@mui/material';
-// import { HelpOutline } from '@mui/icons-material';
-// import { AppTooltip } from './common-form-fields/AppTooltip';
 import { useAppSelector, useAppDispatch } from '../../hooks/redux';
 import { fetchCountries } from '../../redux/filters/thunk';
 import {
@@ -145,6 +141,7 @@ export default function FiltersDialog({
             );
             handleSetModalAlert();
             handleClose();
+
             const searchQuery = filtersToURL(values);
             history.push({ pathname: '/cases', search: searchQuery });
         },
@@ -174,49 +171,6 @@ export default function FiltersDialog({
         handleClose();
         closeAlert(false);
     };
-
-    // COMMENTED OUT AS WE MAY WANT TO ADD TOOLTIPS TO SOME FIELDS IN THE FUTURE
-    // const tooltipHelpIcon = (tooltipContent: JSX.Element) => {
-    //     return (
-    //         <InputAdornment position="end">
-    //             <AppTooltip maxwidth="auto" arrow title={tooltipContent}>
-    //                 <IconButton edge="end">
-    //                     <HelpOutline className={classes.helpIcon} />
-    //                 </IconButton>
-    //             </AppTooltip>
-    //         </InputAdornment>
-    //     );
-    // };
-
-    // const admin1Tooltip = (
-    //     <>
-    //         <strong>Location admin 1</strong>
-    //         <p>
-    //             Aliqua esse officia nostrud veniam id ut nostrud in
-    //             reprehenderit ea reprehenderit excepteur cillum.
-    //         </p>
-    //     </>
-    // );
-
-    // const admin2Tooltip = (
-    //     <>
-    //         <strong>Location admin 2</strong>
-    //         <p>
-    //             Aliqua esse officia nostrud veniam id ut nostrud in
-    //             reprehenderit ea reprehenderit excepteur cillum.
-    //         </p>
-    //     </>
-    // );
-
-    // const admin3Tooltip = (
-    //     <>
-    //         <strong>Location admin 3</strong>
-    //         <p>
-    //             Aliqua esse officia nostrud veniam id ut nostrud in
-    //             reprehenderit ea reprehenderit excepteur cillum.
-    //         </p>
-    //     </>
-    // );
 
     const getMaxDate = () => {
         const currentDate = new Date();

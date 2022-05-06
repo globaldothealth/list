@@ -1,7 +1,7 @@
 import * as Yup from 'yup';
 
 import { Button, LinearProgress, Typography } from '@mui/material';
-import { Case, VerificationStatus } from './Case';
+import { Case, VerificationStatus } from '../api/models/Case';
 import { Form, Formik } from 'formik';
 import { GenomeSequence, Travel } from './new-case-form-fields/CaseFormValues';
 import { Paper } from '@mui/material';

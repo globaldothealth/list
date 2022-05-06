@@ -8,7 +8,7 @@ import {
     Variant,
     Vaccine,
     VerificationStatus,
-} from './Case';
+} from '../api/models/Case';
 import AppModal from './AppModal';
 import EditIcon from '@mui/icons-material/EditOutlined';
 import { Link } from 'react-router-dom';
@@ -24,10 +24,8 @@ import useMediaQuery from '@mui/material/useMediaQuery';
 import { useTheme } from '@mui/material/styles';
 import Highlighter from 'react-highlight-words';
 import { useSelector } from 'react-redux';
-import {
-    selectSearchQuery,
-    selectFilterBreadcrumbs,
-} from '../redux/app/selectors';
+import { selectFilterBreadcrumbs } from '../redux/app/selectors';
+import { selectSearchQuery } from '../redux/linelistTable/selectors';
 import Chip from '@mui/material/Chip';
 import { nameCountry } from './util/countryNames';
 
@@ -895,7 +893,7 @@ function RowContent(props: { content: string; isLink?: boolean }): JSX.Element {
                         className="highlighted"
                         searchWords={searchQueryArray}
                         autoEscape={true}
-                        textToHighlight={props.content}
+                        textToHighlight={props.content ?? ''}
                     />
                 </a>
             ) : (
@@ -904,7 +902,7 @@ function RowContent(props: { content: string; isLink?: boolean }): JSX.Element {
                     className="highlighted"
                     searchWords={searchQueryArray}
                     autoEscape={true}
-                    textToHighlight={props.content}
+                    textToHighlight={props.content ?? ''}
                 />
             )}
         </Grid>

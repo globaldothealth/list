@@ -8,18 +8,11 @@ import axios from 'axios';
 import range from 'lodash/range';
 import userEvent from '@testing-library/user-event';
 import { ChipData } from './App';
-import { RootState } from '../redux/store';
+import { initialLoggedInState } from '../redux/store';
 import { SortBy, SortByOrder } from '../constants/types';
 
 jest.mock('axios');
 const mockedAxios = axios as jest.Mocked<typeof axios>;
-
-const curator = {
-    _id: 'testUser',
-    name: 'Alice Smith',
-    email: 'foo@bar.com',
-    roles: ['admin', 'curator'],
-};
 
 afterEach(() => {
     mockedAxios.get.mockClear();
@@ -29,46 +22,6 @@ afterEach(() => {
 });
 
 const DATA_LIMIT = 10000;
-
-const initialState: RootState = {
-    app: {
-        isLoading: false,
-        searchQuery: '',
-        filterBreadcrumbs: [],
-        version: '1.0',
-        env: 'local',
-        diseaseName: 'COVID-19',
-    },
-    filters: {
-        countryList: [],
-        isLoading: false,
-        error: '',
-    },
-    auth: {
-        isLoading: false,
-        error: undefined,
-        changePasswordResponse: undefined,
-        user: {
-            _id: '1',
-            googleID: '42',
-            name: 'Alice Smith',
-            email: 'foo@bar.com',
-            roles: ['admin', 'curator'],
-        },
-        forgotPasswordPopupOpen: false,
-        passwordReset: false,
-        resetPasswordEmailSent: false,
-        snackbar: {
-            isOpen: false,
-            message: '',
-        },
-    },
-    acknowledgment: {
-        isLoading: false,
-        error: undefined,
-        acknowledgmentData: [],
-    },
-};
 
 describe('<LinelistTable />', () => {
     it('loads and displays cases', async () => {
@@ -165,7 +118,7 @@ describe('<LinelistTable />', () => {
                 diseaseName="COVID-19"
             />,
             {
-                initialState,
+                initialState: initialLoggedInState,
             },
         );
 
@@ -248,7 +201,7 @@ describe('<LinelistTable />', () => {
             />,
 
             {
-                initialState,
+                initialState: initialLoggedInState,
             },
         );
 
@@ -324,7 +277,7 @@ describe('<LinelistTable />', () => {
             />,
 
             {
-                initialState,
+                initialState: initialLoggedInState,
             },
         );
         expect(mockedAxios.get).toHaveBeenCalledTimes(1);
@@ -435,7 +388,7 @@ describe('<LinelistTable />', () => {
             />,
 
             {
-                initialState,
+                initialState: initialLoggedInState,
             },
         );
         expect(mockedAxios.get).toHaveBeenCalledTimes(1);
@@ -516,9 +469,9 @@ describe('<LinelistTable />', () => {
             />,
             {
                 initialState: {
-                    ...initialState,
+                    ...initialLoggedInState,
                     auth: {
-                        ...initialState.auth,
+                        ...initialLoggedInState.auth,
                         user: {
                             _id: 'testUser',
                             googleID: '42',
@@ -599,7 +552,7 @@ describe('<LinelistTable />', () => {
             />,
 
             {
-                initialState,
+                initialState: initialLoggedInState,
             },
         );
 
@@ -672,7 +625,7 @@ describe('<LinelistTable />', () => {
             />,
 
             {
-                initialState,
+                initialState: initialLoggedInState,
             },
         );
 
@@ -715,9 +668,9 @@ describe('<LinelistTable />', () => {
             />,
             {
                 initialState: {
-                    ...initialState,
+                    ...initialLoggedInState,
                     app: {
-                        ...initialState.app,
+                        ...initialLoggedInState.app,
                         filterBreadcrumbs: breadcrumbs,
                     },
                 },
@@ -754,9 +707,9 @@ describe('<LinelistTable />', () => {
             />,
             {
                 initialState: {
-                    ...initialState,
+                    ...initialLoggedInState,
                     app: {
-                        ...initialState.app,
+                        ...initialLoggedInState.app,
                         filterBreadcrumbs: breadcrumbs,
                     },
                 },
