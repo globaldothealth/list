@@ -359,6 +359,12 @@ async function makeApp() {
         mustHaveAnyRole(['admin']),
         usersController.updateRoles,
     );
+    apiRouter.delete(
+        '/users/:id',
+        authenticateByAPIKey,
+        mustHaveAnyRole(['admin']),
+        usersController.deleteUser,
+    );
     apiRouter.get(
         '/users/roles',
         authenticateByAPIKey,
