@@ -1,6 +1,6 @@
 import { CaseDocument, CaseDTO } from '../model/case';
 import { CaseReferenceDocument } from '../model/case-reference';
-import { DemographicsDocument } from '../model/demographics';
+import { demographicsAgeRange, DemographicsDocument } from '../model/demographics';
 import { EventDocument } from '../model/event';
 import { LocationDocument } from '../model/location';
 import { PathogenDocument } from '../model/pathogen';
@@ -170,11 +170,11 @@ export const removeBlankHeader = (headers: string[]): string[] => {
     return headers;
 };
 
-export const denormalizeFields = (doc: CaseDocument): Partial<CaseDocument> => {
+export const denormalizeFields = async (doc: CaseDocument): Promise<Partial<CaseDocument>> => {
     const caseReferenceFields = denormalizeCaseReferenceFields(
         doc.caseReference,
     );
-    const demographicsFields = denormalizeDemographicsFields(doc.demographics);
+    const demographicsFields = await denormalizeDemographicsFields(doc.demographics);
     const eventFields = denormalizeEventsFields(doc.events);
     const locationFields = denormalizeLocationFields(doc.location);
     const pathogenFields = denormalizePathogenFields(doc.pathogens);
@@ -259,12 +259,13 @@ function denormalizeCaseReferenceFields(
     return denormalizedData;
 }
 
-function denormalizeDemographicsFields(
+async function denormalizeDemographicsFields(
     doc: DemographicsDocument,
-): Record<string, string | number> {
+): Promise<Record<string, string | number>> {
     const denormalizedData: Record<string, string | number> = {};
-    denormalizedData['demographics.ageRange.end'] = doc.ageRange?.end || '';
-    denormalizedData['demographics.ageRange.start'] = doc.ageRange?.start || '';
+    const ageRange = await demographicsAgeRange(doc);
+    denormalizedData['demographics.ageRange.end'] = ageRange?.end || '';
+    denormalizedData['demographics.ageRange.start'] = ageRange?.start || '';
     denormalizedData['demographics.ethnicity'] = doc.ethnicity || '';
     denormalizedData['demographics.gender'] = doc.gender || '';
     const nationalities =

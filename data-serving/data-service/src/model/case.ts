@@ -1,5 +1,5 @@
 import { CaseReferenceDocument, caseReferenceSchema } from './case-reference';
-import { DemographicsDocument, DemographicsDTO, demographicsSchema } from './demographics';
+import { demographicsAgeRange, DemographicsDocument, DemographicsDTO, demographicsSchema } from './demographics';
 import { EventDocument, eventSchema } from './event';
 import {
     GenomeSequenceDocument,
@@ -204,3 +204,7 @@ export const RestrictedCase = mongoose.model<CaseDocument>(
     'RestrictedCase',
     caseSchema,
 );
+
+export const caseAgeRange = async (aCase: LeanDocument<CaseDocument>) => {
+   return await demographicsAgeRange(aCase.demographics);
+};

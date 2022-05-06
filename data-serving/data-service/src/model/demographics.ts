@@ -1,6 +1,7 @@
 import { Range } from './range';
-import mongoose from 'mongoose';
+import mongoose, { LeanDocument } from 'mongoose';
 import { ObjectId } from 'mongodb';
+import { AgeBucket } from './age-bucket';
 
 /*
  * There are separate types for demographics for data storage (the mongoose document) and
@@ -23,19 +24,6 @@ export const demographicsSchema = new mongoose.Schema(
          * than one of the buckets we use.
          */
         ageBuckets: [{ type: mongoose.Schema.Types.ObjectId, ref: 'ageBuckets' }],
-        ageRange: {
-            start: {
-                type: Number,
-                min: 0,
-                max: 120,
-            },
-            end: {
-                type: Number,
-                min: 0,
-                max: 120,
-            },
-            _id: false,
-        },
         gender: String,
         occupation: String,
         nationalities: [String],
@@ -44,15 +32,18 @@ export const demographicsSchema = new mongoose.Schema(
     { _id: false },
 );
 
-export type DemographicsDTO = {
-    ageRange?: Range<number>;
+type DemographicsCommonFields = {
     gender: string;
     occupation: string;
     nationalities: [string];
     ethnicity: string;
+};
+
+export type DemographicsDTO = DemographicsCommonFields & {
+    ageRange?: Range<number>;
 }
 
-export type DemographicsDocument = mongoose.Document & DemographicsDTO & {
+export type DemographicsDocument = mongoose.Document & DemographicsCommonFields & {
     ageBuckets: ObjectId[];
 };
 
@@ -60,3 +51,25 @@ export const Demographics = mongoose.model<DemographicsDocument>(
     'Demographics',
     demographicsSchema,
 );
+
+export const demographicsAgeRange = async (demographics: LeanDocument<DemographicsDocument>) => {
+    if (
+        demographics &&
+        demographics.ageBuckets &&
+        demographics.ageBuckets.length > 0
+    ) {
+        const ageBuckets = await Promise.all(
+            demographics.ageBuckets.map((bucketId) => {
+                return AgeBucket.findById(bucketId).lean();
+            }),
+        );
+        const minimumAge = Math.min(...ageBuckets.map((b) => b!.start));
+        const maximumAge = Math.max(...ageBuckets.map((b) => b!.end));
+        return {
+            start: minimumAge,
+            end: maximumAge,
+        };
+    } else {
+        return undefined;
+    }
+};
