@@ -46,6 +46,7 @@ const caseFromDTO = async (receivedCase: CaseDTO) => {
         const allBuckets = await AgeBucket.find({});
         const caseStart = receivedCase.demographics?.ageRange.start;
         const caseEnd = receivedCase.demographics?.ageRange.end;
+        validateCaseAges(caseStart, caseEnd);
         const matchingBucketIDs = allBuckets
             .filter((b) => {
                 const bucketContainsStart =
@@ -416,7 +417,8 @@ export class CasesController {
                 }
             }
             res.status(201).json(result);
-        } catch (err) {
+        } catch (e) {
+            const err = e as Error;
             if (err instanceof GeocodeNotFoundError) {
                 res.status(404).json({
                     message: err.message,
@@ -427,12 +429,12 @@ export class CasesController {
                 err.name === 'ValidationError' ||
                 err instanceof InvalidParamError
             ) {
-                console.error('validation error');
-                console.error(err);
+                logger.error('validation error');
+                logger.error(err);
                 res.status(422).json(err);
                 return;
             }
-            console.error(err);
+            logger.error(err);
             res.status(500).json(err);
             return;
         }
@@ -452,6 +454,15 @@ export class CasesController {
         // sequentially, so if Mongo creates a batch validate method that should be used here.
         for (let index = 0; index < cases.length; index++) {
             const c = cases[index];
+            const ageStart = c.demographics?.ageRange?.start;
+            const ageEnd = c.demographics?.ageRange?.end;
+            try {
+                validateCaseAges(ageStart, ageEnd);
+            } catch (e) {
+                const err = e as Error;
+                errors.push({ index, message: err.message });
+                continue;
+            }
             await new Case(c).validate().catch((e) => {
                 errors.push({ index: index, message: e.message });
             });
@@ -599,10 +610,11 @@ export class CasesController {
         } catch (e) {
             const err = e as Error;
             if (err.name === 'ValidationError') {
+                logger.error(err);
                 res.status(422).json(err);
                 return;
             }
-            logger.warn(err);
+            logger.error(err);
             res.status(500).json(err);
             return;
         }
@@ -796,7 +808,7 @@ export class CasesController {
             await RestrictedCase.deleteMany(casesQuery);
             res.status(204).end();
         } catch (err) {
-            console.error(err);
+            logger.error(err);
             res.status(500).json(err);
         }
     };
@@ -1109,9 +1121,9 @@ export const casesMatchingSearchQuery = (opts: {
 }): any => {
     // set data limit to 10K by default
     const countLimit = opts.limit ? opts.limit : 10000;
-    console.log(`Search query: ${opts.searchQuery}`);
+    logger.info(`Search query: ${opts.searchQuery}`);
     const parsedSearch = parseSearchQuery(opts.searchQuery);
-    console.log(`Parsed search (full text?): ${parsedSearch.fullTextSearch}`);
+    logger.debug(`Parsed search (full text?): ${parsedSearch.fullTextSearch}`);
     const queryOpts = parsedSearch.fullTextSearch
         ? {
               $text: { $search: parsedSearch.fullTextSearch },
@@ -1330,3 +1342,9 @@ export const listOccupations = async (
         return;
     }
 };
+function validateCaseAges(caseStart: number, caseEnd: number) {
+    if (caseStart < 0 || caseEnd < caseStart || caseStart > 120 || caseEnd > 120) {
+        throw new InvalidParamError(`Case validation failed: age range ${caseStart}-${caseEnd} invalid (must be within 0-120)`);
+    }
+}
+
