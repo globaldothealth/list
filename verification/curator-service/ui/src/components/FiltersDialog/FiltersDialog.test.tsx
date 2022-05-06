@@ -8,14 +8,7 @@ describe('<FiltersDialog />', () => {
     it('Should render properly', () => {
         render(
             <MemoryRouter>
-                <FiltersDialog
-                    isOpen={true}
-                    handleClose={jest.fn()}
-                    activeFilterInput=""
-                    setActiveFilterInput={jest.fn()}
-                    showModalAlert={false}
-                    closeAlert={jest.fn()}
-                />
+                <FiltersDialog showModalAlert={false} closeAlert={jest.fn()} />
             </MemoryRouter>,
         );
 
@@ -25,14 +18,7 @@ describe('<FiltersDialog />', () => {
     it('Should display an error when trying to enter future date', async () => {
         render(
             <MemoryRouter>
-                <FiltersDialog
-                    isOpen={true}
-                    handleClose={jest.fn()}
-                    activeFilterInput=""
-                    setActiveFilterInput={jest.fn()}
-                    showModalAlert={false}
-                    closeAlert={jest.fn()}
-                />
+                <FiltersDialog showModalAlert={false} closeAlert={jest.fn()} />
             </MemoryRouter>,
         );
 

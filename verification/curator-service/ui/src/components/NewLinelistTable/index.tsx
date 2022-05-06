@@ -33,10 +33,11 @@ import Alert from '@mui/material/Alert';
 import { nameCountry } from '../util/countryNames';
 import renderDate, { renderDateRange } from '../util/date';
 import { createData, labels, parseAge } from './helperFunctions';
-import Pagination from './Pagination';
-import Header from './Header';
 import { LoaderContainer } from './styled';
 import { URLToSearchQuery } from '../util/searchQuery';
+
+import Pagination from './Pagination';
+import Header from './Header';
 
 const dataLimit = 10000;
 
@@ -73,6 +74,7 @@ const NewLinelistTable = () => {
         if (currentPage === 0) return;
 
         dispatch(setCurrentPage(0));
+        // eslint-disable-next-line
     }, [dispatch, searchQuery]);
 
     const rows = cases.map((data) =>

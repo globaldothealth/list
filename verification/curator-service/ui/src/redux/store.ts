@@ -29,7 +29,9 @@ export const initialLoggedInState: RootState = {
         diseaseName: 'COVID-19',
     },
     filters: {
+        modalOpen: false,
         countryList: [],
+        activeFilterInput: '',
         error: '',
         isLoading: false,
     },

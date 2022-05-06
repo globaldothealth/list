@@ -27,15 +27,16 @@ import {
     filterError,
 } from '../../redux/filters/selectors';
 import { selectUser } from '../../redux/auth/selectors';
+import {
+    selectModalOpen,
+    selectActiveFilterInput,
+} from '../../redux/filters/selectors';
+import { setModalOpen, setActiveFilterInput } from '../../redux/filters/slice';
 import { codeForCountry } from '../util/countryNames';
 import CloseIcon from '@mui/icons-material/Close';
 import { useStyles } from './styled';
 
 interface FiltersModalProps {
-    isOpen: boolean;
-    activeFilterInput: string;
-    handleClose: () => void;
-    setActiveFilterInput: (value: string) => void;
     showModalAlert: boolean;
     closeAlert: (flag: boolean) => void;
 }
@@ -66,13 +67,10 @@ interface FilterFormErrors {
 }
 
 export default function FiltersDialog({
-    isOpen,
-    activeFilterInput,
-    handleClose,
-    setActiveFilterInput,
     showModalAlert,
     closeAlert,
 }: FiltersModalProps): JSX.Element {
+    const dispatch = useAppDispatch();
     const classes = useStyles();
     const location = useLocation();
     const history = useHistory();
@@ -85,10 +83,11 @@ export default function FiltersDialog({
     const isSmallScreen = useMediaQuery('(max-height:800px)');
     const inputSize = isSmallScreen ? 'small' : 'medium';
 
-    const dispatch = useAppDispatch();
     const loadingState = useAppSelector(isLoading);
     const error = useAppSelector(filterError);
     const user = useAppSelector(selectUser);
+    const modalOpen = useAppSelector(selectModalOpen);
+    const activeFilterInput = useAppSelector(selectActiveFilterInput);
 
     useEffect(() => {
         dispatch(fetchCountries());
@@ -140,7 +139,7 @@ export default function FiltersDialog({
                             : values[k]),
             );
             handleSetModalAlert();
-            handleClose();
+            dispatch(setModalOpen(false));
 
             const searchQuery = filtersToURL(values);
             history.push({ pathname: '/cases', search: searchQuery });
@@ -151,7 +150,7 @@ export default function FiltersDialog({
     useEffect(() => {
         if (activeFilterInput === '') return;
 
-        setActiveFilterInput('');
+        dispatch(setActiveFilterInput(''));
 
         // eslint-disable-next-line
     }, [formik.values]);
@@ -168,7 +167,7 @@ export default function FiltersDialog({
     }
 
     const closeAndResetAlert = () => {
-        handleClose();
+        dispatch(setModalOpen(false));
         closeAlert(false);
     };
 
@@ -190,13 +189,13 @@ export default function FiltersDialog({
     };
 
     return (
-        <Dialog open={isOpen} maxWidth={'xl'} onClose={closeAndResetAlert}>
+        <Dialog open={modalOpen} maxWidth={'xl'} onClose={closeAndResetAlert}>
             <DialogTitle>
                 Apply filters
                 <IconButton
                     aria-label="close"
                     className={classes.closeButton}
-                    onClick={handleClose}
+                    onClick={() => dispatch(setModalOpen(false))}
                     size="large"
                 >
                     <CloseIcon />

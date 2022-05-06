@@ -11,6 +11,8 @@ import InputLabel from '@mui/material/InputLabel';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 
+import FilterChips from './FilterChips';
+
 const sortKeywords = [
     {
         name: 'Confirmation date ascending',
@@ -80,6 +82,8 @@ const Header = () => {
                     ))}
                 </Select>
             </FormControl>
+
+            <FilterChips />
         </Stack>
     );
 };

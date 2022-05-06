@@ -11,7 +11,7 @@ import {
     Typography,
     useMediaQuery,
 } from '@mui/material';
-import LinelistTable, { DownloadButton } from '../LinelistTable';
+import { DownloadButton } from '../LinelistTable';
 import NewLinelistTable from '../NewLinelistTable';
 import {
     Link,
@@ -44,12 +44,8 @@ import ViewCase from '../ViewCase';
 import clsx from 'clsx';
 import { useCookieBanner } from '../../hooks/useCookieBanner';
 import { MapLink } from '../../constants/types';
-import { URLToSearchQuery, searchQueryToURL } from '../util/searchQuery';
 import { useAppDispatch, useAppSelector } from '../../hooks/redux';
-import {
-    setFilterBreadcrumbs,
-    deleteFilterBreadcrumbs,
-} from '../../redux/app/slice';
+import { setFilterBreadcrumbs } from '../../redux/app/slice';
 import {
     selectIsLoading,
     selectEnv,
@@ -286,10 +282,6 @@ export default function App(): JSX.Element {
     const rootRef = React.useRef<HTMLDivElement>(null);
     const history = useHistory();
     const location = useLocation<LocationState>();
-    const [filtersModalOpen, setFiltersModalOpen] =
-        React.useState<boolean>(false);
-    const [activeFilterInput, setActiveFilterInput] =
-        React.useState<string>('');
     const classes = useStyles();
 
     const savedSearchQuery = localStorage.getItem('searchQuery');
@@ -346,17 +338,6 @@ export default function App(): JSX.Element {
         // eslint-disable-next-line
     }, [savedSearchQuery]);
 
-    // Function for deleting filter breadcrumbs
-    const handleFilterBreadcrumbDelete = (breadcrumbToDelete: ChipData) => {
-        const searchParams = new URLSearchParams(location.search);
-        dispatch(deleteFilterBreadcrumbs(breadcrumbToDelete));
-        searchParams.delete(breadcrumbToDelete.key);
-        history.push({
-            pathname: '/cases',
-            search: searchParams.toString(),
-        });
-    };
-
     // When user is redirected from map to this app we have to parse url search query
     useEffect(() => {
         if (location.pathname.includes('/cases/view')) return;
@@ -389,13 +370,7 @@ export default function App(): JSX.Element {
                     {location.pathname === '/cases' && user ? (
                         <>
                             <div className={classes.searchBar}>
-                                <SearchBar
-                                    rootComponentRef={rootRef}
-                                    filtersModalOpen={filtersModalOpen}
-                                    setFiltersModalOpen={setFiltersModalOpen}
-                                    activeFilterInput={activeFilterInput}
-                                    setActiveFilterInput={setActiveFilterInput}
-                                />
+                                <SearchBar rootComponentRef={rootRef} />
                             </div>
                             <DownloadButton />
                         </>
@@ -433,22 +408,6 @@ export default function App(): JSX.Element {
                     />
                     {user && (
                         <Route exact path="/cases">
-                            {/* <LinelistTable
-                                page={listPage}
-                                pageSize={listPageSize}
-                                onChangePage={setListPage}
-                                onChangePageSize={setListPageSize}
-                                handleBreadcrumbDelete={
-                                    handleFilterBreadcrumbDelete
-                                }
-                                setFiltersModalOpen={setFiltersModalOpen}
-                                setActiveFilterInput={setActiveFilterInput}
-                                sortBy={sortBy}
-                                sortByOrder={sortByOrder}
-                                setSortBy={setSortBy}
-                                setSortByOrder={setSortByOrder}
-                                diseaseName={diseaseName}
-                            /> */}
                             <NewLinelistTable />
                         </Route>
                     )}

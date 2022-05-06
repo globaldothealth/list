@@ -19,8 +19,9 @@ import FiltersDialog from './FiltersDialog';
 import { searchQueryToURL, URLToSearchQuery } from './util/searchQuery';
 import { useLocation, useHistory } from 'react-router-dom';
 import { KeyboardEvent, ChangeEvent } from 'react';
-import { useSelector } from 'react-redux';
+import { useAppSelector, useAppDispatch } from '../hooks/redux';
 import { selectFilterBreadcrumbs } from '../redux/app/selectors';
+import { setModalOpen } from '../redux/filters/slice';
 
 const searchBarStyles = makeStyles((theme: Theme) => ({
     searchRoot: {
@@ -72,19 +73,12 @@ const StyledInputAdornment = withStyles({
 
 interface SearchBarProps {
     rootComponentRef: React.RefObject<HTMLDivElement>;
-    filtersModalOpen: boolean;
-    setFiltersModalOpen: (value: boolean) => void;
-    activeFilterInput: string;
-    setActiveFilterInput: (value: string) => void;
 }
 
 export default function SearchBar({
     rootComponentRef,
-    filtersModalOpen,
-    setFiltersModalOpen,
-    activeFilterInput,
-    setActiveFilterInput,
 }: SearchBarProps): JSX.Element {
+    const dispatch = useAppDispatch();
     const classes = searchBarStyles();
     const location = useLocation();
     const history = useHistory();
@@ -101,7 +95,7 @@ export default function SearchBar({
 
     const [searchError, setSearchError] = useState<boolean>(false);
 
-    const filtersBreadcrumb = useSelector(selectFilterBreadcrumbs);
+    const filtersBreadcrumb = useAppSelector(selectFilterBreadcrumbs);
 
     useEffect(() => {
         if (filtersBreadcrumb.length > 0) {
@@ -158,7 +152,7 @@ export default function SearchBar({
         e.preventDefault();
         setIsUserTyping(false);
         setModalAlert(true);
-        setFiltersModalOpen(true);
+        dispatch(setModalOpen(true));
     };
 
     function handleSetModalAlert(shouldTheAlertStillBeOpen: boolean) {
@@ -224,7 +218,7 @@ export default function SearchBar({
                                         startIcon={<FilterListIcon />}
                                         className="filter-button"
                                         onClick={() =>
-                                            setFiltersModalOpen(true)
+                                            dispatch(setModalOpen(true))
                                         }
                                     >
                                         Filter
@@ -280,10 +274,6 @@ export default function SearchBar({
             </div>
 
             <FiltersDialog
-                isOpen={filtersModalOpen}
-                handleClose={() => setFiltersModalOpen(false)}
-                activeFilterInput={activeFilterInput}
-                setActiveFilterInput={setActiveFilterInput}
                 showModalAlert={modalAlert}
                 closeAlert={handleSetModalAlert}
             />

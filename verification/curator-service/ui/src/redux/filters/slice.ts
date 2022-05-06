@@ -1,22 +1,33 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { fetchCountries } from './thunk';
 
-const initialState = {
-    countryList: [],
-    isLoading: false,
-    error: undefined,
-};
-
 interface initialStateTypes {
+    modalOpen: boolean;
     countryList: string[];
+    activeFilterInput: string;
     isLoading: boolean;
     error: string | undefined;
 }
 
+const initialState = {
+    modalOpen: false,
+    countryList: [],
+    activeFilterInput: '',
+    isLoading: false,
+    error: undefined,
+};
+
 const slice = createSlice({
     name: 'filters',
     initialState: initialState as initialStateTypes,
-    reducers: {},
+    reducers: {
+        setModalOpen: (state, action: PayloadAction<boolean>) => {
+            state.modalOpen = action.payload;
+        },
+        setActiveFilterInput: (state, action: PayloadAction<string>) => {
+            state.activeFilterInput = action.payload;
+        },
+    },
     extraReducers: (builder) => {
         builder.addCase(fetchCountries.fulfilled, (state, action) => {
             state.countryList = action.payload;
@@ -34,5 +45,8 @@ const slice = createSlice({
         });
     },
 });
+
+// actions
+export const { setModalOpen, setActiveFilterInput } = slice.actions;
 
 export default slice.reducer;
