@@ -1,5 +1,6 @@
 import {
     Case,
+    caseAgeRange,
     CaseDocument,
     CaseDTO,
     caseWithDenormalisedConfirmationDate,
@@ -67,26 +68,13 @@ const caseFromDTO = async (receivedCase: CaseDTO) => {
 
 const dtoFromCase = async (storedCase: LeanDocument<CaseDocument>) => {
     let dto = (storedCase as unknown) as CaseDTO;
-    if (
-        storedCase.demographics &&
-        storedCase.demographics.ageBuckets &&
-        storedCase.demographics.ageBuckets.length > 0
-    ) {
-        const ageBuckets = await Promise.all(
-            storedCase.demographics.ageBuckets.map((bucketId) => {
-                return AgeBucket.findById(bucketId).lean();
-            }),
-        );
-        const minimumAge = Math.min(...ageBuckets.map((b) => b!.start));
-        const maximumAge = Math.max(...ageBuckets.map((b) => b!.end));
+    const ageRange = await caseAgeRange(storedCase);
+    if (ageRange) {
         dto = {
             ...dto,
             demographics: {
                 ...dto.demographics!,
-                ageRange: {
-                    start: minimumAge,
-                    end: maximumAge,
-                },
+                ageRange,
             },
         };
         // although the type system can't see it, there's an ageBuckets property on the demographics DTO now
@@ -265,7 +253,7 @@ export class CasesController {
                 while (doc != null) {
                     delete doc.restrictedNotes;
                     delete doc.notes;
-                    const normalizedDoc = denormalizeFields(doc);
+                    const normalizedDoc = await denormalizeFields(doc);
                     if (!doc.hasOwnProperty('SGTF')) {
                         normalizedDoc.SGTF = 'NA';
                     }

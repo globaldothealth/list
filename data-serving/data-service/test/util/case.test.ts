@@ -1,6 +1,7 @@
 // @ts-nocheck Unable to block-ignore errors ('Property does not exist' in this file)
 // https://github.com/Microsoft/TypeScript/issues/19573
 
+import { AgeBucket } from '../../src/model/age-bucket';
 import { CaseDocument } from '../model/case';
 import { CaseReferenceDocument } from '../model/case-reference';
 import { DemographicsDocument } from '../model/demographics';
@@ -22,6 +23,43 @@ import {
     denormalizeFields,
 } from '../../src/util/case';
 import events from '../model/data/case.events.json';
+import mongoose from 'mongoose';
+import MongoMemoryServer from 'mongodb-memory-server';
+
+
+let mongoServer: MongoMemoryServer;
+
+async function createAgeBuckets() {
+    await new AgeBucket({
+        start: 0,
+        end: 0,
+    }).save();
+    for (let start = 1; start <= 116; start += 5) {
+        const end = start + 4;
+        await new AgeBucket({
+            start,
+            end,
+        }).save();
+    }
+}
+
+beforeAll(async () => {
+    mongoServer = new MongoMemoryServer();
+    const mongoURL = process.env.MONGO_URL;
+    await mongoose.connect(mongoURL, {
+        useCreateIndex: true,
+        useNewUrlParser: true,
+        useUnifiedTopology: true,
+        useFindAndModify: false,
+    });
+     await createAgeBuckets();
+});
+
+afterAll(async () => {
+    await AgeBucket.deleteMany({});
+    await mongoose.disconnect();
+    return mongoServer.stop();
+});
 
 describe('Case', () => {
     it('is parsed properly for download', () => {
@@ -177,7 +215,7 @@ describe('Case', () => {
             'vaccines.3.batch','vaccines.3.date','vaccines.3.sideEffects']
         );
     });
-    it('handles any undefined fields', () => {
+    it('handles any undefined fields', async () => {
         const caseDoc = {
             caseReference: {} as CaseReferenceDocument,
             demographics: {} as DemographicsDocument,
@@ -193,7 +231,7 @@ describe('Case', () => {
             variant: {} as VariantDocument,
         } as CaseDocument;
 
-        const denormalizedCase = denormalizeFields(caseDoc);
+        const denormalizedCase = await denormalizeFields(caseDoc);
 
         expect(denormalizedCase['caseReference.sourceId']).toEqual('');
         expect(denormalizedCase['caseReference.sourceEntryId']).toEqual('');
@@ -268,7 +306,7 @@ describe('Case', () => {
         expect(denormalizedCase['vaccines.3.sideEffects']).toEqual('');
         expect(denormalizedCase['variantOfConcern']).toEqual('');
     });
-    it('denormalizes case reference fields', () => {
+    it('denormalizes case reference fields', async () => {
         const caseRefDoc = {
             sourceId: 'a source id',
             sourceEntryId: 'a source entry id',
@@ -296,7 +334,7 @@ describe('Case', () => {
             variant: {} as VariantDocument,
         } as CaseDocument;
 
-        const denormalizedCase = denormalizeFields(caseDoc);
+        const denormalizedCase = await denormalizeFields(caseDoc);
 
         expect(denormalizedCase['caseReference.sourceId']).toEqual('a source id');
         expect(denormalizedCase['caseReference.sourceEntryId']).toEqual('a source entry id');
@@ -305,12 +343,10 @@ describe('Case', () => {
         expect(denormalizedCase['caseReference.verificationStatus']).toEqual('UNVERIFIED');
         expect(denormalizedCase['caseReference.additionalSources']).toEqual('google.com,ap.org');
     });
-    it('denormalizes demographics fields', () => {
+    it('denormalizes demographics fields', async () => {
+        const anAgeBucket = await AgeBucket.findOne({ start: 41 });
         const demographicsDoc = {
-            ageRange: {
-                start: 42,
-                end: 50,
-            },
+            ageBuckets: [anAgeBucket._id],
             gender: 'Male',
             occupation: 'Anesthesiologist',
             nationalities: ['Georgian', 'Azerbaijani'],
@@ -332,16 +368,16 @@ describe('Case', () => {
             variant: {} as VariantDocument,
         } as CaseDocument;
 
-        const denormalizedCase = denormalizeFields(caseDoc);
+        const denormalizedCase = await denormalizeFields(caseDoc);
 
-        expect(denormalizedCase['demographics.ageRange.end']).toEqual(50);
-        expect(denormalizedCase['demographics.ageRange.start']).toEqual(42);
+        expect(denormalizedCase['demographics.ageRange.end']).toEqual(45);
+        expect(denormalizedCase['demographics.ageRange.start']).toEqual(41);
         expect(denormalizedCase['demographics.ethnicity']).toEqual('Caucasian');
         expect(denormalizedCase['demographics.gender']).toEqual('Male');
         expect(denormalizedCase['demographics.nationalities']).toEqual('Georgian,Azerbaijani');
         expect(denormalizedCase['demographics.occupation']).toEqual('Anesthesiologist');
     });
-    it('denormalizes events fields', () => {
+    it('denormalizes events fields', async () => {
         const consultEvent = {
             name: 'firstClinicalConsultation',
             dateRange: {
@@ -382,7 +418,7 @@ describe('Case', () => {
             variant: {} as VariantDocument,
         } as CaseDocument;
 
-        const denormalizedCase = denormalizeFields(caseDoc);
+        const denormalizedCase = await denormalizeFields(caseDoc);
 
         expect(denormalizedCase['events.firstClinicalConsultation.date']).toEqual(consultEvent.dateRange.end);
         expect(denormalizedCase['events.onsetSymptoms.date']).toEqual(onsetEvent.dateRange.end);
@@ -396,7 +432,7 @@ describe('Case', () => {
         expect(denormalizedCase['events.icuAdmission.date']).toEqual('');
         expect(denormalizedCase['events.icuAdmission.value']).toEqual('');
     });
-    it('denormalizes location fields', () => {
+    it('denormalizes location fields', async () => {
         const locationDoc = {
             country: 'Georgia',
             name: 'Tbilisi',
@@ -422,7 +458,7 @@ describe('Case', () => {
             variant: {} as VariantDocument,
         } as CaseDocument;
 
-        const denormalizedCase = denormalizeFields(caseDoc);
+        const denormalizedCase = await denormalizeFields(caseDoc);
 
         expect(denormalizedCase['location.country']).toEqual(locationDoc.country);
         expect(denormalizedCase['location.administrativeAreaLevel1']).toEqual('');
@@ -435,7 +471,7 @@ describe('Case', () => {
         expect(denormalizedCase['location.place']).toEqual('');
         expect(denormalizedCase['location.query']).toEqual('');
     });
-    it('denormalizes pathogen fields', () => {
+    it('denormalizes pathogen fields', async () => {
         const bacteriaDoc = {
             name: 'E. coli',
             id: '0',
@@ -466,11 +502,11 @@ describe('Case', () => {
             variant: {} as VariantDocument,
         } as CaseDocument;
 
-        const denormalizedCase = denormalizeFields(caseDoc);
+        const denormalizedCase = await denormalizeFields(caseDoc);
         const pathogenNames = [bacteriaDoc.name, virusDoc.name, fungiDoc.name].join(',');
         expect(denormalizedCase['pathogens']).toEqual(pathogenNames);
     });
-    it('denormalizes preexisting conditions fields', () => {
+    it('denormalizes preexisting conditions fields', async () => {
         const conditionsDoc = {
             values: ['Obesity', 'Diabetes'],
             hasPreexistingConditions: true,
@@ -491,11 +527,11 @@ describe('Case', () => {
             variant: {} as VariantDocument,
         } as CaseDocument;
 
-        const denormalizedCase = denormalizeFields(caseDoc);
+        const denormalizedCase = await denormalizeFields(caseDoc);
         expect(denormalizedCase['preexistingConditions.hasPreexistingConditions']).toEqual(true);
         expect(denormalizedCase['preexistingConditions.values']).toEqual('Obesity,Diabetes');
     });
-    it('denormalizes revision metadata fields', () => {
+    it('denormalizes revision metadata fields', async () => {
         const revisionDoc = {
             revisionNumber: 4,
             creationMetadata: {
@@ -525,7 +561,7 @@ describe('Case', () => {
             variant: {} as VariantDocument,
         } as CaseDocument;
 
-        const denormalizedCase = denormalizeFields(caseDoc);
+        const denormalizedCase = await denormalizeFields(caseDoc);
         
         expect(denormalizedCase['revisionMetadata.creationMetadata.curator']).toEqual('Joe');
         expect(denormalizedCase['revisionMetadata.creationMetadata.date']).toEqual('2020-05-01');
@@ -535,7 +571,7 @@ describe('Case', () => {
         expect(denormalizedCase['revisionMetadata.editMetadata.notes']).toEqual('removed some information');
         expect(denormalizedCase['revisionMetadata.revisionNumber']).toEqual(4);
     });
-    it('denormalizes symptoms fields', () => {
+    it('denormalizes symptoms fields', async () => {
         const symptomsDoc = {
             values: ['Cough', 'Fever'],
             status: 'current',
@@ -555,12 +591,12 @@ describe('Case', () => {
             variant: {} as VariantDocument,
         } as CaseDocument;
 
-        const denormalizedCase = denormalizeFields(caseDoc);
+        const denormalizedCase = await denormalizeFields(caseDoc);
 
         expect(denormalizedCase['symptoms.values']).toEqual('Cough,Fever');
         expect(denormalizedCase['symptoms.status']).toEqual('current');
     });
-    it('denormalizes transmission fields', () => {
+    it('denormalizes transmission fields', async () => {
         const transmissionDoc = {
             linkedCaseIds: ['0', '1', '2'],
             places: ['Tbilisi', 'Baku'],
@@ -582,13 +618,13 @@ describe('Case', () => {
             variant: {} as VariantDocument,
         } as CaseDocument;
 
-        const denormalizedCase = denormalizeFields(caseDoc);
+        const denormalizedCase = await denormalizeFields(caseDoc);
         
         expect(denormalizedCase['transmission.linkedCaseIds']).toEqual('0,1,2');
         expect(denormalizedCase['transmission.places']).toEqual('Tbilisi,Baku');
         expect(denormalizedCase['transmission.routes']).toEqual('train,plane');
     });
-    it('denormalizes travel history fields', () => {
+    it('denormalizes travel history fields', async () => {
         const travelHistoryDoc = {
             travel: [{
                 dateRange: {
@@ -642,7 +678,7 @@ describe('Case', () => {
             variant: {} as VariantDocument,
         } as CaseDocument;
 
-        const denormalizedCase = denormalizeFields(caseDoc);
+        const denormalizedCase = await denormalizeFields(caseDoc);
         
         expect(denormalizedCase['travelHistory.travel.dateRange.end']).toEqual('2020-05-03,2020-06-03');
         expect(denormalizedCase['travelHistory.travel.dateRange.start']).toEqual('2020-05-01,2020-06-01');
@@ -652,7 +688,7 @@ describe('Case', () => {
         expect(denormalizedCase['travelHistory.travel.purpose']).toEqual('business,pleasure');
         expect(denormalizedCase['travelHistory.traveledPrior30Days']).toEqual(true);
     });
-    it('denormalizes vaccine fields', () => {
+    it('denormalizes vaccine fields', async () => {
         const firstVaccineDoc = {
             name: 'Pfizer',
             batch: 'TK421',
@@ -702,7 +738,7 @@ describe('Case', () => {
             variant: {} as VariantDocument,
         } as CaseDocument;
 
-        const denormalizedCase = denormalizeFields(caseDoc);
+        const denormalizedCase = await denormalizeFields(caseDoc);
         expect(denormalizedCase['vaccines.0.batch']).toEqual('TK421');
         expect(denormalizedCase['vaccines.0.date']).toEqual('2021-03-01');
         expect(denormalizedCase['vaccines.0.name']).toEqual('Pfizer');
@@ -720,7 +756,7 @@ describe('Case', () => {
         expect(denormalizedCase['vaccines.3.name']).toEqual('');
         expect(denormalizedCase['vaccines.3.sideEffects']).toEqual('');
     });
-    it('denormalizes variant fields', () => {
+    it('denormalizes variant fields', async () => {
         const variantDoc = {
             name: 'Omicron',
         } as VariantDocument;
@@ -740,7 +776,7 @@ describe('Case', () => {
             variant: variantDoc,
         } as CaseDocument;
 
-        const denormalizedCase = denormalizeFields(caseDoc);
+        const denormalizedCase = await denormalizeFields(caseDoc);
         
         expect(denormalizedCase['variantOfConcern']).toEqual('Omicron');
     });
