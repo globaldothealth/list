@@ -276,7 +276,7 @@ describe('Bulk upload form', function () {
             .should('have.length', 1)
             .should(
                 'contain',
-                'demographics.ageRange.start: Path `ageRange.start` (142) is more than maximum allowed value (120)',
+                'age range 142-42 invalid',
             );
         cy.get('button[aria-label="close overlay"').click();
 
