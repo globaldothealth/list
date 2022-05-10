@@ -11,7 +11,7 @@ import {
     Typography,
     useMediaQuery,
 } from '@mui/material';
-import { DownloadButton } from '../LinelistTable';
+import { DownloadButton } from '../DownloadButton';
 import NewLinelistTable from '../NewLinelistTable';
 import {
     Link,
