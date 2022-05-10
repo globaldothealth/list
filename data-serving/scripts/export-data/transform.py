@@ -39,6 +39,7 @@ __OMIT = [
     "events",
     "notes",
     "travelHistory.travel",
+    "caseReference.sourceEntryId"
 ]
 
 __TRAVEL = [

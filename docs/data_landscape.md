@@ -23,8 +23,8 @@ Various buckets (data containers) are used for both temporary and long-term stor
 
 Aggregated data from the line list used by the map visualisation.
 
-* covid-19-aggregates-eu
-* covid-19-aggregates-dev-eu
+* covid-19-aggregates
+* covid-19-aggregates-dev
 
 ### Export
 

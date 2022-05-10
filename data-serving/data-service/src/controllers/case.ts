@@ -124,10 +124,11 @@ export class CasesController {
             return;
         }
 
-        // don't export any note
+        // don't export notes or sourceEntryIds
         c.forEach((aCase: LeanDocument<CaseDocument>) => {
             delete aCase.restrictedNotes;
             delete aCase.notes;
+            delete aCase.caseReference.sourceEntryId;
         });
 
         res.json(await Promise.all(c.map((aCase) => dtoFromCase(aCase))));
@@ -232,6 +233,8 @@ export class CasesController {
                 doc = await cursor.next();
                 while (doc != null) {
                     delete doc.restrictedNotes;
+                    delete doc.notes;
+                    delete doc.caseReference.sourceEntryId;
                     const caseDTO = await dtoFromCase(doc);
                     const parsedCase = parseDownloadedCase(caseDTO);
                     const stringifiedCase = stringify([parsedCase], {
@@ -254,6 +257,7 @@ export class CasesController {
                 while (doc != null) {
                     delete doc.restrictedNotes;
                     delete doc.notes;
+                    delete doc.caseReference.sourceEntryId;
                     const normalizedDoc = await denormalizeFields(doc);
                     if (!doc.hasOwnProperty('SGTF')) {
                         normalizedDoc.SGTF = 'NA';

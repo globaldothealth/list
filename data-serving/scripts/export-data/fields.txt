@@ -1,6 +1,5 @@
 _id
 caseReference.additionalSources
-caseReference.sourceEntryId
 caseReference.sourceId
 caseReference.sourceUrl
 caseReference.uploadIds
