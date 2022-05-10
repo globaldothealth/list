@@ -114,8 +114,8 @@ if __name__ == "__main__":
     setup_logger()
     endpoint_url = os.getenv("ENDPOINT_URL")
     objects = data_files(
-        os.getenv("COUNTRY_EXPORT_BUCKET", "covid-19-country-export-eu"),
+        os.getenv("COUNTRY_EXPORT_BUCKET", "covid-19-country-export"),
         endpoint_url=endpoint_url,
     )
     data = completeness_s3_many(objects, endpoint_url)
-    upload(data, os.getenv("METRICS_BUCKET", "covid-19-aggregates-eu"), endpoint_url)
+    upload(data, os.getenv("METRICS_BUCKET", "covid-19-aggregates"), endpoint_url)

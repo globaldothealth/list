@@ -122,6 +122,13 @@ describe('GET', () => {
         const res = await request(app).get(`/api/cases/${c._id}`).expect(200);
         expect(res.body[0].notes).toBeUndefined();
     });
+    it('should not show the sourceEntryId for a case', async () => {
+        const c = new Case(minimalCase);
+        c.caseReference.sourceEntryId = 'Sourcey McSourceFace';
+        await c.save();
+        const res = await request(app).get(`/api/cases/${c._id}`).expect(200);
+        expect(res.body[0].caseReference.sourceEntryId).toBeUndefined();
+    });
     it('should convert age bucket to age range', async () => {
         const c = new Case(minimalCase);
         const bucket = await AgeBucket.findOne({});
