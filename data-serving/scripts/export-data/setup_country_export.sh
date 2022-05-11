@@ -11,7 +11,7 @@ require_env "${BUCKET:-}" "Specify S3 bucket to output files in BUCKET"
 
 echo "Setting up country export job definitions for environment {ENV}..."
 
-CASECOUNT_URL=${CASECOUNT_URL:-https://covid-19-aggregates.s3.amazonaws.com/country/latest.json}
+CASECOUNT_URL=${CASECOUNT_URL:-https://covid-19-aggregates-eu.s3.amazonaws.com/country/latest.json}
 # mongoexport rate in cases/s
 # actual rate is higher, but this allows some wiggle room
 # in calculation of Batch job timeouts

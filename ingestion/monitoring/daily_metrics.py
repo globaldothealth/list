@@ -11,7 +11,7 @@ import requests
 import boto3
 
 
-BUCKET = "covid-19-aggregates"
+BUCKET = "covid-19-aggregates-eu"
 WEBHOOK_URL = os.environ.get("SLACK_WEBHOOK_METRICS_URL", None)
 
 logger = logging.getLogger(__name__)
