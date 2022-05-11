@@ -91,8 +91,6 @@ def send_slack_message(slack_message: str) -> None:
         if response.status_code != 200:
             logger.error(f"Slack notification failed with {response.status_code}: {response.text}")
             sys.exit(1)
-    if "⚠️" in ret:
-        sys.exit(1)  # Trigger CI failure as an additional notification
 
 
 if __name__ == "__main__":
@@ -119,3 +117,6 @@ if __name__ == "__main__":
 
     logger.info(slack_message)
     send_slack_message(slack_message)
+
+    if "⚠️" in slack_message:
+        sys.exit(1)  # Trigger CI failure as an additional notification
