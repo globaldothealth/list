@@ -12,3 +12,11 @@ export const selectRowsPerPage = (state: RootState) =>
 export const selectSort = (state: RootState) => state.linelist.sort;
 export const selectSearchQuery = (state: RootState) =>
     state.linelist.searchQuery;
+export const selectExcludeCasesDialogOpen = (state: RootState) =>
+    state.linelist.excludeCasesDialogOpen;
+export const selectCasesSelected = (state: RootState) =>
+    state.linelist.casesSelected;
+export const selectDeleteCasesDialogOpen = (state: RootState) =>
+    state.linelist.deleteCasesDialogOpen;
+export const selectRefetchData = (state: RootState) =>
+    state.linelist.refetchData;

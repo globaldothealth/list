@@ -1,3 +1,5 @@
+import { VerificationStatus, ExclusionData } from '../../api/models/Case';
+
 export const labels = [
     'Case ID',
     'Confirmation date',
@@ -32,6 +34,8 @@ export const createData = (
     hospitalizationDate?: string,
     symptomsOnsetDate?: string,
     sourceUrl?: string,
+    verificationStatus?: VerificationStatus,
+    exclusionData?: ExclusionData,
 ) => {
     return {
         caseId,
@@ -49,6 +53,8 @@ export const createData = (
         hospitalizationDate,
         symptomsOnsetDate,
         sourceUrl,
+        verificationStatus,
+        exclusionData,
     };
 };
 

@@ -45,7 +45,7 @@ import { ReactComponent as UnverifiedIcon } from './assets/unverified_icon.svg';
 import { ReactComponent as ExcludedIcon } from './assets/excluded_icon.svg';
 import VerificationStatusHeader from './VerificationStatusHeader';
 import VerificationStatusIndicator from './VerificationStatusIndicator';
-import CaseExcludeDialog from './CaseExcludeDialog';
+import CaseExcludeDialog from './Dialogs/CaseExcludeDialog';
 import CaseIncludeDialog from './CaseIncludeDialog';
 import renderDate, { renderDateRange } from './util/date';
 import { URLToSearchQuery } from './util/searchQuery';
@@ -422,9 +422,6 @@ function RowMenu(props: {
             <CaseExcludeDialog
                 isOpen={excludeDialogOpen}
                 onClose={(): void => setExcludeDialogOpen(false)}
-                onSubmit={(values: { note: string }): Promise<void> =>
-                    handleStatusChange(VerificationStatus.Excluded, values.note)
-                }
                 caseIds={[props.rowId]}
             />
             <CaseIncludeDialog
@@ -1064,15 +1061,6 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                             isOpen={this.state.excludeDialogOpen}
                             onClose={(): void =>
                                 this.setState({ excludeDialogOpen: false })
-                            }
-                            onSubmit={(values: {
-                                note: string;
-                            }): Promise<void> =>
-                                this.setCaseVerification(
-                                    this.state.selectedRowsCurrentPage,
-                                    VerificationStatus.Excluded,
-                                    values.note,
-                                )
                             }
                             caseIds={this.state.selectedRowsCurrentPage.map(
                                 ({ id }) => id,

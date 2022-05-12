@@ -1,9 +1,12 @@
-import { useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from '../../hooks/redux';
 import { fetchLinelistData } from '../../redux/linelistTable/thunk';
 import {
     setCurrentPage,
     setRowsPerPage,
+    setExcludeCasesDialogOpen,
+    setCasesSelected,
+    setDeleteCasesDialogOpen,
 } from '../../redux/linelistTable/slice';
 import {
     selectIsLoading,
@@ -14,7 +17,12 @@ import {
     selectRowsPerPage,
     selectSort,
     selectSearchQuery,
+    selectExcludeCasesDialogOpen,
+    selectCasesSelected,
+    selectDeleteCasesDialogOpen,
+    selectRefetchData,
 } from '../../redux/linelistTable/selectors';
+import { selectUser } from '../../redux/auth/selectors';
 import { useHistory, useLocation } from 'react-router-dom';
 
 import Table from '@mui/material/Table';
@@ -29,15 +37,21 @@ import Stack from '@mui/material/Stack';
 import TableFooter from '@mui/material/TableFooter';
 import CircularProgress from '@mui/material/CircularProgress';
 import Alert from '@mui/material/Alert';
+import Checkbox from '@mui/material/Checkbox';
 
 import { nameCountry } from '../util/countryNames';
 import renderDate, { renderDateRange } from '../util/date';
 import { createData, labels, parseAge } from './helperFunctions';
 import { LoaderContainer } from './styled';
 import { URLToSearchQuery } from '../util/searchQuery';
+import { hasAnyRole } from '../util/helperFunctions';
+import { Helmet } from 'react-helmet';
 
 import Pagination from './Pagination';
-import Header from './Header';
+import EnhancedTableToolbar from './EnhancedTableToolbar';
+import { CaseExcludeDialog } from '../Dialogs/CaseExcludeDialog';
+import { CaseDeleteDialog } from '../Dialogs/CaseDeleteDialog';
+import VerificationStatusIndicator from '../VerificationStatusIndicator';
 
 const dataLimit = 10000;
 
@@ -54,6 +68,11 @@ const NewLinelistTable = () => {
     const rowsPerPage = useAppSelector(selectRowsPerPage);
     const sort = useAppSelector(selectSort);
     const searchQuery = useAppSelector(selectSearchQuery);
+    const user = useAppSelector(selectUser);
+    const excludeCasesDialogOpen = useAppSelector(selectExcludeCasesDialogOpen);
+    const casesSelected = useAppSelector(selectCasesSelected);
+    const deleteCasesDialogOpen = useAppSelector(selectDeleteCasesDialogOpen);
+    const refetchData = useAppSelector(selectRefetchData);
 
     // Build query and fetch data
     useEffect(() => {
@@ -67,7 +86,7 @@ const NewLinelistTable = () => {
         }&order=${sort.order}${query}`;
 
         dispatch(fetchLinelistData(preparedQuery));
-    }, [dispatch, currentPage, rowsPerPage, sort, searchQuery]);
+    }, [dispatch, currentPage, rowsPerPage, sort, searchQuery, refetchData]);
 
     // When user applies filters we should go back to the first page of results
     useEffect(() => {
@@ -103,6 +122,8 @@ const NewLinelistTable = () => {
                     ?.dateRange,
             ),
             data.caseReference.sourceUrl || '',
+            data.caseReference.verificationStatus,
+            data.exclusionData,
         ),
     );
 
@@ -144,15 +165,51 @@ const NewLinelistTable = () => {
         });
     };
 
+    const handleSelectAllClick = (
+        event: React.ChangeEvent<HTMLInputElement>,
+    ) => {
+        if (event.target.checked) {
+            const newSelected = rows.map((n) => n.caseId);
+            dispatch(setCasesSelected(newSelected));
+            return;
+        }
+        dispatch(setCasesSelected([]));
+    };
+
+    const handleCaseSelect = (
+        event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
+        caseId: string,
+    ) => {
+        const selectedIndex = casesSelected.indexOf(caseId);
+        let newSelected: string[] = [];
+
+        if (selectedIndex === -1) {
+            newSelected = [...casesSelected, caseId];
+        } else {
+            newSelected = casesSelected.filter((id) => id !== caseId);
+        }
+
+        dispatch(setCasesSelected(newSelected));
+
+        // In order to stop opening case details after clicking on a checkbox
+        event.stopPropagation();
+    };
+
+    const isSelected = (id: string) => casesSelected.indexOf(id) !== -1;
+
     return (
         <>
+            <Helmet>
+                <title>Global.health | Cases</title>
+            </Helmet>
+
             {error && (
                 <Alert severity="error" sx={{ marginTop: '2rem' }}>
                     {error}
                 </Alert>
             )}
 
-            <Header />
+            <EnhancedTableToolbar numSelected={casesSelected.length} />
 
             <Paper
                 sx={{
@@ -176,12 +233,53 @@ const NewLinelistTable = () => {
                 >
                     <Table
                         sx={{ minWidth: 650 }}
-                        size="small"
+                        size="medium"
                         aria-label="Linelist table"
                         stickyHeader
                     >
                         <TableHead>
                             <TableRow>
+                                {hasAnyRole(user, ['curator', 'admin']) && (
+                                    <>
+                                        <TableCell
+                                            padding="checkbox"
+                                            sx={{
+                                                backgroundColor: '#fff',
+                                            }}
+                                        >
+                                            <Checkbox
+                                                color="primary"
+                                                indeterminate={
+                                                    casesSelected.length > 0 &&
+                                                    casesSelected.length <
+                                                        rows.length
+                                                }
+                                                checked={
+                                                    rows.length > 0 &&
+                                                    casesSelected.length ===
+                                                        rows.length
+                                                }
+                                                onChange={handleSelectAllClick}
+                                                inputProps={{
+                                                    'aria-label':
+                                                        'select all cases',
+                                                }}
+                                            />
+                                        </TableCell>
+
+                                        <TableCell
+                                            align="center"
+                                            sx={{
+                                                backgroundColor: '#fff',
+                                                fontWeight: 600,
+                                                whiteSpace: 'nowrap',
+                                            }}
+                                        >
+                                            Status
+                                        </TableCell>
+                                    </>
+                                )}
+
                                 {labels.map((label) => (
                                     <TableCell
                                         key={label}
@@ -214,6 +312,45 @@ const NewLinelistTable = () => {
                                             handleCaseClick(row.caseId)
                                         }
                                     >
+                                        {hasAnyRole(user, [
+                                            'curator',
+                                            'admin',
+                                        ]) && (
+                                            <>
+                                                <TableCell padding="checkbox">
+                                                    <Checkbox
+                                                        color="primary"
+                                                        size="small"
+                                                        checked={isSelected(
+                                                            row.caseId,
+                                                        )}
+                                                        inputProps={{
+                                                            'aria-labelledby': `${row.caseId} - checkbox`,
+                                                        }}
+                                                        onClick={(e) =>
+                                                            handleCaseSelect(
+                                                                e,
+                                                                row.caseId,
+                                                            )
+                                                        }
+                                                    />
+                                                </TableCell>
+
+                                                <TableCell
+                                                    component="th"
+                                                    scope="row"
+                                                >
+                                                    <VerificationStatusIndicator
+                                                        status={
+                                                            row.verificationStatus
+                                                        }
+                                                        exclusionData={
+                                                            row.exclusionData
+                                                        }
+                                                    />
+                                                </TableCell>
+                                            </>
+                                        )}
                                         <TableCell component="th" scope="row">
                                             {row.caseId}
                                         </TableCell>
@@ -318,6 +455,18 @@ const NewLinelistTable = () => {
                     </TableFooter>
                 </Table>
             </Stack>
+
+            <CaseExcludeDialog
+                isOpen={excludeCasesDialogOpen}
+                onClose={() => dispatch(setExcludeCasesDialogOpen(false))}
+                caseIds={casesSelected}
+            />
+
+            <CaseDeleteDialog
+                isOpen={deleteCasesDialogOpen}
+                handleClose={() => dispatch(setDeleteCasesDialogOpen(false))}
+                caseIds={casesSelected}
+            />
         </>
     );
 };

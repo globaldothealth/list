@@ -72,6 +72,10 @@ export const initialLoggedInState: RootState = {
         searchQuery: '',
         total: 0,
         error: undefined,
+        excludeCasesDialogOpen: false,
+        deleteCasesDialogOpen: false,
+        casesSelected: [],
+        refetchData: false,
     },
 };
 

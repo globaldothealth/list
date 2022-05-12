@@ -51,12 +51,7 @@ const Header = () => {
     };
 
     return (
-        <Stack
-            direction="row"
-            alignItems="center"
-            spacing={2}
-            sx={{ margin: '1rem 0' }}
-        >
+        <Stack direction="row" spacing={3} alignItems="center">
             <Typography variant="body1">{diseaseName} Linelist</Typography>
 
             <FormControl sx={{ minWidth: 200 }} variant="standard" size="small">

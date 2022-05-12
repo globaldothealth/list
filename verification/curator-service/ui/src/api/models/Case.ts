@@ -118,7 +118,7 @@ interface RevisionMetadata {
     updateMetadata?: Revision;
 }
 
-interface ExclusionData {
+export interface ExclusionData {
     date: string;
     note: string;
 }

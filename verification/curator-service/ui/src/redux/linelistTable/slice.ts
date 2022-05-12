@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { fetchLinelistData } from './thunk';
+import { fetchLinelistData, changeCasesStatus, deleteCases } from './thunk';
 import { Case } from '../../api/models/Case';
 import { SortBy, SortByOrder } from '../../constants/types';
 
@@ -16,6 +16,10 @@ interface LinelistTableState {
     searchQuery: string;
     total: number;
     error: string | undefined;
+    excludeCasesDialogOpen: boolean;
+    deleteCasesDialogOpen: boolean;
+    casesSelected: string[];
+    refetchData: boolean;
 }
 
 const initialState: LinelistTableState = {
@@ -31,6 +35,10 @@ const initialState: LinelistTableState = {
     searchQuery: '',
     total: 0,
     error: undefined,
+    excludeCasesDialogOpen: false,
+    deleteCasesDialogOpen: false,
+    casesSelected: [],
+    refetchData: false,
 };
 
 const linelistTableSlice = createSlice({
@@ -52,8 +60,18 @@ const linelistTableSlice = createSlice({
         setSearchQuery: (state, action: PayloadAction<string>) => {
             state.searchQuery = action.payload;
         },
+        setExcludeCasesDialogOpen: (state, action: PayloadAction<boolean>) => {
+            state.excludeCasesDialogOpen = action.payload;
+        },
+        setCasesSelected: (state, action: PayloadAction<string[]>) => {
+            state.casesSelected = action.payload;
+        },
+        setDeleteCasesDialogOpen: (state, action: PayloadAction<boolean>) => {
+            state.deleteCasesDialogOpen = action.payload;
+        },
     },
     extraReducers: (builder) => {
+        // FETCH CASES
         builder.addCase(fetchLinelistData.pending, (state) => {
             state.isLoading = true;
             state.error = undefined;
@@ -70,11 +88,67 @@ const linelistTableSlice = createSlice({
                 ? action.payload
                 : action.error.message;
         });
+
+        // CHANGE STATUS
+        builder.addCase(changeCasesStatus.pending, (state) => {
+            state.isLoading = true;
+            state.excludeCasesDialogOpen = false;
+        });
+        builder.addCase(changeCasesStatus.fulfilled, (state, { payload }) => {
+            const { updatedIds, newStatus } = payload;
+
+            state.isLoading = false;
+            state.casesSelected = [];
+            state.cases = state.cases.map((data) =>
+                updatedIds.includes(data._id)
+                    ? {
+                          ...data,
+                          caseReference: {
+                              ...data.caseReference,
+                              verificationStatus: newStatus,
+                          },
+                      }
+                    : data,
+            );
+        });
+        builder.addCase(changeCasesStatus.rejected, (state, action) => {
+            state.isLoading = false;
+            state.excludeCasesDialogOpen = false;
+            state.error = action.payload
+                ? action.payload
+                : action.error.message;
+        });
+
+        // DELETE
+        builder.addCase(deleteCases.pending, (state) => {
+            state.isLoading = true;
+        });
+        builder.addCase(deleteCases.fulfilled, (state, { payload }) => {
+            state.isLoading = false;
+            state.deleteCasesDialogOpen = false;
+            state.casesSelected = [];
+            // This acts only as a trigger, so it doesn't matter which boolean value it is
+            state.refetchData = !state.refetchData;
+        });
+        builder.addCase(deleteCases.rejected, (state, action) => {
+            state.isLoading = false;
+            state.deleteCasesDialogOpen = false;
+            state.error = action.payload
+                ? action.payload
+                : action.error.message;
+        });
     },
 });
 
 // actions
-export const { setCurrentPage, setRowsPerPage, setSort, setSearchQuery } =
-    linelistTableSlice.actions;
+export const {
+    setCurrentPage,
+    setRowsPerPage,
+    setSort,
+    setSearchQuery,
+    setExcludeCasesDialogOpen,
+    setCasesSelected,
+    setDeleteCasesDialogOpen,
+} = linelistTableSlice.actions;
 
 export default linelistTableSlice.reducer;
