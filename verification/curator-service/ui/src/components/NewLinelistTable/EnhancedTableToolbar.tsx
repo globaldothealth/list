@@ -4,10 +4,7 @@ import {
     setExcludeCasesDialogOpen,
     setDeleteCasesDialogOpen,
 } from '../../redux/linelistTable/slice';
-import {
-    changeCasesStatus,
-    downloadCases,
-} from '../../redux/linelistTable/thunk';
+import { changeCasesStatus } from '../../redux/linelistTable/thunk';
 import { selectCasesSelected } from '../../redux/linelistTable/selectors';
 import { VerificationStatus } from '../../api/models/Case';
 

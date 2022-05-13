@@ -118,20 +118,16 @@ export default function Transmission(): JSX.Element {
                 />
             </div>
             <ChipInput
-                // fullWidth
-                // alwaysShowPlaceholder
-                // placeholder="Contacted case IDs"
-                // defaultValue={initialValues.transmissionLinkedCaseIds}
-                // onBlur={(): void =>
-                //     setTouched({ transmissionLinkedCaseIds: true })
-                // }
-                // onChange={(values): void => {
-                //     setFieldValue(
-                //         'transmissionLinkedCaseIds',
-                //         values ?? undefined,
-                //     );
-                // }}
-                values={['sample']}
+                label="Transmission linked case IDs"
+                placeholder="Contacted case IDs"
+                defaultValue={initialValues.transmissionLinkedCaseIds}
+                onChange={(values) => {
+                    setFieldValue(
+                        'transmissionLinkedCaseIds',
+                        values ?? undefined,
+                    );
+                }}
+                values={values.transmissionLinkedCaseIds}
             />
         </Scroll.Element>
     );

@@ -1,3 +1,5 @@
+//@TODO
+
 import React, { RefObject } from 'react';
 import {
     Button,
@@ -448,12 +450,13 @@ class SourceTable extends React.Component<Props, SourceTableState> {
                                         : '',
                                 editComponent: (props): JSX.Element => (
                                     <ChipInput
-                                        values={['sample']}
-                                        // defaultValue={props.value || []}
-                                        // onChange={(value: string[]): void =>
-                                        //     props.onChange(value)
-                                        // }
-                                        // placeholder="Email address(es)"
+                                        label="Notification recipients"
+                                        placeholder="Email address(es)"
+                                        values={props.value}
+                                        defaultValue={props.value || []}
+                                        onChange={(values) =>
+                                            props.onChange(values)
+                                        }
                                     />
                                 ),
                             },

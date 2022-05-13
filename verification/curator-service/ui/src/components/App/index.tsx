@@ -187,6 +187,7 @@ function ProfileMenu(props: { user: User; version: string }): JSX.Element {
                 </Link>
 
                 <MenuItem
+                    sx={{ color: '#0e7569' }}
                     onClick={() => {
                         dispatch(logout());
                     }}
@@ -206,7 +207,6 @@ function ProfileMenu(props: { user: User; version: string }): JSX.Element {
                     <MenuItem>Data acknowledgments</MenuItem>
                 </Link>
                 <a
-                    className={classes.link}
                     rel="noopener noreferrer"
                     target="_blank"
                     href="https://raw.githubusercontent.com/globaldothealth/list/main/data-serving/scripts/export-data/data_dictionary.txt"
@@ -340,9 +340,17 @@ export default function App(): JSX.Element {
 
     // When user is redirected from map to this app we have to parse url search query
     useEffect(() => {
-        if (location.pathname.includes('/cases/view')) return;
+        if (
+            location.pathname.includes('/cases/view') ||
+            location.pathname === '/'
+        )
+            return;
 
+        console.log('here');
         dispatch(setSearchQuery(location.search));
+
+        // Save searchQuery to local storage not to lost it when user goes through auth process
+        localStorage.setItem('searchQuery', location.search);
 
         //eslint-disable-next-line
     }, [location.search]);

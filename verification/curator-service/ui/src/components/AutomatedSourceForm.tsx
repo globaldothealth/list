@@ -15,6 +15,7 @@ import { SelectField } from './common-form-fields/FormikFields';
 import { TextField, CheckboxWithLabel } from 'formik-mui';
 import axios from 'axios';
 import { useHistory } from 'react-router-dom';
+import countries from 'i18n-iso-countries';
 
 // eslint-disable-next-line
 enum Format {
@@ -106,6 +107,8 @@ export default function AutomatedSourceForm(props: Props): JSX.Element {
     const [errorMessage, setErrorMessage] = React.useState('');
 
     const user = useAppSelector(selectUser);
+
+    const countryCodesList = Object.keys(countries.getAlpha2Codes());
 
     const createSource = async (
         values: AutomatedSourceFormValues,
@@ -218,29 +221,22 @@ export default function AutomatedSourceForm(props: Props): JSX.Element {
                                         </div>
                                         <div className={classes.formSection}>
                                             <ChipInput
-                                                // classes={{
-                                                //     helperText:
-                                                //         classes.errorHelper,
-                                                // }}
+                                                label="Country codes"
+                                                placeholder="Two letter ISO-3166-1 country codes (or ZZ for world)"
                                                 data-testid="countryCodes"
-                                                // helperText={
-                                                //     errors.countryCodes
-                                                //         ? 'Values must be valid country codes'
-                                                //         : undefined
-                                                // }
-                                                // fullWidth
-                                                // alwaysShowPlaceholder
-                                                // placeholder="Two letter ISO-3166-1 country codes (or ZZ for world)"
-                                                // defaultValue={
-                                                //     initialValues.countryCodes
-                                                // }
-                                                values={['sample']}
-                                                // onChange={(values): void =>
-                                                //     setFieldValue(
-                                                //         'countryCodes',
-                                                //         values ?? undefined,
-                                                //     )
-                                                // }
+                                                values={values.countryCodes}
+                                                options={countryCodesList}
+                                                onChange={(values) =>
+                                                    setFieldValue(
+                                                        'countryCodes',
+                                                        values ?? undefined,
+                                                    )
+                                                }
+                                                helperText={
+                                                    errors.countryCodes
+                                                        ? 'Values must be valid country codes'
+                                                        : undefined
+                                                }
                                             />
                                         </div>
                                         <div className={classes.formSection}>
@@ -310,29 +306,26 @@ export default function AutomatedSourceForm(props: Props): JSX.Element {
                                         </div>
                                         <div className={classes.formSection}>
                                             <ChipInput
-                                                // classes={{
-                                                //     helperText:
-                                                //         classes.errorHelper,
-                                                // }}
                                                 data-testid="recipients"
-                                                // helperText={
-                                                //     errors.notificationRecipients
-                                                //         ? 'Values must be valid email addresses'
-                                                //         : undefined
-                                                // }
-                                                // fullWidth
-                                                // alwaysShowPlaceholder
-                                                // placeholder="Notification recipient emails"
-                                                // defaultValue={
-                                                //     initialValues.notificationRecipients
-                                                // }
-                                                values={['sample']}
-                                                // onChange={(values): void =>
-                                                //     setFieldValue(
-                                                //         'notificationRecipients',
-                                                //         values ?? undefined,
-                                                //     )
-                                                // }
+                                                helperText={
+                                                    errors.notificationRecipients
+                                                        ? 'Values must be valid email addresses'
+                                                        : undefined
+                                                }
+                                                label="Notification recipients"
+                                                placeholder="Notification recipient emails"
+                                                defaultValue={
+                                                    initialValues.notificationRecipients
+                                                }
+                                                values={
+                                                    values.notificationRecipients
+                                                }
+                                                onChange={(values) =>
+                                                    setFieldValue(
+                                                        'notificationRecipients',
+                                                        values ?? undefined,
+                                                    )
+                                                }
                                             />
                                         </div>
                                     </Paper>

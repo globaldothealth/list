@@ -231,14 +231,6 @@ const LandingPage = (): JSX.Element => {
         // eslint-disable-next-line
     }, [dispatch, registrationScreenOn]);
 
-    // Store searchQuery in localStorage to apply filters after going through login process
-    // @TODO
-    // useEffect(() => {
-    //     if (!lastLocation || lastLocation.search === '') return;
-
-    //     localStorage.setItem('searchQuery', lastLocation.search);
-    // }, [lastLocation]);
-
     return (
         <>
             <Helmet>

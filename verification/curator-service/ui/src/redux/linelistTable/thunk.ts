@@ -68,26 +68,3 @@ export const deleteCases = createAsyncThunk<
         return rejectWithValue(error.response.data.message);
     }
 });
-
-export const downloadCases = createAsyncThunk<
-    void,
-    string[],
-    { rejectValue: string }
->('linelist/downloadCases', async (caseIds, { rejectWithValue }) => {
-    const formData = new FormData();
-    caseIds.forEach((caseId) => formData.append('caseIds[]', caseId));
-
-    try {
-        await axios({
-            method: 'POST',
-            url: '/api/cases/download',
-            data: formData,
-        });
-
-        return;
-    } catch (error) {
-        if (!error.response) throw error;
-
-        return rejectWithValue(error.response.data.message);
-    }
-});

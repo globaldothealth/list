@@ -1,39 +1,39 @@
 import Autocomplete from '@mui/material/Autocomplete';
-import Chip from '@mui/material/Chip';
-import TextField from '@mui/material/Chip';
+import TextField from '@mui/material/TextField';
 
 interface ChipInputProps {
+    label: string;
+    placeholder: string;
     values: string[];
-    setValues?: (values: string[]) => void;
+    defaultValue?: string[];
+    onChange: (values: string[]) => void;
+    options?: string[];
+    helperText?: string;
 }
 
-const ChipInput = ({ values, setValues }: ChipInputProps) => {
+const ChipInput = ({
+    label,
+    placeholder,
+    values,
+    defaultValue,
+    onChange,
+    options,
+    helperText,
+}: ChipInputProps) => {
     return (
         <Autocomplete
             multiple
-            options={[]}
-            defaultValue={[]}
-            onChange={(e, value) => console.log(value)}
-            renderTags={(
-                value: any[],
-                getTagProps: (arg0: { index: any }) => JSX.IntrinsicAttributes,
-            ) =>
-                value.map((option: any, index: any) => {
-                    return (
-                        <Chip
-                            key={index}
-                            variant="outlined"
-                            label={option}
-                            {...getTagProps({ index })}
-                        />
-                    );
-                })
-            }
-            renderInput={(params: any) => (
+            options={options || []}
+            value={values}
+            defaultValue={defaultValue}
+            freeSolo
+            onChange={(_, values) => onChange(values)}
+            renderInput={(params) => (
                 <TextField
                     {...params}
-                    label="Receivers"
-                    placeholder="Add a receiver by pressing enter after its dotName or address"
+                    label={label}
+                    placeholder={placeholder}
+                    helperText={helperText || ''}
                 />
             )}
         />
