@@ -54,7 +54,6 @@ describe('Bulk upload form', function () {
 
         // Case data
         cy.contains('www.bulksource.com');
-        cy.contains('sourceEntryId');
         cy.contains('superuser@test.com');
         cy.contains('Data upload IDs')
             .parent()

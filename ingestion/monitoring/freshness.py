@@ -91,7 +91,7 @@ if __name__ == "__main__":
     setup_logger()
     if not (api_key := os.getenv("GDH_API_KEY")):
         raise ValueError("Set GDH_API_KEY to your Global.health API key")
-    bucket = os.getenv("BUCKET", "covid-19-aggregates")
+    bucket = os.getenv("BUCKET", "covid-19-aggregates-eu")
     s3_endpoint = os.getenv("S3_ENDPOINT")
     instance = os.getenv("GDH_URL", DEFAULT_INSTANCE)
     if sources := fetch_sources(api_key, instance):
