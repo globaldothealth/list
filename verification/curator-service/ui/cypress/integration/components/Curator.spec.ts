@@ -200,10 +200,6 @@ describe('Curator', function () {
                     'www.example.com',
                 );
             });
-            cy.get('input[name="caseReference.sourceEntryId"]').should(
-                'have.value',
-                'testSourceEntryID123',
-            );
 
             // Demographics.
             cy.get('input[name="gender"]').should('have.value', 'Female');
@@ -308,7 +304,6 @@ describe('Curator', function () {
             cy.contains('td', 'www.example.com').click({ force: true });
             // Case data.
             cy.contains('www.example.com');
-            cy.contains('testSourceEntryID123');
             cy.contains('superuser@test.com');
             cy.contains('VERIFIED');
             // Demographics.
