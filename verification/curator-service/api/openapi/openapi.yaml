@@ -1758,6 +1758,7 @@ components:
                     type: string
                     description: Full name of the user if provided by the OAuth provider
                     example: John Doe
+                    nullable: true
                 email:
                     type: string
                     format: email
