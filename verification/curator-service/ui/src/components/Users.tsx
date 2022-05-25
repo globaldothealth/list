@@ -1,5 +1,19 @@
 import MaterialTable, { QueryResult } from 'material-table';
-import { Avatar, Paper, TablePagination, Typography } from '@material-ui/core';
+import {
+    Avatar,
+    Button,
+    CircularProgress,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogContentText,
+    DialogTitle,
+    IconButton,
+    Menu,
+    Paper,
+    TablePagination,
+    Typography,
+} from '@material-ui/core';
 import React, { RefObject } from 'react';
 import { connect, ConnectedProps } from 'react-redux';
 import { RootState } from '../redux/store';
@@ -8,7 +22,10 @@ import {
     WithStyles,
     createStyles,
     withStyles,
+    makeStyles,
 } from '@material-ui/core/styles';
+import DeleteIcon from '@material-ui/icons/DeleteOutline';
+import MoreVertIcon from '@material-ui/icons/MoreVert';
 
 import FormControl from '@material-ui/core/FormControl';
 import MenuItem from '@material-ui/core/MenuItem';
@@ -69,6 +86,134 @@ const styles = (theme: Theme) =>
         },
     });
 
+const rowMenuStyles = makeStyles((theme: Theme) => ({
+    menuItemTitle: {
+        marginLeft: theme.spacing(1),
+    },
+    dialogLoadingSpinner: {
+        marginRight: theme.spacing(2),
+        padding: '6px',
+    },
+}));
+
+function RowMenu(props: {
+    rowId: string;
+    rowData: TableRow;
+    setError: (error: string) => void;
+    refreshData: () => void;
+}): JSX.Element {
+    const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+    const [deleteDialogOpen, setDeleteDialogOpen] =
+        React.useState<boolean>(false);
+    const [isDeleting, setIsDeleting] = React.useState(false);
+    const classes = rowMenuStyles();
+
+    const handleClick = (event: React.MouseEvent<HTMLButtonElement>): void => {
+        event.stopPropagation();
+        setAnchorEl(event.currentTarget);
+    };
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const handleClose = (event?: any): void => {
+        if (event) {
+            event.stopPropagation();
+        }
+        setAnchorEl(null);
+    };
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const openDeleteDialog = (event?: any): void => {
+        if (event) {
+            event.stopPropagation();
+        }
+        setDeleteDialogOpen(true);
+    };
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const handleDelete = async (event?: any): Promise<void> => {
+        if (event) {
+            event.stopPropagation();
+        }
+        try {
+            setIsDeleting(true);
+            props.setError('');
+            const deleteUrl = '/api/users/' + props.rowId;
+            await axios.delete(deleteUrl);
+            props.refreshData();
+        } catch (e) {
+            props.setError((e as Error).toString());
+        } finally {
+            setDeleteDialogOpen(false);
+            setIsDeleting(false);
+            handleClose();
+        }
+    };
+
+    return (
+        <>
+            <IconButton
+                aria-controls="topbar-menu"
+                aria-haspopup="true"
+                aria-label="row menu"
+                data-testid="row menu"
+                onClick={handleClick}
+                color="inherit"
+            >
+                <MoreVertIcon />
+            </IconButton>
+            <Menu
+                anchorEl={anchorEl}
+                keepMounted
+                open={Boolean(anchorEl)}
+                onClose={handleClose}
+            >
+                <MenuItem onClick={openDeleteDialog}>
+                    <DeleteIcon />
+                    <span className={classes.menuItemTitle}>Delete</span>
+                </MenuItem>
+            </Menu>
+            <Dialog
+                open={deleteDialogOpen}
+                onClose={(): void => setDeleteDialogOpen(false)}
+                // Stops the click being propagated to the table which
+                // would trigger the onRowClick action.
+                onClick={(e): void => e.stopPropagation()}
+            >
+                <DialogTitle>
+                    Are you sure you want to delete this user?
+                </DialogTitle>
+                <DialogContent>
+                    <DialogContentText>
+                        User {props.rowData.email} will be permanently deleted.
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    {isDeleting ? (
+                        <CircularProgress
+                            classes={{ root: classes.dialogLoadingSpinner }}
+                        />
+                    ) : (
+                        <>
+                            <Button
+                                onClick={(): void => {
+                                    setDeleteDialogOpen(false);
+                                }}
+                                color="primary"
+                                autoFocus
+                            >
+                                Cancel
+                            </Button>
+                            <Button onClick={handleDelete} color="primary">
+                                Yes
+                            </Button>
+                        </>
+                    )}
+                </DialogActions>
+            </Dialog>
+        </>
+    );
+}
+
 class Users extends React.Component<Props, UsersState> {
     // We could use a proper type here but then we wouldn't be able to call
     // onQueryChange() to refresh the table as we want.
@@ -113,6 +258,33 @@ class Users extends React.Component<Props, UsersState> {
                 <MaterialTable
                     tableRef={this.tableRef}
                     columns={[
+                        ...((this.props.user?.roles ?? []).includes('admin')
+                            ? [
+                                  // TODO: move to the left of selection checkboxes when possible
+                                  // https://github.com/mbrn/material-table/issues/2317
+                                  {
+                                      cellStyle: {
+                                          padding: '0',
+                                      },
+                                      render: (
+                                          rowData: TableRow,
+                                      ): JSX.Element => (
+                                          <RowMenu
+                                              rowId={rowData.id}
+                                              rowData={rowData}
+                                              refreshData={(): void =>
+                                                  this.tableRef.current.onQueryChange()
+                                              }
+                                              setError={(error): void =>
+                                                  this.setState({
+                                                      error: error,
+                                                  })
+                                              }
+                                          ></RowMenu>
+                                      ),
+                                  },
+                              ]
+                            : []),
                         {
                             title: 'id',
                             field: 'id',
