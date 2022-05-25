@@ -97,6 +97,7 @@ const rowMenuStyles = makeStyles((theme: Theme) => ({
 }));
 
 function RowMenu(props: {
+    myId: string;
     rowId: string;
     rowData: TableRow;
     setError: (error: string) => void;
@@ -139,6 +140,15 @@ function RowMenu(props: {
             props.setError('');
             const deleteUrl = '/api/users/' + props.rowId;
             await axios.delete(deleteUrl);
+            if (props.rowId === props.myId) {
+                /* The user has deleted themselves (alright metaphysicists, their own account).
+                 * We need to redirect them to the homepage, because they can't use the app any more.
+                 * But we also need to end their session, to avoid errors looking up their user.
+                 * When the app can't deserialise the (now-nonexistent) user from the session, it will
+                 * log them out and display the sign up page again.
+                 */
+                window.location.replace('/');
+            }
             props.refreshData();
         } catch (e) {
             props.setError((e as Error).toString());
@@ -270,6 +280,7 @@ class Users extends React.Component<Props, UsersState> {
                                           rowData: TableRow,
                                       ): JSX.Element => (
                                           <RowMenu
+                                              myId={this.props.user?.id ?? ''}
                                               rowId={rowData.id}
                                               rowData={rowData}
                                               refreshData={(): void =>
