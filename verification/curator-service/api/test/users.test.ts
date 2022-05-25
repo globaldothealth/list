@@ -153,19 +153,18 @@ describe('PUT', () => {
     });
 });
 
-
 describe('DELETE', () => {
     it('should delete a user', async () => {
         const request = supertest.agent(app);
         const userRes = await request
             .post('/auth/register')
-            .send({ ...baseUser, ...{ roles: ['admin'] } })
-            .expect(200, /admin/)
+            .send({ ...baseUser, ...{ roles: [] } })
+            .expect(200)
             .expect('Content-Type', /json/);
         const userRes2 = await request
             .post('/auth/register')
-            .send({ ...baseUser, ...{ roles: [] } })
-            .expect(200)
+            .send({ ...baseUser, ...{ roles: ['admin'] } })
+            .expect(200, /admin/)
             .expect('Content-Type', /json/);
 
         const res = await request
