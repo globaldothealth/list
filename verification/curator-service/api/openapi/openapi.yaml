@@ -2164,6 +2164,8 @@ components:
             description: Empty
         '400':
             description: Malformed request
+        '401':
+            description: Unauthorized
         '403':
             description: Forbidden
             content:
