@@ -30,7 +30,7 @@ This script is used to generate a list of the ISO-3166-2 alpha-2 country codes s
 Any user with an API key can run this script:
 
 ```shell
-export GDOTH_API_BASEURL=<URL of the curator-service API, e.g. https://data-covid-19.global.health>
+export GDOTH_API_BASEURL=<URL of the curator-service API, e.g. https://data.covid-19.global.health>
 export GDOTH_API_KEY=<API key>
 poetry run python3 country_codes_map.py
 ```
