@@ -334,6 +334,7 @@ export class CasesController {
      */
     create = async (req: Request, res: Response): Promise<void> => {
         const numCases = Number(req.query.num_cases) || 1;
+
         try {
             await this.geocode(req);
             let c = new Case(req.body);

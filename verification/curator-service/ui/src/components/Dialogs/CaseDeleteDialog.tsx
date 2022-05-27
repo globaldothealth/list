@@ -1,5 +1,8 @@
 import { useAppSelector, useAppDispatch } from '../../hooks/redux';
-import { selectIsLoading } from '../../redux/linelistTable/selectors';
+import {
+    selectIsLoading,
+    selectTotalCases,
+} from '../../redux/linelistTable/selectors';
 import { deleteCases } from '../../redux/linelistTable/thunk';
 
 import { useTheme } from '@mui/material/styles';
@@ -14,18 +17,41 @@ import Button from '@mui/material/Button';
 interface CaseDeleteDialogProps {
     isOpen: boolean;
     handleClose: () => void;
-    caseIds: string[];
+    caseIds: string[] | undefined;
+    query: string | undefined;
 }
 
 export const CaseDeleteDialog = ({
     isOpen,
     handleClose,
     caseIds,
+    query,
 }: CaseDeleteDialogProps) => {
     const dispatch = useAppDispatch();
     const theme = useTheme();
 
     const isLoading = useAppSelector(selectIsLoading);
+    const totalCases = useAppSelector(selectTotalCases);
+
+    const renderTitle = () => {
+        if (caseIds) {
+            return `Are you sure you want to delete ${
+                caseIds.length === 1 ? '1 case' : `${caseIds.length} cases`
+            }?`;
+        } else {
+            return `Are you sure you want to delete ${totalCases} cases?`;
+        }
+    };
+
+    const renderContent = () => {
+        if (caseIds) {
+            return `${
+                caseIds.length === 1 ? '1 case' : `${caseIds.length} cases`
+            } will be permanently deleted.`;
+        } else {
+            return `${totalCases} cases will be permanently deleted.`;
+        }
+    };
 
     return (
         <Dialog
@@ -35,17 +61,9 @@ export const CaseDeleteDialog = ({
             // would trigger the onRowClick action.
             onClick={(e): void => e.stopPropagation()}
         >
-            <DialogTitle>
-                Are you sure you want to delete{' '}
-                {caseIds.length === 1 ? '1 case' : `${caseIds.length} cases`}?
-            </DialogTitle>
+            <DialogTitle>{renderTitle()}</DialogTitle>
             <DialogContent>
-                <DialogContentText>
-                    {caseIds.length === 1
-                        ? '1 case'
-                        : `${caseIds.length} cases`}{' '}
-                    will be permanently deleted.
-                </DialogContentText>
+                <DialogContentText>{renderContent()}</DialogContentText>
             </DialogContent>
             <DialogActions>
                 {isLoading ? (
@@ -59,7 +77,9 @@ export const CaseDeleteDialog = ({
                         </Button>
 
                         <Button
-                            onClick={() => dispatch(deleteCases(caseIds))}
+                            onClick={() =>
+                                dispatch(deleteCases({ caseIds, query }))
+                            }
                             color="primary"
                         >
                             Yes

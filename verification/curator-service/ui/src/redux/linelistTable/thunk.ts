@@ -21,22 +21,33 @@ export const fetchLinelistData = createAsyncThunk<
         return response.data;
     } catch (error) {
         if (!error.response) throw error;
-        return rejectWithValue(error.response.data.message);
+        return rejectWithValue(
+            `Error: Request failed with status code ${error.response.status}`,
+        );
     }
 });
 
 export const changeCasesStatus = createAsyncThunk<
-    { newStatus: VerificationStatus; updatedIds: string[] },
-    { status: VerificationStatus; caseIds: string[]; note?: string },
+    { newStatus: VerificationStatus; updatedIds?: string[] },
+    {
+        status: VerificationStatus;
+        caseIds?: string[];
+        note?: string;
+        query?: string;
+    },
     { rejectValue: string }
 >('linelist/changeCasesStatus', async (args, { rejectWithValue }) => {
-    const { status, caseIds, note } = args;
+    const { status, caseIds, note, query } = args;
 
     try {
+        const parsedQuery =
+            query && query.replace('?', '').replaceAll('=', ':');
+
         const response = await axios.post('/api/cases/batchStatusChange', {
             status,
             caseIds,
             note,
+            query: parsedQuery,
         });
 
         if (response.status !== 200) throw new Error(response.data.message);
@@ -45,26 +56,35 @@ export const changeCasesStatus = createAsyncThunk<
     } catch (error) {
         if (!error.response) throw error;
 
-        return rejectWithValue(error.response.data.message);
+        return rejectWithValue(
+            `Error: Request failed with status code ${error.response.status}`,
+        );
     }
 });
 
 export const deleteCases = createAsyncThunk<
-    string[],
-    string[],
+    void,
+    { caseIds?: string[]; query?: string },
     { rejectValue: string }
->('linelist/deleteCases', async (caseIds, { rejectWithValue }) => {
+>('linelist/deleteCases', async (args, { rejectWithValue }) => {
+    const { caseIds, query } = args;
+
     try {
+        const parsedQuery =
+            query && query.replace('?', '').replaceAll('=', ':');
+
         const response = await axios.delete('/api/cases', {
-            data: { caseIds },
+            data: { caseIds, query: parsedQuery },
         });
 
         if (response.status !== 204) throw new Error(response.data.message);
 
-        return caseIds;
+        return;
     } catch (error) {
         if (!error.response) throw error;
 
-        return rejectWithValue(error.response.data.message);
+        return rejectWithValue(
+            `Error: Request failed with status code ${error.response.status}`,
+        );
     }
 });

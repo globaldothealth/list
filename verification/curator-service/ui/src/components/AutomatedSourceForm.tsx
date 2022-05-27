@@ -306,7 +306,7 @@ export default function AutomatedSourceForm(props: Props): JSX.Element {
                                         </div>
                                         <div className={classes.formSection}>
                                             <ChipInput
-                                                data-testid="recipients"
+                                                dataTestId="recipients"
                                                 helperText={
                                                     errors.notificationRecipients
                                                         ? 'Values must be valid email addresses'

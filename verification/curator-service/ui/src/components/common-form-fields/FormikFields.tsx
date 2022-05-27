@@ -9,10 +9,12 @@ import CaseFormValues from '../new-case-form-fields/CaseFormValues';
 import FormControl from '@mui/material/FormControl';
 import { FormHelperText } from '@mui/material';
 import InputLabel from '@mui/material/InputLabel';
-import { DesktopDatePicker } from 'formik-mui-lab';
+import { DatePicker } from 'formik-mui-lab';
 import MenuItem from '@mui/material/MenuItem';
-import AdapterDateFns from '@mui/lab/AdapterDateFns';
-import LocalizationProvider from '@mui/lab/LocalizationProvider';
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+// import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import MuiTextField from '@mui/material/TextField';
 import { Select, TextField } from 'formik-mui';
 import axios from 'axios';
 import { hasKey } from '../Utils';
@@ -147,12 +149,13 @@ interface SelectFieldProps {
 export function SelectField(props: SelectFieldProps): JSX.Element {
     const classes = useStyles();
     return (
-        <FormControl className={classes.fieldRow}>
-            <InputLabel htmlFor={props.name}>
+        <FormControl className={classes.fieldRow} variant="standard">
+            <InputLabel htmlFor={props.name} shrink>
                 {props.label}
                 {props.required && ' *'}
             </InputLabel>
             <FastField
+                variant="standard"
                 as="select"
                 name={props.name}
                 type="text"
@@ -182,6 +185,7 @@ interface DateFieldProps {
 
 export function DateField(props: DateFieldProps): JSX.Element {
     const classes = useStyles();
+
     return (
         <div className={classes.fieldRow}>
             <LocalizationProvider dateAdapter={AdapterDateFns}>
@@ -191,7 +195,8 @@ export function DateField(props: DateFieldProps): JSX.Element {
                     data-testid={props.name}
                     name={props.name}
                     label={props.label}
-                    format="yyyy/MM/dd"
+                    inputFormat="yyyy/MM/dd"
+                    mask="____/__/__"
                     minDate={new Date('2019/12/01')}
                     disableFuture
                     autoOk
@@ -199,8 +204,12 @@ export function DateField(props: DateFieldProps): JSX.Element {
                         props.initialFocusedDate ?? '',
                     )}
                     invalidDateMessage="Invalid date format (YYYY/MM/DD)"
-                    component={DesktopDatePicker}
-                    helperText="YYYY/MM/DD"
+                    component={DatePicker}
+                    textField={{
+                        placeholder: 'YYYY/MM/DD',
+                        variant: 'standard',
+                        name: props.name,
+                    }}
                 />
             </LocalizationProvider>
             {props.required && (

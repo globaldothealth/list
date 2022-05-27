@@ -30,7 +30,7 @@ describe('Automated source form', function () {
         cy.get('div[data-testid="url"]').type(url);
         cy.get('div[data-testid="name"]').type(name);
         cy.get('div[data-testid="license"]').type(license);
-        cy.get('div[data-testid="recipients"]').type(otherEmail);
+        cy.get('div[data-testid="recipients"]').type(`${otherEmail}{enter}`);
         cy.get('div[data-testid="format"]').click();
         cy.get(`li[data-value=${format}`).click();
 

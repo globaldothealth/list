@@ -15,13 +15,15 @@ import { useFormik } from 'formik';
 interface Props {
     isOpen: boolean;
     onClose: () => void;
-    caseIds: string[];
+    caseIds: string[] | undefined;
+    query: string | undefined;
 }
 
 export const CaseExcludeDialog = ({
     isOpen,
     onClose,
     caseIds,
+    query,
 }: Props): JSX.Element => {
     const dispatch = useAppDispatch();
 
@@ -33,10 +35,13 @@ export const CaseExcludeDialog = ({
             const { note } = values;
             if (!note) return;
 
+            onClose();
+
             dispatch(
                 changeCasesStatus({
                     status: VerificationStatus.Excluded,
                     caseIds,
+                    query,
                     note,
                 }),
             );
@@ -57,14 +62,17 @@ export const CaseExcludeDialog = ({
                 </DialogTitle>
                 <DialogContent>
                     <DialogContentText>
-                        The following cases will be ignored in the ingestion
-                        process:
+                        {caseIds
+                            ? 'The following cases will be ignored in the ingestion process:'
+                            : 'All cases matching current search query will be ignored in the ingestion process'}
                     </DialogContentText>
-                    <ul>
-                        {caseIds.map((id) => (
-                            <li key={id}>{id}</li>
-                        ))}
-                    </ul>
+                    {caseIds && (
+                        <ul>
+                            {caseIds.map((id) => (
+                                <li key={id}>{id}</li>
+                            ))}
+                        </ul>
+                    )}
                     <TextField
                         name="note"
                         variant="standard"

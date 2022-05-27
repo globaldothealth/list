@@ -123,8 +123,8 @@ describe('Uploads table', function () {
         cy.contains('United Kingdom').should('not.exist');
         cy.contains('Germany').should('not.exist');
 
-        cy.visit('/');
-        cy.visit('/uploads');
+        cy.get('div[role="button"]').contains('Uploads').click();
+
         cy.contains(
             'a[href="/cases?uploadid=5ef8e943dfe6e00030892d59"]',
             '2',

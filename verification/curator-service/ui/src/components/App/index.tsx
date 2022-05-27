@@ -65,7 +65,7 @@ import { selectSearchQuery } from '../../redux/linelistTable/selectors';
 
 const menuStyles = makeStyles((theme) => ({
     link: {
-        color: theme.palette.text.primary,
+        color: theme.custom.palette.link.color,
         fontWeight: 300,
     },
     divider: {
@@ -182,15 +182,19 @@ function ProfileMenu(props: { user: User; version: string }): JSX.Element {
                 onClose={handleClose}
                 data-testid="profile-menu-dropdown"
             >
-                <Link to="/profile" onClick={handleClose}>
+                <Link
+                    to="/profile"
+                    onClick={handleClose}
+                    className={classes.link}
+                >
                     <MenuItem>Profile</MenuItem>
                 </Link>
 
                 <MenuItem
-                    sx={{ color: '#0e7569' }}
                     onClick={() => {
                         dispatch(logout());
                     }}
+                    className={classes.link}
                 >
                     Logout
                 </MenuItem>
@@ -200,10 +204,15 @@ function ProfileMenu(props: { user: User; version: string }): JSX.Element {
                     onClick={handleClose}
                     target="_blank"
                     rel="noopener noreferrer"
+                    className={classes.link}
                 >
                     <MenuItem>About Global.health</MenuItem>
                 </a>
-                <Link to="/data-acknowledgments" onClick={handleClose}>
+                <Link
+                    to="/data-acknowledgments"
+                    onClick={handleClose}
+                    className={classes.link}
+                >
                     <MenuItem>Data acknowledgments</MenuItem>
                 </Link>
                 <a
@@ -211,6 +220,7 @@ function ProfileMenu(props: { user: User; version: string }): JSX.Element {
                     target="_blank"
                     href="https://raw.githubusercontent.com/globaldothealth/list/main/data-serving/scripts/export-data/data_dictionary.txt"
                     onClick={handleClose}
+                    className={classes.link}
                 >
                     <MenuItem>Data dictionary</MenuItem>
                 </a>
@@ -219,6 +229,7 @@ function ProfileMenu(props: { user: User; version: string }): JSX.Element {
                     rel="noopener noreferrer"
                     target="_blank"
                     onClick={handleClose}
+                    className={classes.link}
                 >
                     <MenuItem>View source on Github</MenuItem>
                 </a>
@@ -232,6 +243,7 @@ function ProfileMenu(props: { user: User; version: string }): JSX.Element {
                             rel="noopener noreferrer"
                             target="_blank"
                             onClick={handleClose}
+                            className={classes.link}
                         >
                             <MenuItem>Version: {props.version}</MenuItem>
                         </a>
@@ -244,6 +256,7 @@ function ProfileMenu(props: { user: User; version: string }): JSX.Element {
 
 interface LocationState {
     search: string;
+    lastLocation: string;
 }
 
 export interface ChipData {
@@ -313,8 +326,12 @@ export default function App(): JSX.Element {
 
     const onModalClose = (): void => {
         history.push({
-            pathname: '/cases',
+            pathname:
+                location.state && location.state.lastLocation
+                    ? location.state.lastLocation
+                    : '/cases',
             search: searchQuery,
+            state: { lastLocation: '/case/view' },
         });
     };
 
@@ -342,11 +359,11 @@ export default function App(): JSX.Element {
     useEffect(() => {
         if (
             location.pathname.includes('/cases/view') ||
+            location.pathname.includes('/cases/edit') ||
             location.pathname === '/'
         )
             return;
 
-        console.log('here');
         dispatch(setSearchQuery(location.search));
 
         // Save searchQuery to local storage not to lost it when user goes through auth process

@@ -18,5 +18,11 @@ export const selectCasesSelected = (state: RootState) =>
     state.linelist.casesSelected;
 export const selectDeleteCasesDialogOpen = (state: RootState) =>
     state.linelist.deleteCasesDialogOpen;
+export const selectReincludeCasesDialogOpen = (state: RootState) =>
+    state.linelist.reincludeCasesDialogOpen;
 export const selectRefetchData = (state: RootState) =>
     state.linelist.refetchData;
+export const selectVerificationStatus = (state: RootState) =>
+    state.linelist.verificationStatus;
+export const selectRowsAcrossPages = (state: RootState) =>
+    state.linelist.rowsAcrossPagesSelected;

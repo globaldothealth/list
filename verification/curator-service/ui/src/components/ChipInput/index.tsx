@@ -9,9 +9,11 @@ interface ChipInputProps {
     onChange: (values: string[]) => void;
     options?: string[];
     helperText?: string;
+    dataTestId?: string;
 }
 
 const ChipInput = ({
+    dataTestId,
     label,
     placeholder,
     values,
@@ -22,6 +24,7 @@ const ChipInput = ({
 }: ChipInputProps) => {
     return (
         <Autocomplete
+            data-testid={dataTestId}
             multiple
             options={options || []}
             value={values}

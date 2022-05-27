@@ -28,7 +28,7 @@ describe('New case form', function () {
         cy.visit('/cases/new');
         cy.contains('Create new COVID-19 line list case');
         cy.get('div[data-testid="caseReference"]').type('www.example.com');
-        cy.contains('li', 'www.example.com').click();
+        cy.contains('www.example.com').click();
         cy.get('div[data-testid="location"]').type('France');
         cy.contains('li', 'France').click();
         cy.get('input[name="confirmedDate"]').type('2020-01-01');
@@ -102,7 +102,7 @@ describe('New case form', function () {
         cy.visit('/cases/new');
         cy.contains('Create new COVID-19 line list case');
         cy.get('div[data-testid="caseReference"]').type('www.example.com');
-        cy.contains('li', 'www.example.com').click();
+        cy.contains('www.example.com').click();
         cy.get('div[data-testid="location"]').type('France');
         cy.contains('li', 'France').click();
         cy.get('input[name="confirmedDate"]').type('2020-01-01');
@@ -135,7 +135,7 @@ describe('New case form', function () {
 
         cy.visit('/cases/new');
         cy.get('div[data-testid="caseReference"]').type('www.example.com');
-        cy.contains('li', 'www.example.com').click();
+        cy.contains('www.example.com').click();
         cy.get('div[data-testid="location"]').type('France');
         cy.contains('France');
         cy.contains('li', 'France').click();
@@ -180,7 +180,7 @@ describe('New case form', function () {
         cy.visit('/cases/new');
         cy.contains('Create new COVID-19 line list case');
         cy.get('div[data-testid="caseReference"]').type('www.example.com');
-        cy.contains('li', 'www.example.com').click();
+        cy.contains('www.example.com').click();
         cy.get('div[data-testid="gender"]').click();
         cy.get('li[data-value="Unknown"').click();
         cy.get('div[data-testid="location"]').type('France');
@@ -264,7 +264,7 @@ describe('New case form', function () {
         cy.visit('/cases/new');
         cy.contains('Create new COVID-19 line list case');
         cy.get('div[data-testid="caseReference"]').type('www.example.com');
-        cy.contains('li', 'www.example.com').click();
+        cy.contains('www.example.com').click();
         cy.contains('Actor');
         cy.contains('Horse trainer');
         cy.get('span:contains("Horse trainer")').click();
@@ -324,7 +324,7 @@ describe('New case form', function () {
 
         cy.visit('/cases/new');
         cy.get('div[data-testid="caseReference"]').type('www.example.com');
-        cy.contains('li', 'www.example.com').click();
+        cy.contains('www.example.com').click();
         cy.get('div[data-testid="location"]').type('France');
         cy.contains('France');
         cy.contains('li', 'France').click();
@@ -350,10 +350,10 @@ describe('New case form', function () {
         cy.visit('/cases/new');
 
         cy.get('div[data-testid="caseReference"]').type('www.example.com');
-        cy.contains('li', 'www.example.com').click();
+        cy.contains('www.example.com').click();
         cy.get('input[name="caseReference.sourceName"]').type('New source');
         cy.get('div[data-testid="caseReference"]').type('www.example.com2');
-        cy.contains('li', 'www.example.com2').click();
+        cy.contains('www.example.com2').click();
         cy.get('input[name="caseReference.sourceName"]').should(
             'have.value',
             'New source',
@@ -387,7 +387,7 @@ describe('New case form', function () {
         cy.visit('/cases/new');
         cy.get('svg[data-testid="error-icon"]').should('not.exist');
         cy.get('svg[data-testid="check-icon"]').should('not.exist');
-        cy.get('input[name="confirmedDate"]').type('2020/02/31').blur();
+        cy.get('input[name="confirmedDate"]').click().blur();
         cy.get('svg[data-testid="error-icon"]').should('exist');
         cy.get('svg[data-testid="check-icon"]').should('not.exist');
     });
@@ -401,7 +401,7 @@ describe('New case form', function () {
         cy.visit('/cases/new');
         cy.contains('Create new COVID-19 line list case');
         cy.get('div[data-testid="caseReference"]').type('www.example.com');
-        cy.contains('li', 'www.example.com').click();
+        cy.contains('www.example.com').click();
         cy.get('button[id="add-location"]').click();
         cy.get('div[id="location.geoResolution"]').click();
         cy.contains('li', 'Admin3').click();

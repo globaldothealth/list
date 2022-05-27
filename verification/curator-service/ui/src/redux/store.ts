@@ -74,8 +74,11 @@ export const initialLoggedInState: RootState = {
         error: undefined,
         excludeCasesDialogOpen: false,
         deleteCasesDialogOpen: false,
+        reincludeCasesDialogOpen: false,
         casesSelected: [],
         refetchData: false,
+        verificationStatus: undefined,
+        rowsAcrossPagesSelected: false,
     },
 };
 

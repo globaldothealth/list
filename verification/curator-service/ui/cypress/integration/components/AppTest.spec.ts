@@ -124,6 +124,8 @@ describe('App', function () {
             getDefaultQuery({ query: 'gender:notProvided' }),
         ).as('filterByGender');
 
+        console.log(getDefaultQuery({ query: 'gender:notProvided' }));
+
         cy.visit('/');
         cy.contains('Line list').click();
 

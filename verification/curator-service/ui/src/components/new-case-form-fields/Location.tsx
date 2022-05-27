@@ -13,6 +13,7 @@ const styles = makeStyles(() => ({
     root: {
         display: 'flex',
         flexWrap: 'wrap',
+        marginTop: '2rem',
     },
     field: {
         marginRight: '1em',
@@ -43,6 +44,7 @@ export default function Location(props: {
                         Geo resolution
                     </InputLabel>
                     <FastField
+                        variant="standard"
                         as="select"
                         id={`${props.locationPath}.geoResolution`}
                         name={`${props.locationPath}.geoResolution`}
@@ -59,6 +61,7 @@ export default function Location(props: {
                     </FastField>
                 </FormControl>
                 <FastField
+                    variant="standard"
                     className={classes.field}
                     label="Name"
                     name={`${props.locationPath}.name`}
@@ -70,6 +73,7 @@ export default function Location(props: {
                     }}
                 />
                 <FastField
+                    variant="standard"
                     className={classes.field}
                     label="Country"
                     name={`${props.locationPath}.country`}
@@ -81,6 +85,7 @@ export default function Location(props: {
                     }}
                 />
                 <FastField
+                    variant="standard"
                     className={classes.field}
                     label="Admin area 1"
                     name={`${props.locationPath}.administrativeAreaLevel1`}
@@ -91,6 +96,7 @@ export default function Location(props: {
                     }}
                 />
                 <FastField
+                    variant="standard"
                     className={classes.field}
                     label="Admin area 2"
                     name={`${props.locationPath}.administrativeAreaLevel2`}
@@ -101,6 +107,7 @@ export default function Location(props: {
                     }}
                 />
                 <FastField
+                    variant="standard"
                     className={classes.field}
                     label="Admin area 3"
                     name={`${props.locationPath}.administrativeAreaLevel3`}
@@ -111,6 +118,7 @@ export default function Location(props: {
                     }}
                 />
                 <FastField
+                    variant="standard"
                     className={classes.field}
                     label="Latitude"
                     name={`${props.locationPath}.geometry.latitude`}
@@ -122,6 +130,7 @@ export default function Location(props: {
                     }}
                 />
                 <FastField
+                    variant="standard"
                     className={classes.field}
                     label="Longitude"
                     name={`${props.locationPath}.geometry.longitude`}

@@ -7,6 +7,8 @@ import {
     setExcludeCasesDialogOpen,
     setCasesSelected,
     setDeleteCasesDialogOpen,
+    setReincludeCasesDialogOpen,
+    setRowsAcrossPagesSelected,
 } from '../../redux/linelistTable/slice';
 import {
     selectIsLoading,
@@ -21,9 +23,11 @@ import {
     selectCasesSelected,
     selectDeleteCasesDialogOpen,
     selectRefetchData,
+    selectReincludeCasesDialogOpen,
+    selectRowsAcrossPages,
 } from '../../redux/linelistTable/selectors';
 import { selectUser } from '../../redux/auth/selectors';
-import { useHistory, useLocation } from 'react-router-dom';
+import { Link, useHistory, useLocation } from 'react-router-dom';
 
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -36,13 +40,13 @@ import TablePagination from '@mui/material/TablePagination';
 import Stack from '@mui/material/Stack';
 import TableFooter from '@mui/material/TableFooter';
 import CircularProgress from '@mui/material/CircularProgress';
-import Alert from '@mui/material/Alert';
 import Checkbox from '@mui/material/Checkbox';
+import Button from '@mui/material/Button';
 
 import { nameCountry } from '../util/countryNames';
 import renderDate, { renderDateRange } from '../util/date';
 import { createData, labels, parseAge } from './helperFunctions';
-import { LoaderContainer } from './styled';
+import { LoaderContainer, StyledAlert } from './styled';
 import { URLToSearchQuery } from '../util/searchQuery';
 import { hasAnyRole } from '../util/helperFunctions';
 import { Helmet } from 'react-helmet';
@@ -51,14 +55,23 @@ import Pagination from './Pagination';
 import EnhancedTableToolbar from './EnhancedTableToolbar';
 import { CaseExcludeDialog } from '../Dialogs/CaseExcludeDialog';
 import { CaseDeleteDialog } from '../Dialogs/CaseDeleteDialog';
+import { CaseIncludeDialog } from '../Dialogs/CaseIncludeDialog';
 import VerificationStatusIndicator from '../VerificationStatusIndicator';
+import { ActionMenu } from './ActionMenu';
 
 const dataLimit = 10000;
+
+interface LocationState {
+    lastLocation: string;
+    newCaseIds: string[];
+    editedCaseIds: string[];
+    bulkMessage: string;
+}
 
 const NewLinelistTable = () => {
     const dispatch = useAppDispatch();
     const history = useHistory();
-    const location = useLocation();
+    const location = useLocation<LocationState>();
 
     const isLoading = useAppSelector(selectIsLoading);
     const cases = useAppSelector(selectCases);
@@ -72,7 +85,11 @@ const NewLinelistTable = () => {
     const excludeCasesDialogOpen = useAppSelector(selectExcludeCasesDialogOpen);
     const casesSelected = useAppSelector(selectCasesSelected);
     const deleteCasesDialogOpen = useAppSelector(selectDeleteCasesDialogOpen);
+    const reincludeCasesDialogOpen = useAppSelector(
+        selectReincludeCasesDialogOpen,
+    );
     const refetchData = useAppSelector(selectRefetchData);
+    const rowsAcrossPagesSelected = useAppSelector(selectRowsAcrossPages);
 
     // Build query and fetch data
     useEffect(() => {
@@ -90,14 +107,18 @@ const NewLinelistTable = () => {
 
     // When user applies filters we should go back to the first page of results
     useEffect(() => {
-        if (currentPage === 0) return;
+        if (
+            currentPage === 0 ||
+            (location.state && location.state.lastLocation === '/case/view')
+        )
+            return;
 
         dispatch(setCurrentPage(0));
         // eslint-disable-next-line
     }, [dispatch, searchQuery]);
 
-    const rows = cases.map((data) =>
-        createData(
+    const rows = cases.map((data) => {
+        return createData(
             data._id || '',
             renderDate(data.confirmationDate) || '',
             data.location.administrativeAreaLevel3 || '',
@@ -112,7 +133,9 @@ const NewLinelistTable = () => {
                 data.demographics?.ageRange?.end,
             ),
             data.demographics?.gender || '',
-            data.importedCase?.outcome || '',
+            data.importedCase?.outcome ||
+                data.events.find((event) => event.name === 'outcome')?.value ||
+                '',
             renderDateRange(
                 data.events.find((event) => event.name === 'hospitalAdmission')
                     ?.dateRange,
@@ -124,14 +147,8 @@ const NewLinelistTable = () => {
             data.caseReference.sourceUrl || '',
             data.caseReference.verificationStatus,
             data.exclusionData,
-        ),
-    );
-
-    // Avoid a layout jump when reaching the last page with empty rows.
-    const emptyRows =
-        currentPage > 0
-            ? Math.max(0, (1 + currentPage) * rowsPerPage - rows.length)
-            : 0;
+        );
+    });
 
     const handleChangePage = (
         event: React.MouseEvent<HTMLButtonElement> | null,
@@ -174,6 +191,7 @@ const NewLinelistTable = () => {
             return;
         }
         dispatch(setCasesSelected([]));
+        dispatch(setRowsAcrossPagesSelected(false));
     };
 
     const handleCaseSelect = (
@@ -197,6 +215,8 @@ const NewLinelistTable = () => {
 
     const isSelected = (id: string) => casesSelected.indexOf(id) !== -1;
 
+    console.log(searchQuery);
+
     return (
         <>
             <Helmet>
@@ -204,12 +224,62 @@ const NewLinelistTable = () => {
             </Helmet>
 
             {error && (
-                <Alert severity="error" sx={{ marginTop: '2rem' }}>
+                <StyledAlert severity="error" sx={{ marginTop: '2rem' }}>
                     {error}
-                </Alert>
+                </StyledAlert>
             )}
 
-            <EnhancedTableToolbar numSelected={casesSelected.length} />
+            {!location.state?.bulkMessage &&
+                location.state?.newCaseIds &&
+                location.state?.newCaseIds.length > 0 &&
+                (location.state.newCaseIds.length === 1 ? (
+                    <StyledAlert
+                        variant="standard"
+                        action={
+                            <Link
+                                to={`/cases/view/${location.state.newCaseIds}`}
+                            >
+                                <Button
+                                    color="primary"
+                                    size="small"
+                                    data-testid="view-case-btn"
+                                >
+                                    VIEW
+                                </Button>
+                            </Link>
+                        }
+                    >
+                        {`Case ${location.state.newCaseIds} added`}
+                    </StyledAlert>
+                ) : (
+                    <StyledAlert variant="standard">
+                        {`${location.state.newCaseIds.length} cases added`}
+                    </StyledAlert>
+                ))}
+            {!location.state?.bulkMessage &&
+                (location.state?.editedCaseIds?.length ?? 0) > 0 && (
+                    <StyledAlert
+                        variant="standard"
+                        action={
+                            <Link
+                                to={`/cases/view/${location.state.editedCaseIds}`}
+                            >
+                                <Button color="primary" size="small">
+                                    VIEW
+                                </Button>
+                            </Link>
+                        }
+                    >
+                        {`Case ${location.state.editedCaseIds} edited`}
+                    </StyledAlert>
+                )}
+            {location.state?.bulkMessage && (
+                <StyledAlert variant="standard">
+                    {location.state.bulkMessage}
+                </StyledAlert>
+            )}
+
+            <EnhancedTableToolbar />
 
             <Paper
                 sx={{
@@ -267,6 +337,13 @@ const NewLinelistTable = () => {
                                             />
                                         </TableCell>
 
+                                        {/* Empty table cell for actions menu */}
+                                        <TableCell
+                                            sx={{
+                                                backgroundColor: '#fff',
+                                            }}
+                                        />
+
                                         <TableCell
                                             align="center"
                                             sx={{
@@ -297,7 +374,7 @@ const NewLinelistTable = () => {
                         </TableHead>
                         <TableBody>
                             {rows.length > 0 ? (
-                                rows.map((row) => (
+                                rows.map((row, idx) => (
                                     <TableRow
                                         key={row.caseId}
                                         sx={{
@@ -326,6 +403,7 @@ const NewLinelistTable = () => {
                                                         )}
                                                         inputProps={{
                                                             'aria-labelledby': `${row.caseId} - checkbox`,
+                                                            id: `checkbox${idx}`,
                                                         }}
                                                         onClick={(e) =>
                                                             handleCaseSelect(
@@ -333,6 +411,15 @@ const NewLinelistTable = () => {
                                                                 row.caseId,
                                                             )
                                                         }
+                                                    />
+                                                </TableCell>
+
+                                                <TableCell
+                                                    component="th"
+                                                    scope="row"
+                                                >
+                                                    <ActionMenu
+                                                        caseId={row.caseId}
                                                     />
                                                 </TableCell>
 
@@ -415,14 +502,8 @@ const NewLinelistTable = () => {
                             ) : (
                                 <TableRow>
                                     <TableCell sx={{ padding: '1rem' }}>
-                                        No data available
+                                        No records to display
                                     </TableCell>
-                                </TableRow>
-                            )}
-
-                            {emptyRows > 0 && (
-                                <TableRow style={{ height: 53 * emptyRows }}>
-                                    <TableCell colSpan={6} />
                                 </TableRow>
                             )}
                         </TableBody>
@@ -456,16 +537,25 @@ const NewLinelistTable = () => {
                 </Table>
             </Stack>
 
+            <CaseIncludeDialog
+                isOpen={reincludeCasesDialogOpen}
+                onClose={() => dispatch(setReincludeCasesDialogOpen(false))}
+                caseIds={rowsAcrossPagesSelected ? undefined : casesSelected}
+                query={rowsAcrossPagesSelected ? searchQuery : undefined}
+            />
+
             <CaseExcludeDialog
                 isOpen={excludeCasesDialogOpen}
                 onClose={() => dispatch(setExcludeCasesDialogOpen(false))}
-                caseIds={casesSelected}
+                caseIds={rowsAcrossPagesSelected ? undefined : casesSelected}
+                query={rowsAcrossPagesSelected ? searchQuery : undefined}
             />
 
             <CaseDeleteDialog
                 isOpen={deleteCasesDialogOpen}
                 handleClose={() => dispatch(setDeleteCasesDialogOpen(false))}
-                caseIds={casesSelected}
+                caseIds={rowsAcrossPagesSelected ? undefined : casesSelected}
+                query={rowsAcrossPagesSelected ? searchQuery : undefined}
             />
         </>
     );

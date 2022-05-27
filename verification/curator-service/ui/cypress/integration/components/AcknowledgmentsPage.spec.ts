@@ -35,6 +35,7 @@ describe('<AcknowledgmentsPage />', function () {
     it('Should display loading indicator', function () {
         cy.intercept('GET', '/api/acknowledgment-sources', {
             delay: 2000,
+            fixture: 'acknowledgment_data.json',
         }).as('fetchSources');
 
         cy.visit('/data-acknowledgments');
@@ -107,7 +108,7 @@ describe('<AcknowledgmentsPage />', function () {
         }
 
         // Go to the next page
-        cy.get('[aria-label="Next page"]').click();
+        cy.get('[aria-label="Go to next page"]').click();
 
         // Only last 5 sources should be visible
         for (let i = 0; i < 10; i++) {

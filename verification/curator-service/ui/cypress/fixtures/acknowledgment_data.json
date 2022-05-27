@@ -1,104 +1,101 @@
-{
-    "sources": [
-        {
-            "_id": "1",
-            "name": "USA",
-            "origin": {
-                "url": "https://test.com",
-                "license": "MIT",
-                "providerName": "USA",
-                "providerWebsiteUrl": "https://test.com"
-            }
-        },
-        {
-            "_id": "2",
-            "name": "Germany",
-            "origin": {
-                "url": "https://test.com",
-                "license": "MIT",
-                "providerWebsiteUrl": "https://test.com"
-            }
-        },
-        {
-            "_id": "3",
-            "name": "Poland",
-            "origin": {
-                "url": "https://test.com",
-                "license": "MIT",
-                "providerName": "Poland",
-                "providerWebsiteUrl": "https://test.com"
-            }
-        },
-        {
-            "_id": "4",
-            "name": "Argentina",
-            "origin": {
-                "url": "https://test.com",
-                "license": "MIT",
-                "providerName": "Argentina",
-                "providerWebsiteUrl": "https://test.com"
-            }
-        },
-        {
-            "_id": "5",
-            "name": "Peru",
-            "origin": {
-                "url": "https://test.com",
-                "license": "MIT",
-                "providerName": "Peru",
-                "providerWebsiteUrl": "https://test.com"
-            }
-        },
-        {
-            "_id": "6",
-            "name": "United Kingdom",
-            "origin": {
-                "url": "https://test.com",
-                "license": "MIT",
-                "providerName": "United Kingdom",
-                "providerWebsiteUrl": "https://test.com"
-            }
-        },
-        {
-            "_id": "7",
-            "name": "Brazil",
-            "origin": {
-                "url": "https://test.com",
-                "license": "MIT",
-                "providerName": "Brazil",
-                "providerWebsiteUrl": "https://test.com"
-            }
-        },
-        {
-            "_id": "8",
-            "name": "China",
-            "origin": {
-                "url": "https://test.com",
-                "license": "MIT",
-                "providerName": "China",
-                "providerWebsiteUrl": "https://test.com"
-            }
-        },
-        {
-            "_id": "9",
-            "name": "Canada",
-            "origin": {
-                "url": "https://test.com",
-                "license": "MIT",
-                "providerName": "Canada",
-                "providerWebsiteUrl": "https://test.com"
-            }
-        },
-        {
-            "_id": "10",
-            "name": "Spain",
-            "origin": {
-                "url": "https://test.com",
-                "license": "MIT",
-                "providerName": "Spain",
-                "providerWebsiteUrl": "https://test.com"
-            }
+[
+    {
+        "_id": "1",
+        "name": "USA",
+        "origin": {
+            "url": "https://test.com",
+            "license": "MIT",
+            "providerName": "USA",
+            "providerWebsiteUrl": "https://test.com"
         }
-    ],
-    "total": 10
-}
+    },
+    {
+        "_id": "2",
+        "name": "Germany",
+        "origin": {
+            "url": "https://test.com",
+            "license": "MIT",
+            "providerWebsiteUrl": "https://test.com"
+        }
+    },
+    {
+        "_id": "3",
+        "name": "Poland",
+        "origin": {
+            "url": "https://test.com",
+            "license": "MIT",
+            "providerName": "Poland",
+            "providerWebsiteUrl": "https://test.com"
+        }
+    },
+    {
+        "_id": "4",
+        "name": "Argentina",
+        "origin": {
+            "url": "https://test.com",
+            "license": "MIT",
+            "providerName": "Argentina",
+            "providerWebsiteUrl": "https://test.com"
+        }
+    },
+    {
+        "_id": "5",
+        "name": "Peru",
+        "origin": {
+            "url": "https://test.com",
+            "license": "MIT",
+            "providerName": "Peru",
+            "providerWebsiteUrl": "https://test.com"
+        }
+    },
+    {
+        "_id": "6",
+        "name": "United Kingdom",
+        "origin": {
+            "url": "https://test.com",
+            "license": "MIT",
+            "providerName": "United Kingdom",
+            "providerWebsiteUrl": "https://test.com"
+        }
+    },
+    {
+        "_id": "7",
+        "name": "Brazil",
+        "origin": {
+            "url": "https://test.com",
+            "license": "MIT",
+            "providerName": "Brazil",
+            "providerWebsiteUrl": "https://test.com"
+        }
+    },
+    {
+        "_id": "8",
+        "name": "China",
+        "origin": {
+            "url": "https://test.com",
+            "license": "MIT",
+            "providerName": "China",
+            "providerWebsiteUrl": "https://test.com"
+        }
+    },
+    {
+        "_id": "9",
+        "name": "Canada",
+        "origin": {
+            "url": "https://test.com",
+            "license": "MIT",
+            "providerName": "Canada",
+            "providerWebsiteUrl": "https://test.com"
+        }
+    },
+    {
+        "_id": "10",
+        "name": "Spain",
+        "origin": {
+            "url": "https://test.com",
+            "license": "MIT",
+            "providerName": "Spain",
+            "providerWebsiteUrl": "https://test.com"
+        }
+    }
+]

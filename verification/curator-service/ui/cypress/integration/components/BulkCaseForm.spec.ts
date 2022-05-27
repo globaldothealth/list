@@ -32,9 +32,9 @@ describe('Bulk upload form', function () {
 
         cy.visit('/');
         cy.get('button[data-testid="create-new-button"]').click();
-        cy.contains('li', 'New bulk upload').click();
+        cy.contains('New bulk upload').click();
         cy.get('div[data-testid="caseReference"]').type('www.bulksource.com');
-        cy.contains('li', 'www.bulksource.com').click();
+        cy.contains('www.bulksource.com').click();
         const csvFixture = '../fixtures/bulk_data_with_all_fields.csv';
         cy.get('input[type="file"]').attachFile(csvFixture);
 
@@ -108,9 +108,9 @@ describe('Bulk upload form', function () {
 
         cy.visit('/');
         cy.get('button[data-testid="create-new-button"]').click();
-        cy.contains('li', 'New bulk upload').click();
+        cy.contains('New bulk upload').click();
         cy.get('div[data-testid="caseReference"]').type('www.bulksource.com');
-        cy.contains('li', 'www.bulksource.com').click();
+        cy.contains('www.bulksource.com').click();
         const csvFixture = '../fixtures/bulk_data.csv';
         cy.get('input[type="file"]').attachFile(csvFixture);
 
@@ -138,9 +138,9 @@ describe('Bulk upload form', function () {
 
         cy.visit('/');
         cy.get('button[data-testid="create-new-button"]').click();
-        cy.contains('li', 'New bulk upload').click();
+        cy.contains('New bulk upload').click();
         cy.get('div[data-testid="caseReference"]').type('www.new-source.com');
-        cy.contains('li', 'www.new-source.com').click();
+        cy.contains('www.new-source.com').click();
         cy.get('input[name="caseReference.sourceName"]').type('New source');
         cy.get('input[name="caseReference.sourceLicense"]').type('GPL3');
         const csvFixture = '../fixtures/bulk_data.csv';
@@ -178,9 +178,9 @@ describe('Bulk upload form', function () {
 
         cy.visit('/');
         cy.get('button[data-testid="create-new-button"]').click();
-        cy.contains('li', 'New bulk upload').click();
+        cy.contains('New bulk upload').click();
         cy.get('div[data-testid="caseReference"]').type('www.bulksource.com');
-        cy.contains('li', 'www.bulksource.com').click();
+        cy.contains('www.bulksource.com').click();
         const csvFixture = '../fixtures/bulk_data.csv';
         cy.get('input[type="file"]').attachFile(csvFixture);
 
@@ -196,9 +196,9 @@ describe('Bulk upload form', function () {
         cy.contains('Female').should('not.exist');
 
         cy.get('button[data-testid="create-new-button"]').click();
-        cy.contains('li', 'New bulk upload').click();
+        cy.contains('New bulk upload').click();
         cy.get('div[data-testid="caseReference"]').type('www.bulksource.com');
-        cy.contains('li', 'www.bulksource.com').click();
+        cy.contains('www.bulksource.com').click();
         const updatedCsvFixture = '../fixtures/updated_bulk_data.csv';
         cy.get('input[type="file"]').attachFile(updatedCsvFixture);
 
@@ -232,9 +232,9 @@ describe('Bulk upload form', function () {
 
         cy.visit('/');
         cy.get('button[data-testid="create-new-button"]').click();
-        cy.contains('li', 'New bulk upload').click();
+        cy.contains('New bulk upload').click();
         cy.get('div[data-testid="caseReference"]').type('www.bulksource.com');
-        cy.contains('li', 'www.bulksource.com').click();
+        cy.contains('www.bulksource.com').click();
         const csvFixture = '../fixtures/bulk_data_with_case_count.csv';
         cy.get('input[type="file"]').attachFile(csvFixture);
 
@@ -258,9 +258,9 @@ describe('Bulk upload form', function () {
 
         cy.visit('/');
         cy.get('button[data-testid="create-new-button"]').click();
-        cy.contains('li', 'New bulk upload').click();
+        cy.contains('New bulk upload').click();
         cy.get('div[data-testid="caseReference"]').type('www.bulksource.com');
-        cy.contains('li', 'www.bulksource.com').click();
+        cy.contains('www.bulksource.com').click();
         const csvFixture = '../fixtures/bad_bulk_data.csv';
         cy.get('input[type="file"]').attachFile(csvFixture);
 
@@ -272,13 +272,9 @@ describe('Bulk upload form', function () {
             'p',
             'The selected file could not be uploaded. Found 1 row(s) with errors.',
         );
-        cy.get('ul').eq(1).get('li').should('contain', 'Row 1');
+        cy.get('ul').eq(3).should('contain', 'Row 1');
         cy.get('ul')
-            .eq(1)
-            .get('li')
-            .children('ul')
-            .first()
-            .find('li')
+            .eq(3)
             .should('have.length', 1)
             .should(
                 'contain',
@@ -300,9 +296,9 @@ describe('Bulk upload form', function () {
 
         cy.visit('/');
         cy.get('button[data-testid="create-new-button"]').click();
-        cy.contains('li', 'New bulk upload').click();
+        cy.contains('New bulk upload').click();
         cy.get('div[data-testid="caseReference"]').type('www.bulksource.com');
-        cy.contains('li', 'www.bulksource.com').click();
+        cy.contains('www.bulksource.com').click();
         const csvFixture = '../fixtures/no_header.csv';
         cy.get('input[type="file"]').attachFile(csvFixture);
 
@@ -310,10 +306,7 @@ describe('Bulk upload form', function () {
 
         cy.get('button[data-testid="submit"]').click();
         cy.wait('@batchUpsert');
-        cy.contains(
-            'li',
-            'location.query must be specified to be able to geocode',
-        );
+        cy.contains('location.query must be specified to be able to geocode');
         cy.get('button[aria-label="close overlay"').click();
 
         cy.visit('/');

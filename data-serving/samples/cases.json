@@ -12,9 +12,7 @@
       },
       "gender": "Female",
       "occupation": "Horse trainer",
-      "nationalities": [
-        "Swedish"
-      ],
+      "nationalities": ["Swedish"],
       "ethnicity": "Other"
     },
     "genomeSequences": [
@@ -111,11 +109,7 @@
     "list": true,
     "SGTF": "1",
     "symptoms": {
-      "values": [
-        "Severe pneumonia",
-        "Dyspnea",
-        "Weakness"
-      ],
+      "values": ["Severe pneumonia", "Dyspnea", "Weakness"],
       "status": "Symptomatic"
     },
     "preexistingConditions": {
@@ -157,9 +151,7 @@
               }
             }
           },
-          "methods": [
-            "Plane"
-          ],
+          "methods": ["Plane"],
           "purpose": "Family"
         }
       ],
@@ -198,16 +190,9 @@
       }
     },
     "transmission": {
-      "routes": [
-        "Vector borne"
-      ],
-      "places": [
-        "Gym"
-      ],
-      "linkedCaseIds": [
-        "abc",
-        "def"
-      ]
+      "routes": ["Vector borne"],
+      "places": ["Gym"],
+      "linkedCaseIds": ["abc", "def"]
     },
     "importedCase": {
       "ID": "idk",

@@ -3,7 +3,6 @@ import { DateField, SelectField } from '../common-form-fields/FormikFields';
 import CaseFormValues from './CaseFormValues';
 import FieldTitle from '../common-form-fields/FieldTitle';
 import { StyledTooltip } from './StyledTooltip';
-import React from 'react';
 import Scroll from 'react-scroll';
 import { useFormikContext } from 'formik';
 

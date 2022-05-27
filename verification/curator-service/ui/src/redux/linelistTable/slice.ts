@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { fetchLinelistData, changeCasesStatus, deleteCases } from './thunk';
-import { Case } from '../../api/models/Case';
+import { Case, VerificationStatus } from '../../api/models/Case';
 import { SortBy, SortByOrder } from '../../constants/types';
 
 interface LinelistTableState {
@@ -18,8 +18,11 @@ interface LinelistTableState {
     error: string | undefined;
     excludeCasesDialogOpen: boolean;
     deleteCasesDialogOpen: boolean;
+    reincludeCasesDialogOpen: boolean;
     casesSelected: string[];
     refetchData: boolean;
+    verificationStatus: VerificationStatus | undefined;
+    rowsAcrossPagesSelected: boolean;
 }
 
 const initialState: LinelistTableState = {
@@ -37,8 +40,11 @@ const initialState: LinelistTableState = {
     error: undefined,
     excludeCasesDialogOpen: false,
     deleteCasesDialogOpen: false,
+    reincludeCasesDialogOpen: false,
     casesSelected: [],
     refetchData: false,
+    verificationStatus: undefined,
+    rowsAcrossPagesSelected: false,
 };
 
 const linelistTableSlice = createSlice({
@@ -68,6 +74,21 @@ const linelistTableSlice = createSlice({
         },
         setDeleteCasesDialogOpen: (state, action: PayloadAction<boolean>) => {
             state.deleteCasesDialogOpen = action.payload;
+        },
+        setReincludeCasesDialogOpen: (
+            state,
+            action: PayloadAction<boolean>,
+        ) => {
+            state.reincludeCasesDialogOpen = action.payload;
+        },
+        setVerificationStatus: (
+            state,
+            action: PayloadAction<VerificationStatus>,
+        ) => {
+            state.verificationStatus = action.payload;
+        },
+        setRowsAcrossPagesSelected: (state, action: PayloadAction<boolean>) => {
+            state.rowsAcrossPagesSelected = action.payload;
         },
     },
     extraReducers: (builder) => {
@@ -99,17 +120,23 @@ const linelistTableSlice = createSlice({
 
             state.isLoading = false;
             state.casesSelected = [];
-            state.cases = state.cases.map((data) =>
-                updatedIds.includes(data._id)
-                    ? {
-                          ...data,
-                          caseReference: {
-                              ...data.caseReference,
-                              verificationStatus: newStatus,
-                          },
-                      }
-                    : data,
-            );
+            state.rowsAcrossPagesSelected = false;
+            if (updatedIds) {
+                state.cases = state.cases.map((data) =>
+                    updatedIds.includes(data._id)
+                        ? {
+                              ...data,
+                              caseReference: {
+                                  ...data.caseReference,
+                                  verificationStatus: newStatus,
+                              },
+                          }
+                        : data,
+                );
+            } else {
+                // This acts only as a trigger, so it doesn't matter which boolean value it is
+                state.refetchData = !state.refetchData;
+            }
         });
         builder.addCase(changeCasesStatus.rejected, (state, action) => {
             state.isLoading = false;
@@ -123,10 +150,11 @@ const linelistTableSlice = createSlice({
         builder.addCase(deleteCases.pending, (state) => {
             state.isLoading = true;
         });
-        builder.addCase(deleteCases.fulfilled, (state, { payload }) => {
+        builder.addCase(deleteCases.fulfilled, (state) => {
             state.isLoading = false;
             state.deleteCasesDialogOpen = false;
             state.casesSelected = [];
+            state.rowsAcrossPagesSelected = false;
             // This acts only as a trigger, so it doesn't matter which boolean value it is
             state.refetchData = !state.refetchData;
         });
@@ -149,6 +177,9 @@ export const {
     setExcludeCasesDialogOpen,
     setCasesSelected,
     setDeleteCasesDialogOpen,
+    setReincludeCasesDialogOpen,
+    setVerificationStatus,
+    setRowsAcrossPagesSelected,
 } = linelistTableSlice.actions;
 
 export default linelistTableSlice.reducer;

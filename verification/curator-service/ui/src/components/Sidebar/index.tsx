@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useMemo } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useHistory } from 'react-router-dom';
 import { useAppSelector } from '../../hooks/redux';
 import { selectUser } from '../../redux/auth/selectors';
 import { selectDiseaseName } from '../../redux/app/selectors';
@@ -29,6 +29,7 @@ interface SidebarProps {
 const Sidebar = ({ drawerOpen }: SidebarProps): JSX.Element => {
     const classes = useStyles();
     const location = useLocation();
+    const history = useHistory();
 
     const diseaseName = useAppSelector(selectDiseaseName);
     const [createNewButtonAnchorEl, setCreateNewButtonAnchorEl] =
@@ -43,6 +44,15 @@ const Sidebar = ({ drawerOpen }: SidebarProps): JSX.Element => {
 
     const closeCreateNewPopup = (): void => {
         setCreateNewButtonAnchorEl(undefined);
+    };
+
+    const handleNewCaseClick = () => {
+        closeCreateNewPopup();
+
+        history.push({
+            pathname: '/cases/new',
+            state: { lastLocation: location.pathname },
+        });
     };
 
     const menuList = useMemo(
@@ -131,21 +141,30 @@ const Sidebar = ({ drawerOpen }: SidebarProps): JSX.Element => {
                             horizontal: 'left',
                         }}
                     >
-                        <Link to="/cases/new" onClick={closeCreateNewPopup}>
-                            <MenuItem>New line list case</MenuItem>
-                        </Link>
-                        <Link to="/cases/bulk" onClick={closeCreateNewPopup}>
+                        <MenuItem
+                            onClick={handleNewCaseClick}
+                            className={classes.link}
+                        >
+                            New line list case
+                        </MenuItem>
+                        <Link
+                            to="/cases/bulk"
+                            onClick={closeCreateNewPopup}
+                            className={classes.link}
+                        >
                             <MenuItem>New bulk upload</MenuItem>
                         </Link>
                         <Link
                             to="/sources/automated"
                             onClick={closeCreateNewPopup}
+                            className={classes.link}
                         >
                             <MenuItem>New automated source</MenuItem>
                         </Link>
                         <Link
                             to="/sources/backfill"
                             onClick={closeCreateNewPopup}
+                            className={classes.link}
                         >
                             <MenuItem>New automated source backfill</MenuItem>
                         </Link>

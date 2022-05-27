@@ -5,7 +5,7 @@ import { Typography } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 
 import AddIcon from '@mui/icons-material/Add';
-import { Autocomplete } from '@mui/material';
+import Autocomplete from '@mui/material/Autocomplete';
 import Button from '@mui/material/Button';
 import CaseFormValues from './CaseFormValues';
 import FieldTitle from '../common-form-fields/FieldTitle';
@@ -14,6 +14,7 @@ import Location from './Location';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import { RequiredHelperText } from '../common-form-fields/FormikFields';
 import Scroll from 'react-scroll';
+import MuiTextField from '@mui/material/TextField';
 import { TextField } from 'formik-mui';
 import { StyledTooltip } from './StyledTooltip';
 import axios from 'axios';
@@ -100,6 +101,12 @@ const useStyles = makeStyles((theme) => ({
     suggestion: {
         display: 'flex',
         alignItems: 'center',
+        padding: '0.5rem 0',
+        cursor: 'pointer',
+
+        '&:hover': {
+            backgroundColor: '#00000014',
+        },
     },
 }));
 
@@ -176,6 +183,7 @@ export function PlacesAutocomplete(
             options={options}
             value={value}
             onChange={(event: unknown, newValue: Loc | null): void => {
+                console.log('change');
                 setOptions(newValue ? [newValue, ...options] : options);
                 setValue(newValue);
                 setFieldValue(props.name, newValue);
@@ -204,6 +212,7 @@ export function PlacesAutocomplete(
                         }
                         component={TextField}
                         fullWidth
+                        variant="standard"
                     ></Field>
                     {props.required && (
                         <RequiredHelperText
@@ -215,10 +224,10 @@ export function PlacesAutocomplete(
             )}
             renderOption={(props, option: Loc, state): React.ReactNode => {
                 return (
-                    <span className={classes.suggestion}>
+                    <li {...props} className={classes.suggestion}>
                         <LocationOnIcon className={classes.icon} />
                         <Typography variant="body2">{option.name}</Typography>
-                    </span>
+                    </li>
                 );
             }}
         />

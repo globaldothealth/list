@@ -45,7 +45,7 @@ describe('Curator', function () {
         cy.get('button[data-testid="create-new-button"]').click();
         cy.contains('li', 'New line list case').click();
         cy.get('div[data-testid="caseReference"]').type('www.example.com');
-        cy.contains('li', 'www.example.com').click();
+        cy.contains('www.example.com').click();
         cy.get('input[name="caseReference.sourceName"]').type('Example source');
         cy.get('input[name="caseReference.sourceLicense"]').type('MPL');
         cy.get('div[data-testid="sourceEntryId"]')
@@ -63,11 +63,12 @@ describe('Curator', function () {
         cy.contains('li', 'Accountant').click();
         cy.get('div[data-testid="location"]').type('France');
         cy.contains('France');
-        cy.contains('li', 'France').click();
+        cy.contains('France').click();
         /* Change France to something else to check we can edit geocode results.
          * We need to change it to a valid country so that we can find the ISO code!
          */
-        cy.get('input[name="location.country"]').clear().type('Germany');
+        cy.get('div[data-testid="location"]').clear().type('Germany');
+        cy.contains('Germany').click();
         cy.get('input[name="confirmedDate"]').type('2020-01-01');
         cy.get('div[data-testid="methodOfConfirmation"]').click();
         cy.get('li[data-value="PCR test"').click();
@@ -134,10 +135,8 @@ describe('Curator', function () {
         );
         cy.contains('li', 'Test method').click();
         cy.get('button[data-testid="addTravelHistory"').click();
-        cy.get('div[data-testid="travelHistory[1].location"]').type(
-            'United Kingdom',
-        );
-        cy.contains('li', 'United Kingdom').click();
+        cy.get('div[data-testid="travelHistory[1].location"]').type('Spain');
+        cy.contains('li', 'Spain').click();
         cy.get('input[name="travelHistory[1].dateRange.start"]').type(
             '2020-01-01',
         );
@@ -186,15 +185,18 @@ describe('Curator', function () {
             cy.contains('2020-01-01');
             cy.contains('Recovered');
 
+            cy.intercept('GET', `/api/cases/${resp.body.cases[0]._id}`).as(
+                'fetchCaseDetails',
+            );
+
             // View the case from the message bar.
             cy.get('button[data-testid="view-case-btn"').click({ force: true });
+            cy.wait('@fetchCaseDetails');
+
             cy.contains(/Case details\b/);
-            // Go back to linelist.
-            cy.visit('/cases');
 
             // Edit the case.
-            cy.get('button[data-testid="row menu"]').click();
-            cy.contains('li', 'Edit').click();
+            cy.get('button').contains(/EDIT/i).click();
 
             // Everything should be there.
             // Source.
@@ -225,11 +227,11 @@ describe('Curator', function () {
             );
             cy.get('input[name="location.geometry.latitude"]').should(
                 'have.value',
-                '45.75889',
+                '51.0968509',
             );
             cy.get('input[name="location.geometry.longitude"]').should(
                 'have.value',
-                '4.84139',
+                '5.9688274',
             );
             // Events.
             cy.get('input[name="onsetSymptomsDate"]').should(
@@ -265,7 +267,7 @@ describe('Curator', function () {
             cy.contains('ADULT syndrome');
             // Travel history.
             cy.contains('Germany');
-            cy.contains('United Kingdom');
+            cy.contains('Spain');
             cy.get('input[name="travelHistory[1].dateRange.start"]').should(
                 'have.value',
                 '2020/01/01',
@@ -329,8 +331,8 @@ describe('Curator', function () {
             cy.contains('Asian');
             cy.contains('Germany');
             // Rounded numbers when displayed.
-            cy.contains('45.7589');
-            cy.contains('4.8414');
+            cy.contains('51.0969');
+            cy.contains('5.9688');
             // Events.
             cy.contains('2020-01-01');
             cy.contains('2020-01-02');
@@ -358,7 +360,7 @@ describe('Curator', function () {
             cy.contains('Business');
             cy.contains('Germany');
             cy.contains('Bus');
-            cy.contains('United Kingdom');
+            cy.contains('Spain');
             // Pathogens and genome.
             cy.contains('Bartonella (232), Ebola (41)');
             cy.contains('www.example2.com');

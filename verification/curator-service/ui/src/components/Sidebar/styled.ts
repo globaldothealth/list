@@ -3,7 +3,7 @@ import makeStyles from '@mui/styles/makeStyles';
 
 export const useStyles = makeStyles((theme: Theme) => ({
     link: {
-        marginTop: 12,
+        color: theme.custom.palette.link.color,
     },
     divider: {
         backgroundColor: '#0A7369',

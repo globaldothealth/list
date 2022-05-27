@@ -19,6 +19,9 @@ declare module '@mui/material/styles' {
                 landingPage: {
                     descriptionTextColor: string;
                 };
+                link: {
+                    color: string;
+                };
             };
         };
         drawerWidth: number;
@@ -40,6 +43,9 @@ declare module '@mui/material/styles' {
                 };
                 landingPage?: {
                     descriptionTextColor?: string;
+                };
+                link?: {
+                    color: string;
                 };
             };
         };
@@ -133,6 +139,9 @@ export const theme = createTheme({
             },
             landingPage: {
                 descriptionTextColor: '#838D89',
+            },
+            link: {
+                color: '#5D5D5D',
             },
         },
     },

@@ -28,7 +28,7 @@ declare global {
                 variant?: any;
                 sourceUrl?: any;
                 gender?: string;
-                creationDate?: Date;
+                creationDate?: string;
                 outcome?: Outcome;
             }) => void;
             login: (opts?: {
@@ -67,7 +67,7 @@ export function addCase(opts: {
     caseid?: string;
     sourceUrl?: string;
     gender?: string;
-    creationDate?: Date;
+    creationDate?: string;
     outcome?: Outcome;
 }): void {
     cy.request({
