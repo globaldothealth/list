@@ -1,6 +1,6 @@
 FROM alpine:3.14
 RUN apk update
-RUN apk add bash aws-cli
+RUN apk add bash aws-cli curl
 
 COPY common.sh .
 COPY full_export.sh .
