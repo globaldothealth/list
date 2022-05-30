@@ -3,7 +3,7 @@ import { IUser, users } from '../model/user';
 import axios, { AxiosError } from 'axios';
 import { logger } from '../util/logger';
 import AWS from 'aws-sdk';
-import crypto from 'crypto';
+import crypto, { createHash } from 'crypto';
 import { ModifyResult, ObjectId } from 'mongodb';
 
 // Don't set client-side timeouts for requests to the data service.
@@ -17,6 +17,21 @@ const defaultOutputQuery =
     '/cases/?limit=50&page=1&count_limit=10000&sort_by=default&order=ascending';
 
 /**
+ * This is both a token that can be uesd to retrieve a previously-frozen query's results,
+ * and enough metadata about that query to describe the content.
+ */
+interface FrozenQueryToken {
+    /* The date at which the query was made, to the nearest minute because that's more than
+     * precise enough (we update most sources less frequently than daily).
+     */
+    queryDate: string;
+    /* The base URL of the instance of G.h that was queried. */
+    baseURL: string;
+    /* The query that was frozen. */
+    query: string;
+}
+
+/**
  * CasesController mostly forwards case-related requests to the data service.
  * It handles CRUD operations from curators.
  */
@@ -25,6 +40,7 @@ export default class CasesController {
         private readonly dataServerURL: string,
         private readonly completeDataBucket: string,
         private readonly countryDataBucket: string,
+        private readonly frozenQueryBucket: string,
         private readonly s3Client: AWS.S3,
     ) {}
 
@@ -288,6 +304,120 @@ export default class CasesController {
         }
 
         return;
+    };
+
+    tokenHash = (token: FrozenQueryToken): string => {
+        return createHash('sha256').update(JSON.stringify(token)).digest('hex');
+    };
+
+    /* freezeQuery generates a reference token, streams the query results to S3 with a key hashed from the token,
+     * then returns the token.
+     */
+    freezeQuery = async (req: Request, res: Response): Promise<void> => {
+        const millisInMinute = 60 * 1000;
+        const queryDate = new Date(
+            Math.round(new Date(Date.now()).getTime() / millisInMinute) *
+                millisInMinute,
+        ).toISOString();
+        const baseURL = req.baseUrl;
+        const query = req.body.query;
+
+        const freezeToken: FrozenQueryToken = {
+            queryDate,
+            baseURL,
+            query,
+        };
+
+        const user = req.user as IUser;
+        const url = this.dataServerURL + '/api' + req.url.replace('Async', '');
+        req.body.correlationId = crypto.randomBytes(16).toString('hex');
+        logger.info(
+            `Streaming case data in format ${req.body.format} matching query ${req.body.query} for correlation ID ${req.body.correlationId} to S3 for frozen query`,
+        );
+        const result = await users().findOneAndUpdate(
+            {
+                _id: new ObjectId(user.id),
+            },
+            {
+                $push: {
+                    downloads: {
+                        timestamp: new Date(),
+                        format: req.body.format,
+                        query: req.body.query,
+                    },
+                },
+            },
+        );
+
+        this.logOutcomeOfAppendingDownloadToUser(user.id, result);
+
+        try {
+            const stream = await axios({
+                method: 'post',
+                url: url,
+                data: req.body,
+                responseType: 'stream',
+            });
+            const key = this.tokenHash(freezeToken);
+            await this.s3Client.putObject({
+                Body: stream.data,
+                Bucket: this.frozenQueryBucket,
+                Key: key,
+            });
+            res.status(200).send(freezeToken);
+        } catch (e) {
+            const err = e as Error;
+            logger.error(
+                `Error streaming data for frozen query for correlation ID ${req.body.correlationId}`,
+                err,
+            );
+            res.status(500).send(err);
+        }
+    };
+
+    /* retrieveFrozenQuery accepts a reference token, generates a signed URL to download the frozen results
+     * from S3, and then redirects the user to that signed URL.
+     * Although first it checks whether you have made a request to the correct instance. If not,
+     * it redirects you to that instance instead.
+     */
+    retrieveFrozenQuery = async (
+        req: Request,
+        res: Response,
+    ): Promise<void> => {
+        const baseURL = req.baseUrl;
+        const freezeToken = req.body as FrozenQueryToken;
+        if (baseURL !== freezeToken.baseURL) {
+            /* the user has an account here but replayed the token into the wrong server:
+             * help them out by redirecting them to the other location
+             */
+            const actualURL = req.url.replace(req.baseUrl, freezeToken.baseURL);
+            res.redirect(actualURL);
+            return;
+        }
+        const key = this.tokenHash(freezeToken);
+        try {
+            const object = await this.s3Client.getObject({
+                Bucket: this.frozenQueryBucket,
+                Key: key,
+            });
+            const stream = object.createReadStream();
+            res.setHeader(
+                'Content-Type',
+                object.httpRequest.headers['content-type'],
+            );
+            res.setHeader(
+                'Content-Disposition',
+                object.httpRequest.headers['content-disposition'],
+            );
+            res.setHeader('Cache-Control', 'no-cache');
+            res.setHeader('Pragma', 'no-cache');
+            stream.pipe(res);
+        } catch (e) {
+            // this error is probably a 404 but I will inspect it to work out how to handle
+            const err = e as Error;
+            logger.error('error fetching frozen query', err);
+            res.status(500).send(err);
+        }
     };
 
     /** hasCountryOnly checks the query string to see whether it contains only a filter for a nation **/

@@ -244,7 +244,9 @@ async function makeApp() {
         env.DATASERVER_URL,
         env.COMPLETE_DATA_BUCKET,
         env.COUNTRY_DATA_BUCKET,
-        s3Client);
+        env.FROZEN_QUERY_BUCKET,
+        s3Client,
+    );
     apiRouter.get(
         '/cases',
         authenticateByAPIKey,
@@ -344,6 +346,18 @@ async function makeApp() {
         authenticateByAPIKey,
         mustHaveAnyRole(['curator']),
         casesController.del,
+    );
+    apiRouter.post(
+        '/cases/freezeQuery',
+        authenticateByAPIKey,
+        mustBeAuthenticated,
+        casesController.freezeQuery,
+    );
+    apiRouter.post(
+        '/cases/retrieveFrozenQuery',
+        authenticateByAPIKey,
+        mustBeAuthenticated,
+        casesController.retrieveFrozenQuery,
     );
 
     // Configure users controller.

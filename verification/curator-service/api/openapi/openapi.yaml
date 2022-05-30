@@ -893,6 +893,50 @@ paths:
                     $ref: '#/components/responses/404'
                 '500':
                     $ref: '#/components/responses/500'
+    /cases/freezeQuery:
+        post:
+            summary: >
+                Returns a token to download the results of a query as viewed at this date.
+                Users can then call /cases/retrieveFrozenQuery and at any time will receive
+                the same response that was "frozen" by this call.
+            tags: [Case]
+            operationId: freezeQuery
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            properties:
+                                query:
+                                    description: >
+                                        Cases matching this query will be returned.
+                                    type: string
+            responses:
+                '200':
+                    $ref: '#/components/responses/200FrozenQueryToken'
+                '500':
+                    $ref: '#/components/responses/500'
+    /cases/retrieveFrozenQuery:
+        post:
+            summary: >
+                Returns the responses frozen by a previous call to /cases/freezeQuery. The
+                reponses for a given frozen query token will always remain the same, no matter
+                how the schema or data change between freezing the query and retrieving it.
+                In fact this endpoint will redirect you to the location of the frozen response.
+            tags: [Case]
+            operationId: retrieveFrozenQuery
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/FrozenQueryToken'
+            responses:
+                '301':
+                    $ref: '#/components/responses/301'
+                '404':
+                    $ref: '#/components/responses/404'
+                '500':
+                    $ref: '#/components/responses/500'
     /geocode/seed:
         post:
             tags: [Geocode]
@@ -1701,6 +1745,21 @@ components:
                 notes:
                     type: string
                     description: Notes from the curator about the update
+        FrozenQueryToken:
+            description: A representation of a response to a historical query
+            properties:
+                query:
+                    description: The query that was frozen
+                    example: country=GB
+                    type: string
+                queryDate:
+                    description: The date, to the nearest minute, in ISO format, at which the query was frozen
+                    example: 2022-03-17T15:41:00.000Z
+                    type: string
+                baseUrl:
+                    description: The URL of the Global.health instance on which the query was frozen.
+                    example: https://data.covid-19.global.health
+                    type: string
         NewCase:
             description: >
                 A "#/components/schemas/Case" with additional required fields for
@@ -1997,6 +2056,12 @@ components:
                 application/json:
                     schema:
                         $ref: '#/components/schemas/BatchCaseUpsertResponse'
+        '200FrozenQueryToken':
+            description: OK
+            content:
+                application/json:
+                    schema:
+                        $ref: '#/components/schemas/FrozenQueryToken'                        
         '207BatchCaseUpsert':
             description: Multi-Status
             content:
@@ -2163,6 +2228,8 @@ components:
                         $ref: '#/components/schemas/LocationArray'
         '204':
             description: Empty
+        '301':
+            description: Moved permanently
         '400':
             description: Malformed request
         '401':

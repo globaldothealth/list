@@ -13,6 +13,7 @@ export default function validateEnv(): Readonly<{
     EMAIL_USER_ADDRESS: string;
     ENABLE_LOCAL_AUTH: boolean;
     EVENT_ROLE_ARN: string;
+    FROZEN_QUERY_BUCKET: string;
     GOOGLE_OAUTH_CLIENT_ID: string;
     GOOGLE_OAUTH_CLIENT_SECRET: string;
     LOCALSTACK_URL: string;
@@ -78,6 +79,10 @@ export default function validateEnv(): Readonly<{
         EVENT_ROLE_ARN: str({
             desc: 'AWS ARN for EventBridge rules',
             devDefault: 'default-dev-arn',
+        }),
+        FROZEN_QUERY_BUCKET: str({
+            desc: 'S3 bucket containing frozen query requests',
+            devDefault: 'covid-19-frozen-queries',
         }),
         GOOGLE_OAUTH_CLIENT_ID: str({
             desc: 'OAuth client ID from the Google developer console',
