@@ -6,7 +6,7 @@ import requests
 
 
 LOCALSTACK_URL = environ.get("AWS_ENDPOINT", "http://localstack:4566")
-BATCH_READY = '"batch": "running"'
+BATCH_READY = '"batch": "available"'
 
 IAM_PROFILE_NAME = "ecsInstanceRole"
 IAM_PROFILE_ARN = "".join(["arn:aws:iam::000000000000:instance-profile/", "ecsInstanceRole"])
@@ -49,6 +49,7 @@ CACHE_BUCKET_NAME = environ.get("CACHE_BUCKET_NAME", "covid-19-country-export")
 RETRIEVAL_BUCKET_NAME = environ.get("RETRIEVAL_BUCKET_NAME", "gdh-sources")
 SES_EMAIL_ADDRESS = environ.get("SES_EMAIL_ADDRESS", "info@global.health")
 ECR_REPOSITORY_NAME = environ.get("ECR_REPOSITORY_NAME", "gdh-ingestor")
+FROZEN_QUERY_BUCKET_NAME = environ.get("FROZEN_QUERY_BUCKET_NAME", "covid-19-frozen-queries")
 
 
 class LocalstackWrangler(object):
@@ -201,5 +202,6 @@ if __name__ == "__main__":
     lw.create_s3_bucket(DATA_BUCKET_NAME)
     lw.create_s3_bucket(CACHE_BUCKET_NAME)
     lw.create_s3_bucket(RETRIEVAL_BUCKET_NAME)
+    lw.create_s3_bucket(FROZEN_QUERY_BUCKET_NAME)
     lw.create_container_repository(ECR_REPOSITORY_NAME)
     print("Done setting up localstack resources")
