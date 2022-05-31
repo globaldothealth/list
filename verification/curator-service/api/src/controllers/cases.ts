@@ -329,7 +329,10 @@ export default class CasesController {
         };
 
         const user = req.user as IUser;
-        const url = this.dataServerURL + '/api' + req.url.replace('Async', '');
+        const url =
+            this.dataServerURL +
+            '/api' +
+            req.url.replace('freezeQuery', 'download');
         req.body.correlationId = crypto.randomBytes(16).toString('hex');
         logger.info(
             `Streaming case data in format ${req.body.format} matching query ${req.body.query} for correlation ID ${req.body.correlationId} to S3 for frozen query`,
