@@ -355,18 +355,20 @@ export default class CasesController {
         this.logOutcomeOfAppendingDownloadToUser(user.id, result);
 
         try {
-            const stream = await axios({
+            const response = await axios({
                 method: 'post',
                 url: url,
                 data: req.body,
-                responseType: 'stream',
             });
             const key = this.tokenHash(freezeToken);
-            await this.s3Client.putObject({
-                Body: stream.data,
-                Bucket: this.frozenQueryBucket,
-                Key: key,
-            });
+            logger.info(`created frozen query ${key}`);
+            this.s3Client
+                .putObject({
+                    Body: response.data,
+                    Bucket: this.frozenQueryBucket,
+                    Key: key,
+                })
+                .send();
             res.status(200).send(freezeToken);
         } catch (e) {
             const err = e as Error;
@@ -398,19 +400,17 @@ export default class CasesController {
             return;
         }
         const key = this.tokenHash(freezeToken);
+        logger.info(`retrieving frozen query ${key}`);
         try {
             const object = await this.s3Client.getObject({
                 Bucket: this.frozenQueryBucket,
                 Key: key,
             });
             const stream = object.createReadStream();
-            res.setHeader(
-                'Content-Type',
-                object.httpRequest.headers['content-type'],
-            );
+            res.setHeader('Content-Type', 'text/csv');
             res.setHeader(
                 'Content-Disposition',
-                object.httpRequest.headers['content-disposition'],
+                'attachment; filename="global_health.csv"',
             );
             res.setHeader('Cache-Control', 'no-cache');
             res.setHeader('Pragma', 'no-cache');
@@ -419,6 +419,7 @@ export default class CasesController {
             // this error is probably a 404 but I will inspect it to work out how to handle
             const err = e as Error;
             logger.error('error fetching frozen query', err);
+            logger.error(err);
             res.status(500).send(err);
         }
     };
