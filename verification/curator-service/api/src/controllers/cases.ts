@@ -401,27 +401,28 @@ export default class CasesController {
         }
         const key = this.tokenHash(freezeToken);
         logger.info(`retrieving frozen query ${key}`);
-        try {
-            const object = await this.s3Client.getObject({
+        this.s3Client.getObject(
+            {
                 Bucket: this.frozenQueryBucket,
                 Key: key,
-            });
-            const stream = object.createReadStream();
-            res.setHeader('Content-Type', 'text/csv');
-            res.setHeader(
-                'Content-Disposition',
-                'attachment; filename="global_health.csv"',
-            );
-            res.setHeader('Cache-Control', 'no-cache');
-            res.setHeader('Pragma', 'no-cache');
-            stream.pipe(res);
-        } catch (e) {
-            // this error is probably a 404 but I will inspect it to work out how to handle
-            const err = e as Error;
-            logger.error('error fetching frozen query', err);
-            logger.error(err);
-            res.status(500).send(err);
-        }
+            },
+            (err, data) => {
+                if (err) {
+                    logger.error('error fetching frozen query', err);
+                    logger.error(err);
+                    res.status(err.statusCode ?? 500).send(err);
+                } else {
+                    res.setHeader('Content-Type', 'text/csv');
+                    res.setHeader(
+                        'Content-Disposition',
+                        'attachment; filename="global_health.csv"',
+                    );
+                    res.setHeader('Cache-Control', 'no-cache');
+                    res.setHeader('Pragma', 'no-cache');
+                    res.status(200).send(data.Body);
+                }
+            },
+        );
     };
 
     /** hasCountryOnly checks the query string to see whether it contains only a filter for a nation **/
