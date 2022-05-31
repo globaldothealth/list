@@ -931,8 +931,8 @@ paths:
                         schema:
                             $ref: '#/components/schemas/FrozenQueryToken'
             responses:
-                '301':
-                    $ref: '#/components/responses/301'
+                '200':
+                    $ref: '#/components/responses/200CasesDownload'
                 '404':
                     $ref: '#/components/responses/404'
                 '500':

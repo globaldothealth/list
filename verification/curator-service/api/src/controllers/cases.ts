@@ -25,8 +25,10 @@ interface FrozenQueryToken {
      * precise enough (we update most sources less frequently than daily).
      */
     queryDate: string;
-    /* The base URL of the instance of G.h that was queried. */
-    baseURL: string;
+    /* The disease name for the G.h instance that this query was frozen on. */
+    disease: string;
+    /* The environment for the G.h instance that this query was frozen on. */
+    environment: string;
     /* The query that was frozen. */
     query: string;
 }
@@ -42,6 +44,8 @@ export default class CasesController {
         private readonly countryDataBucket: string,
         private readonly frozenQueryBucket: string,
         private readonly s3Client: AWS.S3,
+        private readonly diseaseName: string,
+        private readonly environment: string,
     ) {}
 
     /** List simply forwards the request to the data service */
@@ -324,7 +328,8 @@ export default class CasesController {
 
         const freezeToken: FrozenQueryToken = {
             queryDate,
-            baseURL,
+            disease: this.diseaseName,
+            environment: this.environment,
             query,
         };
 
@@ -389,14 +394,17 @@ export default class CasesController {
         req: Request,
         res: Response,
     ): Promise<void> => {
-        const baseURL = req.baseUrl;
         const freezeToken = req.body as FrozenQueryToken;
-        if (baseURL !== freezeToken.baseURL) {
+        if (
+            freezeToken.disease !== this.diseaseName ||
+            freezeToken.environment !== this.environment
+        ) {
             /* the user has an account here but replayed the token into the wrong server:
-             * help them out by redirecting them to the other location
+             * we can't help them as we don't have access to the other server's data.
              */
-            const actualURL = req.url.replace(req.baseUrl, freezeToken.baseURL);
-            res.redirect(actualURL);
+            res.status(404).send(
+                `I am not the ${freezeToken.environment} server for ${freezeToken.disease} cases.`,
+            );
             return;
         }
         const key = this.tokenHash(freezeToken);

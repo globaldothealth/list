@@ -246,6 +246,8 @@ async function makeApp() {
         env.COUNTRY_DATA_BUCKET,
         env.FROZEN_QUERY_BUCKET,
         s3Client,
+        env.DISEASE_NAME,
+        env.SERVICE_ENV,
     );
     apiRouter.get(
         '/cases',
