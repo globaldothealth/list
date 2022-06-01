@@ -19,6 +19,9 @@ services:
       STATIC_DIR: ""
       ENABLE_LOCAL_AUTH: "true"
       DISEASE_NAME: "COVID-19"
+      COMPLETE_DATA_BUCKET: "covid-19-data-export"
+      COUNTRY_DATA_BUCKET: "covid-19-country-export"
+      FROZEN_QUERY_BUCKET: "covid-19-frozen-queries"
   data:
     command: "npm run dev"
     volumes:
