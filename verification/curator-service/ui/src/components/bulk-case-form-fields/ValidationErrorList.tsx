@@ -1,31 +1,24 @@
 import CaseValidationError from './CaseValidationError';
 import ErrorIcon from '@mui/icons-material/Error';
-import React from 'react';
-import makeStyles from '@mui/styles/makeStyles';
+import { styled } from '@mui/material/styles';
 
 interface ValidateErrorListProps {
     errors: CaseValidationError[];
     maxDisplayErrors: number;
 }
 
-const useStyles = makeStyles((theme) => ({
-    errorList: {
-        marginLeft: theme.spacing(4),
-    },
-    icon: {
-        verticalAlign: 'middle',
-        marginRight: theme.spacing(4),
-    },
-    summary: {
-        color: theme.palette.error.main,
-        marginTop: '4em',
-    },
+const ErrorList = styled('ul')(({ theme }) => ({
+    marginLeft: theme.spacing(4),
+}));
+
+const Summary = styled('p')(({ theme }) => ({
+    color: theme.palette.error.main,
+    marginTop: '4em',
 }));
 
 export default function ValidationErrorList(
     props: ValidateErrorListProps,
 ): JSX.Element {
-    const classes = useStyles();
     const truncated = props.errors.length > props.maxDisplayErrors;
     const errorList = props.errors
         .slice(0, props.maxDisplayErrors)
@@ -42,14 +35,17 @@ export default function ValidationErrorList(
         });
     return (
         <div>
-            <p className={classes.summary} data-testid="summary">
-                <ErrorIcon className={classes.icon} data-testid="icon" />
+            <Summary data-testid="summary">
+                <ErrorIcon
+                    sx={{ verticalAlign: 'middle', marginRight: 4 }}
+                    data-testid="icon"
+                />
                 The selected file could not be uploaded. Found{' '}
                 {props.errors.length} row(s) with errors.
                 {truncated &&
                     ` Displaying first ${props.maxDisplayErrors} below.`}
-            </p>
-            <ul className={classes.errorList}>{errorList}</ul>
+            </Summary>
+            <ul>{errorList}</ul>
         </div>
     );
 }

@@ -38,7 +38,7 @@ describe('Search query - string to url', () => {
 describe('Search query - url to string', () => {
     it('converts url search parameters into filters', () => {
         expect(URLToSearchQuery('?country=china&gender=female')).toEqual(
-            'country:china gender:female',
+            encodeURIComponent('country:china gender:female'),
         );
     });
 

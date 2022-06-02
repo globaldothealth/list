@@ -1,7 +1,6 @@
 import '@testing-library/jest-dom/extend-expect';
 
 import { MemoryRouter } from 'react-router-dom';
-import React from 'react';
 import UploadsTable from './UploadsTable';
 import axios from 'axios';
 import { render } from '@testing-library/react';

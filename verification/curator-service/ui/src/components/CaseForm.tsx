@@ -5,7 +5,7 @@ import { Case, VerificationStatus } from '../api/models/Case';
 import { Form, Formik } from 'formik';
 import { GenomeSequence, Travel } from './new-case-form-fields/CaseFormValues';
 import { Paper } from '@mui/material';
-import makeStyles from '@mui/styles/makeStyles';
+import { styled } from '@mui/material/styles';
 import Source, { submitSource } from './common-form-fields/Source';
 import { green, grey, red } from '@mui/material/colors';
 
@@ -40,29 +40,26 @@ import useMediaQuery from '@mui/material/useMediaQuery';
 import { useTheme } from '@mui/material/styles';
 import { codeForCountry, nameCountry } from './util/countryNames';
 
-const useStyles = makeStyles((theme) => ({
-    appBar: {
-        background: theme.palette.background.paper,
-    },
-    tableOfContents: {
-        position: 'fixed',
-    },
-    tableOfContentsRow: {
-        alignItems: 'center',
-        display: 'flex',
-    },
-    form: {
+const TableOfContents = styled('nav')(() => ({
+    position: 'fixed',
+}));
+
+const TableOfContentsRow = styled('div')(() => ({
+    alignItems: 'center',
+    display: 'flex',
+}));
+
+const StyledForm = styled('div', {
+    shouldForwardProp: (prop) => prop !== 'showTableOfContents',
+})<{ showTableOfContents: boolean }>(({ showTableOfContents }) => ({
+    ...(showTableOfContents && {
         paddingLeft: '18em',
-    },
-    formSection: {
-        padding: '0.5em 1em 1em',
-        margin: '2em 0',
-    },
-    statusMessage: {
-        marginTop: '1em',
-        maxWidth: '80%',
-    },
-    cancelButton: { marginLeft: '1em' },
+    }),
+}));
+
+const FormSection = styled(Paper)(() => ({
+    padding: '0.5em 1em 1em',
+    margin: '2em 0',
 }));
 
 function initialValuesFromCase(c?: Case): CaseFormValues {
@@ -294,7 +291,6 @@ export default function CaseForm(props: Props): JSX.Element {
     const { initialCase } = props;
     const theme = useTheme();
     const showTableOfContents = useMediaQuery(theme.breakpoints.up('sm'));
-    const classes = useStyles();
     const history = useHistory();
     const [errorMessage, setErrorMessage] = React.useState('');
 
@@ -595,9 +591,8 @@ export default function CaseForm(props: Props): JSX.Element {
                 }): JSX.Element => (
                     <div>
                         {showTableOfContents && (
-                            <nav className={classes.tableOfContents}>
-                                <div
-                                    className={classes.tableOfContentsRow}
+                            <TableOfContents>
+                                <TableOfContentsRow
                                     onClick={(): void => scrollTo('source')}
                                 >
                                     {tableOfContentsIcon({
@@ -618,9 +613,8 @@ export default function CaseForm(props: Props): JSX.Element {
                                         ),
                                     })}
                                     {'Source'.toLocaleUpperCase()}
-                                </div>
-                                <div
-                                    className={classes.tableOfContentsRow}
+                                </TableOfContentsRow>
+                                <TableOfContentsRow
                                     onClick={(): void =>
                                         scrollTo('demographics')
                                     }
@@ -654,9 +648,8 @@ export default function CaseForm(props: Props): JSX.Element {
                                         ),
                                     })}
                                     {'Demographics'.toLocaleUpperCase()}
-                                </div>
-                                <div
-                                    className={classes.tableOfContentsRow}
+                                </TableOfContentsRow>
+                                <TableOfContentsRow
                                     onClick={(): void => scrollTo('location')}
                                 >
                                     {tableOfContentsIcon({
@@ -670,9 +663,8 @@ export default function CaseForm(props: Props): JSX.Element {
                                         ),
                                     })}
                                     {'Location'.toLocaleUpperCase()}
-                                </div>
-                                <div
-                                    className={classes.tableOfContentsRow}
+                                </TableOfContentsRow>
+                                <TableOfContentsRow
                                     onClick={(): void => scrollTo('events')}
                                 >
                                     {tableOfContentsIcon({
@@ -696,9 +688,8 @@ export default function CaseForm(props: Props): JSX.Element {
                                         ),
                                     })}
                                     {'Events'.toLocaleUpperCase()}
-                                </div>
-                                <div
-                                    className={classes.tableOfContentsRow}
+                                </TableOfContentsRow>
+                                <TableOfContentsRow
                                     onClick={(): void => scrollTo('symptoms')}
                                 >
                                     {tableOfContentsIcon({
@@ -710,9 +701,8 @@ export default function CaseForm(props: Props): JSX.Element {
                                         ),
                                     })}
                                     {'Symptoms'.toLocaleUpperCase()}
-                                </div>
-                                <div
-                                    className={classes.tableOfContentsRow}
+                                </TableOfContentsRow>
+                                <TableOfContentsRow
                                     onClick={(): void =>
                                         scrollTo('preexistingConditions')
                                     }
@@ -731,9 +721,8 @@ export default function CaseForm(props: Props): JSX.Element {
                                         ),
                                     })}
                                     {'Preexisting conditions'.toLocaleUpperCase()}
-                                </div>
-                                <div
-                                    className={classes.tableOfContentsRow}
+                                </TableOfContentsRow>
+                                <TableOfContentsRow
                                     onClick={(): void =>
                                         scrollTo('transmission')
                                     }
@@ -757,9 +746,8 @@ export default function CaseForm(props: Props): JSX.Element {
                                         ),
                                     })}
                                     {'Transmission'.toLocaleUpperCase()}
-                                </div>
-                                <div
-                                    className={classes.tableOfContentsRow}
+                                </TableOfContentsRow>
+                                <TableOfContentsRow
                                     onClick={(): void =>
                                         scrollTo('travelHistory')
                                     }
@@ -777,9 +765,8 @@ export default function CaseForm(props: Props): JSX.Element {
                                         ),
                                     })}
                                     {'Travel History'.toLocaleUpperCase()}
-                                </div>
-                                <div
-                                    className={classes.tableOfContentsRow}
+                                </TableOfContentsRow>
+                                <TableOfContentsRow
                                     onClick={(): void =>
                                         scrollTo('genomeSequences')
                                     }
@@ -794,9 +781,8 @@ export default function CaseForm(props: Props): JSX.Element {
                                         ),
                                     })}
                                     {'Genome Sequences'.toLocaleUpperCase()}
-                                </div>
-                                <div
-                                    className={classes.tableOfContentsRow}
+                                </TableOfContentsRow>
+                                <TableOfContentsRow
                                     onClick={(): void =>
                                         scrollTo('variantOfConcern')
                                     }
@@ -813,9 +799,8 @@ export default function CaseForm(props: Props): JSX.Element {
                                         ),
                                     })}
                                     {'Variant of Concern'.toLocaleUpperCase()}
-                                </div>
-                                <div
-                                    className={classes.tableOfContentsRow}
+                                </TableOfContentsRow>
+                                <TableOfContentsRow
                                     onClick={(): void => scrollTo('pathogens')}
                                 >
                                     {tableOfContentsIcon({
@@ -827,9 +812,8 @@ export default function CaseForm(props: Props): JSX.Element {
                                         ),
                                     })}
                                     {'Pathogens'.toLocaleUpperCase()}
-                                </div>
-                                <div
-                                    className={classes.tableOfContentsRow}
+                                </TableOfContentsRow>
+                                <TableOfContentsRow
                                     onClick={(): void => scrollTo('vaccines')}
                                 >
                                     {tableOfContentsIcon({
@@ -839,9 +823,8 @@ export default function CaseForm(props: Props): JSX.Element {
                                         hasError: false,
                                     })}
                                     {'Vaccines'.toLocaleUpperCase()}
-                                </div>
-                                <div
-                                    className={classes.tableOfContentsRow}
+                                </TableOfContentsRow>
+                                <TableOfContentsRow
                                     onClick={(): void => scrollTo('notes')}
                                 >
                                     {tableOfContentsIcon({
@@ -853,10 +836,9 @@ export default function CaseForm(props: Props): JSX.Element {
                                         ),
                                     })}
                                     {'Notes'.toLocaleUpperCase()}
-                                </div>
+                                </TableOfContentsRow>
                                 {!props.initialCase && (
-                                    <div
-                                        className={classes.tableOfContentsRow}
+                                    <TableOfContentsRow
                                         onClick={(): void =>
                                             scrollTo('numCases')
                                         }
@@ -870,13 +852,11 @@ export default function CaseForm(props: Props): JSX.Element {
                                             ),
                                         })}
                                         {'Number of cases'.toLocaleUpperCase()}
-                                    </div>
+                                    </TableOfContentsRow>
                                 )}
-                            </nav>
+                            </TableOfContents>
                         )}
-                        <div
-                            className={showTableOfContents ? classes.form : ''}
-                        >
+                        <StyledForm showTableOfContents={showTableOfContents}>
                             <Typography variant="h4">
                                 Enter the details for{' '}
                                 {props.initialCase
@@ -888,54 +868,52 @@ export default function CaseForm(props: Props): JSX.Element {
                                 Required fields are marked.
                             </Typography>
                             <Form>
-                                <Paper classes={{ root: classes.formSection }}>
+                                <FormSection>
                                     <Source
                                         initialValue={values.caseReference}
                                         hasSourceEntryId={true}
                                     ></Source>
-                                </Paper>
-                                <Paper classes={{ root: classes.formSection }}>
+                                </FormSection>
+                                <FormSection>
                                     <Demographics></Demographics>
-                                </Paper>
-                                <Paper classes={{ root: classes.formSection }}>
+                                </FormSection>
+                                <FormSection>
                                     <LocationForm></LocationForm>
-                                </Paper>
-                                <Paper classes={{ root: classes.formSection }}>
+                                </FormSection>
+                                <FormSection>
                                     <Events></Events>
-                                </Paper>
-                                <Paper classes={{ root: classes.formSection }}>
+                                </FormSection>
+                                <FormSection>
                                     <Symptoms></Symptoms>
-                                </Paper>
-                                <Paper classes={{ root: classes.formSection }}>
+                                </FormSection>
+                                <FormSection>
                                     <PreexistingConditions></PreexistingConditions>
-                                </Paper>
-                                <Paper classes={{ root: classes.formSection }}>
+                                </FormSection>
+                                <FormSection>
                                     <Transmission></Transmission>
-                                </Paper>
-                                <Paper classes={{ root: classes.formSection }}>
+                                </FormSection>
+                                <FormSection>
                                     <TravelHistory></TravelHistory>
-                                </Paper>
-                                <Paper classes={{ root: classes.formSection }}>
+                                </FormSection>
+                                <FormSection>
                                     <GenomeSequences></GenomeSequences>
-                                </Paper>
-                                <Paper classes={{ root: classes.formSection }}>
+                                </FormSection>
+                                <FormSection>
                                     <Variant></Variant>
-                                </Paper>
-                                <Paper classes={{ root: classes.formSection }}>
+                                </FormSection>
+                                <FormSection>
                                     <Pathogens></Pathogens>
-                                </Paper>
-                                <Paper classes={{ root: classes.formSection }}>
+                                </FormSection>
+                                <FormSection>
                                     <Vaccines></Vaccines>
-                                </Paper>
-                                <Paper classes={{ root: classes.formSection }}>
+                                </FormSection>
+                                <FormSection>
                                     <Notes></Notes>
-                                </Paper>
+                                </FormSection>
                                 {!props.initialCase && (
-                                    <Paper
-                                        classes={{ root: classes.formSection }}
-                                    >
+                                    <FormSection>
                                         <NumCases></NumCases>
-                                    </Paper>
+                                    </FormSection>
                                 )}
                                 {isSubmitting && <LinearProgress />}
                                 <br />
@@ -952,7 +930,7 @@ export default function CaseForm(props: Props): JSX.Element {
                                         : 'Submit case'}
                                 </Button>
                                 <Button
-                                    className={classes.cancelButton}
+                                    sx={{ marginLeft: '1em' }}
                                     color="primary"
                                     variant="outlined"
                                     onClick={props.onModalClose}
@@ -962,7 +940,7 @@ export default function CaseForm(props: Props): JSX.Element {
                             </Form>
                             {errorMessage && (
                                 <MuiAlert
-                                    className={classes.statusMessage}
+                                    sx={{ marginTop: '1em', maxWidth: '80%' }}
                                     elevation={6}
                                     variant="filled"
                                     severity="error"
@@ -970,7 +948,7 @@ export default function CaseForm(props: Props): JSX.Element {
                                     {errorMessage}
                                 </MuiAlert>
                             )}
-                        </div>
+                        </StyledForm>
                     </div>
                 )}
             </Formik>

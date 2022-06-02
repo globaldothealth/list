@@ -1,7 +1,7 @@
 import React from 'react';
 import * as Yup from 'yup';
 
-import { Button, CircularProgress, Typography } from '@mui/material';
+import { Box, Button, CircularProgress, Typography } from '@mui/material';
 import { Form, Formik } from 'formik';
 import Source, { CaseReferenceForm } from './common-form-fields/Source';
 
@@ -10,7 +10,7 @@ import { DateField } from './common-form-fields/FormikFields';
 import MuiAlert from '@mui/material/Alert';
 import { Paper } from '@mui/material';
 import axios from 'axios';
-import makeStyles from '@mui/styles/makeStyles';
+import { styled } from '@mui/material/styles';
 import { useInterval } from '../hooks/useInterval';
 
 /**
@@ -30,59 +30,22 @@ interface RetrievalResult {
     upload_id: string;
 }
 
-// Return type isn't meaningful.
-// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
-const useStyles = makeStyles(() => ({
-    headerBlurb: {
-        maxWidth: '70%',
-        paddingBottom: '3em',
-        paddingTop: '1em',
-    },
-    headerText: {
-        marginTop: '2em',
-    },
-    form: {
-        display: 'flex',
-        flexDirection: 'column',
-        height: '100%',
-        paddingLeft: '3em',
-        paddingRight: '4em',
-    },
-    formSection: {
-        paddingBottom: '2em',
-    },
-    allFormSections: {
-        marginBottom: '2em',
-        maxWidth: '60%',
-        paddingBottom: '0.5em',
-        paddingLeft: '1em',
-        paddingRight: '1em',
-        paddingTop: '0.5em',
-    },
-    statusMessage: {
-        marginTop: '2em',
-        maxWidth: '60%',
-        whiteSpace: 'pre-line',
-    },
-    buttonBar: {
-        alignItems: 'center',
-        display: 'flex',
-        height: '4em',
-        marginTop: 'auto',
-    },
-    cancelButton: {
-        marginLeft: '1em',
-    },
-    progressIndicator: {
-        alignItems: 'center',
-        display: 'flex',
-    },
-    progressText: {
-        marginLeft: '1em',
-    },
-    uploadDetails: {
-        marginLeft: '2em',
-    },
+const StyledForm = styled('div')(() => ({
+    display: 'flex',
+    flexDirection: 'column',
+    height: '100%',
+    paddingLeft: '3em',
+    paddingRight: '4em',
+}));
+
+const StatusMessage = styled(MuiAlert)(() => ({
+    marginTop: '2em',
+    maxWidth: '60%',
+    whiteSpace: 'pre-line',
+}));
+
+const ProgressText = styled('span')(() => ({
+    marginLeft: '1em',
 }));
 
 interface UploadSummary {
@@ -122,7 +85,6 @@ const AutomatedBackfillSchema = Yup.object().shape({
 });
 
 export default function AutomatedBackfill(props: Props): JSX.Element {
-    const classes = useStyles();
     const [errorMessage, setErrorMessage] = React.useState('');
     const [successMessage, setSuccessMessage] = React.useState('');
     const [sourceId, setSourceId] = React.useState('');
@@ -266,28 +228,42 @@ export default function AutomatedBackfill(props: Props): JSX.Element {
                 }}
             >
                 {({ isSubmitting, submitForm }): JSX.Element => (
-                    <div className={classes.form}>
-                        <div className={classes.headerText}>
+                    <StyledForm>
+                        <Box sx={{ marginTop: '2em' }}>
                             <Typography data-testid="header-title" variant="h5">
                                 Backfill historical data
                             </Typography>
                             <Typography
-                                className={classes.headerBlurb}
+                                sx={{
+                                    maxWidth: '70%',
+                                    paddingBottom: '3em',
+                                    paddingTop: '1em',
+                                }}
                                 data-testid="header-blurb"
                                 variant="body2"
                             >
                                 Automatically ingest cases for a configured
                                 source over a specified date range.
                             </Typography>
-                        </div>
+                        </Box>
                         <Form>
-                            <Paper className={classes.allFormSections}>
-                                <div className={classes.formSection}>
+                            <Paper
+                                sx={{
+                                    marginBottom: '2em',
+                                    maxWidth: '60%',
+                                    paddingBottom: '0.5em',
+                                    paddingLeft: '1em',
+                                    paddingRight: '1em',
+                                    paddingTop: '0.5em',
+                                }}
+                            >
+                                <Box sx={{ paddingBottom: '2em' }}>
                                     <Source
                                         freeSolo={false}
                                         sourcesWithStableIdentifiers
                                     />
-                                </div>
+                                </Box>
+
                                 <DateField
                                     name="startDate"
                                     label="First date to backfill (inclusive)"
@@ -301,28 +277,25 @@ export default function AutomatedBackfill(props: Props): JSX.Element {
                             </Paper>
                         </Form>
                         {successMessage && (
-                            <MuiAlert
-                                className={classes.statusMessage}
+                            <StatusMessage
                                 elevation={6}
                                 variant="filled"
                                 severity="success"
                             >
                                 {successMessage}
-                            </MuiAlert>
+                            </StatusMessage>
                         )}
                         {errorMessage && (
-                            <MuiAlert
-                                className={classes.statusMessage}
+                            <StatusMessage
                                 elevation={6}
                                 variant="filled"
                                 severity="error"
                             >
                                 {errorMessage}
-                            </MuiAlert>
+                            </StatusMessage>
                         )}
                         {(isSubmitting || uploadStatus === 'IN_PROGRESS') && (
-                            <MuiAlert
-                                className={classes.statusMessage}
+                            <StatusMessage
                                 data-testid="progressDetails"
                                 elevation={6}
                                 severity="info"
@@ -341,9 +314,16 @@ export default function AutomatedBackfill(props: Props): JSX.Element {
                                         Upload ID: {uploadId}.
                                     </>
                                 )}
-                            </MuiAlert>
+                            </StatusMessage>
                         )}
-                        <div className={classes.buttonBar}>
+                        <Box
+                            sx={{
+                                alignItems: 'center',
+                                display: 'flex',
+                                height: '4em',
+                                marginTop: 'auto',
+                            }}
+                        >
                             <Button
                                 variant="contained"
                                 color="primary"
@@ -357,7 +337,7 @@ export default function AutomatedBackfill(props: Props): JSX.Element {
                                 Backfill source
                             </Button>
                             <Button
-                                className={classes.cancelButton}
+                                sx={{ marginLeft: '1em' }}
                                 color="primary"
                                 disabled={
                                     isSubmitting ||
@@ -371,15 +351,20 @@ export default function AutomatedBackfill(props: Props): JSX.Element {
                             <span style={{ flexGrow: 1 }}></span>
                             {(isSubmitting ||
                                 uploadStatus === 'IN_PROGRESS') && (
-                                <div className={classes.progressIndicator}>
+                                <Box
+                                    sx={{
+                                        alignItems: 'center',
+                                        display: 'flex',
+                                    }}
+                                >
                                     <CircularProgress data-testid="progress" />
-                                    <span className={classes.progressText}>
+                                    <ProgressText>
                                         <strong>Processing backfill.</strong>
-                                    </span>
-                                </div>
+                                    </ProgressText>
+                                </Box>
                             )}
-                        </div>
-                    </div>
+                        </Box>
+                    </StyledForm>
                 )}
             </Formik>
         </AppModal>

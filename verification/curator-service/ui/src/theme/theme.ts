@@ -1,4 +1,4 @@
-import createTheme from '@mui/material/styles/createTheme';
+import { createTheme } from '@mui/material/styles';
 
 // to use our custom theme values in typescript we need to define an extension to the DeprecatedThemeOptions type.
 declare module '@mui/material/styles' {

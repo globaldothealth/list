@@ -1,4 +1,3 @@
-import React from 'react';
 import * as fullCase from './fixtures/fullCase.json';
 import { screen, render, waitFor } from './util/test-utils';
 import EditCase from './EditCase';
