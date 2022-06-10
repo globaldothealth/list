@@ -1,8 +1,8 @@
-export const dateFieldInfo = {
+export const dateFieldInfo = (outbreakDate: Date) => ({
     type: Date,
-    // TODO: This is COVID-19 specific, think about removing this.
-    min: '2019-11-01',
+    // Configure an outbreak date. Case reports will be rejected if they are earlier than that date.
+    min: outbreakDate,
     // Account for skew, add 5s. because when running locally the dates
     // can sometimes be > now when set just before validation.
     max: (): number => Date.now() + 5000,
-};
+});
