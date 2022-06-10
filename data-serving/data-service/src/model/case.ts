@@ -26,6 +26,7 @@ import _ from 'lodash';
 import mongoose, { LeanDocument } from 'mongoose';
 import { ExclusionDataDocument, exclusionDataSchema } from './exclusion-data';
 import { dateFieldInfo } from './date';
+import validateEnv from '../util/validate-env';
 
 /*
  * There are separate types for case for data storage (the mongoose document) and
@@ -37,7 +38,7 @@ import { dateFieldInfo } from './date';
  */
 
 const requiredDateField = {
-    ...dateFieldInfo,
+    ...dateFieldInfo(validateEnv().OUTBREAK_DATE),
     required: true,
 };
 
