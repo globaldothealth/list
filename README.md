@@ -7,13 +7,15 @@ This repository contains the servers and scripts that support its data curation 
 
 Should you have any questions please feel free to get in touch via: info@global.health
 
-## Data
+## COVID-19 Data
 
 The data exposed on Global.health was curated using two methods. ~60,000 cases were manually curated by humans analyzing sources and inputting data into spreadsheets. This data was ported from the spreadsheets into the Curator Portal as described [here](https://github.com/globaldothealth/list/blob/main/data-serving/scripts/convert-data#converting-line-list-data). The rest of the data was automatically ingested from sources through a process described [here](https://github.com/globaldothealth/list/tree/main/ingestion/functions#ingestion-functions). Each case is marked as `VERIFIED` if a human has confirmed this data is valid or `UNVERIFIED` if it has not yet been reviewed.
 
 You can tell if a case was imported from the manually created spreadsheets data in a couple of ways. The case will be marked as created by covid19_spreadsheets@googlegroups.com. It will also have a source URL that links to this documentation. The source URL that was used to find data about these cases can be found in the additional sources section of the detailed case view (found by clicking on the table row).
 
 ## Frontends
+
+### COVID-19
 
 - [dev](https://dev-data.covid-19.global.health)
 - [prod](https://data.covid-19.global.health)
