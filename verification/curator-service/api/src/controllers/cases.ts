@@ -56,9 +56,14 @@ export default class CasesController {
         }
     };
 
-    private logOutcomeOfAppendingDownloadToUser(userId: string, result: FindAndModifyWriteOpResultObject<any>) {
+    private logOutcomeOfAppendingDownloadToUser(
+        userId: string,
+        result: FindAndModifyWriteOpResultObject<any>,
+    ) {
         if (!result.ok) {
-            logger.error(`Error adding download to user: ${result.lastErrorObject}`);
+            logger.error(
+                `Error adding download to user: ${result.lastErrorObject}`,
+            );
         } else {
             logger.info(`Added download to user ${userId}`);
         }
@@ -72,7 +77,7 @@ export default class CasesController {
         try {
             const user = req.user as IUser;
             const result = await users().findOneAndUpdate(
-                { _id: new ObjectId(user.id) },
+                { _id: new ObjectId(user._id) },
                 {
                     $push: {
                         downloads: {
@@ -83,7 +88,7 @@ export default class CasesController {
                     },
                 },
             );
-            this.logOutcomeOfAppendingDownloadToUser(user.id, result);
+            this.logOutcomeOfAppendingDownloadToUser(user._id, result);
 
             axios({
                 method: 'post',
@@ -139,7 +144,7 @@ export default class CasesController {
             );
             const result = await users().findOneAndUpdate(
                 {
-                    _id: new ObjectId(user.id),
+                    _id: new ObjectId(user._id),
                 },
                 {
                     $push: {
@@ -152,7 +157,7 @@ export default class CasesController {
                 },
             );
 
-            this.logOutcomeOfAppendingDownloadToUser(user.id, result);
+            this.logOutcomeOfAppendingDownloadToUser(user._id, result);
 
             axios({
                 method: 'post',
@@ -211,7 +216,7 @@ export default class CasesController {
             });
 
             const result = await users().findOneAndUpdate(
-                { _id: new ObjectId(user.id) },
+                { _id: new ObjectId(user._id) },
                 {
                     $push: {
                         downloads: {
@@ -220,7 +225,7 @@ export default class CasesController {
                     },
                 },
             );
-            this.logOutcomeOfAppendingDownloadToUser(user.id, result);
+            this.logOutcomeOfAppendingDownloadToUser(user._id, result);
 
             res.status(200).send({ signedUrl });
         } catch (err) {
@@ -259,7 +264,7 @@ export default class CasesController {
             });
 
             const result = await users().findOneAndUpdate(
-                { _id: new ObjectId(user.id) },
+                { _id: new ObjectId(user._id) },
                 {
                     $push: {
                         downloads: {
@@ -270,7 +275,7 @@ export default class CasesController {
                     },
                 },
             );
-            this.logOutcomeOfAppendingDownloadToUser(user.id, result);
+            this.logOutcomeOfAppendingDownloadToUser(user._id, result);
 
             res.status(200).send({ signedUrl });
         } catch (err) {

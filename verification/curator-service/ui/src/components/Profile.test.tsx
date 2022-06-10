@@ -93,6 +93,8 @@ describe('<Profile />', () => {
     });
 
     it('checks if the old password is right', async () => {
+        const user = userEvent.setup();
+
         server.use(
             rest.post('/auth/change-password', (req, res, ctx) => {
                 return res(
@@ -103,56 +105,49 @@ describe('<Profile />', () => {
         );
         render(<Profile />, { initialState: noUserInfoState });
 
-        userEvent.type(screen.getByLabelText('Old Password'), '1234567');
-        userEvent.type(screen.getByLabelText('New password'), 'asdD?234');
-        userEvent.type(
+        await user.type(screen.getByLabelText('Old Password'), '1234567');
+        await user.type(screen.getByLabelText('New password'), 'asdD?234');
+        await user.type(
             screen.getByLabelText('Repeat new password'),
             'asdD?234',
         );
 
-        userEvent.click(
+        await user.click(
             screen.getByRole('button', { name: 'Change password' }),
         );
 
-        await waitFor(
-            () => {
-                expect(
-                    screen.getByText(/Old password is incorrect/i),
-                ).toBeInTheDocument();
-            },
-            { timeout: 15000 },
-        );
+        expect(
+            await screen.findByText(/Old password is incorrect/i),
+        ).toBeInTheDocument();
     });
 
     it('checks if the password was changed successfully', async () => {
+        const user = userEvent.setup();
+
         server.use(
             rest.post('/auth/change-password', (req, res, ctx) => {
                 return res(
                     ctx.status(200),
-                    ctx.json({ message: 'Password changed successfull' }),
+                    ctx.json({ message: 'Password changed successfully' }),
                 );
             }),
         );
+
         render(<Profile />, { initialState: noUserInfoState });
 
-        userEvent.type(screen.getByLabelText('Old Password'), '1234567');
-        userEvent.type(screen.getByLabelText('New password'), 'asdD?234');
-        userEvent.type(
+        await user.type(screen.getByLabelText('Old Password'), '1234567');
+        await user.type(screen.getByLabelText('New password'), 'asdD?234');
+        await user.type(
             screen.getByLabelText('Repeat new password'),
             'asdD?234',
         );
 
-        userEvent.click(
+        await user.click(
             screen.getByRole('button', { name: 'Change password' }),
         );
 
-        await waitFor(
-            () => {
-                expect(
-                    screen.getByText(/Password changed successfull/i),
-                ).toBeInTheDocument();
-            },
-            { timeout: 15000 },
-        );
+        expect(
+            await screen.findByText(/Password changed successfully/i),
+        ).toBeInTheDocument();
     });
 });

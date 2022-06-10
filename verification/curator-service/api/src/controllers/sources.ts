@@ -1,6 +1,13 @@
 import { Request, Response } from 'express';
 import { cases, restrictedCases } from '../model/case';
-import { awsRuleDescriptionForSource, awsRuleNameForSource, awsRuleTargetIdForSource, awsStatementIdForSource, ISource, sources } from '../model/source';
+import {
+    awsRuleDescriptionForSource,
+    awsRuleNameForSource,
+    awsRuleTargetIdForSource,
+    awsStatementIdForSource,
+    ISource,
+    sources,
+} from '../model/source';
 
 import AwsBatchClient from '../clients/aws-batch-client';
 import EmailClient from '../clients/email-client';
@@ -62,7 +69,7 @@ export default class SourcesController {
         try {
             const [docsCursor, total] = await Promise.all([
                 sources().find(filter, {
-                    sort: { name: 1},
+                    sort: { name: 1 },
                     skip: limit * (page - 1),
                     limit: limit + 1,
                 }),
@@ -123,7 +130,9 @@ export default class SourcesController {
      * Get a single source.
      */
     get = async (req: Request, res: Response): Promise<void> => {
-        const doc = await sources().findOne({ _id: new ObjectId(req.params.id) });
+        const doc = await sources().findOne({
+            _id: new ObjectId(req.params.id),
+        });
         if (!doc) {
             res.status(404).json({
                 message: `source with id ${req.params.id} could not be found`,
@@ -142,7 +151,9 @@ export default class SourcesController {
             const sourceId = new ObjectId(req.params.id);
             const originalSource = await sources().findOne({ _id: sourceId });
             if (!originalSource) {
-                logger.error(`source with id ${req.params.id} could not be found`);
+                logger.error(
+                    `source with id ${req.params.id} could not be found`,
+                );
                 res.status(404).json({
                     message: `source with id ${req.params.id} could not be found`,
                 });
@@ -156,7 +167,7 @@ export default class SourcesController {
             }
             let update = {
                 $set: {
-                    ...req.body
+                    ...req.body,
                 },
                 $unset: {},
             };
@@ -165,7 +176,7 @@ export default class SourcesController {
             // empty object and set it undefined ourselves here.
             if (JSON.stringify(req.body.dateFilter) === '{}') {
                 update['$unset'] = {
-                    dateFilter: 1
+                    dateFilter: 1,
                 };
                 delete update['$set'].dateFilter;
             }
@@ -174,7 +185,7 @@ export default class SourcesController {
                 update,
                 { returnDocument: 'after' },
             );
-            if(!updatedSource.ok) {
+            if (!updatedSource.ok) {
                 logger.error(`error updating source with ID ${req.params.id}`);
                 logger.error(updatedSource.lastErrorObject);
             }
@@ -288,5 +299,4 @@ export default class SourcesController {
         }
         return;
     };
-
 }

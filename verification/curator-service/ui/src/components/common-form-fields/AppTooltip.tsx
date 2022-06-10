@@ -1,6 +1,6 @@
 import Tooltip from '@mui/material/Tooltip';
-import withStyles from '@mui/styles/withStyles';
 import { Theme } from '@mui/material/styles';
+import { withStyles } from '@mui/styles';
 
 interface Widetooltip {
     maxwidth: 'auto' | '40vw';

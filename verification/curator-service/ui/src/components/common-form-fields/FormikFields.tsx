@@ -14,7 +14,6 @@ import MenuItem from '@mui/material/MenuItem';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 // import { DatePicker } from '@mui/x-date-pickers/DatePicker';
-import MuiTextField from '@mui/material/TextField';
 import { Select, TextField } from 'formik-mui';
 import axios from 'axios';
 import { hasKey } from '../Utils';
@@ -209,6 +208,7 @@ export function DateField(props: DateFieldProps): JSX.Element {
                         placeholder: 'YYYY/MM/DD',
                         variant: 'standard',
                         name: props.name,
+                        'data-testid': props.name,
                     }}
                 />
             </LocalizationProvider>

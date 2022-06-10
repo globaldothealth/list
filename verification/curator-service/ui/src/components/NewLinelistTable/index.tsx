@@ -117,38 +117,42 @@ const NewLinelistTable = () => {
         // eslint-disable-next-line
     }, [dispatch, searchQuery]);
 
-    const rows = cases.map((data) => {
-        return createData(
-            data._id || '',
-            renderDate(data.confirmationDate) || '',
-            data.location.administrativeAreaLevel3 || '',
-            data.location.administrativeAreaLevel2 || '',
-            data.location.administrativeAreaLevel1 || '',
-            nameCountry(data.location.country) || '',
-            parseFloat(data.location.geometry.latitude.toFixed(4)) || '',
-            parseFloat(data.location.geometry.longitude.toFixed(4)) || '',
-            data.demographics?.nationalities || '',
-            parseAge(
-                data.demographics?.ageRange?.start,
-                data.demographics?.ageRange?.end,
-            ),
-            data.demographics?.gender || '',
-            data.importedCase?.outcome ||
-                data.events.find((event) => event.name === 'outcome')?.value ||
-                '',
-            renderDateRange(
-                data.events.find((event) => event.name === 'hospitalAdmission')
-                    ?.dateRange,
-            ),
-            renderDateRange(
-                data.events.find((event) => event.name === 'onsetSymptoms')
-                    ?.dateRange,
-            ),
-            data.caseReference.sourceUrl || '',
-            data.caseReference.verificationStatus,
-            data.exclusionData,
-        );
-    });
+    const rows =
+        cases &&
+        cases.map((data) => {
+            return createData(
+                data._id || '',
+                renderDate(data.confirmationDate) || '',
+                data.location.administrativeAreaLevel3 || '',
+                data.location.administrativeAreaLevel2 || '',
+                data.location.administrativeAreaLevel1 || '',
+                nameCountry(data.location.country) || '',
+                parseFloat(data.location.geometry.latitude.toFixed(4)) || '',
+                parseFloat(data.location.geometry.longitude.toFixed(4)) || '',
+                data.demographics?.nationalities || '',
+                parseAge(
+                    data.demographics?.ageRange?.start,
+                    data.demographics?.ageRange?.end,
+                ),
+                data.demographics?.gender || '',
+                data.importedCase?.outcome ||
+                    data.events.find((event) => event.name === 'outcome')
+                        ?.value ||
+                    '',
+                renderDateRange(
+                    data.events.find(
+                        (event) => event.name === 'hospitalAdmission',
+                    )?.dateRange,
+                ),
+                renderDateRange(
+                    data.events.find((event) => event.name === 'onsetSymptoms')
+                        ?.dateRange,
+                ),
+                data.caseReference.sourceUrl || '',
+                data.caseReference.verificationStatus,
+                data.exclusionData,
+            );
+        });
 
     const handleChangePage = (
         event: React.MouseEvent<HTMLButtonElement> | null,

@@ -7,7 +7,6 @@ import {
 } from './util/test-utils';
 
 import BulkCaseForm from './BulkCaseForm';
-import React from 'react';
 import axios from 'axios';
 
 jest.mock('axios');
@@ -43,8 +42,7 @@ it('renders source and csv upload widgets', async () => {
     expect(screen.getByTestId('header-blurb')).toBeInTheDocument();
 
     // Source selection
-    const sourceComponent = screen.getByTestId('caseReference');
-    expect(screen.getByRole('combobox')).toContainElement(sourceComponent);
+    expect(screen.getByTestId('caseReference')).toBeInTheDocument();
 
     // File upload
     const inputField = screen.getByTestId('csv-input');

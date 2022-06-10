@@ -1,5 +1,4 @@
 import LandingPage from './LandingPage';
-import React from 'react';
 import { render, screen, waitFor } from '../util/test-utils';
 import SignInForm from './SignInForm';
 import SignUpForm from './SignUpForm';
@@ -82,6 +81,8 @@ describe('<SignInForm />', () => {
             }),
         );
 
+        const user = userEvent.setup();
+
         render(<LandingPage />);
 
         // Go to sign in form
@@ -91,18 +92,15 @@ describe('<SignInForm />', () => {
         ).toBeInTheDocument();
 
         // Fill out the form
-        userEvent.type(screen.getByLabelText(/Email/i), 'test@email.com');
-        userEvent.type(screen.getByLabelText('Password'), '1234567');
-        userEvent.click(screen.getByRole('button', { name: 'Sign in' }));
+        await user.type(screen.getByLabelText(/Email/i), 'test@email.com');
+        await user.type(screen.getByLabelText('Password'), '1234567');
+        await user.click(screen.getByRole('button', { name: 'Sign in' }));
 
-        await waitFor(
-            () => {
-                expect(
-                    screen.getByText(/Wrong username or password/i),
-                ).toBeInTheDocument();
-            },
-            { timeout: 15000 },
-        );
+        await waitFor(() => {
+            expect(
+                screen.getByText(/Wrong username or password/i),
+            ).toBeInTheDocument();
+        });
     });
 
     it('displays verification errors when email input is empty', async () => {
@@ -309,9 +307,11 @@ describe('<ForgotPasswordForm />', () => {
     });
 
     test('displays the forgot password window', async () => {
+        const user = userEvent.setup();
+
         render(<SignInForm setRegistrationScreenOn={() => false} />);
 
-        userEvent.click(screen.getByTestId('forgot-password-link'));
+        await user.click(screen.getByTestId('forgot-password-link'));
 
         expect(
             screen.getByTestId('forgot-password-dialog'),
@@ -319,11 +319,13 @@ describe('<ForgotPasswordForm />', () => {
     });
 
     test('displays verification errors when email is incorrect', async () => {
+        const user = userEvent.setup();
+
         render(<SignInForm setRegistrationScreenOn={() => false} />);
 
-        userEvent.click(screen.getByTestId('forgot-password-link'));
-        userEvent.type(screen.getByRole('textbox'), 'incorrectemail');
-        userEvent.click(screen.getByTestId('send-reset-link'));
+        await user.click(screen.getByTestId('forgot-password-link'));
+        await user.type(screen.getByRole('textbox'), 'incorrectemail');
+        await user.click(screen.getByTestId('send-reset-link'));
 
         await waitFor(() => {
             expect(
@@ -333,10 +335,12 @@ describe('<ForgotPasswordForm />', () => {
     });
 
     test('displays verification errors when email is empty', async () => {
+        const user = userEvent.setup();
+
         render(<SignInForm setRegistrationScreenOn={() => false} />);
 
-        userEvent.click(screen.getByTestId('forgot-password-link'));
-        userEvent.click(screen.getByTestId('send-reset-link'));
+        await user.click(screen.getByTestId('forgot-password-link'));
+        await user.click(screen.getByTestId('send-reset-link'));
 
         await waitFor(() => {
             expect(
@@ -359,6 +363,8 @@ describe('<ChangePasswordForm />', () => {
     });
 
     test('displays verification errors when password in ChangePassword form is empty', async () => {
+        const user = userEvent.setup();
+
         render(
             <Route exact path="/reset-password/:token/:id">
                 <LandingPage />
@@ -366,7 +372,7 @@ describe('<ChangePasswordForm />', () => {
             { initialRoute: '/reset-password/token/id' },
         );
 
-        userEvent.click(screen.getByTestId('change-password-button'));
+        await user.click(screen.getByTestId('change-password-button'));
 
         await waitFor(() => {
             expect(screen.getByText('Required!')).toBeInTheDocument();
@@ -374,6 +380,8 @@ describe('<ChangePasswordForm />', () => {
     });
 
     test('displays verification errors when confirm password is empty', async () => {
+        const user = userEvent.setup();
+
         render(
             <Route exact path="/reset-password/:token/:id">
                 <LandingPage />
@@ -381,8 +389,8 @@ describe('<ChangePasswordForm />', () => {
             { initialRoute: '/reset-password/token/id' },
         );
 
-        userEvent.type(screen.getByLabelText('Password'), '12345');
-        userEvent.click(screen.getByTestId('change-password-button'));
+        await user.type(screen.getByLabelText('Password'), '12345');
+        await user.click(screen.getByTestId('change-password-button'));
 
         await waitFor(() => {
             expect(

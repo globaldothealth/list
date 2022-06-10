@@ -4,6 +4,8 @@ import { MemoryRouter } from 'react-router-dom';
 import UploadsTable from './UploadsTable';
 import axios from 'axios';
 import { render } from '@testing-library/react';
+import { ThemeProvider } from '@mui/material/styles';
+import { theme } from '../theme/theme';
 
 jest.mock('axios');
 const mockedAxios = axios as jest.Mocked<typeof axios>;
@@ -45,7 +47,9 @@ it('loads and displays uploads', async () => {
 
     const { findByText } = render(
         <MemoryRouter>
-            <UploadsTable />
+            <ThemeProvider theme={theme}>
+                <UploadsTable />
+            </ThemeProvider>
         </MemoryRouter>,
     );
 
@@ -70,7 +74,9 @@ it('API errors are displayed', async () => {
 
     const { findByText } = render(
         <MemoryRouter>
-            <UploadsTable />
+            <ThemeProvider theme={theme}>
+                <UploadsTable />
+            </ThemeProvider>
         </MemoryRouter>,
     );
     expect(mockedAxios.get).toHaveBeenCalledTimes(1);

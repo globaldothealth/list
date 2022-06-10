@@ -567,8 +567,7 @@ describe('Linelist table', function () {
         cy.contains('1 - 5 of 7').should('exist');
     });
 
-    // @TODO
-    it.only('Can sort the data', () => {
+    it('Can sort the data', () => {
         cy.addCase({
             country: 'France',
             notes: 'some notes',

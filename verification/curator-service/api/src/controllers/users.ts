@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import { ObjectId } from 'mongodb';
 
 import { userRoles, users } from '../model/user';
+import { logger } from '../util/logger';
 
 /**
  * List the users.
@@ -22,13 +23,17 @@ export const list = async (req: Request, res: Response): Promise<void> => {
     }
     try {
         const [docsCursor, total] = await Promise.all([
-            users().find({}, {
-                skip: limit * (page - 1),
-                limit: limit + 1,
-            }),
+            users().find(
+                {},
+                {
+                    skip: limit * (page - 1),
+                    limit: limit + 1,
+                },
+            ),
             users().countDocuments({}),
         ]);
         const docs = await docsCursor.toArray();
+
         // If we have more items than limit, add a response param
         // indicating that there is more to fetch on the next page.
         if (docs.length == limit + 1) {
@@ -58,10 +63,10 @@ export const updateRoles = async (
     try {
         const result = await users().findOneAndUpdate(
             { _id: new ObjectId(req.params.id) },
-            { $set: { roles: req.body.roles }},
+            { $set: { roles: req.body.roles } },
             {
                 // Return the updated object.
-                returnDocument: "after",
+                returnDocument: 'after',
             },
         );
         if (!result.ok || !result.value) {

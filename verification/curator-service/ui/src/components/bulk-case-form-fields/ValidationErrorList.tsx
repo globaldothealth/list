@@ -7,10 +7,6 @@ interface ValidateErrorListProps {
     maxDisplayErrors: number;
 }
 
-const ErrorList = styled('ul')(({ theme }) => ({
-    marginLeft: theme.spacing(4),
-}));
-
 const Summary = styled('p')(({ theme }) => ({
     color: theme.palette.error.main,
     marginTop: '4em',

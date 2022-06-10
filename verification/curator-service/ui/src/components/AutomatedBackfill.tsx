@@ -218,16 +218,18 @@ export default function AutomatedBackfill(props: Props): JSX.Element {
             <Formik
                 validationSchema={AutomatedBackfillSchema}
                 validateOnChange={false}
-                initialValues={{
-                    caseReference: undefined,
-                    startDate: null,
-                    endDate: null,
-                }}
-                onSubmit={(values): Promise<void> => {
+                initialValues={
+                    {
+                        caseReference: undefined,
+                        startDate: null,
+                        endDate: null,
+                    } as AutomatedBackfillValues
+                }
+                onSubmit={(values: AutomatedBackfillValues): Promise<void> => {
                     return triggerBackfill(values);
                 }}
             >
-                {({ isSubmitting, submitForm }): JSX.Element => (
+                {({ isSubmitting, submitForm, values }): JSX.Element => (
                     <StyledForm>
                         <Box sx={{ marginTop: '2em' }}>
                             <Typography data-testid="header-title" variant="h5">
@@ -268,12 +270,12 @@ export default function AutomatedBackfill(props: Props): JSX.Element {
                                     name="startDate"
                                     label="First date to backfill (inclusive)"
                                     required
-                                ></DateField>
+                                />
                                 <DateField
                                     name="endDate"
                                     label="Last date to backfill (inclusive)"
                                     required
-                                ></DateField>
+                                />
                             </Paper>
                         </Form>
                         {successMessage && (
@@ -344,6 +346,7 @@ export default function AutomatedBackfill(props: Props): JSX.Element {
                                     uploadStatus === 'IN_PROGRESS'
                                 }
                                 onClick={props.onModalClose}
+                                data-testid="cancel"
                                 variant="outlined"
                             >
                                 Cancel

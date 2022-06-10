@@ -36,7 +36,10 @@ export const ActionMenu = ({ caseId }: ActionMenuProps) => {
         setAnchorEl(event.currentTarget);
     };
 
-    const handleClose = () => {
+    const handleClose = (event?: any) => {
+        if (event) {
+            event.stopPropagation();
+        }
         setAnchorEl(null);
     };
 
@@ -76,7 +79,7 @@ export const ActionMenu = ({ caseId }: ActionMenuProps) => {
                 }}
                 anchorEl={anchorEl}
                 open={open}
-                onClose={handleClose}
+                onClose={(event: any) => handleClose(event)}
             >
                 <ActionMenuItem
                     onClick={(event) => handleActionClick(event, Actions.Edit)}

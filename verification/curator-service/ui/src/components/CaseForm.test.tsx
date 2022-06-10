@@ -1,9 +1,10 @@
-import { fireEvent, render, waitFor } from '@testing-library/react';
+import { fireEvent, render, waitFor, screen } from '@testing-library/react';
 
 import CaseForm from './CaseForm';
 import { MemoryRouter } from 'react-router-dom';
-import React from 'react';
 import axios from 'axios';
+import { ThemeProvider } from '@mui/material/styles';
+import { theme } from '../theme/theme';
 
 jest.mock('axios');
 const mockedAxios = axios as jest.Mocked<typeof axios>;
@@ -55,34 +56,40 @@ afterEach(() => {
 });
 
 it('renders form', async () => {
-    const { getAllByText, getByTestId, getByText } = render(
+    render(
         <MemoryRouter>
-            <CaseForm
-                onModalClose={(): void => {
-                    return;
-                }}
-            />
+            <ThemeProvider theme={theme}>
+                <CaseForm
+                    onModalClose={(): void => {
+                        return;
+                    }}
+                />
+            </ThemeProvider>
         </MemoryRouter>,
     );
     await waitFor(() => expect(mockedAxios.get).toHaveBeenCalledTimes(4));
-    expect(getByText('Enter the details for a new case')).toBeInTheDocument();
-    expect(getByText(/Submit case/i)).toBeInTheDocument();
-    expect(getAllByText(/Demographics/i)).toHaveLength(1);
-    expect(getAllByText(/Location/i)).toHaveLength(3);
-    expect(getAllByText(/Events/i)).toHaveLength(1);
-    expect(getByTestId('caseReference')).toBeInTheDocument();
-    expect(getByText(/Nationalities/i)).toBeInTheDocument();
-    expect(getByText(/Variant of Concern/i)).toBeInTheDocument();
+    expect(
+        screen.getByText('Enter the details for a new case'),
+    ).toBeInTheDocument();
+    expect(screen.getByText(/Submit case/i)).toBeInTheDocument();
+    expect(screen.getAllByText(/Demographics/i)).toHaveLength(1);
+    expect(screen.getAllByText(/Location/i)).toHaveLength(3);
+    expect(screen.getAllByText(/Events/i)).toHaveLength(1);
+    expect(screen.getByTestId('caseReference')).toBeInTheDocument();
+    expect(screen.getByLabelText(/Nationalities/i)).toBeInTheDocument();
+    expect(screen.getByText(/Variant of Concern/i)).toBeInTheDocument();
 });
 
 test('Check location error message to become red on submit', () => {
     const { getByText } = render(
         <MemoryRouter>
-            <CaseForm
-                onModalClose={(): void => {
-                    return;
-                }}
-            />
+            <ThemeProvider theme={theme}>
+                <CaseForm
+                    onModalClose={(): void => {
+                        return;
+                    }}
+                />
+            </ThemeProvider>
         </MemoryRouter>,
     );
 
@@ -95,11 +102,13 @@ test('Check location error message to become red on submit', () => {
 it('can add and remove genome sequencing sections', async () => {
     const { queryByTestId, getByTestId, getByText } = render(
         <MemoryRouter>
-            <CaseForm
-                onModalClose={(): void => {
-                    return;
-                }}
-            />
+            <ThemeProvider theme={theme}>
+                <CaseForm
+                    onModalClose={(): void => {
+                        return;
+                    }}
+                />
+            </ThemeProvider>
         </MemoryRouter>,
     );
     await waitFor(() => expect(mockedAxios.get).toHaveBeenCalledTimes(4));

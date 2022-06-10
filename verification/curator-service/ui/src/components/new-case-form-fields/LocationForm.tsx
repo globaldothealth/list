@@ -2,7 +2,7 @@ import React from 'react';
 import { Field, useFormikContext } from 'formik';
 import { Typography } from '@mui/material';
 
-import makeStyles from '@mui/styles/makeStyles';
+import { makeStyles } from '@mui/styles';
 
 import AddIcon from '@mui/icons-material/Add';
 import Autocomplete from '@mui/material/Autocomplete';
@@ -14,7 +14,6 @@ import Location from './Location';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import { RequiredHelperText } from '../common-form-fields/FormikFields';
 import Scroll from 'react-scroll';
-import MuiTextField from '@mui/material/TextField';
 import { TextField } from 'formik-mui';
 import { StyledTooltip } from './StyledTooltip';
 import axios from 'axios';

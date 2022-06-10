@@ -25,12 +25,6 @@ const TablePaginationBar = styled('div')(({ theme }) => ({
     height: '64px',
 }));
 
-interface UploadsTableState {
-    url: string;
-    error: string;
-    pageSize: number;
-}
-
 interface UploadSummary {
     numCreated?: number;
     numUpdated?: number;
@@ -73,7 +67,7 @@ interface TableRow {
 const UploadsTable = () => {
     const tableRef = useRef<any>(null);
 
-    const [url, setUrl] = useState('/api/sources/uploads');
+    const [url] = useState('/api/sources/uploads');
     const [error, setError] = useState('');
     const [pageSize, setPageSize] = useState(10);
 

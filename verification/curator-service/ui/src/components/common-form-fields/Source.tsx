@@ -366,8 +366,15 @@ export function SourcesAutocomplete(
                     option: CaseReferenceForm,
                 ): React.ReactNode => {
                     return (
-                        <span>
-                            <Typography variant="body2">
+                        <span key={option.sourceId}>
+                            <Typography
+                                variant="body2"
+                                onClick={() => {
+                                    setValue(option);
+                                    setFieldValue(name, option);
+                                }}
+                                sx={{ cursor: 'pointer' }}
+                            >
                                 {option.sourceUrl}
                             </Typography>
                         </span>

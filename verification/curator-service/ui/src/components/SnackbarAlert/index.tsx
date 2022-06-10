@@ -1,18 +1,21 @@
-import React, { ReactNode } from 'react';
+import React, { ReactNode, forwardRef } from 'react';
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert, { AlertProps } from '@mui/material/Alert';
 
 interface SnackbarAlertProps {
     isOpen: boolean | undefined;
-    onClose: (value: boolean) => void;
+    onClose: () => void;
     message: string | ReactNode;
     type: 'success' | 'warning' | 'info' | 'error';
     durationMs?: number;
 }
 
-const Alert = (props: AlertProps) => {
-    return <MuiAlert elevation={6} variant="filled" {...props} />;
-};
+const Alert = forwardRef<HTMLDivElement, AlertProps>(function Alert(
+    props,
+    ref,
+) {
+    return <MuiAlert elevation={6} variant="filled" ref={ref} {...props} />;
+});
 
 export const SnackbarAlert: React.FC<SnackbarAlertProps> = ({
     isOpen,
@@ -23,9 +26,10 @@ export const SnackbarAlert: React.FC<SnackbarAlertProps> = ({
 }) => {
     return (
         <Snackbar
+            anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
             open={isOpen}
             autoHideDuration={durationMs}
-            onClose={() => onClose(false)}
+            onClose={onClose}
         >
             <Alert severity={type}>{message}</Alert>
         </Snackbar>
