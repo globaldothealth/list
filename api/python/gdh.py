@@ -27,6 +27,11 @@ FILTERS = {
     "country"
 }
 
+ENVIRONMENTS = {
+    "production",
+    "dev",
+    "qa"
+}
 
 def stringify_filters(**kwargs):
     if not kwargs:
@@ -53,13 +58,16 @@ def cases_cachefile(server, folder="cache", **kwargs):
 
 
 class GlobalDotHealth:
-    def __init__(self, apikey, disease='covid-19'):
+    def __init__(self, apikey, disease='covid-19', environment = 'production'):
         # Let someone override our URL explicitly
         if server := os.getenv('GDH_URL'):
             self.server = server
         else:
-            # Otherwise, build a production URL from the disease name
-            self.server = f'https://data.{disease}.global.health'
+            # Otherwise, build a URL from the disease name/environment
+            if environment == 'production':
+                self.server = f'https://data.{disease}.global.health'
+            else:
+                self.server = f'https://{environment}-data.{disease}.global.health'
         self.apikey = apikey
 
     def get_cases(self, **kwargs):

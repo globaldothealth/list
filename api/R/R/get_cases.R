@@ -1,6 +1,6 @@
 get_cases <-
-function(apikey, disease = 'covid-19', ...) {
-    server <- get_server(disease)
+function(apikey, disease = DISEASE, environment = ENVIRONMENT, ...) {
+    server <- get_server(disease, environment)
     data <- sprintf('{"format": "csv", "query": "%s"}', trimws(stringify_filters(...)))
     res <- POST(paste0(server, downloadAsync), body = data,
                 add_headers("Content-Type" = "application/json",
