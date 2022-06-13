@@ -1,5 +1,6 @@
 get_cases <-
-function(apikey, server = GDH_URL, ...) {
+function(apikey, disease = 'covid-19', ...) {
+    server <- get_server(disease)
     data <- sprintf('{"format": "csv", "query": "%s"}', trimws(stringify_filters(...)))
     res <- POST(paste0(server, downloadAsync), body = data,
                 add_headers("Content-Type" = "application/json",
