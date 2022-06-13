@@ -13,7 +13,7 @@ Unless you always need to be working with the latest data, we recommend
 using this function instead of \code{\link{get_cases}}.
 }
 \usage{
-get_cached_cases(apikey, disease = 'covid-19', refresh = FALSE, folder = "cache", \dots)
+get_cached_cases(apikey, disease = 'covid-19', environment = 'production', refresh = FALSE, folder = "cache", \dots)
 }
 \arguments{
   \item{apikey}{
@@ -23,6 +23,9 @@ and clicking on Profile.
 }
   \item{disease}{
 Identify the outbreak for which you want to fetch data; the default is COVID-19.
+}
+  \item{environment}{
+Specify the environment whose data you want to use: default is production, alternatives are dev or qa.
 }
   \item{refresh}{
 Optional, if set to TRUE, refreshes the cache and returns the latest version of
