@@ -16,6 +16,6 @@ def test_stringify_filters(source, expected):
 
 def test_cases_cachefile():
     assert (
-        cases_cachefile(country="Belgium")
+        cases_cachefile('https://data.covid-19.global.health', country="Belgium")
         == "cache/e6ee72213b1c28500279d56c119fb9eccb2d5c67b0b6167ca241980a3bfc7762.csv"
     )
