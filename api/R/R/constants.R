@@ -1,3 +1,3 @@
-GDH_URL <- "https://data.covid-19.global.health"
 FILTERS <- c("country")
+DISEASE <- "covid-19"
 downloadAsync <- "/api/cases/downloadAsync"
