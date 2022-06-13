@@ -10,7 +10,7 @@ Unless you always need to be working with the latest data, we recommend
 using \code{\link{get_cached_cases}} instead of this function.
 }
 \usage{
-get_cases(apikey, disease = 'covid-19', \dots)
+get_cases(apikey, disease = 'covid-19', environment = 'production', \dots)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -20,6 +20,9 @@ up at \url{https://data.covid-19.global.health} and clicking on Profile.
 }
   \item{disease}{
 Identify the outbreak for which you want to fetch data; the default is COVID-19.
+}
+  \item{environment}{
+Specify the environment whose data you want to use: default is production, alternatives are dev or qa.
 }
   \item{\dots}{
 Filters to use for data. Currently the only supported filter is 'country'
