@@ -4,15 +4,16 @@
 
 G.h case data, as well as the source, user, and session data for the curator portal, is stored in a MongoDB database.
 
-We have multiple instances of MongoDB, ranging from local instances for development, to dev (for
-https://dev-data.covid-19.global.health/), to prod (for https://data.covid-19.global.health/).
+We have multiple instances of MongoDB, ranging from local instances for development, to dev and qa (for
+https://dev-data.covid-19.global.health/ and https://qa-data.covid-19.global.health in the case of COVID-19 data),
+and prod (for https://data.covid-19.global.health/ for COVID-19).
 
 Each instance has a `covid19` database, which in turn has collections for each type of data, e.g. `cases`, `users`, etc.
 
 ## Case data
 
 The data in the `cases` collection is the primary data that G.h collects, verifies, and shares. Each document in the
-`cases` collection represents a single COVID-19 case.
+`cases` collection represents a single disease case.
 
 ### Shape of the data
 
@@ -33,7 +34,7 @@ indexes the id of the `case` and its revision for quick lookups.
 
 ### Importing cases
 
-G.h has millions of case records that predate the new curator portal. These are exported to a
+G.h has millions of COVID-19 case records that predate the new curator portal. These are exported to a
 [gzipped CSV](https://github.com/beoutbreakprepared/nCoV2019/tree/master/latest_data) in a
 [separate repo](https://github.com/beoutbreakprepared/nCoV2019).
 
