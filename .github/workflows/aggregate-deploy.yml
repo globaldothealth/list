@@ -5,8 +5,8 @@ on:
     branches: [main]
     paths:
     - '.github/workflows/aggregate-deploy.yml'
-    - 'data-serving/scripts/aggregate/**'
-    - '!data-serving/scripts/aggregate/README.md'
+    - 'data-serving/scripts/aggregate-covid19/**'
+    - '!data-serving/scripts/aggregate-covid19/README.md'
   workflow_dispatch:
 
 jobs:
@@ -26,7 +26,7 @@ jobs:
       uses: aws-actions/amazon-ecr-login@v1
 
     - name: Build, tag, and push image to Amazon ECR (latest)
-      working-directory: data-serving/scripts/aggregate/aggregate
+      working-directory: data-serving/scripts/aggregate-covid19/aggregate
       env:
         REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         REPO: gdh-map-aggregator
