@@ -63,7 +63,7 @@ data-export/
 └── latest
 ```
 
-Currently the corresponding S3 buckets according to environment are:
+Currently the corresponding S3 buckets for the COVID-19 data according to environment are:
 * **prod**: covid-19-country-export, covid-19-data-export
 * **dev**: covid-19-country-export-dev, covid-19-data-export-dev
 
