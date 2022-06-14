@@ -69,7 +69,7 @@ Give your user all the permissions to access the portal and make CRUD updates.
 ./dev/make_superuser.sh $YOUR_GOOGLE_EMAIL
 ```
 
-Note that **the user must be logged-in into the portal before you can issue this command**.
+Note that **the user must be logged-in into the portal before you can issue this command**. To run it against a different instance/database, set `$GDH_DATABASE` to the appropriate connection string.
 
 **Windows users**
 
