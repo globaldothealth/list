@@ -22,6 +22,7 @@ import bcrypt from 'bcrypt';
 import * as crypto from 'crypto';
 import EmailClient from '../clients/email-client';
 import { ObjectId } from 'mongodb';
+import { baseURL } from '../util/base-url';
 
 // Global variable for newsletter acceptance
 let isNewsletterAccepted: boolean;
@@ -172,6 +173,7 @@ export class AuthController {
     constructor(
         private readonly env: string,
         private readonly afterLoginRedirURL: string,
+        private readonly disease: string,
         public readonly lambdaClient: AwsLambdaClient,
         public readonly emailClient: EmailClient,
     ) {
@@ -470,24 +472,7 @@ export class AuthController {
                         createdAt: Date.now(),
                     });
 
-                    let url = '';
-                    switch (env) {
-                        case 'local':
-                            url = 'http://localhost:3002';
-                            break;
-                        case 'dev':
-                            url = 'https://dev-data.covid-19.global.health';
-                            break;
-                        case 'qa':
-                            url = 'https://qa-data.covid-19.global.health';
-                            break;
-                        case 'prod':
-                            url = 'https://data.covid-19.global.health';
-                            break;
-                        default:
-                            url = 'http://localhost:3002';
-                            break;
-                    }
+                    const url = baseURL(this.disease, this.env);
 
                     const resetLink = `${url}/reset-password/${resetToken}/${user._id}`;
 
