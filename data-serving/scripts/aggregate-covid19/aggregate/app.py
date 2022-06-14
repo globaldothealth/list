@@ -200,7 +200,7 @@ def transform_counts(
     counts: list[dict[str, Any]], jhu_counts: dict[str, int] = None
 ) -> list[dict[str, Any]]:
     """
-    Transforms aggregated casecount data for map
+    Transforms aggregated COVID-19 casecount data for map
 
     counts -- Case counts as a list of records of the form
               [{"_id": "two-letter country code", "casecount": N}, ... ]
