@@ -154,6 +154,7 @@ describe('mustHaveAnyRole', () => {
         const authController = new AuthController(
             'local',
             '/redirect-after-login',
+            'covid-19',
             mLambdaClient,
             mEmailClient,
         );
