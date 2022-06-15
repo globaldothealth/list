@@ -22,6 +22,7 @@ import bcrypt from 'bcrypt';
 import * as crypto from 'crypto';
 import EmailClient from '../clients/email-client';
 import { ObjectId } from 'mongodb';
+import { baseURL, welcomeEmail } from '../util/instance-details';
 
 // Global variable for newsletter acceptance
 let isNewsletterAccepted: boolean;
@@ -172,6 +173,7 @@ export class AuthController {
     constructor(
         private readonly env: string,
         private readonly afterLoginRedirURL: string,
+        private readonly disease: string,
         public readonly lambdaClient: AwsLambdaClient,
         public readonly emailClient: EmailClient,
     ) {
@@ -470,24 +472,7 @@ export class AuthController {
                         createdAt: Date.now(),
                     });
 
-                    let url = '';
-                    switch (env) {
-                        case 'local':
-                            url = 'http://localhost:3002';
-                            break;
-                        case 'dev':
-                            url = 'https://dev-data.covid-19.global.health';
-                            break;
-                        case 'qa':
-                            url = 'https://qa-data.covid-19.global.health';
-                            break;
-                        case 'prod':
-                            url = 'https://data.covid-19.global.health';
-                            break;
-                        default:
-                            url = 'http://localhost:3002';
-                            break;
-                    }
+                    const url = baseURL(this.disease, this.env);
 
                     const resetLink = `${url}/reset-password/${resetToken}/${user._id}`;
 
@@ -703,19 +688,7 @@ export class AuthController {
                         await this.emailClient.send(
                             [email],
                             'Welcome to Global.health',
-                            `<p>Hello ${email},</p>
-                            <p>Thank you for registering with Global.health! We're thrilled to have you join our international community and mission to advance the global response to infectious diseases through the sharing of trusted and open public health data.</p>
-                            <p>Here are a few things you can do:</p>
-                            <ul>
-                                <li>Filter and export <a href="https://data.covid-19.global.health">G.h Data</a> containing detailed information on over 50 million anonymized COVID-19 cases from over 100 countries.</li>
-                                <li>Explore the <a href="https://map.covid-19.global.health">G.h Map</a> to see available case data visualized by country, region, and coverage.</li>
-                                <li>Check out our <a href="https://global.health/faqs/">FAQs</a> for more information on our platform, process, team, data sources, citation guidelines, and plans for the future.</li>
-                                <li>Get involved! G.h is being built via a network of hundreds of volunteers that could use your help. If you're interested in joining us, please fill out this <a href="https://global.health/about/#get-involved">form</a>.</li>
-                                <li>Connect with us on <a href="https://twitter.com/globaldothealth">Twitter</a>, <a href="https://www.linkedin.com/company/globaldothealth">LinkedIn</a>, and <a href="https://github.com/globaldothealth">GitHub</a> for the latest news and updates.</li>
-                            </ul>
-                            <p>If you have any questions, suggestions, or connections don't hesitate to email us and a member of our team will be sure to follow up.</p>
-                            <p>Thank you again for your interest and support! We hope G.h proves valuable to your work and look forward to hearing from you.</p>
-                            <p>The G.h Team</p>`,
+                            welcomeEmail(this.disease, email),
                         );
 
                         return done(null, userPublicFields(newUser));

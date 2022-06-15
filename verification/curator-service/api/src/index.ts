@@ -139,6 +139,7 @@ async function makeApp() {
     const authController = new AuthController(
         env.SERVICE_ENV,
         env.AFTER_LOGIN_REDIRECT_URL,
+        env.DISEASE_NAME,
         awsLambdaClient,
         emailClient,
     );
@@ -244,7 +245,8 @@ async function makeApp() {
         env.DATASERVER_URL,
         env.COMPLETE_DATA_BUCKET,
         env.COUNTRY_DATA_BUCKET,
-        s3Client);
+        s3Client,
+    );
     apiRouter.get(
         '/cases',
         authenticateByAPIKey,
