@@ -65,6 +65,7 @@ interface TableRow {
 }
 
 const UploadsTable = () => {
+    // eslint-disable-next-line
     const tableRef = useRef<any>(null);
 
     const [url] = useState('/api/sources/uploads');

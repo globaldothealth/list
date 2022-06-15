@@ -12,7 +12,7 @@ import {
     useMediaQuery,
 } from '@mui/material';
 import { DownloadButton } from '../DownloadButton';
-import NewLinelistTable from '../NewLinelistTable';
+import LinelistTable from '../LinelistTable';
 import {
     Link,
     Redirect,
@@ -433,7 +433,7 @@ export default function App(): JSX.Element {
                     />
                     {user && (
                         <Route exact path="/cases">
-                            <NewLinelistTable />
+                            <LinelistTable />
                         </Route>
                     )}
                     {hasAnyRole(user, ['curator']) && (

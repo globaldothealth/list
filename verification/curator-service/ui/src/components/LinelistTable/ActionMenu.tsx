@@ -36,6 +36,7 @@ export const ActionMenu = ({ caseId }: ActionMenuProps) => {
         setAnchorEl(event.currentTarget);
     };
 
+    // eslint-disable-next-line
     const handleClose = (event?: any) => {
         if (event) {
             event.stopPropagation();
@@ -79,7 +80,7 @@ export const ActionMenu = ({ caseId }: ActionMenuProps) => {
                 }}
                 anchorEl={anchorEl}
                 open={open}
-                onClose={(event: any) => handleClose(event)}
+                onClose={(event) => handleClose(event)}
             >
                 <ActionMenuItem
                     onClick={(event) => handleActionClick(event, Actions.Edit)}

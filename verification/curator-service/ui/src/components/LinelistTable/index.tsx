@@ -68,7 +68,7 @@ interface LocationState {
     bulkMessage: string;
 }
 
-const NewLinelistTable = () => {
+const LinelistTable = () => {
     const dispatch = useAppDispatch();
     const history = useHistory();
     const location = useLocation<LocationState>();
@@ -563,4 +563,4 @@ const NewLinelistTable = () => {
     );
 };
 
-export default NewLinelistTable;
+export default LinelistTable;
