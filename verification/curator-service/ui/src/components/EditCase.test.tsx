@@ -73,6 +73,7 @@ describe('<EditCase />', () => {
                 onModalClose={(): void => {
                     return;
                 }}
+                diseaseName="COVID-19"
             />,
         );
         await waitFor(() => expect(mockedAxios.get).toHaveBeenCalledTimes(6));
@@ -146,6 +147,7 @@ describe('<EditCase />', () => {
                 onModalClose={(): void => {
                     return;
                 }}
+                diseaseName="COVID-19"
             />,
         );
 
