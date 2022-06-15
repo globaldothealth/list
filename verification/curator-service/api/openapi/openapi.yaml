@@ -940,6 +940,8 @@ paths:
             responses:
                 '200':
                     $ref: '#/components/responses/200LocationArray'
+                '403':
+                    $ref: '#/components/responses/403'
                 '422':
                     $ref: '#/components/responses/422'
                 '500':
@@ -1052,6 +1054,21 @@ paths:
                     $ref: '#/components/responses/404'
                 '422':
                     $ref: '#/components/responses/422'
+                '500':
+                    $ref: '#/components/responses/500'
+        delete:
+            tags: [User]
+            summary: Deletes a user
+            operationId: deleteUser
+            responses:
+                '204':
+                    $ref: '#/components/responses/204'
+                '401':
+                    $ref: '#/components/responses/401'
+                '403':
+                    $ref: '#/components/responses/403'
+                '404':
+                    $ref: '#/components/responses/404'
                 '500':
                     $ref: '#/components/responses/500'
     /users/roles:
@@ -1590,14 +1607,6 @@ components:
                                 type: integer
                                 format: int32
                                 minimum: 0
-                notes:
-                    type: string
-                    description: >
-                        Anything that does not fit in a schema but worth mentioning about
-                        the case
-                    example: >
-                        Case travelled to meet their family in their hometown, got infected
-                        at a party there.
                 revisionMetadata:
                     type: object
                     description: Various revisions of this case over time
@@ -1749,6 +1758,7 @@ components:
                     type: string
                     description: Full name of the user if provided by the OAuth provider
                     example: John Doe
+                    nullable: true
                 email:
                     type: string
                     format: email
@@ -1959,6 +1969,13 @@ components:
                     $ref: '#/components/schemas/Date'
                 sideEffects:
                     $ref: '#/components/schemas/SymptomArray'
+        Error:
+            description: An error response
+            properties:
+                message:
+                    description: A description of the error that occurred
+                    example: User with ID 1235abcd453 was not found
+                    type: string
     responses:
         '200':
             description: OK
@@ -2148,10 +2165,20 @@ components:
             description: Empty
         '400':
             description: Malformed request
+        '401':
+            description: Unauthorized
         '403':
             description: Forbidden
+            content:
+                application/json:
+                    schema:
+                        $ref: '#/components/schemas/Error'
         '404':
             description: Not found
+            content:
+                application/json:
+                    schema:
+                        $ref: '#/components/schemas/Error'
         '422':
             description: Unprocessable entity
         '500':

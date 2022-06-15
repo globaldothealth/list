@@ -5,22 +5,19 @@ on:
     branches: [main, '*-stable']
     paths:
     - '.github/workflows/aggregate-ci.yml'
-    - 'data-serving/scripts/aggregate/aggregate/**'
+    - 'data-serving/scripts/aggregate-covid19/aggregate/**'
   pull_request:
     paths:
     - '.github/workflows/aggregate-ci.yml'
-    - 'data-serving/scripts/aggregate/aggregate/**'
+    - 'data-serving/scripts/aggregate-covid19/aggregate/**'
   workflow_dispatch:
-    paths:
-    - '.github/workflows/aggregate-ci.yml'
-    - 'data-serving/scripts/aggregate/aggregate/**'
 
 jobs:
   ci:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     defaults:
       run:
-        working-directory: data-serving/scripts/aggregate/aggregate
+        working-directory: data-serving/scripts/aggregate-covid19/aggregate
     steps:
     - uses: actions/checkout@v2
     - name: Set up Python 3.9

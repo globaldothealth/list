@@ -53,7 +53,7 @@ describe('Curator', function () {
             .type('testSourceEntryID123');
         cy.get('div[data-testid="gender"]').click();
         cy.get('li[data-value="Female"').click();
-        cy.get('input[name="age"]').type('21');
+        // TODO UI for age entry needs redesign
         cy.get('div[data-testid="ethnicity"]').click().type('Asian');
         cy.get('div[data-testid="nationalities"]').type('Afghan');
         cy.contains('li', 'Afghan').click();
@@ -180,7 +180,7 @@ describe('Curator', function () {
             cy.get('svg[data-testid="verified-svg"').should('exist');
             cy.contains('www.example.com');
             cy.contains('Female');
-            cy.contains('21');
+            // TODO UI for demographics.age needs redesigning
             cy.contains('Germany');
             cy.contains('2020-01-01');
             cy.contains('Recovered');
@@ -206,14 +206,10 @@ describe('Curator', function () {
                     'www.example.com',
                 );
             });
-            cy.get('input[name="caseReference.sourceEntryId"]').should(
-                'have.value',
-                'testSourceEntryID123',
-            );
 
             // Demographics.
             cy.get('input[name="gender"]').should('have.value', 'Female');
-            cy.get('input[name="age"]').should('have.value', '21');
+            // TODO UI for demographics.age needs redesign
             cy.get('div[data-testid="occupation"]').within(() => {
                 cy.get('input[type="text"]').should('have.value', 'Accountant');
             });
@@ -283,10 +279,6 @@ describe('Curator', function () {
             // Pathogens.
             cy.contains('Bartonella');
             cy.contains('Ebola');
-            cy.get('textarea[name="notes"]').should(
-                'have.value',
-                'test notes\non new line',
-            );
             // Transmission.
             cy.contains('Airborne infection');
             cy.contains('Test route');
@@ -313,18 +305,15 @@ describe('Curator', function () {
             cy.contains('No records to display').should('not.exist');
             cy.contains('Male');
             // What's untouched should stay as is.
-            cy.contains('21');
-
+            // TODO UI for demographics.age needs redesigning
             // View full details about the case
             cy.contains('td', 'www.example.com').click({ force: true });
             // Case data.
             cy.contains('www.example.com');
-            cy.contains('testSourceEntryID123');
             cy.contains('superuser@test.com');
-            cy.contains('test notes on new line');
             cy.contains('VERIFIED');
             // Demographics.
-            cy.contains('21');
+            // TODO UI for demographics.age needs redesigning
             cy.contains('Male');
             cy.contains('Test occupation');
             cy.contains('Afghan, Albanian');

@@ -11,13 +11,10 @@ on:
     - '.github/workflows/api-python-tests.yml'
     - 'api/python/**'
   workflow_dispatch:
-    paths:
-    - '.github/workflows/api-python-tests.yml'
-    - 'api/python/**'
 
 jobs:
   tests:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     defaults:
       run:
         working-directory: api/python

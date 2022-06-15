@@ -1,9 +1,10 @@
 import mongoose from 'mongoose';
+import validateEnv from '../util/validate-env';
 import { dateFieldInfo } from './date';
 
 export const exclusionDataSchema = new mongoose.Schema(
     {
-        date: dateFieldInfo,
+        date: dateFieldInfo(validateEnv().OUTBREAK_DATE),
         note: String,
     },
     { _id: false },

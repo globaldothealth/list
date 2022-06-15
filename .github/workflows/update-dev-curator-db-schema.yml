@@ -8,15 +8,10 @@ on:
       - "data-serving/scripts/setup-db/migrations/**"
       - ".github/workflows/update-dev-curator-db-schema.yaml"
   workflow_dispatch:
-    # Run workflow when the schema changes.
-    branches: [main]
-    paths:
-      - "data-serving/scripts/setup-db/migrations/**"
-      - ".github/workflows/update-dev-curator-db-schema.yaml"
 
 jobs:
   update-sources-data-dev:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
 
     steps:
       - name: Checkout

@@ -24,29 +24,24 @@ METADATA
 
     Additional sources (URLs) for this case
 
- 3. caseReference.sourceEntryId
-
-    Unique source entry ID. This is only present in sources that
-    offer this information.
-
- 4. caseReference.sourceId *
+ 3. caseReference.sourceId *
 
     Unique source ID for this case. Each case is ingested from
     a specific source URL, which has an unique ID. This is
     stable for a particular source.
 
- 5. caseReference.sourceUrl *
+ 4. caseReference.sourceUrl *
 
     Data URL from which this case was ingested.
 
- 6. caseReference.uploadIds [] *
+ 5. caseReference.uploadIds [] *
 
     Subsequent uploads following the initial upload of a case can
     change the data of a case (only in sources that provide an
     unique ID in caseReference.sourceEntryId). This field records
     the unique upload IDs that updated this case.
 
- 7. caseReference.verificationStatus *
+ 6. caseReference.verificationStatus *
 
     Case verification status
     Values: VERIFIED | UNVERIFIED | EXCLUDED
@@ -63,27 +58,27 @@ DEMOGRAPHICS
 Generally, we prefer to ingest demographic information over
 location, if they are not available in the same dataset.
 
- 8. demographics.ageRange.end
+ 7. demographics.ageRange.end
 
     Upper age range of individual (0 - 120)
 
- 9. demographics.ageRange.start
+ 8. demographics.ageRange.start
 
     Lower age range of individual (0 - 120)
 
-10. demographics.ethnicity
+9. demographics.ethnicity
 
     Ethnicity of individual
 
-11. demographics.gender
+10. demographics.gender
 
     Gender of individual (Male | Female | Non-binary/Third gender | Other)
 
-12. demographics.nationalities []
+11. demographics.nationalities []
 
     All the nationalities of the individual
 
-13. demographics.occupation
+12. demographics.occupation
 
     Occupation of the individual
 
@@ -91,142 +86,136 @@ EVENTS
 
 All .date values are dates in YYYY-MM-DD format.
 
-14. events.confirmed.date *
-15. events.confirmed.value
+13. events.confirmed.date *
+14. events.confirmed.value
 
     Confirmed date. If value is present, indicates
     method of confirmation.
 
-16. events.firstClinicalConsultation.date
+15. events.firstClinicalConsultation.date
 
     First clinical consultation date
 
-17. events.hospitalAdmission.date
-18. events.hospitalAdmission.value
+16. events.hospitalAdmission.date
+17. events.hospitalAdmission.value
 
     Hospital admission date, value (Yes | No)
 
-19. events.icuAdmission.date
-20. events.icuAdmission.value
+18. events.icuAdmission.date
+19. events.icuAdmission.value
 
     Intensive Care Unit admission date, value (Yes | No)
 
-21. events.onsetSymptoms.date
+20. events.onsetSymptoms.date
 
     Date of onset of symptoms
 
-22. events.outcome.date
-23. events.outcome.value
+21. events.outcome.date
+22. events.outcome.value
 
     Outcome date, values are
       Death | Recovered | hospitalAdmission | icuAdmission | Unknown
 
-24. events.selfIsolation.date
+23. events.selfIsolation.date
 
     Date that individual started self-isolating
 
 LOCATION
 
-25. location.administrativeAreaLevel1
+24. location.administrativeAreaLevel1
 
     Admin1 level location of individual (usually state or province)
 
-26. location.administrativeAreaLevel2
+25. location.administrativeAreaLevel2
 
     Admin2 level location of individual (usually district)
 
-27. location.administrativeAreaLevel3
+26. location.administrativeAreaLevel3
 
     Admin3 level location of individual (usually city)
 
-28. location.country *
+27. location.country *
 
     Country that case was reported in.
 
-29. location.geoResolution *
+28. location.geoResolution *
 
     Geo-resolution of location (how coarse the location is)
       Country | Admin1 | Admin2 | Admin3 | Point
 
-30. location.geometry.latitude *
+29. location.geometry.latitude *
 
     Geolocated latitude (-90 to 90)
     Positive values are North, negative values are South
 
-31. location.geometry.longitude *
+30. location.geometry.longitude *
 
     Geolocated longitude (-180 to 180)
     Positive values are East, negative values are West
 
-32. location.name
+31. location.name
 
     Full name of location
     (example: Lyon, Auvergne-Rhône-Alpes, France)
 
-33. location.place
+32. location.place
 
     Name of the place this location refers to
     (example: Boston Children's Hospital)
 
-NOTES
-
-34. notes
-
-    Notes from upstream source
-
 PATHOGENS
 
-35. pathogens []
+33. pathogens []
 
     Pathogens other than SARS-CoV-2
 
 
 PRE-EXISTING CONDITIONS
 
-36. preexistingConditions.hasPreexistingConditions
+34. preexistingConditions.hasPreexistingConditions
 
     Whether the patient has pre-existing conditions
     Boolean: True | False
 
-37. preexistingConditions.values []
+35. preexistingConditions.values []
 
     List of pre-existing conditions
 
 REVISION METADATA
 
-38. revisionMetadata.creationMetadata.date
+36. revisionMetadata.creationMetadata.date
 
     Date this case was first created
 
-39. revisionMetadata.creationMetadata.notes
+37. revisionMetadata.creationMetadata.notes
 
     Notes added by the curator for this case
 
-40. revisionMetadata.editMetadata.date
+38. revisionMetadata.editMetadata.date
 
     Date this case was last edited
     
-41. revisionMetadata.editMetadata.notes
+39. revisionMetadata.editMetadata.notes
 
     Notes added by the curator for last edit
     
-42. revisionMetadata.revisionNumber
+40. revisionMetadata.revisionNumber
 
     Revision number of the case (positive integer)
 
 SGTF
 
-43. SGTF
+41. SGTF
 
     S-Gene Target failure (0 = no deletion, 1 = deletion (S-))
 
 SYMPTOMS
 
-44. symptoms.status
+42. symptoms.status
 
     Symptom status (Asymptomatic | Symptomatic | Presymptomatic | null)
 
-45. symptoms.values []
+43. symptoms.values []
 
     List of symptoms
 
@@ -234,96 +223,96 @@ TRANSMISSION
 
 How this case got infected and by who if known
 
-46. transmission.linkedCaseIds []
+44. transmission.linkedCaseIds []
 
     UUID of a related case in the system
 
-47. transmission.places []
+45. transmission.places []
 
     Places where transmission occurred
 
-48. transmission.routes []
+46. transmission.routes []
 
     Routes of transmission
 
 TRAVEL HISTORY
 
-49. travelHistory.travel.dateRange.end
-50. travelHistory.travel.dateRange.start
+47. travelHistory.travel.dateRange.end
+48. travelHistory.travel.dateRange.start
 
     Start and end dates for travel history
 
-51. travelHistory.travel.location.administrativeAreaLevel1 []
-52. travelHistory.travel.location.administrativeAreaLevel2 []
-53. travelHistory.travel.location.administrativeAreaLevel3 []
-54. travelHistory.travel.location.country []
-55. travelHistory.travel.location.geoResolution []
+49. travelHistory.travel.location.administrativeAreaLevel1 []
+50. travelHistory.travel.location.administrativeAreaLevel2 []
+51. travelHistory.travel.location.administrativeAreaLevel3 []
+52. travelHistory.travel.location.country []
+53. travelHistory.travel.location.geoResolution []
 
     These have the same meaning as in LOCATION, except that these
     pertain to travel history of the individual. Unlike the fields in
     location, the fields here are all comma-separated arrays, with each
     item corresponding to a travel location in the last 30 days.
 
-56. travelHistory.travel.location.geometry.coordinates []
+54. travelHistory.travel.location.geometry.coordinates []
 
     Comma-separated tuples of latitude and longitude. If the individual
     visited latitude m1 and longitude n1 this would be represented as
     "(m1, n1)". If there was another travel coordinate (m2, n2), then
     this would be represented as "(m1, n1),(m2, n2)"
 
-57. travelHistory.travel.location.name []
-58. travelHistory.travel.location.place []
+55. travelHistory.travel.location.name []
+56. travelHistory.travel.location.place []
     
     Same as LOCATION, except these are arrays
 
-59. travelHistory.travel.methods []
+57. travelHistory.travel.methods []
 
     Corresponding travel methods (such as air, ship, rail ...)
 
-60. travelHistory.travel.purpose []
+58. travelHistory.travel.purpose []
 
     Purpose of travel
 
-61. travelHistory.traveledPrior30Days
+59. travelHistory.traveledPrior30Days
 
     Whether the patient has travelled in the past 30 days
     Boolean: True | False
 
 VACCINES
 
-62. vaccines.0.batch
+60. vaccines.0.batch
 
     First vaccine batch
 
-63. vaccines.0.date
+61. vaccines.0.date
 
     Date of first vaccine
 
-64. vaccines.0.name
+62. vaccines.0.name
 
     Name of first vaccine
 
-65. vaccines.0.sideEffects []
+63. vaccines.0.sideEffects []
 
     List of side-effects experienced after vaccine
 
-66. vaccines.1.batch
-67. vaccines.1.date
-68. vaccines.1.name
-69. vaccines.1.sideEffects
-70. vaccines.2.batch
-71. vaccines.2.date
-72. vaccines.2.name
-73. vaccines.2.sideEffects
-74. vaccines.3.batch
-75. vaccines.3.date
-76. vaccines.3.name
-77. vaccines.3.sideEffects
+64. vaccines.1.batch
+65. vaccines.1.date
+66. vaccines.1.name
+67. vaccines.1.sideEffects
+68. vaccines.2.batch
+69. vaccines.2.date
+70. vaccines.2.name
+71. vaccines.2.sideEffects
+72. vaccines.3.batch
+73. vaccines.3.date
+74. vaccines.3.name
+75. vaccines.3.sideEffects
 
     Same as before, for subsequent vaccines taken by the same individual
 
 VARIANT OF CONCERN
 
-78. variantOfConcern
+76. variantOfConcern
 
     Variant of concern that was detected. This uses the Pango lineage.

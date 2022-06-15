@@ -1,6 +1,7 @@
 import { dateFieldInfo } from './date';
 import mongoose from 'mongoose';
 import { positiveIntFieldInfo } from './positive-int';
+import validateEnv from '../util/validate-env';
 
 const editMetadataSchema = new mongoose.Schema(
     {
@@ -9,7 +10,7 @@ const editMetadataSchema = new mongoose.Schema(
             required: true,
         },
         date: {
-            ...dateFieldInfo,
+            ...dateFieldInfo(validateEnv().OUTBREAK_DATE),
             required: true,
         },
         notes: String,

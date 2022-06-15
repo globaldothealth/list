@@ -69,8 +69,11 @@ class Geocoder:
         # workaround a common problem: "United States" is the Mapbox name for US, but the algorithm
         # below will also find UM (United States Minor Outlying Islands) and fail because the
         # query is ambiguous.
+        #
+        # additionally the PRC is not in the iso3166 list (but China is).
         fixups = {
-            'united states': 'US'
+            'united states': 'US',
+            "people's republic of china": 'CN'
         }
         name = countryName.lower()
         if fixedCode := fixups.get(name):

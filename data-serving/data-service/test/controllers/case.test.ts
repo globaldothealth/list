@@ -3,6 +3,7 @@ import { CaseRevision } from '../../src/model/case-revision';
 import { Demographics } from '../../src/model/demographics';
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import { Source } from '../../src/model/source';
+import { PathogenDocument } from '../../src/model/pathogen';
 import app from './../../src/index';
 import fullCase from './../model/data/case.full.json';
 import minimalCase from './../model/data/case.minimal.json';
@@ -16,6 +17,8 @@ import {
     handlers,
 } from '../mocks/handlers';
 import fs from 'fs';
+import { AgeBucket } from '../../src/model/age-bucket';
+import { ObjectId } from 'mongodb';
 
 let mongoServer: MongoMemoryServer;
 
@@ -43,9 +46,24 @@ function stringParser(res: request.Response) {
     });
 }
 
+async function createAgeBuckets() {
+    await new AgeBucket({
+        start: 0,
+        end: 0,
+    }).save();
+    for (let start = 1; start <= 116; start += 5) {
+        const end = start + 4;
+        await new AgeBucket({
+            start,
+            end,
+        }).save();
+    }
+}
+
 beforeAll(async () => {
     mockLocationServer.listen();
     mongoServer = new MongoMemoryServer();
+    await createAgeBuckets();
     global.Date.now = jest.fn(() => new Date('2020-12-12T12:12:37Z').getTime());
 });
 
@@ -61,6 +79,7 @@ afterEach(() => {
 });
 
 afterAll(async () => {
+    await AgeBucket.deleteMany({});
     mockLocationServer.close();
     global.Date.now = realDate;
     return mongoServer.stop();
@@ -95,6 +114,29 @@ describe('GET', () => {
         await c.save();
         const res = await request(app).get(`/api/cases/${c._id}`).expect(200);
         expect(res.body[0].restrictedNotes).toBeUndefined();
+    });
+    it('should not show the notes for a case', async () => {
+        const c = new Case(minimalCase);
+        c.notes = 'I want to tell you a secret';
+        await c.save();
+        const res = await request(app).get(`/api/cases/${c._id}`).expect(200);
+        expect(res.body[0].notes).toBeUndefined();
+    });
+    it('should not show the sourceEntryId for a case', async () => {
+        const c = new Case(minimalCase);
+        c.caseReference.sourceEntryId = 'Sourcey McSourceFace';
+        await c.save();
+        const res = await request(app).get(`/api/cases/${c._id}`).expect(200);
+        expect(res.body[0].caseReference.sourceEntryId).toBeUndefined();
+    });
+    it('should convert age bucket to age range', async () => {
+        const c = new Case(minimalCase);
+        const bucket = await AgeBucket.findOne({});
+        c.demographics.ageBuckets = [bucket!._id];
+        await c.save();
+        const res = await request(app).get(`/api/cases/${c._id}`).expect(200);
+        expect(res.body[0].demographics.ageRange.start).toEqual(bucket!.start);
+        expect(res.body[0].demographics.ageRange.end).toEqual(bucket!.end);
     });
     describe('list', () => {
         it('should return 200 OK', () => {
@@ -173,29 +215,21 @@ describe('GET', () => {
                 .expect(200);
             expect(res.body.cases).toHaveLength(1);
         });
-        it('should query results', async () => {
-            // Simulate index creation used in unit tests, in production they are
-            // setup by the migrations and such indexes are not present by
-            // default in the in memory mongo spawned by unit tests.
-            await mongoose.connection.collection('cases').createIndex({
-                notes: 'text',
-            });
-
+        it('should use age buckets in results', async () => {
             const c = new Case(minimalCase);
-            c.notes = 'got it at work';
+            const aBucket = await AgeBucket.findOne({});
+            c.demographics.ageBuckets = [aBucket!._id];
             await c.save();
-            // Search for non-matching notes.
             const res = await request(app)
-                .get('/api/cases?page=1&limit=10&q=home')
+                .get('/api/cases?page=1&limit=10')
                 .expect(200)
                 .expect('Content-Type', /json/);
-            expect(res.body.cases).toHaveLength(0);
-            expect(res.body.total).toEqual(0);
-            // Search for matching notes.
-            await request(app)
-                .get(`/api/cases?page=1&limit=10&q=${encodeURI('at work')}`)
-                .expect(200, /got it at work/)
-                .expect('Content-Type', /json/);
+            expect(res.body.cases[0].demographics.ageRange.start).toEqual(
+                aBucket!.start,
+            );
+            expect(res.body.cases[0].demographics.ageRange.end).toEqual(
+                aBucket!.end,
+            );
         });
         it('should ignore the restricted collection', async () => {
             const r = new RestrictedCase(minimalCase);
@@ -225,6 +259,14 @@ describe('GET', () => {
             const res = await request(app).get('/api/cases').expect(200);
             expect(res.body.cases).toHaveLength(1);
             expect(res.body.cases[0].restrictedNotes).toBeUndefined();
+        });
+        it('should strip out notes', async () => {
+            const c = new Case(minimalCase);
+            c.notes = 'Can you keep a secret?';
+            await c.save();
+            const res = await request(app).get('/api/cases').expect(200);
+            expect(res.body.cases).toHaveLength(1);
+            expect(res.body.cases[0].notes).toBeUndefined();
         });
         describe('keywords', () => {
             beforeEach(async () => {
@@ -276,7 +318,7 @@ describe('GET', () => {
             it('Search for matching country and something else that does not match', async () => {
                 const res = await request(app)
                     .get(
-                        '/api/cases?page=1&limit=1&q=country%3ADE%occupation%3Anope',
+                        '/api/cases?page=1&limit=1&q=country%3ADE%20occupation%3Anope',
                     )
                     .expect(200)
                     .expect('Content-Type', /json/);
@@ -456,6 +498,32 @@ describe('POST', () => {
             .expect(201);
         expect(await Case.collection.countDocuments()).toEqual(1);
     });
+    it('create with valid input should bucket the age range', async () => {
+        await request(app)
+            .post('/api/cases')
+            .send(minimalRequest)
+            .expect('Content-Type', /json/)
+            .expect(201);
+        const theCase = await Case.findOne({});
+        // case has range 40-50, should be bucketed into 36-40, 41-45, 46-50
+        expect(theCase!.demographics.ageBuckets).toHaveLength(3);
+    });
+    it('GETting the POSTed case should return an age range', async () => {
+        const theCase = await request(app)
+            .post('/api/cases')
+            .send(minimalRequest)
+            .expect('Content-Type', /json/)
+            .expect(201);
+
+        const res = await request(app)
+            .get(`/api/cases/${theCase.body._id}`)
+            .expect('Content-Type', /json/)
+            .expect(200);
+        expect(res.body[0].demographics.ageRange).toEqual({
+            start: 36,
+            end: 50,
+        });
+    });
     it('create many cases with valid input should return 201 OK', async () => {
         const res = await request(app)
             .post('/api/cases?num_cases=3')
@@ -529,7 +597,9 @@ describe('POST', () => {
 
         const changedCaseWithEntryId = new Case(fullCase);
         await changedCaseWithEntryId.save();
-        changedCaseWithEntryId.notes = 'new notes';
+        changedCaseWithEntryId.pathogens = [
+            { id: '304', name: 'Pneumonia' } as PathogenDocument,
+        ];
 
         const unchangedCaseWithEntryId = new Case(fullCase);
         unchangedCaseWithEntryId.caseReference.sourceEntryId =
@@ -561,6 +631,37 @@ describe('POST', () => {
         const updatedCaseInDb = await Case.findById(changedCaseWithEntryId._id);
         expect(updatedCaseInDb?.notes).toEqual(changedCaseWithEntryId.notes);
     });
+    it('batch upsert with same case twice should not update anything', async () => {
+        const newCaseWithEntryId = new Case(minimalCase);
+        newCaseWithEntryId.caseReference.sourceEntryId = 'newId';
+
+        const res = await request(app)
+            .post('/api/cases/batchUpsert')
+            .send({
+                cases: [
+                    newCaseWithEntryId,
+                ],
+                ...curatorMetadata,
+            })
+            .expect(200);
+
+        expect(res.body.numCreated).toBe(1); // Exactly one case created.
+        expect(res.body.numUpdated).toBe(0); // No case was updated.
+
+        const secondRes = await request(app)
+            .post('/api/cases/batchUpsert')
+            .send({
+                cases: [
+                    newCaseWithEntryId, // same case again!
+                ],
+                ...curatorMetadata,
+            })
+            .expect(200);
+
+        expect(secondRes.body.numCreated).toBe(0); // No case created this time.
+        expect(res.body.numUpdated).toBe(0); // No case was updated either.
+    });
+
     it('batch upsert should add uploadId to field array', async () => {
         const newUploadIds = ['012301234567890123456789'];
 
@@ -573,7 +674,9 @@ describe('POST', () => {
         const changedCaseWithEntryId = new Case(fullCase);
         await changedCaseWithEntryId.save();
         changedCaseWithEntryId.caseReference.uploadIds = newUploadIds;
-        changedCaseWithEntryId.notes = 'new notes';
+        changedCaseWithEntryId.pathogens = [
+            { id: '304', name: 'Pneumonia' } as PathogenDocument,
+        ];
 
         const unchangedCaseWithEntryId = new Case(fullCase);
         unchangedCaseWithEntryId.caseReference.sourceEntryId =
@@ -641,6 +744,28 @@ describe('POST', () => {
         expect(res.body.numCreated).toBe(1); // Case was created.
         expect(res.body.numUpdated).toBe(0); // No case was updated.
     });
+    it('batch upsert should set the age buckets', async () => {
+        const caseID = new ObjectId();
+
+        const res = await request(app)
+            .post('/api/cases/batchUpsert')
+            .send({
+                cases: [
+                    {
+                        _id: caseID,
+                        ...fullCase,
+                    },
+                ],
+                ...curatorMetadata,
+            })
+            .expect(200);
+
+        expect(res.body.numCreated).toBe(1); // A new case was created.
+        expect(res.body.numUpdated).toBe(0); // No case was updated.
+
+        const updatedCaseInDb = await Case.findById(caseID);
+        expect(updatedCaseInDb?.demographics.ageBuckets).toHaveLength(3);
+    });
     it('geocodes everything that is necessary', async () => {
         seedFakeGeocodes('Canada', {
             country: 'CA',
@@ -685,7 +810,9 @@ describe('POST', () => {
     it('batch upsert should result in create and update metadata', async () => {
         const existingCase = new Case(fullCase);
         await existingCase.save();
-        existingCase.notes = 'new notes';
+        existingCase.pathogens = [
+            { id: '104', name: 'Pneumonia' } as PathogenDocument,
+        ];
 
         const res = await request(app)
             .post('/api/cases/batchUpsert')
@@ -716,7 +843,9 @@ describe('POST', () => {
     it('batch upsert should result in case revisions of existing cases', async () => {
         const existingCase = new Case(fullCase);
         await existingCase.save();
-        existingCase.notes = 'new notes';
+        existingCase.pathogens = [
+            { id: '104', name: 'Pneumonia' } as PathogenDocument,
+        ];
 
         const res = await request(app)
             .post('/api/cases/batchUpsert')
@@ -790,6 +919,31 @@ describe('POST', () => {
                 expect(text).toContain(c2._id);
                 expect(text).toContain(c2.caseReference.verificationStatus);
                 expect(text).toContain(c2.caseReference.sourceId);
+
+                fs.unlinkSync(destination);
+            });
+        });
+        it('should use the age buckets in the download', async () => {
+            const destination = './test_buckets.csv';
+            const fileStream = fs.createWriteStream(destination);
+
+            const c = new Case(minimalCase);
+            await c.save();
+
+            const responseStream = request(app)
+                .post('/api/cases/download')
+                .send({ format: 'csv' })
+                .expect('Content-Type', 'text/csv')
+                .expect(200)
+                .parse(stringParser);
+
+            responseStream.pipe(fileStream);
+            responseStream.on('finish', () => {
+                const text: string = fs
+                    .readFileSync(destination)
+                    .toString('utf-8');
+                expect(text).toContain('35');
+                expect(text).toContain('50');
 
                 fs.unlinkSync(destination);
             });
@@ -1348,6 +1502,27 @@ describe('PUT', () => {
 
         expect(res.body.notes).toEqual(newNotes);
     });
+    it('update present item with new age range should change the age buckets', async () => {
+        const c = new Case(minimalCase);
+        await c.save();
+
+        const newAgeRange = {
+            start: 6,
+            end: 7,
+        };
+        const res = await request(app)
+            .put(`/api/cases/${c._id}`)
+            .send({
+                ...curatorMetadata,
+                demographics: {
+                    ageRange: newAgeRange,
+                },
+            })
+            .expect('Content-Type', /json/)
+            .expect(200);
+        expect(res.body.demographics.ageRange.start).toEqual(6);
+        expect(res.body.demographics.ageRange.end).toEqual(10);
+    });
     it('update present item with unknown travel locations should be 200 OK', async () => {
         const c = new Case(minimalCase);
         await c.save();
@@ -1448,6 +1623,35 @@ describe('PUT', () => {
         const cases = await Case.find();
         expect(cases[0].notes).toEqual(newNotes);
         expect(cases[1].notes).toEqual(newNotes2);
+    });
+    it('update many items should update the age buckets', async () => {
+        const c = new Case(minimalCase);
+        await c.save();
+
+        const ageRange = {
+            start: 1,
+            end: 9,
+        };
+
+        const res = await request(app)
+            .post('/api/cases/batchUpdate')
+            .send({
+                ...curatorMetadata,
+                cases: [
+                    {
+                        _id: c._id,
+                        demographics: {
+                            ageRange,
+                        },
+                    },
+                ],
+            })
+            .expect('Content-Type', /json/)
+            .expect(200);
+
+        expect(res.body.numModified).toEqual(1);
+        const cases = await Case.find();
+        expect(cases[0].demographics.ageBuckets).toHaveLength(2);
     });
     it('update many items without locations in travel history should return 200 OK', async () => {
         const c = new Case(minimalCase);
@@ -1582,6 +1786,37 @@ describe('PUT', () => {
 
         expect(res.body.notes).toEqual(newNotes);
         expect(await c.collection.countDocuments()).toEqual(1);
+    });
+    it('upsert present item should update the age buckets', async () => {
+        const c = new Case(minimalCase);
+        const sourceId = '5ea86423bae6982635d2e1f8';
+        const entryId = 'def456';
+        c.set('caseReference.sourceId', sourceId);
+        c.set('caseReference.sourceEntryId', entryId);
+        await c.save();
+
+        const ageRange = {
+            start: 12,
+            end: 13,
+        };
+        await request(app)
+            .put('/api/cases')
+            .send({
+                caseReference: {
+                    sourceId: sourceId,
+                    sourceEntryId: entryId,
+                    sourceUrl: 'cdc.gov',
+                },
+                demographics: {
+                    ageRange,
+                },
+                ...curatorMetadata,
+            })
+            .expect('Content-Type', /json/)
+            .expect(200);
+
+        const updatedCase = await Case.findOne({});
+        expect(updatedCase?.demographics.ageBuckets).toHaveLength(1);
     });
     it('upsert present item should result in update metadata', async () => {
         const c = new Case(minimalCase);

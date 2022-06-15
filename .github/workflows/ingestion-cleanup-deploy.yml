@@ -13,17 +13,10 @@ on:
     tags:
       - "*"
   workflow_dispatch:
-    branches: [main, '*-stable']
-    paths:
-    - '.github/workflows/ingestion-cleanup-deploy.yml'
-    - 'ingestion/functions/**'
-    - '!ingestion/functions/README.md'
-    - '!ingestion/functions/parsing/**'
-    - '!ingestion/functions/retrieval/**'
 
 jobs:
   deploy:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     steps:
     - uses: actions/checkout@v2
     - name: Configure AWS credentials

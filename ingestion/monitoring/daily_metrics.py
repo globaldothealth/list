@@ -1,26 +1,33 @@
+import datetime
 import os
 import sys
 import json
 import operator
-import requests
 import tempfile
 from pathlib import Path
 import logging
 
-import sys
+import requests
 import boto3
 
-BUCKET = "covid-19-aggregates"
+
+BUCKET = "covid-19-aggregates-eu"
 WEBHOOK_URL = os.environ.get("SLACK_WEBHOOK_METRICS_URL", None)
 
 logger = logging.getLogger(__name__)
 
-def to_isodate(d):
-    mm, dd, yyyy = d.split("-")
+
+def is_latest_file_current(latest_s3_date: str) -> bool:
+    today = datetime.date.today().isoformat()
+    return today == latest_s3_date
+
+
+def to_isodate(date: str) -> str:
+    mm, dd, yyyy = date.split("-")
     return f"{yyyy}-{mm}-{dd}"
 
 
-def get_data(s3, bucket, key):
+def get_data(s3: object, bucket: str, key: str) -> dict:
     data = None
     with tempfile.NamedTemporaryFile() as fout:
         s3.Object(bucket, key).download_file(fout.name)
@@ -32,13 +39,13 @@ def get_data(s3, bucket, key):
     return data
 
 
-def diff(x, y):
+def format_difference(x: int, y: int) -> str:
     if y == x:
         return "= "
     return ("▲ " if y > x else "▼ ") + str(abs(y - x))
 
 
-def compare(d1, d2):
+def compare_daily_counts(d1, d2) -> str:
     last_day = next(iter(d1))
     d1 = d1[last_day]
     today = next(iter(d2))
@@ -69,7 +76,7 @@ def compare(d1, d2):
         if countries1[c] == countries2[c]:
             continue
         common_countries.append(
-            f"- {c}: {countries2[c]} ({diff(countries1[c], countries2[c])})"
+            f"- {c}: {countries2[c]} ({format_difference(countries1[c], countries2[c])})"
         )
     if common_countries:
         lines.append("*Country data additions/deletions*:")
@@ -78,10 +85,18 @@ def compare(d1, d2):
     return "\n".join(lines)
 
 
+def send_slack_message(slack_message: str) -> None:
+    if WEBHOOK_URL:
+        response = requests.post(WEBHOOK_URL, json={"text": slack_message})
+        if response.status_code != 200:
+            logger.error(f"Slack notification failed with {response.status_code}: {response.text}")
+            sys.exit(1)
+
+
 if __name__ == "__main__":
     s3 = boto3.resource("s3")
     bucket = s3.Bucket(BUCKET)
-    today, last_day = sorted(
+    latest_s3_day, second_latest_s3_day = sorted(
         [
             (x.key, to_isodate(Path(x.key).stem))
             for x in bucket.objects.filter(Prefix="country")
@@ -90,15 +105,18 @@ if __name__ == "__main__":
         key=operator.itemgetter(1),
         reverse=True,
     )[:2]
-    d1 = get_data(s3, BUCKET, last_day[0])
-    d2 = get_data(s3, BUCKET, today[0])
-    ret = compare(d1, d2)
-    logger.info(ret)
 
-    if WEBHOOK_URL:
-        response = requests.post(WEBHOOK_URL, json={"text": ret})
-        if response.status_code != 200:
-            logger.error(f"Slack notification failed with {response.status_code}: {response.text}")
-            sys.exit(1)
-    if "⚠️" in ret:
+    slack_message = ""
+
+    if is_latest_file_current(latest_s3_day[1]):
+        last_days_data = get_data(s3, BUCKET, second_latest_s3_day[0])
+        todays_data = get_data(s3, BUCKET, latest_s3_day[0])
+        slack_message = compare_daily_counts(last_days_data, todays_data)
+    else:
+        slack_message = f"No case count file in S3 for today. The latest file is dated {latest_s3_day[1]}"
+
+    logger.info(slack_message)
+    send_slack_message(slack_message)
+
+    if "⚠️" in slack_message:
         sys.exit(1)  # Trigger CI failure as an additional notification

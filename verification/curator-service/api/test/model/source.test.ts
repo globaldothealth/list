@@ -1,5 +1,12 @@
 import { ObjectId } from 'mongodb';
-import { awsRuleDescriptionForSource, awsRuleNameForSource, awsRuleTargetIdForSource, awsStatementIdForSource, sources, ISource } from '../../src/model/source';
+import {
+    awsRuleDescriptionForSource,
+    awsRuleNameForSource,
+    awsRuleTargetIdForSource,
+    awsStatementIdForSource,
+    sources,
+    ISource,
+} from '../../src/model/source';
 import minimalSource from './data/source.minimal.json';
 
 describe('helper functions', () => {
@@ -8,7 +15,9 @@ describe('helper functions', () => {
             _id: new ObjectId(),
             ...minimalSource,
         };
-        expect(awsStatementIdForSource(s as ISource)).toContain(s._id.toString());
+        expect(awsStatementIdForSource(s as ISource)).toContain(
+            s._id.toString(),
+        );
     });
     it('awsRuleDescriptionForSource returns formatted source name', () => {
         const s = {
@@ -29,6 +38,8 @@ describe('helper functions', () => {
             _id: new ObjectId(),
             ...minimalSource,
         };
-        expect(awsRuleTargetIdForSource(s as ISource)).toContain(s._id.toString());
+        expect(awsRuleTargetIdForSource(s as ISource)).toContain(
+            s._id.toString(),
+        );
     });
 });

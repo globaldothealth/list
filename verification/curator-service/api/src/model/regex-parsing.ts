@@ -4,5 +4,5 @@ interface Field {
 }
 
 export type IRegexParsing = {
-    fields: [Field],
+    fields: [Field];
 };

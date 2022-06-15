@@ -10,10 +10,6 @@ on:
       - ".github/workflows/data-service-node.yml"
       - "data-serving/data-service/**"
   workflow_dispatch:
-    branches: [main, '*-stable']
-    paths:
-      - ".github/workflows/data-service-node.yml"
-      - "data-serving/data-service/**"
   pull_request:
     paths:
       - ".github/workflows/data-service-node.yml"
@@ -21,7 +17,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
 
     steps:
       - uses: actions/checkout@v2

@@ -1,12 +1,10 @@
 _id
 caseReference.additionalSources
-caseReference.sourceEntryId
 caseReference.sourceId
 caseReference.sourceUrl
 caseReference.uploadIds
 caseReference.verificationStatus
-demographics.ageRange.end
-demographics.ageRange.start
+demographics.ageBuckets
 demographics.ethnicity
 demographics.gender
 demographics.nationalities
@@ -22,7 +20,6 @@ location.geometry.longitude
 location.name
 location.place
 location.query
-notes
 pathogens
 preexistingConditions.hasPreexistingConditions
 preexistingConditions.values

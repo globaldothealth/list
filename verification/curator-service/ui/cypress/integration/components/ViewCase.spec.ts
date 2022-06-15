@@ -26,19 +26,15 @@ describe('View case', function () {
         cy.visit('/cases');
         cy.wait('@getCases');
 
-        cy.get('input[id="search-field"]').type('travel{enter}');
+        cy.get('input[id="search-field"]').type('example{enter}');
 
         cy.get('body').then(($body) => {
             if ($body.find('.iubenda-cs-accept-btn').length) {
                 cy.get('.iubenda-cs-accept-btn').click();
             }
         });
-
         cy.contains('France').click();
-        cy.contains('travelled')
-            .should('have.attr', 'class')
-            .and('equal', 'highlighted');
-        cy.get('.highlighted').children('mark').contains('travel');
+        cy.get('.highlighted').children('mark').contains('example');
     });
 
     // View of a full case is covered in the curator test.
@@ -55,7 +51,7 @@ describe('View case', function () {
             cy.visit('/');
             cy.visit(`cases/view/${resp.body.cases[0]._id}`);
             cy.contains('France');
-            cy.contains('some notes');
+            cy.should('not.contain', 'some notes');
             cy.contains('www.example.com');
             cy.contains('PCR test');
             cy.contains('French');

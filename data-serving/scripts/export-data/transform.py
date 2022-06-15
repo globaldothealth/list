@@ -37,7 +37,9 @@ __OMIT = [
     "revisionMetadata.creationMetadata.curator",
     "revisionMetadata.editMetadata.curator",
     "events",
+    "notes",
     "travelHistory.travel",
+    "caseReference.sourceEntryId"
 ]
 
 __TRAVEL = [
@@ -184,6 +186,8 @@ def get_headers_and_fields(fileobject) -> list[str]:
         logging.exception("Error in reading mongoexport header")
         sys.exit(1)
     cols_to_add = [
+        "demographics.ageRange.start",
+        "demographics.ageRange.end",
         "events.confirmed.value",
         "events.confirmed.date",
         "events.firstClinicalConsultation.date",
@@ -196,21 +200,31 @@ def get_headers_and_fields(fileobject) -> list[str]:
         "events.outcome.value",
         "events.selfIsolation.date",
     ]
+    cols_to_remove = [
+        "demographics.ageBuckets",
+    ]
     fields = set(headers).union(set(cols_to_add))
     fields = fields.union(set(__TRAVEL + __VARIANT))
+    fields = fields.difference(cols_to_remove)
     fields = sorted(list(fields - set(__OMIT)), key=str.casefold)
     return headers, fields
 
 
-def convert_row(row: dict[str, Any]) -> Optional[dict[str, Any]]:
+def age_range(case_buckets: str, buckets: [dict[str, Any]]) -> (int, int):
+    bucket_ids = json.loads(case_buckets)
+    matching_buckets = [b for b in buckets if b["_id"] in bucket_ids]
+    min_age = min([b["start"] for b in matching_buckets])
+    max_age = max([b["end"] for b in matching_buckets])
+    return (min_age, max_age)
+
+
+def convert_row(row: dict[str, Any], buckets: [dict[str, Any]]) -> Optional[dict[str, Any]]:
     if "ObjectId" not in row["_id"]:
         return None
-    if type(row["notes"]) == str:
-        row["notes"] = row["notes"].replace("\n", ", ")
     for arr_field in __ARRAYS:
-        if row[arr_field]:
+        if row.get(arr_field):
             row[arr_field] = convert_string_list(row[arr_field])
-    if row["caseReference.additionalSources"]:
+    if row.get("caseReference.additionalSources"):
         row["caseReference.additionalSources"] = convert_addl_sources(
             row["caseReference.additionalSources"]
         )
@@ -222,6 +236,9 @@ def convert_row(row: dict[str, Any]) -> Optional[dict[str, Any]]:
     if row["travelHistory.traveledPrior30Days"] == "true":
         if "travelHistory.travel" in row:
             row.update(convert_travel(row["travelHistory.travel"]))
+    if row.get("demographics.ageBuckets", None):
+        (row["demographics.ageRange.start"], row["demographics.ageRange.end"]) = age_range(row["demographics.ageBuckets"], buckets)
+        del row["demographics.ageBuckets"]
     return row
 
 
@@ -288,19 +305,21 @@ def open_writers(formats: list[str], fields: list[str], output: str):
             files[fmt].close()
 
 
-def transform(input: Optional[str], output: str, formats: list[str]):
+def transform(input: Optional[str], output: str, formats: list[str], bucketpath: str):
     with (open(input) if input else sys.stdin) as inputfile:
-        headers, fields = get_headers_and_fields(inputfile)
-        reader = csv.DictReader(inputfile, fieldnames=headers)
-        hasrows = False
-        with open_writers(formats, fields, output) as writers:
-            for i, row in enumerate(map(convert_row, reader)):
-                hasrows = True
-                writerow(formats, writers, row, i)
-        if output != "-" and not hasrows:  # cleanup empty files
-            cleanup_files = [Path(f"{output}.{fmt}.gz") for fmt in formats]
-            for file in cleanup_files:
-                file.unlink(missing_ok=True)
+        with open(bucketpath) as bucketfile:
+            buckets = json.load(bucketfile)
+            headers, fields = get_headers_and_fields(inputfile)
+            reader = csv.DictReader(inputfile, fieldnames=headers)
+            hasrows = False
+            with open_writers(formats, fields, output) as writers:
+                for i, row in enumerate(map(lambda row: convert_row(row, buckets), reader)):
+                    hasrows = True
+                    writerow(formats, writers, row, i)
+            if output != "-" and not hasrows:  # cleanup empty files
+                cleanup_files = [Path(f"{output}.{fmt}.gz") for fmt in formats]
+                for file in cleanup_files:
+                    file.unlink(missing_ok=True)
 
 
 if __name__ == "__main__":
@@ -318,5 +337,11 @@ if __name__ == "__main__":
         "--input",
         help="Input file to transform instead of stdin"
     )
+    parser.add_argument(
+        "-b",
+        "--buckets",
+        help="JSON collection of age buckets to determine case age ranges",
+        required=True
+    )
     args = parser.parse_args()
-    transform(args.input, args.output, args.format.split(","))
+    transform(args.input, args.output, args.format.split(","), args.buckets)

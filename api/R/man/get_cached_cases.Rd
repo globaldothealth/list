@@ -13,16 +13,19 @@ Unless you always need to be working with the latest data, we recommend
 using this function instead of \code{\link{get_cases}}.
 }
 \usage{
-get_cached_cases(apikey, server = GDH_URL, refresh = FALSE, folder = "cache", \dots)
+get_cached_cases(apikey, disease = 'covid-19', environment = 'production', refresh = FALSE, folder = "cache", \dots)
 }
 \arguments{
   \item{apikey}{
 Put your Global.health API key here. You can get a free API key by signing
-up at \url{https://data.covid-19.global.health} and clicking on Profile.
+up at \url{https://data.covid-19.global.health} (or another server instance)
+and clicking on Profile.
 }
-  \item{server}{
-If you are using a self-hosted version of Global.health, put the URL to it
-here. This is not needed if you are using the main instance.
+  \item{disease}{
+Identify the outbreak for which you want to fetch data; the default is COVID-19.
+}
+  \item{environment}{
+Specify the environment whose data you want to use: default is production, alternatives are dev or qa.
 }
   \item{refresh}{
 Optional, if set to TRUE, refreshes the cache and returns the latest version of

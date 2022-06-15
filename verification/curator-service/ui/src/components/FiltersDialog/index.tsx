@@ -35,6 +35,7 @@ import { setModalOpen, setActiveFilterInput } from '../../redux/filters/slice';
 import { codeForCountry } from '../util/countryNames';
 import CloseIcon from '@mui/icons-material/Close';
 import { useStyles } from './styled';
+import { sendCustomGtmEvent } from '../util/helperFunctions';
 
 interface FiltersModalProps {
     showModalAlert: boolean;
@@ -142,6 +143,9 @@ export default function FiltersDialog({
             dispatch(setModalOpen(false));
 
             const searchQuery = filtersToURL(values);
+
+            sendCustomGtmEvent('filters_applied', { query: searchQuery });
+
             history.push({ pathname: '/cases', search: searchQuery });
         },
     });

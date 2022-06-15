@@ -11,13 +11,10 @@ on:
     - '.github/workflows/suggest-python.yml'
     - 'suggest/acronyms/**'
   workflow_dispatch:
-    paths:
-    - '.github/workflows/suggest-python.yml'
-    - 'suggest/acronyms/**'
 
 jobs:
   ci:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     defaults:
       run:
         working-directory: suggest/acronyms

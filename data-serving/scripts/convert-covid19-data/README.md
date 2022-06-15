@@ -1,6 +1,6 @@
 # Working with line-list data
 
-This directory contains scripts for converting, ingesting, and otherwise munging line-list data.
+This directory contains scripts for converting, ingesting, and otherwise munging COVID-19 line-list data.
 
 ## Prerequisites
 

@@ -8,8 +8,8 @@ import boto3
 
 AWS_REGION = os.getenv("GDH_AGGREGATE_AWS_REGION", "eu-central-1")
 # Job definition names are of the form PREFIX-<env>
-PREFIX = "gdh-map-aggregation"
-JOB_QUEUE = "gdh-map-aggregation"
+PREFIX = os.getenv("JOB_DEF_PREFIX", "gdh-map-aggregation")
+JOB_QUEUE = os.getenv("AGG_JOB_QUEUE", "gdh-map-aggregation-fargate")
 
 
 def run(sources: list[dict[str, Any]], env: str, dry_run: bool = False):

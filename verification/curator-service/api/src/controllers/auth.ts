@@ -11,7 +11,6 @@ import {
     users,
 } from '../model/user';
 import { tokens } from '../model/token';
-import { isValidObjectId } from 'mongoose';
 
 import { Router } from 'express';
 import axios from 'axios';
@@ -37,6 +36,11 @@ async function findUserByAPIKey(apiKey?: string): Promise<Express.User> {
         throw new Error('Invalid API key');
     }
     return user as Express.User;
+}
+
+async function getRandomString(bytes: number): Promise<string> {
+    const randomValues = await crypto.randomBytes(bytes);
+    return randomValues.toString('hex');
 }
 
 /**
@@ -156,7 +160,7 @@ interface GoogleProfile extends Profile {
     displayName: string;
     // List of emails belonging to the profile.
     // Unclear as to when multiple ones are possible.
-    emails: [{ value: string }];
+    emails: [{ value: string; verified: 'true' | 'false' }];
 }
 
 /**
@@ -200,7 +204,7 @@ export class AuthController {
                             if (err) return next(err);
                         });
 
-                        res.status(200).json(user);
+                        return res.status(200).json(user);
                     },
                 )(req, res, next);
             },
@@ -270,7 +274,7 @@ export class AuthController {
             async (req: Request, res: Response): Promise<void> => {
                 const theUser = req.user as IUser;
                 const currentUser = await users().findOne({
-                    _id: new ObjectId(theUser._id),
+                    _id: new ObjectId(theUser.id),
                 });
                 if (!currentUser) {
                     // internal server error as you were authenticated but unknown
@@ -285,11 +289,6 @@ export class AuthController {
                 }
             },
         );
-
-        async function getRandomString(bytes: number): Promise<string> {
-            const randomValues = await crypto.randomBytes(bytes);
-            return randomValues.toString('hex');
-        }
 
         /**
          * Create a new api key for the logged-in user.
@@ -306,7 +305,8 @@ export class AuthController {
                     // internal server error as you were authenticated but unknown
                     res.status(500).end();
                 } else {
-                    const userQuery = { _id: new ObjectId(theUser._id) };
+                    const userID = new ObjectId(theUser.id);
+                    const userQuery = { _id: userID };
                     const currentUser = await users().findOne(userQuery);
                     if (!currentUser) {
                         // internal server error as you were authenticated but unknown
@@ -314,10 +314,9 @@ export class AuthController {
                         return;
                     }
                     // prefix the API key with the user ID to make it easier to find users by API key in auth
-                    const randomPart = await getRandomString(32);
-                    const apiKey = `${theUser._id.toString()}${randomPart}`;
+                    const apiKey = await this.generateAPIKey(userID);
                     await users().updateOne(
-                        { _id: new ObjectId(theUser._id) },
+                        { _id: userID },
                         { $set: { apiKey } },
                     );
                     res.status(201).json(apiKey).end();
@@ -381,8 +380,10 @@ export class AuthController {
                 }
 
                 try {
-                    const userQuery = { _id: new ObjectId(user._id) };
-                    const currentUser = await users().findOne(userQuery);
+                    const userQuery = { _id: new ObjectId(user.id) };
+                    const currentUser = (await users().findOne(
+                        userQuery,
+                    )) as IUser;
                     if (!currentUser) {
                         return res.sendStatus(403);
                     }
@@ -521,7 +522,7 @@ export class AuthController {
 
                 try {
                     // Validate user id
-                    const isValidId = isValidObjectId(userId);
+                    const isValidId = ObjectId.isValid(userId);
                     if (!isValidId) {
                         throw new Error('Invalid user id');
                     }
@@ -558,15 +559,15 @@ export class AuthController {
                     if (!result.ok) {
                         logger.error(
                             `error resetting password for user ${userId}`,
+                            result.lastErrorObject,
                         );
-                        logger.error(result.lastErrorObject);
                         throw new Error(
                             'Something went wrong, please try again later',
                         );
                     }
 
                     // Send confirmation email to the user
-                    const user = result.value;
+                    const user = result.value as IUser;
 
                     await this.emailClient.send(
                         [user.email],
@@ -589,6 +590,12 @@ export class AuthController {
         );
     }
 
+    private async generateAPIKey(userID: ObjectId) {
+        const randomPart = await getRandomString(32);
+        const apiKey = `${userID.toString()}${randomPart}`;
+        return apiKey;
+    }
+
     /**
      * configureLocalAuth will get or create the user present in the request.
      */
@@ -605,11 +612,12 @@ export class AuthController {
                     name: req.body.name,
                     email: req.body.email,
                     roles: req.body.roles,
+                    apiKey: await this.generateAPIKey(userId),
                     ...(removeGoogleID !== true && { googleID: '42' }),
-                });
-                const user = await users().findOne({
+                } as IUser);
+                const user = (await users().findOne({
                     _id: result.insertedId,
-                });
+                })) as IUser;
                 req.login(user, (err: Error) => {
                     if (!err) {
                         res.json(user);
@@ -632,14 +640,16 @@ export class AuthController {
         // @ts-ignore
         passport.serializeUser((user: IUser, done: any) => {
             // Serializes the user id in the cookie, no user info should be in there, just the id.
-            done(null, user._id.toString());
+            // _id needed for configureLocalAuth
+            done(null, user.id || user._id);
         });
 
         passport.deserializeUser((id: string, done: any) => {
             // Find the user based on its id in the cookie.
             users()
                 .findOne({ _id: new ObjectId(id) })
-                .then((user) => {
+                .then((u) => {
+                    const user = u as IUser;
                     // Invalidate session when user cannot be found.
                     // This means an cookie pointing to an invalid user was sent to us.
                     // Cf. https://github.com/jaredhanson/passport/issues/6#issuecomment-4857287
@@ -683,11 +693,11 @@ export class AuthController {
                             roles: [],
                             newsletterAccepted:
                                 req.body.newsletterAccepted || false,
-                        });
+                        } as unknown as IUser);
 
-                        const newUser = await users().findOne({
+                        const newUser = (await users().findOne({
                             _id: result.insertedId,
-                        });
+                        })) as IUser;
 
                         // Send welcome email
                         await this.emailClient.send(
@@ -708,9 +718,9 @@ export class AuthController {
                             <p>The G.h Team</p>`,
                         );
 
-                        done(null, userPublicFields(newUser));
+                        return done(null, userPublicFields(newUser));
                     } catch (error) {
-                        done(error);
+                        return done(error);
                     }
                 },
             ),
@@ -725,7 +735,9 @@ export class AuthController {
                 },
                 async (email, password, done) => {
                     try {
-                        const user = await users().findOne({ email });
+                        const user = (await users().findOne({
+                            email,
+                        })) as IUser;
                         if (!user) {
                             return done(null, false, {
                                 message: 'Wrong username or password',
@@ -742,7 +754,7 @@ export class AuthController {
                             });
                         }
 
-                        done(null, userPublicFields(user));
+                        done(null, user);
                     } catch (error) {
                         done(error);
                     }
@@ -784,10 +796,10 @@ export class AuthController {
                                 roles: [],
                                 picture: picture,
                                 newsletterAccepted: isNewsletterAccepted,
-                            });
-                            user = await users().findOne({
+                            } as unknown as IUser);
+                            user = (await users().findOne({
                                 _id: result.insertedId,
-                            });
+                            })) as IUser;
 
                             try {
                                 // Send welcome email
@@ -882,7 +894,7 @@ export class AuthController {
                                 roles: [],
                                 // Do not care about names for bearer tokens, they are usually not humans.
                                 name: '',
-                            });
+                            } as unknown as IUser);
                             user = await users().findOne({
                                 _id: result.insertedId,
                             });

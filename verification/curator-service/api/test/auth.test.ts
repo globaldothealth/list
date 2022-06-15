@@ -5,7 +5,7 @@ import { Request, Response } from 'express';
 import { sessions, users } from '../src/model/user';
 
 import { MongoMemoryServer } from 'mongodb-memory-server';
-import app from '../src/index';
+import makeApp from '../src/index';
 import axios from 'axios';
 import bodyParser from 'body-parser';
 import express from 'express';
@@ -30,9 +30,11 @@ jest.mock('../src/clients/aws-lambda-client', () => {
 jest.mock('axios');
 const mockedAxios = axios as jest.Mocked<typeof axios>;
 let mongoServer: MongoMemoryServer;
+let app: any;
 
-beforeAll(() => {
+beforeAll(async () => {
     mongoServer = new MongoMemoryServer();
+    app = await makeApp();
 });
 
 afterAll(async () => {
@@ -255,9 +257,7 @@ describe('api keys', () => {
                 email: 'foo@bar.com',
             })
             .expect(200, /test-curator/);
-        await request
-            .post('/auth/profile/apiKey')
-            .expect(201);
+        await request.post('/auth/profile/apiKey').expect(201);
     });
 
     it('must let a user retrieve their API key', async () => {
@@ -269,26 +269,8 @@ describe('api keys', () => {
                 email: 'foo@bar.com',
             })
             .expect(200, /test-curator/);
-        await request
-            .post('/auth/profile/apiKey')
-            .expect(201);
-        await request
-            .get('/auth/profile/apiKey')
-            .expect(200);
-    });
-
-    it('does not find an API key where none has been set', async () => {
-        const request = supertest.agent(app);
-        await request
-            .post('/auth/register')
-            .send({
-                name: 'test-curator',
-                email: 'foo@bar.com',
-            })
-            .expect(200, /test-curator/);
-        await request
-            .get('/auth/profile/apiKey')
-            .expect(404);
+        await request.post('/auth/profile/apiKey').expect(201);
+        await request.get('/auth/profile/apiKey').expect(200);
     });
 
     it('lets the user get their profile by API key', async () => {
@@ -300,16 +282,11 @@ describe('api keys', () => {
                 email: 'foo@bar.com',
             })
             .expect(200, /test-curator/);
-        await request
-            .post('/auth/profile/apiKey')
-            .expect(201);
-        const apiKey = await request
-            .get('/auth/profile/apiKey');
+        await request.post('/auth/profile/apiKey').expect(201);
+        const apiKey = await request.get('/auth/profile/apiKey');
         request.set('X-API-key', apiKey.body);
         await request.get('/auth/logout').expect(302);
-        await request
-            .get('/auth/profile')
-            .expect(200, /test-curator/);
+        await request.get('/auth/profile').expect(200, /test-curator/);
     });
 
     it("lets an admin delete another user's API key", async () => {
@@ -321,11 +298,8 @@ describe('api keys', () => {
                 email: 'foo@bar.com',
             })
             .expect(200, /test-curator/);
-        await request
-            .post('/auth/profile/apiKey')
-            .expect(201);
-        const apiKey = await request
-            .get('/auth/profile/apiKey');
+        await request.post('/auth/profile/apiKey').expect(201);
+        const apiKey = await request.get('/auth/profile/apiKey');
         await request.get('/auth/logout').expect(302);
         await request
             .post('/auth/register')
@@ -341,9 +315,7 @@ describe('api keys', () => {
         // now try to use the API key
         await request.get('/auth/logout').expect(302);
         request.set('X-API-key', apiKey.body);
-        await request
-            .get('/auth/profile')
-            .expect(403);
+        await request.get('/auth/profile').expect(403);
     });
 
     it("does not let a non-admin delete another user's API key", async () => {
@@ -355,11 +327,8 @@ describe('api keys', () => {
                 email: 'foo@bar.com',
             })
             .expect(200, /test-curator/);
-        await request
-            .post('/auth/profile/apiKey')
-            .expect(201);
-        const apiKey = await request
-            .get('/auth/profile/apiKey');
+        await request.post('/auth/profile/apiKey').expect(201);
+        const apiKey = await request.get('/auth/profile/apiKey');
         await request.get('/auth/logout').expect(302);
         await request
             .post('/auth/register')

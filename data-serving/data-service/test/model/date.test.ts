@@ -3,10 +3,12 @@ import { dateFieldInfo } from '../../src/model/date';
 import mongoose from 'mongoose';
 
 /** A fake model with a field using the date schema. */
+const outbreakDate = new Date('2019-11-01');
+
 const FakeModel = mongoose.model(
     'FakeDocument',
     new mongoose.Schema({
-        date: dateFieldInfo,
+        date: dateFieldInfo(outbreakDate),
     }),
 );
 
@@ -18,8 +20,8 @@ describe('validate', () => {
         });
     });
 
-    it('a date before 2019-11-01 is invalid', async () => {
-        return new FakeModel({ date: Date.parse('2019-10-31') }).validate(
+    it('a date before the start of the outbreak is invalid', async () => {
+        return new FakeModel({ date: new Date('2019-10-31') }).validate(
             (e) => {
                 expect(e).not.toBeNull();
                 if (e) expect(e.name).toBe(Error.ValidationError.name);

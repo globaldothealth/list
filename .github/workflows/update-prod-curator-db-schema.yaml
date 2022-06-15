@@ -3,20 +3,15 @@ name: Migrate prod database schema
 on:
   push:
     # Run workflow when the schema changes. The branch name should always reflect the current release!
-    branches: [1.9-stable]
+    branches: [1.11-stable]
     paths:
       - "data-serving/scripts/setup-db/migrations/**"
       - ".github/workflows/update-prod-curator-db-schema.yaml"
   workflow_dispatch:
-    # Run workflow when the schema changes. The branch name should always reflect the current release!
-    branches: [1.9-stable]
-    paths:
-      - "data-serving/scripts/setup-db/migrations/**"
-      - ".github/workflows/update-prod-curator-db-schema.yaml"
 
 jobs:
   update-sources-data:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
 
     steps:
       - name: Checkout

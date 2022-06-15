@@ -1,9 +1,9 @@
 import * as baseUser from './users/base.json';
 
-import { sessions, users } from '../src/model/user';
+import { IUser, sessions, users } from '../src/model/user';
 
 import { MongoMemoryServer } from 'mongodb-memory-server';
-import app from '../src/index';
+import makeApp from '../src/index';
 import supertest from 'supertest';
 
 jest.mock('../src/clients/email-client', () => {
@@ -13,8 +13,11 @@ jest.mock('../src/clients/email-client', () => {
 });
 
 let mongoServer: MongoMemoryServer;
-beforeAll(() => {
+let app: any;
+
+beforeAll(async () => {
     mongoServer = new MongoMemoryServer();
+    app = await makeApp();
 });
 
 beforeEach(async () => {
@@ -65,7 +68,7 @@ describe('GET', () => {
                 email: 'foo@bar.com',
                 googleID: `testGoogleID${i}`,
                 roles: ['curator'],
-            });
+            } as IUser);
         }
         // Fetch first page as an admin.
         let res = await adminRequest
@@ -147,5 +150,49 @@ describe('PUT', () => {
             .put(`/api/users/${userRes.body._id}`)
             .send({ roles: ['invalidRole'] })
             .expect(400);
+    });
+});
+
+describe('DELETE', () => {
+    it('should delete a user', async () => {
+        const request = supertest.agent(app);
+        const userRes = await request
+            .post('/auth/register')
+            .send({ ...baseUser, ...{ roles: [] } })
+            .expect(200)
+            .expect('Content-Type', /json/);
+        const userRes2 = await request
+            .post('/auth/register')
+            .send({ ...baseUser, ...{ roles: ['admin'] } })
+            .expect(200, /admin/)
+            .expect('Content-Type', /json/);
+
+        const res = await request
+            .delete(`/api/users/${userRes.body._id}`)
+            .expect(204);
+        const res2 = await request
+            .delete(`/api/users/${userRes2.body._id}`)
+            .expect(204);
+    });
+    it('cannot delete an nonexistent user', async () => {
+        const request = supertest.agent(app);
+        await request
+            .post('/auth/register')
+            .send({ ...baseUser, ...{ roles: ['admin'] } })
+            .expect(200)
+            .expect('Content-Type', /json/);
+        return request
+            .delete('/api/users/5ea86423bae6982635d2e1f8')
+            .expect(404);
+    });
+    it('should not delete without admin permissions', async () => {
+        const request = supertest.agent(app);
+        const userRes = await request
+            .post('/auth/register')
+            .send({ ...baseUser, ...{ roles: [] } })
+            .expect('Content-Type', /json/);
+        const res = await request
+            .delete(`/api/users/${userRes.body._id}`)
+            .expect(403);
     });
 });

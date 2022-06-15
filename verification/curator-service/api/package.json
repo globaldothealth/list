@@ -22,14 +22,13 @@
   "license": "MIT",
   "config": {
     "mongodbMemoryServer": {
-      "version": "latest"
+      "version": "5.0.8"
     }
   },
   "devDependencies": {
     "@shelf/jest-mongodb": "^1.2.3",
     "@types/bcrypt": "^5.0.0",
     "@types/chai": "^4.2.12",
-    "@types/connect-mongo": "^3.1.3",
     "@types/cookie-parser": "^1.4.2",
     "@types/cors": "^2.8.12",
     "@types/dotenv": "^8.2.0",
@@ -38,8 +37,7 @@
     "@types/express-session": "^1.17.0",
     "@types/jest": "^27.0.2",
     "@types/lodash": "^4.14.161",
-    "@types/mongodb": "^3.6.20",
-    "@types/node": "^14.11.1",
+    "@types/node": "^17.0.0",
     "@types/nodemailer": "^6.4.0",
     "@types/passport": "^1.0.4",
     "@types/passport-google-oauth20": "^2.0.4",
@@ -72,7 +70,7 @@
     "aws-sdk": "^2.933.0",
     "axios": "^0.21.2",
     "bcrypt": "^5.0.1",
-    "connect-mongo": "^3.2.0",
+    "connect-mongo": "^4.6.0",
     "cookie-parser": "^1.4.5",
     "cors": "^2.8.5",
     "dotenv": "^8.2.0",
@@ -80,14 +78,15 @@
     "express": "^4.17.1",
     "express-openapi-validator": "^4.9.0",
     "express-session": "^1.17.1",
+    "express-winston": "^4.2.0",
     "i18n-iso-countries": "^7.3.0",
     "jsonwebtoken": "^8.5.1",
     "jszip": "^3.7.0",
     "lodash": "^4.17.21",
     "longjohn": "^0.2.12",
     "mimemessage": "^1.0.5",
+    "mongodb": "^4.1.4",
     "mongodb-memory-server": "^6.6.7",
-    "mongoose": "^5.13.9",
     "nodemailer": "^6.4.16",
     "passport": "^0.4.1",
     "passport-google-oauth20": "^2.0.0",
@@ -96,6 +95,7 @@
     "pino": "^6.6.1",
     "pino-pretty": "^4.2.1",
     "swagger-ui-express": "^4.1.4",
+    "winston": "^3.7.2",
     "yamljs": "^0.3.0"
   },
   "husky": {
@@ -109,6 +109,6 @@
     ]
   },
   "engines": {
-    "node": "14.17.1"
+    "node": "16.14.2"
   }
 }

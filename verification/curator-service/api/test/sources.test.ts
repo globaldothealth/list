@@ -14,8 +14,15 @@ import { sessions, users } from '../src/model/user';
 
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import { cases, restrictedCases } from '../src/model/case';
-import { awsRuleDescriptionForSource, awsRuleNameForSource, awsRuleTargetIdForSource, awsStatementIdForSource, ISource, sources } from '../src/model/source';
-import app from '../src/index';
+import {
+    awsRuleDescriptionForSource,
+    awsRuleNameForSource,
+    awsRuleTargetIdForSource,
+    awsStatementIdForSource,
+    ISource,
+    sources,
+} from '../src/model/source';
+import makeApp from '../src/index';
 import axios from 'axios';
 import supertest from 'supertest';
 import { ObjectId } from 'mongodb';
@@ -30,9 +37,11 @@ jest.mock('../src/clients/aws-batch-client', () => {
 });
 
 let mongoServer: MongoMemoryServer;
+let app: any;
 
-beforeAll(() => {
+beforeAll(async () => {
     mongoServer = new MongoMemoryServer();
+    app = await makeApp();
 });
 
 afterAll(async () => {
@@ -75,19 +84,25 @@ describe('unauthenticated access', () => {
 describe('GET', () => {
     it('list should return 200', async () => {
         const id1 = new ObjectId();
+        /*
+         * The below " as unknown as ISource" cast is used throughout because the
+         * source documents inserted here are typically incomplete, so they don't match
+         * the typescript type for a source. Mongo doesn't care, because it isn't
+         * checking the schema (not in unit tests, anyway).
+         */
         await sources().insertOne({
             _id: id1,
             name: 'test-source',
             origin: { url: 'http://foo.bar', license: 'MIT' },
             format: 'JSON',
-        });
+        } as unknown as ISource);
         const id2 = new ObjectId();
         await sources().insertOne({
             _id: id2,
             name: 'another-source',
             origin: { url: 'http://foo.bar', license: 'MIT' },
             format: 'JSON',
-        });
+        } as unknown as ISource);
         const res = await curatorRequest
             .get('/api/sources')
             .expect(200)
@@ -106,12 +121,12 @@ describe('GET', () => {
             name: 'test-source',
             origin: { url: 'http://foo.bar', license: 'MIT' },
             format: 'JSON',
-        });
+        } as unknown as ISource);
         await sources().insertOne({
             name: 'test-source',
             origin: { url: 'http://bar.baz', license: 'MIT' },
             format: 'JSON',
-        });
+        } as unknown as ISource);
 
         const res = await curatorRequest
             .get('/api/sources?url=foo')
@@ -128,7 +143,7 @@ describe('GET', () => {
                 name: `test-source-${i}`,
                 origin: { url: 'http://foo.bar', license: 'MIT' },
                 format: 'JSON',
-            });
+            } as unknown as ISource);
         }
         // Fetch first page.
         let res = await curatorRequest
@@ -172,7 +187,7 @@ describe('GET', () => {
             name: 'test-source',
             origin: { url: 'http://foo.bar', license: 'MIT' },
             format: 'JSON',
-        });
+        } as unknown as ISource);
         const res = await curatorRequest
             .get(`/api/sources/${id.toHexString()}`)
             .expect(200)
@@ -189,7 +204,7 @@ describe('PUT', () => {
             name: 'test-source',
             origin: { url: 'http://foo.bar', license: 'MIT' },
             format: 'JSON',
-        });
+        } as unknown as ISource);
         const res = await curatorRequest
             .put(`/api/sources/${id.toHexString()}`)
             .send({ name: 'new name' })
@@ -208,7 +223,7 @@ describe('PUT', () => {
             name: 'test-source',
             origin: { url: 'http://foo.bar', license: 'MIT' },
             format: 'JSON',
-        });
+        } as unknown as ISource);
         const res = await curatorRequest
             .put(`/api/sources/${id.toHexString()}`)
             .send({ excludeFromLineList: true })
@@ -227,7 +242,7 @@ describe('PUT', () => {
             name: 'test-source',
             origin: { url: 'http://foo.bar', license: 'MIT' },
             format: 'JSON',
-        });
+        } as unknown as ISource);
         let res = await curatorRequest
             .put(`/api/sources/${id.toHexString()}`)
             .send({
@@ -316,8 +331,10 @@ describe('DELETE', () => {
             name: 'test-source',
             origin: { url: 'http://foo.bar', license: 'MIT' },
             format: 'JSON',
-        });
-        await curatorRequest.delete(`/api/sources/${id.toHexString()}`).expect(204);
+        } as unknown as ISource);
+        await curatorRequest
+            .delete(`/api/sources/${id.toHexString()}`)
+            .expect(204);
         expect(mockDeleteRule).not.toHaveBeenCalled();
     });
     it('should not delete a source where a case exists', async () => {
@@ -327,13 +344,15 @@ describe('DELETE', () => {
             name: 'test-source',
             origin: { url: 'http://foo.bar', license: 'MIT' },
             format: 'JSON',
-        });
+        } as unknown as ISource);
         const aCase = await cases().insertOne({
             caseReference: {
                 sourceId: id.toHexString(),
             },
         });
-        await curatorRequest.delete(`/api/sources/${id.toHexString()}`).expect(403);
+        await curatorRequest
+            .delete(`/api/sources/${id.toHexString()}`)
+            .expect(403);
         expect(mockDeleteRule).not.toHaveBeenCalled();
     });
     it('should not delete a source where a restricted case exists', async () => {
@@ -343,13 +362,15 @@ describe('DELETE', () => {
             name: 'test-source',
             origin: { url: 'http://foo.bar', license: 'MIT' },
             format: 'JSON',
-        });
+        } as unknown as ISource);
         const aCase = await restrictedCases().insertOne({
             caseReference: {
                 sourceId: id.toHexString(),
             },
         });
-        await curatorRequest.delete(`/api/sources/${id.toHexString()}`).expect(403);
+        await curatorRequest
+            .delete(`/api/sources/${id.toHexString()}`)
+            .expect(403);
         expect(mockDeleteRule).not.toHaveBeenCalled();
     });
     it('should not be able to delete a non existent source', (done) => {

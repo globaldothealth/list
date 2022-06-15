@@ -4,7 +4,7 @@ import axios, { AxiosError } from 'axios';
 import { logger } from '../util/logger';
 import AWS from 'aws-sdk';
 import crypto from 'crypto';
-import { FindAndModifyWriteOpResultObject, ObjectId } from 'mongodb';
+import { ModifyResult, ObjectId } from 'mongodb';
 
 // Don't set client-side timeouts for requests to the data service.
 // TODO: Make this more fine-grained once we fix
@@ -23,6 +23,8 @@ const defaultOutputQuery =
 export default class CasesController {
     constructor(
         private readonly dataServerURL: string,
+        private readonly completeDataBucket: string,
+        private readonly countryDataBucket: string,
         private readonly s3Client: AWS.S3,
     ) {}
 
@@ -45,9 +47,12 @@ export default class CasesController {
                 );
             }
             res.status(response.status).json(response.data);
-        } catch (err) {
-            logger.error(`Exception thrown by axios accessing URL: ${query}`);
-            logger.error(err);
+        } catch (e) {
+            const err = e as AxiosError;
+            logger.error(
+                `Exception thrown by axios accessing URL: ${query}`,
+                err,
+            );
             if (err.response?.status && err.response?.data) {
                 res.status(err.response.status).send(err.response.data);
                 return;
@@ -58,7 +63,7 @@ export default class CasesController {
 
     private logOutcomeOfAppendingDownloadToUser(
         userId: string,
-        result: FindAndModifyWriteOpResultObject<any>,
+        result: ModifyResult<IUser>,
     ) {
         if (!result.ok) {
             logger.error(
@@ -197,7 +202,7 @@ export default class CasesController {
         const filename = `gh_${year}-${month}-${day}.tar`;
 
         const params = {
-            Bucket: 'covid-19-data-export',
+            Bucket: this.completeDataBucket,
             Key: 'latest/latestdata-csv.tar',
             Expires: 5 * 60,
             ResponseContentDisposition:
@@ -245,7 +250,7 @@ export default class CasesController {
         const filename = `${country}.${format}.gz`;
         const filepath = `${format}/${filename}`;
         const params = {
-            Bucket: 'covid-19-country-export',
+            Bucket: this.countryDataBucket,
             Key: filepath,
             Expires: 5 * 60,
             ResponseContentDisposition:
@@ -302,7 +307,7 @@ export default class CasesController {
         const filepath = `${format}/${country}.${format}.gz`;
         const contains = await this.s3Client
             .headObject({
-                Bucket: 'covid-19-country-export',
+                Bucket: this.countryDataBucket,
                 Key: filepath,
             })
             .promise()
@@ -342,7 +347,8 @@ export default class CasesController {
                 this.dataServerURL + '/api' + req.url,
             );
             res.status(response.status).json(response.data);
-        } catch (err) {
+        } catch (e) {
+            const err = e as AxiosError;
             logger.error(err);
             if (err.response?.status && err.response?.data) {
                 res.status(err.response.status).send(err.response.data);
@@ -359,7 +365,8 @@ export default class CasesController {
                 this.dataServerURL + '/api' + req.url,
             );
             res.status(response.status).json(response.data);
-        } catch (err) {
+        } catch (e) {
+            const err = e as AxiosError;
             logger.error(err);
             if (err.response?.status && err.response?.data) {
                 res.status(err.response.status).send(err.response.data);
@@ -376,7 +383,8 @@ export default class CasesController {
                 this.dataServerURL + '/api' + req.url,
             );
             res.status(response.status).json(response.data);
-        } catch (err) {
+        } catch (e) {
+            const err = e as AxiosError;
             logger.error(err);
             if (err.response?.status && err.response?.data) {
                 res.status(err.response.status).send(err.response.data);
@@ -399,7 +407,8 @@ export default class CasesController {
                 { data: req.body },
             );
             res.status(response.status).end();
-        } catch (err) {
+        } catch (e) {
+            const err = e as AxiosError;
             logger.error(err);
             if (err.response?.status && err.response?.data) {
                 res.status(err.response.status).send(err.response.data);
@@ -416,7 +425,8 @@ export default class CasesController {
                 this.dataServerURL + '/api' + req.url,
             );
             res.status(response.status).end();
-        } catch (err) {
+        } catch (e) {
+            const err = e as AxiosError;
             logger.error(err);
             if (err.response?.status && err.response?.data) {
                 res.status(err.response.status).send(err.response.data);
@@ -437,7 +447,8 @@ export default class CasesController {
                 },
             );
             res.status(response.status).json(response.data);
-        } catch (err) {
+        } catch (e) {
+            const err = e as AxiosError;
             logger.error(err);
             if (err.response?.status && err.response?.data) {
                 res.status(err.response.status).send(err.response.data);
@@ -460,7 +471,8 @@ export default class CasesController {
                 },
             );
             res.status(response.status).json(response.data);
-        } catch (err) {
+        } catch (e) {
+            const err = e as AxiosError;
             if (err.response?.status && err.response?.data) {
                 res.status(err.response.status).send(err.response.data);
                 return;
@@ -484,7 +496,8 @@ export default class CasesController {
             );
             res.status(upsertResponse.status).send(upsertResponse.data);
             return;
-        } catch (err) {
+        } catch (e) {
+            const err = e as AxiosError;
             logger.error(err);
             if (err.response?.status && err.response?.data) {
                 res.status(err.response.status).send(err.response.data);
@@ -513,7 +526,8 @@ export default class CasesController {
                 numModified: updateResponse.data.numModified,
             });
             return;
-        } catch (err) {
+        } catch (e) {
+            const err = e as AxiosError;
             logger.error(err);
             if (err.response?.status && err.response?.data) {
                 res.status(err.response.status).send(err.response.data);
@@ -542,7 +556,8 @@ export default class CasesController {
                 numModified: updateResponse.data.numModified,
             });
             return;
-        } catch (err) {
+        } catch (e) {
+            const err = e as AxiosError;
             logger.error(err);
             if (err.response?.status && err.response?.data) {
                 res.status(err.response.status).send(err.response.data);
@@ -567,7 +582,8 @@ export default class CasesController {
                 },
             );
             res.status(response.status).end();
-        } catch (err) {
+        } catch (e) {
+            const err = e as AxiosError;
             if (err.response?.status && err.response?.data) {
                 res.status(err.response.status).send(err.response.data);
                 return;
@@ -591,7 +607,8 @@ export default class CasesController {
                 },
             );
             res.status(response.status).json(response.data);
-        } catch (err) {
+        } catch (e) {
+            const err = e as AxiosError;
             if (err.response?.status && err.response?.data) {
                 res.status(err.response.status).send(err.response.data);
                 return;
@@ -614,7 +631,8 @@ export default class CasesController {
                 this.dataServerURL + '/api' + req.url,
             );
             res.status(response.status).json(response.data);
-        } catch (err) {
+        } catch (e) {
+            const err = e as AxiosError;
             if (err.response?.status && err.response?.data) {
                 res.status(err.response.status).send(err.response.data);
                 return;

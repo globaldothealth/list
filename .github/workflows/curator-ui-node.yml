@@ -10,10 +10,6 @@ on:
       - ".github/workflows/curator-ui-node.yml"
       - "verification/curator-service/ui/**"
   workflow_dispatch:
-    branches: [main, '*-stable']
-    paths:
-      - ".github/workflows/curator-ui-node.yml"
-      - "verification/curator-service/ui/**"
   pull_request:
     paths:
       - ".github/workflows/curator-ui-node.yml"
@@ -21,7 +17,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
 
     steps:
       - uses: actions/checkout@v2

@@ -3,11 +3,15 @@
 
 from functools import cache
 import logging
+import os
 from typing import Any
 import unicodedata
 
 import boto3
 import pycountry
+
+
+JOB_QUEUE = os.getenv("EXP_JOB_QUEUE", "export-queue")
 
 
 # We do not always use the pycountry names, here's a list of exceptions
@@ -84,7 +88,7 @@ def run(sources: list[dict[str, Any]], env: str, dry_run: bool = False):
             logging.info(f"Submitting job for {jobdef} ...")
             if not dry_run:
                 batch.submit_job(
-                    jobName=jobdef, jobDefinition=jobdef, jobQueue="export-queue"
+                    jobName=jobdef, jobDefinition=jobdef, jobQueue=JOB_QUEUE
                 )
         except Exception as e:
             logging.exception(f"Error occurred while trying to submit {jobdef}")

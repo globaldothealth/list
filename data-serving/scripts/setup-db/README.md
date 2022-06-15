@@ -17,3 +17,7 @@ To create a new migration (i.e. to change the expected state of the database):
     migrate-mongo create name-of-migration
 
 That creates a file called `migrations/datetime-name-of-migration.js`. Edit the `up()` function to apply your change, and the `down()` function to disapply it. Now `npm run migrate` (or `dev/setup_db.sh` at the root level, if you're testing locally in Docker, will also work).
+
+## Importing sample data
+
+This folder also contains `import-sample-data.py`, a script for importing the test data for running cypress tests (in `verification/curator-service/ui/cypress` in this repo). You can run it with no arguments, or via `npm run import-sample-data`, and it will create a curator user in the locally-running G.h instance and use that users' API key to import the data. You can choose a different user by setting the `GH_API_KEY` environment variable, and you can choose a different instance by setting `GH_BASE_URL`.

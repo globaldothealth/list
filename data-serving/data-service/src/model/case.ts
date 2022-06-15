@@ -1,5 +1,5 @@
 import { CaseReferenceDocument, caseReferenceSchema } from './case-reference';
-import { DemographicsDocument, demographicsSchema } from './demographics';
+import { demographicsAgeRange, DemographicsDocument, DemographicsDTO, demographicsSchema } from './demographics';
 import { EventDocument, eventSchema } from './event';
 import {
     GenomeSequenceDocument,
@@ -23,12 +23,22 @@ import { VariantDocument, variantSchema } from './variant';
 
 import { ObjectId } from 'mongodb';
 import _ from 'lodash';
-import mongoose from 'mongoose';
+import mongoose, { LeanDocument } from 'mongoose';
 import { ExclusionDataDocument, exclusionDataSchema } from './exclusion-data';
 import { dateFieldInfo } from './date';
+import validateEnv from '../util/validate-env';
+
+/*
+ * There are separate types for case for data storage (the mongoose document) and
+ * for data transfer (CaseDTO). The DTO only has an age range, and is what the cases
+ * controller receives and transmits over the network. The mongoose document has both an age
+ * range and age buckets, and is what gets written to the database. The end goal is that the
+ * mongoose document only has age buckets, and that the cases controller converts between the
+ * two so that outside you only see a single age range.
+ */
 
 const requiredDateField = {
-    ...dateFieldInfo,
+    ...dateFieldInfo(validateEnv().OUTBREAK_DATE),
     required: true,
 };
 
@@ -111,8 +121,6 @@ caseSchema.methods.equalsJSON = function (jsonCase: any): boolean {
         _.isEqual(thisJson.exclusionData, other.exclusionData) &&
         _.isEqual(thisJson.genomeSequences, other.genomeSequences) &&
         _.isEqual(thisJson.location, other.location) &&
-        _.isEqual(thisJson.notes, other.notes) &&
-        _.isEqual(thisJson.restrictedNotes, other.restrictedNotes) &&
         _.isEqual(thisJson.pathogens, other.pathogens) &&
         _.isEqual(
             thisJson.preexistingConditions,
@@ -127,18 +135,16 @@ caseSchema.methods.equalsJSON = function (jsonCase: any): boolean {
     );
 };
 
-export type CaseDocument = mongoose.Document & {
-    _id: ObjectId;
+export type ICase = {
     caseReference: CaseReferenceDocument;
     confirmationDate: Date;
-    demographics: DemographicsDocument;
     events: [EventDocument];
     exclusionData: ExclusionDataDocument;
     genomeSequences: [GenomeSequenceDocument];
     importedCase: unknown;
     location: LocationDocument;
     revisionMetadata: RevisionMetadataDocument;
-    notes: string;
+    notes?: string;
     restrictedNotes?: string;
     pathogens: [PathogenDocument];
     list: boolean;
@@ -149,7 +155,15 @@ export type CaseDocument = mongoose.Document & {
     travelHistory: TravelHistoryDocument;
     vaccines: [VaccineDocument];
     variant: VariantDocument;
+};
 
+export type CaseDTO = ICase & {
+    demographics?: DemographicsDTO;
+};
+
+export type CaseDocument = mongoose.Document & ICase & {
+    _id: ObjectId;
+    demographics: DemographicsDocument;
     // TODO: Type request Cases.
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     equalsJSON(jsonCase: any): boolean;
@@ -157,14 +171,14 @@ export type CaseDocument = mongoose.Document & {
 
 /* Denormalise the confirmation date before saving or updating any case object */
 
-function denormaliseConfirmationDate(aCase: CaseDocument) {
+function denormaliseConfirmationDate(aCase: CaseDocument | LeanDocument<CaseDocument>) {
     const confirmationEvents = _.filter(aCase.events, (e) => e.name === 'confirmed');
     if (confirmationEvents.length) {
         aCase.confirmationDate = confirmationEvents[0].dateRange.start;
     }
 }
 
-export function caseWithDenormalisedConfirmationDate(aCase: CaseDocument) {
+export function caseWithDenormalisedConfirmationDate(aCase: CaseDocument | LeanDocument<CaseDocument>) {
     denormaliseConfirmationDate(aCase);
     return aCase;
 }
@@ -191,3 +205,7 @@ export const RestrictedCase = mongoose.model<CaseDocument>(
     'RestrictedCase',
     caseSchema,
 );
+
+export const caseAgeRange = async (aCase: LeanDocument<CaseDocument>) => {
+   return await demographicsAgeRange(aCase.demographics);
+};

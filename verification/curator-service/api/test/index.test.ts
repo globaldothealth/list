@@ -1,5 +1,5 @@
 import { MongoMemoryServer } from 'mongodb-memory-server';
-import app from '../src/index';
+import makeApp from '../src/index';
 import request from 'supertest';
 
 jest.mock('../src/clients/email-client', () => {
@@ -9,8 +9,11 @@ jest.mock('../src/clients/email-client', () => {
 });
 
 let mongoServer: MongoMemoryServer;
-beforeAll(() => {
+let app: any;
+
+beforeAll(async () => {
     mongoServer = new MongoMemoryServer();
+    app = await makeApp();
 });
 
 afterAll(async () => {

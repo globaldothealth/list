@@ -11,13 +11,10 @@ on:
     - '.github/workflows/geocoding-service-python.yml'
     - 'geocoding/location-service/**'
   workflow_dispatch:
-    paths:
-    - '.github/workflows/geocoding-service-python.yml'
-    - 'geocoding/location-service/**'
 
 jobs:
   ci:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     defaults:
       run:
         working-directory: geocoding/location-service

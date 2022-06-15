@@ -21,8 +21,12 @@ module.exports = {
     rules: {
         'no-bitwise': ['error'],
         'linebreak-style': ['error', 'unix'],
-        quotes: ['error', 'single'],
+        quotes: ['error', 'single', { 'avoidEscape': true }],
         semi: ['error', 'always'],
         '@typescript-eslint/ban-ts-comment': 'off',
+        '@typescript-eslint/no-explicit-any': 'off',
+        '@typescript-eslint/no-non-null-assertion': 'off',
+        '@typescript-eslint/explicit-module-boundary-types': 'off',
+        '@typescript-eslint/no-explicit-any': 'off'
     },
 };
