@@ -121,7 +121,7 @@ const MoreInformationLinks = ({
     classes,
     version,
     env,
-}: StyleProps & { version: string; env: string; diseaseName: string }) => {
+}: StyleProps & { version: string; env: string }) => {
     const dispatch = useAppDispatch();
 
     useEffect(() => {
