@@ -40,7 +40,7 @@ export const useStyles = makeStyles((theme: Theme) => ({
     createNewIcon: {
         marginRight: '12px',
     },
-    covidTitle: {
+    diseaseTitle: {
         fontSize: '28px',
         marginLeft: '14px',
         marginTop: '8px',
