@@ -25,9 +25,14 @@ import { SnackbarAlert } from '../SnackbarAlert';
 import { useParams, Link } from 'react-router-dom';
 
 import Helmet from 'react-helmet';
-import { selectVersion, selectEnv } from '../../redux/app/selectors';
+import {
+    selectVersion,
+    selectEnv,
+    selectDiseaseName,
+} from '../../redux/app/selectors';
 import { MapLink } from '../../constants/types';
 import { getReleaseNotesUrl } from '../util/helperFunctions';
+import { getDiseaseName } from '../../redux/app/thunk';
 
 interface UrlParams {
     token?: string;
@@ -116,8 +121,15 @@ const MoreInformationLinks = ({
     classes,
     version,
     env,
-}: StyleProps & { version: string; env: string }) => {
+}: StyleProps & { version: string; env: string; diseaseName: string }) => {
+    const dispatch = useAppDispatch();
+
+    useEffect(() => {
+        dispatch(getDiseaseName());
+    }, [dispatch]);
+
     const releaseNotesUrl = getReleaseNotesUrl(version);
+    const diseaseName = useAppSelector(selectDiseaseName);
 
     return (
         <div className={classes.linksContainer}>
@@ -143,7 +155,7 @@ const MoreInformationLinks = ({
                 </div>
                 <div className={classes.link}>
                     <a
-                        href={MapLink[env]}
+                        href={MapLink[diseaseName][env]}
                         rel="noopener noreferrer"
                         target="_blank"
                     >

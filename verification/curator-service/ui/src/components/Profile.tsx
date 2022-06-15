@@ -97,13 +97,11 @@ export function ResetAPIKeyForm(): JSX.Element {
                     : 'You have yet to set an API key.'}
             </p>
             <p>
-                Your API key lets you access the{' '}
-                <a href="https://data.covid-19.global.health/api-docs/">
-                    Global.health API
-                </a>{' '}
-                programmatically, from Python, R, or another programming
-                environment. It is unique to you and requests made using the API
-                are associated with your account, so keep your API key secret.
+                Your API key lets you access the&nbsp;
+                <a href="/api-docs/">Global.health API</a> programmatically,
+                from Python, R, or another programming environment. It is unique
+                to you and requests made using the API are associated with your
+                account, so keep your API key secret.
             </p>
             <Button
                 data-testid="reset-api-key"

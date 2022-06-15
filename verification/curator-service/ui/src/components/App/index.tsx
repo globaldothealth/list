@@ -50,6 +50,7 @@ import {
     selectIsLoading,
     selectEnv,
     selectVersion,
+    selectDiseaseName,
 } from '../../redux/app/selectors';
 import { getEnv, getVersion, getDiseaseName } from '../../redux/app/thunk';
 import { getUserProfile, logout } from '../../redux/auth/thunk';
@@ -289,6 +290,7 @@ export default function App(): JSX.Element {
     const env = useAppSelector(selectEnv);
     const appVersion = useAppSelector(selectVersion);
     const searchQuery = useAppSelector(selectSearchQuery);
+    const diseaseName = useAppSelector(selectDiseaseName);
 
     const showMenu = useMediaQuery(theme.breakpoints.up('sm'));
     const [drawerOpen, setDrawerOpen] = useState<boolean>(false);
@@ -407,7 +409,7 @@ export default function App(): JSX.Element {
                         <a
                             className={classes.mapLink}
                             data-testid="mapLink"
-                            href={MapLink[env]}
+                            href={MapLink[diseaseName][env]}
                             rel="noopener noreferrer"
                             target="_blank"
                         >
@@ -473,7 +475,10 @@ export default function App(): JSX.Element {
                     )}
                     {user && hasAnyRole(user, ['curator']) && (
                         <Route path="/cases/new">
-                            <CaseForm onModalClose={onModalClose} />
+                            <CaseForm
+                                onModalClose={onModalClose}
+                                diseaseName={diseaseName}
+                            />
                         </Route>
                     )}
                     {user && hasAnyRole(user, ['curator']) && (
@@ -484,6 +489,7 @@ export default function App(): JSX.Element {
                                     <EditCase
                                         id={match.params.id}
                                         onModalClose={onModalClose}
+                                        diseaseName={diseaseName}
                                     />
                                 );
                             }}

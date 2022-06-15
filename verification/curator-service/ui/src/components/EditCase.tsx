@@ -9,6 +9,7 @@ import axios from 'axios';
 interface Props {
     id: string;
     onModalClose: () => void;
+    diseaseName: string;
 }
 
 export default function EditCase(props: Props): JSX.Element {
@@ -40,7 +41,11 @@ export default function EditCase(props: Props): JSX.Element {
                 </MuiAlert>
             )}
             {c && (
-                <CaseForm initialCase={c} onModalClose={props.onModalClose} />
+                <CaseForm
+                    initialCase={c}
+                    onModalClose={props.onModalClose}
+                    diseaseName={props.diseaseName}
+                />
             )}
         </div>
     );

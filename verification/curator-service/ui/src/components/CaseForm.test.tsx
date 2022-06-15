@@ -63,6 +63,7 @@ it('renders form', async () => {
                     onModalClose={(): void => {
                         return;
                     }}
+                    diseaseName="COVID-19"
                 />
             </ThemeProvider>
         </MemoryRouter>,
@@ -88,6 +89,7 @@ test('Check location error message to become red on submit', () => {
                     onModalClose={(): void => {
                         return;
                     }}
+                    diseaseName="COVID-19"
                 />
             </ThemeProvider>
         </MemoryRouter>,
@@ -107,6 +109,7 @@ it('can add and remove genome sequencing sections', async () => {
                     onModalClose={(): void => {
                         return;
                     }}
+                    diseaseName="COVID-19"
                 />
             </ThemeProvider>
         </MemoryRouter>,
