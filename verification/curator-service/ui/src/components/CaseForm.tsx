@@ -194,6 +194,7 @@ function initialValuesFromCase(c?: Case): CaseFormValues {
 interface Props {
     initialCase?: Case;
     onModalClose: () => void;
+    diseaseName: string;
 }
 
 // TODO: get 0 and 120 min/max age values from the backend.
@@ -573,7 +574,7 @@ export default function CaseForm(props: Props): JSX.Element {
             title={
                 props.initialCase
                     ? 'Edit case'
-                    : 'Create new COVID-19 line list case'
+                    : `Create new ${props.diseaseName} line list case`
             }
             onModalClose={props.onModalClose}
         >

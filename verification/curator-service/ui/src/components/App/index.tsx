@@ -634,7 +634,10 @@ export default function App(): JSX.Element {
                         )}
                         {user && hasAnyRole(user, ['curator']) && (
                             <Route path="/cases/new">
-                                <CaseForm onModalClose={onModalClose} />
+                                <CaseForm
+                                    onModalClose={onModalClose}
+                                    diseaseName={diseaseName}
+                                />
                             </Route>
                         )}
                         {user && hasAnyRole(user, ['curator']) && (
@@ -645,6 +648,7 @@ export default function App(): JSX.Element {
                                         <EditCase
                                             id={match.params.id}
                                             onModalClose={onModalClose}
+                                            diseaseName={diseaseName}
                                         />
                                     );
                                 }}
