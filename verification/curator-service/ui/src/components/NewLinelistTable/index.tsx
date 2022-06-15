@@ -219,8 +219,6 @@ const NewLinelistTable = () => {
 
     const isSelected = (id: string) => casesSelected.indexOf(id) !== -1;
 
-    console.log(searchQuery);
-
     return (
         <>
             <Helmet>

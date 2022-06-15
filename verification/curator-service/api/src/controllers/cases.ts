@@ -93,7 +93,10 @@ export default class CasesController {
                     },
                 },
             );
-            this.logOutcomeOfAppendingDownloadToUser(user._id, result);
+            this.logOutcomeOfAppendingDownloadToUser(
+                user._id.toHexString(),
+                result,
+            );
 
             axios({
                 method: 'post',
@@ -162,7 +165,10 @@ export default class CasesController {
                 },
             );
 
-            this.logOutcomeOfAppendingDownloadToUser(user._id, result);
+            this.logOutcomeOfAppendingDownloadToUser(
+                user._id.toHexString(),
+                result,
+            );
 
             axios({
                 method: 'post',
@@ -230,7 +236,10 @@ export default class CasesController {
                     },
                 },
             );
-            this.logOutcomeOfAppendingDownloadToUser(user._id, result);
+            this.logOutcomeOfAppendingDownloadToUser(
+                user._id.toHexString(),
+                result,
+            );
 
             res.status(200).send({ signedUrl });
         } catch (err) {
@@ -280,7 +289,10 @@ export default class CasesController {
                     },
                 },
             );
-            this.logOutcomeOfAppendingDownloadToUser(user._id, result);
+            this.logOutcomeOfAppendingDownloadToUser(
+                user._id.toHexString(),
+                result,
+            );
 
             res.status(200).send({ signedUrl });
         } catch (err) {

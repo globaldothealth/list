@@ -229,7 +229,7 @@ describe('<Users />', () => {
                     auth: {
                         ...initialLoggedInState.auth,
                         user: {
-                            _id: 'abc321',
+                            id: 'abc321',
                             googleID: '42',
                             name: 'Alice Smith',
                             email: 'foo@bar.com',

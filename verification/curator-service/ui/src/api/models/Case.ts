@@ -155,4 +155,5 @@ export interface Case {
     isSourceExcluded?: boolean;
     vaccines: Vaccine[];
     confirmationDate: Date;
+    notes: string;
 }

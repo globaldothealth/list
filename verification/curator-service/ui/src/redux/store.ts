@@ -40,7 +40,7 @@ export const initialLoggedInState: RootState = {
         error: undefined,
         changePasswordResponse: undefined,
         user: {
-            _id: '1',
+            id: '1',
             googleID: '42',
             name: 'Alice Smith',
             email: 'foo@bar.com',
