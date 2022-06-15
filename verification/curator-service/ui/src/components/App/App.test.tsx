@@ -78,10 +78,11 @@ describe('<App />', () => {
         });
 
         render(<App />);
-        expect(mockedAxios.get).toHaveBeenCalledTimes(4);
+        expect(mockedAxios.get).toHaveBeenCalledTimes(5);
         expect(mockedAxios.get).toHaveBeenCalledWith('/auth/profile');
         expect(mockedAxios.get).toHaveBeenCalledWith('/version');
         expect(mockedAxios.get).toHaveBeenCalledWith('/env');
+        expect(mockedAxios.get).toHaveBeenCalledWith('/diseaseName');
         expect(await screen.findByTestId('profile-menu')).toBeInTheDocument();
     });
 
@@ -102,10 +103,11 @@ describe('<App />', () => {
             }
         });
         render(<App />);
-        expect(mockedAxios.get).toHaveBeenCalledTimes(4);
+        expect(mockedAxios.get).toHaveBeenCalledTimes(5);
         expect(mockedAxios.get).toHaveBeenCalledWith('/auth/profile');
         expect(mockedAxios.get).toHaveBeenCalledWith('/version');
         expect(mockedAxios.get).toHaveBeenCalledWith('/env');
+        expect(mockedAxios.get).toHaveBeenCalledWith('/diseaseName');
         expect(screen.queryByTestId('profile-menu')).not.toBeInTheDocument();
     });
 

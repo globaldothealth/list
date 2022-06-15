@@ -542,12 +542,11 @@ export default function App(): JSX.Element {
                         ) : (
                             <span className={classes.spacer}></span>
                         )}
-
                         <Typography>
                             <a
                                 className={classes.mapLink}
                                 data-testid="mapLink"
-                                href={MapLink[env]}
+                                href={MapLink[diseaseName][env]}
                                 rel="noopener noreferrer"
                                 target="_blank"
                             >
