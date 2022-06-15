@@ -105,7 +105,7 @@ const Sidebar = ({ drawerOpen }: SidebarProps): JSX.Element => {
         >
             <div className={classes.drawerContents}>
                 <div className={classes.drawerHeader}></div>
-                <Typography className={classes.covidTitle}>
+                <Typography className={classes.diseaseTitle}>
                     {diseaseName}
                 </Typography>
                 <>
