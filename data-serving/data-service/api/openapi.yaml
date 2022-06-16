@@ -132,6 +132,8 @@ paths:
                     $ref: '#/components/responses/400'
                 '403':
                     $ref: '#/components/responses/403'
+                '404':
+                    $ref: '#/components/responses/404'
                 '422':
                     $ref: '#/components/responses/422'
                 '500':
@@ -257,6 +259,10 @@ paths:
             responses:
                 '200':
                     $ref: '#/components/responses/200CasesDownload'
+                '400':
+                    $ref: '#/components/responses/400'
+                '422':
+                    $ref: '#/components/responses/422'
                 '500':
                     $ref: '#/components/responses/500'
     /cases/batchUpsert:
@@ -1039,6 +1045,8 @@ components:
                     $ref: '#/components/schemas/Date'
                 sideEffects:
                     $ref: '#/components/schemas/SymptomArray'
+        AnyValue:
+            description: Used for errors and exceptional cases that need human inspection and intervention
     responses:
         '200Case':
             description: OK
@@ -1122,12 +1130,24 @@ components:
             description: No content
         '400':
             description: Malformed request
+            content:
+                application/json:
+                    schema:
+                        $ref: '#/components/schemas/AnyValue'
         '403':
             description: Forbidden
         '404':
             description: Not found
+            content:
+                application/json:
+                    schema:
+                        $ref: '#/components/schemas/AnyValue'
         '422':
             description: Unprocessable entity
+            content:
+                application/json:
+                    schema:
+                        $ref: '#/components/schemas/AnyValue'
         '500':
             description: Internal server error
 servers:
