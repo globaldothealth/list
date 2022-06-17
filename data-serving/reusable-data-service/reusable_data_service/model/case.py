@@ -22,7 +22,12 @@ class DayZeroCase:
         case = cls()
         source = json.loads(obj)
         for key in source:
-            setattr(case, key, source[key])
+            if key in ['confirmation_date']:
+                # parse as an ISO 8601 date
+                date = datetime.datetime.strptime(source[key], '%Y-%m-%dT%H:%M:%S.%fZ')
+                setattr(case, key, date)
+            else:
+                setattr(case, key, source[key])
         case.validate()
         return case
 
