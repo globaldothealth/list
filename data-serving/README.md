@@ -1,8 +1,21 @@
 # All things data
 
+# Emerging outbreaks
+
+Any new outbreak that is tracked by Global.health will use the `reusable-data-service` for CRUD operations on line list cases.
+It incorporates a simple "day zero" schema along with facilities for flexibly extending the data model.
+
+## Configuration
+
+TBD as the service gets written!
+
+# COVID-19 instances
+
+The `data-service` folder contains the service for CRUD operations involving the COVID-19 schema.
+
 ## Database design
 
-G.h case data, as well as the source, user, and session data for the curator portal, is stored in a MongoDB database.
+G.h COVID-19 case data, as well as the source, user, and session data for the curator portal, is stored in a MongoDB database.
 
 We have multiple instances of MongoDB, ranging from local instances for development, to dev and qa (for
 https://dev-data.covid-19.global.health/ and https://qa-data.covid-19.global.health in the case of COVID-19 data),
@@ -154,9 +167,3 @@ Add your index as a [migration](https://github.com/globaldothealth/list/tree/mai
 ##### Sample PRs
 
 * [Adding a new compound index](https://github.com/globaldothealth/list/pull/701/files)
-
-## Extending to new outbreaks
-
-Our database design is intended to be flexible enough to support future outbreaks. To spin up an instance of the curator
-service with a different dataset, create a new database in your MongoDB instance and
-[point the curator portal to it](https://github.com/globaldothealth/list/blob/main/dev/docker-compose.yml).
