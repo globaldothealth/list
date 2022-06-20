@@ -1,5 +1,6 @@
 import os
 import pymongo
+from reusable_data_service.model.case import Case
 from json import loads
 from bson.errors import InvalidId
 from bson.json_util import dumps
@@ -28,14 +29,17 @@ class MongoStore:
     def case_by_id(self, id: str):
         try:
             case = self.get_case_collection().find_one({"_id": ObjectId(id)})
-            # case includes BSON fields like ObjectID - convert into JSON for use by the app
-            return loads(dumps(case))
+            if case is not None:
+                # case includes BSON fields like ObjectID - convert into JSON for use by the app
+                return Case.from_json(dumps(case))
+            else:
+                return None
         except InvalidId:
             return None
 
     def all_cases(self):
         cases = self.get_case_collection().find({})
-        return loads(dumps(cases))
+        return [Case.from_json(dumps(c)) for c in cases]
 
     @staticmethod
     def setup():
