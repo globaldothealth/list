@@ -10,7 +10,7 @@ def client_with_patched_mongo(monkeypatch):
     # configure controllers
     monkeypatch.setenv("DATA_STORAGE_BACKEND", "mongodb")
     monkeypatch.setenv(
-        "MONGO_CONNECTION_STRING", "mongodb://localhost/27017"
+        "MONGO_CONNECTION_STRING", "mongodb://localhost:27017/outbreak"
     )  # will be unused
     monkeypatch.setenv("MONGO_DB", "outbreak")
     monkeypatch.setenv("MONGO_CASE_COLLECTION", "cases")
@@ -28,7 +28,7 @@ def client_with_patched_mongo(monkeypatch):
 
 def test_get_case_with_known_id(client_with_patched_mongo):
     # insert a case
-    db = pymongo.MongoClient("mongodb://localhost/27017")
+    db = pymongo.MongoClient("mongodb://localhost:27017/outbreak")
     case_id = (
         db["outbreak"]["cases"]
         .insert_one({"confirmation_date": "2021-12-31T01:23:45.678Z"})
