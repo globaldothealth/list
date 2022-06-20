@@ -1,6 +1,7 @@
 import os
 import pymongo
 from json import loads
+from bson.errors import InvalidId
 from bson.json_util import dumps
 from bson.objectid import ObjectId
 
@@ -25,9 +26,12 @@ class MongoStore:
         return self.get_database()[self.collection_name]
 
     def case_by_id(self, id: str):
-        case = self.get_case_collection().find_one({"_id": ObjectId(id)})
-        # case includes BSON fields like ObjectID - convert into JSON for use by the app
-        return loads(dumps(case))
+        try:
+            case = self.get_case_collection().find_one({"_id": ObjectId(id)})
+            # case includes BSON fields like ObjectID - convert into JSON for use by the app
+            return loads(dumps(case))
+        except InvalidId:
+            return None
 
     @staticmethod
     def setup():

@@ -1,5 +1,4 @@
 import pytest
-import os
 import mongomock
 import pymongo
 
@@ -40,3 +39,13 @@ def test_get_case_with_known_id(client_with_patched_mongo):
     assert response.status_code == 200
     assert result is not None
     assert result["confirmation_date"] == "2021-12-31T01:23:45.678Z"
+
+
+def test_get_case_with_poorly_formatted_id(client_with_patched_mongo):
+    response = client_with_patched_mongo.get(f"/api/case/not_a_case_id")
+    assert response.status_code == 404
+
+
+def test_get_case_with_valid_absent_id(client_with_patched_mongo):
+    response = client_with_patched_mongo.get(f"/api/case/01234567890123456789abcd")
+    assert response.status_code == 404
