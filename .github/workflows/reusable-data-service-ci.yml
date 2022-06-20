@@ -35,5 +35,4 @@ jobs:
       run: |
         pip install poetry
         poetry install
-        poetry update
         poetry run pytest
