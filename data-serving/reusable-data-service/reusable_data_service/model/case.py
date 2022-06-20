@@ -4,6 +4,7 @@ import json
 
 from typing import Any
 
+
 @dataclasses.dataclass()
 class DayZeroCase:
     """This class implements the "day-zero" data schema for Global.health.
@@ -31,7 +32,9 @@ class DayZeroCase:
         for key in dictionary:
             if key in ["confirmation_date"]:
                 # parse as an ISO 8601 date
-                date_dt = datetime.datetime.strptime(dictionary[key], "%Y-%m-%dT%H:%M:%S.%fZ")
+                date_dt = datetime.datetime.strptime(
+                    dictionary[key], "%Y-%m-%dT%H:%M:%S.%fZ"
+                )
                 date = date_dt.date()
                 setattr(case, key, date)
             else:

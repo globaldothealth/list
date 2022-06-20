@@ -1,6 +1,7 @@
 import flask.json
 import datetime
 
+
 class ISOJSONEncoder(flask.json.JSONEncoder):
     def default(self, obj):
         try:
