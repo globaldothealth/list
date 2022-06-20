@@ -1,3 +1,4 @@
+import os
 import pymongo
 from json import loads
 from bson.json_util import dumps
@@ -23,3 +24,12 @@ class MongoStore:
         case = self.get_case_collection().find_one({"_id": ObjectId(id)})
         # case includes BSON fields like ObjectID - convert into JSON for use by the app
         return loads(dumps(case))
+    
+    @staticmethod
+    def setup():
+        """Configure a store instance from the environment."""
+        mongo_connection_string = os.environ.get('MONGO_CONNECTION')
+        mongo_database = os.environ.get('MONGO_DB')
+        mongo_collection = os.environ.get('MONGO_CASE_COLLECTION')
+        mongo_store = MongoStore(mongo_connection_string, mongo_database, mongo_collection)
+        return mongo_store
