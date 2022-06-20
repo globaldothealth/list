@@ -1,10 +1,12 @@
 from flask import jsonify
 
+
 class CaseController:
     """Implements CRUD operations on cases. Uses an external store
     class to actually work with the cases collection, so that different
     storage technology can be chosen.
     All methods return a tuple of (response, HTTP status code)"""
+
     def __init__(self, store):
         self._store = store
 
