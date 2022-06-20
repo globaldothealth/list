@@ -127,7 +127,7 @@ describe('Bulk upload form', function () {
         cy.contains('Alberta');
         cy.contains('Banff');
         cy.contains('Male');
-        cy.contains('41-45');
+        cy.contains('41 - 45');
     });
 
     it('Can upload CSV with new source', function () {
@@ -161,7 +161,7 @@ describe('Bulk upload form', function () {
         cy.contains('Alberta');
         cy.contains('Banff');
         cy.contains('Male');
-        cy.contains('41-45');
+        cy.contains('41 - 45');
 
         cy.visit('/sources');
         cy.contains('www.new-source.com');
@@ -277,10 +277,7 @@ describe('Bulk upload form', function () {
         cy.get('ul')
             .eq(3)
             .should('have.length', 1)
-            .should(
-                'contain',
-                'age range 142-42 invalid',
-            );
+            .should('contain', 'age range 142-42 invalid');
         cy.get('button[aria-label="close overlay"').click();
 
         cy.visit('/');
