@@ -38,7 +38,7 @@ def test_get_case_with_known_id(client_with_patched_mongo):
     result = response.get_json()
     assert response.status_code == 200
     assert result is not None
-    assert result["confirmation_date"] == "Fri, 31 Dec 2021 00:00:00 GMT"
+    assert result["confirmation_date"] == "2021-12-31"
 
 
 def test_get_case_with_poorly_formatted_id(client_with_patched_mongo):

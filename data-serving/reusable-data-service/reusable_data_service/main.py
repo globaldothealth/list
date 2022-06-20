@@ -1,10 +1,13 @@
 from flask import Flask, request
 from . import CaseController, MongoStore
+from reusable_data_service.util.iso_json_encoder import ISOJSONEncoder
 
 import os
 import logging
 
 app = Flask(__name__)
+app.json_encoder = ISOJSONEncoder
+
 case_controller = None  # Will be set up in main()
 
 
