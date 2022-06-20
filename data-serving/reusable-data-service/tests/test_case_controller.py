@@ -14,6 +14,9 @@ class MemoryStore:
 
     def put_case(self, id: str, case: Case):
         self.cases[id] = case
+    
+    def all_cases(self):
+        return list(self.cases.values())
 
 
 @pytest.fixture
@@ -39,3 +42,11 @@ def test_one_absent_item_should_return_400_not_found(app_context):
     (response, status) = controller.get_case("foo")
     assert status == 404
     assert response == "No case with ID foo"
+
+
+def test_list_cases_should_return_200_OK(app_context):
+    store = MemoryStore()
+    controller = CaseController(store)
+    (response, status) = controller.list_cases()
+    assert status == 200
+    assert response.json == []

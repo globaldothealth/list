@@ -33,6 +33,10 @@ class MongoStore:
         except InvalidId:
             return None
 
+    def all_cases(self):
+        cases = self.get_case_collection().find({})
+        return loads(dumps(cases))
+
     @staticmethod
     def setup():
         """Configure a store instance from the environment."""
