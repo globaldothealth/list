@@ -2,6 +2,7 @@ import dataclasses
 import datetime
 import json
 
+from typing import Any
 
 @dataclasses.dataclass()
 class DayZeroCase:
@@ -16,20 +17,25 @@ class DayZeroCase:
     to that function)."""
 
     _: dataclasses.KW_ONLY
-    confirmation_date: datetime.datetime = dataclasses.field(init=False)
+    confirmation_date: datetime.date = dataclasses.field(init=False)
 
     @classmethod
     def from_json(cls, obj: str) -> type:
         """Create an instance of this class from a JSON representation."""
-        case = cls()
         source = json.loads(obj)
-        for key in source:
+        return cls.from_dict(source)
+
+    @classmethod
+    def from_dict(cls, dictionary: dict[str, Any]) -> type:
+        case = cls()
+        for key in dictionary:
             if key in ["confirmation_date"]:
                 # parse as an ISO 8601 date
-                date = datetime.datetime.strptime(source[key], "%Y-%m-%dT%H:%M:%S.%fZ")
+                date_dt = datetime.datetime.strptime(dictionary[key], "%Y-%m-%dT%H:%M:%S.%fZ")
+                date = date_dt.date()
                 setattr(case, key, date)
             else:
-                setattr(case, key, source[key])
+                setattr(case, key, dictionary[key])
         case.validate()
         return case
 
