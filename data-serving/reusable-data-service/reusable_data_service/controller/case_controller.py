@@ -18,3 +18,8 @@ class CaseController:
         if case is None:
             return f"No case with ID {id}", 404
         return jsonify(case), 200
+
+    def list_cases(self):
+        """Implements get /cases."""
+        cases = self._store.all_cases()
+        return jsonify(cases), 200

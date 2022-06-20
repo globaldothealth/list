@@ -8,9 +8,14 @@ app = Flask(__name__)
 case_controller = None  # Will be set up in main()
 
 
-@app.route("/api/case/<id>")
+@app.route("/api/cases/<id>")
 def get_case(id):
     return case_controller.get_case(id)
+
+
+@app.route("/api/cases")
+def list_cases():
+    return case_controller.list_cases()
 
 
 def set_up_controllers():
