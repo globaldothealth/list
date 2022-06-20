@@ -14,7 +14,7 @@ class MemoryStore:
 
     def put_case(self, id: str, case: Case):
         self.cases[id] = case
-    
+
     def all_cases(self):
         return list(self.cases.values())
 
