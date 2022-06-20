@@ -50,3 +50,15 @@ def test_list_cases_should_return_200_OK(app_context):
     (response, status) = controller.list_cases()
     assert status == 200
     assert response.json == []
+
+
+def test_list_cases_should_list_the_cases(app_context):
+    store = MemoryStore()
+    controller = CaseController(store)
+    with open("./tests/data/case.minimal.json", "r") as minimal_file:
+        case = Case.from_json(minimal_file.read())
+        store.put_case("foo", case)
+        store.put_case("bar", case)
+    (response, status) = controller.list_cases()
+    assert status == 200
+    assert len(response.json) == 2
