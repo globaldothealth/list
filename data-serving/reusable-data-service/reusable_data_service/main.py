@@ -2,7 +2,7 @@ from flask import Flask, request
 from . import CaseController, MongoStore
 
 import os
-
+import logging
 
 app = Flask(__name__)
 case_controller = None # Will be set up in main()
@@ -13,12 +13,14 @@ def get_case(id):
 
 def set_up_controllers():
     global case_controller
-    # TODO choose which store to load from configuration
-    mongo_connection_string = os.environ.get('MONGO_CONNECTION')
-    mongo_database = os.environ.get('MONGO_DB')
-    mongo_collection = os.environ.get('MONGO_CASE_COLLECTION')
-    mongo_store = MongoStore(mongo_connection_string, mongo_database, mongo_collection)
-    case_controller = CaseController(mongo_store)
+    store_options = { 'mongodb': MongoStore.setup }
+    if store_choice := os.environ.get('DATA_STORAGE_BACKEND'):
+        try:
+            store = store_options[store_choice]()
+        except KeyError:
+            logging.exception(f"Cannot configure backend data store {store_choice}")
+            raise
+    case_controller = CaseController(store)
 
 def main():
     set_up_controllers()

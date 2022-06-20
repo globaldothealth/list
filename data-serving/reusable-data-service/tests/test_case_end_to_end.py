@@ -8,6 +8,7 @@ from reusable_data_service import app, set_up_controllers
 @pytest.fixture
 def client_with_patched_mongo(monkeypatch):
     # configure controllers
+    monkeypatch.setenv('DATA_STORAGE_BACKEND', 'mongodb')
     monkeypatch.setenv('MONGO_CONNECTION_STRING', 'mongodb://localhost/27017') # will be unused
     monkeypatch.setenv('MONGO_DB', 'outbreak')
     monkeypatch.setenv('MONGO_CASE_COLLECTION', 'cases')
