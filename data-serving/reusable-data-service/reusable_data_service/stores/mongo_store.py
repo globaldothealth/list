@@ -38,7 +38,9 @@ class MongoStore:
             return None
 
     def fetch_cases(self, page: int, limit: int):
-        cases = self.get_case_collection().find({}, skip=(page - 1) * limit, limit = limit)
+        cases = self.get_case_collection().find(
+            {}, skip=(page - 1) * limit, limit=limit
+        )
         return [Case.from_json(dumps(c)) for c in cases]
 
     def count_cases(self) -> int:

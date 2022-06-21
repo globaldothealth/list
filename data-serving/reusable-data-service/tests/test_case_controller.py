@@ -16,10 +16,11 @@ class MemoryStore:
         self.cases[id] = case
 
     def fetch_cases(self, page: int, limit: int):
-        return list(self.cases.values())[(page - 1) * limit: page * limit]
+        return list(self.cases.values())[(page - 1) * limit : page * limit]
 
     def count_cases(self):
         return len(self.cases)
+
 
 @pytest.fixture
 def case_controller():
@@ -71,6 +72,7 @@ def test_list_cases_should_paginate(case_controller):
     assert response.json["nextPage"] == 2
     assert response.json["total"] == 15
 
+
 def test_list_cases_last_page(case_controller):
     with open("./tests/data/case.minimal.json", "r") as minimal_file:
         case = Case.from_json(minimal_file.read())
@@ -81,6 +83,7 @@ def test_list_cases_last_page(case_controller):
     assert len(response.json["cases"]) == 5
     assert response.json["total"] == 15
     assert "nextPage" not in response.json
+
 
 def test_list_cases_nonexistent_page(case_controller):
     with open("./tests/data/case.minimal.json", "r") as minimal_file:
