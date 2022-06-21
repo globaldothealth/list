@@ -58,9 +58,12 @@ def test_list_cases_when_none_present_is_empty_list(client_with_patched_mongo):
     assert response.status_code == 200
     assert response.json["cases"] == []
 
+
 def test_list_cases_with_pagination_query(client_with_patched_mongo):
     db = pymongo.MongoClient("mongodb://localhost:27017/outbreak")
-    db["outbreak"]["cases"].insert_many([{"confirmation_date": datetime(2020, 12, 24)} for i in range(25)])
+    db["outbreak"]["cases"].insert_many(
+        [{"confirmation_date": datetime(2020, 12, 24)} for i in range(25)]
+    )
     response = client_with_patched_mongo.get(f"/api/cases?page=2&limit=10")
     assert response.status_code == 200
     assert len(response.json["cases"]) == 10
