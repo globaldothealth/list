@@ -528,11 +528,11 @@ describe('Linelist table', function () {
         }
 
         cy.intercept('GET', getDefaultQuery({ limit: 50 })).as('getCases');
+        cy.intercept('GET', getDefaultQuery({ limit: 5 })).as('getFirstPage');
         cy.visit('/');
         cy.visit('/cases');
         cy.wait('@getCases');
         cy.get('select[aria-label="rows per page"]').select('5');
-        cy.intercept('GET', getDefaultQuery({ limit: 5 })).as('getFirstPage');
         cy.wait('@getFirstPage');
 
         cy.get('button[aria-label="next page"]').click();
@@ -553,11 +553,11 @@ describe('Linelist table', function () {
         }
 
         cy.intercept('GET', getDefaultQuery({ limit: 50 })).as('getCases');
+        cy.intercept('GET', getDefaultQuery({ limit: 5 })).as('getFirstPage');
         cy.visit('/');
         cy.visit('/cases');
         cy.wait('@getCases');
         cy.get('select[aria-label="rows per page"]').select('5');
-        cy.intercept('GET', getDefaultQuery({ limit: 5 })).as('getFirstPage');
         cy.wait('@getFirstPage');
 
         cy.get('button[aria-label="next page"]').click();
