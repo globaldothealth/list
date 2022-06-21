@@ -305,7 +305,7 @@ describe('Linelist table', function () {
         cy.visit('/');
         cy.visit('/cases');
         cy.wait('@getCasesDefault');
-        cy.get('button.iubenda-cs-accept-btn').click();
+        // cy.get('button.iubenda-cs-accept-btn').click();
         cy.get('svg[data-testid="unverified-svg"]').should('have.length', 9);
         cy.get('select[aria-label="rows per page"]').select('5');
         cy.wait('@getCases');
@@ -493,7 +493,7 @@ describe('Linelist table', function () {
         cy.visit('/');
         cy.visit('/cases');
         cy.wait('@getCases');
-        cy.get('button.iubenda-cs-accept-btn').click();
+        // cy.get('button.iubenda-cs-accept-btn').click();
 
         cy.get('select[aria-label="rows per page"]').select('5');
         cy.contains('Filter').click();
