@@ -18,7 +18,9 @@ def get_case(id):
 
 @app.route("/api/cases")
 def list_cases():
-    return case_controller.list_cases()
+    page = request.args.get('page', type=int)
+    limit = request.args.get('limit', type=int)
+    return case_controller.list_cases(page=page, limit=limit)
 
 
 def set_up_controllers():

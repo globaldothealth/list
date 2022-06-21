@@ -19,8 +19,10 @@ class CaseController:
             return f"No case with ID {id}", 404
         return jsonify(case), 200
 
-    def list_cases(self, page:int=1, limit:int=10):
+    def list_cases(self, page:int=None, limit:int=None):
         """Implements get /cases."""
+        page = 1 if page is None else page
+        limit = 10 if limit is None else limit
         validation_error = None
         if page <= 0:
             validation_error = { "message" : "page must be >0" }
