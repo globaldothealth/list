@@ -56,4 +56,4 @@ def test_get_case_with_valid_absent_id(client_with_patched_mongo):
 def test_list_cases_when_none_present_is_empty_list(client_with_patched_mongo):
     response = client_with_patched_mongo.get(f"/api/cases")
     assert response.status_code == 200
-    assert response.json == []
+    assert response.json["cases"] == []
