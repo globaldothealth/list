@@ -2,7 +2,7 @@ name: Integration Tests CI
 
 on:
   push:
-    branches: [main, '*-stable']
+    branches: [main, "*-stable"]
     paths:
       - ".github/workflows/integration-tests.yml"
       - "dev/docker-compose.yml"
@@ -35,11 +35,14 @@ jobs:
         with:
           working-directory: verification/curator-service/ui
           browser: ${{ matrix.browser }}
+          headless: true
+          record: true
           wait-on: "http://localhost:3002"
           wait-on-timeout: 300
           install-command: sh ./install_in_ci.sh
         env:
           CI: true
+          CYPRESS_RECORD_KEY: 1ce3e9e4-e9e0-4e00-834f-7410b0d922d2
       # Screenshots are only available on failures.
       - uses: actions/upload-artifact@v1
         if: failure()
