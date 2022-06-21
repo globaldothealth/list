@@ -204,10 +204,12 @@ export function DateField(props: DateFieldProps): JSX.Element {
                     )}
                     invalidDateMessage="Invalid date format (YYYY/MM/DD)"
                     component={DatePicker}
+                    readonly={false}
                     textField={{
                         placeholder: 'YYYY/MM/DD',
                         variant: 'standard',
                         name: props.name,
+                        readonly: false,
                         'data-testid': props.name,
                     }}
                 />
