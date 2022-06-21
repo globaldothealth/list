@@ -9,7 +9,7 @@ import CaseFormValues from '../new-case-form-fields/CaseFormValues';
 import FormControl from '@mui/material/FormControl';
 import { FormHelperText } from '@mui/material';
 import InputLabel from '@mui/material/InputLabel';
-import { DatePicker } from 'formik-mui-lab';
+import { DesktopDatePicker } from 'formik-mui-lab';
 import MenuItem from '@mui/material/MenuItem';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
@@ -203,13 +203,11 @@ export function DateField(props: DateFieldProps): JSX.Element {
                         props.initialFocusedDate ?? '',
                     )}
                     invalidDateMessage="Invalid date format (YYYY/MM/DD)"
-                    component={DatePicker}
-                    readonly={false}
+                    component={DesktopDatePicker}
                     textField={{
                         placeholder: 'YYYY/MM/DD',
                         variant: 'standard',
                         name: props.name,
-                        readonly: false,
                         'data-testid': props.name,
                     }}
                 />
