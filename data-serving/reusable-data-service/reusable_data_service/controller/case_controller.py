@@ -19,7 +19,22 @@ class CaseController:
             return f"No case with ID {id}", 404
         return jsonify(case), 200
 
-    def list_cases(self):
+    def list_cases(self, page:int=1, limit:int=10):
         """Implements get /cases."""
-        cases = self.store.all_cases()
-        return jsonify(cases), 200
+        validation_error = None
+        if page <= 0:
+            validation_error = { "message" : "page must be >0" }
+        if limit <= 0:
+            validation_error = { "message" : "limit must be >0" }
+        if validation_error is not None:
+            return jsonify(validation_error), 422
+        cases = self.store.fetch_cases(page, limit)
+        count = self.store.count_cases()
+        response = {
+            "cases": cases,
+            "total": count
+        }
+        if count > page * limit:
+            response["nextPage"] = page + 1
+
+        return jsonify(response), 200
