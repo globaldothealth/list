@@ -7,6 +7,14 @@ before(() => {
     Cypress.Cookies.debug(true, { verbose: false });
 });
 
+Cypress.on('uncaught:exception', (err, runnable, promise) => {
+    if (promise) {
+        return false;
+    }
+    // we still want to ensure there are no other unexpected
+    // errors, so we let them fail the test
+});
+
 // After all tests have run, seed database with initial data.
 after(() => {
     cy.task('clearCasesDB', {});
