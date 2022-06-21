@@ -8,18 +8,18 @@ class CaseController:
     All methods return a tuple of (response, HTTP status code)"""
 
     def __init__(self, store):
-        self._store = store
+        self.store = store
 
     def get_case(self, id: str):
         """Implements get /cases/:id. Interpretation of ID is dependent
         on the store implementation but here it is an opaque token that
         should be unique to each case."""
-        case = self._store.case_by_id(id)
+        case = self.store.case_by_id(id)
         if case is None:
             return f"No case with ID {id}", 404
         return jsonify(case), 200
 
     def list_cases(self):
         """Implements get /cases."""
-        cases = self._store.all_cases()
+        cases = self.store.all_cases()
         return jsonify(cases), 200
