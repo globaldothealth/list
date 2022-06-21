@@ -2,6 +2,8 @@ import pytest
 import mongomock
 import pymongo
 
+from datetime import datetime
+
 from reusable_data_service import app, set_up_controllers
 
 
@@ -31,7 +33,7 @@ def test_get_case_with_known_id(client_with_patched_mongo):
     db = pymongo.MongoClient("mongodb://localhost:27017/outbreak")
     case_id = (
         db["outbreak"]["cases"]
-        .insert_one({"confirmation_date": "2021-12-31T01:23:45.678Z"})
+        .insert_one({"confirmation_date": datetime(2021, 12, 31, 1, 23, 45, 678)})
         .inserted_id
     )
     response = client_with_patched_mongo.get(f"/api/cases/{str(case_id)}")
