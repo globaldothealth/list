@@ -1,4 +1,11 @@
 from flask import jsonify
+from datetime import date
+from reusable_data_service.model.filter import (
+    Anything,
+    Filter,
+    PropertyFilter,
+    FilterOperator,
+)
 
 
 class CaseController:
@@ -19,7 +26,7 @@ class CaseController:
             return f"No case with ID {id}", 404
         return jsonify(case), 200
 
-    def list_cases(self, page: int = None, limit: int = None):
+    def list_cases(self, page: int = None, limit: int = None, filter: str = None):
         """Implements get /cases."""
         page = 1 if page is None else page
         limit = 10 if limit is None else limit
@@ -30,10 +37,31 @@ class CaseController:
             validation_error = {"message": "limit must be >0"}
         if validation_error is not None:
             return jsonify(validation_error), 422
-        cases = self.store.fetch_cases(page, limit)
-        count = self.store.count_cases()
+        predicate = CaseController.parse_filter(filter)
+        cases = self.store.fetch_cases(page, limit, predicate)
+        count = self.store.count_cases(predicate)
         response = {"cases": cases, "total": count}
         if count > page * limit:
             response["nextPage"] = page + 1
 
         return jsonify(response), 200
+
+    @staticmethod
+    def parse_filter(filter: str) -> Filter:
+        """Interpret the filter query in the incoming request."""
+        if filter is None:
+            return Anything()
+        # split query on spaces (when more than one keyword supported)
+
+        # keyword value pairs separated by colon
+        (keyword, value) = filter.split(":")
+        # special case dateconfirmedbefore, dateconfirmedafter
+        if keyword == "dateconfirmedbefore":
+            return PropertyFilter(
+                "confirmation_date", FilterOperator.LESS_THAN, date.fromisoformat(value)
+            )
+        if keyword == "dateconfirmedafter":
+            return PropertyFilter(
+                "confirmation_date", FilterOperator.GREATER_THAN, date.fromisoformat(value)
+            )
+        # anything else (not supported yet) is equality
