@@ -3,6 +3,7 @@ from datetime import date
 from reusable_data_service.model.filter import (
     Anything,
     Filter,
+    AndFilter,
     PropertyFilter,
     FilterOperator,
 )
@@ -51,10 +52,19 @@ class CaseController:
         """Interpret the filter query in the incoming request."""
         if filter is None:
             return Anything()
-        # split query on spaces (when more than one keyword supported)
+        # split query on spaces
+        components = filter.split(" ")
+        filters = [CaseController.individual_filter(c) for c in components]
+        if len(filters) == 1:
+            return filters[0]
+        else:
+            return AndFilter(filters)
 
+    @staticmethod
+    def individual_filter(term: str) -> Filter:
+        """Turn a single property:value filter request into a filter object"""
         # keyword value pairs separated by colon
-        (keyword, value) = filter.split(":")
+        (keyword, value) = term.split(":")
         # special case dateconfirmedbefore, dateconfirmedafter
         if keyword == "dateconfirmedbefore":
             return PropertyFilter(
