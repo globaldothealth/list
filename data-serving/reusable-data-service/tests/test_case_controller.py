@@ -123,3 +123,20 @@ def test_create_valid_case_adds_to_collection(case_controller):
     )
     assert status == 201
     assert case_controller.store.count_cases() == 1
+
+
+def test_create_valid_case_with_negative_count_400_error(case_controller):
+    (response, status) = case_controller.create_case(
+        {"confirmation_date": date(2021, 6, 3)},
+        num_cases = -7
+    )
+    assert status == 400
+
+
+def test_create_valid_case_with_positive_count_adds_to_collection(case_controller):
+    (response, status) = case_controller.create_case(
+        {"confirmation_date": date(2021, 6, 3)},
+        num_cases = 7
+    )
+    assert status == 201
+    assert case_controller.store.count_cases() == 7

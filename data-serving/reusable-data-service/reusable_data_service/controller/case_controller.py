@@ -58,12 +58,15 @@ class CaseController:
 
         return jsonify(response), 200
 
-    def create_case(self, maybe_case: dict):
+    def create_case(self, maybe_case: dict, num_cases: int = 1):
         """Implements post /cases."""
+        if num_cases <= 0:
+            return "Must create a positive number of cases", 400
         try:
             case = Case.from_dict(maybe_case)
             self.check_case_preconditions(case)
-            self.store.insert_case(case)
+            for i in range(num_cases):
+                self.store.insert_case(case)
             return "", 201
         except ValueError as ve:
             # ValueError means we can't even turn this into a case
