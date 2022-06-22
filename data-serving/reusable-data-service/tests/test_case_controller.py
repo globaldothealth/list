@@ -1,4 +1,5 @@
 import pytest
+from datetime import date
 
 from reusable_data_service import Case, CaseController, app
 
@@ -26,7 +27,7 @@ class MemoryStore:
 def case_controller():
     with app.app_context():
         store = MemoryStore()
-        controller = CaseController(store)
+        controller = CaseController(store, outbreak_date = date(2019, 11, 1))
         yield controller
 
 
@@ -100,3 +101,8 @@ def test_list_cases_nonexistent_page(case_controller):
 def test_create_case_with_missing_properties_400_error(case_controller):
     (response, status) = case_controller.create_case({})
     assert status == 400
+
+
+def test_create_case_with_invalid_data_422_error(case_controller):
+    (response, status) = case_controller.create_case({ "confirmation_date": date(2001, 3, 17)})
+    assert status == 422

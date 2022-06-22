@@ -1,3 +1,4 @@
+from datetime import date
 from flask import Flask, request
 from . import CaseController, MongoStore
 from reusable_data_service.util.iso_json_encoder import ISOJSONEncoder
@@ -33,7 +34,10 @@ def set_up_controllers():
         except KeyError:
             logging.exception(f"Cannot configure backend data store {store_choice}")
             raise
-    case_controller = CaseController(store)
+    outbreak_date = os.environ.get("OUTBREAK_DATE")
+    if outbreak_date is None:
+        raise ValueError("Define $OUTBREAK_DATE in the environment")
+    case_controller = CaseController(store, date.fromisoformat(outbreak_date))
 
 
 def main():
