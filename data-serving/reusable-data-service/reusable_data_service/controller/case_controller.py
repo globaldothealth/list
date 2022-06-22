@@ -9,6 +9,9 @@ from reusable_data_service.model.filter import (
     FilterOperator,
 )
 
+class PreconditionError(Exception):
+    pass
+
 
 class CaseController:
     """Implements CRUD operations on cases. Uses an external store
@@ -16,8 +19,11 @@ class CaseController:
     storage technology can be chosen.
     All methods return a tuple of (response, HTTP status code)"""
 
-    def __init__(self, store):
+    def __init__(self, store, outbreak_date: date):
+        """store is an adapter to the external storage technology.
+        outbreak_date is the earliest date on which this instance should accept cases."""
         self.store = store
+        self.outbreak_date = outbreak_date
 
     def get_case(self, id: str):
         """Implements get /cases/:id. Interpretation of ID is dependent
@@ -55,9 +61,18 @@ class CaseController:
         """Implements post /cases."""
         try:
             case = Case.from_dict(maybe_case)
+            self.check_case_preconditions(case)
             return "", 201
         except ValueError as ve:
+            # ValueError means we can't even turn this into a case
             return ve.args[0], 400
+        except PreconditionError as pe:
+            # PreconditionError means it's a case, but not one we can use
+            return pe.args[0], 422
+
+    def check_case_preconditions(self, case: Case):
+        if case.confirmation_date < self.outbreak_date:
+            raise PreconditionError("Confirmation date is before outbreak began")
 
     @staticmethod
     def parse_filter(filter: str) -> Filter:

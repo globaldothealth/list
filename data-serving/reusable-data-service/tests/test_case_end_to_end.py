@@ -16,6 +16,7 @@ def client_with_patched_mongo(monkeypatch):
     )  # will be unused
     monkeypatch.setenv("MONGO_DB", "outbreak")
     monkeypatch.setenv("MONGO_CASE_COLLECTION", "cases")
+    monkeypatch.setenv("OUTBREAK_DATE", "2019-11-01")
     db = mongomock.MongoClient()
 
     def fake_mongo(connection_string):
