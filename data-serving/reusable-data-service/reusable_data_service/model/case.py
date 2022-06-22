@@ -40,7 +40,7 @@ class DayZeroCase:
                 elif isinstance(maybe_date, str):
                     value = datetime.datetime.strptime(
                         maybe_date, "%Y-%m-%dT%H:%M:%S.%fZ"
-                    )
+                    ).date()
                 elif isinstance(maybe_date, dict) and "$date" in maybe_date:
                     value = datetime.datetime.strptime(
                         maybe_date["$date"], "%Y-%m-%dT%H:%M:%SZ"
@@ -59,6 +59,10 @@ class DayZeroCase:
             raise ValueError("Confirmation Date is mandatory")
         elif self.confirmation_date is None:
             raise ValueError("Confirmation Date must have a value")
+    
+    def to_dict(self):
+        """Return myself as a dictionary."""
+        return dataclasses.asdict(self)
 
     @classmethod
     def date_fields(cls) -> list[str]:
