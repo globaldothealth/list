@@ -144,3 +144,10 @@ def test_list_cases_no_matching_results(client_with_patched_mongo):
     assert response.status_code == 200
     assert len(response.json["cases"]) == 0
     assert response.json["total"] == 0
+
+
+def test_list_cases_with_bad_filter_rejected(client_with_patched_mongo):
+    response = client_with_patched_mongo.get(
+        f"/api/cases?q=country%3A"
+    )
+    assert response.status_code == 422
