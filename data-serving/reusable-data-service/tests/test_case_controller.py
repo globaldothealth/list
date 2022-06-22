@@ -97,6 +97,6 @@ def test_list_cases_nonexistent_page(case_controller):
     assert "nextPage" not in response.json
 
 
-def test_put_case_with_missing_properties_400_error(case_controller):
-    (response, status) = case_controller.post_case({})
+def test_create_case_with_missing_properties_400_error(case_controller):
+    (response, status) = case_controller.create_case({})
     assert status == 400

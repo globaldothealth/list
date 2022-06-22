@@ -51,7 +51,7 @@ class CaseController:
 
         return jsonify(response), 200
 
-    def post_case(self, maybe_case: dict):
+    def create_case(self, maybe_case: dict):
         """Implements post /cases."""
         try:
             case = Case.from_dict(maybe_case)
