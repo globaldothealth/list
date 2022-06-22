@@ -50,6 +50,13 @@ class MongoStore:
             return self.get_case_collection().estimated_document_count()
         return self.get_case_collection().count_documents(filter.to_mongo_query())
 
+    def insert_case(self, case: Case):
+        to_insert = case.to_dict()
+        for field in Case.date_fields():
+            # BSON works with datetimes, not dates
+            to_insert[field] = date_to_datetime(to_insert[field])
+        self.get_case_collection().insert_one(to_insert)
+
     @staticmethod
     def setup():
         """Configure a store instance from the environment."""
@@ -62,6 +69,10 @@ class MongoStore:
         return mongo_store
 
 
+def date_to_datetime(dt: datetime.date) -> datetime.datetime:
+    """Convert datetime.date to datetime.datetime for encoding as BSON"""
+    return datetime.datetime(dt.year, dt.month, dt.day)
+
 # Add methods to the Filter classes here to turn them into Mongo queries.
 def anything_query(self):
     return {}
@@ -71,7 +82,7 @@ Anything.to_mongo_query = anything_query
 def property_query(self):
     # rewrite dates specified in the app to datetimes because pymongo
     # expects datetimes to represent BSON dates.
-    value = datetime.datetime(self.value.year, self.value.month, self.value.day) if isinstance(self.value, datetime.date) else self.value
+    value = date_to_datetime(self.value) if isinstance(self.value, datetime.date) else self.value
     match self.operation:
         case FilterOperator.LESS_THAN:
             return { self.property_name: { "$lt" : value }}

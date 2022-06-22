@@ -150,5 +150,16 @@ def test_list_cases_no_matching_results(client_with_patched_mongo):
 
 
 def test_list_cases_with_bad_filter_rejected(client_with_patched_mongo):
-    response = client_with_patched_mongo.get(f"/api/cases?q=country%3A")
+    response = client_with_patched_mongo.get("/api/cases?q=country%3A")
     assert response.status_code == 422
+
+
+def test_post_case_list_cases_round_trip(client_with_patched_mongo):
+    post_response = client_with_patched_mongo.post("/api/cases", json = {
+        "confirmation_date": "2022-01-23T13:45:01.234Z"
+    })
+    assert post_response.status_code == 201
+    get_response = client_with_patched_mongo.get("/api/cases")
+    assert get_response.status_code == 200
+    assert len(get_response.json["cases"]) == 1
+    assert get_response.json["cases"][0]["confirmation_date"] == "2022-01-23"

@@ -17,13 +17,15 @@ def get_case(id):
     return case_controller.get_case(id)
 
 
-@app.route("/api/cases")
+@app.route("/api/cases", methods = ['POST', 'GET'])
 def list_cases():
-    page = request.args.get("page", type=int)
-    limit = request.args.get("limit", type=int)
-    filter = request.args.get("q", type=str)
-    return case_controller.list_cases(page=page, limit=limit, filter=filter)
-
+    if request.method == 'GET':
+        page = request.args.get("page", type=int)
+        limit = request.args.get("limit", type=int)
+        filter = request.args.get("q", type=str)
+        return case_controller.list_cases(page=page, limit=limit, filter=filter)
+    else:
+        return case_controller.create_case(request.get_json())
 
 def set_up_controllers():
     global case_controller
