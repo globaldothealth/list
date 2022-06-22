@@ -9,12 +9,19 @@ class MemoryStore:
 
     def __init__(self):
         self.cases = dict()
+        self.next_id = 0
 
     def case_by_id(self, id: str):
         return self.cases.get(id)
 
     def put_case(self, id: str, case: Case):
+        """Used in the tests to populate the store."""
         self.cases[id] = case
+
+    def insert_case(self, case: Case):
+        """Used by the controller to insert a new case."""
+        self.next_id += 1
+        self.put_case(str(self.next_id), case)
 
     def fetch_cases(self, page: int, limit: int, *args):
         return list(self.cases.values())[(page - 1) * limit : page * limit]
@@ -27,7 +34,7 @@ class MemoryStore:
 def case_controller():
     with app.app_context():
         store = MemoryStore()
-        controller = CaseController(store, outbreak_date = date(2019, 11, 1))
+        controller = CaseController(store, outbreak_date=date(2019, 11, 1))
         yield controller
 
 
@@ -104,5 +111,15 @@ def test_create_case_with_missing_properties_400_error(case_controller):
 
 
 def test_create_case_with_invalid_data_422_error(case_controller):
-    (response, status) = case_controller.create_case({ "confirmation_date": date(2001, 3, 17)})
+    (response, status) = case_controller.create_case(
+        {"confirmation_date": date(2001, 3, 17)}
+    )
     assert status == 422
+
+
+def test_create_valid_case_adds_to_collection(case_controller):
+    (response, status) = case_controller.create_case(
+        {"confirmation_date": date(2021, 6, 3)}
+    )
+    assert status == 201
+    assert case_controller.store.count_cases() == 1

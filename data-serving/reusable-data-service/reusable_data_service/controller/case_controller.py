@@ -9,6 +9,7 @@ from reusable_data_service.model.filter import (
     FilterOperator,
 )
 
+
 class PreconditionError(Exception):
     pass
 
@@ -62,6 +63,7 @@ class CaseController:
         try:
             case = Case.from_dict(maybe_case)
             self.check_case_preconditions(case)
+            self.store.insert_case(case)
             return "", 201
         except ValueError as ve:
             # ValueError means we can't even turn this into a case
@@ -103,6 +105,8 @@ class CaseController:
             )
         if keyword == "dateconfirmedafter":
             return PropertyFilter(
-                "confirmation_date", FilterOperator.GREATER_THAN, date.fromisoformat(value)
+                "confirmation_date",
+                FilterOperator.GREATER_THAN,
+                date.fromisoformat(value),
             )
         # anything else (not supported yet) is equality
