@@ -121,3 +121,16 @@ def test_list_cases_filter_confirmation_date_before_and_after(client_with_patche
     assert "2022-05-11" in dates
     assert "2022-05-12" in dates
     assert "2022-05-13" not in dates
+
+
+def test_list_cases_no_matching_results(client_with_patched_mongo):
+    db = pymongo.MongoClient("mongodb://localhost:27017/outbreak")
+    db["outbreak"]["cases"].insert_many(
+        [{"confirmation_date": datetime(2022, 5, i)} for i in range(1, 32)]
+    )
+    response = client_with_patched_mongo.get(
+        f"/api/cases?q=dateconfirmedafter%3a2023-05-10"
+    )
+    assert response.status_code == 200
+    assert len(response.json["cases"]) == 0
+    assert response.json["total"] == 0
