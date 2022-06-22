@@ -25,7 +25,10 @@ def list_cases():
         filter = request.args.get("q", type=str)
         return case_controller.list_cases(page=page, limit=limit, filter=filter)
     else:
-        return case_controller.create_case(request.get_json())
+        count = request.args.get("num_cases", type=int)
+        if count is None:
+            count = 1
+        return case_controller.create_case(request.get_json(), num_cases=count)
 
 def set_up_controllers():
     global case_controller
