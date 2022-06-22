@@ -95,3 +95,8 @@ def test_list_cases_nonexistent_page(case_controller):
     assert len(response.json["cases"]) == 0
     assert response.json["total"] == 15
     assert "nextPage" not in response.json
+
+
+def test_put_case_with_missing_properties_400_error(case_controller):
+    (response, status) = case_controller.post_case({})
+    assert status == 400
