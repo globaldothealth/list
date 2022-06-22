@@ -2,7 +2,7 @@ import datetime
 import os
 import pymongo
 from reusable_data_service.model.case import Case
-from reusable_data_service.model.filter import Filter, Anything, PropertyFilter, FilterOperator
+from reusable_data_service.model.filter import Filter, Anything, AndFilter, PropertyFilter, FilterOperator
 from json import loads
 from bson.errors import InvalidId
 from bson.json_util import dumps
@@ -81,3 +81,9 @@ def property_query(self):
             raise ValueError(f"Unhandled operation {self.operation}")
 
 PropertyFilter.to_mongo_query = property_query
+
+
+def and_query(self):
+    return { "$and": [f.to_mongo_query() for f in self.filters] }
+
+AndFilter.to_mongo_query = and_query
