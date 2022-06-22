@@ -20,7 +20,8 @@ def get_case(id):
 def list_cases():
     page = request.args.get("page", type=int)
     limit = request.args.get("limit", type=int)
-    return case_controller.list_cases(page=page, limit=limit)
+    filter = request.args.get("q", type=str)
+    return case_controller.list_cases(page=page, limit=limit, filter=filter)
 
 
 def set_up_controllers():

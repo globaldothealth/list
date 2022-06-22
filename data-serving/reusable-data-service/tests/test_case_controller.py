@@ -15,10 +15,10 @@ class MemoryStore:
     def put_case(self, id: str, case: Case):
         self.cases[id] = case
 
-    def fetch_cases(self, page: int, limit: int):
+    def fetch_cases(self, page: int, limit: int, *args):
         return list(self.cases.values())[(page - 1) * limit : page * limit]
 
-    def count_cases(self):
+    def count_cases(self, *args):
         return len(self.cases)
 
 
