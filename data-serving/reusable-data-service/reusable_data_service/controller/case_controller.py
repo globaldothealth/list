@@ -1,5 +1,6 @@
 from flask import jsonify
 from datetime import date
+from reusable_data_service.model.case import Case
 from reusable_data_service.model.filter import (
     Anything,
     Filter,
@@ -49,6 +50,14 @@ class CaseController:
             response["nextPage"] = page + 1
 
         return jsonify(response), 200
+
+    def post_case(self, maybe_case: dict):
+        """Implements post /cases."""
+        try:
+            case = Case.from_dict(maybe_case)
+            return "", 201
+        except ValueError as ve:
+            return ve.args[0], 400
 
     @staticmethod
     def parse_filter(filter: str) -> Filter:
