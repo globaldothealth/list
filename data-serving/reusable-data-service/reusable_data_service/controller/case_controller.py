@@ -37,7 +37,7 @@ class CaseController:
         if limit <= 0:
             validation_error = {"message": "limit must be >0"}
         if validation_error is not None:
-            return jsonify(validation_error), 422
+            return jsonify(validation_error), 400
         predicate = CaseController.parse_filter(filter)
         cases = self.store.fetch_cases(page, limit, predicate)
         count = self.store.count_cases(predicate)

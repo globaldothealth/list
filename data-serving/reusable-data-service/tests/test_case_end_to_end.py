@@ -71,6 +71,16 @@ def test_list_cases_with_pagination_query(client_with_patched_mongo):
     assert response.json["nextPage"] == 3
 
 
+def test_list_cases_with_negative_page_rejected(client_with_patched_mongo):
+    response = client_with_patched_mongo.get(f"/api/cases?page=-2")
+    assert response.status_code == 400
+
+
+def test_list_cases_with_negative_page_rejected(client_with_patched_mongo):
+    response = client_with_patched_mongo.get(f"/api/cases?limit=-2")
+    assert response.status_code == 400
+
+
 def test_list_cases_filter_confirmation_date_before(client_with_patched_mongo):
     db = pymongo.MongoClient("mongodb://localhost:27017/outbreak")
     db["outbreak"]["cases"].insert_many(
