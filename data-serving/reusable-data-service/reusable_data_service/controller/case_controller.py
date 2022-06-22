@@ -39,6 +39,9 @@ class CaseController:
         if validation_error is not None:
             return jsonify(validation_error), 400
         predicate = CaseController.parse_filter(filter)
+        if predicate is None:
+            validation_error = {"message:" "cannot understand query"}
+            return jsonify(validation_error), 422
         cases = self.store.fetch_cases(page, limit, predicate)
         count = self.store.count_cases(predicate)
         response = {"cases": cases, "total": count}
@@ -55,6 +58,8 @@ class CaseController:
         # split query on spaces
         components = filter.split(" ")
         filters = [CaseController.individual_filter(c) for c in components]
+        if None in filters:
+            return None
         if len(filters) == 1:
             return filters[0]
         else:
@@ -65,6 +70,8 @@ class CaseController:
         """Turn a single property:value filter request into a filter object"""
         # keyword value pairs separated by colon
         (keyword, value) = term.split(":")
+        if len(keyword) == 0 or len(value) == 0:
+            return None
         # special case dateconfirmedbefore, dateconfirmedafter
         if keyword == "dateconfirmedbefore":
             return PropertyFilter(
