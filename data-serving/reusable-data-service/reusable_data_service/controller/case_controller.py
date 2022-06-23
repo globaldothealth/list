@@ -63,8 +63,7 @@ class CaseController:
         if num_cases <= 0:
             return "Must create a positive number of cases", 400
         try:
-            case = Case.from_dict(maybe_case)
-            self.check_case_preconditions(case)
+            case = self.create_case_if_valid(maybe_case)
             for i in range(num_cases):
                 self.store.insert_case(case)
             return "", 201
@@ -74,6 +73,25 @@ class CaseController:
         except PreconditionError as pe:
             # PreconditionError means it's a case, but not one we can use
             return pe.args[0], 422
+
+    def validate_case_dictionary(self, maybe_case: dict):
+        """Check whether a case _could_ be valid, without storing it if it is."""
+        try:
+            case = self.create_case_if_valid(maybe_case)
+            return "", 204
+        except ValueError as ve:
+            # ValueError means we can't even turn this into a case
+            return ve.args[0], 400
+        except PreconditionError as pe:
+            # PreconditionError means it's a case, but not one we can use
+            return pe.args[0], 422
+
+    def create_case_if_valid(self, maybe_case: dict):
+        """Attempts to create a case from an input dictionary and validate it against
+        the application rules. Raises ValueError or PreconditionError on invalid input."""
+        case = Case.from_dict(maybe_case)
+        self.check_case_preconditions(case)
+        return case
 
     def check_case_preconditions(self, case: Case):
         if case.confirmation_date < self.outbreak_date:

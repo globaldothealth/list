@@ -174,3 +174,12 @@ def test_post_multiple_case_list_cases_round_trip(client_with_patched_mongo):
     assert get_response.status_code == 200
     assert len(get_response.json["cases"]) == 3
     assert get_response.json["cases"][0]["confirmation_date"] == "2022-01-23"
+
+def test_post_case_validate_only(client_with_patched_mongo):
+    post_response = client_with_patched_mongo.post("/api/cases?validate_only=true", json = {
+        "confirmation_date": "2022-01-23T13:45:01.234Z"
+    })
+    assert post_response.status_code == 204
+    get_response = client_with_patched_mongo.get("/api/cases")
+    assert get_response.status_code == 200
+    assert len(get_response.json["cases"]) == 0
