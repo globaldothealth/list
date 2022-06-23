@@ -140,3 +140,16 @@ def test_create_valid_case_with_positive_count_adds_to_collection(case_controlle
     )
     assert status == 201
     assert case_controller.store.count_cases() == 7
+
+
+def test_validate_case_with_invalid_case_is_400_error(case_controller):
+    (response, status) = case_controller.validate_case_dictionary({})
+    assert status == 400
+
+
+def test_validate_case_with_valid_case_returns_204_and_does_not_add_case(case_controller):
+    (response, status) = case_controller.validate_case_dictionary(
+        {"confirmation_date": date(2021, 6, 3)}
+    )
+    assert status == 204
+    assert case_controller.store.count_cases() == 0

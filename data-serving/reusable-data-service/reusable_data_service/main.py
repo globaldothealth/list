@@ -25,10 +25,14 @@ def list_cases():
         filter = request.args.get("q", type=str)
         return case_controller.list_cases(page=page, limit=limit, filter=filter)
     else:
+        potential_case = request.get_json()
+        validate_only = request.args.get("validate_only", type=bool)
+        if validate_only:
+            return case_controller.validate_case_dictionary(potential_case)
         count = request.args.get("num_cases", type=int)
         if count is None:
             count = 1
-        return case_controller.create_case(request.get_json(), num_cases=count)
+        return case_controller.create_case(potential_case, num_cases=count)
 
 def set_up_controllers():
     global case_controller
