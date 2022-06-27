@@ -185,3 +185,21 @@ def test_post_case_validate_only(client_with_patched_mongo):
     get_response = client_with_patched_mongo.get("/api/cases")
     assert get_response.status_code == 200
     assert len(get_response.json["cases"]) == 0
+
+def test_batch_upsert_case(client_with_patched_mongo):
+    post_response = client_with_patched_mongo.post("/api/cases/batchUpsert", json = {
+        "cases": [{
+            "confirmation_date": "2022-01-23T13:45:01.234Z",
+            "caseReference": {
+                "sourceId": "abcd12345678901234567890",
+                "sourceEntryId": "a secret",
+            }
+        }]
+    })
+    assert post_response.status_code == 200
+    assert post_response.json["errors"] == {}
+    # mongomock doesn't correctly track upserts for creation/replacement, so can't test numCreated/numUpdated
+    get_response = client_with_patched_mongo.get("/api/cases")
+    assert get_response.status_code == 200
+    assert len(get_response.json["cases"]) == 1
+    assert get_response.json["cases"][0]["caseReference"]["sourceEntryId"] != "a secret"
