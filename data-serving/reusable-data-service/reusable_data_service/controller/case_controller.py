@@ -98,6 +98,22 @@ class CaseController:
             return "", 400
         if len(cases) == 0:
             return "", 400
+        errors = {}
+        usable_cases = []
+        for i, maybe_case in enumerate(cases):
+            try:
+                self.create_case_if_valid(maybe_case)
+                usable_cases.append(maybe_case)
+            except Exception as e:
+                errors[str(i)] = e.args[0]
+        (created, updated) = self.store.batch_upsert(usable_cases)
+        status = 200 if len(errors) == 0 else 207
+        response = {
+            'numCreated': created,
+            'numUpdated': updated,
+            'errors': errors
+        }
+        return jsonify(response), status
 
     def create_case_if_valid(self, maybe_case: dict):
         """Attempts to create a case from an input dictionary and validate it against
