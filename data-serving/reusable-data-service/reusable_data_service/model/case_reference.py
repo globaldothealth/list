@@ -13,7 +13,13 @@ class CaseReference:
         """Create a CaseReference from a dictionary representation."""
         ref = CaseReference()
         if 'sourceId' in d:
-            ref.sourceId = bson.ObjectId(d['sourceId'])
+            theId = d['sourceId']
+            if isinstance(theId, str):
+                ref.sourceId = bson.ObjectId(theId)
+            elif '$oid' in theId:
+                ref.sourceId = bson.ObjectId(theId['$oid'])
+            else:
+                raise ValueError(f"Cannot interpret {theId} as an ObjectId")
         if 'sourceEntryId' in d:
             ref.sourceEntryId = d['sourceEntryId']
         return ref

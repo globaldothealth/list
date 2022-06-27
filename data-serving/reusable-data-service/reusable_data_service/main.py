@@ -1,13 +1,13 @@
 from datetime import date
 from flask import Flask, request
 from . import CaseController, MongoStore
-from reusable_data_service.util.iso_json_encoder import ISOJSONEncoder
+from reusable_data_service.util.iso_json_encoder import DataServiceJSONEncoder
 
 import os
 import logging
 
 app = Flask(__name__)
-app.json_encoder = ISOJSONEncoder
+app.json_encoder = DataServiceJSONEncoder
 
 case_controller = None  # Will be set up in main()
 
@@ -34,6 +34,10 @@ def list_cases():
             count = 1
         return case_controller.create_case(potential_case, num_cases=count)
 
+
+@app.route("/api/cases/batchUpsert", methods = ['POST'])
+def batch_upsert_cases():
+    return case_controller.batch_upsert(request.get_json())
 
 def set_up_controllers():
     global case_controller
