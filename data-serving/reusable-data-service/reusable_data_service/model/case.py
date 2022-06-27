@@ -4,6 +4,7 @@ import json
 
 from typing import Any
 
+from reusable_data_service.model.case_reference import CaseReference
 
 @dataclasses.dataclass()
 class DayZeroCase:
@@ -19,6 +20,7 @@ class DayZeroCase:
 
     _: dataclasses.KW_ONLY
     confirmationDate: datetime.date = dataclasses.field(init=False)
+    caseReference: CaseReference = dataclasses.field(init=False, default=None)
 
     @classmethod
     def from_json(cls, obj: str) -> type:
