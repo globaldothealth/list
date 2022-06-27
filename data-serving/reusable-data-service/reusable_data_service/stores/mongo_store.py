@@ -56,8 +56,16 @@ class MongoStore:
 
     def batch_upsert(self, cases: List[Case]) -> Tuple[int, int]:
         dicts = [MongoStore.case_to_bson_compatible_dict(c) for c in cases]
-        self.get_case_collection().insert_many(dicts)
-        return len(cases), 0
+        needs_insert = lambda d: d['caseReference'] is None or d['caseReference']['sourceId'] is None or d['caseReference']['sourceEntryId'] is None
+        to_insert = [d for d in dicts if needs_insert(d)]
+        to_upsert = [d for d in dicts if not needs_insert(d)]
+        inserts = [pymongo.InsertOne(d) for d in to_insert]
+        replacements = [pymongo.ReplaceOne(filter = {
+            'caseReference.sourceId': d['caseReference']['sourceId'],
+            'caseReference.sourceEntryId': d['caseReference']['sourceEntryId'],
+            }, replacement = d, upsert = True) for d in to_upsert]
+        results = self.get_case_collection().bulk_write(inserts + replacements)
+        return results.inserted_count, results.modified_count
 
     @staticmethod
     def setup():
