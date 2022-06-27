@@ -228,3 +228,16 @@ def test_batch_upsert_reports_errors(case_controller):
     assert response.json['errors'] == {
         '0': 'Confirmation Date is mandatory'
     }
+
+def test_batch_upsert_hides_original_source_entry_id(case_controller):
+    case_controller.store.upsert_create_count = 1 # create the case so we can read it later
+    with open("./tests/data/case.minimal.json", "r") as minimal_file:
+        case = json.loads(minimal_file.read())
+    case['caseReference'] = {
+        'sourceId': '12345678901234567890abcd',
+        'sourceEntryId': 'foo',
+    }
+    (response, status) = case_controller.batch_upsert({ 'cases': [case] })
+    assert status == 200
+    retrieved_case = case_controller.store.case_by_id('1')
+    assert retrieved_case.caseReference.sourceEntryId != 'foo'

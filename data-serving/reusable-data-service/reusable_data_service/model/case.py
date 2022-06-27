@@ -49,6 +49,9 @@ class DayZeroCase:
                     ).date()
                 else:
                     raise ValueError(f"Cannot interpret date {maybe_date}")
+            elif key == 'caseReference':
+                caseRef = dictionary[key]
+                value = CaseReference.from_dict(caseRef) if caseRef is not None else None
             else:
                 value = dictionary[key]
             setattr(case, key, value)
