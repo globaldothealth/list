@@ -86,6 +86,19 @@ class CaseController:
             # PreconditionError means it's a case, but not one we can use
             return pe.args[0], 422
 
+    def batch_upsert(self, body: dict):
+        """Upsert a collection of cases (updating ones that already exist, inserting
+        new cases). This method can potentially return a 207 mixed status as each case is
+        handled separately. The response will report the number of cases inserted, the
+        number updated, and any validation errors encountered."""
+        if body is None:
+            return "", 415
+        cases = body.get('cases')
+        if cases is None:
+            return "", 400
+        if len(cases) == 0:
+            return "", 400
+
     def create_case_if_valid(self, maybe_case: dict):
         """Attempts to create a case from an input dictionary and validate it against
         the application rules. Raises ValueError or PreconditionError on invalid input."""
