@@ -153,3 +153,18 @@ def test_validate_case_with_valid_case_returns_204_and_does_not_add_case(
     )
     assert status == 204
     assert case_controller.store.count_cases() == 0
+
+
+def test_batch_upsert_with_no_body_returns_415(case_controller):
+    (response, status) = case_controller.batch_upsert(None)
+    assert status == 415
+
+
+def test_batch_upsert_with_no_case_list_returns_400(case_controller):
+    (response, status) = case_controller.batch_upsert({})
+    assert status == 400
+
+
+def test_batch_upsert_with_empty_case_list_returns_400(case_controller):
+    (response, status) = case_controller.batch_upsert({ 'cases': [] })
+    assert status == 400
