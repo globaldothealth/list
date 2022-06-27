@@ -7,7 +7,7 @@ from json import loads
 from bson.errors import InvalidId
 from bson.json_util import dumps
 from bson.objectid import ObjectId
-
+from typing import List, Tuple
 
 class MongoStore:
     """A line list store backed by mongodb."""
@@ -51,11 +51,13 @@ class MongoStore:
         return self.get_case_collection().count_documents(filter.to_mongo_query())
 
     def insert_case(self, case: Case):
-        to_insert = case.to_dict()
-        for field in Case.date_fields():
-            # BSON works with datetimes, not dates
-            to_insert[field] = date_to_datetime(to_insert[field])
+        to_insert = MongoStore.case_to_bson_compatible_dict(case)
         self.get_case_collection().insert_one(to_insert)
+
+    def batch_upsert(self, cases: List[Case]) -> Tuple[int, int]:
+        dicts = [MongoStore.case_to_bson_compatible_dict(c) for c in cases]
+        self.get_case_collection().insert_many(dicts)
+        return len(cases), 0
 
     @staticmethod
     def setup():
@@ -68,6 +70,14 @@ class MongoStore:
         )
         return mongo_store
 
+    @staticmethod
+    def case_to_bson_compatible_dict(case: Case):
+        """Turn a case into a representation that mongo will accept."""
+        bson_case = case.to_dict()
+        for field in Case.date_fields():
+            # BSON works with datetimes, not dates
+            bson_case[field] = date_to_datetime(bson_case[field])
+        return bson_case
 
 def date_to_datetime(dt: datetime.date) -> datetime.datetime:
     """Convert datetime.date to datetime.datetime for encoding as BSON"""
