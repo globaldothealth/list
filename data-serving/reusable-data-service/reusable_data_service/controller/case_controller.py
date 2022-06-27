@@ -94,7 +94,7 @@ class CaseController:
         number updated, and any validation errors encountered."""
         if body is None:
             return "", 415
-        cases = body.get('cases')
+        cases = body.get("cases")
         if cases is None:
             return "", 400
         if len(cases) == 0:
@@ -109,11 +109,7 @@ class CaseController:
                 errors[str(i)] = e.args[0]
         (created, updated) = self.store.batch_upsert(usable_cases)
         status = 200 if len(errors) == 0 else 207
-        response = {
-            'numCreated': created,
-            'numUpdated': updated,
-            'errors': errors
-        }
+        response = {"numCreated": created, "numUpdated": updated, "errors": errors}
         return jsonify(response), status
 
     def create_anonymised_case_if_valid(self, maybe_case: dict):
@@ -134,8 +130,13 @@ class CaseController:
     def anonymise_case(case: Case):
         """Ensure that a stable one-way hash of the source entry ID is stored, and
         not the source entry ID itself."""
-        if case.caseReference is not None and case.caseReference.sourceEntryId is not None:
-            case.caseReference.sourceEntryId = sha256(case.caseReference.sourceEntryId.encode('utf-8')).hexdigest()
+        if (
+            case.caseReference is not None
+            and case.caseReference.sourceEntryId is not None
+        ):
+            case.caseReference.sourceEntryId = sha256(
+                case.caseReference.sourceEntryId.encode("utf-8")
+            ).hexdigest()
 
     @staticmethod
     def parse_filter(filter: str) -> Filter:
