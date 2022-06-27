@@ -6,6 +6,7 @@ from typing import Any
 
 from reusable_data_service.model.case_reference import CaseReference
 
+
 @dataclasses.dataclass()
 class DayZeroCase:
     """This class implements the "day-zero" data schema for Global.health.
@@ -49,9 +50,11 @@ class DayZeroCase:
                     ).date()
                 else:
                     raise ValueError(f"Cannot interpret date {maybe_date}")
-            elif key == 'caseReference':
+            elif key == "caseReference":
                 caseRef = dictionary[key]
-                value = CaseReference.from_dict(caseRef) if caseRef is not None else None
+                value = (
+                    CaseReference.from_dict(caseRef) if caseRef is not None else None
+                )
             else:
                 value = dictionary[key]
             setattr(case, key, value)

@@ -31,7 +31,7 @@ class MemoryStore:
 
     def count_cases(self, *args):
         return len(self.cases)
-    
+
     def batch_upsert(self, cases: List[Case]):
         """For testing the case controller, a trivial implementation. Look to
         tests of the stores and integration tests for richer expressions of
@@ -184,60 +184,74 @@ def test_batch_upsert_with_no_case_list_returns_400(case_controller):
 
 
 def test_batch_upsert_with_empty_case_list_returns_400(case_controller):
-    (response, status) = case_controller.batch_upsert({ 'cases': [] })
+    (response, status) = case_controller.batch_upsert({"cases": []})
     assert status == 400
 
 
 def test_batch_upsert_creates_valid_case(case_controller):
     with open("./tests/data/case.minimal.json", "r") as minimal_file:
         minimal_case_description = json.loads(minimal_file.read())
-    case_controller.store.upsert_create_count = 1 # store should create this case
-    (response, status) = case_controller.batch_upsert({ 'cases': [minimal_case_description] })
+    case_controller.store.upsert_create_count = 1  # store should create this case
+    (response, status) = case_controller.batch_upsert(
+        {"cases": [minimal_case_description]}
+    )
     assert status == 200
     assert case_controller.store.count_cases() == 1
-    assert response.json['numCreated'] == 1
-    assert response.json['numUpdated'] == 0
-    assert response.json['errors'] == {}
+    assert response.json["numCreated"] == 1
+    assert response.json["numUpdated"] == 0
+    assert response.json["errors"] == {}
+
 
 def test_batch_upsert_updates_valid_case(case_controller):
     with open("./tests/data/case.minimal.json", "r") as minimal_file:
         minimal_case_description = json.loads(minimal_file.read())
-    case_controller.store.upsert_create_count = 0 # store should update this case
-    (response, status) = case_controller.batch_upsert({ 'cases': [minimal_case_description] })
+    case_controller.store.upsert_create_count = 0  # store should update this case
+    (response, status) = case_controller.batch_upsert(
+        {"cases": [minimal_case_description]}
+    )
     assert status == 200
-    assert response.json['numCreated'] == 0
-    assert response.json['numUpdated'] == 1
-    assert response.json['errors'] == {}
+    assert response.json["numCreated"] == 0
+    assert response.json["numUpdated"] == 1
+    assert response.json["errors"] == {}
+
 
 def test_batch_upsert_reports_both_updates_and_inserts(case_controller):
     with open("./tests/data/case.minimal.json", "r") as minimal_file:
         minimal_case_description = json.loads(minimal_file.read())
-    case_controller.store.upsert_create_count = 1 # store should create one, update other
-    (response, status) = case_controller.batch_upsert({ 'cases': [minimal_case_description, minimal_case_description] })
+    case_controller.store.upsert_create_count = (
+        1  # store should create one, update other
+    )
+    (response, status) = case_controller.batch_upsert(
+        {"cases": [minimal_case_description, minimal_case_description]}
+    )
     assert status == 200
-    assert response.json['numCreated'] == 1
-    assert response.json['numUpdated'] == 1
-    assert response.json['errors'] == {}
+    assert response.json["numCreated"] == 1
+    assert response.json["numUpdated"] == 1
+    assert response.json["errors"] == {}
+
 
 def test_batch_upsert_reports_errors(case_controller):
-    case_controller.store.upsert_create_count = 0 # store won't have anything to do in this test anyway
-    (response, status) = case_controller.batch_upsert({ 'cases': [{}] })
+    case_controller.store.upsert_create_count = (
+        0  # store won't have anything to do in this test anyway
+    )
+    (response, status) = case_controller.batch_upsert({"cases": [{}]})
     assert status == 207
-    assert response.json['numCreated'] == 0
-    assert response.json['numUpdated'] == 0
-    assert response.json['errors'] == {
-        '0': 'Confirmation Date is mandatory'
-    }
+    assert response.json["numCreated"] == 0
+    assert response.json["numUpdated"] == 0
+    assert response.json["errors"] == {"0": "Confirmation Date is mandatory"}
+
 
 def test_batch_upsert_hides_original_source_entry_id(case_controller):
-    case_controller.store.upsert_create_count = 1 # create the case so we can read it later
+    case_controller.store.upsert_create_count = (
+        1  # create the case so we can read it later
+    )
     with open("./tests/data/case.minimal.json", "r") as minimal_file:
         case = json.loads(minimal_file.read())
-    case['caseReference'] = {
-        'sourceId': '12345678901234567890abcd',
-        'sourceEntryId': 'foo',
+    case["caseReference"] = {
+        "sourceId": "12345678901234567890abcd",
+        "sourceEntryId": "foo",
     }
-    (response, status) = case_controller.batch_upsert({ 'cases': [case] })
+    (response, status) = case_controller.batch_upsert({"cases": [case]})
     assert status == 200
-    retrieved_case = case_controller.store.case_by_id('1')
-    assert retrieved_case.caseReference.sourceEntryId != 'foo'
+    retrieved_case = case_controller.store.case_by_id("1")
+    assert retrieved_case.caseReference.sourceEntryId != "foo"

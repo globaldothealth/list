@@ -35,9 +35,10 @@ def list_cases():
         return case_controller.create_case(potential_case, num_cases=count)
 
 
-@app.route("/api/cases/batchUpsert", methods = ['POST'])
+@app.route("/api/cases/batchUpsert", methods=["POST"])
 def batch_upsert_cases():
     return case_controller.batch_upsert(request.get_json())
+
 
 def set_up_controllers():
     global case_controller
