@@ -94,7 +94,7 @@ class CaseController:
         return case
 
     def check_case_preconditions(self, case: Case):
-        if case.confirmation_date < self.outbreak_date:
+        if case.confirmationDate < self.outbreak_date:
             raise PreconditionError("Confirmation date is before outbreak began")
 
     @staticmethod
@@ -122,11 +122,11 @@ class CaseController:
         # special case dateconfirmedbefore, dateconfirmedafter
         if keyword == "dateconfirmedbefore":
             return PropertyFilter(
-                "confirmation_date", FilterOperator.LESS_THAN, date.fromisoformat(value)
+                "confirmationDate", FilterOperator.LESS_THAN, date.fromisoformat(value)
             )
         if keyword == "dateconfirmedafter":
             return PropertyFilter(
-                "confirmation_date",
+                "confirmationDate",
                 FilterOperator.GREATER_THAN,
                 date.fromisoformat(value),
             )
