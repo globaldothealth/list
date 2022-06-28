@@ -107,7 +107,7 @@ class CaseController:
                 usable_cases.append(case)
             except Exception as e:
                 errors[str(i)] = e.args[0]
-        (created, updated) = self.store.batch_upsert(usable_cases)
+        (created, updated) = self.store.batch_upsert(usable_cases) if len(usable_cases) > 0 else (0,0)
         status = 200 if len(errors) == 0 else 207
         response = {"numCreated": created, "numUpdated": updated, "errors": errors}
         return jsonify(response), status

@@ -193,7 +193,7 @@ def test_batch_upsert_case(client_with_patched_mongo):
         json={
             "cases": [
                 {
-                    "confirmation_date": "2022-01-23T13:45:01.234Z",
+                    "confirmationDate": "2022-01-23T13:45:01.234Z",
                     "caseReference": {
                         "sourceId": "abcd12345678901234567890",
                         "sourceEntryId": "a secret",
