@@ -18,7 +18,7 @@ class DayZeroCase:
     to that function)."""
 
     _: dataclasses.KW_ONLY
-    confirmation_date: datetime.date = dataclasses.field(init=False)
+    confirmationDate: datetime.date = dataclasses.field(init=False)
 
     @classmethod
     def from_json(cls, obj: str) -> type:
@@ -55,11 +55,11 @@ class DayZeroCase:
 
     def validate(self):
         """Check whether I am consistent. Raise ValueError if not."""
-        if not hasattr(self, "confirmation_date"):
+        if not hasattr(self, "confirmationDate"):
             raise ValueError("Confirmation Date is mandatory")
-        elif self.confirmation_date is None:
+        elif self.confirmationDate is None:
             raise ValueError("Confirmation Date must have a value")
-    
+
     def to_dict(self):
         """Return myself as a dictionary."""
         return dataclasses.asdict(self)
@@ -68,7 +68,7 @@ class DayZeroCase:
     def date_fields(cls) -> list[str]:
         """Record where dates are kept because they sometimes need special treatment.
         A subclass could override this method to indicate it stores additional date fields."""
-        return ["confirmation_date"]
+        return ["confirmationDate"]
 
 
 # Actually we want to capture extra fields which can be specified dynamically:

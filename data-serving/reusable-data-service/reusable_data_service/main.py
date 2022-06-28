@@ -17,9 +17,9 @@ def get_case(id):
     return case_controller.get_case(id)
 
 
-@app.route("/api/cases", methods = ['POST', 'GET'])
+@app.route("/api/cases", methods=["POST", "GET"])
 def list_cases():
-    if request.method == 'GET':
+    if request.method == "GET":
         page = request.args.get("page", type=int)
         limit = request.args.get("limit", type=int)
         filter = request.args.get("q", type=str)
@@ -33,6 +33,7 @@ def list_cases():
         if count is None:
             count = 1
         return case_controller.create_case(potential_case, num_cases=count)
+
 
 def set_up_controllers():
     global case_controller
