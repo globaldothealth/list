@@ -94,6 +94,16 @@ class DayZeroCase:
         """Record where dates are kept because they sometimes need special treatment."""
         return [f.name for f in dataclasses.fields(cls) if f.type == datetime.date]
 
+    @classmethod
+    def csv_header(cls) -> str:
+        """Generate the header row for a CSV file containing members of this class."""
+        fields = []
+        for f in dataclasses.fields(cls):
+            if dataclasses.is_dataclass(f.type):
+                fields += [f"{f.name}.{g.name}" for g in dataclasses.fields(f.type)]
+            else:
+                fields.append(f.name)
+        return ",".join(fields)
 
 # Actually we want to capture extra fields which can be specified dynamically:
 # so Case is the class that you should use.
