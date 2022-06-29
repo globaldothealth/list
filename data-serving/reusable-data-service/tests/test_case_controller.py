@@ -12,7 +12,6 @@ class MemoryStore:
     def __init__(self):
         self.cases = dict()
         self.next_id = 0
-        self.upsert_create_count = 0
 
     def case_by_id(self, id: str):
         return self.cases.get(id)
@@ -33,19 +32,9 @@ class MemoryStore:
         return len(self.cases)
 
     def batch_upsert(self, cases: List[Case]):
-        """For testing the case controller, a trivial implementation. Look to
-        tests of the stores and integration tests for richer expressions of
-        behaviour; otherwise we end up duplicating a lot of the upsert logic
-        in this test double."""
-        original_create_count = self.upsert_create_count
         for case in cases:
-            if self.upsert_create_count > 0:
-                self.insert_case(case)
-                self.upsert_create_count -= 1
-            else:
-                # don't do anything, pretending a case was updated
-                pass
-        return original_create_count, len(cases) - original_create_count
+            self.insert_case(case)
+        return len(cases), 0
 
 
 @pytest.fixture
@@ -130,14 +119,20 @@ def test_create_case_with_missing_properties_400_error(case_controller):
 
 def test_create_case_with_invalid_data_422_error(case_controller):
     (response, status) = case_controller.create_case(
-        {"confirmationDate": date(2001, 3, 17)}
+        {
+            "confirmationDate": date(2001, 3, 17),
+            "caseReference": {"sourceId": "123ab4567890123ef4567890"},
+        }
     )
     assert status == 422
 
 
 def test_create_valid_case_adds_to_collection(case_controller):
     (response, status) = case_controller.create_case(
-        {"confirmationDate": date(2021, 6, 3)}
+        {
+            "confirmationDate": date(2021, 6, 3),
+            "caseReference": {"sourceId": "123ab4567890123ef4567890"},
+        }
     )
     assert status == 201
     assert case_controller.store.count_cases() == 1
@@ -145,14 +140,22 @@ def test_create_valid_case_adds_to_collection(case_controller):
 
 def test_create_valid_case_with_negative_count_400_error(case_controller):
     (response, status) = case_controller.create_case(
-        {"confirmationDate": date(2021, 6, 3)}, num_cases=-7
+        {
+            "confirmationDate": date(2021, 6, 3),
+            "caseReference": {"sourceId": "123ab4567890123ef4567890"},
+        },
+        num_cases=-7,
     )
     assert status == 400
 
 
 def test_create_valid_case_with_positive_count_adds_to_collection(case_controller):
     (response, status) = case_controller.create_case(
-        {"confirmationDate": date(2021, 6, 3)}, num_cases=7
+        {
+            "confirmationDate": date(2021, 6, 3),
+            "caseReference": {"sourceId": "123ab4567890123ef4567890"},
+        },
+        num_cases=7,
     )
     assert status == 201
     assert case_controller.store.count_cases() == 7
@@ -167,7 +170,10 @@ def test_validate_case_with_valid_case_returns_204_and_does_not_add_case(
     case_controller,
 ):
     (response, status) = case_controller.validate_case_dictionary(
-        {"confirmationDate": date(2021, 6, 3)}
+        {
+            "confirmationDate": date(2021, 6, 3),
+            "caseReference": {"sourceId": "123ab4567890123ef4567890"},
+        }
     )
     assert status == 204
     assert case_controller.store.count_cases() == 0
@@ -191,7 +197,6 @@ def test_batch_upsert_with_empty_case_list_returns_400(case_controller):
 def test_batch_upsert_creates_valid_case(case_controller):
     with open("./tests/data/case.minimal.json", "r") as minimal_file:
         minimal_case_description = json.loads(minimal_file.read())
-    case_controller.store.upsert_create_count = 1  # store should create this case
     (response, status) = case_controller.batch_upsert(
         {"cases": [minimal_case_description]}
     )
@@ -202,56 +207,9 @@ def test_batch_upsert_creates_valid_case(case_controller):
     assert response.json["errors"] == {}
 
 
-def test_batch_upsert_updates_valid_case(case_controller):
-    with open("./tests/data/case.minimal.json", "r") as minimal_file:
-        minimal_case_description = json.loads(minimal_file.read())
-    case_controller.store.upsert_create_count = 0  # store should update this case
-    (response, status) = case_controller.batch_upsert(
-        {"cases": [minimal_case_description]}
-    )
-    assert status == 200
-    assert response.json["numCreated"] == 0
-    assert response.json["numUpdated"] == 1
-    assert response.json["errors"] == {}
-
-
-def test_batch_upsert_reports_both_updates_and_inserts(case_controller):
-    with open("./tests/data/case.minimal.json", "r") as minimal_file:
-        minimal_case_description = json.loads(minimal_file.read())
-    case_controller.store.upsert_create_count = (
-        1  # store should create one, update other
-    )
-    (response, status) = case_controller.batch_upsert(
-        {"cases": [minimal_case_description, minimal_case_description]}
-    )
-    assert status == 200
-    assert response.json["numCreated"] == 1
-    assert response.json["numUpdated"] == 1
-    assert response.json["errors"] == {}
-
-
 def test_batch_upsert_reports_errors(case_controller):
-    case_controller.store.upsert_create_count = (
-        0  # store won't have anything to do in this test anyway
-    )
     (response, status) = case_controller.batch_upsert({"cases": [{}]})
     assert status == 207
     assert response.json["numCreated"] == 0
     assert response.json["numUpdated"] == 0
     assert response.json["errors"] == {"0": "Confirmation Date is mandatory"}
-
-
-def test_batch_upsert_hides_original_source_entry_id(case_controller):
-    case_controller.store.upsert_create_count = (
-        1  # create the case so we can read it later
-    )
-    with open("./tests/data/case.minimal.json", "r") as minimal_file:
-        case = json.loads(minimal_file.read())
-    case["caseReference"] = {
-        "sourceId": "12345678901234567890abcd",
-        "sourceEntryId": "foo",
-    }
-    (response, status) = case_controller.batch_upsert({"cases": [case]})
-    assert status == 200
-    retrieved_case = case_controller.store.case_by_id("1")
-    assert retrieved_case.caseReference.sourceEntryId != "foo"

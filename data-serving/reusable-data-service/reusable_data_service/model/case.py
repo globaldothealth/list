@@ -67,6 +67,11 @@ class DayZeroCase:
             raise ValueError("Confirmation Date is mandatory")
         elif self.confirmationDate is None:
             raise ValueError("Confirmation Date must have a value")
+        if not hasattr(self, "caseReference"):
+            raise ValueError("Case Reference is mandatory")
+        elif self.caseReference is None:
+            raise ValueError("Case Reference must have a value")
+        self.caseReference.validate()
 
     def to_dict(self):
         """Return myself as a dictionary."""

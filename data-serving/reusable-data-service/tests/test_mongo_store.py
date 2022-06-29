@@ -55,7 +55,7 @@ def test_store_inserts_case_with_populated_case_reference(mongo_store):
     assert mongo_store.count_cases(Anything()) == 1
 
 
-def test_store_updates_case_with_known_case_reference(mongo_store):
+def test_store_inserts_case_even_with_known_case_reference(mongo_store):
     with open("./tests/data/case.minimal.json", "r") as minimal_file:
         case = Case.from_json(minimal_file.read())
     caseReference = CaseReference()
@@ -65,4 +65,4 @@ def test_store_updates_case_with_known_case_reference(mongo_store):
     mongo_store.insert_case(case)
     case.confirmation_date = date(2022, 1, 13)
     (created, updated) = mongo_store.batch_upsert([case])
-    assert mongo_store.count_cases(Anything()) == 1
+    assert mongo_store.count_cases(Anything()) == 2

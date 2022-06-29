@@ -1,6 +1,5 @@
 from flask import jsonify
 from datetime import date
-from hashlib import sha256
 from reusable_data_service.model.case import Case
 from reusable_data_service.model.filter import (
     Anything,
@@ -64,7 +63,7 @@ class CaseController:
         if num_cases <= 0:
             return "Must create a positive number of cases", 400
         try:
-            case = self.create_anonymised_case_if_valid(maybe_case)
+            case = self.create_case_if_valid(maybe_case)
             for i in range(num_cases):
                 self.store.insert_case(case)
             return "", 201
@@ -78,7 +77,7 @@ class CaseController:
     def validate_case_dictionary(self, maybe_case: dict):
         """Check whether a case _could_ be valid, without storing it if it is."""
         try:
-            case = self.create_anonymised_case_if_valid(maybe_case)
+            case = self.create_case_if_valid(maybe_case)
             return "", 204
         except ValueError as ve:
             # ValueError means we can't even turn this into a case
@@ -103,40 +102,27 @@ class CaseController:
         usable_cases = []
         for i, maybe_case in enumerate(cases):
             try:
-                case = self.create_anonymised_case_if_valid(maybe_case)
+                case = self.create_case_if_valid(maybe_case)
                 usable_cases.append(case)
             except Exception as e:
                 errors[str(i)] = e.args[0]
-        (created, updated) = self.store.batch_upsert(usable_cases) if len(usable_cases) > 0 else (0,0)
+        (created, updated) = (
+            self.store.batch_upsert(usable_cases) if len(usable_cases) > 0 else (0, 0)
+        )
         status = 200 if len(errors) == 0 else 207
         response = {"numCreated": created, "numUpdated": updated, "errors": errors}
         return jsonify(response), status
 
-    def create_anonymised_case_if_valid(self, maybe_case: dict):
+    def create_case_if_valid(self, maybe_case: dict):
         """Attempts to create a case from an input dictionary and validate it against
-        the application rules. Implements anonymisation rules so that cases cannot be
-        reidentified against external source data.
-        Raises ValueError or PreconditionError on invalid input."""
+        the application rules. Raises ValueError or PreconditionError on invalid input."""
         case = Case.from_dict(maybe_case)
         self.check_case_preconditions(case)
-        CaseController.anonymise_case(case)
         return case
 
     def check_case_preconditions(self, case: Case):
         if case.confirmationDate < self.outbreak_date:
             raise PreconditionError("Confirmation date is before outbreak began")
-
-    @staticmethod
-    def anonymise_case(case: Case):
-        """Ensure that a stable one-way hash of the source entry ID is stored, and
-        not the source entry ID itself."""
-        if (
-            case.caseReference is not None
-            and case.caseReference.sourceEntryId is not None
-        ):
-            case.caseReference.sourceEntryId = sha256(
-                case.caseReference.sourceEntryId.encode("utf-8")
-            ).hexdigest()
 
     @staticmethod
     def parse_filter(filter: str) -> Filter:

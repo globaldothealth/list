@@ -8,7 +8,13 @@ class CaseReference:
 
     _: dataclasses.KW_ONLY
     sourceId: bson.ObjectId = dataclasses.field(init=False, default=None)
-    sourceEntryId: str = dataclasses.field(init=False, default=None)
+
+    def validate(self):
+        """Check whether I am consistent. Raise ValueError if not."""
+        if not hasattr(self, "sourceId"):
+            raise ValueError("Source ID is mandatory")
+        elif self.sourceId is None:
+            raise ValueError("Source ID must have a value")
 
     @staticmethod
     def from_dict(d: dict[str, str]):
@@ -22,6 +28,4 @@ class CaseReference:
                 ref.sourceId = bson.ObjectId(theId["$oid"])
             else:
                 raise ValueError(f"Cannot interpret {theId} as an ObjectId")
-        if "sourceEntryId" in d:
-            ref.sourceEntryId = d["sourceEntryId"]
         return ref
