@@ -11,3 +11,8 @@ def test_case_from_minimal_json_is_valid():
     with open("./tests/data/case.minimal.json", "r") as minimal_file:
         case = Case.from_json(minimal_file.read())
         assert case is not None
+
+
+def test_csv_header():
+    header_line = Case.csv_header()
+    assert header_line == "_id,confirmationDate,caseReference.sourceId"
