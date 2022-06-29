@@ -91,9 +91,8 @@ class DayZeroCase:
 
     @classmethod
     def date_fields(cls) -> list[str]:
-        """Record where dates are kept because they sometimes need special treatment.
-        A subclass could override this method to indicate it stores additional date fields."""
-        return ["confirmationDate"]
+        """Record where dates are kept because they sometimes need special treatment."""
+        return [f.name for f in dataclasses.fields(cls) if f.type == datetime.date]
 
 
 # Actually we want to capture extra fields which can be specified dynamically:
