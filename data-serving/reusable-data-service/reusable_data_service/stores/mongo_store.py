@@ -55,10 +55,12 @@ class MongoStore:
         self.get_case_collection().insert_one(to_insert)
 
     def batch_upsert(self, cases: List[Case]) -> Tuple[int, int]:
-        to_insert = [MongoStore.case_to_bson_compatible_dict(c) for c in cases]
+        to_insert = [MongoStore.case_to_bson_compatible_dict(c) for c in cases if c._id is None]
+        to_replace = {c._id: MongoStore.case_to_bson_compatible_dict(c) for c in cases if c._id is not None}
         inserts = [pymongo.InsertOne(d) for d in to_insert]
-        results = self.get_case_collection().bulk_write(inserts)
-        return results.inserted_count, 0
+        replacements = [pymongo.ReplaceOne({ "_id": k}, v) for (k,v) in to_replace.items()]
+        results = self.get_case_collection().bulk_write(inserts + replacements)
+        return results.inserted_count, results.modified_count
 
     @staticmethod
     def setup():
@@ -75,6 +77,13 @@ class MongoStore:
     def case_to_bson_compatible_dict(case: Case):
         """Turn a case into a representation that mongo will accept."""
         bson_case = case.to_dict()
+        # Mongo mostly won't like having the _id left around: for inserts
+        # it will try to use the (None) _id and fail, and for updates it
+        # will complain that you're trying to rewrite the _id (to the same)
+        # value it already had! Therefore remove it always here. If you find
+        # a case where mongo wants the _id in a document, add it back for that
+        # operation.
+        del bson_case['_id']
         for field in Case.date_fields():
             # BSON works with datetimes, not dates
             bson_case[field] = date_to_datetime(bson_case[field])

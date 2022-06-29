@@ -66,3 +66,13 @@ def test_store_inserts_case_even_with_known_case_reference(mongo_store):
     case.confirmation_date = date(2022, 1, 13)
     (created, updated) = mongo_store.batch_upsert([case])
     assert mongo_store.count_cases(Anything()) == 2
+
+
+def test_batch_upsert_updates_case_with_existing_object_id(mongo_store):
+    with open("./tests/data/case.minimal.json", "r") as minimal_file:
+        minimal_case = Case.from_json(minimal_file.read())
+    mongo_store.insert_case(minimal_case)
+    retrieved_case = mongo_store.fetch_cases(1, 10, Anything())[0]
+    retrieved_case.confirmationDate = date(2021, 6, 19)
+    (created, updated) = mongo_store.batch_upsert([retrieved_case])
+    assert mongo_store.count_cases(Anything()) == 1

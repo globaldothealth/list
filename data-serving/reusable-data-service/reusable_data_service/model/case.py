@@ -20,6 +20,11 @@ class DayZeroCase:
     to that function)."""
 
     _: dataclasses.KW_ONLY
+    """_id is treated as an opaque identifier by the model, allowing the
+    store to use whatever format it needs to uniquely identify a stored case.
+    The _id is allowed to be None, for cases that have been created but not
+    yet saved into a store."""
+    _id: str = dataclasses.field(init=False, default=None)
     confirmationDate: datetime.date = dataclasses.field(init=False)
     caseReference: CaseReference = dataclasses.field(init=False, default=None)
 
@@ -55,6 +60,13 @@ class DayZeroCase:
                 value = (
                     CaseReference.from_dict(caseRef) if caseRef is not None else None
                 )
+            elif key == "_id":
+                the_id = dictionary[key]
+                if isinstance(the_id, dict):
+                    # this came from a BSON objectID representation
+                    value = the_id["$oid"]
+                else:
+                    value = the_id
             else:
                 value = dictionary[key]
             setattr(case, key, value)
