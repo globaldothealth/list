@@ -1,3 +1,6 @@
 {
-    "confirmationDate": "2021-12-31T01:23:45.678Z"
+    "confirmationDate": "2021-12-31T01:23:45.678Z",
+    "caseReference": {
+        "sourceId": "fedc09876543210987654321"
+    }
 }
