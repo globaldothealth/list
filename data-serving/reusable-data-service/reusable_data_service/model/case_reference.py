@@ -29,3 +29,13 @@ class CaseReference:
             else:
                 raise ValueError(f"Cannot interpret {theId} as an ObjectId")
         return ref
+
+    def to_csv(self) -> str:
+        """Generate a row in a CSV file representing myself."""
+        fields = []
+        for f in dataclasses.fields(self):
+            if dataclasses.is_dataclass(f.type):
+                fields.append(getattr(self, f.name).to_csv())
+            else:
+                fields.append(str(getattr(self, f.name)))
+        return ",".join(fields)
