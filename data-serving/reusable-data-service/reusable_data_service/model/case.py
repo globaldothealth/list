@@ -105,6 +105,18 @@ class DayZeroCase:
                 fields.append(f.name)
         return ",".join(fields)
 
+    def to_csv(self) -> str:
+        """Generate a row in a CSV file representing myself."""
+        fields = []
+        for f in dataclasses.fields(self):
+            value = getattr(self, f.name)
+            if dataclasses.is_dataclass(f.type):
+                fields.append(value.to_csv())
+            else:
+                fields.append(str(value) if value is not None else "")
+        return ",".join(fields)
+
+
 # Actually we want to capture extra fields which can be specified dynamically:
 # so Case is the class that you should use.
 Case = dataclasses.make_dataclass("Case", fields=[], bases=(DayZeroCase,))
