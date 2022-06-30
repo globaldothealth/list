@@ -30,3 +30,17 @@ def test_csv_row_with_no_id():
     case.caseReference = ref
     csv = case.to_csv()
     assert csv == ",2022-06-13,abcd12903478565647382910"
+
+
+def test_csv_row_with_id():
+    id1 = "abcd01903478565647382910"
+    id2 = "abcd12903478565647382910"
+    oid2 = bson.ObjectId(id2)
+    ref = CaseReference()
+    ref.sourceId = oid2
+    case = Case()
+    case._id = id1
+    case.confirmationDate = date(2022, 6, 13)
+    case.caseReference = ref
+    csv = case.to_csv()
+    assert csv == f"{id1},2022-06-13,{id2}"
