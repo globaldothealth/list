@@ -103,7 +103,7 @@ class DayZeroCase:
                 fields += [f"{f.name}.{g.name}" for g in dataclasses.fields(f.type)]
             else:
                 fields.append(f.name)
-        return ",".join(fields)
+        return ",".join(fields) + "\n"
 
     def to_csv(self) -> str:
         """Generate a row in a CSV file representing myself."""
@@ -114,7 +114,7 @@ class DayZeroCase:
                 fields.append(value.to_csv())
             else:
                 fields.append(str(value) if value is not None else "")
-        return ",".join(fields)
+        return ",".join(fields) + "\n"
 
 
 # Actually we want to capture extra fields which can be specified dynamically:
