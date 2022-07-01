@@ -36,12 +36,15 @@ class MemoryStore:
             self.insert_case(case)
         return len(cases), 0
 
+    def case_iterator(self, query):
+        return iter(self.cases.values())
+
 
 @pytest.fixture
 def case_controller():
     with app.app_context():
         store = MemoryStore()
-        controller = CaseController(store, outbreak_date=date(2019, 11, 1))
+        controller = CaseController(app, store, outbreak_date=date(2019, 11, 1))
         yield controller
 
 
@@ -213,3 +216,21 @@ def test_batch_upsert_reports_errors(case_controller):
     assert response.json["numCreated"] == 0
     assert response.json["numUpdated"] == 0
     assert response.json["errors"] == {"0": "Confirmation Date is mandatory"}
+
+
+def test_download_with_no_query_is_ok(case_controller):
+    _ = case_controller.create_case(
+        {
+            "confirmationDate": date(2021, 6, 3),
+            "caseReference": {"sourceId": "123ab4567890123ef4567890"},
+        },
+        num_cases=2,
+    )
+    (response, status) = case_controller.download(format='csv')
+    assert status == 200
+    assert response.headers['Content-Type'] == 'text/csv; charset=utf-8'
+    body = response.get_data().decode('utf-8')
+    assert body.startswith(Case.csv_header())
+    lines = body.splitlines()
+    assert len(lines) == 3
+

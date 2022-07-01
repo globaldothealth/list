@@ -20,9 +20,11 @@ class CaseController:
     storage technology can be chosen.
     All methods return a tuple of (response, HTTP status code)"""
 
-    def __init__(self, store, outbreak_date: date):
-        """store is an adapter to the external storage technology.
+    def __init__(self, app, store, outbreak_date: date):
+        """store is the flask app
+        store is an adapter to the external storage technology.
         outbreak_date is the earliest date on which this instance should accept cases."""
+        self.app = app
         self.store = store
         self.outbreak_date = outbreak_date
 
@@ -112,6 +114,27 @@ class CaseController:
         status = 200 if len(errors) == 0 else 207
         response = {"numCreated": created, "numUpdated": updated, "errors": errors}
         return jsonify(response), status
+    
+    def download(self, format:str = 'csv', query:Filter = Anything()):
+        """Download all cases matching the requested query, in the given format."""
+        permitted_formats = {'csv': 'text/csv', 'json': 'application/json', 'tsv': 'text/tab-separated-values'}
+        if format not in permitted_formats.keys():
+            return jsonify({"message": f"Format must be one of {permitted_formats.keys()}"}), 400
+        # now we know the format is good, we can build method names using it
+        converter_method = f"to_{format}"
+        header_method = f"{format}_header"
+        footer_method = f"{format}_footer"
+        def generate_output():
+            if hasattr(Case, header_method):
+                yield getattr(Case, header_method)()
+            for case in self.store.case_iterator(query):
+                yield getattr(case, converter_method)()
+            if hasattr(Case, footer_method):
+                yield getattr(Case, footer_method)()
+        # wait, I need access to the app
+        # consider a redesign: this controller either returns content or raises an error
+        # main.py deals with HTTP gubbins
+        return self.app.response_class(generate_output(), mimetype=permitted_formats[format]), 200
 
     def create_case_if_valid(self, maybe_case: dict):
         """Attempts to create a case from an input dictionary and validate it against
