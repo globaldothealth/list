@@ -8,10 +8,7 @@ from reusable_data_service.model.filter import (
     PropertyFilter,
     FilterOperator,
 )
-
-
-class PreconditionError(Exception):
-    pass
+from reusable_data_service.util.errors import PreconditionUnsatisfiedError, UnsupportedTypeError, ValidationError
 
 
 class CaseController:
@@ -34,59 +31,49 @@ class CaseController:
         should be unique to each case."""
         case = self.store.case_by_id(id)
         if case is None:
-            return f"No case with ID {id}", 404
-        return jsonify(case), 200
+            raise KeyError(f"No case with ID {id}")
+        return case
 
     def list_cases(self, page: int = None, limit: int = None, filter: str = None):
         """Implements get /cases."""
         page = 1 if page is None else page
         limit = 10 if limit is None else limit
-        validation_error = None
         if page <= 0:
-            validation_error = {"message": "page must be >0"}
+            raise PreconditionUnsatisfiedError("page must be >0")
         if limit <= 0:
-            validation_error = {"message": "limit must be >0"}
-        if validation_error is not None:
-            return jsonify(validation_error), 400
+            raise PreconditionUnsatisfiedError("limit must be >0")
         predicate = CaseController.parse_filter(filter)
         if predicate is None:
-            validation_error = {"message:" "cannot understand query"}
-            return jsonify(validation_error), 422
+            raise ValidationError("cannot understand query")
+        # TODO introduce a CaseListPage response object in the model
         cases = self.store.fetch_cases(page, limit, predicate)
         count = self.store.count_cases(predicate)
         response = {"cases": cases, "total": count}
         if count > page * limit:
             response["nextPage"] = page + 1
 
-        return jsonify(response), 200
+        return response
 
     def create_case(self, maybe_case: dict, num_cases: int = 1):
         """Implements post /cases."""
         if num_cases <= 0:
-            return "Must create a positive number of cases", 400
+            raise PreconditionUnsatisfiedError("Must create a positive number of cases")
         try:
             case = self.create_case_if_valid(maybe_case)
             for i in range(num_cases):
                 self.store.insert_case(case)
-            return "", 201
-        except ValueError as ve:
-            # ValueError means we can't even turn this into a case
-            return ve.args[0], 400
-        except PreconditionError as pe:
-            # PreconditionError means it's a case, but not one we can use
-            return pe.args[0], 422
+            return
+        except:
+            # pass this upstream for the app to handle
+            raise
 
     def validate_case_dictionary(self, maybe_case: dict):
         """Check whether a case _could_ be valid, without storing it if it is."""
         try:
             case = self.create_case_if_valid(maybe_case)
-            return "", 204
-        except ValueError as ve:
-            # ValueError means we can't even turn this into a case
-            return ve.args[0], 400
-        except PreconditionError as pe:
-            # PreconditionError means it's a case, but not one we can use
-            return pe.args[0], 422
+        except:
+            # pass this upstream for the app to handle
+            raise
 
     def batch_upsert(self, body: dict):
         """Upsert a collection of cases (updating ones that already exist, inserting
@@ -94,12 +81,10 @@ class CaseController:
         handled separately. The response will report the number of cases inserted, the
         number updated, and any validation errors encountered."""
         if body is None:
-            return "", 415
+            raise UnsupportedTypeError()
         cases = body.get("cases")
-        if cases is None:
-            return "", 400
-        if len(cases) == 0:
-            return "", 400
+        if cases is None or len(cases) == 0:
+            raise PreconditionUnsatisfiedError()
         errors = {}
         usable_cases = []
         for i, maybe_case in enumerate(cases):
@@ -111,15 +96,15 @@ class CaseController:
         (created, updated) = (
             self.store.batch_upsert(usable_cases) if len(usable_cases) > 0 else (0, 0)
         )
-        status = 200 if len(errors) == 0 else 207
+        # TODO introduce a batchUpsertResult model object
         response = {"numCreated": created, "numUpdated": updated, "errors": errors}
-        return jsonify(response), status
+        return response
     
     def download(self, format:str = 'csv', query:Filter = Anything()):
         """Download all cases matching the requested query, in the given format."""
-        permitted_formats = {'csv': 'text/csv', 'json': 'application/json', 'tsv': 'text/tab-separated-values'}
-        if format not in permitted_formats.keys():
-            return jsonify({"message": f"Format must be one of {permitted_formats.keys()}"}), 400
+        permitted_formats = ['csv']
+        if format not in permitted_formats:
+            raise PreconditionUnsatisfiedError(f"Format must be one of {permitted_formats}")
         # now we know the format is good, we can build method names using it
         converter_method = f"to_{format}"
         header_method = f"{format}_header"
@@ -131,21 +116,18 @@ class CaseController:
                 yield getattr(case, converter_method)()
             if hasattr(Case, footer_method):
                 yield getattr(Case, footer_method)()
-        # wait, I need access to the app
-        # consider a redesign: this controller either returns content or raises an error
-        # main.py deals with HTTP gubbins
-        return self.app.response_class(generate_output(), mimetype=permitted_formats[format]), 200
+        return generate_output
 
     def create_case_if_valid(self, maybe_case: dict):
         """Attempts to create a case from an input dictionary and validate it against
-        the application rules. Raises ValueError or PreconditionError on invalid input."""
+        the application rules. Raises ValidationError or PreconditionUnsatisfiedError on invalid input."""
         case = Case.from_dict(maybe_case)
         self.check_case_preconditions(case)
         return case
 
     def check_case_preconditions(self, case: Case):
         if case.confirmationDate < self.outbreak_date:
-            raise PreconditionError("Confirmation date is before outbreak began")
+            raise ValidationError("Confirmation date is before outbreak began")
 
     @staticmethod
     def parse_filter(filter: str) -> Filter:

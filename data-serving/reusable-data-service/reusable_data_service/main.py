@@ -1,6 +1,7 @@
 from datetime import date
-from flask import Flask, request
+from flask import Flask, jsonify, request
 from . import CaseController, MongoStore
+from reusable_data_service.util.errors import PreconditionUnsatisfiedError, UnsupportedTypeError, ValidationError
 from reusable_data_service.util.iso_json_encoder import DataServiceJSONEncoder
 
 import os
@@ -14,7 +15,10 @@ case_controller = None  # Will be set up in main()
 
 @app.route("/api/cases/<id>")
 def get_case(id):
-    return case_controller.get_case(id)
+    try:
+        return jsonify(case_controller.get_case(id)), 200
+    except KeyError:
+        return jsonify({"message": f"No case with ID {id}"}), 404
 
 
 @app.route("/api/cases", methods=["POST", "GET"])
@@ -23,21 +27,46 @@ def list_cases():
         page = request.args.get("page", type=int)
         limit = request.args.get("limit", type=int)
         filter = request.args.get("q", type=str)
-        return case_controller.list_cases(page=page, limit=limit, filter=filter)
+        try:
+            return jsonify(case_controller.list_cases(page=page, limit=limit, filter=filter)), 200
+        except PreconditionUnsatisfiedError as e:
+            return jsonify({"message": e.args[0]}), 400
+        except ValidationError as e:
+            return jsonify({"message": e.args[0]}), 422
     else:
         potential_case = request.get_json()
         validate_only = request.args.get("validate_only", type=bool)
         if validate_only:
-            return case_controller.validate_case_dictionary(potential_case)
+            try:
+                case_controller.validate_case_dictionary(potential_case)
+                return "", 204
+            except PreconditionUnsatisfiedError as e:
+                return jsonify({"message": e.args[0]}), 400
+            except ValidationError as e:
+                return jsonify({"message": e.args[0]}), 422
         count = request.args.get("num_cases", type=int)
         if count is None:
             count = 1
-        return case_controller.create_case(potential_case, num_cases=count)
+        try:
+            case_controller.create_case(potential_case, num_cases=count)
+            return "", 201
+        except PreconditionUnsatisfiedError as e:
+            return jsonify({"message": e.args[0]}), 400
+        except ValidationError as e:
+            return jsonify({"message": e.args[0]}), 422
 
 
 @app.route("/api/cases/batchUpsert", methods=["POST"])
 def batch_upsert_cases():
-    return case_controller.batch_upsert(request.get_json())
+    try:
+        result = case_controller.batch_upsert(request.get_json())
+        status = 200 if len(result['errors']) == 0 else 207
+        return jsonify(result), status
+    except PreconditionUnsatisfiedError as e:
+        return jsonify(""), 400
+    except UnsupportedTypeError as e:
+        return jsonify(""), 415
+
 
 
 def set_up_controllers():

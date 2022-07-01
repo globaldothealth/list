@@ -1,10 +1,12 @@
 import dataclasses
 import datetime
 import json
+import flask.json
 
 from typing import Any
 
 from reusable_data_service.model.case_reference import CaseReference
+from reusable_data_service.util.errors import PreconditionUnsatisfiedError, ValidationError
 
 
 @dataclasses.dataclass()
@@ -74,20 +76,24 @@ class DayZeroCase:
         return case
 
     def validate(self):
-        """Check whether I am consistent. Raise ValueError if not."""
+        """Check whether I am consistent. Raise ValidationError if not."""
         if not hasattr(self, "confirmationDate"):
-            raise ValueError("Confirmation Date is mandatory")
+            raise ValidationError("Confirmation Date is mandatory")
         elif self.confirmationDate is None:
-            raise ValueError("Confirmation Date must have a value")
+            raise ValidationError("Confirmation Date must have a value")
         if not hasattr(self, "caseReference"):
-            raise ValueError("Case Reference is mandatory")
+            raise ValidationError("Case Reference is mandatory")
         elif self.caseReference is None:
-            raise ValueError("Case Reference must have a value")
+            raise ValidationError("Case Reference must have a value")
         self.caseReference.validate()
 
     def to_dict(self):
         """Return myself as a dictionary."""
         return dataclasses.asdict(self)
+    
+    def to_json(self):
+        """Return myself as JSON"""
+        return flask.json.dumps(self.to_dict())
 
     @classmethod
     def date_fields(cls) -> list[str]:
