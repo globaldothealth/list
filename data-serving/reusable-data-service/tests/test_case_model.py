@@ -2,10 +2,11 @@ import pytest
 import bson
 from datetime import date
 from reusable_data_service import Case, CaseReference
+from reusable_data_service.util.errors import ValidationError
 
 
 def test_instantiating_case_from_empty_json_is_error():
-    with pytest.raises(ValueError):
+    with pytest.raises(ValidationError):
         case = Case.from_json("{}")
 
 
