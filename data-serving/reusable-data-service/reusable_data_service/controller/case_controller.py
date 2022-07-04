@@ -10,7 +10,11 @@ from reusable_data_service.model.filter import (
     PropertyFilter,
     FilterOperator,
 )
-from reusable_data_service.util.errors import PreconditionUnsatisfiedError, UnsupportedTypeError, ValidationError
+from reusable_data_service.util.errors import (
+    PreconditionUnsatisfiedError,
+    UnsupportedTypeError,
+    ValidationError,
+)
 
 
 class CaseController:
@@ -95,16 +99,19 @@ class CaseController:
             self.store.batch_upsert(usable_cases) if len(usable_cases) > 0 else (0, 0)
         )
         return CaseUpsertOutcome(created, updated, errors)
-    
-    def download(self, format:str = 'csv', query:Filter = Anything()):
+
+    def download(self, format: str = "csv", query: Filter = Anything()):
         """Download all cases matching the requested query, in the given format."""
-        permitted_formats = ['csv']
+        permitted_formats = ["csv"]
         if format not in permitted_formats:
-            raise PreconditionUnsatisfiedError(f"Format must be one of {permitted_formats}")
+            raise PreconditionUnsatisfiedError(
+                f"Format must be one of {permitted_formats}"
+            )
         # now we know the format is good, we can build method names using it
         converter_method = f"to_{format}"
         header_method = f"{format}_header"
         footer_method = f"{format}_footer"
+
         def generate_output():
             if hasattr(Case, header_method):
                 yield getattr(Case, header_method)()
@@ -112,6 +119,7 @@ class CaseController:
                 yield getattr(case, converter_method)()
             if hasattr(Case, footer_method):
                 yield getattr(Case, footer_method)()
+
         return generate_output
 
     def create_case_if_valid(self, maybe_case: dict):
