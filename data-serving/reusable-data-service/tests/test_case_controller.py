@@ -4,7 +4,11 @@ from datetime import date
 from typing import List
 
 from reusable_data_service import Case, CaseController, app
-from reusable_data_service.util.errors import PreconditionUnsatisfiedError, UnsupportedTypeError, ValidationError
+from reusable_data_service.util.errors import (
+    PreconditionUnsatisfiedError,
+    UnsupportedTypeError,
+    ValidationError,
+)
 
 
 class MemoryStore:
@@ -55,7 +59,7 @@ def test_one_present_item_should_return_the_case(case_controller):
         case_controller.store.put_case("foo", case)
     response = case_controller.get_case("foo")
     assert response is not None
-    assert response.confirmationDate == date(2021,12,31)
+    assert response.confirmationDate == date(2021, 12, 31)
 
 
 def test_one_absent_item_should_raise_KeyError(case_controller):
@@ -192,9 +196,7 @@ def test_batch_upsert_with_empty_case_list_raises(case_controller):
 def test_batch_upsert_creates_valid_case(case_controller):
     with open("./tests/data/case.minimal.json", "r") as minimal_file:
         minimal_case_description = json.loads(minimal_file.read())
-    response = case_controller.batch_upsert(
-        {"cases": [minimal_case_description]}
-    )
+    response = case_controller.batch_upsert({"cases": [minimal_case_description]})
     assert case_controller.store.count_cases() == 1
     assert response.numCreated == 1
     assert response.numUpdated == 0
@@ -216,7 +218,7 @@ def test_download_with_no_query_is_ok(case_controller):
         },
         num_cases=2,
     )
-    generator = case_controller.download(format='csv')
+    generator = case_controller.download(format="csv")
     result = ""
     for chunk in generator():
         result += chunk

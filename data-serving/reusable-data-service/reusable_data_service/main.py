@@ -1,7 +1,11 @@
 from datetime import date
 from flask import Flask, jsonify, request
 from . import CaseController, MongoStore
-from reusable_data_service.util.errors import PreconditionUnsatisfiedError, UnsupportedTypeError, ValidationError
+from reusable_data_service.util.errors import (
+    PreconditionUnsatisfiedError,
+    UnsupportedTypeError,
+    ValidationError,
+)
 from reusable_data_service.util.iso_json_encoder import DataServiceJSONEncoder
 
 import os
@@ -28,7 +32,12 @@ def list_cases():
         limit = request.args.get("limit", type=int)
         filter = request.args.get("q", type=str)
         try:
-            return jsonify(case_controller.list_cases(page=page, limit=limit, filter=filter)), 200
+            return (
+                jsonify(
+                    case_controller.list_cases(page=page, limit=limit, filter=filter)
+                ),
+                200,
+            )
         except PreconditionUnsatisfiedError as e:
             return jsonify({"message": e.args[0]}), 400
         except ValidationError as e:
@@ -66,7 +75,6 @@ def batch_upsert_cases():
         return jsonify(""), 400
     except UnsupportedTypeError as e:
         return jsonify(""), 415
-
 
 
 def set_up_controllers():

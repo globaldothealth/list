@@ -6,7 +6,10 @@ import flask.json
 from typing import Any
 
 from reusable_data_service.model.case_reference import CaseReference
-from reusable_data_service.util.errors import PreconditionUnsatisfiedError, ValidationError
+from reusable_data_service.util.errors import (
+    PreconditionUnsatisfiedError,
+    ValidationError,
+)
 
 
 @dataclasses.dataclass()
@@ -90,7 +93,7 @@ class DayZeroCase:
     def to_dict(self):
         """Return myself as a dictionary."""
         return dataclasses.asdict(self)
-    
+
     def to_json(self):
         """Return myself as JSON"""
         return flask.json.dumps(self.to_dict())
