@@ -60,7 +60,7 @@ def list_cases():
 def batch_upsert_cases():
     try:
         result = case_controller.batch_upsert(request.get_json())
-        status = 200 if len(result['errors']) == 0 else 207
+        status = 200 if len(result.errors) == 0 else 207
         return jsonify(result), status
     except PreconditionUnsatisfiedError as e:
         return jsonify(""), 400

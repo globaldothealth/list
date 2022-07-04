@@ -2,6 +2,7 @@ from flask import jsonify
 from datetime import date
 from reusable_data_service.model.case import Case
 from reusable_data_service.model.case_page import CasePage
+from reusable_data_service.model.case_upsert_outcome import CaseUpsertOutcome
 from reusable_data_service.model.filter import (
     Anything,
     Filter,
@@ -93,9 +94,7 @@ class CaseController:
         (created, updated) = (
             self.store.batch_upsert(usable_cases) if len(usable_cases) > 0 else (0, 0)
         )
-        # TODO introduce a batchUpsertResult model object
-        response = {"numCreated": created, "numUpdated": updated, "errors": errors}
-        return response
+        return CaseUpsertOutcome(created, updated, errors)
     
     def download(self, format:str = 'csv', query:Filter = Anything()):
         """Download all cases matching the requested query, in the given format."""
