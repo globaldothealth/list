@@ -129,6 +129,21 @@ class DayZeroCase:
         """Generate the header row for a CSV file containing members of this class."""
         return cls.delimiter_separated_header(",")
 
+    @classmethod
+    def json_header(cls) -> str:
+        """The start of a JSON array."""
+        return "["
+    
+    @classmethod
+    def json_footer(cls) -> str:
+        """The end of a JSON array."""
+        return "]"
+    
+    @classmethod
+    def json_separator(cls) -> str:
+        """The string between values in a JSON array."""
+        return ","
+
     def field_values(self) -> List[str]:
         """The list of values of fields on this object and member dataclasses."""
         fields = []

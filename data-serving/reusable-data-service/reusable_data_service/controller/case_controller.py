@@ -112,27 +112,36 @@ class CaseController:
                 "Do not supply both a filter and a list of IDs"
             )
 
-        permitted_formats = ["csv", "tsv"]
+        permitted_formats = ["csv", "tsv", "json"]
         if format not in permitted_formats:
             raise UnsupportedTypeError(f"Format must be one of {permitted_formats}")
         # now we know the format is good, we can build method names using it
         converter_method = f"to_{format}"
         header_method = f"{format}_header"
+        separator_method = f"{format}_separator"
         footer_method = f"{format}_footer"
 
         if case_ids is not None:
             case_iterator = self.store.identified_case_iterator(case_ids)
+            count = len(case_ids)
         else:
             predicate = CaseController.parse_filter(filter)
             if predicate is None:
                 raise ValidationError("cannot understand query")
             case_iterator = self.store.matching_case_iterator(predicate)
+            count = self.store.count_cases(predicate)
 
         def generate_output():
             if hasattr(Case, header_method):
                 yield getattr(Case, header_method)()
+            i = 0
+            has_separator = hasattr(Case, separator_method)
             for case in case_iterator:
                 yield getattr(case, converter_method)()
+                if i < count - 1:
+                    if has_separator:
+                        yield getattr(Case, separator_method)()
+                    i += 1
             if hasattr(Case, footer_method):
                 yield getattr(Case, footer_method)()
 
