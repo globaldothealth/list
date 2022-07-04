@@ -225,3 +225,13 @@ def test_download_with_no_query_is_ok(case_controller):
     assert result.startswith(Case.csv_header())
     lines = result.splitlines()
     assert len(lines) == 3
+
+
+def test_download_with_malformed_query_throws(case_controller):
+    with pytest.raises(ValidationError):
+        case_controller.download("csv", "country:")
+
+
+def test_download_with_unsupported_format_throws(case_controller):
+    with pytest.raises(UnsupportedTypeError):
+        case_controller.download(format="docx")
