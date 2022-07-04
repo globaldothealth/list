@@ -43,7 +43,7 @@ class MemoryStore:
 
     def matching_case_iterator(self, query):
         return iter(self.cases.values())
-    
+
     def identified_case_iterator(self, case_ids):
         ids_as_ints = [int(x) for x in case_ids]
         all_cases = list(self.cases.values())
