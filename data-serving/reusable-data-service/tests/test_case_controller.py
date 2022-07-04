@@ -263,3 +263,19 @@ def test_download_cases_by_id(case_controller):
     assert "2021-06-02" in result
     assert "2021-06-03" not in result
     assert "2021-06-04" in result
+
+
+def test_filter_cases_by_query(case_controller):
+    for i in range(4):
+        _ = case_controller.create_case(
+            {
+                "confirmationDate": date(2021, 6, i + 1),
+                "caseReference": {"sourceId": "123ab4567890123ef4567890"},
+            },
+        )
+    generator = case_controller.download("csv", filter="dateconfirmedbefore:2021-06-03")
+    result = ""
+    for chunk in generator():
+        result += chunk
+    # test double version of the store doesn't actually filter by case ID so just check we get the CSV back
+    assert result.startswith(Case.csv_header())
