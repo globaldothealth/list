@@ -100,22 +100,24 @@ class CaseController:
         )
         return CaseUpsertOutcome(created, updated, errors)
 
-    def download(self, format: str = "csv", query: Filter = Anything()):
+    def download(self, format: str = "csv", filter: str = None):
         """Download all cases matching the requested query, in the given format."""
         permitted_formats = ["csv"]
         if format not in permitted_formats:
-            raise PreconditionUnsatisfiedError(
-                f"Format must be one of {permitted_formats}"
-            )
+            raise UnsupportedTypeError(f"Format must be one of {permitted_formats}")
         # now we know the format is good, we can build method names using it
         converter_method = f"to_{format}"
         header_method = f"{format}_header"
         footer_method = f"{format}_footer"
 
+        predicate = CaseController.parse_filter(filter)
+        if predicate is None:
+            raise ValidationError("cannot understand query")
+
         def generate_output():
             if hasattr(Case, header_method):
                 yield getattr(Case, header_method)()
-            for case in self.store.case_iterator(query):
+            for case in self.store.case_iterator(predicate):
                 yield getattr(case, converter_method)()
             if hasattr(Case, footer_method):
                 yield getattr(Case, footer_method)()
