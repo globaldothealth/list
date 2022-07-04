@@ -120,14 +120,18 @@ class CaseController:
         header_method = f"{format}_header"
         footer_method = f"{format}_footer"
 
-        predicate = CaseController.parse_filter(filter)
-        if predicate is None:
-            raise ValidationError("cannot understand query")
+        if case_ids is not None:
+            case_iterator = self.store.identified_case_iterator(case_ids)
+        else:
+            predicate = CaseController.parse_filter(filter)
+            if predicate is None:
+                raise ValidationError("cannot understand query")
+            case_iterator = self.store.matching_case_iterator(predicate)
 
         def generate_output():
             if hasattr(Case, header_method):
                 yield getattr(Case, header_method)()
-            for case in self.store.case_iterator(predicate):
+            for case in case_iterator:
                 yield getattr(case, converter_method)()
             if hasattr(Case, footer_method):
                 yield getattr(Case, footer_method)()

@@ -41,8 +41,14 @@ class MemoryStore:
             self.insert_case(case)
         return len(cases), 0
 
-    def case_iterator(self, query):
+    def matching_case_iterator(self, query):
         return iter(self.cases.values())
+    
+    def identified_case_iterator(self, case_ids):
+        ids_as_ints = [int(x) for x in case_ids]
+        all_cases = list(self.cases.values())
+        matching_cases = [all_cases[i] for i in ids_as_ints]
+        return iter(matching_cases)
 
 
 @pytest.fixture
@@ -240,3 +246,20 @@ def test_download_with_unsupported_format_throws(case_controller):
 def test_download_with_query_and_case_ids_throws(case_controller):
     with pytest.raises(PreconditionUnsatisfiedError):
         case_controller.download(format="csv", filter="country:IN", case_ids=["1"])
+
+
+def test_download_cases_by_id(case_controller):
+    for i in range(4):
+        _ = case_controller.create_case(
+            {
+                "confirmationDate": date(2021, 6, i + 1),
+                "caseReference": {"sourceId": "123ab4567890123ef4567890"},
+            },
+        )
+    generator = case_controller.download("csv", case_ids=["1", "3"])
+    result = ""
+    for chunk in generator():
+        result += chunk
+    assert "2021-06-02" in result
+    assert "2021-06-03" not in result
+    assert "2021-06-04" in result
