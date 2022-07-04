@@ -1,5 +1,7 @@
 from flask import jsonify
 from datetime import date
+from typing import List
+
 from reusable_data_service.model.case import Case
 from reusable_data_service.model.case_page import CasePage
 from reusable_data_service.model.case_upsert_outcome import CaseUpsertOutcome
@@ -100,8 +102,16 @@ class CaseController:
         )
         return CaseUpsertOutcome(created, updated, errors)
 
-    def download(self, format: str = "csv", filter: str = None):
+    def download(
+        self, format: str = "csv", filter: str = None, case_ids: List[str] = None
+    ):
         """Download all cases matching the requested query, in the given format."""
+
+        if filter is not None and case_ids is not None:
+            raise PreconditionUnsatisfiedError(
+                "Do not supply both a filter and a list of IDs"
+            )
+
         permitted_formats = ["csv"]
         if format not in permitted_formats:
             raise UnsupportedTypeError(f"Format must be one of {permitted_formats}")
