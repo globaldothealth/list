@@ -112,7 +112,7 @@ class CaseController:
                 "Do not supply both a filter and a list of IDs"
             )
 
-        permitted_formats = ["csv"]
+        permitted_formats = ["csv", "tsv"]
         if format not in permitted_formats:
             raise UnsupportedTypeError(f"Format must be one of {permitted_formats}")
         # now we know the format is good, we can build method names using it
