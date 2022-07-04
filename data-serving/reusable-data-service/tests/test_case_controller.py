@@ -235,3 +235,8 @@ def test_download_with_malformed_query_throws(case_controller):
 def test_download_with_unsupported_format_throws(case_controller):
     with pytest.raises(UnsupportedTypeError):
         case_controller.download(format="docx")
+
+
+def test_download_with_query_and_case_ids_throws(case_controller):
+    with pytest.raises(PreconditionUnsatisfiedError):
+        case_controller.download(format="csv", filter="country:IN", case_ids=["1"])
