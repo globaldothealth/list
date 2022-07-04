@@ -65,7 +65,7 @@ def test_one_absent_item_should_raise_KeyError(case_controller):
 
 def test_list_cases__when_there_are_none_should_return_empty_list(case_controller):
     cases = case_controller.list_cases()
-    cases["cases"] == []
+    cases.cases == []
 
 
 def test_list_cases_should_list_the_cases(case_controller):
@@ -74,7 +74,7 @@ def test_list_cases_should_list_the_cases(case_controller):
         case_controller.store.put_case("foo", case)
         case_controller.store.put_case("bar", case)
     cases = case_controller.list_cases()
-    len(cases["cases"]) == 2
+    len(cases.cases) == 2
 
 
 def test_list_cases_should_paginate(case_controller):
@@ -83,9 +83,9 @@ def test_list_cases_should_paginate(case_controller):
         for i in range(15):
             case_controller.store.put_case(f"case_{i}", case)
     cases = case_controller.list_cases(page=1, limit=10)
-    assert len(cases["cases"]) == 10
-    assert cases["nextPage"] == 2
-    assert cases["total"] == 15
+    assert len(cases.cases) == 10
+    assert cases.nextPage == 2
+    assert cases.total == 15
 
 
 def test_list_cases_last_page(case_controller):
@@ -94,9 +94,9 @@ def test_list_cases_last_page(case_controller):
         for i in range(15):
             case_controller.store.put_case(f"case_{i}", case)
     cases = case_controller.list_cases(page=2, limit=10)
-    assert len(cases["cases"]) == 5
-    assert cases["total"] == 15
-    assert "nextPage" not in cases
+    assert len(cases.cases) == 5
+    assert cases.total == 15
+    assert cases.nextPage is None
 
 
 def test_list_cases_nonexistent_page(case_controller):
@@ -105,9 +105,9 @@ def test_list_cases_nonexistent_page(case_controller):
         for i in range(15):
             case_controller.store.put_case(f"case_{i}", case)
     cases = case_controller.list_cases(page=43, limit=10)
-    assert len(cases["cases"]) == 0
-    assert cases["total"] == 15
-    assert "nextPage" not in cases
+    assert len(cases.cases) == 0
+    assert cases.total == 15
+    assert cases.nextPage is None
 
 
 def test_create_case_with_missing_properties_raises(case_controller):
