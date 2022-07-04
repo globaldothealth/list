@@ -28,7 +28,9 @@ class MemoryStore:
     def insert_case(self, case: Case):
         """This is the external case insertion API that the case controller uses."""
         self.next_id += 1
-        self.put_case(str(self.next_id), case)
+        id = str(self.next_id)
+        case._id = id
+        self.put_case(id, case)
 
     def fetch_cases(self, page: int, limit: int, *args):
         return list(self.cases.values())[(page - 1) * limit : page * limit]
@@ -296,3 +298,21 @@ def test_download_supports_tsv(case_controller):
     assert result.startswith(Case.tsv_header())
     lines = result.splitlines()
     assert len(lines) == 3
+
+
+def test_download_supports_json(case_controller):
+    _ = case_controller.create_case(
+        {
+            "confirmationDate": date(2021, 6, 3),
+            "caseReference": {"sourceId": "123ab4567890123ef4567890"},
+        },
+        num_cases=2,
+    )
+    generator = case_controller.download(format="json")
+    output = ""
+    for chunk in generator():
+        output += chunk
+    result = json.loads(output)
+    assert len(result) == 2
+    assert result[0]['confirmationDate'] == '2021-06-03'
+    assert result[1]['caseReference']['sourceId'] == '123ab4567890123ef4567890'
