@@ -3,7 +3,7 @@ import datetime
 import json
 import flask.json
 
-from typing import Any
+from typing import Any, List
 
 from reusable_data_service.model.case_reference import CaseReference
 from reusable_data_service.util.errors import (
@@ -104,18 +104,33 @@ class DayZeroCase:
         return [f.name for f in dataclasses.fields(cls) if f.type == datetime.date]
 
     @classmethod
-    def csv_header(cls) -> str:
-        """Generate the header row for a CSV file containing members of this class."""
+    def field_names(cls) -> List[str]:
+        """The list of names of fields in this class and member dataclasses."""
         fields = []
         for f in dataclasses.fields(cls):
             if dataclasses.is_dataclass(f.type):
                 fields += [f"{f.name}.{g.name}" for g in dataclasses.fields(f.type)]
             else:
                 fields.append(f.name)
-        return ",".join(fields) + "\n"
+        return fields
 
-    def to_csv(self) -> str:
-        """Generate a row in a CSV file representing myself."""
+    @classmethod
+    def delimiter_separated_header(cls, sep: str) -> str:
+        """Create a line naming all of the fields in this class and member dataclasses."""
+        return sep.join(cls.field_names()) + "\n"
+
+    @classmethod
+    def tsv_header(cls) -> str:
+        """Generate the header row for a TSV file containing members of this class."""
+        return cls.delimiter_separated_header("\t")
+
+    @classmethod
+    def csv_header(cls) -> str:
+        """Generate the header row for a CSV file containing members of this class."""
+        return cls.delimiter_separated_header(",")
+
+    def field_values(self) -> List[str]:
+        """The list of values of fields on this object and member dataclasses."""
         fields = []
         for f in dataclasses.fields(self):
             value = getattr(self, f.name)
@@ -123,7 +138,19 @@ class DayZeroCase:
                 fields.append(value.to_csv())
             else:
                 fields.append(str(value) if value is not None else "")
-        return ",".join(fields) + "\n"
+        return fields
+
+    def delimiter_separated_values(self, sep: str) -> str:
+        """Create a line listing all of the fields in me and my member dataclasses."""
+        return sep.join(self.field_values()) + "\n"
+
+    def to_tsv(self) -> str:
+        """Generate a row in a CSV file representing myself."""
+        return self.delimiter_separated_values("\t")
+
+    def to_csv(self) -> str:
+        """Generate a row in a CSV file representing myself."""
+        return self.delimiter_separated_values(",")
 
 
 # Actually we want to capture extra fields which can be specified dynamically:
