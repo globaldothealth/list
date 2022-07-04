@@ -1,6 +1,7 @@
 from flask import jsonify
 from datetime import date
 from reusable_data_service.model.case import Case
+from reusable_data_service.model.case_page import CasePage
 from reusable_data_service.model.filter import (
     Anything,
     Filter,
@@ -45,14 +46,10 @@ class CaseController:
         predicate = CaseController.parse_filter(filter)
         if predicate is None:
             raise ValidationError("cannot understand query")
-        # TODO introduce a CaseListPage response object in the model
         cases = self.store.fetch_cases(page, limit, predicate)
         count = self.store.count_cases(predicate)
-        response = {"cases": cases, "total": count}
-        if count > page * limit:
-            response["nextPage"] = page + 1
-
-        return response
+        nextPage = page + 1 if count > page * limit else None
+        return CasePage(cases, count, nextPage)
 
     def create_case(self, maybe_case: dict, num_cases: int = 1):
         """Implements post /cases."""
