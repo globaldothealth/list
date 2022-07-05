@@ -3,7 +3,7 @@ import bson
 import datetime
 
 
-class DataServiceJSONEncoder(flask.json.JSONEncoder):
+class JSONEncoder(flask.json.JSONEncoder):
     def default(self, obj):
         try:
             if isinstance(obj, datetime.date):
