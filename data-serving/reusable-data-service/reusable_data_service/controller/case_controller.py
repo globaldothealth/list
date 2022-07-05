@@ -128,7 +128,7 @@ class CaseController:
         else:
             predicate = CaseController.parse_filter(filter)
             if predicate is None:
-                raise ValidationError("cannot understand query")
+                raise ValidationError(f"cannot understand query {filter}")
             case_iterator = self.store.matching_case_iterator(predicate)
             count = self.store.count_cases(predicate)
 
