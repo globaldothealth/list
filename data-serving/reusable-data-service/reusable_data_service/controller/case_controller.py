@@ -13,6 +13,7 @@ from reusable_data_service.model.filter import (
     FilterOperator,
 )
 from reusable_data_service.util.errors import (
+    NotFoundError,
     PreconditionUnsatisfiedError,
     UnsupportedTypeError,
     ValidationError,
@@ -39,7 +40,7 @@ class CaseController:
         should be unique to each case."""
         case = self.store.case_by_id(id)
         if case is None:
-            raise KeyError(f"No case with ID {id}")
+            raise NotFoundError(f"No case with ID {id}")
         return case
 
     def list_cases(self, page: int = None, limit: int = None, filter: str = None):
