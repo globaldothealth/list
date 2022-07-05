@@ -87,7 +87,7 @@ def test_list_cases_should_list_the_cases(case_controller):
         case_controller.store.put_case("foo", case)
         case_controller.store.put_case("bar", case)
     cases = case_controller.list_cases()
-    len(cases.cases) == 2
+    assert len(cases.cases) == 2
 
 
 def test_list_cases_should_paginate(case_controller):
