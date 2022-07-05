@@ -79,9 +79,7 @@ class MongoStore:
 
     def matching_case_iterator(self, predicate: Filter):
         """Return an object that iterates over cases matching the predicate."""
-        cases = self.get_case_collection().find(
-            predicate.to_mongo_query()
-        )
+        cases = self.get_case_collection().find(predicate.to_mongo_query())
         return map(lambda c: Case.from_json(dumps(c)), cases)
 
     @staticmethod

@@ -314,5 +314,5 @@ def test_download_supports_json(case_controller):
         output += chunk
     result = json.loads(output)
     assert len(result) == 2
-    assert result[0]['confirmationDate'] == '2021-06-03'
-    assert result[1]['caseReference']['sourceId'] == '123ab4567890123ef4567890'
+    assert result[0]["confirmationDate"] == "2021-06-03"
+    assert result[1]["caseReference"]["sourceId"] == "123ab4567890123ef4567890"
