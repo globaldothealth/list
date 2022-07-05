@@ -281,12 +281,13 @@ def test_download_all_cases_csv(client_with_patched_mongo):
             for i in range(1, 4)
         ]
     )
-    post_response = client_with_patched_mongo.post("/api/cases/download", json = {
-        "format": "csv"
-    })
+    post_response = client_with_patched_mongo.post(
+        "/api/cases/download", json={"format": "csv"}
+    )
     assert post_response.status_code == 200
-    string = post_response.get_data().decode('utf-8')
-    assert '2022-05-01' in string
+    string = post_response.get_data().decode("utf-8")
+    assert "2022-05-01" in string
+
 
 def test_download_selected_cases_tsv(client_with_patched_mongo):
     db = pymongo.MongoClient("mongodb://localhost:27017/outbreak")
@@ -301,13 +302,12 @@ def test_download_selected_cases_tsv(client_with_patched_mongo):
             for i in range(1, 4)
         ]
     )
-    post_response = client_with_patched_mongo.post("/api/cases/download", json = {
-        "format": "tsv",
-        "query": "dateconfirmedbefore:2022-05-02"
-    })
+    post_response = client_with_patched_mongo.post(
+        "/api/cases/download",
+        json={"format": "tsv", "query": "dateconfirmedbefore:2022-05-02"},
+    )
     assert post_response.status_code == 200
-    string = post_response.get_data().decode('utf-8')
-    assert '2022-05-01' in string
-    assert '\t' in string
-    assert '2022-05-03' not in string
-
+    string = post_response.get_data().decode("utf-8")
+    assert "2022-05-01" in string
+    assert "\t" in string
+    assert "2022-05-03" not in string

@@ -82,12 +82,14 @@ def download_cases():
     try:
         req = request.get_json()
         content_types = {
-            'csv': 'text/csv',
-            'tsv': 'text/tab-separated-values',
-            'json': 'application/json',
+            "csv": "text/csv",
+            "tsv": "text/tab-separated-values",
+            "json": "application/json",
         }
-        mime_type = content_types.get(req.get('format'), 'text/plain')
-        generator = case_controller.download(req.get('format'), req.get('query'), req.get('caseIds'))
+        mime_type = content_types.get(req.get("format"), "text/plain")
+        generator = case_controller.download(
+            req.get("format"), req.get("query"), req.get("caseIds")
+        )
         return app.response_class(generator(), mimetype=mime_type)
     except PreconditionUnsatisfiedError as e:
         return jsonify(""), 400

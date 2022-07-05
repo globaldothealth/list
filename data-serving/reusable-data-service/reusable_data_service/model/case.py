@@ -133,12 +133,12 @@ class DayZeroCase:
     def json_header(cls) -> str:
         """The start of a JSON array."""
         return "["
-    
+
     @classmethod
     def json_footer(cls) -> str:
         """The end of a JSON array."""
         return "]"
-    
+
     @classmethod
     def json_separator(cls) -> str:
         """The string between values in a JSON array."""
