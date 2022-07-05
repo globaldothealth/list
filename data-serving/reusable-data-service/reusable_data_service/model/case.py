@@ -10,7 +10,7 @@ from reusable_data_service.util.errors import (
     PreconditionUnsatisfiedError,
     ValidationError,
 )
-from reusable_data_service.util.data_service_json_encoder import DataServiceJSONEncoder
+from reusable_data_service.util.json_encoder import JSONEncoder
 
 
 @dataclasses.dataclass()
@@ -97,7 +97,7 @@ class DayZeroCase:
 
     def to_json(self):
         """Return myself as JSON"""
-        return DataServiceJSONEncoder().encode(self.to_dict())
+        return JSONEncoder().encode(self.to_dict())
 
     @classmethod
     def date_fields(cls) -> list[str]:

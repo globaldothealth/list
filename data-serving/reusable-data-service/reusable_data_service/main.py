@@ -7,13 +7,13 @@ from reusable_data_service.util.errors import (
     ValidationError,
     WebApplicationError,
 )
-from reusable_data_service.util.data_service_json_encoder import DataServiceJSONEncoder
+from reusable_data_service.util.json_encoder import JSONEncoder
 
 import os
 import logging
 
 app = Flask(__name__)
-app.json_encoder = DataServiceJSONEncoder
+app.json_encoder = JSONEncoder
 
 case_controller = None  # Will be set up in main()
 
