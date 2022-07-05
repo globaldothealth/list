@@ -1,8 +1,8 @@
 import pytest
 import bson
 from datetime import date
-from reusable_data_service import Case, CaseReference
-from reusable_data_service.util.errors import ValidationError
+from data_service import Case, CaseReference
+from data_service.util.errors import ValidationError
 
 
 def test_instantiating_case_from_empty_json_is_error():

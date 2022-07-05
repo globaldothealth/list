@@ -1,7 +1,7 @@
 import dataclasses
 from typing import Dict
 
-from reusable_data_service.model.case import Case
+from data_service.model.case import Case
 
 
 @dataclasses.dataclass

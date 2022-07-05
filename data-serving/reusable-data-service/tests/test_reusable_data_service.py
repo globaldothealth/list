@@ -1,4 +1,4 @@
-from reusable_data_service import __version__
+from data_service import __version__
 
 
 def test_version():
