@@ -80,7 +80,22 @@ class MongoStore:
     def matching_case_iterator(self, predicate: Filter):
         """Return an object that iterates over cases matching the predicate."""
         cases = self.get_case_collection().find(predicate.to_mongo_query())
-        return map(lambda c: Case.from_json(dumps(c)), cases)
+        return MongoStore.case_model_iterator(cases)
+
+    def identified_case_iterator(self, caseIds: List[str]):
+        """Return an object that iterates over cases with the listed IDs."""
+        oids = [ObjectId(anId) for anId in caseIds]
+        cases = self.get_case_collection().find({
+            "_id": {
+                "$in": oids
+            }
+        })
+        return MongoStore.case_model_iterator(cases)
+
+    @staticmethod
+    def case_model_iterator(mongo_iterator):
+        """Turn an iterator of mongo results into an iterator of cases."""
+        return map(lambda c: Case.from_json(dumps(c)), mongo_iterator)
 
     @staticmethod
     def setup():
