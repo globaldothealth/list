@@ -312,6 +312,7 @@ def test_download_selected_cases_tsv(client_with_patched_mongo):
     assert "\t" in string
     assert "2022-05-03" not in string
 
+
 def test_download_selected_cases_tsv(client_with_patched_mongo):
     db = pymongo.MongoClient("mongodb://localhost:27017/outbreak")
     inserted = db["outbreak"]["cases"].insert_many(
@@ -333,5 +334,5 @@ def test_download_selected_cases_tsv(client_with_patched_mongo):
     assert post_response.status_code == 200
     cases = post_response.json
     assert len(cases) == 2
-    assert cases[0]['confirmationDate'] == '2022-05-01'
-    assert cases[1]['confirmationDate'] == '2022-05-03'
+    assert cases[0]["confirmationDate"] == "2022-05-01"
+    assert cases[1]["confirmationDate"] == "2022-05-03"

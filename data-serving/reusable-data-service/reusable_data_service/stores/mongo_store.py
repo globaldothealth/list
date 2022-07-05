@@ -85,11 +85,7 @@ class MongoStore:
     def identified_case_iterator(self, caseIds: List[str]):
         """Return an object that iterates over cases with the listed IDs."""
         oids = [ObjectId(anId) for anId in caseIds]
-        cases = self.get_case_collection().find({
-            "_id": {
-                "$in": oids
-            }
-        })
+        cases = self.get_case_collection().find({"_id": {"$in": oids}})
         return MongoStore.case_model_iterator(cases)
 
     @staticmethod
