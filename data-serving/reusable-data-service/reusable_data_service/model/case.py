@@ -10,6 +10,7 @@ from reusable_data_service.util.errors import (
     PreconditionUnsatisfiedError,
     ValidationError,
 )
+from reusable_data_service.util.iso_json_encoder import DataServiceJSONEncoder
 
 
 @dataclasses.dataclass()
@@ -96,7 +97,7 @@ class DayZeroCase:
 
     def to_json(self):
         """Return myself as JSON"""
-        return flask.json.dumps(self.to_dict())
+        return DataServiceJSONEncoder().encode(self.to_dict())
 
     @classmethod
     def date_fields(cls) -> list[str]:
