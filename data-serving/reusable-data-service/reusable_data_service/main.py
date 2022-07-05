@@ -5,6 +5,7 @@ from reusable_data_service.util.errors import (
     PreconditionUnsatisfiedError,
     UnsupportedTypeError,
     ValidationError,
+    WebApplicationError,
 )
 from reusable_data_service.util.data_service_json_encoder import DataServiceJSONEncoder
 
@@ -21,8 +22,8 @@ case_controller = None  # Will be set up in main()
 def get_case(id):
     try:
         return jsonify(case_controller.get_case(id)), 200
-    except KeyError:
-        return jsonify({"message": f"No case with ID {id}"}), 404
+    except WebApplicationError as e:
+        return jsonify({"message": e.args[0]}), e.http_code
 
 
 @app.route("/api/cases", methods=["POST", "GET"])
@@ -38,10 +39,8 @@ def list_cases():
                 ),
                 200,
             )
-        except PreconditionUnsatisfiedError as e:
-            return jsonify({"message": e.args[0]}), 400
-        except ValidationError as e:
-            return jsonify({"message": e.args[0]}), 422
+        except WebApplicationError as e:
+            return jsonify({"message": e.args[0]}), e.http_code
     else:
         potential_case = request.get_json()
         validate_only = request.args.get("validate_only", type=bool)
@@ -49,20 +48,16 @@ def list_cases():
             try:
                 case_controller.validate_case_dictionary(potential_case)
                 return "", 204
-            except PreconditionUnsatisfiedError as e:
-                return jsonify({"message": e.args[0]}), 400
-            except ValidationError as e:
-                return jsonify({"message": e.args[0]}), 422
+            except WebApplicationError as e:
+                return jsonify({"message": e.args[0]}), e.http_code
         count = request.args.get("num_cases", type=int)
         if count is None:
             count = 1
         try:
             case_controller.create_case(potential_case, num_cases=count)
             return "", 201
-        except PreconditionUnsatisfiedError as e:
-            return jsonify({"message": e.args[0]}), 400
-        except ValidationError as e:
-            return jsonify({"message": e.args[0]}), 422
+        except WebApplicationError as e:
+            return jsonify({"message": e.args[0]}), e.http_code
 
 
 @app.route("/api/cases/batchUpsert", methods=["POST"])
@@ -71,10 +66,8 @@ def batch_upsert_cases():
         result = case_controller.batch_upsert(request.get_json())
         status = 200 if len(result.errors) == 0 else 207
         return jsonify(result), status
-    except PreconditionUnsatisfiedError as e:
-        return jsonify(""), 400
-    except UnsupportedTypeError as e:
-        return jsonify(""), 415
+    except WebApplicationError as e:
+        return jsonify({"message": e.args[0]}), e.http_code
 
 
 @app.route("/api/cases/download", methods=["POST"])
@@ -91,10 +84,8 @@ def download_cases():
             req.get("format"), req.get("query"), req.get("caseIds")
         )
         return app.response_class(generator(), mimetype=mime_type)
-    except PreconditionUnsatisfiedError as e:
-        return jsonify(""), 400
-    except UnsupportedTypeError as e:
-        return jsonify(""), 415
+    except WebApplicationError as e:
+        return jsonify({"message": e.args[0]}), e.http_code
 
 
 def set_up_controllers():

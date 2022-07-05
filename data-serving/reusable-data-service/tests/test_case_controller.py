@@ -5,6 +5,7 @@ from typing import List
 
 from reusable_data_service import Case, CaseController, app
 from reusable_data_service.util.errors import (
+    NotFoundError,
     PreconditionUnsatisfiedError,
     UnsupportedTypeError,
     ValidationError,
@@ -70,8 +71,8 @@ def test_one_present_item_should_return_the_case(case_controller):
     assert response.confirmationDate == date(2021, 12, 31)
 
 
-def test_one_absent_item_should_raise_KeyError(case_controller):
-    with pytest.raises(KeyError):
+def test_one_absent_item_should_raise_NotFoundError(case_controller):
+    with pytest.raises(NotFoundError):
         case_controller.get_case("foo")
 
 
