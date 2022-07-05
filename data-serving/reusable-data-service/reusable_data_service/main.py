@@ -6,7 +6,7 @@ from reusable_data_service.util.errors import (
     UnsupportedTypeError,
     ValidationError,
 )
-from reusable_data_service.util.iso_json_encoder import DataServiceJSONEncoder
+from reusable_data_service.util.data_service_json_encoder import DataServiceJSONEncoder
 
 import os
 import logging
