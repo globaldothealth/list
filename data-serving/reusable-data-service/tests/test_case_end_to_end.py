@@ -266,3 +266,24 @@ def test_batch_upsert_case(client_with_patched_mongo):
     get_response = client_with_patched_mongo.get("/api/cases")
     assert get_response.status_code == 200
     assert len(get_response.json["cases"]) == 1
+
+
+def test_download_all_cases_csv(client_with_patched_mongo):
+    db = pymongo.MongoClient("mongodb://localhost:27017/outbreak")
+    db["outbreak"]["cases"].insert_many(
+        [
+            {
+                "confirmationDate": datetime(2022, 5, i),
+                "caseReference": {
+                    "sourceId": bson.ObjectId("fedc12345678901234567890")
+                },
+            }
+            for i in range(1, 4)
+        ]
+    )
+    post_response = client_with_patched_mongo.post("/api/cases/download", json = {
+        "format": "csv"
+    })
+    assert post_response.status_code == 200
+    string = post_response.get_data().decode('utf-8')
+    assert '2022-05-01' in string
