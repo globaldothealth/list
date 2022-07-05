@@ -4,10 +4,10 @@ import mongomock
 from bson import ObjectId
 from datetime import date
 
-from reusable_data_service.model.case import Case
-from reusable_data_service.model.case_reference import CaseReference
-from reusable_data_service.model.filter import Anything
-from reusable_data_service.stores.mongo_store import MongoStore
+from data_service.model.case import Case
+from data_service.model.case_reference import CaseReference
+from data_service.model.filter import Anything
+from data_service.stores.mongo_store import MongoStore
 
 
 @pytest.fixture

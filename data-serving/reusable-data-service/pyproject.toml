@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "reusable-data-service"
+name = "data_service"
 version = "0.1.0"
 description = "A scalable, extensible application server for CRUD operations on line list data for infectious disease outbreaks."
 authors = ["Global.health <info@global.health>"]

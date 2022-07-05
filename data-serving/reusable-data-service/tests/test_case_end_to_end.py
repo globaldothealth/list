@@ -5,7 +5,7 @@ import pymongo
 
 from datetime import datetime
 
-from reusable_data_service import app, set_up_controllers
+from data_service import app, set_up_controllers
 
 
 @pytest.fixture

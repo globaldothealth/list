@@ -5,12 +5,12 @@ import flask.json
 
 from typing import Any, List
 
-from reusable_data_service.model.case_reference import CaseReference
-from reusable_data_service.util.errors import (
+from data_service.model.case_reference import CaseReference
+from data_service.util.errors import (
     PreconditionUnsatisfiedError,
     ValidationError,
 )
-from reusable_data_service.util.json_encoder import JSONEncoder
+from data_service.util.json_encoder import JSONEncoder
 
 
 @dataclasses.dataclass()

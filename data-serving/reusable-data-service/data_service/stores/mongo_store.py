@@ -1,8 +1,8 @@
 import datetime
 import os
 import pymongo
-from reusable_data_service.model.case import Case
-from reusable_data_service.model.filter import (
+from data_service.model.case import Case
+from data_service.model.filter import (
     Filter,
     Anything,
     AndFilter,

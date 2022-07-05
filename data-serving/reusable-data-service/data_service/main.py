@@ -1,13 +1,13 @@
 from datetime import date
 from flask import Flask, jsonify, request
 from . import CaseController, MongoStore
-from reusable_data_service.util.errors import (
+from data_service.util.errors import (
     PreconditionUnsatisfiedError,
     UnsupportedTypeError,
     ValidationError,
     WebApplicationError,
 )
-from reusable_data_service.util.json_encoder import JSONEncoder
+from data_service.util.json_encoder import JSONEncoder
 
 import os
 import logging

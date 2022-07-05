@@ -1,7 +1,7 @@
 import bson
 import pytest
 
-from reusable_data_service.model.case_reference import CaseReference
+from data_service.model.case_reference import CaseReference
 
 
 def test_csv_row():

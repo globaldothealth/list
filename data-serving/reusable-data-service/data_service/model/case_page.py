@@ -1,5 +1,5 @@
 import dataclasses
-from reusable_data_service.model.case import Case
+from data_service.model.case import Case
 from typing import List, Optional
 
 

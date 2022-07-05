@@ -2,17 +2,17 @@ from flask import jsonify
 from datetime import date
 from typing import List
 
-from reusable_data_service.model.case import Case
-from reusable_data_service.model.case_page import CasePage
-from reusable_data_service.model.case_upsert_outcome import CaseUpsertOutcome
-from reusable_data_service.model.filter import (
+from data_service.model.case import Case
+from data_service.model.case_page import CasePage
+from data_service.model.case_upsert_outcome import CaseUpsertOutcome
+from data_service.model.filter import (
     Anything,
     Filter,
     AndFilter,
     PropertyFilter,
     FilterOperator,
 )
-from reusable_data_service.util.errors import (
+from data_service.util.errors import (
     NotFoundError,
     PreconditionUnsatisfiedError,
     UnsupportedTypeError,

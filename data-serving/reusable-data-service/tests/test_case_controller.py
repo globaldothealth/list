@@ -3,8 +3,8 @@ import json
 from datetime import date
 from typing import List
 
-from reusable_data_service import Case, CaseController, app
-from reusable_data_service.util.errors import (
+from data_service import Case, CaseController, app
+from data_service.util.errors import (
     NotFoundError,
     PreconditionUnsatisfiedError,
     UnsupportedTypeError,
