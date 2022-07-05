@@ -86,10 +86,10 @@ class CaseController:
         handled separately. The response will report the number of cases inserted, the
         number updated, and any validation errors encountered."""
         if body is None:
-            raise UnsupportedTypeError()
+            raise UnsupportedTypeError("Empty request body is not supported")
         cases = body.get("cases")
         if cases is None or len(cases) == 0:
-            raise PreconditionUnsatisfiedError()
+            raise PreconditionUnsatisfiedError("No cases to upsert!")
         errors = {}
         usable_cases = []
         for i, maybe_case in enumerate(cases):
