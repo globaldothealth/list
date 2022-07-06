@@ -322,3 +322,8 @@ def test_download_supports_json(case_controller):
 def test_batch_status_change_rejects_invalid_status(case_controller):
     with pytest.raises(PreconditionUnsatisfiedError):
         case_controller.batch_status_change([], 'xxx')
+
+
+def test_batch_status_change_rejects_exclusion_with_no_note(case_controller):
+    with pytest.raises(ValidationError):
+        case_controller.batch_status_change([], 'EXCLUDED')

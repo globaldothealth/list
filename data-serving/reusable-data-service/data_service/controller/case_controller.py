@@ -1,6 +1,6 @@
 from flask import jsonify
 from datetime import date
-from typing import List
+from typing import List, Optional
 
 from data_service.model.case import Case
 from data_service.model.case_page import CasePage
@@ -148,12 +148,14 @@ class CaseController:
 
         return generate_output
 
-    def batch_status_change(self, case_ids: List[str], status: str):
+    def batch_status_change(self, case_ids: List[str], status: str, note: Optional[str] = None):
         """Update all of the cases identified in case_ids to have the supplied curation status.
-        Raises PreconditionUnsatisfiedError on invalid input."""
-        valid_statuses = []
+        Raises PreconditionUnsatisfiedError or ValidationError on invalid input."""
+        valid_statuses = ['EXCLUDED']
         if not status in valid_statuses:
             raise PreconditionUnsatisfiedError(f"status {status} not one of {valid_statuses}")
+        if status == 'EXCLUDED' and note is None:
+            raise ValidationError(f"Excluding cases must be documented in a note")
         
     def create_case_if_valid(self, maybe_case: dict):
         """Attempts to create a case from an input dictionary and validate it against
