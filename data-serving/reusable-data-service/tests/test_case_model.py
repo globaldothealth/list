@@ -1,7 +1,8 @@
 import pytest
 import bson
 from datetime import date
-from data_service import Case, CaseReference
+from data_service.model.case import Case
+from data_service.model.case_reference import CaseReference
 from data_service.util.errors import ValidationError
 
 
