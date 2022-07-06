@@ -148,6 +148,13 @@ class CaseController:
 
         return generate_output
 
+    def batch_status_change(self, case_ids: List[str], status: str):
+        """Update all of the cases identified in case_ids to have the supplied curation status.
+        Raises PreconditionUnsatisfiedError on invalid input."""
+        valid_statuses = []
+        if not status in valid_statuses:
+            raise PreconditionUnsatisfiedError(f"status {status} not one of {valid_statuses}")
+        
     def create_case_if_valid(self, maybe_case: dict):
         """Attempts to create a case from an input dictionary and validate it against
         the application rules. Raises ValidationError or PreconditionUnsatisfiedError on invalid input."""

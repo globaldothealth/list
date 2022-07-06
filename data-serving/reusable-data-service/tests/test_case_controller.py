@@ -317,3 +317,8 @@ def test_download_supports_json(case_controller):
     assert len(result) == 2
     assert result[0]["confirmationDate"] == "2021-06-03"
     assert result[1]["caseReference"]["sourceId"] == "123ab4567890123ef4567890"
+
+
+def test_batch_status_change_rejects_invalid_status(case_controller):
+    with pytest.raises(PreconditionUnsatisfiedError):
+        case_controller.batch_status_change([], 'xxx')
