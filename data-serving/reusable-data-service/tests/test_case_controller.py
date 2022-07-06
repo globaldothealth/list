@@ -1,5 +1,7 @@
+import freezegun
 import pytest
 import json
+
 from datetime import date
 from typing import List
 
@@ -350,3 +352,22 @@ def test_batch_status_change_excludes_cases_with_note(case_controller):
     another_case = case_controller.store.case_by_id("3")
     assert another_case.caseReference.status == "UNVERIFIED"
     assert another_case.caseExclusion is None
+
+
+@freezegun.freeze_time("Aug 13th, 2021")
+def test_batch_status_change_records_date_of_exclusion(case_controller, monkeypatch):
+    case_controller.create_case(
+        {
+            "confirmationDate": date(2021, 6, 23),
+            "caseReference": {
+                "sourceId": "123ab4567890123ef4567890",
+            },
+        }
+    )
+
+    case_controller.batch_status_change(["1"], "EXCLUDED", "Mistakes have been made")
+
+    case = case_controller.store.case_by_id("1")
+    assert case.caseReference.status == "EXCLUDED"
+    assert case.caseExclusion.note == "Mistakes have been made"
+    assert case.caseExclusion.date == date(2021, 8, 13)
