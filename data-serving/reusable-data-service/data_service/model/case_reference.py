@@ -16,6 +16,8 @@ class CaseReference:
             raise ValueError("Source ID is mandatory")
         elif self.sourceId is None:
             raise ValueError("Source ID must have a value")
+        if self.status not in self.valid_statuses():
+            raise ValueError(f"Status {self.status} is not acceptable")
 
     @staticmethod
     def valid_statuses():
