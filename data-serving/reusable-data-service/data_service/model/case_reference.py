@@ -22,7 +22,7 @@ class CaseReference:
     @staticmethod
     def valid_statuses():
         """A case reference must have one of these statuses."""
-        return ["EXCLUDED", "UNVERIFIED"]
+        return ["EXCLUDED", "UNVERIFIED", "VERIFIED"]
 
     @staticmethod
     def from_dict(d: dict[str, str]):
