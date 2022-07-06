@@ -151,7 +151,11 @@ class CaseController:
         return generate_output
 
     def batch_status_change(
-        self, status: str, note: Optional[str] = None, case_ids: Optional[List[str]] = None, filter: Optional[str] = None
+        self,
+        status: str,
+        note: Optional[str] = None,
+        case_ids: Optional[List[str]] = None,
+        filter: Optional[str] = None,
     ):
         """Update all of the cases identified in case_ids to have the supplied curation status.
         Raises PreconditionUnsatisfiedError or ValidationError on invalid input."""
