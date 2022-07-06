@@ -5,6 +5,7 @@ import flask.json
 
 from typing import Any, List
 
+from data_service.model.case_exclusion_metadata import CaseExclusionMetadata
 from data_service.model.case_reference import CaseReference
 from data_service.util.errors import (
     PreconditionUnsatisfiedError,
@@ -33,6 +34,7 @@ class DayZeroCase:
     _id: str = dataclasses.field(init=False, default=None)
     confirmationDate: datetime.date = dataclasses.field(init=False)
     caseReference: CaseReference = dataclasses.field(init=False, default=None)
+    caseExclusion: CaseExclusionMetadata = dataclasses.field(init=False, default=None)
 
     @classmethod
     def from_json(cls, obj: str) -> type:
@@ -65,6 +67,13 @@ class DayZeroCase:
                 caseRef = dictionary[key]
                 value = (
                     CaseReference.from_dict(caseRef) if caseRef is not None else None
+                )
+            elif key == "caseExclusion":
+                exclusion = dictionary[key]
+                value = (
+                    CaseExclusionMetadata.from_dict(exclusion)
+                    if exclusion is not None
+                    else None
                 )
             elif key == "_id":
                 the_id = dictionary[key]
@@ -110,7 +119,8 @@ class DayZeroCase:
         fields = []
         for f in dataclasses.fields(cls):
             if dataclasses.is_dataclass(f.type):
-                fields += [f"{f.name}.{g.name}" for g in dataclasses.fields(f.type)]
+                if DayZeroCase.include_dataclass_fields(f.type):
+                    fields += [f"{f.name}.{g.name}" for g in dataclasses.fields(f.type)]
             else:
                 fields.append(f.name)
         return fields
@@ -151,10 +161,16 @@ class DayZeroCase:
         for f in dataclasses.fields(self):
             value = getattr(self, f.name)
             if dataclasses.is_dataclass(f.type):
-                fields.append(value.to_csv())
+                if DayZeroCase.include_dataclass_fields(f.type):
+                    fields.append(value.to_csv())
             else:
                 fields.append(str(value) if value is not None else "")
         return fields
+
+    @staticmethod
+    def include_dataclass_fields(aType: type):
+        test_exclusion = getattr(aType, "exclude_from_download", None)
+        return test_exclusion is None or test_exclusion() is False
 
     def delimiter_separated_values(self, sep: str) -> str:
         """Create a line listing all of the fields in me and my member dataclasses."""

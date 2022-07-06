@@ -61,6 +61,11 @@ class MongoStore:
         to_insert = MongoStore.case_to_bson_compatible_dict(case)
         self.get_case_collection().insert_one(to_insert)
 
+    def replace_case(self, id: str, case: Case):
+        to_replace = MongoStore.case_to_bson_compatible_dict(case)
+        oid = ObjectId(id)
+        self.get_case_collection().replace_one({"_id": oid}, to_replace)
+
     def batch_upsert(self, cases: List[Case]) -> Tuple[int, int]:
         to_insert = [
             MongoStore.case_to_bson_compatible_dict(c) for c in cases if c._id is None
