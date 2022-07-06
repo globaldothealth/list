@@ -371,3 +371,21 @@ def test_batch_status_change_records_date_of_exclusion(case_controller):
     assert case.caseReference.status == "EXCLUDED"
     assert case.caseExclusion.note == "Mistakes have been made"
     assert case.caseExclusion.date == date(2021, 8, 13)
+
+
+def test_batch_status_change_removes_exclusion_data_on_unexcluding_case(case_controller):
+    case_controller.create_case(
+        {
+            "confirmationDate": date(2021, 6, 23),
+            "caseReference": {
+                "sourceId": "123ab4567890123ef4567890",
+            },
+        }
+    )
+
+    case_controller.batch_status_change(["1"], "EXCLUDED", "Mistakes have been made")
+    case_controller.batch_status_change(["1"], "UNVERIFIED")
+
+    case = case_controller.store.case_by_id("1")
+    assert case.caseReference.status == "UNVERIFIED"
+    assert case.caseExclusion is None

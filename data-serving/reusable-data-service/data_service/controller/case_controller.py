@@ -166,6 +166,8 @@ class CaseController:
             if status == "EXCLUDED":
                 case.caseExclusion = CaseExclusionMetadata()
                 case.caseExclusion.note = note
+            else:
+                case.caseExclusion = None
             self.store.replace_case(anId, case)
 
     def create_case_if_valid(self, maybe_case: dict):
