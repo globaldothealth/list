@@ -1,0 +1,38 @@
+name: Re-usable Data Service Python CI
+
+on:
+  push:
+    branches: [main, '*-stable']
+    paths:
+    - '.github/workflows/reusable-data-service-ci.yml'
+    - 'data-serving/reusable-data-service/**'
+  pull_request:
+    paths:
+    - '.github/workflows/reusable-data-service-ci.yml'
+    - 'data-serving/reusable-data-service/**'
+  workflow_dispatch:
+
+jobs:
+  ci:
+    runs-on: ubuntu-20.04
+    defaults:
+      run:
+        working-directory: data-serving/reusable-data-service
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python 3.10
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.10.5'
+    - name: Lint with flake8
+      run: |
+        pip install flake8
+        # stop the build if there are Python syntax errors or undefined names
+        flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+        # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
+        flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+    - name: Run python tests
+      run: |
+        pip install poetry
+        poetry install
+        poetry run pytest
