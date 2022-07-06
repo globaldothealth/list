@@ -8,8 +8,7 @@ class CaseReference:
 
     _: dataclasses.KW_ONLY
     sourceId: bson.ObjectId = dataclasses.field(init=False, default=None)
-    status: str = dataclasses.field(init=False, default='UNVERIFIED')
-    exclusion_note: str = dataclasses.field(init=False, default=None)
+    status: str = dataclasses.field(init=False, default="UNVERIFIED")
 
     def validate(self):
         """Check whether I am consistent. Raise ValueError if not."""
@@ -21,7 +20,7 @@ class CaseReference:
     @staticmethod
     def valid_statuses():
         """A case reference must have one of these statuses."""
-        return ['EXCLUDED', 'UNVERIFIED']
+        return ["EXCLUDED", "UNVERIFIED"]
 
     @staticmethod
     def from_dict(d: dict[str, str]):
@@ -45,5 +44,5 @@ class CaseReference:
                 fields.append(getattr(self, f.name).to_csv())
             else:
                 value = getattr(self, f.name)
-                fields.append(str(value) if value else '')
+                fields.append(str(value) if value else "")
         return ",".join(fields)

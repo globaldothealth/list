@@ -3,6 +3,7 @@ from datetime import date
 from typing import List, Optional
 
 from data_service.model.case import Case
+from data_service.model.case_exclusion_metadata import CaseExclusionMetadata
 from data_service.model.case_page import CasePage
 from data_service.model.case_reference import CaseReference
 from data_service.model.case_upsert_outcome import CaseUpsertOutcome
@@ -149,16 +150,24 @@ class CaseController:
 
         return generate_output
 
-    def batch_status_change(self, case_ids: List[str], status: str, note: Optional[str] = None):
+    def batch_status_change(
+        self, case_ids: List[str], status: str, note: Optional[str] = None
+    ):
         """Update all of the cases identified in case_ids to have the supplied curation status.
         Raises PreconditionUnsatisfiedError or ValidationError on invalid input."""
         statuses = CaseReference.valid_statuses()
         if not status in statuses:
             raise PreconditionUnsatisfiedError(f"status {status} not one of {statuses}")
-        if status == 'EXCLUDED' and note is None:
+        if status == "EXCLUDED" and note is None:
             raise ValidationError(f"Excluding cases must be documented in a note")
-        self.store.batch_status_change(case_ids, status, note)
-        
+        for anId in case_ids:
+            case = self.store.case_by_id(anId)
+            case.caseReference.status = status
+            if status == "EXCLUDED":
+                case.caseExclusion = CaseExclusionMetadata()
+                case.caseExclusion.note = note
+            self.store.replace_case(anId, case)
+
     def create_case_if_valid(self, maybe_case: dict):
         """Attempts to create a case from an input dictionary and validate it against
         the application rules. Raises ValidationError or PreconditionUnsatisfiedError on invalid input."""

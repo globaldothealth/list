@@ -4,6 +4,7 @@ from datetime import date
 from typing import List
 
 from data_service import Case, CaseController, app
+from data_service.model.case_exclusion_metadata import CaseExclusionMetadata
 from data_service.util.errors import (
     NotFoundError,
     PreconditionUnsatisfiedError,
@@ -33,6 +34,9 @@ class MemoryStore:
         case._id = id
         self.put_case(id, case)
 
+    def replace_case(self, id: str, case: Case):
+        self.put_case(id, case)
+
     def fetch_cases(self, page: int, limit: int, *args):
         return list(self.cases.values())[(page - 1) * limit : page * limit]
 
@@ -52,13 +56,6 @@ class MemoryStore:
         all_cases = list(self.cases.values())
         matching_cases = [all_cases[i] for i in ids_as_ints]
         return iter(matching_cases)
-    
-    def batch_status_change(self, case_ids, status, note):
-        for an_id in case_ids:
-            case = self.cases[an_id]
-            case.caseReference.status = status
-            if status == 'EXCLUDED':
-                case.caseReference.exclusion_note = note
 
 
 @pytest.fixture
@@ -328,12 +325,12 @@ def test_download_supports_json(case_controller):
 
 def test_batch_status_change_rejects_invalid_status(case_controller):
     with pytest.raises(PreconditionUnsatisfiedError):
-        case_controller.batch_status_change([], 'xxx')
+        case_controller.batch_status_change([], "xxx")
 
 
 def test_batch_status_change_rejects_exclusion_with_no_note(case_controller):
     with pytest.raises(ValidationError):
-        case_controller.batch_status_change([], 'EXCLUDED')
+        case_controller.batch_status_change([], "EXCLUDED")
 
 
 def test_batch_status_change_excludes_cases_with_note(case_controller):
@@ -344,10 +341,10 @@ def test_batch_status_change_excludes_cases_with_note(case_controller):
                 "caseReference": {"sourceId": "123ab4567890123ef4567890"},
             },
         )
-    case_controller.batch_status_change(["1", "2"], 'EXCLUDED', 'I dislike this case')
+    case_controller.batch_status_change(["1", "2"], "EXCLUDED", "I dislike this case")
     an_excluded_case = case_controller.store.case_by_id("1")
-    assert an_excluded_case.caseReference.status == 'EXCLUDED'
-    assert an_excluded_case.caseReference.exclusion_note == 'I dislike this case'
+    assert an_excluded_case.caseReference.status == "EXCLUDED"
+    assert an_excluded_case.caseExclusion.note == "I dislike this case"
     another_case = case_controller.store.case_by_id("3")
-    assert another_case.caseReference.status == 'UNVERIFIED'
-    assert another_case.caseReference.exclusion_note is None
+    assert another_case.caseReference.status == "UNVERIFIED"
+    assert another_case.caseExclusion is None
