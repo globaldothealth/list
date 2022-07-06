@@ -355,7 +355,7 @@ def test_batch_status_change_excludes_cases_with_note(case_controller):
 
 
 @freezegun.freeze_time("Aug 13th, 2021")
-def test_batch_status_change_records_date_of_exclusion(case_controller, monkeypatch):
+def test_batch_status_change_records_date_of_exclusion(case_controller):
     case_controller.create_case(
         {
             "confirmationDate": date(2021, 6, 23),
