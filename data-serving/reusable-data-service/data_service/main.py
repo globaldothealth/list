@@ -88,6 +88,14 @@ def download_cases():
     except WebApplicationError as e:
         return jsonify({"message": e.args[0]}), e.http_code
 
+@app.route("/api/cases/batchStatusChange", methods=["POST"])
+def batch_status_change():
+    try:
+        req = request.get_json()
+        case_controller.batch_status_change(status = req.get('status'), note = req.get('note'), case_ids = req.get('caseIds'), filter=req.get('query'))
+        return "", 204
+    except WebApplicationError as e:
+        return jsonify({"message": e.args[0]}), e.http_code
 
 def set_up_controllers():
     global case_controller

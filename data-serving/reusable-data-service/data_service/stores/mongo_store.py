@@ -2,6 +2,7 @@ import datetime
 import os
 import pymongo
 from data_service.model.case import Case
+from data_service.model.case_exclusion_metadata import CaseExclusionMetadata
 from data_service.model.filter import (
     Filter,
     Anything,
@@ -64,7 +65,9 @@ class MongoStore:
     def replace_case(self, id: str, case: Case):
         to_replace = MongoStore.case_to_bson_compatible_dict(case)
         oid = ObjectId(id)
-        self.get_case_collection().replace_one({"_id": oid}, to_replace)
+        result = self.get_case_collection().replace_one({"_id": oid}, to_replace)
+        if result.modified_count != 1:
+            raise ValueError("Did not update any documents!")
 
     def batch_upsert(self, cases: List[Case]) -> Tuple[int, int]:
         to_insert = [
@@ -115,14 +118,18 @@ class MongoStore:
         bson_case = case.to_dict()
         # Mongo mostly won't like having the _id left around: for inserts
         # it will try to use the (None) _id and fail, and for updates it
-        # will complain that you're trying to rewrite the _id (to the same)
-        # value it already had! Therefore remove it always here. If you find
+        # will complain that you're trying to rewrite the _id (to the same
+        # value it already had, although because it treats the string value as 
+        # different from the ObjectId value)! Therefore remove it always here. If you find
         # a case where mongo wants the _id in a document, add it back for that
         # operation.
         del bson_case["_id"]
+        # BSON works with datetimes, not dates
         for field in Case.date_fields():
-            # BSON works with datetimes, not dates
             bson_case[field] = date_to_datetime(bson_case[field])
+        if case.caseExclusion is not None:
+            for field in CaseExclusionMetadata.date_fields():
+                bson_case['caseExclusion'][field] = date_to_datetime(bson_case['caseExclusion'][field])
         return bson_case
 
 

@@ -1,5 +1,6 @@
 import pytest
 import bson
+import freezegun
 import mongomock
 import pymongo
 
@@ -337,3 +338,23 @@ def test_download_selected_cases_tsv(client_with_patched_mongo):
     assert len(cases) == 2
     assert cases[0]["confirmationDate"] == "2022-05-01"
     assert cases[1]["confirmationDate"] == "2022-05-03"
+
+
+def test_exclude_selected_cases(client_with_patched_mongo):
+    db = pymongo.MongoClient("mongodb://localhost:27017/outbreak")
+    inserted = db["outbreak"]["cases"].insert_one(
+        {
+                "confirmationDate": datetime(2022, 5, 10),
+                "caseReference": {
+                    "sourceId": bson.ObjectId("fedc12345678901234567890")
+                },
+        }
+    ).inserted_id
+    post_response = client_with_patched_mongo.post(
+        "/api/cases/batchStatusChange",
+        json={"status": "EXCLUDED", "caseIds": [str(inserted)], "note": "Duplicate"},
+    )
+    assert post_response.status_code == 204
+    get_response = client_with_patched_mongo.get(f"/api/cases/{str(inserted)}")
+    assert get_response.status_code == 200
+    assert get_response.get_json()["caseReference"]["status"] == "EXCLUDED"
