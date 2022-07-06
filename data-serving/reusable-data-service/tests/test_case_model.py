@@ -18,7 +18,7 @@ def test_case_from_minimal_json_is_valid():
 
 def test_csv_header():
     header_line = Case.csv_header()
-    assert header_line == "_id,confirmationDate,caseReference.sourceId\n"
+    assert header_line == "_id,confirmationDate,caseReference.sourceId,caseReference.status,caseReference.exclusion_note\n"
 
 
 def test_csv_row_with_no_id():
@@ -30,7 +30,7 @@ def test_csv_row_with_no_id():
     case.confirmationDate = date(2022, 6, 13)
     case.caseReference = ref
     csv = case.to_csv()
-    assert csv == ",2022-06-13,abcd12903478565647382910\n"
+    assert csv == ",2022-06-13,abcd12903478565647382910,UNVERIFIED,\n"
 
 
 def test_csv_row_with_id():
@@ -44,4 +44,4 @@ def test_csv_row_with_id():
     case.confirmationDate = date(2022, 6, 13)
     case.caseReference = ref
     csv = case.to_csv()
-    assert csv == f"{id1},2022-06-13,{id2}\n"
+    assert csv == f"{id1},2022-06-13,{id2},UNVERIFIED,\n"
