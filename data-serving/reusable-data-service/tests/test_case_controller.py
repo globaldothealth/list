@@ -3,7 +3,9 @@ import json
 from datetime import date
 from typing import List
 
-from data_service import Case, CaseController, app
+from data_service import app
+from data_service.controller.case_controller import CaseController
+from data_service.model.case import Case
 from data_service.model.case_exclusion_metadata import CaseExclusionMetadata
 from data_service.util.errors import (
     NotFoundError,
