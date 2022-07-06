@@ -342,14 +342,18 @@ def test_download_selected_cases_tsv(client_with_patched_mongo):
 
 def test_exclude_selected_cases(client_with_patched_mongo):
     db = pymongo.MongoClient("mongodb://localhost:27017/outbreak")
-    inserted = db["outbreak"]["cases"].insert_one(
-        {
+    inserted = (
+        db["outbreak"]["cases"]
+        .insert_one(
+            {
                 "confirmationDate": datetime(2022, 5, 10),
                 "caseReference": {
                     "sourceId": bson.ObjectId("fedc12345678901234567890")
                 },
-        }
-    ).inserted_id
+            }
+        )
+        .inserted_id
+    )
     post_response = client_with_patched_mongo.post(
         "/api/cases/batchStatusChange",
         json={"status": "EXCLUDED", "caseIds": [str(inserted)], "note": "Duplicate"},

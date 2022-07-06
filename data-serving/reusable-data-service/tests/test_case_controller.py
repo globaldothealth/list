@@ -345,7 +345,9 @@ def test_batch_status_change_excludes_cases_with_note(case_controller):
                 "caseReference": {"sourceId": "123ab4567890123ef4567890"},
             },
         )
-    case_controller.batch_status_change("EXCLUDED", "I dislike this case", case_ids=["1", "2"])
+    case_controller.batch_status_change(
+        "EXCLUDED", "I dislike this case", case_ids=["1", "2"]
+    )
     an_excluded_case = case_controller.store.case_by_id("1")
     assert an_excluded_case.caseReference.status == "EXCLUDED"
     assert an_excluded_case.caseExclusion.note == "I dislike this case"
@@ -365,7 +367,9 @@ def test_batch_status_change_records_date_of_exclusion(case_controller):
         }
     )
 
-    case_controller.batch_status_change("EXCLUDED", "Mistakes have been made", case_ids=["1"])
+    case_controller.batch_status_change(
+        "EXCLUDED", "Mistakes have been made", case_ids=["1"]
+    )
 
     case = case_controller.store.case_by_id("1")
     assert case.caseReference.status == "EXCLUDED"
@@ -373,7 +377,9 @@ def test_batch_status_change_records_date_of_exclusion(case_controller):
     assert case.caseExclusion.date == date(2021, 8, 13)
 
 
-def test_batch_status_change_removes_exclusion_data_on_unexcluding_case(case_controller):
+def test_batch_status_change_removes_exclusion_data_on_unexcluding_case(
+    case_controller,
+):
     case_controller.create_case(
         {
             "confirmationDate": date(2021, 6, 23),
@@ -383,7 +389,9 @@ def test_batch_status_change_removes_exclusion_data_on_unexcluding_case(case_con
         }
     )
 
-    case_controller.batch_status_change("EXCLUDED", "Mistakes have been made", case_ids=["1"])
+    case_controller.batch_status_change(
+        "EXCLUDED", "Mistakes have been made", case_ids=["1"]
+    )
     case_controller.batch_status_change("UNVERIFIED", case_ids=["1"])
 
     case = case_controller.store.case_by_id("1")
@@ -401,7 +409,9 @@ def test_batch_status_change_by_query(case_controller):
         }
     )
 
-    case_controller.batch_status_change("EXCLUDED", "Mistakes have been made", filter="dateconfirmedafter:2021-06-01")
+    case_controller.batch_status_change(
+        "EXCLUDED", "Mistakes have been made", filter="dateconfirmedafter:2021-06-01"
+    )
 
     case = case_controller.store.case_by_id("1")
     assert case.caseReference.status == "EXCLUDED"

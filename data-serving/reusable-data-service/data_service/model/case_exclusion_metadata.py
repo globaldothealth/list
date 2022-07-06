@@ -30,12 +30,14 @@ class CaseExclusionMetadata:
     def from_dict(cls, dictionary: dict[str, Any]) -> type:
         """Create a CaseExclusionMetadata from a dictionary representation."""
         exclusion = CaseExclusionMetadata()
-        exclusion.note = dictionary.get('note')
+        exclusion.note = dictionary.get("note")
         # TODO move this and the Case implementation into a common place
-        maybe_date = dictionary.get('date')
+        maybe_date = dictionary.get("date")
         value = None
         if maybe_date is None:
-            raise ValueError(f"date missing in CaseExclusionMetadata dictionary {dictionary}")
+            raise ValueError(
+                f"date missing in CaseExclusionMetadata dictionary {dictionary}"
+            )
         if isinstance(maybe_date, datetime.datetime):
             value = maybe_date.date()
         elif isinstance(maybe_date, datetime.date):

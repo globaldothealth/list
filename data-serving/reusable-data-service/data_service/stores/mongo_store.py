@@ -119,7 +119,7 @@ class MongoStore:
         # Mongo mostly won't like having the _id left around: for inserts
         # it will try to use the (None) _id and fail, and for updates it
         # will complain that you're trying to rewrite the _id (to the same
-        # value it already had, although because it treats the string value as 
+        # value it already had, although because it treats the string value as
         # different from the ObjectId value)! Therefore remove it always here. If you find
         # a case where mongo wants the _id in a document, add it back for that
         # operation.
@@ -129,7 +129,9 @@ class MongoStore:
             bson_case[field] = date_to_datetime(bson_case[field])
         if case.caseExclusion is not None:
             for field in CaseExclusionMetadata.date_fields():
-                bson_case['caseExclusion'][field] = date_to_datetime(bson_case['caseExclusion'][field])
+                bson_case["caseExclusion"][field] = date_to_datetime(
+                    bson_case["caseExclusion"][field]
+                )
         return bson_case
 
 
