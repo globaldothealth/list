@@ -151,24 +151,40 @@ class CaseController:
         return generate_output
 
     def batch_status_change(
-        self, case_ids: List[str], status: str, note: Optional[str] = None
+        self, status: str, note: Optional[str] = None, case_ids: Optional[List[str]] = None, filter: Optional[str] = None
     ):
         """Update all of the cases identified in case_ids to have the supplied curation status.
         Raises PreconditionUnsatisfiedError or ValidationError on invalid input."""
         statuses = CaseReference.valid_statuses()
         if not status in statuses:
             raise PreconditionUnsatisfiedError(f"status {status} not one of {statuses}")
+        if filter is not None and case_ids is not None:
+            raise PreconditionUnsatisfiedError(
+                "Do not supply both a filter and a list of IDs"
+            )
         if status == "EXCLUDED" and note is None:
             raise ValidationError(f"Excluding cases must be documented in a note")
-        for anId in case_ids:
-            case = self.store.case_by_id(anId)
+
+        def update_status(case):
             case.caseReference.status = status
             if status == "EXCLUDED":
                 case.caseExclusion = CaseExclusionMetadata()
                 case.caseExclusion.note = note
             else:
                 case.caseExclusion = None
-            self.store.replace_case(anId, case)
+            self.store.replace_case(case._id, case)
+
+        if case_ids is not None:
+            for anId in case_ids:
+                case = self.store.case_by_id(anId)
+                update_status(case)
+        else:
+            predicate = CaseController.parse_filter(filter)
+            if predicate is None:
+                raise ValidationError(f"cannot understand query {filter}")
+            case_iterator = self.store.matching_case_iterator(predicate)
+            for case in case_iterator:
+                update_status(case)
 
     def create_case_if_valid(self, maybe_case: dict):
         """Attempts to create a case from an input dictionary and validate it against
