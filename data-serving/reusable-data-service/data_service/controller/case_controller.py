@@ -169,26 +169,24 @@ class CaseController:
         if status == "EXCLUDED" and note is None:
             raise ValidationError(f"Excluding cases must be documented in a note")
 
-        def update_status(case):
-            case.caseReference.status = status
+        def update_status(id: str, status: str, note: str):
             if status == "EXCLUDED":
-                case.caseExclusion = CaseExclusionMetadata()
-                case.caseExclusion.note = note
+                caseExclusion = CaseExclusionMetadata()
+                caseExclusion.note = note
             else:
-                case.caseExclusion = None
-            self.store.replace_case(case._id, case)
+                caseExclusion = None
+            self.store.update_case_status(id, status, caseExclusion)
 
         if case_ids is not None:
             for anId in case_ids:
-                case = self.store.case_by_id(anId)
-                update_status(case)
+                update_status(anId, status, note)
         else:
             predicate = CaseController.parse_filter(filter)
             if predicate is None:
                 raise ValidationError(f"cannot understand query {filter}")
             case_iterator = self.store.matching_case_iterator(predicate)
             for case in case_iterator:
-                update_status(case)
+                update_status(case._id, status, note)
 
     def create_case_if_valid(self, maybe_case: dict):
         """Attempts to create a case from an input dictionary and validate it against

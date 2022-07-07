@@ -41,6 +41,12 @@ class MemoryStore:
     def replace_case(self, id: str, case: Case):
         self.put_case(id, case)
 
+    def update_case_status(self, id:str, status: str, exclusion: CaseExclusionMetadata):
+        print(f"updating {id} to {status} with {exclusion}")
+        case = self.case_by_id(id)
+        case.caseReference.status = status
+        case.caseExclusion = exclusion
+
     def fetch_cases(self, page: int, limit: int, *args):
         return list(self.cases.values())[(page - 1) * limit : page * limit]
 

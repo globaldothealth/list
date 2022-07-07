@@ -69,6 +69,18 @@ class MongoStore:
         if result.modified_count != 1:
             raise ValueError("Did not update any documents!")
 
+    def update_case_status(self, id:str, status: str, exclusion: CaseExclusionMetadata):
+        update = {
+            "$set": {
+                "caseReference.status": status
+            }
+        }
+        if exclusion:
+            update["$set"]["caseExclusion"] = self.case_exclusion_to_bson_compatible_dict(exclusion)
+        else:
+            update["$unset"] = { "caseExclusion": True }
+        result = self.get_case_collection().update_one({ "_id": ObjectId(id) }, update )
+
     def batch_upsert(self, cases: List[Case]) -> Tuple[int, int]:
         to_insert = [
             MongoStore.case_to_bson_compatible_dict(c) for c in cases if c._id is None
@@ -128,12 +140,16 @@ class MongoStore:
         for field in Case.date_fields():
             bson_case[field] = date_to_datetime(bson_case[field])
         if case.caseExclusion is not None:
-            for field in CaseExclusionMetadata.date_fields():
-                bson_case["caseExclusion"][field] = date_to_datetime(
-                    bson_case["caseExclusion"][field]
-                )
+            bson_case["caseExclusion"] = self.case_exclusion_to_bson_compatible_dict(case.caseExclusion)
         return bson_case
 
+    @staticmethod
+    def case_exclusion_to_bson_compatible_dict(exclusion: CaseExclusionMetadata):
+        """Turn a case exclusion document into a representation that mongo will accept."""
+        bson_exclusion = exclusion.to_dict()
+        for field in CaseExclusionMetadata.date_fields():
+            bson_exclusion[field] = date_to_datetime(bson_exclusion[field])
+        return bson_exclusion
 
 def date_to_datetime(dt: datetime.date) -> datetime.datetime:
     """Convert datetime.date to datetime.datetime for encoding as BSON"""
