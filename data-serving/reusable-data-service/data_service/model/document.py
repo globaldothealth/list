@@ -26,9 +26,7 @@ class Document:
     def interpret_date(maybe_date) -> datetime.date:
         value = None
         if maybe_date is None:
-            raise ValueError(
-                f"date missing in CaseExclusionMetadata dictionary {dictionary}"
-            )
+            value = None
         if isinstance(maybe_date, datetime.datetime):
             value = maybe_date.date()
         elif isinstance(maybe_date, datetime.date):

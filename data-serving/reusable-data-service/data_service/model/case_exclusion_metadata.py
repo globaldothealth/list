@@ -28,4 +28,6 @@ class CaseExclusionMetadata(Document):
         exclusion = CaseExclusionMetadata()
         exclusion.note = dictionary.get("note")
         exclusion.date = cls.interpret_date(dictionary.get("date"))
+        if exclusion.date is None:
+            raise ValueError(f"date missing in CaseExclusion document {dict}")
         return exclusion
