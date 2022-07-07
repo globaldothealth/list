@@ -3,6 +3,7 @@ import datetime
 
 from typing import Any
 
+# TODO many methods are similar/identical to methods on Case: introduce a common superclass
 
 @dataclasses.dataclass
 class CaseExclusionMetadata:
@@ -16,6 +17,10 @@ class CaseExclusionMetadata:
 
     def __post_init__(self):
         self.date = datetime.datetime.now().date()
+
+    def to_dict(self):
+        """Me, as a dictionary."""
+        return dataclasses.asdict(self)
 
     @classmethod
     def exclude_from_download(cls):
@@ -31,7 +36,6 @@ class CaseExclusionMetadata:
         """Create a CaseExclusionMetadata from a dictionary representation."""
         exclusion = CaseExclusionMetadata()
         exclusion.note = dictionary.get("note")
-        # TODO move this and the Case implementation into a common place
         maybe_date = dictionary.get("date")
         value = None
         if maybe_date is None:
