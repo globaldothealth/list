@@ -21,7 +21,6 @@ def client_with_patched_mongo(monkeypatch):
     monkeypatch.setenv("MONGO_CASE_COLLECTION", "cases")
     monkeypatch.setenv("OUTBREAK_DATE", "2019-11-01")
     db = mongomock.MongoClient()
-
     def fake_mongo(connection_string):
         return db
 
@@ -361,4 +360,6 @@ def test_exclude_selected_cases(client_with_patched_mongo):
     assert post_response.status_code == 204
     get_response = client_with_patched_mongo.get(f"/api/cases/{str(inserted)}")
     assert get_response.status_code == 200
-    assert get_response.get_json()["caseReference"]["status"] == "EXCLUDED"
+    document = get_response.get_json()
+    assert document["caseReference"]["status"] == "EXCLUDED"
+    assert document["caseExclusion"]["note"] == "Duplicate"

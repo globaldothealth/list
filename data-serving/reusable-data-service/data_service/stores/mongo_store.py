@@ -79,7 +79,7 @@ class MongoStore:
             update["$set"]["caseExclusion"] = self.case_exclusion_to_bson_compatible_dict(exclusion)
         else:
             update["$unset"] = { "caseExclusion": True }
-        result = self.get_case_collection().update_one({ "_id": ObjectId(id) }, update )
+        self.get_case_collection().update_one({ "_id": ObjectId(id) }, update )
 
     def batch_upsert(self, cases: List[Case]) -> Tuple[int, int]:
         to_insert = [
