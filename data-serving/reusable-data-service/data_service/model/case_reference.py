@@ -1,9 +1,11 @@
 import bson
 import dataclasses
 
+from data_service.model.document import Document
+
 
 @dataclasses.dataclass
-class CaseReference:
+class CaseReference(Document):
     """Represents information about the source of a given case."""
 
     _: dataclasses.KW_ONLY
@@ -38,14 +40,3 @@ class CaseReference:
                 raise ValueError(f"Cannot interpret {theId} as an ObjectId")
         ref.status = d["status"] if 'status' in d else 'UNVERIFIED'
         return ref
-
-    def to_csv(self) -> str:
-        """Generate a row in a CSV file representing myself."""
-        fields = []
-        for f in dataclasses.fields(self):
-            if dataclasses.is_dataclass(f.type):
-                fields.append(getattr(self, f.name).to_csv())
-            else:
-                value = getattr(self, f.name)
-                fields.append(str(value) if value else "")
-        return ",".join(fields)
