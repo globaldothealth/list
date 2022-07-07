@@ -140,7 +140,7 @@ class MongoStore:
         for field in Case.date_fields():
             bson_case[field] = date_to_datetime(bson_case[field])
         if case.caseExclusion is not None:
-            bson_case["caseExclusion"] = self.case_exclusion_to_bson_compatible_dict(case.caseExclusion)
+            bson_case["caseExclusion"] = MongoStore.case_exclusion_to_bson_compatible_dict(case.caseExclusion)
         return bson_case
 
     @staticmethod
