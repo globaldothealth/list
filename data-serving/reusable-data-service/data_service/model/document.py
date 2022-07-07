@@ -5,6 +5,7 @@ from data_service.util.json_encoder import JSONEncoder
 
 from typing import List
 
+
 @dataclasses.dataclass
 class Document:
     """The base class for anything that's going into the database."""

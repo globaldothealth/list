@@ -38,5 +38,5 @@ class CaseReference(Document):
                 ref.sourceId = bson.ObjectId(theId["$oid"])
             else:
                 raise ValueError(f"Cannot interpret {theId} as an ObjectId")
-        ref.status = d["status"] if 'status' in d else 'UNVERIFIED'
+        ref.status = d["status"] if "status" in d else "UNVERIFIED"
         return ref

@@ -5,6 +5,7 @@ from typing import Any
 
 from data_service.model.document import Document
 
+
 @dataclasses.dataclass
 class CaseExclusionMetadata(Document):
     """If a case is excluded, record when and why."""
