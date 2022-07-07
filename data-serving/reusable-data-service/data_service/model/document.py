@@ -92,7 +92,7 @@ class Document:
         fields = []
         for f in dataclasses.fields(self):
             value = getattr(self, f.name)
-            if dataclasses.is_dataclass(f.type):
+            if issubclass(f.type, Document):
                 if self.include_dataclass_fields(f.type):
                     fields += value.field_values()
             else:
