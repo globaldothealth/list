@@ -36,6 +36,7 @@ class CaseReference:
                 ref.sourceId = bson.ObjectId(theId["$oid"])
             else:
                 raise ValueError(f"Cannot interpret {theId} as an ObjectId")
+        ref.status = d["status"] if 'status' in d else 'UNVERIFIED'
         return ref
 
     def to_csv(self) -> str:
