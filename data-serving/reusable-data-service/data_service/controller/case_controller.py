@@ -192,7 +192,7 @@ class CaseController:
         """Return the identifiers of all excluded cases for a given source."""
         if source_id is None:
             raise PreconditionUnsatisfiedError("No sourceId provided")
-        return []
+        return [c._id for c in self.store.excluded_cases(source_id)]
 
     def create_case_if_valid(self, maybe_case: dict):
         """Attempts to create a case from an input dictionary and validate it against
