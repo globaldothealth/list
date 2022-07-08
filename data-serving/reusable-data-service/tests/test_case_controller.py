@@ -60,6 +60,9 @@ class MemoryStore:
             self.insert_case(case)
         return len(cases), 0
 
+    def excluded_cases(self, source_id: str):
+        return [c for c in self.cases.values() if c.caseReference.sourceId == source_id and c.caseReference.status == "EXCLUDED"]
+
     def matching_case_iterator(self, query):
         return iter(self.cases.values())
 
@@ -429,3 +432,35 @@ def test_batch_status_change_by_query(case_controller):
 def test_excluded_case_ids_raises_if_no_source_id(case_controller):
     with pytest.raises(PreconditionUnsatisfiedError):
         case_controller.excluded_case_ids(source_id=None)
+
+
+def test_excluded_case_ids_returns_empty_if_no_matching_cases(case_controller):
+    case_controller.create_case(
+        {
+            "confirmationDate": date(2021, 6, 23),
+            "caseReference": {
+                "sourceId": "123ab4567890123ef4567890",
+                "status": "VERIFIED"
+            },
+        }
+    )
+    ids = case_controller.excluded_case_ids("123ab4567890123ef4567890")
+    assert len(ids) == 0
+
+def test_excluded_case_ids_returns_ids_of_matching_cases(case_controller):
+    case_controller.create_case(
+        {
+            "confirmationDate": date(2021, 6, 23),
+            "caseReference": {
+                "sourceId": "123ab4567890123ef4567890",
+                "status": "EXCLUDED"
+            },
+            "caseExclusion": {
+                "date": date(2022, 5, 17),
+                "note": "I told him we already have one"
+            }
+        }
+    )
+    ids = case_controller.excluded_case_ids("123ab4567890123ef4567890")
+    assert len(ids) == 1
+    assert ids[0] == "1"
