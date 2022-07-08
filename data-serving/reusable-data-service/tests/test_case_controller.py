@@ -424,3 +424,8 @@ def test_batch_status_change_by_query(case_controller):
     case = case_controller.store.case_by_id("1")
     assert case.caseReference.status == "EXCLUDED"
     assert case.caseExclusion is not None
+
+
+def test_excluded_case_ids_raises_if_no_source_id(case_controller):
+    with pytest.raises(PreconditionUnsatisfiedError):
+        case_controller.excluded_case_ids(source_id=None)

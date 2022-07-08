@@ -188,6 +188,12 @@ class CaseController:
             for case in case_iterator:
                 update_status(case._id, status, note)
 
+    def excluded_case_ids(self, source_id: str) -> List[str]:
+        """Return the identifiers of all excluded cases for a given source."""
+        if source_id is None:
+            raise PreconditionUnsatisfiedError("No sourceId provided")
+        return []
+
     def create_case_if_valid(self, maybe_case: dict):
         """Attempts to create a case from an input dictionary and validate it against
         the application rules. Raises ValidationError or PreconditionUnsatisfiedError on invalid input."""
