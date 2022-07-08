@@ -364,3 +364,29 @@ def test_exclude_selected_cases(client_with_patched_mongo):
     document = get_response.get_json()
     assert document["caseReference"]["status"] == "EXCLUDED"
     assert document["caseExclusion"]["note"] == "Duplicate"
+
+
+def test_excluded_case_ids(client_with_patched_mongo):
+    db = pymongo.MongoClient("mongodb://localhost:27017/outbreak")
+    inserted = (
+        db["outbreak"]["cases"]
+        .insert_one(
+            {
+                "confirmationDate": datetime(2022, 5, 10),
+                "caseReference": {
+                    "sourceId": bson.ObjectId("fedc12345678901234567890")
+                },
+            }
+        )
+        .inserted_id
+    )
+    post_response = client_with_patched_mongo.post(
+        "/api/cases/batchStatusChange",
+        json={"status": "EXCLUDED", "caseIds": [str(inserted)], "note": "Duplicate"},
+    )
+    assert post_response.status_code == 204
+    get_response = client_with_patched_mongo.get(f"/api/excludedCaseIds?sourceId=fedc12345678901234567890")
+    assert get_response.status_code == 200
+    ids = get_response.get_json()
+    assert len(ids) == 1
+    assert ids[0] == str(inserted)

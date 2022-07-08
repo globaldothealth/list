@@ -104,6 +104,16 @@ def batch_status_change():
         return jsonify({"message": e.args[0]}), e.http_code
 
 
+@app.route("/api/excludedCaseIds")
+def excluded_case_ids():
+    try:
+        source_id = request.args.get("sourceId")
+        ids = case_controller.excluded_case_ids(source_id)
+        return jsonify(ids), 200
+    except WebApplicationError as e:
+        return jsonify({"message": e.args[0]}), e.http_code
+
+
 def set_up_controllers():
     global case_controller
     store_options = {"mongodb": MongoStore.setup}
