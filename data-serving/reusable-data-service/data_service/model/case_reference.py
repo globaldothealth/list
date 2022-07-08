@@ -9,7 +9,7 @@ class CaseReference(Document):
     """Represents information about the source of a given case."""
 
     _: dataclasses.KW_ONLY
-    sourceId: bson.ObjectId = dataclasses.field(init=False, default=None)
+    sourceId: str = dataclasses.field(init=False, default=None)
     status: str = dataclasses.field(init=False, default="UNVERIFIED")
 
     def validate(self):
@@ -30,13 +30,6 @@ class CaseReference(Document):
     def from_dict(d: dict[str, str]):
         """Create a CaseReference from a dictionary representation."""
         ref = CaseReference()
-        if "sourceId" in d:
-            theId = d["sourceId"]
-            if isinstance(theId, str):
-                ref.sourceId = bson.ObjectId(theId)
-            elif "$oid" in theId:
-                ref.sourceId = bson.ObjectId(theId["$oid"])
-            else:
-                raise ValueError(f"Cannot interpret {theId} as an ObjectId")
-        ref.status = d["status"] if "status" in d else "UNVERIFIED"
+        ref.sourceId = d.get("sourceId")
+        ref.status = d.get("status", "UNVERIFIED")
         return ref
