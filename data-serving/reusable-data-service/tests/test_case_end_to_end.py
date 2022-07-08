@@ -385,7 +385,9 @@ def test_excluded_case_ids(client_with_patched_mongo):
         json={"status": "EXCLUDED", "caseIds": [str(inserted)], "note": "Duplicate"},
     )
     assert post_response.status_code == 204
-    get_response = client_with_patched_mongo.get(f"/api/excludedCaseIds?sourceId=fedc12345678901234567890")
+    get_response = client_with_patched_mongo.get(
+        f"/api/excludedCaseIds?sourceId=fedc12345678901234567890"
+    )
     assert get_response.status_code == 200
     ids = get_response.get_json()
     assert len(ids) == 1

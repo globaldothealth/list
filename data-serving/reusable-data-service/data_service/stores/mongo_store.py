@@ -99,10 +99,12 @@ class MongoStore:
 
     def excluded_cases(self, source_id: str) -> List[Case]:
         """Return all cases for a given source that are excluded."""
-        cases = self.get_case_collection().find({
-            "caseReference.sourceId": ObjectId(source_id),
-            "caseReference.status": "EXCLUDED"
-        })
+        cases = self.get_case_collection().find(
+            {
+                "caseReference.sourceId": ObjectId(source_id),
+                "caseReference.status": "EXCLUDED",
+            }
+        )
         return [Case.from_json(dumps(c)) for c in cases]
 
     def matching_case_iterator(self, predicate: Filter):
