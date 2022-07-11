@@ -3,7 +3,7 @@ import pytest
 import json
 
 from datetime import date
-from typing import List
+from typing import List, Optional
 
 from data_service import app
 from data_service.controller.case_controller import CaseController
@@ -60,7 +60,7 @@ class MemoryStore:
             self.insert_case(case)
         return len(cases), 0
 
-    def excluded_cases(self, source_id: str):
+    def excluded_cases(self, source_id: str, filter: Optional[str] = None):
         return [
             c
             for c in self.cases.values()

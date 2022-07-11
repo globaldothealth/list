@@ -392,3 +392,33 @@ def test_excluded_case_ids(client_with_patched_mongo):
     ids = get_response.get_json()
     assert len(ids) == 1
     assert ids[0] == str(inserted)
+
+
+def test_filter_excluded_case_ids(client_with_patched_mongo):
+    db = pymongo.MongoClient("mongodb://localhost:27017/outbreak")
+    inserted = db["outbreak"]["cases"].insert_many(
+        [
+            {
+                "confirmationDate": datetime(2022, 5, i),
+                "caseReference": {
+                    "sourceId": bson.ObjectId("fedc12345678901234567890"),
+                    "status": "EXCLUDED"
+                },
+                "caseExclusion": {
+                    "date": datetime(2022, 6, i),
+                    "note": f"Excluded upon this day, the {i}th of June"
+                }
+            }
+            for i in range(1, 4)
+        ]
+    )
+    inserted_ids = [str(anId) for anId in inserted.inserted_ids]
+    get_response = client_with_patched_mongo.get(
+        f"/api/excludedCaseIds?sourceId=fedc12345678901234567890&query=dateconfirmedbefore%3a2022-05-03"
+    )
+    assert get_response.status_code == 200
+    ids = get_response.get_json()
+    assert len(ids) == 2
+    assert str(inserted_ids[0]) in ids
+    assert str(inserted_ids[1]) in ids
+    assert str(inserted_ids[2]) not in ids

@@ -108,7 +108,8 @@ def batch_status_change():
 def excluded_case_ids():
     try:
         source_id = request.args.get("sourceId")
-        ids = case_controller.excluded_case_ids(source_id)
+        query = request.args.get("query")
+        ids = case_controller.excluded_case_ids(source_id, query)
         return jsonify(ids), 200
     except WebApplicationError as e:
         return jsonify({"message": e.args[0]}), e.http_code

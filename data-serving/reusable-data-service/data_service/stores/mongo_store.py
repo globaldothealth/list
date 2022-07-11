@@ -97,12 +97,18 @@ class MongoStore:
         results = self.get_case_collection().bulk_write(inserts + replacements)
         return results.inserted_count, results.modified_count
 
-    def excluded_cases(self, source_id: str) -> List[Case]:
+    def excluded_cases(self, source_id: str, filter: Filter) -> List[Case]:
         """Return all cases for a given source that are excluded."""
+        query = filter.to_mongo_query()
         cases = self.get_case_collection().find(
             {
-                "caseReference.sourceId": ObjectId(source_id),
-                "caseReference.status": "EXCLUDED",
+                "$and": [
+                    {
+                        "caseReference.sourceId": ObjectId(source_id),
+                        "caseReference.status": "EXCLUDED",
+                    },
+                    query
+                ]
             }
         )
         return [Case.from_json(dumps(c)) for c in cases]
