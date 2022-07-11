@@ -9,8 +9,8 @@ class Filter:
 
 class Anything(Filter):
     """Represents a lack of constraints."""
-
-    pass
+    def __str__(self) -> str:
+        return "Anything()"
 
 
 class PropertyFilter(Filter):
@@ -24,6 +24,9 @@ class PropertyFilter(Filter):
         self.operation = operation
         self.value = value
 
+    def __str__(self) -> str:
+        return f"PropertyFilter({self.property_name} {self.operation} {self.value})"
+
 
 class FilterOperator:
     LESS_THAN = "<"
@@ -35,3 +38,6 @@ class AndFilter(Filter):
 
     def __init__(self, filters: List[Filter]):
         self.filters = filters
+
+    def __str__(self) -> str:
+        return f"AndFilter({' AND '.join([str(f) for f in self.filters])})"
