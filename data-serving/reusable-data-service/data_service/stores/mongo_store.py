@@ -118,7 +118,8 @@ class MongoStore:
         if len(update) == 0:
             return  # nothing to do
         # TODO convert str to ObjectId
-        sets = {key: value for key, value in update.updates_iter()}
+        objectify_id = lambda k, v: ObjectId(v) if Case.field_type_for_key_path(k) == ObjectId else v
+        sets = {key: objectify_id(key, value) for key, value in update.updates_iter()}
         unsets = {key: True for key in update.unsets_iter()}
         command = dict()
         if len(sets) > 0:
