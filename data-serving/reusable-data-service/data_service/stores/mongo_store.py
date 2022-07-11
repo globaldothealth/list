@@ -108,7 +108,7 @@ class MongoStore:
                         "caseReference.sourceId": ObjectId(source_id),
                         "caseReference.status": "EXCLUDED",
                     },
-                    query
+                    query,
                 ]
             }
         )
