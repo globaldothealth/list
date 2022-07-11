@@ -1,6 +1,7 @@
 import copy
 import dataclasses
 import datetime
+import operator
 
 from data_service.model.document_update import DocumentUpdate
 from data_service.util.json_encoder import JSONEncoder
@@ -126,4 +127,10 @@ class Document:
     def apply_update(self, update: DocumentUpdate):
         """Apply a document update to myself."""
         for key, value in update.updates_iter():
-            setattr(self, key, value)
+            if (dot_index := key.rfind('.')) == -1:
+                setattr(self, key, value)
+            else:
+                container_key = key[:dot_index]
+                prop = key[dot_index + 1:]
+                container = operator.attrgetter(container_key)(self)
+                setattr(container, prop, value)
