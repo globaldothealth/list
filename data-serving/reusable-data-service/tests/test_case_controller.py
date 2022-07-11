@@ -9,7 +9,6 @@ from data_service import app
 from data_service.controller.case_controller import CaseController
 from data_service.model.case import Case
 from data_service.model.case_exclusion_metadata import CaseExclusionMetadata
-from data_service.model.document_update import DocumentUpdate
 from data_service.util.errors import (
     NotFoundError,
     PreconditionUnsatisfiedError,
@@ -42,13 +41,10 @@ class MemoryStore:
     def replace_case(self, id: str, case: Case):
         self.put_case(id, case)
 
-    def update_case(self, id: str, update: DocumentUpdate):
-        case = self.case_by_id(id)
-        case.apply_update(update)
-
     def update_case_status(
         self, id: str, status: str, exclusion: CaseExclusionMetadata
     ):
+        print(f"updating {id} to {status} with {exclusion}")
         case = self.case_by_id(id)
         case.caseReference.status = status
         case.caseExclusion = exclusion
@@ -474,58 +470,3 @@ def test_excluded_case_ids_returns_ids_of_matching_cases(case_controller):
     ids = case_controller.excluded_case_ids("123ab4567890123ef4567890")
     assert len(ids) == 1
     assert ids[0] == "1"
-
-
-def test_updating_missing_case_should_throw_NotFoundError(case_controller):
-    case_controller.create_case(
-        {
-            "confirmationDate": date(2021, 6, 23),
-            "caseReference": {
-                "sourceId": "123ab4567890123ef4567890",
-                "status": "EXCLUDED",
-            },
-            "caseExclusion": {
-                "date": date(2022, 5, 17),
-                "note": "I told him we already have one",
-            },
-        }
-    )
-    with pytest.raises(NotFoundError):
-        case_controller.update_case("2", {"caseExclusion": {"note": "Duplicate"}})
-
-
-def test_updating_case_to_invalid_state_should_throw_ValidationError(case_controller):
-    case_controller.create_case(
-        {
-            "confirmationDate": date(2021, 6, 23),
-            "caseReference": {
-                "sourceId": "123ab4567890123ef4567890",
-                "status": "EXCLUDED",
-            },
-            "caseExclusion": {
-                "date": date(2022, 5, 17),
-                "note": "I told him we already have one",
-            },
-        }
-    )
-    with pytest.raises(ValidationError):
-        case_controller.update_case("1", {"confirmationDate": None})
-
-
-def test_updating_case_to_valid_state_returns_updated_case(case_controller):
-    case_controller.create_case(
-        {
-            "confirmationDate": date(2021, 6, 23),
-            "caseReference": {
-                "sourceId": "123ab4567890123ef4567890",
-                "status": "EXCLUDED",
-            },
-            "caseExclusion": {
-                "date": date(2022, 5, 17),
-                "note": "I told him we already have one",
-            },
-        }
-    )
-
-    new_case = case_controller.update_case("1", {"confirmationDate": date(2021, 6, 24)})
-    assert new_case.confirmationDate == date(2021, 6, 24)

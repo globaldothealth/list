@@ -19,13 +19,10 @@ app.json_encoder = JSONEncoder
 case_controller = None  # Will be set up in main()
 
 
-@app.route("/api/cases/<id>", methods=["GET", "PUT"])
+@app.route("/api/cases/<id>")
 def get_case(id):
     try:
-        if request.method == "GET":
-            return jsonify(case_controller.get_case(id)), 200
-        else:
-            return jsonify(case_controller.update_case(id, request.get_json())), 200
+        return jsonify(case_controller.get_case(id)), 200
     except WebApplicationError as e:
         return jsonify({"message": e.args[0]}), e.http_code
 
