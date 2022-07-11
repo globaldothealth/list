@@ -188,7 +188,9 @@ class CaseController:
             for case in case_iterator:
                 update_status(case._id, status, note)
 
-    def excluded_case_ids(self, source_id: str, query: Optional[str] = None) -> List[str]:
+    def excluded_case_ids(
+        self, source_id: str, query: Optional[str] = None
+    ) -> List[str]:
         """Return the identifiers of all excluded cases for a given source."""
         if source_id is None:
             raise PreconditionUnsatisfiedError("No sourceId provided")

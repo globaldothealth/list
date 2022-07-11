@@ -402,12 +402,12 @@ def test_filter_excluded_case_ids(client_with_patched_mongo):
                 "confirmationDate": datetime(2022, 5, i),
                 "caseReference": {
                     "sourceId": bson.ObjectId("fedc12345678901234567890"),
-                    "status": "EXCLUDED"
+                    "status": "EXCLUDED",
                 },
                 "caseExclusion": {
                     "date": datetime(2022, 6, i),
-                    "note": f"Excluded upon this day, the {i}th of June"
-                }
+                    "note": f"Excluded upon this day, the {i}th of June",
+                },
             }
             for i in range(1, 4)
         ]

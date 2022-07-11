@@ -1,6 +1,8 @@
+import copy
 import dataclasses
 import datetime
 
+from data_service.model.document_update import DocumentUpdate
 from data_service.util.json_encoder import JSONEncoder
 
 from typing import List
@@ -114,3 +116,14 @@ class Document:
     def to_csv(self) -> str:
         """Generate a row in a CSV file representing myself."""
         return self.delimiter_separated_values(",")
+
+    def updated_document(self, update: DocumentUpdate):
+        """A copy of myself with the updates applied."""
+        other = copy.deepcopy(self)
+        other.apply_update(update)
+        return other
+
+    def apply_update(self, update: DocumentUpdate):
+        """Apply a document update to myself."""
+        for key, value in update.updates_iter():
+            setattr(self, key, value)

@@ -9,6 +9,7 @@ class Filter:
 
 class Anything(Filter):
     """Represents a lack of constraints."""
+
     def __str__(self) -> str:
         return "Anything()"
 

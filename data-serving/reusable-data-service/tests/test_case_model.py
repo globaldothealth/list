@@ -3,6 +3,7 @@ import bson
 from datetime import date
 from data_service.model.case import Case
 from data_service.model.case_reference import CaseReference
+from data_service.model.document_update import DocumentUpdate
 from data_service.util.errors import ValidationError
 
 
@@ -49,3 +50,22 @@ def test_csv_row_with_id():
     case.caseReference = ref
     csv = case.to_csv()
     assert csv == f"{id1},2022-06-13,{id2},UNVERIFIED\n"
+
+
+def test_apply_update_to_case():
+    with open("./tests/data/case.minimal.json", "r") as minimal_file:
+        case = Case.from_json(minimal_file.read())
+    update = DocumentUpdate.from_dict({"confirmationDate": date(2022, 3, 7)})
+    updated_case = case.updated_document(update)
+    # original case should be unchanged
+    assert case.confirmationDate == date(2021, 12, 31)
+    # new case should be updated
+    assert updated_case.confirmationDate == date(2022, 3, 7)
+
+
+def test_apply_update_that_unsets_value():
+    with open("./tests/data/case.minimal.json", "r") as minimal_file:
+        case = Case.from_json(minimal_file.read())
+    update = DocumentUpdate.from_dict({"confirmationDate": None})
+    updated_case = case.apply_update(update)
+    assert case.confirmationDate is None
