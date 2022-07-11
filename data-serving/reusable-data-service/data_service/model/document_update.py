@@ -5,6 +5,7 @@ class DocumentUpdate:
 
     def __init__(self):
         self.updates = dict()
+        self.unsets = set()
 
     @staticmethod
     def from_dict(dict):
@@ -31,7 +32,13 @@ class DocumentUpdate:
 
     def update(self, key, value):
         """Record that the value at key should be changed to the supplied value."""
-        self.updates[key] = value
+        if value is None:
+            self.unsets.add(key)
+        else:
+            self.updates[key] = value
 
     def updates_iter(self):
         return iter(self.updates.items())
+
+    def unsets_iter(self):
+        return iter(self.unsets)

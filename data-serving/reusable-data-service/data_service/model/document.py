@@ -127,10 +127,15 @@ class Document:
     def apply_update(self, update: DocumentUpdate):
         """Apply a document update to myself."""
         for key, value in update.updates_iter():
-            if (dot_index := key.rfind('.')) == -1:
-                setattr(self, key, value)
-            else:
-                container_key = key[:dot_index]
-                prop = key[dot_index + 1:]
-                container = operator.attrgetter(container_key)(self)
-                setattr(container, prop, value)
+            self._internal_set_value(key, value)
+        for key in update.unsets_iter():
+            self._internal_set_value(key, None)
+
+    def _internal_set_value(self, key, value):
+        if (dot_index := key.rfind('.')) == -1:
+            setattr(self, key, value)
+        else:
+            container_key = key[:dot_index]
+            prop = key[dot_index + 1:]
+            container = operator.attrgetter(container_key)(self)
+            setattr(container, prop, value)
