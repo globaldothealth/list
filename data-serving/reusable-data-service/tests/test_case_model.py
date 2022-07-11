@@ -74,10 +74,6 @@ def test_apply_update_that_unsets_value():
 def test_apply_nested_update():
     with open("./tests/data/case.minimal.json", "r") as minimal_file:
         case = Case.from_json(minimal_file.read())
-    update = DocumentUpdate.from_dict({
-        "caseReference": {
-            "status": "VERIFIED"
-        }
-    })
+    update = DocumentUpdate.from_dict({"caseReference": {"status": "VERIFIED"}})
     case.apply_update(update)
-    assert case.caseReference.status == 'VERIFIED'
+    assert case.caseReference.status == "VERIFIED"

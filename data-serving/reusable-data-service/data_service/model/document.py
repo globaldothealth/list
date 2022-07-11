@@ -132,10 +132,10 @@ class Document:
             self._internal_set_value(key, None)
 
     def _internal_set_value(self, key, value):
-        if (dot_index := key.rfind('.')) == -1:
+        if (dot_index := key.rfind(".")) == -1:
             setattr(self, key, value)
         else:
             container_key = key[:dot_index]
-            prop = key[dot_index + 1:]
+            prop = key[dot_index + 1 :]
             container = operator.attrgetter(container_key)(self)
             setattr(container, prop, value)

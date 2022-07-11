@@ -1,5 +1,6 @@
 import collections
 
+
 class DocumentUpdate:
     """Represents a collection of changes to a document."""
 
@@ -19,14 +20,14 @@ class DocumentUpdate:
         }
         """
         update = DocumentUpdate()
-        DocumentUpdate._internal_from_dict(update, dict, '')
+        DocumentUpdate._internal_from_dict(update, dict, "")
         return update
 
     @staticmethod
     def _internal_from_dict(update, dict, prefix):
         for k, v in iter(dict.items()):
             if isinstance(v, collections.abc.Mapping):
-                DocumentUpdate._internal_from_dict(update, v, prefix + k + '.')
+                DocumentUpdate._internal_from_dict(update, v, prefix + k + ".")
             else:
                 update.update(prefix + k, v)
 
