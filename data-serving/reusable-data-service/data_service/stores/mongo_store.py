@@ -3,6 +3,7 @@ import os
 import pymongo
 from data_service.model.case import Case
 from data_service.model.case_exclusion_metadata import CaseExclusionMetadata
+from data_service.model.document_update import DocumentUpdate
 from data_service.model.filter import (
     Filter,
     Anything,
