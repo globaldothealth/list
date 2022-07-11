@@ -188,11 +188,14 @@ class CaseController:
             for case in case_iterator:
                 update_status(case._id, status, note)
 
-    def excluded_case_ids(self, source_id: str) -> List[str]:
+    def excluded_case_ids(self, source_id: str, query: Optional[str] = None) -> List[str]:
         """Return the identifiers of all excluded cases for a given source."""
         if source_id is None:
             raise PreconditionUnsatisfiedError("No sourceId provided")
-        return [c._id for c in self.store.excluded_cases(source_id)]
+        predicate = CaseController.parse_filter(query)
+        if predicate is None:
+            raise ValidationError(f"cannot understand query {predicate}")
+        return [c._id for c in self.store.excluded_cases(source_id, predicate)]
 
     def create_case_if_valid(self, maybe_case: dict):
         """Attempts to create a case from an input dictionary and validate it against
