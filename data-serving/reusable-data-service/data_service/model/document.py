@@ -1,7 +1,9 @@
+import copy
 import dataclasses
 import datetime
 import operator
 
+from data_service.model.document_update import DocumentUpdate
 from data_service.util.json_encoder import JSONEncoder
 
 from typing import List
