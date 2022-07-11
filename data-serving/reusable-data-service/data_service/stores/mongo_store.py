@@ -3,6 +3,7 @@ import os
 import pymongo
 from data_service.model.case import Case
 from data_service.model.case_exclusion_metadata import CaseExclusionMetadata
+from data_service.model.document_update import DocumentUpdate
 from data_service.model.filter import (
     Filter,
     Anything,
@@ -112,6 +113,20 @@ class MongoStore:
             }
         )
         return [Case.from_json(dumps(c)) for c in cases]
+
+    def update_case(self, id: str, update: DocumentUpdate):
+        if len(update) == 0:
+            return  # nothing to do
+        # TODO convert str to ObjectId
+        sets = {key: value for key, value in update.updates_iter()}
+        unsets = {key: True for key in update.unsets_iter()}
+        command = dict()
+        if len(sets) > 0:
+            command["$set"] = sets
+        if len(unsets) > 0:
+            command["$unset"] = unsets
+
+        self.get_case_collection().update_one({"_id": ObjectId(id)}, command)
 
     def matching_case_iterator(self, predicate: Filter):
         """Return an object that iterates over cases matching the predicate."""

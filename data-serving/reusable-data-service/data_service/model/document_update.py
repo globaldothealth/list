@@ -43,3 +43,6 @@ class DocumentUpdate:
 
     def unsets_iter(self):
         return iter(self.unsets)
+
+    def __len__(self):
+        return len(self.updates) + len(self.unsets)

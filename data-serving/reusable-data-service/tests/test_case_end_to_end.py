@@ -422,3 +422,24 @@ def test_filter_excluded_case_ids(client_with_patched_mongo):
     assert str(inserted_ids[0]) in ids
     assert str(inserted_ids[1]) in ids
     assert str(inserted_ids[2]) not in ids
+
+
+def test_update_case(client_with_patched_mongo):
+    db = pymongo.MongoClient("mongodb://localhost:27017/outbreak")
+    inserted = (
+        db["outbreak"]["cases"]
+        .insert_one(
+            {
+                "confirmationDate": datetime(2022, 5, 10),
+                "caseReference": {
+                    "sourceId": bson.ObjectId("fedc12345678901234567890")
+                },
+            }
+        )
+        .inserted_id
+    )
+    put_response = client_with_patched_mongo.put(
+        f"/api/cases/{str(inserted)}", json={"confirmationDate": "2022-05-11"}
+    )
+    assert put_response.status_code == 200
+    assert put_response.get_json()["confirmationDate"] == "2022-05-11"

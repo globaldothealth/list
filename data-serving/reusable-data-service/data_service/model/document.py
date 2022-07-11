@@ -133,9 +133,16 @@ class Document:
 
     def _internal_set_value(self, key, value):
         if (dot_index := key.rfind(".")) == -1:
-            setattr(self, key, value)
+            container = self
+            prop = key
         else:
             container_key = key[:dot_index]
             prop = key[dot_index + 1 :]
             container = operator.attrgetter(container_key)(self)
-            setattr(container, prop, value)
+        # patch up the type for updates created from a JSON API
+        if dataclasses.is_dataclass(container):
+            fields = dataclasses.fields(container)
+            the_field = [f for f in fields if f.name == prop][0]
+            if the_field.type == datetime.date and type(value) == str:
+                value = datetime.date.fromisoformat(value)
+        setattr(container, prop, value)
