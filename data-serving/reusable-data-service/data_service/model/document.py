@@ -115,3 +115,48 @@ class Document:
     def to_csv(self) -> str:
         """Generate a row in a CSV file representing myself."""
         return self.delimiter_separated_values(",")
+
+    def updated_document(self, update: DocumentUpdate):
+        """A copy of myself with the updates applied."""
+        other = copy.deepcopy(self)
+        other.apply_update(update)
+        return other
+
+    def apply_update(self, update: DocumentUpdate):
+        """Apply a document update to myself."""
+        for key, value in update.updates_iter():
+            self._internal_set_value(key, value)
+        for key in update.unsets_iter():
+            self._internal_set_value(key, None)
+
+    def _internal_set_value(self, key, value):
+        container, prop = self._internal_object_and_property_for_key_path(key)
+        # patch up the type for updates created from a JSON API
+        if container.field_type(prop) == datetime.date and type(value) == str:
+            value = datetime.date.fromisoformat(value)
+        setattr(container, prop, value)
+
+    def _internal_object_and_property_for_key_path(self, key):
+        if (dot_index := key.rfind(".")) == -1:
+            container = self
+            prop = key
+        else:
+            container_key = key[:dot_index]
+            prop = key[dot_index + 1 :]
+            container = operator.attrgetter(container_key)(self)
+        return container, prop
+
+    @classmethod
+    def field_type(cls, prop: str) -> type:
+        fields = dataclasses.fields(cls)
+        the_field = [f for f in fields if f.name == prop][0]
+        return the_field.type
+
+    @classmethod
+    def field_type_for_key_path(cls, key_path: str):
+        props = key_path.split(".")
+        a_type = cls
+        while props != []:
+            name = props.pop(0)
+            a_type = [f.type for f in dataclasses.fields(a_type) if f.name == name][0]
+        return a_type
