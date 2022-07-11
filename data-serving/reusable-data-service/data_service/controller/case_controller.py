@@ -7,6 +7,7 @@ from data_service.model.case_exclusion_metadata import CaseExclusionMetadata
 from data_service.model.case_page import CasePage
 from data_service.model.case_reference import CaseReference
 from data_service.model.case_upsert_outcome import CaseUpsertOutcome
+from data_service.model.document_update import DocumentUpdate
 from data_service.model.filter import (
     Anything,
     Filter,
@@ -188,7 +189,9 @@ class CaseController:
             for case in case_iterator:
                 update_status(case._id, status, note)
 
-    def excluded_case_ids(self, source_id: str, query: Optional[str] = None) -> List[str]:
+    def excluded_case_ids(
+        self, source_id: str, query: Optional[str] = None
+    ) -> List[str]:
         """Return the identifiers of all excluded cases for a given source."""
         if source_id is None:
             raise PreconditionUnsatisfiedError("No sourceId provided")
@@ -196,6 +199,24 @@ class CaseController:
         if predicate is None:
             raise ValidationError(f"cannot understand query {predicate}")
         return [c._id for c in self.store.excluded_cases(source_id, predicate)]
+
+    def update_case(self, source_id: str, update: dict) -> Case:
+        """Update the case document with the provided ID. Raises NotFoundError if
+        there is no case with that ID, or ValidationError if the case would not be
+        left in a valid state. If the update is successfully applied, returns the updated
+        form of the case."""
+        case = self.store.case_by_id(source_id)
+        if case is None:
+            raise NotFoundError(f"No case with ID {source_id}")
+        # build the updated version of the case to validate
+        diff = DocumentUpdate.from_dict(update)
+        updated_case = case.updated_document(diff)
+        updated_case.validate()
+        self.check_case_preconditions(updated_case)
+        # tell the store to apply the update rather than replacing the whole document:
+        # should be more efficient given a competent DB
+        self.store.update_case(source_id, diff)
+        return updated_case
 
     def create_case_if_valid(self, maybe_case: dict):
         """Attempts to create a case from an input dictionary and validate it against
