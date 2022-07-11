@@ -140,10 +140,10 @@ it('displays spinner and status post backfill', async () => {
         'MMM d, yyyy',
     );
 
-    await user.click(startDate);
+    await user.click(screen.getAllByRole('button', { name: 'Choose date' })[0]);
     await user.click(screen.getByRole('button', { name: startDateVal }));
 
-    await user.click(endDate);
+    await user.click(screen.getByRole('button', { name: 'Choose date' }));
     await user.click(screen.getByRole('button', { name: endDateVal }));
 
     await user.click(screen.getByTestId('submit'));
