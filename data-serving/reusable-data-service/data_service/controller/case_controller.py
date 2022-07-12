@@ -241,11 +241,13 @@ class CaseController:
         of an update, and query indicates which cases to update.
         Raises ValidationError if any update leaves a case
         in an inconsistent state."""
+        if update is None:
+            raise PreconditionUnsatisfiedError("No update supplied")
         cases = self.list_cases(filter=query)
         updates = []
         for case in cases.cases:
             an_update = dict(update)
-            an_update['_id'] = case._id
+            an_update["_id"] = case._id
             updates.append(an_update)
         return self.batch_update(updates)
 
