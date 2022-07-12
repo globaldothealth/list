@@ -55,10 +55,12 @@ class CaseController:
         if limit <= 0:
             raise PreconditionUnsatisfiedError("limit must be >0")
         predicate = CaseController.parse_filter(filter)
+        print(f"predicate: {predicate}")
         if predicate is None:
             raise ValidationError("cannot understand query")
         cases = self.store.fetch_cases(page, limit, predicate)
         count = self.store.count_cases(predicate)
+        print(f"cases: {cases}")
         nextPage = page + 1 if count > page * limit else None
         return CasePage(cases, count, nextPage)
 
@@ -233,6 +235,19 @@ class CaseController:
         for id, update in iter(update_map.items()):
             self.validate_updated_case(id, update)
         return self.store.batch_update(update_map)
+
+    def batch_update_query(self, query: str, update: dict) -> int:
+        """Update a collection of documents. Update is a description
+        of an update, and query indicates which cases to update.
+        Raises ValidationError if any update leaves a case
+        in an inconsistent state."""
+        cases = self.list_cases(filter=query)
+        updates = []
+        for case in cases.cases:
+            an_update = dict(update)
+            an_update['_id'] = case._id
+            updates.append(an_update)
+        return self.batch_update(updates)
 
     def validate_updated_case(self, id: str, update: DocumentUpdate):
         """Find out whether updating a case would result in it being invalid.
