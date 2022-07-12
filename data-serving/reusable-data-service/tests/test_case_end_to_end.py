@@ -468,3 +468,34 @@ def test_update_object_id_on_case(client_with_patched_mongo):
         put_response.get_json()["caseReference"]["sourceId"]
         == "fedc1234567890123456789a"
     )
+
+
+def test_batch_update(client_with_patched_mongo):
+    db = pymongo.MongoClient("mongodb://localhost:27017/outbreak")
+    inserted = db["outbreak"]["cases"].insert_many(
+        [
+            {
+                "confirmationDate": datetime(2022, 5, i),
+                "caseReference": {
+                    "sourceId": bson.ObjectId("fedc12345678901234567890"),
+                    "status": "EXCLUDED",
+                },
+                "caseExclusion": {
+                    "date": datetime(2022, 6, i),
+                    "note": f"Excluded upon this day, the {i}th of June",
+                },
+            }
+            for i in range(1, 4)
+        ]
+    )
+    inserted_ids = [str(anId) for anId in inserted.inserted_ids]
+    updates = [
+        {"_id": inserted_ids[i - 1], "confirmationDate": f"2022-04-0{i}"}
+        for i in range(1, 4)
+    ]
+
+    post_result = client_with_patched_mongo.post(
+        "/api/cases/batchUpdate", json={"cases": updates}
+    )
+    assert post_result.status_code == 200
+    assert post_result.get_json()["numModified"] == 3
