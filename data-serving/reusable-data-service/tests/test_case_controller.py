@@ -595,7 +595,7 @@ def test_batch_update_query_returns_modified_count(case_controller):
                 "caseReference": {"sourceId": "123ab4567890123ef4567890"},
             },
         )
-    update = { "confirmationDate": date(2022, 5, 13) }
-    query = None # didn't implement rich queries on the test store
+    update = {"confirmationDate": date(2022, 5, 13)}
+    query = None  # didn't implement rich queries on the test store
     modified = case_controller.batch_update_query(query, update)
     assert modified == 4
