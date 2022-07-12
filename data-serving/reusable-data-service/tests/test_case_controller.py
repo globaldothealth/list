@@ -568,3 +568,11 @@ def test_batch_update_cases_returns_number_of_modified_cases(case_controller):
     assert case_two.caseReference.status == "VERIFIED"
     case_three = case_controller.get_case("3")
     assert case_three.caseReference.status == "UNVERIFIED"
+
+
+def test_batch_update_raises_if_id_not_supplied(case_controller):
+    update = {
+        "confirmationDate": date(2022,5,3)
+    }
+    with pytest.raises(PreconditionUnsatisfiedError):
+        case_controller.batch_update([update])
