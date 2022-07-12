@@ -585,3 +585,17 @@ def test_batch_update_raises_if_case_not_found(case_controller):
     update = {"_id": "1", "confirmationDate": date(2022, 5, 13)}
     with pytest.raises(NotFoundError):
         case_controller.batch_update([update])
+
+
+def test_batch_update_query_returns_modified_count(case_controller):
+    for i in range(4):
+        _ = case_controller.create_case(
+            {
+                "confirmationDate": date(2021, 6, i + 1),
+                "caseReference": {"sourceId": "123ab4567890123ef4567890"},
+            },
+        )
+    update = { "confirmationDate": date(2022, 5, 13) }
+    query = None # didn't implement rich queries on the test store
+    modified = case_controller.batch_update_query(query, update)
+    assert modified == 4
