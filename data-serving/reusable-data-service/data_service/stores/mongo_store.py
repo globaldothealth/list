@@ -117,7 +117,22 @@ class MongoStore:
     def update_case(self, id: str, update: DocumentUpdate):
         if len(update) == 0:
             return  # nothing to do
-        # TODO convert str to ObjectId
+        command = self.mongodb_update_command(update)
+        self.get_case_collection().update_one({"_id": ObjectId(id)}, command)
+
+    def batch_update(self, updates: dict[str, DocumentUpdate]):
+        mongo_commands = {
+            ObjectId(k): self.mongodb_update_command(v)
+            for k, v in iter(updates.items())
+        }
+        update_ones = [
+            pymongo.UpdateOne({"_id": k}, v) for k, v in iter(mongo_commands.items())
+        ]
+        result = self.get_case_collection().bulk_write(update_ones)
+        return result.modified_count
+
+    @staticmethod
+    def mongodb_update_command(update: DocumentUpdate):
         objectify_id = (
             lambda k, v: ObjectId(v)
             if Case.field_type_for_key_path(k) == ObjectId
@@ -130,8 +145,7 @@ class MongoStore:
             command["$set"] = sets
         if len(unsets) > 0:
             command["$unset"] = unsets
-
-        self.get_case_collection().update_one({"_id": ObjectId(id)}, command)
+        return command
 
     def matching_case_iterator(self, predicate: Filter):
         """Return an object that iterates over cases matching the predicate."""

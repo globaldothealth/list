@@ -107,6 +107,16 @@ def batch_status_change():
         return jsonify({"message": e.args[0]}), e.http_code
 
 
+@app.route("/api/cases/batchUpdate", methods=["POST"])
+def batch_update():
+    try:
+        req = request.get_json()
+        count = case_controller.batch_update(req.get("cases"))
+        return jsonify({"numModified": count})
+    except WebApplicationError as e:
+        return jsonify({"message": e.args[0]}), e.http_code
+
+
 @app.route("/api/excludedCaseIds")
 def excluded_case_ids():
     try:
