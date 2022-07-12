@@ -45,6 +45,11 @@ class MemoryStore:
     def update_case(self, id: str, update: DocumentUpdate):
         case = self.case_by_id(id)
         case.apply_update(update)
+    
+    def batch_update(self, updates: dict[str, DocumentUpdate]):
+        for id, update in iter(updates.items()):
+            self.update_case(id, update)
+        return len(updates)
 
     def update_case_status(
         self, id: str, status: str, exclusion: CaseExclusionMetadata
@@ -529,3 +534,37 @@ def test_updating_case_to_valid_state_returns_updated_case(case_controller):
 
     new_case = case_controller.update_case("1", {"confirmationDate": date(2021, 6, 24)})
     assert new_case.confirmationDate == date(2021, 6, 24)
+
+
+def test_batch_update_cases_returns_number_of_modified_cases(case_controller):
+    for i in range(4):
+        _ = case_controller.create_case(
+            {
+                "confirmationDate": date(2021, 6, i + 1),
+                "caseReference": {"sourceId": "123ab4567890123ef4567890"},
+            },
+        )
+    update_one = {
+        "_id": "1",
+        "caseReference": {
+            "status": "EXCLUDED"
+        },
+        "caseExclusion": {
+            "date": date(2022, 2, 2),
+            "note": "Bad case no likey"
+        }
+    }
+    update_two = {
+        "_id": "2",
+        "caseReference": {
+            "status": "VERIFIED"
+        }
+    }
+    num_modified = case_controller.batch_update([update_one, update_two])
+    assert num_modified == 2
+    case_one = case_controller.get_case("1")
+    assert case_one.caseReference.status == "EXCLUDED"
+    case_two = case_controller.get_case("2")
+    assert case_two.caseReference.status == "VERIFIED"
+    case_three = case_controller.get_case("3")
+    assert case_three.caseReference.status == "UNVERIFIED"
