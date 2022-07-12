@@ -132,11 +132,25 @@ class Document:
             self._internal_set_value(key, None)
 
     def _internal_set_value(self, key, value):
+        self._internal_ensure_containers_exist(key)
         container, prop = self._internal_object_and_property_for_key_path(key)
         # patch up the type for updates created from a JSON API
         if container.field_type(prop) == datetime.date and type(value) == str:
             value = datetime.date.fromisoformat(value)
         setattr(container, prop, value)
+
+    def _internal_ensure_containers_exist(self, key):
+        if (dot_index := key.rfind(".")) == -1:
+            return # no nested containers
+        container_keys = key[:dot_index].split('.')
+        container = self
+        for component in container_keys:
+            next_container = getattr(container, component)
+            if next_container is None:
+                container_type = container.field_type(component)
+                next_container = container_type()
+                setattr(container, component, next_container)
+            container = next_container
 
     def _internal_object_and_property_for_key_path(self, key):
         if (dot_index := key.rfind(".")) == -1:

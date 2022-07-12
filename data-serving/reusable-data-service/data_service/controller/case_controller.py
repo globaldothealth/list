@@ -217,6 +217,22 @@ class CaseController:
         # should be more efficient given a competent DB
         self.store.update_case(source_id, diff)
         return updated_case
+    
+    def batch_update(self, updates: List[dict]) -> int:
+        """Update a collection of documents. Each dictionary in the list is a description
+        of an update, but it also carries the _id field to indicate which case to update.
+        Raises NotFoundError if any update identifies a case that isn't present, PreconditionUnsatisfiedError
+        if any update doesn't include an id, or ValidationError if any update leaves a case
+        in an inconsistent state."""
+        def remove_id(d: dict):
+            d2 = dict(d)
+            del d2['_id']
+            return d2
+        try:
+            update_map = {u['_id']: DocumentUpdate.from_dict(remove_id(u)) for u in updates}
+        except KeyError:
+            raise PreconditionUnsatisfiedError("not every update includes an _id")
+        return self.store.batch_update(update_map)
 
     def create_case_if_valid(self, maybe_case: dict):
         """Attempts to create a case from an input dictionary and validate it against
