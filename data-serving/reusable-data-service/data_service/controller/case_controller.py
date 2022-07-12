@@ -200,39 +200,53 @@ class CaseController:
             raise ValidationError(f"cannot understand query {predicate}")
         return [c._id for c in self.store.excluded_cases(source_id, predicate)]
 
-    def update_case(self, source_id: str, update: dict) -> Case:
+    def update_case(self, case_id: str, update: dict) -> Case:
         """Update the case document with the provided ID. Raises NotFoundError if
         there is no case with that ID, or ValidationError if the case would not be
         left in a valid state. If the update is successfully applied, returns the updated
         form of the case."""
-        case = self.store.case_by_id(source_id)
-        if case is None:
-            raise NotFoundError(f"No case with ID {source_id}")
-        # build the updated version of the case to validate
         diff = DocumentUpdate.from_dict(update)
-        updated_case = case.updated_document(diff)
-        updated_case.validate()
-        self.check_case_preconditions(updated_case)
+        updated_case = self.validate_updated_case(case_id, diff)
         # tell the store to apply the update rather than replacing the whole document:
         # should be more efficient given a competent DB
-        self.store.update_case(source_id, diff)
+        self.store.update_case(case_id, diff)
         return updated_case
-    
+
     def batch_update(self, updates: List[dict]) -> int:
         """Update a collection of documents. Each dictionary in the list is a description
         of an update, but it also carries the _id field to indicate which case to update.
         Raises NotFoundError if any update identifies a case that isn't present, PreconditionUnsatisfiedError
         if any update doesn't include an id, or ValidationError if any update leaves a case
         in an inconsistent state."""
+
         def remove_id(d: dict):
             d2 = dict(d)
-            del d2['_id']
+            del d2["_id"]
             return d2
+
         try:
-            update_map = {u['_id']: DocumentUpdate.from_dict(remove_id(u)) for u in updates}
+            update_map = {
+                u["_id"]: DocumentUpdate.from_dict(remove_id(u)) for u in updates
+            }
         except KeyError:
             raise PreconditionUnsatisfiedError("not every update includes an _id")
+        for id, update in iter(update_map.items()):
+            self.validate_updated_case(id, update)
         return self.store.batch_update(update_map)
+
+    def validate_updated_case(self, id: str, update: DocumentUpdate):
+        """Find out whether updating a case would result in it being invalid.
+        Raises NotFoundError if the case doesn't exist, or ValidationError if
+        the update results in an invalid case. Returns the updated, valid case
+        on success."""
+        case = self.store.case_by_id(id)
+        if case is None:
+            raise NotFoundError(f"No case with ID {id}")
+        # build the updated version of the case to validate
+        updated_case = case.updated_document(update)
+        updated_case.validate()
+        self.check_case_preconditions(updated_case)
+        return updated_case
 
     def create_case_if_valid(self, maybe_case: dict):
         """Attempts to create a case from an input dictionary and validate it against

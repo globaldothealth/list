@@ -45,7 +45,7 @@ class MemoryStore:
     def update_case(self, id: str, update: DocumentUpdate):
         case = self.case_by_id(id)
         case.apply_update(update)
-    
+
     def batch_update(self, updates: dict[str, DocumentUpdate]):
         for id, update in iter(updates.items()):
             self.update_case(id, update)
@@ -546,20 +546,10 @@ def test_batch_update_cases_returns_number_of_modified_cases(case_controller):
         )
     update_one = {
         "_id": "1",
-        "caseReference": {
-            "status": "EXCLUDED"
-        },
-        "caseExclusion": {
-            "date": date(2022, 2, 2),
-            "note": "Bad case no likey"
-        }
+        "caseReference": {"status": "EXCLUDED"},
+        "caseExclusion": {"date": date(2022, 2, 2), "note": "Bad case no likey"},
     }
-    update_two = {
-        "_id": "2",
-        "caseReference": {
-            "status": "VERIFIED"
-        }
-    }
+    update_two = {"_id": "2", "caseReference": {"status": "VERIFIED"}}
     num_modified = case_controller.batch_update([update_one, update_two])
     assert num_modified == 2
     case_one = case_controller.get_case("1")
@@ -571,8 +561,27 @@ def test_batch_update_cases_returns_number_of_modified_cases(case_controller):
 
 
 def test_batch_update_raises_if_id_not_supplied(case_controller):
-    update = {
-        "confirmationDate": date(2022,5,3)
-    }
+    update = {"confirmationDate": date(2022, 5, 3)}
     with pytest.raises(PreconditionUnsatisfiedError):
+        case_controller.batch_update([update])
+
+
+def test_batch_update_raises_if_case_would_be_invalid(case_controller):
+    case_controller.create_case(
+        {
+            "confirmationDate": date(2021, 6, 23),
+            "caseReference": {
+                "sourceId": "123ab4567890123ef4567890",
+                "status": "VERIFIED",
+            },
+        }
+    )
+    update = {"_id": "1", "confirmationDate": None}
+    with pytest.raises(ValidationError):
+        case_controller.batch_update([update])
+
+
+def test_batch_update_raises_if_case_not_found(case_controller):
+    update = {"_id": "1", "confirmationDate": date(2022, 5, 13)}
+    with pytest.raises(NotFoundError):
         case_controller.batch_update([update])

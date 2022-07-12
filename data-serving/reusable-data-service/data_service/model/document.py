@@ -141,8 +141,8 @@ class Document:
 
     def _internal_ensure_containers_exist(self, key):
         if (dot_index := key.rfind(".")) == -1:
-            return # no nested containers
-        container_keys = key[:dot_index].split('.')
+            return  # no nested containers
+        container_keys = key[:dot_index].split(".")
         container = self
         for component in container_keys:
             next_container = getattr(container, component)
