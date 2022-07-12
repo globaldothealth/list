@@ -1,3 +1,5 @@
+import sys
+
 from flask import jsonify
 from datetime import date
 from typing import List, Optional
@@ -243,7 +245,7 @@ class CaseController:
         in an inconsistent state."""
         if update is None:
             raise PreconditionUnsatisfiedError("No update supplied")
-        cases = self.list_cases(filter=query)
+        cases = self.list_cases(limit=sys.maxsize, filter=query)
         updates = []
         for case in cases.cases:
             an_update = dict(update)
