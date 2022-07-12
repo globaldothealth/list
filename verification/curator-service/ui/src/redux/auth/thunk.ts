@@ -11,7 +11,6 @@ export const signInWithEmailAndPassword = createAsyncThunk<
     'auth/signInWithEmailAndPassword',
     async ({ email, password }, { rejectWithValue }) => {
         try {
-            email = email.toLowerCase();
             const response = await axios.post<User>('/auth/signin', {
                 email,
                 password,
@@ -31,7 +30,6 @@ export const signUpWithEmailAndPassword = createAsyncThunk<
     { rejectValue: string }
 >('auth/signUpWithEmailAndPassword', async (data, { rejectWithValue }) => {
     try {
-        data.email = data.email.toLowerCase();
         const response = await axios.post<User>('/auth/signup', data);
 
         sendCustomGtmEvent('sign_up', {
@@ -60,7 +58,6 @@ export const requestResetPasswordLink = createAsyncThunk<
     { rejectValue: string }
 >('auth/requestResetPasswordLink', async (data, { rejectWithValue }) => {
     try {
-        data.email = data.email.toLowerCase();
         const response = await axios.post('/auth/request-password-reset', data);
 
         if (response.status !== 200) {

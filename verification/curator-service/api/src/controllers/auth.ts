@@ -660,8 +660,12 @@ export class AuthController {
                 },
                 async (req, email, password, done) => {
                     try {
-                        const user = await users().findOne({ email });
+                        const userPromise = await users().find({ email })
+                        .collation({ locale: 'en', strength: 2 })
+                        .toArray();
 
+                        const user = userPromise[0];
+                        
                         if (user) {
                             return done(null, false, {
                                 message: 'Email address already exists',
@@ -708,9 +712,12 @@ export class AuthController {
                 },
                 async (email, password, done) => {
                     try {
-                        const user = (await users().findOne({
-                            email,
-                        })) as IUser;
+                        const userPromise = await users().find({ email })
+                        .collation({ locale: 'en', strength: 2 })
+                        .toArray();
+
+                        const user = userPromise[0] as IUser;
+
                         if (!user) {
                             return done(null, false, {
                                 message: 'Wrong username or password',
