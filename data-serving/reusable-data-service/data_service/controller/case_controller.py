@@ -57,12 +57,10 @@ class CaseController:
         if limit <= 0:
             raise PreconditionUnsatisfiedError("limit must be >0")
         predicate = CaseController.parse_filter(filter)
-        print(f"predicate: {predicate}")
         if predicate is None:
             raise ValidationError("cannot understand query")
         cases = self.store.fetch_cases(page, limit, predicate)
         count = self.store.count_cases(predicate)
-        print(f"cases: {cases}")
         nextPage = page + 1 if count > page * limit else None
         return CasePage(cases, count, nextPage)
 
