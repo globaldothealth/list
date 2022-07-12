@@ -41,9 +41,9 @@ export default function Pathogens(): JSX.Element {
 // Based on https://material-ui.com/components/autocomplete/#asynchronous-requests.
 export function PathogensAutocomplete(): JSX.Element {
     const [open, setOpen] = React.useState(false);
-    const [options, setOptions] = React.useState<Map<string, number>>(
-        new Map(),
-    );
+    const [options, setOptions] = React.useState<
+        Map<string | string[], number>
+    >(new Map());
     const loading = open && options.keys.length === 0;
     const { setFieldValue, setTouched, initialValues } =
         useFormikContext<CaseFormValues>();

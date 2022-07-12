@@ -6,8 +6,8 @@ interface ChipInputProps {
     placeholder: string;
     values: string[];
     defaultValue?: string[];
-    onChange: (values: string[]) => void;
-    options?: string[];
+    onChange: (values: (string | string[])[]) => void;
+    options?: (string | string[])[];
     helperText?: string;
     dataTestId?: string;
 }
