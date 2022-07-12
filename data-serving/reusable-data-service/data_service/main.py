@@ -112,7 +112,7 @@ def batch_update():
     try:
         req = request.get_json()
         count = case_controller.batch_update(req.get("cases"))
-        return jsonify({"numModified": count})
+        return jsonify({"numModified": count}), 200
     except WebApplicationError as e:
         return jsonify({"message": e.args[0]}), e.http_code
 
