@@ -661,7 +661,7 @@ export class AuthController {
                 async (req, email, password, done) => {
                     try {
                         const userPromise = await users().find({ email })
-                        .collation({ locale: 'en', strength: 2 })
+                        .collation({ locale: 'en_US', strength: 2 })
                         .toArray();
 
                         const user = userPromise[0];
@@ -713,7 +713,7 @@ export class AuthController {
                 async (email, password, done) => {
                     try {
                         const userPromise = await users().find({ email })
-                        .collation({ locale: 'en', strength: 2 })
+                        .collation({ locale: 'en_US', strength: 2 })
                         .toArray();
 
                         const user = userPromise[0] as IUser;
