@@ -10,6 +10,7 @@ import AutomatedBackfill from './AutomatedBackfill';
 import axios from 'axios';
 import { format, getMonth, getYear } from 'date-fns';
 
+jest.setTimeout(30000);
 jest.mock('axios');
 const mockedAxios = axios as jest.Mocked<typeof axios>;
 

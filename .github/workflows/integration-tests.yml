@@ -31,12 +31,11 @@ jobs:
       - uses: actions/checkout@v2
       - name: Build stack
         run: docker-compose -f dev/docker-compose.yml -f dev/docker-compose.ci.yml up --build -d -V
-      - uses: cypress-io/github-action@v2
+      - uses: cypress-io/github-action@v4
         with:
           working-directory: verification/curator-service/ui
           browser: ${{ matrix.browser }}
-          headless: true
-          record: true
+          record: false
           wait-on: "http://localhost:3002"
           wait-on-timeout: 300
           install-command: sh ./install_in_ci.sh

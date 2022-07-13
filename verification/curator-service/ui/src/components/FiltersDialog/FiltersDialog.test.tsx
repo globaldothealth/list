@@ -57,7 +57,7 @@ describe('<FiltersDialog />', () => {
         expect(await screen.findByText(/Apply filters/i)).toBeInTheDocument();
     });
 
-    it('Should display an error when trying to enter future date', async () => {
+    it("Doesn't apply filters when future date is set", async () => {
         const user = userEvent.setup();
 
         render(<App />, {
@@ -82,16 +82,7 @@ describe('<FiltersDialog />', () => {
 
         await user.click(screen.getByRole('button', { name: 'Apply' }));
 
-        expect(
-            await screen.findByText(
-                /Date confirmed before can't be a future date/i,
-            ),
-        ).toBeVisible();
-
-        expect(
-            await screen.findByText(
-                /Date confirmed after can't be a future date/i,
-            ),
-        ).toBeVisible();
+        // Check if the modal is still open
+        expect(await screen.findByText(/Apply filters/i)).toBeInTheDocument();
     });
 });
