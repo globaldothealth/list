@@ -77,6 +77,9 @@ class MemoryStore:
             and c.caseReference.status == "EXCLUDED"
         ]
 
+    def delete_case(self, source_id: str):
+        del self.cases[source_id]
+
     def matching_case_iterator(self, query):
         return iter(self.cases.values())
 
@@ -599,3 +602,21 @@ def test_batch_update_query_returns_modified_count(case_controller):
     query = None  # didn't implement rich queries on the test store
     modified = case_controller.batch_update_query(query, update)
     assert modified == 4
+
+
+def test_delete_present_case_deletes_case(case_controller):
+    for i in range(4):
+        _ = case_controller.create_case(
+            {
+                "confirmationDate": date(2021, 6, i + 1),
+                "caseReference": {"sourceId": "123ab4567890123ef4567890"},
+            },
+        )
+    case_controller.delete_case("1")
+    assert case_controller.store.count_cases() == 3
+    assert case_controller.store.case_by_id("1") is None
+
+
+def test_delete_absent_case_raises_NotFoundError(case_controller):
+    with pytest.raises(NotFoundError):
+        case_controller.delete_case("1")

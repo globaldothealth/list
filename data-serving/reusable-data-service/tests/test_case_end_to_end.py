@@ -527,3 +527,23 @@ def test_batch_update_query(client_with_patched_mongo):
     )
     assert post_result.status_code == 200
     assert post_result.get_json()["numModified"] == 2
+
+
+def test_delete_case(client_with_patched_mongo):
+    db = pymongo.MongoClient("mongodb://localhost:27017/outbreak")
+    collection = db["outbreak"]["cases"]
+    inserted = collection.insert_one(
+        {
+            "confirmationDate": datetime(2022, 5, 10),
+            "caseReference": {"sourceId": bson.ObjectId("fedc12345678901234567890")},
+        }
+    ).inserted_id
+    delete_result = client_with_patched_mongo.delete(f"/api/cases/{str(inserted)}")
+    assert delete_result.status_code == 204
+    assert collection.count_documents({}) == 0
+
+
+def test_delete_case_404_on_wrong_id(client_with_patched_mongo):
+    id = str(bson.ObjectId())
+    delete_result = client_with_patched_mongo.delete(f"/api/cases/{id}")
+    assert delete_result.status_code == 404

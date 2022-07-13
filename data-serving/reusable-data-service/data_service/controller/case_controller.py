@@ -251,6 +251,12 @@ class CaseController:
             updates.append(an_update)
         return self.batch_update(updates)
 
+    def delete_case(self, case_id: str):
+        """Remove a case. Raises NotFoundError if no case with the given id exists."""
+        if self.store.case_by_id(case_id) is None:
+            raise NotFoundError(f"No case with ID {case_id}")
+        self.store.delete_case(case_id)
+
     def validate_updated_case(self, id: str, update: DocumentUpdate):
         """Find out whether updating a case would result in it being invalid.
         Raises NotFoundError if the case doesn't exist, or ValidationError if

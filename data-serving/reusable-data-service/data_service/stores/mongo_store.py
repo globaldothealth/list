@@ -131,6 +131,10 @@ class MongoStore:
         result = self.get_case_collection().bulk_write(update_ones)
         return result.modified_count
 
+    def delete_case(self, id: str):
+        """Delete the case with the specified ID"""
+        self.get_case_collection().delete_one({"_id": ObjectId(id)})
+
     @staticmethod
     def mongodb_update_command(update: DocumentUpdate):
         objectify_id = (
