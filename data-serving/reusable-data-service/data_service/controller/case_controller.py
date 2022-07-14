@@ -258,7 +258,10 @@ class CaseController:
         self.store.delete_case(case_id)
 
     def batch_delete(
-        self, query: Optional[str] = None, case_ids: Optional[list[str]] = None
+        self,
+        query: Optional[str] = None,
+        case_ids: Optional[list[str]] = None,
+        threshold: Optional[int] = None,
     ):
         if not ((query is None) ^ (case_ids is None)):
             raise PreconditionUnsatisfiedError(
@@ -273,8 +276,12 @@ class CaseController:
                 raise PreconditionUnsatisfiedError(
                     f"unspported query in batch_delete: {query}"
                 )
-            else:
-                self.store.delete_cases(filter)
+            target_case_count = self.store.count_cases(filter)
+            if threshold and target_case_count > threshold:
+                raise ValidationError(
+                    f"Command would delete {target_case_count} cases, above threshold of {threshold}"
+                )
+            self.store.delete_cases(filter)
 
     def validate_updated_case(self, id: str, update: DocumentUpdate):
         """Find out whether updating a case would result in it being invalid.

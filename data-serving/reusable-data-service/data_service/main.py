@@ -68,7 +68,9 @@ def list_cases():
     else:
         req = request.get_json()
         try:
-            case_controller.batch_delete(req.get("query"), req.get("caseIds"))
+            case_controller.batch_delete(
+                req.get("query"), req.get("caseIds"), req.get("maxCasesThreshold")
+            )
             return "", 204
         except WebApplicationError as e:
             return jsonify({"message": e.args[0]}), e.http_code
