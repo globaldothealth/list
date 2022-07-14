@@ -79,6 +79,9 @@ class MemoryStore:
 
     def delete_case(self, source_id: str):
         del self.cases[source_id]
+    
+    def delete_cases(self, query):
+        self.cases = dict()
 
     def matching_case_iterator(self, query):
         return iter(self.cases.values())
@@ -620,3 +623,52 @@ def test_delete_present_case_deletes_case(case_controller):
 def test_delete_absent_case_raises_NotFoundError(case_controller):
     with pytest.raises(NotFoundError):
         case_controller.delete_case("1")
+
+
+def test_cannot_batch_delete_both_query_and_case_ids(case_controller):
+    with pytest.raises(PreconditionUnsatisfiedError):
+        case_controller.batch_delete(query="", case_ids=[])
+
+
+def test_cannot_batch_delete_neither_query_nor_case_ids(case_controller):
+    with pytest.raises(PreconditionUnsatisfiedError):
+        case_controller.batch_delete(None, None)
+
+
+def test_cannot_batch_delete_everything(case_controller):
+    with pytest.raises(PreconditionUnsatisfiedError):
+        case_controller.batch_delete("", None)
+
+
+def test_cannot_batch_delete_with_malformed_query(case_controller):
+    with pytest.raises(PreconditionUnsatisfiedError):
+        case_controller.batch_delete(" ", None)
+
+
+def test_batch_delete_with_case_ids(case_controller):
+    for i in range(4):
+        _ = case_controller.create_case(
+            {
+                "confirmationDate": date(2021, 6, i + 1),
+                "caseReference": {"sourceId": "123ab4567890123ef4567890"},
+            },
+        )
+    case_controller.batch_delete(None, ["1", "2"])
+    assert case_controller.store.count_cases() == 2
+
+
+def test_batch_delete_with_query(case_controller):
+    """This test is deliberately set up to effectively delete all cases because
+    anything more nuanced would require interpreting filter logic in the test store,
+    which is a lot of complexity for little value. Look to the end-to-end tests for
+    better tests of the filtering logic, because the filters should definitely work in
+    production data stores!"""
+    for i in range(4):
+        _ = case_controller.create_case(
+            {
+                "confirmationDate": date(2021, 6, i + 1),
+                "caseReference": {"sourceId": "123ab4567890123ef4567890"},
+            },
+        )
+    case_controller.batch_delete("dateconfirmedafter:2021-05-02", None)
+    assert case_controller.store.count_cases() == 0
