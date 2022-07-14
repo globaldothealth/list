@@ -547,3 +547,59 @@ def test_delete_case_404_on_wrong_id(client_with_patched_mongo):
     id = str(bson.ObjectId())
     delete_result = client_with_patched_mongo.delete(f"/api/cases/{id}")
     assert delete_result.status_code == 404
+
+
+def test_batch_delete_with_ids(client_with_patched_mongo):
+    db = pymongo.MongoClient("mongodb://localhost:27017/outbreak")
+    inserted = db["outbreak"]["cases"].insert_many(
+        [
+            {
+                "confirmationDate": datetime(2022, 5, i),
+                "caseReference": {
+                    "sourceId": bson.ObjectId("fedc12345678901234567890"),
+                    "status": "EXCLUDED",
+                },
+                "caseExclusion": {
+                    "date": datetime(2022, 6, i),
+                    "note": f"Excluded upon this day, the {i}th of June",
+                },
+            }
+            for i in range(1, 4)
+        ]
+    )
+    inserted_ids = [str(anId) for anId in inserted.inserted_ids]
+    delete_result = client_with_patched_mongo.delete(
+        "/api/cases", json={"caseIds": [inserted_ids[1], inserted_ids[2]]}
+    )
+    assert delete_result.status_code == 204
+    for i in range(len(inserted_ids)):
+        get_result = client_with_patched_mongo.get(f"/api/cases/{inserted_ids[i]}")
+        assert get_result.status_code == 200 if i == 0 else 404
+
+
+def test_batch_delete_with_query(client_with_patched_mongo):
+    db = pymongo.MongoClient("mongodb://localhost:27017/outbreak")
+    inserted = db["outbreak"]["cases"].insert_many(
+        [
+            {
+                "confirmationDate": datetime(2022, 5, i),
+                "caseReference": {
+                    "sourceId": bson.ObjectId("fedc12345678901234567890"),
+                    "status": "EXCLUDED",
+                },
+                "caseExclusion": {
+                    "date": datetime(2022, 6, i),
+                    "note": f"Excluded upon this day, the {i}th of June",
+                },
+            }
+            for i in range(1, 4)
+        ]
+    )
+    inserted_ids = [str(anId) for anId in inserted.inserted_ids]
+    delete_result = client_with_patched_mongo.delete(
+        "/api/cases", json={"query": "dateconfirmedafter:2022-05-01"}
+    )
+    assert delete_result.status_code == 204
+    for i in range(len(inserted_ids)):
+        get_result = client_with_patched_mongo.get(f"/api/cases/{inserted_ids[i]}")
+        assert get_result.status_code == 200 if i == 0 else 404

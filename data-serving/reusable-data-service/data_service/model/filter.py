@@ -14,10 +14,9 @@ class Anything(Filter):
 
     def __str__(self) -> str:
         return "Anything()"
-    
+
     def matches_everything(self) -> bool:
         return True
-
 
 
 class PropertyFilter(Filter):

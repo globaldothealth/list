@@ -135,6 +135,11 @@ class MongoStore:
         """Delete the case with the specified ID"""
         self.get_case_collection().delete_one({"_id": ObjectId(id)})
 
+    def delete_cases(self, filter: Filter):
+        """Delete all cases that match the specified filter."""
+        predicate = filter.to_mongo_query()
+        self.get_case_collection().delete_many(predicate)
+
     @staticmethod
     def mongodb_update_command(update: DocumentUpdate):
         objectify_id = (
