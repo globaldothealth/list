@@ -5,6 +5,9 @@ describe('New case form', function () {
         cy.task('clearCasesDB', {});
         cy.login();
         cy.intercept('GET', '/auth/profile').as('getProfile');
+        cy.intercept('GET', '/api/geocode/suggest?q=France', {
+            fixture: 'geolocation_france_suggest.json',
+        }).as('geolocationFranceSuggest');
     });
 
     afterEach(() => {
@@ -30,6 +33,7 @@ describe('New case form', function () {
         cy.get('div[data-testid="caseReference"]').type('www.example.com');
         cy.contains('www.example.com').click();
         cy.get('div[data-testid="location"]').type('France');
+        cy.wait('@geolocationFranceSuggest');
         cy.contains('li', 'France').click();
         cy.get('input[name="confirmedDate"]').type('2020-01-01');
 
@@ -65,6 +69,7 @@ describe('New case form', function () {
         cy.get('input[name="caseReference.sourceName"]').type('New source');
         cy.get('input[name="caseReference.sourceLicense"]').type('WTFPL');
         cy.get('div[data-testid="location"]').type('France');
+        cy.wait('@geolocationFranceSuggest');
         cy.contains('li', 'France').click();
         cy.get('input[name="confirmedDate"]').type('2020-01-01');
 
@@ -104,6 +109,7 @@ describe('New case form', function () {
         cy.get('div[data-testid="caseReference"]').type('www.example.com');
         cy.contains('www.example.com').click();
         cy.get('div[data-testid="location"]').type('France');
+        cy.wait('@geolocationFranceSuggest');
         cy.contains('li', 'France').click();
         cy.get('input[name="confirmedDate"]').type('2020-01-01');
         cy.get('input[name="numCases"]').clear().type('3');
@@ -137,6 +143,7 @@ describe('New case form', function () {
         cy.get('div[data-testid="caseReference"]').type('www.example.com');
         cy.contains('www.example.com').click();
         cy.get('div[data-testid="location"]').type('France');
+        cy.wait('@geolocationFranceSuggest');
         cy.contains('France');
         cy.contains('li', 'France').click();
         cy.get('input[name="confirmedDate"]').type('2020-01-01');
@@ -184,6 +191,7 @@ describe('New case form', function () {
         cy.get('div[data-testid="gender"]').click();
         cy.get('li[data-value="Unknown"').click();
         cy.get('div[data-testid="location"]').type('France');
+        cy.wait('@geolocationFranceSuggest');
         cy.contains('li', 'France').click();
         cy.get('input[name="confirmedDate"]').type('2020-01-01');
         cy.get('div[data-testid="methodOfConfirmation"]').click();
@@ -269,6 +277,7 @@ describe('New case form', function () {
         cy.contains('Horse trainer');
         cy.get('span:contains("Horse trainer")').click();
         cy.get('div[data-testid="location"]').type('France');
+        cy.wait('@geolocationFranceSuggest');
         cy.contains('li', 'France').click();
         cy.get('input[name="confirmedDate"]').type('2020-01-01');
         cy.get('div[data-testid="symptomsStatus"]').click();
@@ -326,6 +335,7 @@ describe('New case form', function () {
         cy.get('div[data-testid="caseReference"]').type('www.example.com');
         cy.contains('www.example.com').click();
         cy.get('div[data-testid="location"]').type('France');
+        cy.wait('@geolocationFranceSuggest');
         cy.contains('France');
         cy.contains('li', 'France').click();
         cy.get('input[name="confirmedDate"]').type('2020-01-01');

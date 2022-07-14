@@ -1,0 +1,32 @@
+[
+    {
+        "country": "FR",
+        "geoResolution": "Country",
+        "geometry": {
+            "latitude": 47.8249046208979,
+            "longitude": 2.61878695312962
+        },
+        "name": "France",
+        "place": ""
+    },
+    {
+        "country": "FR",
+        "geoResolution": "Point",
+        "geometry": {
+            "latitude": 48.86268650746155,
+            "longitude": 2.335103333404541
+        },
+        "name": "Palais-Royal, Place du Palais Royal, Paris, 75001, France",
+        "place": "Palais-Royal"
+    },
+    {
+        "country": "US",
+        "geoResolution": "Point",
+        "geometry": {
+            "latitude": 41.68689475,
+            "longitude": -73.89632387500001
+        },
+        "name": "Frances Lehman Loeb Art Center, 124 Raymond Ave, Poughkeepsie, New York 12603, United States",
+        "place": "Frances Lehman Loeb Art Center"
+    }
+]

@@ -11,8 +11,12 @@ describe('Curator', function () {
 
     it('Can Create, edit and view a full case', function () {
         cy.intercept('GET', '/api/geocode/suggest?q=Spain', {
-            fixture: 'geolocation_suggest.json',
-        }).as('geolocationSuggest');
+            fixture: 'geolocation_spain_suggest.json',
+        }).as('geolocationSpainSuggest');
+
+        cy.intercept('GET', '/api/geocode/suggest?q=France', {
+            fixture: 'geolocation_france_suggest.json',
+        }).as('geolocationFranceSuggest');
 
         cy.visit('/');
         cy.visit('/cases');
@@ -66,7 +70,7 @@ describe('Curator', function () {
         cy.get('div[data-testid="occupation"]').type('Accountant');
         cy.contains('li', 'Accountant').click();
         cy.get('div[data-testid="location"]').type('France');
-        cy.contains('France');
+        cy.wait('@geolocationFranceSuggest');
         cy.contains('France').click();
         /* Change France to something else to check we can edit geocode results.
          * We need to change it to a valid country so that we can find the ISO code!
@@ -140,7 +144,7 @@ describe('Curator', function () {
         cy.contains('li', 'Test method').click();
         cy.get('button[data-testid="addTravelHistory"').click();
         cy.get('div[data-testid="travelHistory[1].location"]').type('Spain');
-        cy.wait('@geolocationSuggest');
+        cy.wait('@geolocationSpainSuggest');
         cy.contains('li', 'Spain').click();
         cy.get('input[name="travelHistory[1].dateRange.start"]').type(
             '2020-01-01',
