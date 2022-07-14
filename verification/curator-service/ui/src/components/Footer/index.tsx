@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import clsx from 'clsx';
 
@@ -7,6 +7,8 @@ import TwitterIcon from '@material-ui/icons/Twitter';
 import LinkedInIcon from '@material-ui/icons/LinkedIn';
 import { useStyles } from './styled';
 import PolicyLink from '../PolicyLink';
+import FeedbackEmailDialog from '../FeedbackEmailDialog';
+import Typography from '@material-ui/core/Typography';
 
 interface FooterProps {
     drawerOpen: boolean;
@@ -14,6 +16,15 @@ interface FooterProps {
 
 const Footer = ({ drawerOpen }: FooterProps): JSX.Element => {
     const classes = useStyles();
+    const [feedbackModalOpen, setFeedbackModalOpen] = useState(false);
+
+    const handleClickOpen = () => {
+        setFeedbackModalOpen(true);
+    };
+
+    const handleClose = () => {
+        setFeedbackModalOpen(false);
+    };
 
     return (
         <footer
@@ -108,12 +119,17 @@ const Footer = ({ drawerOpen }: FooterProps): JSX.Element => {
                 >
                     API
                 </a>
-                <a
-                    href="mailto:info@global.health?subject=Feedback regarding Global.health data portal"
-                    className={classes.link}
+                <Typography
+                    display="inline"
+                    className={classes.feedbackButton}
+                    onClick={() => handleClickOpen()}
                 >
                     Feedback
-                </a>
+                </Typography>
+                <FeedbackEmailDialog
+                    isOpen={feedbackModalOpen}
+                    handleClose={handleClose}
+                ></FeedbackEmailDialog>
             </section>
         </footer>
     );

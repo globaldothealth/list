@@ -57,4 +57,13 @@ export const useStyles = makeStyles((theme: Theme) => ({
         fontSize: '14px',
         margin: '0 20px',
     },
+    feedbackButton: {
+        fontWeight: 400,
+        fontSize: '14px',
+        margin: '0 20px',
+        color: theme.palette.primary.main,
+        '&:hover': {
+            cursor: 'pointer',
+        },
+    },
 }));
