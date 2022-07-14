@@ -191,6 +191,11 @@ export function addSource(
     });
 }
 
+Cypress.on('uncaught:exception', (err, runnable) => {
+    // returning false here prevents Cypress from failing the test
+    return false;
+});
+
 Cypress.Commands.add('addCase', addCase);
 Cypress.Commands.add('login', login);
 Cypress.Commands.add('addSource', addSource);
