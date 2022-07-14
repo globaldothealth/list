@@ -645,6 +645,19 @@ def test_cannot_batch_delete_with_malformed_query(case_controller):
         case_controller.batch_delete(" ", None)
 
 
+def test_cannot_batch_delete_more_cases_than_threshold(case_controller):
+    for i in range(4):
+        _ = case_controller.create_case(
+            {
+                "confirmationDate": date(2021, 6, i + 1),
+                "caseReference": {"sourceId": "123ab4567890123ef4567890"},
+            },
+        )
+    with pytest.raises(ValidationError):
+        case_controller.batch_delete("dateconfirmedafter:2021-05-02", None, 1)
+    assert case_controller.store.count_cases() == 4
+
+
 def test_batch_delete_with_case_ids(case_controller):
     for i in range(4):
         _ = case_controller.create_case(
