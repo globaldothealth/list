@@ -256,6 +256,20 @@ class CaseController:
         if self.store.case_by_id(case_id) is None:
             raise NotFoundError(f"No case with ID {case_id}")
         self.store.delete_case(case_id)
+    
+    def batch_delete(self, query: Optional[str] = None, case_ids: Optional[list[str]] = None):
+        if not ((query is None) ^ (case_ids is None)):
+            raise PreconditionUnsatisfiedError("Must specify exactly one of query or case ID list")
+        if case_ids is not None:
+            for case_id in case_ids:
+                self. delete_case(case_id)
+        else: # query is not None
+            filter = self.parse_filter(query)
+            if filter is None or filter.matches_everything():
+                raise PreconditionUnsatisfiedError(f"unspported query in batch_delete: {query}")
+            else:
+                self.store.delete_cases(filter)
+
 
     def validate_updated_case(self, id: str, update: DocumentUpdate):
         """Find out whether updating a case would result in it being invalid.
@@ -285,17 +299,20 @@ class CaseController:
     @staticmethod
     def parse_filter(filter: str) -> Filter:
         """Interpret the filter query in the incoming request."""
-        if filter is None:
+        if filter is None or len(filter) == 0:
             return Anything()
-        # split query on spaces
-        components = filter.split(" ")
-        filters = [CaseController.individual_filter(c) for c in components]
-        if None in filters:
-            return None
-        if len(filters) == 1:
-            return filters[0]
-        else:
-            return AndFilter(filters)
+        try:
+            # split query on spaces
+            components = filter.split(" ")
+            filters = [CaseController.individual_filter(c) for c in components]
+            if None in filters:
+                return None
+            if len(filters) == 1:
+                return filters[0]
+            else:
+                return AndFilter(filters)
+        except ValueError:
+            raise PreconditionUnsatisfiedError(f"Malformed query {filter}")
 
     @staticmethod
     def individual_filter(term: str) -> Filter:
