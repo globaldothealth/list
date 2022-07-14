@@ -33,7 +33,7 @@ def get_case(id):
         return jsonify({"message": e.args[0]}), e.http_code
 
 
-@app.route("/api/cases", methods=["POST", "GET"])
+@app.route("/api/cases", methods=["POST", "GET", "DELETE"])
 def list_cases():
     if request.method == "GET":
         page = request.args.get("page", type=int)
@@ -48,7 +48,7 @@ def list_cases():
             )
         except WebApplicationError as e:
             return jsonify({"message": e.args[0]}), e.http_code
-    else:
+    elif request.method == "POST":
         potential_case = request.get_json()
         validate_only = request.args.get("validate_only", type=bool)
         if validate_only:
@@ -63,6 +63,13 @@ def list_cases():
         try:
             case_controller.create_case(potential_case, num_cases=count)
             return "", 201
+        except WebApplicationError as e:
+            return jsonify({"message": e.args[0]}), e.http_code
+    else:
+        req = request.get_json()
+        try:
+            case_controller.batch_delete(req.get("query"), req.get("caseIds"))
+            return "", 204
         except WebApplicationError as e:
             return jsonify({"message": e.args[0]}), e.http_code
 

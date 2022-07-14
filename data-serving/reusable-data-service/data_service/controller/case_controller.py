@@ -256,20 +256,25 @@ class CaseController:
         if self.store.case_by_id(case_id) is None:
             raise NotFoundError(f"No case with ID {case_id}")
         self.store.delete_case(case_id)
-    
-    def batch_delete(self, query: Optional[str] = None, case_ids: Optional[list[str]] = None):
+
+    def batch_delete(
+        self, query: Optional[str] = None, case_ids: Optional[list[str]] = None
+    ):
         if not ((query is None) ^ (case_ids is None)):
-            raise PreconditionUnsatisfiedError("Must specify exactly one of query or case ID list")
+            raise PreconditionUnsatisfiedError(
+                "Must specify exactly one of query or case ID list"
+            )
         if case_ids is not None:
             for case_id in case_ids:
-                self. delete_case(case_id)
-        else: # query is not None
+                self.delete_case(case_id)
+        else:  # query is not None
             filter = self.parse_filter(query)
             if filter is None or filter.matches_everything():
-                raise PreconditionUnsatisfiedError(f"unspported query in batch_delete: {query}")
+                raise PreconditionUnsatisfiedError(
+                    f"unspported query in batch_delete: {query}"
+                )
             else:
                 self.store.delete_cases(filter)
-
 
     def validate_updated_case(self, id: str, update: DocumentUpdate):
         """Find out whether updating a case would result in it being invalid.

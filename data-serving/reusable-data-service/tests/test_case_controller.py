@@ -79,7 +79,7 @@ class MemoryStore:
 
     def delete_case(self, source_id: str):
         del self.cases[source_id]
-    
+
     def delete_cases(self, query):
         self.cases = dict()
 
