@@ -1,0 +1,44 @@
+[
+    {
+        "country": "ES",
+        "geoResolution": "Country",
+        "geometry": {
+            "latitude": 41.2948556295683,
+            "longitude": -4.05568501525488
+        },
+        "name": "Spain",
+        "place": ""
+    },
+    {
+        "country": "ES",
+        "geoResolution": "Point",
+        "geometry": { "latitude": 37.37698, "longitude": -5.98696 },
+        "name": "Spain Square, Av. de Isabel 'La Católica', Seville, Seville 41013, Spain",
+        "place": "Spain Square"
+    },
+    {
+        "country": "ES",
+        "geoResolution": "Point",
+        "geometry": {
+            "latitude": 40.42411302734375,
+            "longitude": -3.71026708984375
+        },
+        "name": "Plaza de España / Noviciado, Pl. de España, Madrid, Madrid 28015, Spain",
+        "place": "Plaza de España / Noviciado"
+    },
+    {
+        "country": "ES",
+        "geoResolution": "Point",
+        "geometry": { "latitude": 41.4997535, "longitude": -5.7556955 },
+        "name": "Castle of Zamora, Zamora, Zamora 49001, Spain",
+        "place": "Castle of Zamora"
+    },
+    {
+        "country": "ES",
+        "geoResolution": "Point",
+        "geometry": {
+            "latitude": 41.3856758125,
+            "longitude": 2.1818530156250002
+        }
+    }
+]

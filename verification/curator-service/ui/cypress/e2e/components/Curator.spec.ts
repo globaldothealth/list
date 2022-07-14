@@ -10,6 +10,10 @@ describe('Curator', function () {
     });
 
     it.only('Can Create, edit and view a full case', function () {
+        cy.intercept('GET', '/api/geocode/suggest?q=Spain', {
+            fixture: 'geolocation_suggest.json',
+        }).as('geolocationSuggest');
+
         cy.visit('/');
         cy.visit('/cases');
         cy.contains('No records to display');
@@ -136,7 +140,7 @@ describe('Curator', function () {
         cy.contains('li', 'Test method').click();
         cy.get('button[data-testid="addTravelHistory"').click();
         cy.get('div[data-testid="travelHistory[1].location"]').type('Spain');
-        cy.wait(1000);
+        cy.wait('@geolocationSuggest');
         cy.contains('li', 'Spain').click();
         cy.get('input[name="travelHistory[1].dateRange.start"]').type(
             '2020-01-01',
