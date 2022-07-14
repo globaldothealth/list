@@ -18,6 +18,5 @@ export default defineConfig({
         },
         baseUrl: 'http://localhost:3002',
         specPattern: 'cypress/e2e/**/*.{js,jsx,ts,tsx}',
-        excludeSpecPattern: process.env.CI ? ['cypress/e2e/all.spec.ts'] : [],
     },
 });
