@@ -77,8 +77,8 @@ class MemoryStore:
             and c.caseReference.status == "EXCLUDED"
         ]
 
-    def delete_case(self, source_id: str):
-        del self.cases[source_id]
+    def delete_case(self, case_id: str):
+        del self.cases[case_id]
 
     def delete_cases(self, query):
         self.cases = dict()
