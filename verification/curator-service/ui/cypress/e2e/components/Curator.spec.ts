@@ -136,7 +136,7 @@ describe('Curator', function () {
         cy.contains('li', 'Test method').click();
         cy.get('button[data-testid="addTravelHistory"').click();
         cy.get('div[data-testid="travelHistory[1].location"]').type('Spain');
-        cy.wait(200);
+        cy.wait(1000);
         cy.contains('li', 'Spain').click();
         cy.get('input[name="travelHistory[1].dateRange.start"]').type(
             '2020-01-01',

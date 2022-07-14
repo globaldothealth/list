@@ -35,7 +35,7 @@ jobs:
         with:
           working-directory: verification/curator-service/ui
           browser: ${{ matrix.browser }}
-          record: true
+          record: false
           wait-on: "http://localhost:3002"
           wait-on-timeout: 300
           install-command: sh ./install_in_ci.sh
