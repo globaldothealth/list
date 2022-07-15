@@ -1,7 +1,8 @@
 import dataclasses
 
 from data_service.model.case import Case, make_custom_case_class
-from data_service.util.errors import ConflictError
+from data_service.model.field import Field
+from data_service.util.errors import ConflictError, PreconditionUnsatisfiedError
 
 
 class SchemaController:
@@ -18,6 +19,8 @@ class SchemaController:
         existing_fields = dataclasses.fields(Case)
         if name in [f.name for f in existing_fields]:
             raise ConflictError(f"field {name} already exists")
+        if type not in Field.acceptable_types:
+            raise PreconditionUnsatisfiedError(f"cannot use {type} as the type of a field")
         fields_list = [(f.name, f.type, f) for f in existing_fields]
         fields_list.append((name, type, dataclasses.field(init=False, default=None)))
         # re-invent the Case class

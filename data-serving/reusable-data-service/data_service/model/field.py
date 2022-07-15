@@ -7,3 +7,4 @@ class Field:
 
     STRING = str
     DATE = date
+    acceptable_types = [STRING, DATE]
