@@ -3,12 +3,14 @@ import datetime
 import json
 import flask.json
 
+from collections.abc import Callable
 from typing import Any, List
 
 from data_service.model.case_exclusion_metadata import CaseExclusionMetadata
 from data_service.model.case_reference import CaseReference
 from data_service.model.document import Document
 from data_service.util.errors import (
+    DependencyFailedError,
     PreconditionUnsatisfiedError,
     ValidationError,
 )
@@ -86,6 +88,57 @@ class DayZeroCase(Document):
         self.caseReference.validate()
 
 
+observers = set()
+
 # Actually we want to capture extra fields which can be specified dynamically:
 # so Case is the class that you should use.
-Case = dataclasses.make_dataclass("Case", fields=[], bases=(DayZeroCase,))
+
+
+def make_custom_case_class(name: str, fields=[]) -> type:
+    """Generate a class extending the DayZeroCase class with additional fields."""
+    global Case
+    try:
+        new_case_class = dataclasses.make_dataclass(name, fields, bases=(DayZeroCase,))
+    except TypeError as e:
+        raise DependencyFailedError(*(e.args))
+    for observer in observers:
+        observer(new_case_class)
+    # also store it locally so anyone who does import Case from here gets the new one from now on
+    Case = new_case_class
+    return new_case_class
+
+
+def observe_case_class(observer: Callable[[type], None]) -> None:
+    """When someone imports a class by name, they get a reference to that class object.
+    Unfortunately that means that when we recreate the Case class (e.g. because someone
+    calls make_custom_case_class) nobody finds out about that. They would if we modified
+    the existing Case class, but dataclasses doesn't provide for that. So provide a
+    mechanism for importers to discover that the class has been recreated. An implementation of
+    observer will probably look something like this:
+
+    def observer(new_case_class: type) -> None:
+        global Case
+        Case = new_case_class
+
+    But you could also do something more subtle (like rewrite the __class__ on instances of Case
+    you already have, or recreate a working set of Cases).
+
+    This function calls the observer so that clients can get the initial definition of Case without
+    also having to import that."""
+    observers.add(observer)
+    observer(Case)
+
+
+def remove_case_class_observer(observer: Callable[[type], None]) -> None:
+    """When you're done watching for changes to Case, call this."""
+    observers.remove(observer)
+
+
+def reset_custom_case_fields() -> None:
+    """When you want to get back to where you started, for example to load the field definitions from
+    storage or if you're writing tests that modify the Case class."""
+    make_custom_case_class("Case")
+
+
+# let's start with a clean slate on first load
+reset_custom_case_fields()
