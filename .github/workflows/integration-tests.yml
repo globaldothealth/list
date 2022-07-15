@@ -43,13 +43,13 @@ jobs:
           CI: true
           CYPRESS_RECORD_KEY: 1ce3e9e4-e9e0-4e00-834f-7410b0d922d2
       # Screenshots are only available on failures.
-      - uses: actions/upload-artifact@v1
+      - uses: actions/upload-artifact@v3
         if: failure()
         with:
           name: cypress-screenshots
           path: verification/curator-service/ui/cypress/screenshots
       # Videos are always available.
-      - uses: actions/upload-artifact@v1
+      - uses: actions/upload-artifact@v3
         if: always()
         with:
           name: cypress-videos
