@@ -16,6 +16,12 @@ class NotFoundError(WebApplicationError):
     http_code = 404
 
 
+class ConflictError(WebApplicationError):
+    """Represents a conflicting request."""
+
+    http_code = 409
+
+
 class UnsupportedTypeError(WebApplicationError):
     """Something received a type it couldn't work with."""
 
@@ -26,3 +32,9 @@ class ValidationError(WebApplicationError):
     """Represents invalid data"""
 
     http_code = 422
+
+
+class DependencyFailedError(WebApplicationError):
+    """Something we tried to do to make your request work went wrong."""
+
+    http_code = 424
