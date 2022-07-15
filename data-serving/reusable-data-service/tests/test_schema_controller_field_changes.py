@@ -7,7 +7,7 @@ from data_service.model.case import (
     reset_custom_case_fields,
 )
 from data_service.model.field import Field
-from data_service.util.errors import ConflictError, DependencyFailedError
+from data_service.util.errors import ConflictError, DependencyFailedError, PreconditionUnsatisfiedError
 
 Case = None
 
@@ -39,3 +39,8 @@ def test_cannot_shadow_day_zero_field(schema_controller):
 def test_must_appease_dataclasses(schema_controller):
     with pytest.raises(DependencyFailedError):
         schema_controller.add_field("yield", Field.STRING)
+
+
+def test_cannot_use_arbitrary_type(schema_controller):
+    with pytest.raises(PreconditionUnsatisfiedError):
+        schema_controller.add_field("my_field", set)
