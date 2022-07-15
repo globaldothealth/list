@@ -9,6 +9,7 @@ import DialogTitle from '@material-ui/core/DialogTitle';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { useStyles } from './styled';
+import axios from 'axios';
 
 interface FeedbackEmailDialogProps {
     isOpen: boolean;
@@ -16,7 +17,7 @@ interface FeedbackEmailDialogProps {
 }
 
 export interface FeedbackFormValues {
-    topic: string;
+    subject: string;
     message: string;
 }
 
@@ -26,13 +27,13 @@ const FeedbackEmailDialog = ({
 }: FeedbackEmailDialogProps): JSX.Element => {
     const classes = useStyles();
 
-    const maxSizeTopic = 100;
+    const maxSizeSubject = 100;
     const maxSizeMessage = 800;
 
     const validationFormSchema = Yup.object().shape({
-        topic: Yup.string()
-            .max(maxSizeTopic, 'Topic is too long.')
-            .required('Please, write a topic.'),
+        subject: Yup.string()
+            .max(maxSizeSubject, 'Subject is too long.')
+            .required('Please, write a subject.'),
         message: Yup.string()
             .max(maxSizeMessage, 'Message is too long.')
             .required('Please, write a message.'),
@@ -40,14 +41,27 @@ const FeedbackEmailDialog = ({
 
     const formik = useFormik({
         initialValues: {
-            topic: '',
+            subject: '',
             message: '',
         },
         validationSchema: validationFormSchema,
         validateOnChange: true,
-        onSubmit: (values) => {
+        onSubmit: async (values) => {
             console.log('test');
             console.log(values);
+            const { subject, message } = values;
+            try {
+                const response = await axios.post('/api/feedback', {
+                    subject,
+                    message,
+                });
+                console.log('---------------');
+                console.log(response.data);
+                console.log('---------------');
+            } catch (error) {
+                console.error(error);
+            }
+
             handleClose();
         },
     });
@@ -62,20 +76,20 @@ const FeedbackEmailDialog = ({
                     <form onSubmit={formik.handleSubmit}>
                         <TextField
                             margin="dense"
-                            id="topic"
-                            name="topic"
-                            label="Topic"
+                            id="subject"
+                            name="subject"
+                            label="Subject"
                             type="text"
                             fullWidth
                             variant="standard"
-                            value={formik.values.topic || ''}
+                            value={formik.values.subject || ''}
                             onChange={formik.handleChange}
                             error={
-                                formik.touched.topic &&
-                                Boolean(formik.errors.topic)
+                                formik.touched.subject &&
+                                Boolean(formik.errors.subject)
                             }
                             helperText={
-                                formik.touched.topic && formik.errors.topic
+                                formik.touched.subject && formik.errors.subject
                             }
                         />
                         <DialogContentText>
