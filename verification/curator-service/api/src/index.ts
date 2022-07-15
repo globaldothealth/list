@@ -401,27 +401,21 @@ async function makeApp() {
     // Forward excluded case IDs fetching to data service
     apiRouter.get('/excludedCaseIds', casesController.listExcludedCaseIds);
     
+
+    app.use('/api', apiRouter);
+
     //Send feedback from user to global.health email
-    apiRouter.post('/feedback', mustBeAuthenticated, async (req: Request, res: Response) => {
-        // const {subject, message, feedbackUserAdress} = req.params;
-        let subject = 'topic';
-        let message = 'smth smth smth';
-        let feedbackUserAdress = 'qbi63086@xcoxc.com';
-
-
+    app.post('/feedback', mustBeAuthenticated, async (req: Request, res: Response) => {
+        const {subject, message, feedbackUserAdress} = req.body;   
         try {
-            const sentEmailPromise = emailClient.send([],subject, message, feedbackUserAdress);
+            // const sentEmailPromise = emailClient.send([],subject, message, feedbackUserAdress);
             res.sendStatus(200);
         } catch (err) {
             const error = err as Error;
             logger.error(error);
             return res.sendStatus(500);
-        }
-            
-    
-            
+        }         
     });
-    app.use('/api', apiRouter);
 
     
 

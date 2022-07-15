@@ -10,6 +10,8 @@ import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { useStyles } from './styled';
 import axios from 'axios';
+import { useAppSelector } from '../../hooks/redux';
+import { selectUser } from '../../redux/auth/selectors';
 
 interface FeedbackEmailDialogProps {
     isOpen: boolean;
@@ -26,6 +28,7 @@ const FeedbackEmailDialog = ({
     handleClose,
 }: FeedbackEmailDialogProps): JSX.Element => {
     const classes = useStyles();
+    const user = useAppSelector(selectUser);
 
     const maxSizeSubject = 100;
     const maxSizeMessage = 800;
@@ -47,19 +50,16 @@ const FeedbackEmailDialog = ({
         validationSchema: validationFormSchema,
         validateOnChange: true,
         onSubmit: async (values) => {
-            console.log('test');
-            console.log(values);
             const { subject, message } = values;
             try {
-                const response = await axios.post('/api/feedback', {
+                const response = await axios.post('/feedback', {
                     subject,
                     message,
+                    feedbackUserAdress: user?.email,
                 });
-                console.log('---------------');
-                console.log(response.data);
-                console.log('---------------');
             } catch (error) {
                 console.error(error);
+                throw error;
             }
 
             handleClose();
