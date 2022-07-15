@@ -7,7 +7,11 @@ from data_service.model.case import (
     reset_custom_case_fields,
 )
 from data_service.model.field import Field
-from data_service.util.errors import ConflictError, DependencyFailedError, PreconditionUnsatisfiedError
+from data_service.util.errors import (
+    ConflictError,
+    DependencyFailedError,
+    PreconditionUnsatisfiedError,
+)
 
 Case = None
 
