@@ -23,7 +23,7 @@ class PropertyFilter(Filter):
     """Represents a test that an object's property has a value that satisfies some constraint."""
 
     def __init__(self, property_name: str, operation: str, value: Any):
-        valid_ops = [FilterOperator.LESS_THAN, FilterOperator.GREATER_THAN]
+        valid_ops = [FilterOperator.LESS_THAN, FilterOperator.GREATER_THAN, FilterOperator.EQUAL]
         if operation not in valid_ops:
             raise ValueError(f"Unknown operation {operation}")
         self.property_name = property_name
@@ -37,6 +37,7 @@ class PropertyFilter(Filter):
 class FilterOperator:
     LESS_THAN = "<"
     GREATER_THAN = ">"
+    EQUAL = "="
 
 
 class AndFilter(Filter):

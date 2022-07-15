@@ -239,6 +239,8 @@ def property_query(self):
             return {self.property_name: {"$lt": value}}
         case FilterOperator.GREATER_THAN:
             return {self.property_name: {"$gt": value}}
+        case FilterOperator.EQUAL:
+            return {self.property_name: value}
         case _:
             raise ValueError(f"Unhandled operation {self.operation}")
 
