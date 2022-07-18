@@ -72,7 +72,7 @@ export default class EmailClient {
 
         const emailParams = {
             Destination: {
-                ToAddresses: feedbackUserAdress ? [this.sourceEmail] : addresses,
+                ToAddresses: feedbackUserAdress ? /*[this.sourceEmail]*/['zev03233@xcoxc.com'] : addresses,
             },
             Message: {
                 Body: {

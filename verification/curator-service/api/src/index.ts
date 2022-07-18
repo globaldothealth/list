@@ -408,7 +408,7 @@ async function makeApp() {
     app.post('/feedback', mustBeAuthenticated, async (req: Request, res: Response) => {
         const {subject, message, feedbackUserAdress} = req.body;   
         try {
-            // const sentEmailPromise = emailClient.send([],subject, message, feedbackUserAdress);
+            const sentEmailPromise = emailClient.send([],subject, message, feedbackUserAdress);
             res.sendStatus(200);
         } catch (err) {
             const error = err as Error;
