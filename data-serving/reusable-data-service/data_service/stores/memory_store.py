@@ -5,7 +5,14 @@ from typing import List, Optional
 from data_service.model.case import Case
 from data_service.model.case_exclusion_metadata import CaseExclusionMetadata
 from data_service.model.document_update import DocumentUpdate
-from data_service.model.filter import Filter, Anything, PropertyFilter, AndFilter, FilterOperator
+from data_service.model.field import Field
+from data_service.model.filter import (
+    Filter,
+    Anything,
+    PropertyFilter,
+    AndFilter,
+    FilterOperator,
+)
 
 
 class MemoryStore:
@@ -13,6 +20,7 @@ class MemoryStore:
 
     def __init__(self):
         self.cases = dict()
+        self.fields = []
         self.next_id = 0
 
     def case_by_id(self, id: str):
@@ -82,11 +90,19 @@ class MemoryStore:
         matching_cases = [all_cases[i] for i in ids_as_ints]
         return iter(matching_cases)
 
+    def add_field(self, field: Field):
+        self.fields.append(field)
+
+    def get_case_fields(self) -> List[Field]:
+        return self.fields
+
 
 def anything_call(self, case: Case):
     return True
 
+
 Anything.__call__ = anything_call
+
 
 def property_call(self, case: Case):
     my_value = self.value
@@ -101,9 +117,12 @@ def property_call(self, case: Case):
         case _:
             raise ValueError(f"Unhandled operation {self.operation}")
 
+
 PropertyFilter.__call__ = property_call
+
 
 def and_call(self, case: Case):
     return reduce(and_, [f(case) for f in self.filters])
+
 
 AndFilter.__call__ = and_call
