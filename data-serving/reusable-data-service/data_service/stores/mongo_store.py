@@ -228,6 +228,12 @@ class MongoStore:
     def add_field(self, field: Field):
         self.get_schema_collection().insert_one(field.to_dict())
 
+    def get_case_fields(self):
+        return [
+            Field(doc["key"], doc["type"], doc["data_dictionary_text"])
+            for doc in self.get_schema_collection().find({})
+        ]
+
 
 def date_to_datetime(dt: datetime.date) -> datetime.datetime:
     """Convert datetime.date to datetime.datetime for encoding as BSON"""
