@@ -31,11 +31,9 @@ class CaseController:
     storage technology can be chosen.
     All methods return a tuple of (response, HTTP status code)"""
 
-    def __init__(self, app, store, outbreak_date: date):
-        """store is the flask app
-        store is an adapter to the external storage technology.
+    def __init__(self, store, outbreak_date: date):
+        """store is an adapter to the external storage technology.
         outbreak_date is the earliest date on which this instance should accept cases."""
-        self.app = app
         self.store = store
         self.outbreak_date = outbreak_date
 

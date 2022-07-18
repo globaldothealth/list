@@ -162,7 +162,7 @@ def set_up_controllers():
     outbreak_date = os.environ.get("OUTBREAK_DATE")
     if outbreak_date is None:
         raise ValueError("Define $OUTBREAK_DATE in the environment")
-    case_controller = CaseController(app, store, date.fromisoformat(outbreak_date))
+    case_controller = CaseController(store, date.fromisoformat(outbreak_date))
 
 
 def main():
