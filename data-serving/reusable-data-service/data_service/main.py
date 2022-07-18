@@ -1,6 +1,7 @@
 from datetime import date
 from flask import Flask, jsonify, request
 from data_service.controller.case_controller import CaseController
+from data_service.controller.schema_controller import SchemaController
 from data_service.stores.mongo_store import MongoStore
 from data_service.util.errors import (
     PreconditionUnsatisfiedError,
@@ -17,6 +18,7 @@ app = Flask(__name__)
 app.json_encoder = JSONEncoder
 
 case_controller = None  # Will be set up in main()
+schema_controller = None
 
 
 @app.route("/api/cases/<id>", methods=["GET", "PUT", "DELETE"])
@@ -150,8 +152,18 @@ def excluded_case_ids():
         return jsonify({"message": e.args[0]}), e.http_code
 
 
+@app.route("/api/schema", methods=["POST"])
+def add_field_to_case_schema():
+    try:
+        req = request.get_json()
+        schema_controller.add_field(req["name"], req["type"], req["description"])
+        return "", 201
+    except WebApplicationError as e:
+        return jsonify({"message": e.args[0]}), e.http_code
+
+
 def set_up_controllers():
-    global case_controller
+    global case_controller, schema_controller
     store_options = {"mongodb": MongoStore.setup}
     if store_choice := os.environ.get("DATA_STORAGE_BACKEND"):
         try:
@@ -163,6 +175,7 @@ def set_up_controllers():
     if outbreak_date is None:
         raise ValueError("Define $OUTBREAK_DATE in the environment")
     case_controller = CaseController(store, date.fromisoformat(outbreak_date))
+    schema_controller = SchemaController(store)
 
 
 def main():

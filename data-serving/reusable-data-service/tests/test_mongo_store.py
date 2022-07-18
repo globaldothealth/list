@@ -18,7 +18,9 @@ def mongo_store(monkeypatch):
         return db
 
     monkeypatch.setattr("pymongo.MongoClient", fake_mongo)
-    store = MongoStore("mongodb://localhost:27017/outbreak", "outbreak", "cases")
+    store = MongoStore(
+        "mongodb://localhost:27017/outbreak", "outbreak", "cases", "schema"
+    )
     yield store
 
 
