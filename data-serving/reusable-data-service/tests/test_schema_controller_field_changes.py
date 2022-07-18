@@ -1,3 +1,4 @@
+import datetime
 import pytest
 
 from data_service.controller.schema_controller import SchemaController
@@ -23,11 +24,16 @@ def case_observer(case_class: type) -> None:
 
 
 @pytest.fixture
-def schema_controller():
-    store = MemoryStore()
+def observing_case_changes():
     observe_case_class(case_observer)
-    yield SchemaController(store)
+    yield
     remove_case_class_observer(case_observer)
+
+
+@pytest.fixture
+def schema_controller(observing_case_changes):
+    store = MemoryStore()
+    yield SchemaController(store)
     reset_custom_case_fields()
 
 
@@ -70,3 +76,14 @@ def test_added_field_gets_stored(schema_controller):
     assert (
         field.data_dictionary_text == "A string that describes some feature of a case."
     )
+
+
+def test_stored_field_gets_added(observing_case_changes):
+    store_with_preexisting_field = MemoryStore()
+    a_field = Field(
+        "outcome_date", Field.DATE, "The date on which the case reached an outcome."
+    )
+    store_with_preexisting_field.add_field(a_field)
+    controller = SchemaController(store_with_preexisting_field)
+    assert "outcome_date" in Case.field_names()
+    assert Case.field_type("outcome_date") is datetime.date
