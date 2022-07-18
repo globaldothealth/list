@@ -88,7 +88,7 @@ class DayZeroCase(Document):
         self.caseReference.validate()
 
 
-observers = set()
+observers = []
 
 # Actually we want to capture extra fields which can be specified dynamically:
 # so Case is the class that you should use.
@@ -125,7 +125,7 @@ def observe_case_class(observer: Callable[[type], None]) -> None:
 
     This function calls the observer so that clients can get the initial definition of Case without
     also having to import that."""
-    observers.add(observer)
+    observers.append(observer)
     observer(Case)
 
 
