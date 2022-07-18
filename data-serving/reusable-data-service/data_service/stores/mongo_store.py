@@ -4,6 +4,7 @@ import pymongo
 from data_service.model.case import Case
 from data_service.model.case_exclusion_metadata import CaseExclusionMetadata
 from data_service.model.document_update import DocumentUpdate
+from data_service.model.field import Field
 from data_service.model.filter import (
     Filter,
     Anything,
@@ -22,11 +23,16 @@ class MongoStore:
     """A line list store backed by mongodb."""
 
     def __init__(
-        self, connection_string: str, database_name: str, collection_name: str
+        self,
+        connection_string: str,
+        database_name: str,
+        case_collection_name: str,
+        schema_collection_name: str,
     ):
         self.client = pymongo.MongoClient(connection_string)
         self.database_name = database_name
-        self.collection_name = collection_name
+        self.case_collection_name = case_collection_name
+        self.schema_collection_name = schema_collection_name
 
     def get_client(self):
         return self.client
@@ -35,7 +41,10 @@ class MongoStore:
         return self.get_client()[self.database_name]
 
     def get_case_collection(self):
-        return self.get_database()[self.collection_name]
+        return self.get_database()[self.case_collection_name]
+
+    def get_schema_collection(self):
+        return self.get_database()[self.schema_collection_name]
 
     def case_by_id(self, id: str):
         try:
@@ -177,9 +186,13 @@ class MongoStore:
         """Configure a store instance from the environment."""
         mongo_connection_string = os.environ.get("MONGO_CONNECTION")
         mongo_database = os.environ.get("MONGO_DB")
-        mongo_collection = os.environ.get("MONGO_CASE_COLLECTION")
+        mongo_case_collection = os.environ.get("MONGO_CASE_COLLECTION")
+        mongo_schema_collection = os.environ.get("MONGO_SCHEMA_COLLECTION")
         mongo_store = MongoStore(
-            mongo_connection_string, mongo_database, mongo_collection
+            mongo_connection_string,
+            mongo_database,
+            mongo_case_collection,
+            mongo_schema_collection,
         )
         return mongo_store
 
@@ -211,6 +224,9 @@ class MongoStore:
         for field in CaseExclusionMetadata.date_fields():
             bson_exclusion[field] = date_to_datetime(bson_exclusion[field])
         return bson_exclusion
+
+    def add_field(self, field: Field):
+        self.get_schema_collection().insert_one(field.to_dict())
 
 
 def date_to_datetime(dt: datetime.date) -> datetime.datetime:
