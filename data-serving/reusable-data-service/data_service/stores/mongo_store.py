@@ -1,7 +1,7 @@
 import datetime
 import os
 import pymongo
-from data_service.model.case import Case
+from data_service.model.case import observe_case_class
 from data_service.model.case_exclusion_metadata import CaseExclusionMetadata
 from data_service.model.document_update import DocumentUpdate
 from data_service.model.field import Field
@@ -19,6 +19,12 @@ from bson.objectid import ObjectId
 from typing import List, Tuple
 
 
+Case = None
+
+def case_observer(cls):
+    global Case
+    Case = cls
+
 class MongoStore:
     """A line list store backed by mongodb."""
 
@@ -33,6 +39,7 @@ class MongoStore:
         self.database_name = database_name
         self.case_collection_name = case_collection_name
         self.schema_collection_name = schema_collection_name
+        observe_case_class(case_observer)
 
     def get_client(self):
         return self.client
