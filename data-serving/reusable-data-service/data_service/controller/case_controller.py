@@ -26,6 +26,7 @@ from data_service.util.errors import (
 
 Case = None
 
+
 def case_observer(cls):
     global Case
     Case = cls
