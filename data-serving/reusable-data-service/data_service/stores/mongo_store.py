@@ -21,9 +21,11 @@ from typing import List, Tuple
 
 Case = None
 
+
 def case_observer(cls):
     global Case
     Case = cls
+
 
 class MongoStore:
     """A line list store backed by mongodb."""

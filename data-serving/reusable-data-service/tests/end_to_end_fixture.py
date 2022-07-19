@@ -4,6 +4,7 @@ import mongomock
 from data_service import app
 from data_service.main import set_up_controllers
 
+
 @pytest.fixture
 def client_with_patched_mongo(monkeypatch):
     # configure controllers
