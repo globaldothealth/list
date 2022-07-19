@@ -4,7 +4,7 @@ from flask import jsonify
 from datetime import date
 from typing import List, Optional
 
-from data_service.model.case import Case
+from data_service.model.case import observe_case_class
 from data_service.model.case_exclusion_metadata import CaseExclusionMetadata
 from data_service.model.case_page import CasePage
 from data_service.model.case_reference import CaseReference
@@ -24,6 +24,12 @@ from data_service.util.errors import (
     ValidationError,
 )
 
+Case = None
+
+def case_observer(cls):
+    global Case
+    Case = cls
+
 
 class CaseController:
     """Implements CRUD operations on cases. Uses an external store
@@ -36,6 +42,7 @@ class CaseController:
         outbreak_date is the earliest date on which this instance should accept cases."""
         self.store = store
         self.outbreak_date = outbreak_date
+        observe_case_class(case_observer)
 
     def get_case(self, id: str):
         """Implements get /cases/:id. Interpretation of ID is dependent
