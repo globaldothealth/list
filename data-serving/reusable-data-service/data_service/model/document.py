@@ -1,6 +1,8 @@
 import copy
+import csv
 import dataclasses
 import datetime
+import io
 import operator
 
 from data_service.model.document_update import DocumentUpdate
@@ -108,7 +110,10 @@ class Document:
 
     def delimiter_separated_values(self, sep: str) -> str:
         """Create a line listing all of the fields in me and my member dataclasses."""
-        return sep.join(self.field_values()) + "\n"
+        f = io.StringIO()
+        csv_writer = csv.writer(f, delimiter=sep)
+        csv_writer.writerow(self.field_values())
+        return f.getvalue()
 
     def to_tsv(self) -> str:
         """Generate a row in a CSV file representing myself."""
