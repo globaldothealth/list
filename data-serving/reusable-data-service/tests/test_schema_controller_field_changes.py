@@ -87,3 +87,10 @@ def test_stored_field_gets_added(observing_case_changes):
     controller = SchemaController(store_with_preexisting_field)
     assert "outcome_date" in Case.field_names()
     assert Case.field_type("outcome_date") is datetime.date
+
+
+def test_required_field_must_have_default_value(schema_controller):
+    with pytest.raises(PreconditionUnsatisfiedError):
+        schema_controller.add_field(
+            "countSomething", Field.INTEGER, "Some Number", required=True
+        )

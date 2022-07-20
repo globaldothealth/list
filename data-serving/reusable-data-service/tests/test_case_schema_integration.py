@@ -66,3 +66,34 @@ def test_adding_field_then_downloading_csv(client_with_patched_mongo):
     assert len(cases) == 1
     case = cases[0]
     assert case["someField"] == "well, what have we here"
+
+
+def test_required_field_default_value_spread_to_existing_cases(client_with_patched_mongo):
+    response = client_with_patched_mongo.post(
+        "/api/cases",
+        json={
+            "confirmationDate": "2022-06-01T00:00:00.000Z",
+            "caseReference": {
+                "status": "UNVERIFIED",
+                "sourceId": "24680135792468013579fedc",
+            },
+        },
+    )
+    assert response.status_code == 201
+    response = client_with_patched_mongo.post(
+        "/api/schema",
+        json={
+            "name": "requiredField",
+            "type": "string",
+            "description": "You must supply a value for this",
+            "default": "PENDING",
+            "required": True,
+        },
+    )
+    assert response.status_code == 201
+    response = client_with_patched_mongo.get("/api/cases")
+    assert response.status_code == 200
+    case_list = response.get_json()
+    assert case_list["total"] == 1
+    assert len(case_list["cases"]) == 1
+    assert case_list["cases"][0]["requiredField"] == "PENDING"

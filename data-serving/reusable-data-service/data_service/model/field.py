@@ -1,5 +1,6 @@
 import dataclasses
 from datetime import date
+from typing import Optional, Union
 
 from data_service.model.document import Document
 from data_service.util.errors import PreconditionUnsatisfiedError
@@ -12,9 +13,12 @@ class Field(Document):
     key: str = dataclasses.field(init=True, default=None)
     type: str = dataclasses.field(init=True, default=None)
     data_dictionary_text: str = dataclasses.field(init=True, default=None)
+    required: bool = dataclasses.field(init=True, default=False)
+    default: Optional[Union[bool, str, int, date]] = dataclasses.field(init=True, default=None)
     STRING = "string"
     DATE = "date"
-    type_map = {STRING: str, DATE: date}
+    INTEGER = "integer"
+    type_map = {STRING: str, DATE: date, INTEGER: int}
     acceptable_types = type_map.keys()
 
     @classmethod
