@@ -3,9 +3,16 @@ import dataclasses
 from datetime import date
 from typing import Optional, Union
 
-from data_service.model.case import Case, make_custom_case_class
+from data_service.model.case import add_field_to_case_class, observe_case_class
 from data_service.model.field import Field
-from data_service.util.errors import ConflictError, PreconditionUnsatisfiedError
+from data_service.util.errors import PreconditionUnsatisfiedError
+
+Case = None
+
+
+def case_class_observer(cls: type):
+    global Case
+    Case = cls
 
 
 class SchemaController:
@@ -14,6 +21,7 @@ class SchemaController:
     def __init__(self, store):
         self.store = store
         self.restore_saved_fields()
+        observe_case_class(case_class_observer)
 
     def restore_saved_fields(self) -> None:
         """Find previously-created fields in the store and apply them."""
@@ -52,25 +60,10 @@ class SchemaController:
         
         If a field is required, set required = True. You must also set a default value so that
         existing cases have an initial setting for the field."""
-        existing_fields = dataclasses.fields(Case)
-        if name in [f.name for f in existing_fields]:
-            raise ConflictError(f"field {name} already exists")
-        if type_name not in Field.acceptable_types:
-            raise PreconditionUnsatisfiedError(
-                f"cannot use {type_name} as the type of a field"
-            )
-        if required is True and default is None:
-            raise PreconditionUnsatisfiedError(
-                f"field {name} is required so it must have a default value"
-            )
-        type = Field.model_type(type_name)
-        fields_list = [(f.name, f.type, f) for f in existing_fields]
-        fields_list.append((name, type, dataclasses.field(init=False, default=None)))
-        # re-invent the Case class
-        Case = make_custom_case_class("Case", fields_list)
+        required = required if required is not None else False
+        field_model = Field(name, type_name, description, required, default)
+        add_field_to_case_class(field_model)
         if store_field:
             # create a storable model of the field and store it
             # FIXME rewrite the validation logic above to use the data model
-            required = required if required is not None else False
-            field_model = Field(name, type_name, description, required, default)
             self.store.add_field(field_model)

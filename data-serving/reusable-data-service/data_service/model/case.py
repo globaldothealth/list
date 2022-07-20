@@ -4,12 +4,15 @@ import json
 import flask.json
 
 from collections.abc import Callable
+from operator import attrgetter
 from typing import Any, List
 
 from data_service.model.case_exclusion_metadata import CaseExclusionMetadata
 from data_service.model.case_reference import CaseReference
 from data_service.model.document import Document
+from data_service.model.field import Field
 from data_service.util.errors import (
+    ConflictError,
     DependencyFailedError,
     PreconditionUnsatisfiedError,
     ValidationError,
@@ -37,6 +40,8 @@ class DayZeroCase(Document):
     confirmationDate: datetime.date = dataclasses.field(init=False)
     caseReference: CaseReference = dataclasses.field(init=False, default=None)
     caseExclusion: CaseExclusionMetadata = dataclasses.field(init=False, default=None)
+
+    custom_fields = []
 
     @classmethod
     def from_json(cls, obj: str) -> type:
@@ -86,6 +91,10 @@ class DayZeroCase(Document):
         elif self.caseReference is None:
             raise ValidationError("Case Reference must have a value")
         self.caseReference.validate()
+        print(f"validating custom fields {self.custom_fields}")
+        for field in self.custom_fields:
+            if field.required is True and attrgetter(field.key)(self) is None:
+                raise ValidationError(f"{field.key} must have a value")
 
 
 observers = []
@@ -94,13 +103,18 @@ observers = []
 # so Case is the class that you should use.
 
 
-def make_custom_case_class(name: str, fields=[]) -> type:
-    """Generate a class extending the DayZeroCase class with additional fields."""
+def make_custom_case_class(name: str, fields=[], field_models=[]) -> type:
+    """Generate a class extending the DayZeroCase class with additional fields.
+    fields is a list of dataclass fields that should be added to the generated class.
+    field_models is a list of model objects describing the fields for the data dictionary
+    and for validation."""
+    # FIXME generate the fields list from the field_models
     global Case
     try:
         new_case_class = dataclasses.make_dataclass(name, fields, bases=(DayZeroCase,))
     except TypeError as e:
         raise DependencyFailedError(*(e.args))
+    new_case_class.custom_fields = field_models
     for observer in observers:
         observer(new_case_class)
     # also store it locally so anyone who does import Case from here gets the new one from now on
@@ -137,7 +151,27 @@ def remove_case_class_observer(observer: Callable[[type], None]) -> None:
 def reset_custom_case_fields() -> None:
     """When you want to get back to where you started, for example to load the field definitions from
     storage or if you're writing tests that modify the Case class."""
-    make_custom_case_class("Case")
+    make_custom_case_class("Case", [], [])
+
+
+def add_field_to_case_class(field_model: Field) -> None:
+    existing_fields = dataclasses.fields(Case)
+    field_models = Case.custom_fields
+    if field_model.key in [f.name for f in existing_fields]:
+        raise ConflictError(f"field {field_model.key} already exists")
+    if field_model.type not in Field.acceptable_types:
+        raise PreconditionUnsatisfiedError(
+            f"cannot use {field_model.type} as the type of a field"
+        )
+    if field_model.required is True and field_model.default is None:
+        raise PreconditionUnsatisfiedError(
+            f"field {field_model.key} is required so it must have a default value"
+        )
+    fields_list = [(f.name, f.type, f) for f in existing_fields]
+    fields_list.append(field_model.dataclasses_tuple())
+    field_models.append(field_model)
+    # re-invent the Case class
+    make_custom_case_class("Case", fields_list, field_models)
 
 
 # let's start with a clean slate on first load

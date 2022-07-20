@@ -29,3 +29,18 @@ class Field(Document):
             return cls.type_map[name]
         except KeyError:
             raise PreconditionUnsatisfiedError(f"cannot use type {name} in a Field")
+
+    def python_type(self) -> type:
+        return self.model_type(self.type)
+
+    def dataclasses_tuple(self) -> (str, type, dataclasses.Field):
+        # Note that the default value here is always None, even if I have a default value!
+        # That's because the meaning of "required" in a field model is "a user _is required_ to
+        # supply a value" and the meaning of "default" is "for cases that don't already have this
+        # key, use the default value"; if I give every Case the default value then there's no sense
+        # in which a user is required to define it themselves.
+        return (
+            self.key,
+            self.python_type(),
+            dataclasses.field(init=False, default=None),
+        )
