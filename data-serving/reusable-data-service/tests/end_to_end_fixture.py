@@ -3,10 +3,12 @@ import mongomock
 
 from data_service import app
 from data_service.main import set_up_controllers
+from data_service.model.case import reset_custom_case_fields
 
 
 @pytest.fixture
 def client_with_patched_mongo(monkeypatch):
+    reset_custom_case_fields()
     # configure controllers
     monkeypatch.setenv("DATA_STORAGE_BACKEND", "mongodb")
     monkeypatch.setenv(
@@ -26,3 +28,4 @@ def client_with_patched_mongo(monkeypatch):
     app.config["TESTING"] = True
     client = app.test_client()
     yield client
+    reset_custom_case_fields()

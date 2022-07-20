@@ -99,3 +99,28 @@ def test_required_field_default_value_spread_to_existing_cases(
     assert case_list["total"] == 1
     assert len(case_list["cases"]) == 1
     assert case_list["cases"][0]["requiredField"] == "PENDING"
+
+
+def test_required_field_becomes_required_in_validation(client_with_patched_mongo):
+    response = client_with_patched_mongo.post(
+        "/api/schema",
+        json={
+            "name": "importantInformation",
+            "type": "string",
+            "description": "You must supply a value for this",
+            "default": "PENDING",
+            "required": True,
+        },
+    )
+    assert response.status_code == 201
+    response = client_with_patched_mongo.post(
+        "/api/cases",
+        json={
+            "confirmationDate": "2022-06-01T00:00:00.000Z",
+            "caseReference": {
+                "status": "UNVERIFIED",
+                "sourceId": "24680135792468013579fedc",
+            },
+        },
+    )
+    assert response.status_code == 422
