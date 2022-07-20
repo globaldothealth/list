@@ -63,7 +63,6 @@ export default class EmailClient {
         addresses: string[],
         subject: string,
         message: string,
-        feedbackUserAdress?: string,
     ): Promise<unknown> {
 
         if (this.serviceEnv == 'locale2e') {
@@ -72,7 +71,7 @@ export default class EmailClient {
 
         const emailParams = {
             Destination: {
-                ToAddresses: feedbackUserAdress ? /*[this.sourceEmail]*/['zev03233@xcoxc.com'] : addresses,
+                ToAddresses: addresses,
             },
             Message: {
                 Body: {
@@ -86,7 +85,7 @@ export default class EmailClient {
                     Data: subject,
                 },
             },
-            Source: feedbackUserAdress ? `User <${feedbackUserAdress}>` : `Global.health Team <${this.sourceEmail}>`,
+            Source: `Global.health Team <${this.sourceEmail}>`,
         };
 
         try {

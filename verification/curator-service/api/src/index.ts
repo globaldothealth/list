@@ -33,6 +33,7 @@ import cors from 'cors';
 import db, { connectToDatabase } from './model/database';
 import winston from 'winston';
 import expressWinston from 'express-winston';
+import { validateRecaptchaToken } from './util/validate-recaptcha-token';
 
 async function makeApp() {
     const app = express();
@@ -406,10 +407,14 @@ async function makeApp() {
 
     //Send feedback from user to global.health email
     app.post('/feedback', mustBeAuthenticated, async (req: Request, res: Response) => {
-        const {subject, message, feedbackUserAdress} = req.body;   
+        const {message, token} = req.body;
+        
+        const recaptchaValidation = validateRecaptchaToken(token);
+        if(!recaptchaValidation) res.status(400).send({message: 'Bot'});
+        
         try {
-            const sentEmailPromise = emailClient.send([],subject, message, feedbackUserAdress);
-            res.sendStatus(200);
+            const sentEmailPromise = emailClient.send([env.EMAIL_USER_ADDRESS],'Feedback regarding Covid-19 curator portal', message);
+            res.status(200).send({message: "Email sent successfully"});
         } catch (err) {
             const error = err as Error;
             logger.error(error);
