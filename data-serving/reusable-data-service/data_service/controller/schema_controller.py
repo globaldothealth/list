@@ -19,7 +19,14 @@ class SchemaController:
         """Find previously-created fields in the store and apply them."""
         fields = self.store.get_case_fields()
         for field in fields:
-            self.add_field(field.key, field.type, field.data_dictionary_text, field.required, field.default, False)
+            self.add_field(
+                field.key,
+                field.type,
+                field.data_dictionary_text,
+                field.required,
+                field.default,
+                False,
+            )
 
     def add_field(
         self,

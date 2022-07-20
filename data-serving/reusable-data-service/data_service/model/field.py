@@ -14,7 +14,9 @@ class Field(Document):
     type: str = dataclasses.field(init=True, default=None)
     data_dictionary_text: str = dataclasses.field(init=True, default=None)
     required: bool = dataclasses.field(init=True, default=False)
-    default: Optional[Union[bool, str, int, date]] = dataclasses.field(init=True, default=None)
+    default: Optional[Union[bool, str, int, date]] = dataclasses.field(
+        init=True, default=None
+    )
     STRING = "string"
     DATE = "date"
     INTEGER = "integer"

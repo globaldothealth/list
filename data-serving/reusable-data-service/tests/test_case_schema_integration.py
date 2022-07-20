@@ -68,7 +68,9 @@ def test_adding_field_then_downloading_csv(client_with_patched_mongo):
     assert case["someField"] == "well, what have we here"
 
 
-def test_required_field_default_value_spread_to_existing_cases(client_with_patched_mongo):
+def test_required_field_default_value_spread_to_existing_cases(
+    client_with_patched_mongo,
+):
     response = client_with_patched_mongo.post(
         "/api/cases",
         json={

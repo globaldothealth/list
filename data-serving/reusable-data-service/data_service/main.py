@@ -156,7 +156,13 @@ def excluded_case_ids():
 def add_field_to_case_schema():
     try:
         req = request.get_json()
-        schema_controller.add_field(req["name"], req["type"], req["description"], req.get("required"), req.get("default"))
+        schema_controller.add_field(
+            req["name"],
+            req["type"],
+            req["description"],
+            req.get("required"),
+            req.get("default"),
+        )
         return "", 201
     except WebApplicationError as e:
         return jsonify({"message": e.args[0]}), e.http_code

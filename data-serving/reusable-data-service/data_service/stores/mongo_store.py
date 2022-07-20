@@ -137,7 +137,7 @@ class MongoStore:
             return  # nothing to do
         command = self.mongodb_update_command(update)
         self.get_case_collection().update_one({"_id": ObjectId(id)}, command)
-    
+
     def update_cases(self, filter: Filter, update: DocumentUpdate):
         if len(update) == 0:
             return
@@ -243,14 +243,18 @@ class MongoStore:
     def add_field(self, field: Field):
         self.get_schema_collection().insert_one(field.to_dict())
         if field.required is True:
-            update = DocumentUpdate.from_dict({
-                field.key: field.default
-            })
+            update = DocumentUpdate.from_dict({field.key: field.default})
             self.update_cases(Anything(), update)
 
     def get_case_fields(self):
         return [
-            Field(doc["key"], doc["type"], doc["data_dictionary_text"], doc["required"], doc["default"])
+            Field(
+                doc["key"],
+                doc["type"],
+                doc["data_dictionary_text"],
+                doc["required"],
+                doc["default"],
+            )
             for doc in self.get_schema_collection().find({})
         ]
 
