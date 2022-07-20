@@ -64,6 +64,4 @@ class SchemaController:
         field_model = Field(name, type_name, description, required, default)
         add_field_to_case_class(field_model)
         if store_field:
-            # create a storable model of the field and store it
-            # FIXME rewrite the validation logic above to use the data model
             self.store.add_field(field_model)
