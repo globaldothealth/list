@@ -166,9 +166,8 @@ def parse_cases(raw_data_file, source_id, source_url):
                 for centre in json_data[centre_type]:
                     hospital_map[centre] = json_data[centre_type][centre]['nombre'] + \
                         ", " + json_data[centre_type][centre]['provincia']
-        except:
-            #key not found
-            pass
+        except KeyError:
+            logger.error(f"KeyError in Cuba parser")
 
         # Get schema_version
         try:
