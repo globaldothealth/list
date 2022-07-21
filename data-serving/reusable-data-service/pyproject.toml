@@ -8,6 +8,7 @@ authors = ["Global.health <info@global.health>"]
 python = "^3.10"
 Flask = "^2.1.2"
 pymongo = {extras = ["srv"], version = "^4.1.1"}
+geojson = "^2.5.0"
 
 [tool.poetry.dev-dependencies]
 pytest = "^7.1.2"
