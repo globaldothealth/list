@@ -64,7 +64,7 @@ class Document:
     @classmethod
     def delimiter_separated_header(cls, sep: str) -> str:
         """Create a line naming all of the fields in this class and member dataclasses."""
-        return sep.join(cls.field_names()) + "\n"
+        return sep.join(cls.field_names()) + "\r\n"
 
     @classmethod
     def tsv_header(cls) -> str:
