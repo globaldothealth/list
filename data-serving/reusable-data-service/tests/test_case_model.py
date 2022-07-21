@@ -32,7 +32,7 @@ def test_csv_header():
     header_line = Case.csv_header()
     assert (
         header_line
-        == "_id,confirmationDate,caseReference.sourceId,caseReference.status,location\n"
+        == "_id,confirmationDate,caseReference.sourceId,caseReference.status,location\r\n"
     )
 
 
