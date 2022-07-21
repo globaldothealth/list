@@ -32,7 +32,7 @@ def test_csv_header():
     header_line = Case.csv_header()
     assert (
         header_line
-        == "_id,confirmationDate,caseReference.sourceId,caseReference.status,location\r\n"
+        == "_id,confirmationDate,caseReference.sourceId,caseReference.status,location.latitude,location.longitude,location.admin1,location.admin2,location.admin3,location.country\r\n"
     )
 
 
@@ -45,7 +45,7 @@ def test_csv_row_with_no_id():
     case.confirmationDate = date(2022, 6, 13)
     case.caseReference = ref
     csv = case.to_csv()
-    assert csv == ",2022-06-13,abcd12903478565647382910,UNVERIFIED,\r\n"
+    assert csv == ",2022-06-13,abcd12903478565647382910,UNVERIFIED,,,,,,\r\n"
 
 
 def test_csv_row_with_id():
@@ -59,7 +59,7 @@ def test_csv_row_with_id():
     case.confirmationDate = date(2022, 6, 13)
     case.caseReference = ref
     csv = case.to_csv()
-    assert csv == f"{id1},2022-06-13,{id2},UNVERIFIED,\r\n"
+    assert csv == f"{id1},2022-06-13,{id2},UNVERIFIED,,,,,,\r\n"
 
 
 def test_apply_update_to_case():

@@ -2,6 +2,7 @@ import copy
 import csv
 import dataclasses
 import datetime
+import geojson
 import io
 import operator
 
@@ -50,6 +51,18 @@ class Document:
         return value
 
     @classmethod
+    def location_properties(cls):
+        #return ["latitude", "longitude", "admin1", "admin2", "admin3", "country"]
+        return {
+            "latitude": lambda l: l.geometry.coordinates[0],
+            "longitude": lambda l: l.geometry.coordinates[1],
+            "admin1": lambda l: l.properties['admin1'],
+            "admin2": lambda l: l.properties['admin2'],
+            "admin3": lambda l: l.properties['admin3'],
+            "country": lambda l: l.properties['country']
+        }
+
+    @classmethod
     def field_names(cls) -> List[str]:
         """The list of names of fields in this class and member dataclasses."""
         fields = []
@@ -57,6 +70,9 @@ class Document:
             if dataclasses.is_dataclass(f.type):
                 if cls.include_dataclass_fields(f.type):
                     fields += [f"{f.name}.{g.name}" for g in dataclasses.fields(f.type)]
+            elif issubclass(f.type, geojson.Feature):
+                relevant_props = cls.location_properties().keys()
+                fields += [f"{f.name}.{p}" for p in relevant_props]
             else:
                 fields.append(f.name)
         return fields
@@ -99,6 +115,9 @@ class Document:
             if issubclass(f.type, Document):
                 if self.include_dataclass_fields(f.type):
                     fields += value.field_values()
+            elif issubclass(f.type, geojson.Feature):
+                for getter in self.location_properties().values():
+                    fields.append(getter(value) if value is not None else "")
             else:
                 fields.append(str(value) if value is not None else "")
         return fields
