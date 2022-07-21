@@ -52,14 +52,13 @@ class Document:
 
     @classmethod
     def location_properties(cls):
-        #return ["latitude", "longitude", "admin1", "admin2", "admin3", "country"]
         return {
             "latitude": lambda l: l.geometry.coordinates[0],
             "longitude": lambda l: l.geometry.coordinates[1],
-            "admin1": lambda l: l.properties['admin1'],
-            "admin2": lambda l: l.properties['admin2'],
-            "admin3": lambda l: l.properties['admin3'],
-            "country": lambda l: l.properties['country']
+            "admin1": lambda l: l.properties["admin1"],
+            "admin2": lambda l: l.properties["admin2"],
+            "admin3": lambda l: l.properties["admin3"],
+            "country": lambda l: l.properties["country"],
         }
 
     @classmethod
