@@ -60,8 +60,7 @@ def test_adding_field_then_downloading_csv(client_with_patched_mongo):
         "/api/cases/download", json={"format": "csv"}
     )
     assert response.status_code == 200
-    string = response.get_data().decode("utf-8")
-    csv_file = io.StringIO(string)
+    csv_file = io.StringIO(response.get_data().decode("utf-8"))
     csv_reader = csv.DictReader(csv_file)
     cases = [c for c in csv_reader]
     assert len(cases) == 1
