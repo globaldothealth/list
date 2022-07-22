@@ -28,7 +28,7 @@ class Document:
     def date_fields(cls) -> list[str]:
         """Record where dates are kept because they sometimes need special treatment."""
         return cls.fields_of_class(datetime.date)
-    
+
     @classmethod
     def location_fields(cls) -> list[str]:
         return cls.fields_of_class(Feature)
@@ -64,7 +64,9 @@ class Document:
         fields = []
         for f in dataclasses.fields(cls):
             if dataclasses.is_dataclass(f.type):
-                if cls.include_dataclass_fields(f.type):
+                if hasattr(f.type, "custom_field_names"):
+                    fields += [f"{f.name}.{g}" for g in f.type.custom_field_names()]
+                elif cls.include_dataclass_fields(f.type):
                     fields += [f"{f.name}.{g.name}" for g in dataclasses.fields(f.type)]
             else:
                 fields.append(f.name)
@@ -73,7 +75,7 @@ class Document:
     @classmethod
     def delimiter_separated_header(cls, sep: str) -> str:
         """Create a line naming all of the fields in this class and member dataclasses."""
-        return sep.join(cls.field_names()) + "\n"
+        return sep.join(cls.field_names()) + "\r\n"
 
     @classmethod
     def tsv_header(cls) -> str:
@@ -108,6 +110,11 @@ class Document:
             if issubclass(f.type, Document):
                 if self.include_dataclass_fields(f.type):
                     fields += value.field_values()
+            elif hasattr(f.type, "custom_field_names"):
+                if value is not None:
+                    fields += value.custom_field_values()
+                else:
+                    fields += f.type.custom_none_field_values()
             else:
                 fields.append(str(value) if value is not None else "")
         return fields

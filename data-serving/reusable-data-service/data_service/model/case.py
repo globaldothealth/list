@@ -95,7 +95,6 @@ class DayZeroCase(Document):
         elif self.caseReference is None:
             raise ValidationError("Case Reference must have a value")
         self.caseReference.validate()
-        print(f"validating custom fields {self.custom_fields}")
         for field in self.custom_fields:
             if field.required is True and attrgetter(field.key)(self) is None:
                 raise ValidationError(f"{field.key} must have a value")
