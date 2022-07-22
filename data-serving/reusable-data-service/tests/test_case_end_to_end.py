@@ -1,5 +1,6 @@
 import bson
 import freezegun
+import json
 import pymongo
 
 from datetime import datetime
@@ -192,6 +193,20 @@ def test_post_case_list_cases_round_trip(client_with_patched_mongo):
     assert get_response.status_code == 200
     assert len(get_response.json["cases"]) == 1
     assert get_response.json["cases"][0]["confirmationDate"] == "2022-01-23"
+
+
+def test_post_case_list_cases_geojson_round_trip(client_with_patched_mongo):
+    with open("./tests/data/case.with_location.json", "r") as file:
+        case_json = json.load(file)
+    post_response = client_with_patched_mongo.post(
+        "/api/cases",
+        json=case_json,
+    )
+    assert post_response.status_code == 201
+    get_response = client_with_patched_mongo.get("/api/cases")
+    assert get_response.status_code == 200
+    assert len(get_response.json["cases"]) == 1
+    assert get_response.json["cases"][0]["location"]["properties"]["country"] == "IND"
 
 
 def test_post_multiple_case_list_cases_round_trip(client_with_patched_mongo):
