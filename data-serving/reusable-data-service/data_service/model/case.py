@@ -1,6 +1,5 @@
 import dataclasses
 import datetime
-import geojson
 import json
 import flask.json
 
@@ -41,7 +40,6 @@ class DayZeroCase(Document):
     confirmationDate: datetime.date = dataclasses.field(init=False)
     caseReference: CaseReference = dataclasses.field(init=False, default=None)
     caseExclusion: CaseExclusionMetadata = dataclasses.field(init=False, default=None)
-    location: geojson.Feature = dataclasses.field(init=False, default=None)
 
     custom_fields = []
 
@@ -93,21 +91,7 @@ class DayZeroCase(Document):
         elif self.caseReference is None:
             raise ValidationError("Case Reference must have a value")
         self.caseReference.validate()
-        location = getattr(self, "location", None)
-        if location is not None:
-            if location.type != "Feature":
-                raise ValidationError(f"Location must be a feature, got {location}")
-            if not location.is_valid:
-                raise ValidationError(f"{location} is not a valid GeoJSON Feature")
-            for property in ["admin1", "admin2", "admin3", "country"]:
-                if property not in location.properties:
-                    raise ValidationError(
-                        f"{location} is missing required property {property}"
-                    )
-            if len(location.properties["country"]) != 3:
-                raise ValidationError(
-                    f"{location} doesn't have an ISO-3166-2 three-letter country code"
-                )
+        print(f"validating custom fields {self.custom_fields}")
         for field in self.custom_fields:
             if field.required is True and attrgetter(field.key)(self) is None:
                 raise ValidationError(f"{field.key} must have a value")
