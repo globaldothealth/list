@@ -11,6 +11,7 @@ from data_service.model.case_exclusion_metadata import CaseExclusionMetadata
 from data_service.model.case_reference import CaseReference
 from data_service.model.document import Document
 from data_service.model.field import Field
+from data_service.model.geojson import Feature
 from data_service.util.errors import (
     ConflictError,
     DependencyFailedError,
@@ -40,6 +41,7 @@ class DayZeroCase(Document):
     confirmationDate: datetime.date = dataclasses.field(init=False)
     caseReference: CaseReference = dataclasses.field(init=False, default=None)
     caseExclusion: CaseExclusionMetadata = dataclasses.field(init=False, default=None)
+    location: Feature = dataclasses.field(init=False, default=None)
 
     custom_fields = []
 
@@ -55,6 +57,8 @@ class DayZeroCase(Document):
         for key in dictionary:
             if key in cls.date_fields():
                 value = cls.interpret_date(dictionary[key])
+            elif key in cls.location_fields():
+                value = Feature.from_dict(dictionary[key])
             elif key == "caseReference":
                 caseRef = dictionary[key]
                 value = (

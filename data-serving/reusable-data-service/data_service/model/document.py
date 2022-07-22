@@ -6,6 +6,7 @@ import io
 import operator
 
 from data_service.model.document_update import DocumentUpdate
+from data_service.model.geojson import Feature
 from data_service.util.json_encoder import JSONEncoder
 
 from typing import List
@@ -26,7 +27,15 @@ class Document:
     @classmethod
     def date_fields(cls) -> list[str]:
         """Record where dates are kept because they sometimes need special treatment."""
-        return [f.name for f in dataclasses.fields(cls) if f.type == datetime.date]
+        return cls.fields_of_class(datetime.date)
+    
+    @classmethod
+    def location_fields(cls) -> list[str]:
+        return cls.fields_of_class(Feature)
+
+    @classmethod
+    def fields_of_class(cls, a_class: type) -> list[str]:
+        return [f.name for f in dataclasses.fields(cls) if f.type == a_class]
 
     @staticmethod
     def interpret_date(maybe_date) -> datetime.date:

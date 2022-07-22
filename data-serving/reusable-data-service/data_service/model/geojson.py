@@ -2,12 +2,11 @@ import dataclasses
 
 from typing import Any, Dict, List
 
-from data_service.model.document import Document
 from data_service.util.errors import ValidationError
 
 
 @dataclasses.dataclass
-class Point(Document):
+class Point:
     """Represents a GeoJSON point, but because we only deal with lat/long
     coordinates it has the additional validation constraint that it must be
     two-dimensional and be in the range ((-90<=lat<=90), (-180<=lon<=180))."""
@@ -28,9 +27,16 @@ class Point(Document):
         longitude = self.coordinates[1]
         if longitude < -180.0 or longitude > 180.0:
             raise ValidationError(f"longitude must be between -180º and 180º, got {longitude}")
+    
+    @classmethod
+    def from_dict(cls, d: Dict[str, Any]):
+        p = cls()
+        p.type = d.get("type", None)
+        p.coordinates = d.get("coordinates", None)
+        return p
 
 @dataclasses.dataclass
-class Feature(Document):
+class Feature:
     """Represents a GeoJSON feature, but with restrictions that are appropriate
     to Global.health. To whit: the geometry _must_ be a point (it cannot be a MultiPoint,
     a Line, or any other type of geometry, and nor can it be None);
@@ -50,3 +56,14 @@ class Feature(Document):
         country = self.properties.get('country', 'None')
         if len(country) != 3:
             raise ValidationError(f"country must be defined as an ISO 3166-1 alpha-3 code, not {country}")
+
+    @classmethod
+    def from_dict(cls, d: Dict[str, Any]):
+        if d is None:
+            return None
+        f = cls()
+        f.type = d.get("type", None)
+        f.properties = d.get("properties", None)
+        g = d.get("geometry", None)
+        f.geometry = Point.from_dict(g) if g is not None else None
+        return f

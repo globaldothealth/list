@@ -4,6 +4,7 @@ from datetime import date
 from data_service.model.case import Case
 from data_service.model.case_reference import CaseReference
 from data_service.model.document_update import DocumentUpdate
+from data_service.model.geojson import Feature, Point
 from data_service.util.errors import ValidationError
 
 
@@ -17,6 +18,13 @@ def test_case_from_minimal_json_is_valid():
         case = Case.from_json(minimal_file.read())
         assert case is not None
 
+
+def test_case_with_geojson_is_valid():
+    with open("./tests/data/case.with_location.json", "r") as file:
+        case = Case.from_json(file.read())
+        assert case is not None
+        assert case.location is not None
+        assert type(case.location) == Feature
 
 def test_csv_header():
     header_line = Case.csv_header()
