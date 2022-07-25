@@ -1,7 +1,7 @@
 import iso3166
 import requests
 
-from typing import Dict, List, Union
+from typing import Any, Dict, List, Union
 
 from data_service.model.geojson import Feature, Point
 from data_service.util.errors import DependencyFailedError
@@ -24,7 +24,7 @@ class Geocoder:
         response = requests.get(self.location_endpoint, {"q": query})
         if response.status_code != 200:
             raise DependencyFailedError(
-                f"Geocoding service responded with status {response.status} for query {query}"
+                f"Geocoding service responded with status {response.status_code} for query {query}"
             )
         locations = response.json()
         if len(locations) == 0:
@@ -36,21 +36,33 @@ class Geocoder:
 
     def create_feature(self, location: Dict[str, Union[str, float]], query: str):
         """Turn a location-service response into a GeoJSON feature."""
-        geometry = location["geometry"]
         p = Point()
-        p.coordinates = [geometry["latitude"], geometry["longitude"]]
+        try:
+            geometry = location["geometry"]
+            p.coordinates = [geometry["latitude"], geometry["longitude"]]
+        except KeyError:
+            raise DependencyFailedError(f"location {location} doesn't have coordinates")
         f = Feature()
         f.geometry = p
-        f.properties = {
-            "country": self.iso_two_to_three(location["country"]),
-            "admin1": location["administrativeAreaLevel1"],
-            "admin2": location["administrativeAreaLevel2"],
-            "admin3": location["administrativeAreaLevel3"],
-            "place": location["place"],
-            "name": location["name"],
-            "resolution": location["geoResolution"],
-            "query": query,
-        }
+        try:
+            f.properties = {"country": self.iso_two_to_three(location["country"])}
+        except KeyError:
+            raise DependencyFailedError(f"location {location} doesn't have a country")
+        dict_set_if_present(
+            f.properties, "admin1", location.get("administrativeAreaLevel1", None)
+        )
+        dict_set_if_present(
+            f.properties, "admin2", location.get("administrativeAreaLevel2", None)
+        )
+        dict_set_if_present(
+            f.properties, "admin3", location.get("administrativeAreaLevel3", None)
+        )
+        dict_set_if_present(f.properties, "place", location.get("place", None))
+        dict_set_if_present(f.properties, "name", location.get("name", None))
+        dict_set_if_present(
+            f.properties, "resolution", location.get("geoResolution", None)
+        )
+        f.properties["query"] = query
         return f
 
     def iso_two_to_three(self, iso2: str) -> str:
@@ -60,3 +72,9 @@ class Geocoder:
         if country is None:
             raise DependencyFailedError(f"Country code {iso2} is not known")
         return country.alpha3
+
+
+def dict_set_if_present(dest: Dict, key: str, value: Any):
+    """Set a key in a dictionary only if the value is not None."""
+    if value is not None:
+        dest[key] = value
