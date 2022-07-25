@@ -184,7 +184,11 @@ def set_up_controllers():
     location_service_base = os.environ.get("LOCATION_SERVICE")
     if location_service_base is None:
         raise ValueError("Define $LOCATION_SERVICE in the environment")
-    case_controller = CaseController(store, date.fromisoformat(outbreak_date), geocoder=Geocoder(location_service_base))
+    case_controller = CaseController(
+        store,
+        date.fromisoformat(outbreak_date),
+        geocoder=Geocoder(location_service_base),
+    )
     schema_controller = SchemaController(store)
 
 

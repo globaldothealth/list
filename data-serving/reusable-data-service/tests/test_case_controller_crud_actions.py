@@ -22,7 +22,9 @@ from data_service.util.errors import (
 def case_controller():
     with app.app_context():
         store = MemoryStore()
-        controller = CaseController(store, outbreak_date=date(2019, 11, 1), geocoder=None)
+        controller = CaseController(
+            store, outbreak_date=date(2019, 11, 1), geocoder=None
+        )
         yield controller
 
 
