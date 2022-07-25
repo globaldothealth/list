@@ -1,6 +1,7 @@
 from datetime import date
 from flask import Flask, jsonify, request
 from data_service.controller.case_controller import CaseController
+from data_service.controller.geocode_controller import Geocoder
 from data_service.controller.schema_controller import SchemaController
 from data_service.stores.mongo_store import MongoStore
 from data_service.util.errors import (
@@ -180,7 +181,10 @@ def set_up_controllers():
     outbreak_date = os.environ.get("OUTBREAK_DATE")
     if outbreak_date is None:
         raise ValueError("Define $OUTBREAK_DATE in the environment")
-    case_controller = CaseController(store, date.fromisoformat(outbreak_date), geocoder=None)
+    location_service_base = os.environ.get("LOCATION_SERVICE")
+    if location_service_base is None:
+        raise ValueError("Define $LOCATION_SERVICE in the environment")
+    case_controller = CaseController(store, date.fromisoformat(outbreak_date), geocoder=Geocoder(location_service_base))
     schema_controller = SchemaController(store)
 
 
