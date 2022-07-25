@@ -18,6 +18,7 @@ def client_with_patched_mongo(monkeypatch):
     monkeypatch.setenv("MONGO_CASE_COLLECTION", "cases")
     monkeypatch.setenv("MONGO_SCHEMA_COLLECTION", "schema")
     monkeypatch.setenv("OUTBREAK_DATE", "2019-11-01")
+    monkeypatch.setenv("LOCATION_SERVICE", "https://geocoder.example")
     db = mongomock.MongoClient()
 
     def fake_mongo(connection_string):
