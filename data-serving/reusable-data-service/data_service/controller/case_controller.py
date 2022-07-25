@@ -4,6 +4,8 @@ from flask import jsonify
 from datetime import date
 from typing import List, Optional
 
+from data_service.controller.geocode_controller import Geocoder
+
 from data_service.model.case import observe_case_class
 from data_service.model.case_exclusion_metadata import CaseExclusionMetadata
 from data_service.model.case_page import CasePage
@@ -17,6 +19,7 @@ from data_service.model.filter import (
     PropertyFilter,
     FilterOperator,
 )
+from data_service.model.geojson import Feature
 from data_service.util.errors import (
     NotFoundError,
     PreconditionUnsatisfiedError,
@@ -38,11 +41,12 @@ class CaseController:
     storage technology can be chosen.
     All methods return a tuple of (response, HTTP status code)"""
 
-    def __init__(self, store, outbreak_date: date):
+    def __init__(self, store, outbreak_date: date, geocoder: Geocoder):
         """store is an adapter to the external storage technology.
         outbreak_date is the earliest date on which this instance should accept cases."""
         self.store = store
         self.outbreak_date = outbreak_date
+        self.geocoder = geocoder
         observe_case_class(case_observer)
 
     def get_case(self, id: str):
@@ -305,8 +309,20 @@ class CaseController:
 
     def create_case_if_valid(self, maybe_case: dict):
         """Attempts to create a case from an input dictionary and validate it against
-        the application rules. Raises ValidationError or PreconditionUnsatisfiedError on invalid input."""
+        the application rules. Raises ValidationError or PreconditionUnsatisfiedError on invalid input.
+        Raises DependencyFailedError if it has to geocode a case and the location service fails."""
+        if 'location' in maybe_case:
+            loc = maybe_case['location']
+            if 'query' in loc:
+                features = self.geocoder.locate_feature(loc['query'])
+                feature = features[0]
+            else:
+                # if you aren't asking for a query, you must be telling me what it is
+                feature = Feature.from_dict(loc)
+        else:
+            feature = None
         case = Case.from_dict(maybe_case)
+        case.location = feature
         self.check_case_preconditions(case)
         return case
 
