@@ -1,7 +1,7 @@
 openapi: 3.0.3
 info:
     title: Global.health geolocation service
-    description: Server for looking up geographic infomration for Global.health line-list data
+    description: Server for looking up geographic information for Global.health line-list data
     termsOfService: 'https://global.health/terms-of-use/'
     contact:
         name: Global.health
