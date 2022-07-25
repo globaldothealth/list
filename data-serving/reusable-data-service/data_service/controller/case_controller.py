@@ -311,10 +311,10 @@ class CaseController:
         """Attempts to create a case from an input dictionary and validate it against
         the application rules. Raises ValidationError or PreconditionUnsatisfiedError on invalid input.
         Raises DependencyFailedError if it has to geocode a case and the location service fails."""
-        if 'location' in maybe_case:
-            loc = maybe_case['location']
-            if 'query' in loc:
-                features = self.geocoder.locate_feature(loc['query'])
+        if "location" in maybe_case:
+            loc = maybe_case["location"]
+            if "query" in loc:
+                features = self.geocoder.locate_feature(loc["query"])
                 feature = features[0]
             else:
                 # if you aren't asking for a query, you must be telling me what it is
