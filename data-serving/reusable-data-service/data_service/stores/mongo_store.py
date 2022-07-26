@@ -91,7 +91,7 @@ class MongoStore:
     def update_case_status(
         self, id: str, status: str, exclusion: CaseExclusionMetadata
     ):
-        update = {"$set": {"caseReference.status": status}}
+        update = {"$set": {"caseStatus": status}}
         if exclusion:
             update["$set"][
                 "caseExclusion"
@@ -124,7 +124,7 @@ class MongoStore:
                 "$and": [
                     {
                         "caseReference.sourceId": ObjectId(source_id),
-                        "caseReference.status": "EXCLUDED",
+                        "caseStatus": "omit_error",
                     },
                     query,
                 ]

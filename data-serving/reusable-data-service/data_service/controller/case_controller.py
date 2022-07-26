@@ -163,6 +163,9 @@ class CaseController:
 
         return generate_output
 
+    def valid_statuses(self):
+        return [f.values for f in Case.custom_fields if f.key == "caseStatus"][0]
+
     def batch_status_change(
         self,
         status: str,
@@ -172,18 +175,18 @@ class CaseController:
     ):
         """Update all of the cases identified in case_ids to have the supplied curation status.
         Raises PreconditionUnsatisfiedError or ValidationError on invalid input."""
-        statuses = CaseReference.valid_statuses()
+        statuses = self.valid_statuses()
         if not status in statuses:
             raise PreconditionUnsatisfiedError(f"status {status} not one of {statuses}")
         if filter is not None and case_ids is not None:
             raise PreconditionUnsatisfiedError(
                 "Do not supply both a filter and a list of IDs"
             )
-        if status == "EXCLUDED" and note is None:
+        if status == "omit_error" and note is None:
             raise ValidationError(f"Excluding cases must be documented in a note")
 
         def update_status(id: str, status: str, note: str):
-            if status == "EXCLUDED":
+            if status == "omit_error":
                 caseExclusion = CaseExclusionMetadata()
                 caseExclusion.note = note
             else:

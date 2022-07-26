@@ -31,7 +31,7 @@ def test_csv_header():
     header_line = Case.csv_header()
     assert (
         header_line
-        == "_id,caseStatus,confirmationDate,caseReference.sourceId,caseReference.status,location.country,location.latitude,location.longitude,location.admin1,location.admin2,location.admin3\r\n"
+        == "_id,caseStatus,confirmationDate,caseReference.sourceId,location.country,location.latitude,location.longitude,location.admin1,location.admin2,location.admin3\r\n"
     )
 
 
@@ -45,7 +45,7 @@ def test_csv_row_with_no_id():
     case.caseReference = ref
     case.caseStatus = "probable"
     csv = case.to_csv()
-    assert csv == ",probable,2022-06-13,abcd12903478565647382910,UNVERIFIED,,,,,,\r\n"
+    assert csv == ",probable,2022-06-13,abcd12903478565647382910,,,,,,\r\n"
 
 
 def test_csv_row_with_id():
@@ -60,7 +60,7 @@ def test_csv_row_with_id():
     case.caseReference = ref
     case.caseStatus = "probable"
     csv = case.to_csv()
-    assert csv == f"{id1},probable,2022-06-13,{id2},UNVERIFIED,,,,,,\r\n"
+    assert csv == f"{id1},probable,2022-06-13,{id2},,,,,,\r\n"
 
 
 def test_apply_update_to_case():
@@ -80,11 +80,3 @@ def test_apply_update_that_unsets_value():
     update = DocumentUpdate.from_dict({"confirmationDate": None})
     case.apply_update(update)
     assert case.confirmationDate is None
-
-
-def test_apply_nested_update():
-    with open("./tests/data/case.minimal.json", "r") as minimal_file:
-        case = Case.from_json(minimal_file.read())
-    update = DocumentUpdate.from_dict({"caseReference": {"status": "VERIFIED"}})
-    case.apply_update(update)
-    assert case.caseReference.status == "VERIFIED"
