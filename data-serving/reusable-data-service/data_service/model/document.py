@@ -4,12 +4,14 @@ import dataclasses
 import datetime
 import io
 import operator
+import json
+import flask.json
 
 from data_service.model.document_update import DocumentUpdate
 from data_service.model.geojson import Feature
 from data_service.util.json_encoder import JSONEncoder
 
-from typing import List
+from typing import Any, List
 
 
 @dataclasses.dataclass
@@ -155,6 +157,46 @@ class Document:
             self._internal_set_value(key, value)
         for key in update.unsets_iter():
             self._internal_set_value(key, None)
+
+    @classmethod
+    def from_json(cls, obj: str) -> type:
+        """Create an instance of this class from a JSON representation."""
+        source = json.loads(obj)
+        return cls.from_dict(source)
+
+    @classmethod
+    def from_dict(cls, dictionary: dict[str, Any]) -> type:
+        doc = cls()
+        for key in dictionary:
+            if key in cls.date_fields():
+                value = cls.interpret_date(dictionary[key])
+            elif key in cls.location_fields():
+                value = Feature.from_dict(dictionary[key])
+            elif key in cls.document_fields():
+                field_type = cls.field_type_for_key_path(key)
+                dict_description = dictionary[key]
+                value = (
+                    field_type.from_dict(dict_description)
+                    if dict_description is not None
+                    else None
+                )
+            elif key == "_id":
+                the_id = dictionary[key]
+                if isinstance(the_id, dict):
+                    # this came from a BSON objectID representation
+                    value = the_id["$oid"]
+                else:
+                    value = the_id
+            else:
+                value = dictionary[key]
+            setattr(doc, key, value)
+        doc.validate()
+        return doc
+
+    def validate(self):
+        """Test whether I am in a good state and raise an exception if not. Subclasses can override
+        to provide domain-specific validation rules."""
+        pass
 
     def _internal_set_value(self, key, value):
         self._internal_ensure_containers_exist(key)

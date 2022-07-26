@@ -1,11 +1,8 @@
 import dataclasses
 import datetime
-import json
-import flask.json
 
 from collections.abc import Callable
 from operator import attrgetter
-from typing import Any, List
 
 from data_service.model.case_exclusion_metadata import CaseExclusionMetadata
 from data_service.model.case_reference import CaseReference
@@ -45,39 +42,9 @@ class DayZeroCase(Document):
 
     custom_fields = []
 
-    @classmethod
-    def from_json(cls, obj: str) -> type:
-        """Create an instance of this class from a JSON representation."""
-        source = json.loads(obj)
-        return cls.from_dict(source)
-
-    @classmethod
-    def from_dict(cls, dictionary: dict[str, Any]) -> type:
-        case = cls()
-        for key in dictionary:
-            if key in cls.date_fields():
-                value = cls.interpret_date(dictionary[key])
-            elif key in cls.location_fields():
-                value = Feature.from_dict(dictionary[key])
-            elif key in cls.document_fields():
-                field_type = cls.field_type_for_key_path(key)
-                dict_description = dictionary[key]
-                value = (field_type.from_dict(dict_description) if dict_description is not None else None)
-            elif key == "_id":
-                the_id = dictionary[key]
-                if isinstance(the_id, dict):
-                    # this came from a BSON objectID representation
-                    value = the_id["$oid"]
-                else:
-                    value = the_id
-            else:
-                value = dictionary[key]
-            setattr(case, key, value)
-        case.validate()
-        return case
-
     def validate(self):
         """Check whether I am consistent. Raise ValidationError if not."""
+        super().validate()
         if not hasattr(self, "confirmationDate"):
             raise ValidationError("Confirmation Date is mandatory")
         elif self.confirmationDate is None:

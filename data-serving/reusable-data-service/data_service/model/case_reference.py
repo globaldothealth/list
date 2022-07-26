@@ -14,6 +14,7 @@ class CaseReference(Document):
 
     def validate(self):
         """Check whether I am consistent. Raise ValueError if not."""
+        super().validate()
         if not hasattr(self, "sourceId"):
             raise ValueError("Source ID is mandatory")
         elif self.sourceId is None:
