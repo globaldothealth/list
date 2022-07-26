@@ -6,6 +6,19 @@
         "required": false
     },
     {
+        "key": "caseStatus",
+        "type": "string",
+        "data_dictionary_text": "Status of a case. Cases which are discarded were previously suspected but have now been confirmed negative, and should be excluded from case counts. Cases which are omit_error were incorrectly added and should be dismissed from any data interpretation.",
+        "required": true,
+        "values": [
+            "confirmed",
+            "probable",
+            "suspected",
+            "discarded",
+            "omit_error"
+        ]
+    },
+    {
         "key": "confirmationDate",
         "type": "date",
         "data_dictionary_text": "The date on which the case was confirmed. There will also be a confirmation event but the date is stored denormalised for efficiency.",

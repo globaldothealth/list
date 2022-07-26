@@ -19,6 +19,7 @@ def test_get_case_with_known_id(client_with_patched_mongo):
                 "caseReference": {
                     "sourceId": bson.ObjectId("fedc12345678901234567890")
                 },
+                "caseStatus": "probable",
             }
         )
         .inserted_id
@@ -55,6 +56,7 @@ def test_list_cases_with_pagination_query(client_with_patched_mongo):
                 "caseReference": {
                     "sourceId": bson.ObjectId("fedc12345678901234567890")
                 },
+                "caseStatus": "probable",
             }
             for i in range(25)
         ]
@@ -85,6 +87,7 @@ def test_list_cases_filter_confirmation_date_before(client_with_patched_mongo):
                 "caseReference": {
                     "sourceId": bson.ObjectId("fedc12345678901234567890")
                 },
+                "caseStatus": "probable",
             }
             for i in range(1, 32)
         ]
@@ -110,6 +113,7 @@ def test_list_cases_filter_confirmation_date_after(client_with_patched_mongo):
                 "caseReference": {
                     "sourceId": bson.ObjectId("fedc12345678901234567890")
                 },
+                "caseStatus": "probable",
             }
             for i in range(1, 32)
         ]
@@ -137,6 +141,7 @@ def test_list_cases_filter_confirmation_date_before_and_after(
                 "caseReference": {
                     "sourceId": bson.ObjectId("fedc12345678901234567890")
                 },
+                "caseStatus": "probable",
             }
             for i in range(1, 32)
         ]
@@ -163,6 +168,7 @@ def test_list_cases_no_matching_results(client_with_patched_mongo):
                 "caseReference": {
                     "sourceId": bson.ObjectId("fedc12345678901234567890")
                 },
+                "caseStatus": "probable",
             }
             for i in range(1, 32)
         ]
@@ -186,6 +192,7 @@ def test_post_case_list_cases_round_trip(client_with_patched_mongo):
         json={
             "confirmationDate": "2022-01-23T13:45:01.234Z",
             "caseReference": {"sourceId": bson.ObjectId("fedc12345678901234567890")},
+            "caseStatus": "probable",
         },
     )
     assert post_response.status_code == 201
@@ -215,6 +222,7 @@ def test_post_multiple_case_list_cases_round_trip(client_with_patched_mongo):
         json={
             "confirmationDate": "2022-01-23T13:45:01.234Z",
             "caseReference": {"sourceId": bson.ObjectId("fedc12345678901234567890")},
+            "caseStatus": "probable",
         },
     )
     assert post_response.status_code == 201
@@ -230,6 +238,7 @@ def test_post_case_validate_only(client_with_patched_mongo):
         json={
             "confirmationDate": "2022-01-23T13:45:01.234Z",
             "caseReference": {"sourceId": bson.ObjectId("fedc12345678901234567890")},
+            "caseStatus": "probable",
         },
     )
     assert post_response.status_code == 204
@@ -248,6 +257,7 @@ def test_batch_upsert_case(client_with_patched_mongo):
                     "caseReference": {
                         "sourceId": "abcd12345678901234567890",
                     },
+                    "caseStatus": "probable",
                 }
             ]
         },
@@ -269,6 +279,7 @@ def test_download_all_cases_csv(client_with_patched_mongo):
                 "caseReference": {
                     "sourceId": bson.ObjectId("fedc12345678901234567890")
                 },
+                "caseStatus": "probable",
             }
             for i in range(1, 4)
         ]
@@ -290,6 +301,7 @@ def test_download_selected_cases_tsv(client_with_patched_mongo):
                 "caseReference": {
                     "sourceId": bson.ObjectId("fedc12345678901234567890")
                 },
+                "caseStatus": "probable",
             }
             for i in range(1, 4)
         ]
@@ -314,6 +326,7 @@ def test_download_selected_cases_tsv(client_with_patched_mongo):
                 "caseReference": {
                     "sourceId": bson.ObjectId("fedc12345678901234567890")
                 },
+                "caseStatus": "probable",
             }
             for i in range(1, 4)
         ]
@@ -340,6 +353,7 @@ def test_exclude_selected_cases(client_with_patched_mongo):
                 "caseReference": {
                     "sourceId": bson.ObjectId("fedc12345678901234567890")
                 },
+                "caseStatus": "probable",
             }
         )
         .inserted_id
@@ -366,6 +380,7 @@ def test_excluded_case_ids(client_with_patched_mongo):
                 "caseReference": {
                     "sourceId": bson.ObjectId("fedc12345678901234567890")
                 },
+                "caseStatus": "probable",
             }
         )
         .inserted_id
@@ -398,6 +413,7 @@ def test_filter_excluded_case_ids(client_with_patched_mongo):
                     "date": datetime(2022, 6, i),
                     "note": f"Excluded upon this day, the {i}th of June",
                 },
+                "caseStatus": "probable"
             }
             for i in range(1, 4)
         ]
@@ -424,6 +440,7 @@ def test_update_case(client_with_patched_mongo):
                 "caseReference": {
                     "sourceId": bson.ObjectId("fedc12345678901234567890")
                 },
+                "caseStatus": "probable",
             }
         )
         .inserted_id
@@ -445,6 +462,7 @@ def test_update_object_id_on_case(client_with_patched_mongo):
                 "caseReference": {
                     "sourceId": bson.ObjectId("fedc12345678901234567890")
                 },
+                "caseStatus": "probable",
             }
         )
         .inserted_id
@@ -474,6 +492,7 @@ def test_batch_update(client_with_patched_mongo):
                     "date": datetime(2022, 6, i),
                     "note": f"Excluded upon this day, the {i}th of June",
                 },
+                "caseStatus": "probable",
             }
             for i in range(1, 4)
         ]
@@ -505,6 +524,7 @@ def test_batch_update_query(client_with_patched_mongo):
                     "date": datetime(2022, 6, i),
                     "note": f"Excluded upon this day, the {i}th of June",
                 },
+                "caseStatus": "probable",
             }
             for i in range(1, 4)
         ]
@@ -526,6 +546,7 @@ def test_delete_case(client_with_patched_mongo):
         {
             "confirmationDate": datetime(2022, 5, 10),
             "caseReference": {"sourceId": bson.ObjectId("fedc12345678901234567890")},
+            "caseStatus": "probable",
         }
     ).inserted_id
     delete_result = client_with_patched_mongo.delete(f"/api/cases/{str(inserted)}")
@@ -553,6 +574,7 @@ def test_batch_delete_with_ids(client_with_patched_mongo):
                     "date": datetime(2022, 6, i),
                     "note": f"Excluded upon this day, the {i}th of June",
                 },
+                "caseStatus": "probable",
             }
             for i in range(1, 4)
         ]
@@ -581,6 +603,7 @@ def test_batch_delete_with_query(client_with_patched_mongo):
                     "date": datetime(2022, 6, i),
                     "note": f"Excluded upon this day, the {i}th of June",
                 },
+                "caseStatus": "probable",
             }
             for i in range(1, 4)
         ]
