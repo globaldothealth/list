@@ -194,7 +194,10 @@ class MongoStore:
     @staticmethod
     def case_model_iterator(mongo_iterator):
         """Turn an iterator of mongo results into an iterator of cases."""
-        return map(lambda c: Case.from_dict(MongoStore.mongo_document_to_json(c)), mongo_iterator)
+        return map(
+            lambda c: Case.from_dict(MongoStore.mongo_document_to_json(c)),
+            mongo_iterator,
+        )
 
     @staticmethod
     def setup():
@@ -241,7 +244,6 @@ class MongoStore:
         if isinstance(the_id, dict):
             dictionary["_id"] = the_id["$oid"]
         return dictionary
-
 
     @staticmethod
     def case_exclusion_to_bson_compatible_dict(exclusion: CaseExclusionMetadata):
