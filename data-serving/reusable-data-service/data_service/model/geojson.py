@@ -101,7 +101,6 @@ class Feature:
     @classmethod
     def custom_none_field_values(cls) -> List[str]:
         """Provide an application-specific report of this class's fields and values for CSV export."""
-        print("Asked for None values")
         return [""] * len(cls.field_getters)
 
     def custom_field_values(self) -> List[str]:

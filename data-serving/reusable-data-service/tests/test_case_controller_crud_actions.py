@@ -182,7 +182,7 @@ def test_batch_upsert_reports_errors(case_controller):
     response = case_controller.batch_upsert({"cases": [{}]})
     assert response.numCreated == 0
     assert response.numUpdated == 0
-    assert response.errors == {"0": "Confirmation Date is mandatory"}
+    assert response.errors == {"0": "confirmationDate must have a value"}
 
 
 def test_download_with_no_query_is_ok(case_controller):

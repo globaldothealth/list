@@ -1,5 +1,7 @@
 import dataclasses
 import datetime
+import importlib.resources
+import json
 
 from collections.abc import Callable
 from operator import attrgetter
@@ -30,30 +32,12 @@ class DayZeroCase(Document):
     to that function)."""
 
     _: dataclasses.KW_ONLY
-    """_id is treated as an opaque identifier by the model, allowing the
-    store to use whatever format it needs to uniquely identify a stored case.
-    The _id is allowed to be None, for cases that have been created but not
-    yet saved into a store."""
-    _id: str = dataclasses.field(init=False, default=None)
-    confirmationDate: datetime.date = dataclasses.field(init=False)
-    caseReference: CaseReference = dataclasses.field(init=False, default=None)
-    caseExclusion: CaseExclusionMetadata = dataclasses.field(init=False, default=None)
-    location: Feature = dataclasses.field(init=False, default=None)
 
     custom_fields = []
 
     def validate(self):
         """Check whether I am consistent. Raise ValidationError if not."""
         super().validate()
-        if not hasattr(self, "confirmationDate"):
-            raise ValidationError("Confirmation Date is mandatory")
-        elif self.confirmationDate is None:
-            raise ValidationError("Confirmation Date must have a value")
-        if not hasattr(self, "caseReference"):
-            raise ValidationError("Case Reference is mandatory")
-        elif self.caseReference is None:
-            raise ValidationError("Case Reference must have a value")
-        self.caseReference.validate()
         for field in self.custom_fields:
             if field.required is True and attrgetter(field.key)(self) is None:
                 raise ValidationError(f"{field.key} must have a value")
@@ -113,7 +97,10 @@ def remove_case_class_observer(observer: Callable[[type], None]) -> None:
 def reset_custom_case_fields() -> None:
     """When you want to get back to where you started, for example to load the field definitions from
     storage or if you're writing tests that modify the Case class."""
-    make_custom_case_class("Case", [], [])
+    day_zero_field_definitions = json.loads(importlib.resources.read_text('data_service', 'day_zero_fields.json'))
+    day_zero_fields = [Field.from_dict(f) for f in day_zero_field_definitions]
+    day_zero_dataclass_fields = [f.dataclasses_tuple() for f in day_zero_fields]
+    make_custom_case_class("Case", day_zero_dataclass_fields, day_zero_fields)
 
 
 def add_field_to_case_class(field_model: Field) -> None:

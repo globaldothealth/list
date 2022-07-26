@@ -2,7 +2,10 @@ import dataclasses
 from datetime import date
 from typing import Optional, Union
 
+from data_service.model.case_exclusion_metadata import CaseExclusionMetadata
+from data_service.model.case_reference import CaseReference
 from data_service.model.document import Document
+from data_service.model.geojson import Feature
 from data_service.util.errors import PreconditionUnsatisfiedError
 
 
@@ -20,7 +23,15 @@ class Field(Document):
     STRING = "string"
     DATE = "date"
     INTEGER = "integer"
-    type_map = {STRING: str, DATE: date, INTEGER: int}
+    LOCATION = "geofeature"
+    type_map = {
+        STRING: str,
+        DATE: date,
+        INTEGER: int,
+        LOCATION: Feature,
+        "CaseReference": CaseReference,
+        "CaseExclusion": CaseExclusionMetadata
+    }
     acceptable_types = type_map.keys()
 
     @classmethod
@@ -29,6 +40,16 @@ class Field(Document):
             return cls.type_map[name]
         except KeyError:
             raise PreconditionUnsatisfiedError(f"cannot use type {name} in a Field")
+
+    @classmethod
+    def from_dict(cls, dictionary):
+        return cls(
+            dictionary.get('key'),
+            dictionary.get('type'),
+            dictionary.get('data_dictionary_text'),
+            dictionary.get('required'),
+            dictionary.get('default', None)
+        )
 
     def python_type(self) -> type:
         return self.model_type(self.type)
