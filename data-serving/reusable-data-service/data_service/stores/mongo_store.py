@@ -16,7 +16,7 @@ from json import loads
 from bson.errors import InvalidId
 from bson.json_util import dumps
 from bson.objectid import ObjectId
-from typing import List, Tuple
+from typing import Any, List, Tuple
 
 
 Case = None
@@ -60,7 +60,7 @@ class MongoStore:
             case = self.get_case_collection().find_one({"_id": ObjectId(id)})
             if case is not None:
                 # case includes BSON fields like ObjectID - convert into JSON for use by the app
-                return Case.from_json(dumps(case))
+                return Case.from_dict(MongoStore.mongo_document_to_json(case))
             else:
                 return None
         except InvalidId:
@@ -70,7 +70,7 @@ class MongoStore:
         cases = self.get_case_collection().find(
             filter.to_mongo_query(), skip=(page - 1) * limit, limit=limit
         )
-        return [Case.from_json(dumps(c)) for c in cases]
+        return [Case.from_dict(MongoStore.mongo_document_to_json(c)) for c in cases]
 
     def count_cases(self, filter: Filter) -> int:
         if isinstance(filter, Anything):
@@ -130,7 +130,7 @@ class MongoStore:
                 ]
             }
         )
-        return [Case.from_json(dumps(c)) for c in cases]
+        return [Case.from_dict(MongoStore.mongo_document_to_json(c)) for c in cases]
 
     def update_case(self, id: str, update: DocumentUpdate):
         if len(update) == 0:
@@ -194,7 +194,7 @@ class MongoStore:
     @staticmethod
     def case_model_iterator(mongo_iterator):
         """Turn an iterator of mongo results into an iterator of cases."""
-        return map(lambda c: Case.from_json(dumps(c)), mongo_iterator)
+        return map(lambda c: Case.from_dict(MongoStore.mongo_document_to_json(c)), mongo_iterator)
 
     @staticmethod
     def setup():
@@ -231,6 +231,17 @@ class MongoStore:
                 "caseExclusion"
             ] = MongoStore.case_exclusion_to_bson_compatible_dict(case.caseExclusion)
         return bson_case
+
+    @staticmethod
+    def mongo_document_to_json(doc) -> Any:
+        """Patch up some bson-specific warts in a pymongo document before handing back to the app."""
+        # Because bson.json_util doesn't expose dump we have to round-trip through a string
+        dictionary = loads(dumps(doc))
+        the_id = dictionary["_id"]
+        if isinstance(the_id, dict):
+            dictionary["_id"] = the_id["$oid"]
+        return dictionary
+
 
     @staticmethod
     def case_exclusion_to_bson_compatible_dict(exclusion: CaseExclusionMetadata):
