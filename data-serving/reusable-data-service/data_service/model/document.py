@@ -35,7 +35,7 @@ class Document:
 
     @classmethod
     def fields_of_class(cls, a_class: type) -> list[str]:
-        return [f.name for f in dataclasses.fields(cls) if f.type == a_class]
+        return [f.name for f in dataclasses.fields(cls) if issubclass(f.type, a_class)]
 
     @staticmethod
     def interpret_date(maybe_date) -> datetime.date:
