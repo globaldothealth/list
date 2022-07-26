@@ -1,7 +1,7 @@
 import dataclasses
 
 from datetime import date
-from typing import Optional, Union
+from typing import Any, List, Optional, Union
 
 from data_service.model.case import add_field_to_case_class, observe_case_class
 from data_service.model.field import Field
@@ -33,6 +33,7 @@ class SchemaController:
                 field.data_dictionary_text,
                 field.required,
                 field.default,
+                field.values,
                 False,
             )
 
@@ -43,6 +44,7 @@ class SchemaController:
         description: str,
         required: bool = False,
         default: Optional[Union[bool, str, int, date]] = None,
+        values: Optional[List[Any]] = None,
         store_field: bool = True,
     ):
         global Case
@@ -61,7 +63,7 @@ class SchemaController:
         If a field is required, set required = True. You must also set a default value so that
         existing cases have an initial setting for the field."""
         required = required if required is not None else False
-        field_model = Field(name, type_name, description, required, default)
+        field_model = Field(name, type_name, description, required, default, values)
         add_field_to_case_class(field_model)
         if store_field:
             self.store.add_field(field_model)

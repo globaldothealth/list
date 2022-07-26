@@ -163,6 +163,7 @@ def add_field_to_case_schema():
             req["description"],
             req.get("required"),
             req.get("default"),
+            req.get("values")
         )
         return "", 201
     except WebApplicationError as e:

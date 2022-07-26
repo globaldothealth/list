@@ -1,6 +1,6 @@
 import dataclasses
 from datetime import date
-from typing import Optional, Union
+from typing import Any, List, Optional, Union
 
 from data_service.model.case_exclusion_metadata import CaseExclusionMetadata
 from data_service.model.case_reference import CaseReference
@@ -20,6 +20,8 @@ class Field(Document):
     default: Optional[Union[bool, str, int, date]] = dataclasses.field(
         init=True, default=None
     )
+    values: Optional[List[Any]] = dataclasses.field(init=True, default=None)
+
     STRING = "string"
     DATE = "date"
     INTEGER = "integer"
@@ -49,6 +51,7 @@ class Field(Document):
             dictionary.get("data_dictionary_text"),
             dictionary.get("required"),
             dictionary.get("default", None),
+            dictionary.get("values", None)
         )
 
     def python_type(self) -> type:
