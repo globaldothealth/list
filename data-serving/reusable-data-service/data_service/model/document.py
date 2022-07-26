@@ -193,10 +193,15 @@ class Document:
         """Check whether I am consistent. Raise ValidationError if not."""
         for field in self.custom_fields:
             getter = operator.attrgetter(field.key)
-            if field.required is True and getter(self) is None:
+            value = getter(self)
+            if field.required is True and value is None:
                 raise ValidationError(f"{field.key} must have a value")
-            if field.key in self.document_fields() and getter(self) is not None:
+            if field.key in self.document_fields() and value is not None:
                 getter(self).validate()
+            if field.values is not None:
+                if value is not None and value not in field.values:
+                    raise ValidationError(f"{field.key} value {value} not in permissible values {field.values}")
+
 
     def _internal_set_value(self, key, value):
         self._internal_ensure_containers_exist(key)
