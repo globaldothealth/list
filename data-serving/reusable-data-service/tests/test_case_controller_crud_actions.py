@@ -301,7 +301,7 @@ def test_batch_status_change_rejects_invalid_status(case_controller):
 
 def test_batch_status_change_rejects_exclusion_with_no_note(case_controller):
     with pytest.raises(ValidationError):
-        case_controller.batch_status_change("EXCLUDED", case_ids=[])
+        case_controller.batch_status_change("omit_error", case_ids=[])
 
 
 def test_batch_status_change_excludes_cases_with_note(case_controller):
@@ -314,13 +314,13 @@ def test_batch_status_change_excludes_cases_with_note(case_controller):
             },
         )
     case_controller.batch_status_change(
-        "EXCLUDED", "I dislike this case", case_ids=["1", "2"]
+        "omit_error", "I dislike this case", case_ids=["1", "2"]
     )
     an_excluded_case = case_controller.store.case_by_id("1")
-    assert an_excluded_case.caseReference.status == "EXCLUDED"
+    assert an_excluded_case.caseStatus == "omit_error"
     assert an_excluded_case.caseExclusion.note == "I dislike this case"
     another_case = case_controller.store.case_by_id("3")
-    assert another_case.caseReference.status == "UNVERIFIED"
+    assert another_case.caseStatus == "probable"
     assert another_case.caseExclusion is None
 
 
@@ -337,11 +337,11 @@ def test_batch_status_change_records_date_of_exclusion(case_controller):
     )
 
     case_controller.batch_status_change(
-        "EXCLUDED", "Mistakes have been made", case_ids=["1"]
+        "omit_error", "Mistakes have been made", case_ids=["1"]
     )
 
     case = case_controller.store.case_by_id("1")
-    assert case.caseReference.status == "EXCLUDED"
+    assert case.caseStatus == "omit_error"
     assert case.caseExclusion.note == "Mistakes have been made"
     assert case.caseExclusion.date == date(2021, 8, 13)
 
@@ -360,12 +360,12 @@ def test_batch_status_change_removes_exclusion_data_on_unexcluding_case(
     )
 
     case_controller.batch_status_change(
-        "EXCLUDED", "Mistakes have been made", case_ids=["1"]
+        "omit_error", "Mistakes have been made", case_ids=["1"]
     )
-    case_controller.batch_status_change("UNVERIFIED", case_ids=["1"])
+    case_controller.batch_status_change("suspected", case_ids=["1"])
 
     case = case_controller.store.case_by_id("1")
-    assert case.caseReference.status == "UNVERIFIED"
+    assert case.caseStatus == "suspected"
     assert case.caseExclusion is None
 
 
@@ -381,11 +381,11 @@ def test_batch_status_change_by_query(case_controller):
     )
 
     case_controller.batch_status_change(
-        "EXCLUDED", "Mistakes have been made", filter="dateconfirmedafter:2021-06-01"
+        "omit_error", "Mistakes have been made", filter="dateconfirmedafter:2021-06-01"
     )
 
     case = case_controller.store.case_by_id("1")
-    assert case.caseReference.status == "EXCLUDED"
+    assert case.caseStatus == "omit_error"
     assert case.caseExclusion is not None
 
 
@@ -400,7 +400,6 @@ def test_excluded_case_ids_returns_empty_if_no_matching_cases(case_controller):
             "confirmationDate": date(2021, 6, 23),
             "caseReference": {
                 "sourceId": "123ab4567890123ef4567890",
-                "status": "VERIFIED",
             },
             "caseStatus": "probable",
         }
@@ -415,13 +414,12 @@ def test_excluded_case_ids_returns_ids_of_matching_cases(case_controller):
             "confirmationDate": date(2021, 6, 23),
             "caseReference": {
                 "sourceId": "123ab4567890123ef4567890",
-                "status": "EXCLUDED",
             },
             "caseExclusion": {
                 "date": date(2022, 5, 17),
                 "note": "I told him we already have one",
             },
-            "caseStatus": "probable",
+            "caseStatus": "omit_error",
         }
     )
     ids = case_controller.excluded_case_ids("123ab4567890123ef4567890")
@@ -435,13 +433,12 @@ def test_updating_missing_case_should_throw_NotFoundError(case_controller):
             "confirmationDate": date(2021, 6, 23),
             "caseReference": {
                 "sourceId": "123ab4567890123ef4567890",
-                "status": "EXCLUDED",
             },
             "caseExclusion": {
                 "date": date(2022, 5, 17),
                 "note": "I told him we already have one",
             },
-            "caseStatus": "probable",
+            "caseStatus": "omit_error",
         }
     )
     with pytest.raises(NotFoundError):
@@ -454,13 +451,12 @@ def test_updating_case_to_invalid_state_should_throw_ValidationError(case_contro
             "confirmationDate": date(2021, 6, 23),
             "caseReference": {
                 "sourceId": "123ab4567890123ef4567890",
-                "status": "EXCLUDED",
             },
             "caseExclusion": {
                 "date": date(2022, 5, 17),
                 "note": "I told him we already have one",
             },
-            "caseStatus": "probable",
+            "caseStatus": "omit_error",
         }
     )
     with pytest.raises(ValidationError):
@@ -473,13 +469,12 @@ def test_updating_case_to_valid_state_returns_updated_case(case_controller):
             "confirmationDate": date(2021, 6, 23),
             "caseReference": {
                 "sourceId": "123ab4567890123ef4567890",
-                "status": "EXCLUDED",
             },
             "caseExclusion": {
                 "date": date(2022, 5, 17),
                 "note": "I told him we already have one",
             },
-            "caseStatus": "probable",
+            "caseStatus": "omit_error",
         }
     )
 
@@ -498,18 +493,18 @@ def test_batch_update_cases_returns_number_of_modified_cases(case_controller):
         )
     update_one = {
         "_id": "1",
-        "caseReference": {"status": "EXCLUDED"},
+        "caseStatus": "omit_error",
         "caseExclusion": {"date": date(2022, 2, 2), "note": "Bad case no likey"},
     }
-    update_two = {"_id": "2", "caseReference": {"status": "VERIFIED"}}
+    update_two = {"_id": "2", "caseStatus": "confirmed"}
     num_modified = case_controller.batch_update([update_one, update_two])
     assert num_modified == 2
     case_one = case_controller.get_case("1")
-    assert case_one.caseReference.status == "EXCLUDED"
+    assert case_one.caseStatus == "omit_error"
     case_two = case_controller.get_case("2")
-    assert case_two.caseReference.status == "VERIFIED"
+    assert case_two.caseStatus == "confirmed"
     case_three = case_controller.get_case("3")
-    assert case_three.caseReference.status == "UNVERIFIED"
+    assert case_three.caseStatus == "probable"
 
 
 def test_batch_update_raises_if_id_not_supplied(case_controller):

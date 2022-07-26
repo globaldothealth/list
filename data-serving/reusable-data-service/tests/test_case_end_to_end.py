@@ -360,13 +360,13 @@ def test_exclude_selected_cases(client_with_patched_mongo):
     )
     post_response = client_with_patched_mongo.post(
         "/api/cases/batchStatusChange",
-        json={"status": "EXCLUDED", "caseIds": [str(inserted)], "note": "Duplicate"},
+        json={"status": "omit_error", "caseIds": [str(inserted)], "note": "Duplicate"},
     )
     assert post_response.status_code == 204
     get_response = client_with_patched_mongo.get(f"/api/cases/{str(inserted)}")
     assert get_response.status_code == 200
     document = get_response.get_json()
-    assert document["caseReference"]["status"] == "EXCLUDED"
+    assert document["caseStatus"] == "omit_error"
     assert document["caseExclusion"]["note"] == "Duplicate"
 
 
@@ -387,7 +387,7 @@ def test_excluded_case_ids(client_with_patched_mongo):
     )
     post_response = client_with_patched_mongo.post(
         "/api/cases/batchStatusChange",
-        json={"status": "EXCLUDED", "caseIds": [str(inserted)], "note": "Duplicate"},
+        json={"status": "omit_error", "caseIds": [str(inserted)], "note": "Duplicate"},
     )
     assert post_response.status_code == 204
     get_response = client_with_patched_mongo.get(
@@ -407,13 +407,12 @@ def test_filter_excluded_case_ids(client_with_patched_mongo):
                 "confirmationDate": datetime(2022, 5, i),
                 "caseReference": {
                     "sourceId": bson.ObjectId("fedc12345678901234567890"),
-                    "status": "EXCLUDED",
                 },
                 "caseExclusion": {
                     "date": datetime(2022, 6, i),
                     "note": f"Excluded upon this day, the {i}th of June",
                 },
-                "caseStatus": "probable"
+                "caseStatus": "omit_error"
             }
             for i in range(1, 4)
         ]

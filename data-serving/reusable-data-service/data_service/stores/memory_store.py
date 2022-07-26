@@ -53,7 +53,7 @@ class MemoryStore:
         self, id: str, status: str, exclusion: CaseExclusionMetadata
     ):
         case = self.case_by_id(id)
-        case.caseReference.status = status
+        case.caseStatus = status
         case.caseExclusion = exclusion
 
     def fetch_cases(self, page: int, limit: int, predicate: Filter):
@@ -72,7 +72,7 @@ class MemoryStore:
             c
             for c in self.cases.values()
             if c.caseReference.sourceId == source_id
-            and c.caseReference.status == "EXCLUDED"
+            and c.caseStatus == "omit_error"
         ]
 
     def delete_case(self, case_id: str):
