@@ -34,6 +34,10 @@ class Document:
         return cls.fields_of_class(Feature)
 
     @classmethod
+    def document_fields(cls) -> list[str]:
+        return cls.fields_of_class(Document)
+
+    @classmethod
     def fields_of_class(cls, a_class: type) -> list[str]:
         return [f.name for f in dataclasses.fields(cls) if issubclass(f.type, a_class)]
 

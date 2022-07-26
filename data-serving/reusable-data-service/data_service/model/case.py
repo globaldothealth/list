@@ -59,18 +59,10 @@ class DayZeroCase(Document):
                 value = cls.interpret_date(dictionary[key])
             elif key in cls.location_fields():
                 value = Feature.from_dict(dictionary[key])
-            elif key == "caseReference":
-                caseRef = dictionary[key]
-                value = (
-                    CaseReference.from_dict(caseRef) if caseRef is not None else None
-                )
-            elif key == "caseExclusion":
-                exclusion = dictionary[key]
-                value = (
-                    CaseExclusionMetadata.from_dict(exclusion)
-                    if exclusion is not None
-                    else None
-                )
+            elif key in cls.document_fields():
+                field_type = cls.field_type_for_key_path(key)
+                dict_description = dictionary[key]
+                value = (field_type.from_dict(dict_description) if dict_description is not None else None)
             elif key == "_id":
                 the_id = dictionary[key]
                 if isinstance(the_id, dict):
