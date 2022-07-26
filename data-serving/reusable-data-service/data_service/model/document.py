@@ -9,6 +9,7 @@ import flask.json
 
 from data_service.model.document_update import DocumentUpdate
 from data_service.model.geojson import Feature
+from data_service.util.errors import ValidationError
 from data_service.util.json_encoder import JSONEncoder
 
 from typing import Any, List
@@ -17,6 +18,7 @@ from typing import Any, List
 @dataclasses.dataclass
 class Document:
     """The base class for anything that's going into the database."""
+    custom_fields = []
 
     def to_dict(self):
         """Me, as a dictionary."""
@@ -187,9 +189,13 @@ class Document:
         return doc
 
     def validate(self):
-        """Test whether I am in a good state and raise an exception if not. Subclasses can override
-        to provide domain-specific validation rules."""
-        pass
+        """Check whether I am consistent. Raise ValidationError if not."""
+        for field in self.custom_fields:
+            getter = operator.attrgetter(field.key)
+            if field.required is True and getter(self) is None:
+                raise ValidationError(f"{field.key} must have a value")
+            if field.key in self.document_fields() and getter(self) is not None:
+                getter(self).validate()
 
     def _internal_set_value(self, key, value):
         self._internal_ensure_containers_exist(key)

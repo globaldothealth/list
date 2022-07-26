@@ -4,7 +4,6 @@ import importlib.resources
 import json
 
 from collections.abc import Callable
-from operator import attrgetter
 
 from data_service.model.case_exclusion_metadata import CaseExclusionMetadata
 from data_service.model.case_reference import CaseReference
@@ -15,49 +14,19 @@ from data_service.util.errors import (
     ConflictError,
     DependencyFailedError,
     PreconditionUnsatisfiedError,
-    ValidationError,
 )
-
-
-@dataclasses.dataclass()
-class DayZeroCase(Document):
-    """This class implements the "day-zero" data schema for Global.health.
-    At the beginning of an outbreak, we want to collect at least this much
-    information about an individual case for the line list.
-
-    Parameters here are defined to be keyword-only and not set in the
-    initialiser, so that clients can use Builder to populate them. Use
-    the validate() method to determine whether an instance is in a
-    consistent state (this also means we can add custom validation logic
-    to that function)."""
-
-    _: dataclasses.KW_ONLY
-
-    custom_fields = []
-
-    def validate(self):
-        """Check whether I am consistent. Raise ValidationError if not."""
-        super().validate()
-        for field in self.custom_fields:
-            if field.required is True and attrgetter(field.key)(self) is None:
-                raise ValidationError(f"{field.key} must have a value")
 
 
 observers = []
 
-# Actually we want to capture extra fields which can be specified dynamically:
-# so Case is the class that you should use.
-
-
-def make_custom_case_class(name: str, fields=[], field_models=[]) -> type:
+def make_custom_case_class(name: str, field_models=[]) -> type:
     """Generate a class extending the DayZeroCase class with additional fields.
-    fields is a list of dataclass fields that should be added to the generated class.
     field_models is a list of model objects describing the fields for the data dictionary
     and for validation."""
-    # FIXME generate the fields list from the field_models
     global Case
+    fields = [f.dataclasses_tuple() for f in field_models]
     try:
-        new_case_class = dataclasses.make_dataclass(name, fields, bases=(DayZeroCase,))
+        new_case_class = dataclasses.make_dataclass(name, fields, bases=(Document,))
     except TypeError as e:
         raise DependencyFailedError(*(e.args))
     new_case_class.custom_fields = field_models
@@ -99,14 +68,12 @@ def reset_custom_case_fields() -> None:
     storage or if you're writing tests that modify the Case class."""
     day_zero_field_definitions = json.loads(importlib.resources.read_text('data_service', 'day_zero_fields.json'))
     day_zero_fields = [Field.from_dict(f) for f in day_zero_field_definitions]
-    day_zero_dataclass_fields = [f.dataclasses_tuple() for f in day_zero_fields]
-    make_custom_case_class("Case", day_zero_dataclass_fields, day_zero_fields)
+    make_custom_case_class("Case", day_zero_fields)
 
 
 def add_field_to_case_class(field_model: Field) -> None:
-    existing_fields = dataclasses.fields(Case)
     field_models = Case.custom_fields
-    if field_model.key in [f.name for f in existing_fields]:
+    if field_model.key in [f.key for f in field_models]:
         raise ConflictError(f"field {field_model.key} already exists")
     if field_model.type not in Field.acceptable_types:
         raise PreconditionUnsatisfiedError(
@@ -116,11 +83,9 @@ def add_field_to_case_class(field_model: Field) -> None:
         raise PreconditionUnsatisfiedError(
             f"field {field_model.key} is required so it must have a default value"
         )
-    fields_list = [(f.name, f.type, f) for f in existing_fields]
-    fields_list.append(field_model.dataclasses_tuple())
     field_models.append(field_model)
     # re-invent the Case class
-    make_custom_case_class("Case", fields_list, field_models)
+    make_custom_case_class("Case", field_models)
 
 
 # let's start with a clean slate on first load
