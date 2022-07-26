@@ -19,6 +19,7 @@ from data_service.util.errors import (
 
 observers = []
 
+
 def make_custom_case_class(name: str, field_models=[]) -> type:
     """Generate a class extending the DayZeroCase class with additional fields.
     field_models is a list of model objects describing the fields for the data dictionary
@@ -66,7 +67,9 @@ def remove_case_class_observer(observer: Callable[[type], None]) -> None:
 def reset_custom_case_fields() -> None:
     """When you want to get back to where you started, for example to load the field definitions from
     storage or if you're writing tests that modify the Case class."""
-    day_zero_field_definitions = json.loads(importlib.resources.read_text('data_service', 'day_zero_fields.json'))
+    day_zero_field_definitions = json.loads(
+        importlib.resources.read_text("data_service", "day_zero_fields.json")
+    )
     day_zero_fields = [Field.from_dict(f) for f in day_zero_field_definitions]
     make_custom_case_class("Case", day_zero_fields)
 
