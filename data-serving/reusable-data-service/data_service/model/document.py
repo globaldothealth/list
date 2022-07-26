@@ -180,13 +180,6 @@ class Document:
                     if dict_description is not None
                     else None
                 )
-            elif key == "_id":
-                the_id = dictionary[key]
-                if isinstance(the_id, dict):
-                    # this came from a BSON objectID representation
-                    value = the_id["$oid"]
-                else:
-                    value = the_id
             else:
                 value = dictionary[key]
             setattr(doc, key, value)
