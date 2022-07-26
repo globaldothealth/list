@@ -30,7 +30,7 @@ class Field(Document):
         INTEGER: int,
         LOCATION: Feature,
         "CaseReference": CaseReference,
-        "CaseExclusion": CaseExclusionMetadata
+        "CaseExclusion": CaseExclusionMetadata,
     }
     acceptable_types = type_map.keys()
 
@@ -44,11 +44,11 @@ class Field(Document):
     @classmethod
     def from_dict(cls, dictionary):
         return cls(
-            dictionary.get('key'),
-            dictionary.get('type'),
-            dictionary.get('data_dictionary_text'),
-            dictionary.get('required'),
-            dictionary.get('default', None)
+            dictionary.get("key"),
+            dictionary.get("type"),
+            dictionary.get("data_dictionary_text"),
+            dictionary.get("required"),
+            dictionary.get("default", None),
         )
 
     def python_type(self) -> type:

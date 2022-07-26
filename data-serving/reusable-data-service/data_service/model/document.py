@@ -18,6 +18,7 @@ from typing import Any, List
 @dataclasses.dataclass
 class Document:
     """The base class for anything that's going into the database."""
+
     custom_fields = []
 
     def to_dict(self):
