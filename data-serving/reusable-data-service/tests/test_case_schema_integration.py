@@ -22,6 +22,7 @@ def test_adding_field_then_downloading_case(client_with_patched_mongo):
                 "status": "UNVERIFIED",
                 "sourceId": "24680135792468013579fedc",
             },
+            "caseStatus": "probable",
             "mySymptoms": "coughs, sneezles",
         },
     )
@@ -52,6 +53,7 @@ def test_adding_field_then_downloading_csv(client_with_patched_mongo):
                 "status": "UNVERIFIED",
                 "sourceId": "24680135792468013579fedc",
             },
+            "caseStatus": "probable",
             "someField": "well, what have we here",
         },
     )
@@ -79,6 +81,7 @@ def test_required_field_default_value_spread_to_existing_cases(
                 "status": "UNVERIFIED",
                 "sourceId": "24680135792468013579fedc",
             },
+            "caseStatus": "probable",
         },
     )
     assert response.status_code == 201
@@ -121,6 +124,7 @@ def test_required_field_becomes_required_in_validation(client_with_patched_mongo
                 "status": "UNVERIFIED",
                 "sourceId": "24680135792468013579fedc",
             },
+            "caseStatus": "probable",
         },
     )
     assert response.status_code == 422
@@ -150,6 +154,7 @@ def test_field_enumerating_allowed_values_forbids_other_value(client_with_patche
                 "status": "UNVERIFIED",
                 "sourceId": "24680135792468013579fedc",
             },
+            "caseStatus": "probable",
             "customPathogenStatus": "Something Else"
         },
     )

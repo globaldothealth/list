@@ -109,6 +109,7 @@ def test_create_valid_case_adds_to_collection(case_controller):
         {
             "confirmationDate": date(2021, 6, 3),
             "caseReference": {"sourceId": "123ab4567890123ef4567890"},
+            "caseStatus": "probable",
         }
     )
     assert case_controller.store.count_cases() == 1
@@ -120,6 +121,7 @@ def test_create_valid_case_with_negative_count_raises(case_controller):
             {
                 "confirmationDate": date(2021, 6, 3),
                 "caseReference": {"sourceId": "123ab4567890123ef4567890"},
+                "caseStatus": "probable",
             },
             num_cases=-7,
         )
@@ -130,6 +132,7 @@ def test_create_valid_case_with_positive_count_adds_to_collection(case_controlle
         {
             "confirmationDate": date(2021, 6, 3),
             "caseReference": {"sourceId": "123ab4567890123ef4567890"},
+            "caseStatus": "probable",
         },
         num_cases=7,
     )
@@ -148,6 +151,7 @@ def test_validate_case_with_valid_case_does_not_add_case(
         {
             "confirmationDate": date(2021, 6, 3),
             "caseReference": {"sourceId": "123ab4567890123ef4567890"},
+            "caseStatus": "probable",
         }
     )
     assert case_controller.store.count_cases() == 0
@@ -182,7 +186,7 @@ def test_batch_upsert_reports_errors(case_controller):
     response = case_controller.batch_upsert({"cases": [{}]})
     assert response.numCreated == 0
     assert response.numUpdated == 0
-    assert response.errors == {"0": "confirmationDate must have a value"}
+    assert response.errors == {"0": "caseStatus must have a value"}
 
 
 def test_download_with_no_query_is_ok(case_controller):
@@ -190,6 +194,7 @@ def test_download_with_no_query_is_ok(case_controller):
         {
             "confirmationDate": date(2021, 6, 3),
             "caseReference": {"sourceId": "123ab4567890123ef4567890"},
+            "caseStatus": "probable",
         },
         num_cases=2,
     )
@@ -223,6 +228,7 @@ def test_download_cases_by_id(case_controller):
             {
                 "confirmationDate": date(2021, 6, i + 1),
                 "caseReference": {"sourceId": "123ab4567890123ef4567890"},
+                "caseStatus": "probable",
             },
         )
     generator = case_controller.download("csv", case_ids=["1", "3"])
@@ -240,6 +246,7 @@ def test_filter_cases_by_query(case_controller):
             {
                 "confirmationDate": date(2021, 6, i + 1),
                 "caseReference": {"sourceId": "123ab4567890123ef4567890"},
+                "caseStatus": "probable",
             },
         )
     generator = case_controller.download("csv", filter="dateconfirmedbefore:2021-06-03")
@@ -255,6 +262,7 @@ def test_download_supports_tsv(case_controller):
         {
             "confirmationDate": date(2021, 6, 3),
             "caseReference": {"sourceId": "123ab4567890123ef4567890"},
+            "caseStatus": "probable",
         },
         num_cases=2,
     )
@@ -272,6 +280,7 @@ def test_download_supports_json(case_controller):
         {
             "confirmationDate": date(2021, 6, 3),
             "caseReference": {"sourceId": "123ab4567890123ef4567890"},
+            "caseStatus": "probable", 
         },
         num_cases=2,
     )
@@ -301,6 +310,7 @@ def test_batch_status_change_excludes_cases_with_note(case_controller):
             {
                 "confirmationDate": date(2021, 6, i + 1),
                 "caseReference": {"sourceId": "123ab4567890123ef4567890"},
+                "caseStatus": "probable",
             },
         )
     case_controller.batch_status_change(
@@ -322,6 +332,7 @@ def test_batch_status_change_records_date_of_exclusion(case_controller):
             "caseReference": {
                 "sourceId": "123ab4567890123ef4567890",
             },
+            "caseStatus": "probable",
         }
     )
 
@@ -344,6 +355,7 @@ def test_batch_status_change_removes_exclusion_data_on_unexcluding_case(
             "caseReference": {
                 "sourceId": "123ab4567890123ef4567890",
             },
+            "caseStatus": "probable",
         }
     )
 
@@ -364,6 +376,7 @@ def test_batch_status_change_by_query(case_controller):
             "caseReference": {
                 "sourceId": "123ab4567890123ef4567890",
             },
+            "caseStatus": "probable",
         }
     )
 
@@ -389,6 +402,7 @@ def test_excluded_case_ids_returns_empty_if_no_matching_cases(case_controller):
                 "sourceId": "123ab4567890123ef4567890",
                 "status": "VERIFIED",
             },
+            "caseStatus": "probable",
         }
     )
     ids = case_controller.excluded_case_ids("123ab4567890123ef4567890")
@@ -407,6 +421,7 @@ def test_excluded_case_ids_returns_ids_of_matching_cases(case_controller):
                 "date": date(2022, 5, 17),
                 "note": "I told him we already have one",
             },
+            "caseStatus": "probable",
         }
     )
     ids = case_controller.excluded_case_ids("123ab4567890123ef4567890")
@@ -426,6 +441,7 @@ def test_updating_missing_case_should_throw_NotFoundError(case_controller):
                 "date": date(2022, 5, 17),
                 "note": "I told him we already have one",
             },
+            "caseStatus": "probable",
         }
     )
     with pytest.raises(NotFoundError):
@@ -444,6 +460,7 @@ def test_updating_case_to_invalid_state_should_throw_ValidationError(case_contro
                 "date": date(2022, 5, 17),
                 "note": "I told him we already have one",
             },
+            "caseStatus": "probable",
         }
     )
     with pytest.raises(ValidationError):
@@ -462,6 +479,7 @@ def test_updating_case_to_valid_state_returns_updated_case(case_controller):
                 "date": date(2022, 5, 17),
                 "note": "I told him we already have one",
             },
+            "caseStatus": "probable",
         }
     )
 
@@ -475,6 +493,7 @@ def test_batch_update_cases_returns_number_of_modified_cases(case_controller):
             {
                 "confirmationDate": date(2021, 6, i + 1),
                 "caseReference": {"sourceId": "123ab4567890123ef4567890"},
+                "caseStatus": "probable",
             },
         )
     update_one = {
@@ -507,6 +526,7 @@ def test_batch_update_raises_if_case_would_be_invalid(case_controller):
                 "sourceId": "123ab4567890123ef4567890",
                 "status": "VERIFIED",
             },
+            "caseStatus": "probable",
         }
     )
     update = {"_id": "1", "confirmationDate": None}
@@ -526,6 +546,7 @@ def test_batch_update_query_returns_modified_count(case_controller):
             {
                 "confirmationDate": date(2021, 6, i + 1),
                 "caseReference": {"sourceId": "123ab4567890123ef4567890"},
+                "caseStatus": "probable",
             },
         )
     update = {"confirmationDate": date(2022, 5, 13)}
@@ -540,6 +561,7 @@ def test_delete_present_case_deletes_case(case_controller):
             {
                 "confirmationDate": date(2021, 6, i + 1),
                 "caseReference": {"sourceId": "123ab4567890123ef4567890"},
+                "caseStatus": "probable",
             },
         )
     case_controller.delete_case("1")
@@ -578,6 +600,7 @@ def test_cannot_batch_delete_more_cases_than_threshold(case_controller):
             {
                 "confirmationDate": date(2021, 6, i + 1),
                 "caseReference": {"sourceId": "123ab4567890123ef4567890"},
+                "caseStatus": "probable",
             },
         )
     with pytest.raises(ValidationError):
@@ -591,6 +614,7 @@ def test_batch_delete_with_case_ids(case_controller):
             {
                 "confirmationDate": date(2021, 6, i + 1),
                 "caseReference": {"sourceId": "123ab4567890123ef4567890"},
+                "caseStatus": "probable",
             },
         )
     case_controller.batch_delete(None, ["1", "2"])
@@ -608,6 +632,7 @@ def test_batch_delete_with_query(case_controller):
             {
                 "confirmationDate": date(2021, 6, i + 1),
                 "caseReference": {"sourceId": "123ab4567890123ef4567890"},
+                "caseStatus": "probable",
             },
         )
     case_controller.batch_delete("dateconfirmedafter:2021-05-02", None)
