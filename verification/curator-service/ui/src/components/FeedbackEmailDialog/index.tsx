@@ -64,6 +64,7 @@ const FeedbackEmailDialog = ({
             handleClose();
         },
     });
+
     // -------------------
     // isOpen = true;
     // -------------------
@@ -99,11 +100,11 @@ const FeedbackEmailDialog = ({
                         <DialogActions>
                             <Button onClick={handleClose}>Cancel</Button>
                             <Button type="submit">Send</Button>
-                            <ReCAPTCHA
+                            {/* <ReCAPTCHA
                                 sitekey=""
                                 size="invisible"
                                 ref={recaptchaRef}
-                            />
+                            /> */}
                         </DialogActions>
                     </form>
                 </DialogContent>
