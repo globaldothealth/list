@@ -29,9 +29,9 @@ def test_case_with_geojson_is_valid():
 
 def test_csv_header():
     header_line = Case.csv_header()
-    header_fields = header_line.split(',')
-    assert 'caseStatus' in header_fields
-    assert 'location.latitude' in header_fields
+    header_fields = header_line.split(",")
+    assert "caseStatus" in header_fields
+    assert "location.latitude" in header_fields
 
 
 def test_csv_row_with_no_id():
@@ -45,9 +45,9 @@ def test_csv_row_with_no_id():
     case.caseStatus = "probable"
     case.pathogenStatus = "emerging"
     csv = case.to_csv()
-    csv_fields = csv.split(',')
-    assert 'probable' in csv_fields
-    assert '2022-06-13' in csv_fields
+    csv_fields = csv.split(",")
+    assert "probable" in csv_fields
+    assert "2022-06-13" in csv_fields
 
 
 def test_csv_row_with_id():
@@ -64,9 +64,9 @@ def test_csv_row_with_id():
     case.pathogenStatus = "unknown"
     csv = case.to_csv()
     csv = case.to_csv()
-    csv_fields = csv.split(',')
-    assert 'probable' in csv_fields
-    assert '2022-06-13' in csv_fields
+    csv_fields = csv.split(",")
+    assert "probable" in csv_fields
+    assert "2022-06-13" in csv_fields
 
 
 def test_apply_update_to_case():

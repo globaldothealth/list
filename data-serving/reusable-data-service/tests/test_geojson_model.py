@@ -5,6 +5,7 @@ from data_service.util.errors import ValidationError
 
 from tests.util import does_not_raise
 
+
 def test_point_needs_two_coordinates():
     p = Point()
     p.coordinates = []
