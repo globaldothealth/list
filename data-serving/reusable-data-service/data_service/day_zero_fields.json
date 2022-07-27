@@ -30,6 +30,18 @@
         ]
     },
     {
+        "key": "location",
+        "type": "geofeature",
+        "data_dictionary_text": "The location associated with this case.",
+        "required": false
+    },
+    {
+        "key": "age",
+        "type": "age_range",
+        "data_dictionary_text": "Age of the individual, specified as a range, either open-ended (<n, >n) or as a range delimited by a hyphen following 5-year age increments (m-n)",
+        "required": false
+    },
+    {
         "key": "confirmationDate",
         "type": "date",
         "data_dictionary_text": "The date on which the case was confirmed. There will also be a confirmation event but the date is stored denormalised for efficiency.",
@@ -45,12 +57,6 @@
         "key": "caseExclusion",
         "type": "CaseExclusion",
         "data_dictionary_text": "If this case is excluded from the line list, information about when and why it was excluded.",
-        "required": false
-    },
-    {
-        "key": "location",
-        "type": "geofeature",
-        "data_dictionary_text": "The location associated with this case.",
         "required": false
     }
 ]

@@ -2,6 +2,7 @@ import dataclasses
 from datetime import date
 from typing import Any, List, Optional, Union
 
+from data_service.model.age_range import AgeRange
 from data_service.model.case_exclusion_metadata import CaseExclusionMetadata
 from data_service.model.case_reference import CaseReference
 from data_service.model.document import Document
@@ -26,11 +27,13 @@ class Field(Document):
     DATE = "date"
     INTEGER = "integer"
     LOCATION = "geofeature"
+    AGE_RANGE = "age_range"
     type_map = {
         STRING: str,
         DATE: date,
         INTEGER: int,
         LOCATION: Feature,
+        AGE_RANGE: AgeRange,
         "CaseReference": CaseReference,
         "CaseExclusion": CaseExclusionMetadata,
     }
