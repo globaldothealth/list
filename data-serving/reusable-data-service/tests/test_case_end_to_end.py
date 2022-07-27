@@ -174,9 +174,9 @@ def test_post_case_list_cases_geojson_round_trip(client_with_patched_mongo):
 def test_post_case_list_cases_with_age_round_trip(client_with_patched_mongo):
     with open("./tests/data/case.minimal.json") as case_file:
         case_doc = json.load(case_file)
-    case_doc['age'] = {
-        'lower': 4,
-        'upper': 12,
+    case_doc["age"] = {
+        "lower": 4,
+        "upper": 12,
     }
     post_response = client_with_patched_mongo.post(
         "/api/cases",

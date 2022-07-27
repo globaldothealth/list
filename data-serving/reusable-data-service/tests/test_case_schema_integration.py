@@ -157,3 +157,41 @@ def test_field_enumerating_allowed_values_forbids_other_value(
         },
     )
     assert response.status_code == 422
+
+
+def test_adding_enumerated_field_with_other_value(client_with_patched_mongo):
+    response = client_with_patched_mongo.post(
+        "/api/schema",
+        json={
+            "name": "customPathogenStatus",
+            "type": "string",
+            "description": "Whether the infection is associated with an endemic or emerging incidence",
+            "values": ["Endemic", "Emerging", "Unknown", "other"],
+            "required": False,
+        },
+    )
+    assert response.status_code == 201
+    response = client_with_patched_mongo.post(
+        "/api/cases",
+        json={
+            "confirmationDate": "2022-06-01T00:00:00.000Z",
+            "caseReference": {
+                "status": "UNVERIFIED",
+                "sourceId": "24680135792468013579fedc",
+            },
+            "caseStatus": "probable",
+            "customPathogenStatus": "other",
+            "customPathogenStatus_other": "Neopanspermia",
+        },
+    )
+    assert response.status_code == 201
+    response = client_with_patched_mongo.post(
+        "/api/cases/download", json={"format": "csv"}
+    )
+    assert response.status_code == 200
+    csv_file = io.StringIO(response.get_data().decode("utf-8"))
+    csv_reader = csv.DictReader(csv_file)
+    cases = [c for c in csv_reader]
+    assert len(cases) == 1
+    case = cases[0]
+    assert case["customPathogenStatus_other"] == "Neopanspermia"

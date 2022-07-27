@@ -7,7 +7,7 @@ from tests.util import does_not_raise
 
 
 def test_age_range_massages_input_to_match_buckets():
-    ages = AgeRange(2,6)
+    ages = AgeRange(2, 6)
     assert ages.lower == 1
     assert ages.upper == 10
 

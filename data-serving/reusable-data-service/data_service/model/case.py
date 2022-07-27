@@ -25,7 +25,9 @@ def make_custom_case_class(name: str, field_models=[]) -> type:
     field_models is a list of model objects describing the fields for the data dictionary
     and for validation."""
     global Case
-    fields = [f.dataclasses_tuple() for f in field_models]
+    fields = []
+    for f in field_models:
+        fields += f.dataclasses_tuples()
     try:
         new_case_class = dataclasses.make_dataclass(name, fields, bases=(Document,))
     except TypeError as e:
