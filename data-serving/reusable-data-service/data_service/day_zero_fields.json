@@ -47,9 +47,9 @@
         "data_dictionary_text": "Sex at birth of an individual.",
         "required": true,
         "values": [
-            "Male",
-            "Female",
-            "Unknown",
+            "male",
+            "female",
+            "unknown",
             "other"
         ]
     },
