@@ -17,5 +17,6 @@
         }
     },
     "caseStatus": "probable",
-    "pathogenStatus": "unknown"
+    "pathogenStatus": "unknown",
+    "sexAtBirth": "Female"
 }
