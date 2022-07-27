@@ -118,7 +118,10 @@ class Document:
             value = getattr(self, f.name)
             if issubclass(f.type, Document):
                 if self.include_dataclass_fields(f.type):
-                    fields += value.field_values()
+                    if value is not None:
+                        fields += value.field_values()
+                    else:
+                        fields += f.type.none_field_values()
             elif hasattr(f.type, "custom_field_names"):
                 if value is not None:
                     fields += value.custom_field_values()

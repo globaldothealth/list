@@ -171,6 +171,25 @@ def test_post_case_list_cases_geojson_round_trip(client_with_patched_mongo):
     assert get_response.json["cases"][0]["location"]["properties"]["country"] == "IND"
 
 
+def test_post_case_list_cases_with_age_round_trip(client_with_patched_mongo):
+    with open("./tests/data/case.minimal.json") as case_file:
+        case_doc = json.load(case_file)
+    case_doc['age'] = {
+        'lower': 4,
+        'upper': 12,
+    }
+    post_response = client_with_patched_mongo.post(
+        "/api/cases",
+        json=case_doc,
+    )
+    assert post_response.status_code == 201
+    get_response = client_with_patched_mongo.get("/api/cases")
+    assert get_response.status_code == 200
+    assert len(get_response.json["cases"]) == 1
+    assert get_response.json["cases"][0]["age"]["lower"] == 1
+    assert get_response.json["cases"][0]["age"]["upper"] == 15
+
+
 def test_post_multiple_case_list_cases_round_trip(client_with_patched_mongo):
     with open("./tests/data/case.minimal.json") as case_file:
         case_doc = json.load(case_file)

@@ -48,14 +48,6 @@ def test_age_range_invalid_if_upper_bound_methuselan():
         ages.validate()
 
 
-def test_age_range_invalid_if_gap_too_small():
-    ages = AgeRange(None, None)
-    ages.lower = 10
-    ages.upper = 11
-    with pytest.raises(ValidationError):
-        ages.validate()
-
-
 def test_age_range_ok_for_infants():
     ages = AgeRange(0, 1)
     with does_not_raise(ValidationError):
