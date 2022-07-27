@@ -1,10 +1,13 @@
 import csv
 import io
+import json
 
 from tests.end_to_end_fixture import client_with_patched_mongo
 
 
 def test_adding_field_then_downloading_case(client_with_patched_mongo):
+    with open("./tests/data/case.minimal.json") as json_file:
+        case_doc = json.load(json_file)
     response = client_with_patched_mongo.post(
         "/api/schema",
         json={
@@ -14,17 +17,12 @@ def test_adding_field_then_downloading_case(client_with_patched_mongo):
         },
     )
     assert response.status_code == 201
+
+    case_doc["mySymptoms"] = "coughs, sneezles"
+
     response = client_with_patched_mongo.post(
         "/api/cases",
-        json={
-            "confirmationDate": "2022-06-01T00:00:00.000Z",
-            "caseReference": {
-                "status": "UNVERIFIED",
-                "sourceId": "24680135792468013579fedc",
-            },
-            "caseStatus": "probable",
-            "mySymptoms": "coughs, sneezles",
-        },
+        json=case_doc,
     )
     assert response.status_code == 201
     response = client_with_patched_mongo.get("/api/cases")
@@ -36,6 +34,8 @@ def test_adding_field_then_downloading_case(client_with_patched_mongo):
 
 
 def test_adding_field_then_downloading_csv(client_with_patched_mongo):
+    with open("./tests/data/case.minimal.json") as json_file:
+        case_doc = json.load(json_file)
     response = client_with_patched_mongo.post(
         "/api/schema",
         json={
@@ -45,17 +45,11 @@ def test_adding_field_then_downloading_csv(client_with_patched_mongo):
         },
     )
     assert response.status_code == 201
+
+    case_doc["someField"] = "well, what have we here"
     response = client_with_patched_mongo.post(
         "/api/cases",
-        json={
-            "confirmationDate": "2022-06-01T00:00:00.000Z",
-            "caseReference": {
-                "status": "UNVERIFIED",
-                "sourceId": "24680135792468013579fedc",
-            },
-            "caseStatus": "probable",
-            "someField": "well, what have we here",
-        },
+        json=case_doc,
     )
     assert response.status_code == 201
     response = client_with_patched_mongo.post(
@@ -73,16 +67,11 @@ def test_adding_field_then_downloading_csv(client_with_patched_mongo):
 def test_required_field_default_value_spread_to_existing_cases(
     client_with_patched_mongo,
 ):
+    with open("./tests/data/case.minimal.json") as json_file:
+        case_doc = json.load(json_file)
     response = client_with_patched_mongo.post(
         "/api/cases",
-        json={
-            "confirmationDate": "2022-06-01T00:00:00.000Z",
-            "caseReference": {
-                "status": "UNVERIFIED",
-                "sourceId": "24680135792468013579fedc",
-            },
-            "caseStatus": "probable",
-        },
+        json=case_doc,
     )
     assert response.status_code == 201
     response = client_with_patched_mongo.post(
@@ -105,6 +94,8 @@ def test_required_field_default_value_spread_to_existing_cases(
 
 
 def test_required_field_becomes_required_in_validation(client_with_patched_mongo):
+    with open("./tests/data/case.minimal.json") as json_file:
+        case_doc = json.load(json_file)
     response = client_with_patched_mongo.post(
         "/api/schema",
         json={
@@ -118,14 +109,7 @@ def test_required_field_becomes_required_in_validation(client_with_patched_mongo
     assert response.status_code == 201
     response = client_with_patched_mongo.post(
         "/api/cases",
-        json={
-            "confirmationDate": "2022-06-01T00:00:00.000Z",
-            "caseReference": {
-                "status": "UNVERIFIED",
-                "sourceId": "24680135792468013579fedc",
-            },
-            "caseStatus": "probable",
-        },
+        json=case_doc,
     )
     assert response.status_code == 422
 
@@ -133,6 +117,8 @@ def test_required_field_becomes_required_in_validation(client_with_patched_mongo
 def test_field_enumerating_allowed_values_forbids_other_value(
     client_with_patched_mongo,
 ):
+    with open("./tests/data/case.minimal.json") as json_file:
+        case_doc = json.load(json_file)
     response = client_with_patched_mongo.post(
         "/api/schema",
         json={
@@ -144,22 +130,19 @@ def test_field_enumerating_allowed_values_forbids_other_value(
         },
     )
     assert response.status_code == 201
+
+    case_doc["customPathogenStatus"] = "Something Else"
+
     response = client_with_patched_mongo.post(
         "/api/cases",
-        json={
-            "confirmationDate": "2022-06-01T00:00:00.000Z",
-            "caseReference": {
-                "status": "UNVERIFIED",
-                "sourceId": "24680135792468013579fedc",
-            },
-            "caseStatus": "probable",
-            "customPathogenStatus": "Something Else",
-        },
+        json=case_doc,
     )
     assert response.status_code == 422
 
 
 def test_adding_enumerated_field_with_other_value(client_with_patched_mongo):
+    with open("./tests/data/case.minimal.json") as json_file:
+        case_doc = json.load(json_file)
     response = client_with_patched_mongo.post(
         "/api/schema",
         json={
@@ -171,18 +154,12 @@ def test_adding_enumerated_field_with_other_value(client_with_patched_mongo):
         },
     )
     assert response.status_code == 201
+
+    case_doc["customPathogenStatus"] = "other"
+    case_doc["customPathogenStatus_other"] = "Neopanspermia"
     response = client_with_patched_mongo.post(
         "/api/cases",
-        json={
-            "confirmationDate": "2022-06-01T00:00:00.000Z",
-            "caseReference": {
-                "status": "UNVERIFIED",
-                "sourceId": "24680135792468013579fedc",
-            },
-            "caseStatus": "probable",
-            "customPathogenStatus": "other",
-            "customPathogenStatus_other": "Neopanspermia",
-        },
+        json=case_doc,
     )
     assert response.status_code == 201
     response = client_with_patched_mongo.post(

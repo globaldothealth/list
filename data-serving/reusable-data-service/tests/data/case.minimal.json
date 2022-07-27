@@ -4,5 +4,6 @@
         "sourceId": "fedc09876543210987654321"
     },
     "caseStatus": "probable",
-    "pathogenStatus": "emerging"
+    "pathogenStatus": "emerging",
+    "sexAtBirth": "Female"
 }

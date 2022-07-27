@@ -42,6 +42,18 @@
         "required": false
     },
     {
+        "key": "sexAtBirth",
+        "type": "string",
+        "data_dictionary_text": "Sex at birth of an individual.",
+        "required": true,
+        "values": [
+            "Male",
+            "Female",
+            "Unknown",
+            "other"
+        ]
+    },
+    {
         "key": "confirmationDate",
         "type": "date",
         "data_dictionary_text": "The date on which the case was confirmed. There will also be a confirmation event but the date is stored denormalised for efficiency.",

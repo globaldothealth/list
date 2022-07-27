@@ -8,5 +8,6 @@
         "note": "Excluded upon this day, for reasons"
     },
     "caseStatus": "omit_error",
-    "pathogenStatus": "endemic"
+    "pathogenStatus": "endemic",
+    "sexAtBirth": "Female"
 }
