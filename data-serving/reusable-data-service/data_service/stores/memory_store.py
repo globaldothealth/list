@@ -71,8 +71,7 @@ class MemoryStore:
         return [
             c
             for c in self.cases.values()
-            if c.caseReference.sourceId == source_id
-            and c.caseStatus == "omit_error"
+            if c.caseReference.sourceId == source_id and c.caseStatus == "omit_error"
         ]
 
     def delete_case(self, case_id: str):

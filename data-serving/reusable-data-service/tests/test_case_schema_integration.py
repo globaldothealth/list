@@ -130,18 +130,16 @@ def test_required_field_becomes_required_in_validation(client_with_patched_mongo
     assert response.status_code == 422
 
 
-def test_field_enumerating_allowed_values_forbids_other_value(client_with_patched_mongo):
+def test_field_enumerating_allowed_values_forbids_other_value(
+    client_with_patched_mongo,
+):
     response = client_with_patched_mongo.post(
         "/api/schema",
         json={
             "name": "customPathogenStatus",
             "type": "string",
             "description": "Whether the infection is associated with an endemic or emerging incidence",
-            "values": [
-                "Endemic",
-                "Emerging",
-                "Unknown"
-            ],
+            "values": ["Endemic", "Emerging", "Unknown"],
             "required": False,
         },
     )
@@ -155,7 +153,7 @@ def test_field_enumerating_allowed_values_forbids_other_value(client_with_patche
                 "sourceId": "24680135792468013579fedc",
             },
             "caseStatus": "probable",
-            "customPathogenStatus": "Something Else"
+            "customPathogenStatus": "Something Else",
         },
     )
     assert response.status_code == 422

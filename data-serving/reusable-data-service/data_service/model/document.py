@@ -200,8 +200,9 @@ class Document:
                 getter(self).validate()
             if field.values is not None:
                 if value is not None and value not in field.values:
-                    raise ValidationError(f"{field.key} value {value} not in permissible values {field.values}")
-
+                    raise ValidationError(
+                        f"{field.key} value {value} not in permissible values {field.values}"
+                    )
 
     def _internal_set_value(self, key, value):
         self._internal_ensure_containers_exist(key)
