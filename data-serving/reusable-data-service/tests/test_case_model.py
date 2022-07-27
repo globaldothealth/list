@@ -31,7 +31,7 @@ def test_csv_header():
     header_line = Case.csv_header()
     assert (
         header_line
-        == "_id,caseStatus,confirmationDate,caseReference.sourceId,location.country,location.latitude,location.longitude,location.admin1,location.admin2,location.admin3\r\n"
+        == "_id,caseStatus,pathogenStatus,confirmationDate,caseReference.sourceId,location.country,location.latitude,location.longitude,location.admin1,location.admin2,location.admin3\r\n"
     )
 
 
@@ -44,8 +44,9 @@ def test_csv_row_with_no_id():
     case.confirmationDate = date(2022, 6, 13)
     case.caseReference = ref
     case.caseStatus = "probable"
+    case.pathogenStatus = "emerging"
     csv = case.to_csv()
-    assert csv == ",probable,2022-06-13,abcd12903478565647382910,,,,,,\r\n"
+    assert csv == ",probable,emerging,2022-06-13,abcd12903478565647382910,,,,,,\r\n"
 
 
 def test_csv_row_with_id():
@@ -59,8 +60,9 @@ def test_csv_row_with_id():
     case.confirmationDate = date(2022, 6, 13)
     case.caseReference = ref
     case.caseStatus = "probable"
+    case.pathogenStatus = "unknown"
     csv = case.to_csv()
-    assert csv == f"{id1},probable,2022-06-13,{id2},,,,,,\r\n"
+    assert csv == f"{id1},probable,unknown,2022-06-13,{id2},,,,,,\r\n"
 
 
 def test_apply_update_to_case():

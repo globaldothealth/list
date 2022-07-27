@@ -16,5 +16,6 @@
             "country": "IND"
         }
     },
-    "caseStatus": "probable"
+    "caseStatus": "probable",
+    "pathogenStatus": "unknown"
 }

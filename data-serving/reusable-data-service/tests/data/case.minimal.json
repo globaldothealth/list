@@ -3,5 +3,6 @@
     "caseReference": {
         "sourceId": "fedc09876543210987654321"
     },
-    "caseStatus": "probable"
+    "caseStatus": "probable",
+    "pathogenStatus": "emerging"
 }
