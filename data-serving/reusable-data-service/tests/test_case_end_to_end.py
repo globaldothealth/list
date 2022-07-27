@@ -13,11 +13,7 @@ def test_get_case_with_known_id(client_with_patched_mongo):
     with open("./tests/data/case.minimal.json") as case_file:
         case_doc = json.load(case_file)
     db = pymongo.MongoClient("mongodb://localhost:27017/outbreak")
-    case_id = (
-        db["outbreak"]["cases"]
-        .insert_one(case_doc)
-        .inserted_id
-    )
+    case_id = db["outbreak"]["cases"].insert_one(case_doc).inserted_id
     response = client_with_patched_mongo.get(f"/api/cases/{str(case_id)}")
     result = response.get_json()
     assert response.status_code == 200
@@ -45,9 +41,7 @@ def test_list_cases_with_pagination_query(client_with_patched_mongo):
     db = pymongo.MongoClient("mongodb://localhost:27017/outbreak")
     with open("./tests/data/case.minimal.json") as case_file:
         case_doc = json.load(case_file)
-    db["outbreak"]["cases"].insert_many(
-        [dict(case_doc) for i in range(25)]
-    )
+    db["outbreak"]["cases"].insert_many([dict(case_doc) for i in range(25)])
     response = client_with_patched_mongo.get(f"/api/cases?page=2&limit=10")
     assert response.status_code == 200
     assert len(response.json["cases"]) == 10
@@ -71,7 +65,7 @@ def test_list_cases_filter_confirmation_date_before(client_with_patched_mongo):
     db = pymongo.MongoClient("mongodb://localhost:27017/outbreak")
     cases = [dict(case_doc) for i in range(1, 32)]
     for i in range(1, 32):
-        cases[i-1]["confirmationDate"] = datetime(2022,5,i)
+        cases[i - 1]["confirmationDate"] = datetime(2022, 5, i)
     db["outbreak"]["cases"].insert_many(cases)
     response = client_with_patched_mongo.get(
         f"/api/cases?q=dateconfirmedbefore%3a2022-05-10"
@@ -91,7 +85,7 @@ def test_list_cases_filter_confirmation_date_after(client_with_patched_mongo):
     db = pymongo.MongoClient("mongodb://localhost:27017/outbreak")
     cases = [dict(case_doc) for i in range(1, 32)]
     for i in range(1, 32):
-        cases[i-1]["confirmationDate"] = datetime(2022,5,i)
+        cases[i - 1]["confirmationDate"] = datetime(2022, 5, i)
     db["outbreak"]["cases"].insert_many(cases)
     response = client_with_patched_mongo.get(
         f"/api/cases?q=dateconfirmedafter%3a2022-05-10"
@@ -113,7 +107,7 @@ def test_list_cases_filter_confirmation_date_before_and_after(
     db = pymongo.MongoClient("mongodb://localhost:27017/outbreak")
     cases = [dict(case_doc) for i in range(1, 32)]
     for i in range(1, 32):
-        cases[i-1]["confirmationDate"] = datetime(2022,5,i)
+        cases[i - 1]["confirmationDate"] = datetime(2022, 5, i)
     db["outbreak"]["cases"].insert_many(cases)
     response = client_with_patched_mongo.get(
         f"/api/cases?q=dateconfirmedafter%3a2022-05-10%20dateconfirmedbefore%3a2022-05-13"
@@ -134,7 +128,7 @@ def test_list_cases_no_matching_results(client_with_patched_mongo):
     db = pymongo.MongoClient("mongodb://localhost:27017/outbreak")
     cases = [dict(case_doc) for i in range(1, 32)]
     for i in range(1, 32):
-        cases[i-1]["confirmationDate"] = datetime(2022,5,i)
+        cases[i - 1]["confirmationDate"] = datetime(2022, 5, i)
     db["outbreak"]["cases"].insert_many(cases)
     response = client_with_patched_mongo.get(
         f"/api/cases?q=dateconfirmedafter%3a2023-05-10"
@@ -209,9 +203,7 @@ def test_batch_upsert_case(client_with_patched_mongo):
         case_doc = json.load(case_file)
     post_response = client_with_patched_mongo.post(
         "/api/cases/batchUpsert",
-        json={
-            "cases": [case_doc]
-        },
+        json={"cases": [case_doc]},
     )
     assert post_response.status_code == 200
     assert post_response.json["errors"] == {}
@@ -227,7 +219,7 @@ def test_download_all_cases_csv(client_with_patched_mongo):
     db = pymongo.MongoClient("mongodb://localhost:27017/outbreak")
     cases = [dict(case_doc) for i in range(1, 4)]
     for i in range(1, 4):
-        cases[i-1]["confirmationDate"] = datetime(2022,5,i)
+        cases[i - 1]["confirmationDate"] = datetime(2022, 5, i)
     db["outbreak"]["cases"].insert_many(cases)
     post_response = client_with_patched_mongo.post(
         "/api/cases/download", json={"format": "csv"}
@@ -243,7 +235,7 @@ def test_download_selected_cases_tsv(client_with_patched_mongo):
     db = pymongo.MongoClient("mongodb://localhost:27017/outbreak")
     cases = [dict(case_doc) for i in range(1, 4)]
     for i in range(1, 4):
-        cases[i-1]["confirmationDate"] = datetime(2022,5,i)
+        cases[i - 1]["confirmationDate"] = datetime(2022, 5, i)
     db["outbreak"]["cases"].insert_many(cases)
     post_response = client_with_patched_mongo.post(
         "/api/cases/download",
@@ -262,7 +254,7 @@ def test_download_selected_cases_tsv(client_with_patched_mongo):
     db = pymongo.MongoClient("mongodb://localhost:27017/outbreak")
     cases = [dict(case_doc) for i in range(1, 4)]
     for i in range(1, 4):
-        cases[i-1]["confirmationDate"] = datetime(2022,5,i)
+        cases[i - 1]["confirmationDate"] = datetime(2022, 5, i)
     inserted = db["outbreak"]["cases"].insert_many(cases)
     ids = [str(anId) for anId in inserted.inserted_ids]
     post_response = client_with_patched_mongo.post(
@@ -280,11 +272,7 @@ def test_exclude_selected_cases(client_with_patched_mongo):
     with open("./tests/data/case.minimal.json") as case_file:
         case_doc = json.load(case_file)
     db = pymongo.MongoClient("mongodb://localhost:27017/outbreak")
-    inserted = (
-        db["outbreak"]["cases"]
-        .insert_one(case_doc)
-        .inserted_id
-    )
+    inserted = db["outbreak"]["cases"].insert_one(case_doc).inserted_id
     post_response = client_with_patched_mongo.post(
         "/api/cases/batchStatusChange",
         json={"status": "omit_error", "caseIds": [str(inserted)], "note": "Duplicate"},
@@ -300,13 +288,11 @@ def test_exclude_selected_cases(client_with_patched_mongo):
 def test_excluded_case_ids(client_with_patched_mongo):
     with open("./tests/data/case.minimal.json") as case_file:
         case_doc = json.load(case_file)
-    case_doc['caseReference']['sourceId'] = bson.ObjectId(case_doc['caseReference']['sourceId'])
-    db = pymongo.MongoClient("mongodb://localhost:27017/outbreak")
-    inserted = (
-        db["outbreak"]["cases"]
-        .insert_one(case_doc)
-        .inserted_id
+    case_doc["caseReference"]["sourceId"] = bson.ObjectId(
+        case_doc["caseReference"]["sourceId"]
     )
+    db = pymongo.MongoClient("mongodb://localhost:27017/outbreak")
+    inserted = db["outbreak"]["cases"].insert_one(case_doc).inserted_id
     post_response = client_with_patched_mongo.post(
         "/api/cases/batchStatusChange",
         json={"status": "omit_error", "caseIds": [str(inserted)], "note": "Duplicate"},
@@ -324,11 +310,13 @@ def test_excluded_case_ids(client_with_patched_mongo):
 def test_filter_excluded_case_ids(client_with_patched_mongo):
     with open("./tests/data/case.excluded.json") as case_file:
         case_doc = json.load(case_file)
-    case_doc['caseReference']['sourceId'] = bson.ObjectId(case_doc['caseReference']['sourceId'])
+    case_doc["caseReference"]["sourceId"] = bson.ObjectId(
+        case_doc["caseReference"]["sourceId"]
+    )
     cases = []
-    for i in range(1,4):
+    for i in range(1, 4):
         this_case = dict(case_doc)
-        this_case['confirmationDate'] = datetime(2022,5,i)
+        this_case["confirmationDate"] = datetime(2022, 5, i)
         cases.append(this_case)
     db = pymongo.MongoClient("mongodb://localhost:27017/outbreak")
     inserted = db["outbreak"]["cases"].insert_many(cases)
@@ -348,11 +336,7 @@ def test_update_case(client_with_patched_mongo):
     with open("./tests/data/case.minimal.json") as case_file:
         case_doc = json.load(case_file)
     db = pymongo.MongoClient("mongodb://localhost:27017/outbreak")
-    inserted = (
-        db["outbreak"]["cases"]
-        .insert_one(case_doc)
-        .inserted_id
-    )
+    inserted = db["outbreak"]["cases"].insert_one(case_doc).inserted_id
     put_response = client_with_patched_mongo.put(
         f"/api/cases/{str(inserted)}", json={"confirmationDate": "2022-05-11"}
     )
@@ -364,11 +348,7 @@ def test_update_object_id_on_case(client_with_patched_mongo):
     with open("./tests/data/case.excluded.json") as case_file:
         case_doc = json.load(case_file)
     db = pymongo.MongoClient("mongodb://localhost:27017/outbreak")
-    inserted = (
-        db["outbreak"]["cases"]
-        .insert_one(case_doc)
-        .inserted_id
-    )
+    inserted = db["outbreak"]["cases"].insert_one(case_doc).inserted_id
     put_response = client_with_patched_mongo.put(
         f"/api/cases/{str(inserted)}",
         json={"caseReference": {"sourceId": "fedc1234567890123456789a"}},
@@ -383,11 +363,13 @@ def test_update_object_id_on_case(client_with_patched_mongo):
 def test_batch_update(client_with_patched_mongo):
     with open("./tests/data/case.excluded.json") as case_file:
         case_doc = json.load(case_file)
-    case_doc['caseReference']['sourceId'] = bson.ObjectId(case_doc['caseReference']['sourceId'])
+    case_doc["caseReference"]["sourceId"] = bson.ObjectId(
+        case_doc["caseReference"]["sourceId"]
+    )
     cases = []
-    for i in range(1,4):
+    for i in range(1, 4):
         this_case = dict(case_doc)
-        this_case['confirmationDate'] = datetime(2022,5,i)
+        this_case["confirmationDate"] = datetime(2022, 5, i)
         cases.append(this_case)
     db = pymongo.MongoClient("mongodb://localhost:27017/outbreak")
     inserted = db["outbreak"]["cases"].insert_many(cases)
@@ -407,11 +389,13 @@ def test_batch_update(client_with_patched_mongo):
 def test_batch_update_query(client_with_patched_mongo):
     with open("./tests/data/case.excluded.json") as case_file:
         case_doc = json.load(case_file)
-    case_doc['caseReference']['sourceId'] = bson.ObjectId(case_doc['caseReference']['sourceId'])
+    case_doc["caseReference"]["sourceId"] = bson.ObjectId(
+        case_doc["caseReference"]["sourceId"]
+    )
     cases = []
-    for i in range(1,4):
+    for i in range(1, 4):
         this_case = dict(case_doc)
-        this_case['confirmationDate'] = datetime(2022,5,i)
+        this_case["confirmationDate"] = datetime(2022, 5, i)
         cases.append(this_case)
     db = pymongo.MongoClient("mongodb://localhost:27017/outbreak")
     inserted = db["outbreak"]["cases"].insert_many(cases)
@@ -445,11 +429,13 @@ def test_delete_case_404_on_wrong_id(client_with_patched_mongo):
 def test_batch_delete_with_ids(client_with_patched_mongo):
     with open("./tests/data/case.excluded.json") as case_file:
         case_doc = json.load(case_file)
-    case_doc['caseReference']['sourceId'] = bson.ObjectId(case_doc['caseReference']['sourceId'])
+    case_doc["caseReference"]["sourceId"] = bson.ObjectId(
+        case_doc["caseReference"]["sourceId"]
+    )
     cases = []
-    for i in range(1,4):
+    for i in range(1, 4):
         this_case = dict(case_doc)
-        this_case['confirmationDate'] = datetime(2022,5,i)
+        this_case["confirmationDate"] = datetime(2022, 5, i)
         cases.append(this_case)
     db = pymongo.MongoClient("mongodb://localhost:27017/outbreak")
     inserted = db["outbreak"]["cases"].insert_many(cases)
@@ -466,11 +452,13 @@ def test_batch_delete_with_ids(client_with_patched_mongo):
 def test_batch_delete_with_query(client_with_patched_mongo):
     with open("./tests/data/case.excluded.json") as case_file:
         case_doc = json.load(case_file)
-    case_doc['caseReference']['sourceId'] = bson.ObjectId(case_doc['caseReference']['sourceId'])
+    case_doc["caseReference"]["sourceId"] = bson.ObjectId(
+        case_doc["caseReference"]["sourceId"]
+    )
     cases = []
-    for i in range(1,4):
+    for i in range(1, 4):
         this_case = dict(case_doc)
-        this_case['confirmationDate'] = datetime(2022,5,i)
+        this_case["confirmationDate"] = datetime(2022, 5, i)
         cases.append(this_case)
     db = pymongo.MongoClient("mongodb://localhost:27017/outbreak")
     inserted = db["outbreak"]["cases"].insert_many(cases)

@@ -51,7 +51,7 @@ class Field(Document):
             dictionary.get("data_dictionary_text"),
             dictionary.get("required"),
             dictionary.get("default", None),
-            dictionary.get("values", None)
+            dictionary.get("values", None),
         )
 
     def python_type(self) -> type:
