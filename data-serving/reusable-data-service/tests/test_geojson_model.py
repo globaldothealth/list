@@ -1,18 +1,9 @@
 import pytest
 
-from contextlib import contextmanager
-
 from data_service.model.geojson import Point, Feature
 from data_service.util.errors import ValidationError
 
-
-@contextmanager
-def does_not_raise(exception):
-    try:
-        yield
-    except exception:
-        raise pytest.fail(f"Exception {exception} expected not to be raised")
-
+from tests.util import does_not_raise
 
 def test_point_needs_two_coordinates():
     p = Point()
