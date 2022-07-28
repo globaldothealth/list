@@ -69,6 +69,31 @@
         "is_list": true
     },
     {
+        "key": "race",
+        "type": "string",
+        "data_dictionary_text": "Race of the individual; can select multiple options.",
+        "required": true,
+        "values": [
+            "Native Hawaiian or Other Pacific Islander",
+            "Asian",
+            "American Indian or Alaska Native",
+            "Black or African American",
+            "White",
+            "other"
+        ],
+        "is_list": true
+    },
+    {
+        "key": "ethnicity",
+        "type": "string",
+        "data_dictionary_text": "Ethnicity of the individual, per the U.S. census definition.",
+        "values": [
+            "Hispanic or Latino",
+            "Not Hispanic or Latino",
+            "other"
+        ]
+    },
+    {
         "key": "confirmationDate",
         "type": "date",
         "data_dictionary_text": "The date on which the case was confirmed. There will also be a confirmation event but the date is stored denormalised for efficiency.",

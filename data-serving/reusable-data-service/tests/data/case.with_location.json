@@ -20,5 +20,6 @@
     "pathogenStatus": "unknown",
     "sexAtBirth": "female",
     "gender": ["non-binary", "other"],
-    "gender_other": "womxn"
+    "gender_other": "womxn",
+    "race": []
 }

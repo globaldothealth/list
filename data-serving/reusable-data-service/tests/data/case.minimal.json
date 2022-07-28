@@ -6,5 +6,6 @@
     "caseStatus": "probable",
     "pathogenStatus": "emerging",
     "sexAtBirth": "female",
-    "gender": []
+    "gender": [],
+    "race": []
 }
