@@ -127,7 +127,7 @@ class Document:
                     fields += value.custom_field_values()
                 else:
                     fields += f.type.custom_none_field_values()
-            elif issubclass(f.type, list):
+            elif isinstance(value, list):
                 fields.append(",".join(value))
             else:
                 fields.append(str(value) if value is not None else "")
@@ -203,11 +203,17 @@ class Document:
                 raise ValidationError(f"{field.key} must have a value")
             if field.key in self.document_fields() and value is not None:
                 getter(self).validate()
+            if field.is_list:
+                for element in value:
+                    if not isinstance(element, field.element_type()):
+                        raise ValidationError(f"{field.key} member {element} is of the wrong type")
             if field.values is not None:
-                if value is not None and value not in field.values:
-                    raise ValidationError(
-                        f"{field.key} value {value} not in permissible values {field.values}"
-                    )
+                test_collection = value if field.is_list is True else [value]
+                for a_value in test_collection:
+                    if a_value is not None and a_value not in field.values:
+                        raise ValidationError(
+                            f"{field.key} value {a_value} not in permissible values {field.values}"
+                        )
 
     def _internal_set_value(self, key, value):
         self._internal_ensure_containers_exist(key)

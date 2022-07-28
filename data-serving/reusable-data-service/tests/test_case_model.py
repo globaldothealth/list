@@ -86,3 +86,19 @@ def test_apply_update_that_unsets_value():
     update = DocumentUpdate.from_dict({"confirmationDate": None})
     case.apply_update(update)
     assert case.confirmationDate is None
+
+
+def test_cannot_put_wrong_type_in_list():
+    with open("./tests/data/case.minimal.json", "r") as minimal_file:
+        case = Case.from_json(minimal_file.read())
+    case.gender = ["man", True]
+    with pytest.raises(ValidationError):
+        case.validate()
+
+
+def test_list_elements_must_come_from_acceptable_values():
+    with open("./tests/data/case.minimal.json", "r") as minimal_file:
+        case = Case.from_json(minimal_file.read())
+    case.gender = ["woman", "dalek"]
+    with pytest.raises(ValidationError):
+        case.validate()

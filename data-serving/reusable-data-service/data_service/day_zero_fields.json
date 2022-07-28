@@ -54,6 +54,21 @@
         ]
     },
     {
+        "key": "gender",
+        "type": "string",
+        "data_dictionary_text": "Gender identity of the individual; can select multiple options.",
+        "required": true,
+        "values": [
+            "man",
+            "woman",
+            "transgender",
+            "non-binary",
+            "other",
+            "unknown"
+        ],
+        "is_list": true
+    },
+    {
         "key": "confirmationDate",
         "type": "date",
         "data_dictionary_text": "The date on which the case was confirmed. There will also be a confirmation event but the date is stored denormalised for efficiency.",
