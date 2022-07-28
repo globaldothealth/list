@@ -22,6 +22,7 @@ class Field(Document):
         init=True, default=None
     )
     values: Optional[List[Any]] = dataclasses.field(init=True, default=None)
+    is_list: bool = dataclasses.field(init=True, default=False)
 
     STRING = "string"
     DATE = "date"
@@ -55,10 +56,14 @@ class Field(Document):
             dictionary.get("required"),
             dictionary.get("default", None),
             dictionary.get("values", None),
+            dictionary.get("is_list", False),
         )
 
     def python_type(self) -> type:
-        return self.model_type(self.type)
+        if self.is_list:
+            return list
+        else:
+            return self.model_type(self.type)
 
     def dataclasses_tuples(self):
         # Note that the default value here is always None, even if I have a default value!

@@ -267,6 +267,7 @@ class MongoStore:
                 doc["data_dictionary_text"],
                 doc["required"],
                 doc["default"],
+                doc["is_list"],
             )
             for doc in self.get_schema_collection().find({})
         ]

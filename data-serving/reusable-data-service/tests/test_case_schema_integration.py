@@ -172,3 +172,36 @@ def test_adding_enumerated_field_with_other_value(client_with_patched_mongo):
     assert len(cases) == 1
     case = cases[0]
     assert case["customPathogenStatus_other"] == "Neopanspermia"
+
+
+def test_adding_list_field(client_with_patched_mongo):
+    with open("./tests/data/case.minimal.json") as json_file:
+        case_doc = json.load(json_file)
+    response = client_with_patched_mongo.post(
+        "/api/schema",
+        json={
+            "name": "extraSymptoms",
+            "type": "string",
+            "description": "Additional symptoms outside the main list",
+            "required": False,
+            "is_list": True,
+        },
+    )
+    assert response.status_code == 201
+
+    case_doc["extraSymptoms"] = ["ickiness", "pustulation"]
+    response = client_with_patched_mongo.post(
+        "/api/cases",
+        json=case_doc,
+    )
+    assert response.status_code == 201
+    response = client_with_patched_mongo.post(
+        "/api/cases/download", json={"format": "csv"}
+    )
+    assert response.status_code == 200
+    csv_file = io.StringIO(response.get_data().decode("utf-8"))
+    csv_reader = csv.DictReader(csv_file)
+    cases = [c for c in csv_reader]
+    assert len(cases) == 1
+    case = cases[0]
+    assert case["extraSymptoms"] == "ickiness,pustulation"
