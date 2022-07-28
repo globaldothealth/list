@@ -127,6 +127,8 @@ class Document:
                     fields += value.custom_field_values()
                 else:
                     fields += f.type.custom_none_field_values()
+            elif issubclass(f.type, list):
+                fields.append(",".join(value))
             else:
                 fields.append(str(value) if value is not None else "")
         return fields
