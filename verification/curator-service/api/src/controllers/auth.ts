@@ -23,6 +23,25 @@ import * as crypto from 'crypto';
 import EmailClient from '../clients/email-client';
 import { ObjectId } from 'mongodb';
 import { baseURL, welcomeEmail } from '../util/instance-details';
+import rateLimit from 'express-rate-limit';
+import {
+    failed_attempts,
+    setupFailedAttempts,
+    handleCheckFailedAttempts,
+} from '../model/failed_attempts';
+
+const loginLimiter = rateLimit({
+    windowMs: 60 * 60 * 1000, // 60 minutes
+    max: 4, // Limit each IP to 4 requests per `window` (here, per 60 minutes)
+    standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
+    legacyHeaders: false, // Disable the `X-RateLimit-*` headers
+    handler: function (req, res /*next*/) {
+        return res.status(429).json({
+            message:
+                'You sent too many requests. Please wait a while then try again',
+        });
+    },
+});
 
 // Global variable for newsletter acceptance
 let isNewsletterAccepted: boolean;
@@ -214,14 +233,24 @@ export class AuthController {
 
         this.router.post(
             '/signin',
+            loginLimiter,
             (req: Request, res: Response, next: NextFunction): void => {
                 passport.authenticate(
                     'login',
-                    (error: Error, user: IUser, info: any) => {
+                    (
+                        error: Error,
+                        user: IUser & { timeout: boolean },
+                        info: any,
+                    ) => {
                         if (error) return next(error);
                         if (!user)
                             return res
                                 .status(403)
+                                .json({ message: info.message });
+
+                        if (user.timeout)
+                            return res
+                                .status(429)
                                 .json({ message: info.message });
 
                         req.logIn(user, (err) => {
@@ -427,7 +456,12 @@ export class AuthController {
 
                 try {
                     // Check if user with this email address exists
-                    const user = await users().findOne({ email });
+                    const userPromise = await users()
+                        .find({ email: email })
+                        .collation({ locale: 'en_US', strength: 2 })
+                        .toArray();
+
+                    const user = userPromise[0] as IUser;
                     if (!user) {
                         return res.sendStatus(200);
                     }
@@ -603,6 +637,9 @@ export class AuthController {
                 const user = (await users().findOne({
                     _id: result.insertedId,
                 })) as IUser;
+
+                setupFailedAttempts(result.insertedId);
+
                 req.login(user, (err: Error) => {
                     if (!err) {
                         res.json(user);
@@ -660,12 +697,13 @@ export class AuthController {
                 },
                 async (req, email, password, done) => {
                     try {
-                        const userPromise = await users().find({ email })
-                        .collation({ locale: 'en_US', strength: 2 })
-                        .toArray();
+                        const userPromise = await users()
+                            .find({ email })
+                            .collation({ locale: 'en_US', strength: 2 })
+                            .toArray();
 
                         const user = userPromise[0];
-                        
+
                         if (user) {
                             return done(null, false, {
                                 message: 'Email address already exists',
@@ -687,6 +725,8 @@ export class AuthController {
                         const newUser = (await users().findOne({
                             _id: result.insertedId,
                         })) as IUser;
+
+                        setupFailedAttempts(result.insertedId);
 
                         // Send welcome email
                         await this.emailClient.send(
@@ -712,9 +752,10 @@ export class AuthController {
                 },
                 async (email, password, done) => {
                     try {
-                        const userPromise = await users().find({ email })
-                        .collation({ locale: 'en_US', strength: 2 })
-                        .toArray();
+                        const userPromise = await users()
+                            .find({ email })
+                            .collation({ locale: 'en_US', strength: 2 })
+                            .toArray();
 
                         const user = userPromise[0] as IUser;
 
@@ -724,16 +765,56 @@ export class AuthController {
                             });
                         }
 
+                        const { success, attemptsNumber } =
+                            await handleCheckFailedAttempts(
+                                user._id,
+                                'loginAttempt',
+                            );
+
+                        if (!success)
+                            return done(
+                                null,
+                                { timeout: true },
+                                {
+                                    message:
+                                        'Too Many Attempts try it one hour later',
+                                },
+                            );
+
                         const isValidPassword = await isUserPasswordValid(
                             user,
                             password,
                         );
+
                         if (!isValidPassword) {
+                            await failed_attempts().updateOne(
+                                { userId: user._id },
+                                {
+                                    $set: {
+                                        loginAttempt: {
+                                            count: attemptsNumber,
+                                            createdAt: new Date(),
+                                        },
+                                    },
+                                },
+                            );
+
                             return done(null, false, {
                                 message: 'Wrong username or password',
                             });
                         }
 
+                        await failed_attempts().updateOne(
+                            { userId: user._id },
+                            {
+                                $set: {
+                                    loginAttempt: {
+                                        count: 0,
+                                        createdAt: new Date(),
+                                    },
+                                },
+                            },
+                        );
                         done(null, user);
                     } catch (error) {
                         done(error);
@@ -780,6 +861,8 @@ export class AuthController {
                             user = (await users().findOne({
                                 _id: result.insertedId,
                             })) as IUser;
+
+                            setupFailedAttempts(result.insertedId);
 
                             try {
                                 // Send welcome email
@@ -865,7 +948,13 @@ export class AuthController {
                                 'Supplied bearer token must be scoped for "email"',
                             );
                         }
-                        let user = await users().findOne({ email: email });
+                        const userPromise = await users()
+                            .find({ email: email })
+                            .collation({ locale: 'en_US', strength: 2 })
+                            .toArray();
+
+                        let user = userPromise[0] as IUser | null;
+
                         if (!user) {
                             const result = await users().insertOne({
                                 _id: new ObjectId(),
@@ -878,7 +967,10 @@ export class AuthController {
                             user = await users().findOne({
                                 _id: result.insertedId,
                             });
+
+                            setupFailedAttempts(result.insertedId);
                         }
+
                         return done(null, user);
                     } catch (e) {
                         return done(e);
