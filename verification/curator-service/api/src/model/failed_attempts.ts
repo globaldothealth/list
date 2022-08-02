@@ -1,24 +1,23 @@
 import { Collection, ObjectId } from 'mongodb';
 import db from './database';
 
-/*
- * This is a minimal case schema to support some source-related behaviour.
- * The full schema for cases is in the data service.
- */
+const numberTimeLimiters = {
+    loginAttempt: {
+        maxNumberOfFailedLogins: 8,
+        timeWindowForFailedLogins: 60, //min
+    },
+    resetPasswordAttempt: {
+        maxNumberOfFailedLogins: 6,
+        timeWindowForFailedLogins: 30,
+    },
+};
 
-const maxNumberOfFailedLogins = 8;
-const timeWindowForFailedLogins = 60; //min
-
-type attemptName = 'loginAttempt' | 'registerAttempt' | 'resetPasswordAttempt';
+type attemptName = 'loginAttempt' | 'resetPasswordAttempt';
 
 export type IfailedAttempts = {
     _id: ObjectId;
     userId: ObjectId;
     loginAttempt: {
-        count: number;
-        createdAt: Date;
-    };
-    registerAttempt: {
         count: number;
         createdAt: Date;
     };
@@ -36,10 +35,6 @@ export const setupFailedAttempts = async (userId: ObjectId) => {
         _id: new ObjectId(),
         userId: userId,
         loginAttempt: {
-            count: 0,
-            createdAt: new Date(),
-        },
-        registerAttempt: {
             count: 0,
             createdAt: new Date(),
         },
@@ -66,23 +61,24 @@ export const handleCheckFailedAttempts = async (
                 1000,
         ) / 60;
 
-    if (diffTimeMin >= timeWindowForFailedLogins) attemptsNumber = 1;
+    if (
+        diffTimeMin >= numberTimeLimiters[attemptName].timeWindowForFailedLogins
+    )
+        attemptsNumber = 1;
 
-    if (attemptsNumber > maxNumberOfFailedLogins) {
-        await failed_attempts().updateOne(
-            { userId: userId },
-            {
-                $set: {
-                    [attemptName]: {
-                        count: attemptsNumber,
-                        createdAt: new Date(),
-                    },
+    await failed_attempts().updateOne(
+        { userId: userId },
+        {
+            $set: {
+                [attemptName]: {
+                    count: attemptsNumber,
+                    createdAt: new Date(),
                 },
             },
-        );
+        },
+    );
 
-        return { success: false, attemptsNumber };
-    }
-
-    return { success: true, attemptsNumber };
+    return (
+        attemptsNumber < numberTimeLimiters[attemptName].maxNumberOfFailedLogins
+    );
 };

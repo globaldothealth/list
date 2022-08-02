@@ -23,25 +23,16 @@ import * as crypto from 'crypto';
 import EmailClient from '../clients/email-client';
 import { ObjectId } from 'mongodb';
 import { baseURL, welcomeEmail } from '../util/instance-details';
-import rateLimit from 'express-rate-limit';
 import {
     failed_attempts,
     setupFailedAttempts,
     handleCheckFailedAttempts,
 } from '../model/failed_attempts';
-
-const loginLimiter = rateLimit({
-    windowMs: 60 * 60 * 1000, // 60 minutes
-    max: 4, // Limit each IP to 4 requests per `window` (here, per 60 minutes)
-    standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
-    legacyHeaders: false, // Disable the `X-RateLimit-*` headers
-    handler: function (req, res /*next*/) {
-        return res.status(429).json({
-            message:
-                'You sent too many requests. Please wait a while then try again',
-        });
-    },
-});
+import {
+    loginLimiter,
+    registerLimiter,
+    resetPasswordLimiter,
+} from '../util/single-window-rate-limiters';
 
 // Global variable for newsletter acceptance
 let isNewsletterAccepted: boolean;
@@ -211,6 +202,7 @@ export class AuthController {
 
         this.router.post(
             '/signup',
+            registerLimiter,
             (req: Request, res: Response, next: NextFunction): void => {
                 passport.authenticate(
                     'register',
@@ -451,6 +443,7 @@ export class AuthController {
          */
         this.router.post(
             '/request-password-reset',
+            resetPasswordLimiter,
             async (req: Request, res: Response): Promise<Response<any>> => {
                 const email = req.body.email as string;
 
@@ -465,6 +458,28 @@ export class AuthController {
                     if (!user) {
                         return res.sendStatus(200);
                     }
+
+                    const success = await handleCheckFailedAttempts(
+                        user._id,
+                        'resetPasswordAttempt',
+                    );
+
+                    if (!success)
+                        return res.status(429).json({
+                            message: 'Too Many Attempts try it one hour later',
+                        });
+
+                    await failed_attempts().updateOne(
+                        { userId: user._id },
+                        {
+                            $set: {
+                                resetPasswordAttempt: {
+                                    count: 0,
+                                    createdAt: new Date(),
+                                },
+                            },
+                        },
+                    );
 
                     // Check if user is a Gmail user and send appropriate email message in that case
                     // 42 googleID was set for non Google accounts in the past just to pass mongoose validation
@@ -765,11 +780,10 @@ export class AuthController {
                             });
                         }
 
-                        const { success, attemptsNumber } =
-                            await handleCheckFailedAttempts(
-                                user._id,
-                                'loginAttempt',
-                            );
+                        const success = await handleCheckFailedAttempts(
+                            user._id,
+                            'loginAttempt',
+                        );
 
                         if (!success)
                             return done(
@@ -786,23 +800,10 @@ export class AuthController {
                             password,
                         );
 
-                        if (!isValidPassword) {
-                            await failed_attempts().updateOne(
-                                { userId: user._id },
-                                {
-                                    $set: {
-                                        loginAttempt: {
-                                            count: attemptsNumber,
-                                            createdAt: new Date(),
-                                        },
-                                    },
-                                },
-                            );
-
+                        if (!isValidPassword)
                             return done(null, false, {
                                 message: 'Wrong username or password',
                             });
-                        }
 
                         await failed_attempts().updateOne(
                             { userId: user._id },
