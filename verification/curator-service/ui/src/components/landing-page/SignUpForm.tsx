@@ -21,6 +21,7 @@ import Checkbox from '@material-ui/core/Checkbox';
 import Typography from '@material-ui/core/Typography';
 import GoogleButton from 'react-google-button';
 import { sendCustomGtmEvent } from '../util/helperFunctions';
+import PasswordStrengthBar from 'react-password-strength-bar';
 
 const useStyles = makeStyles((theme: Theme) => ({
     checkboxRoot: {
@@ -99,6 +100,7 @@ export default function SignUpForm({
     const dispatch = useAppDispatch();
 
     const [passwordVisible, setPasswordVisible] = useState(false);
+    const [passwordStrenght, setPasswordStrenght] = useState<number>(0);
     const [passwordConfirmationVisible, setPasswordConfirmationVisible] =
         useState(false);
 
@@ -124,6 +126,9 @@ export default function SignUpForm({
             },
         ),
         password: Yup.string()
+            .test('password-strong-enough', 'Password too weak', () => {
+                return passwordStrenght > 2;
+            })
             .matches(lowercaseRegex, 'One lowercase required')
             .matches(uppercaseRegex, 'One uppercase required')
             .matches(numericRegex, 'One number required')
@@ -191,6 +196,7 @@ export default function SignUpForm({
                             helperText={
                                 formik.touched.email && formik.errors.email
                             }
+                            style={{ marginBottom: 17 }}
                         />
 
                         <TextField
@@ -253,6 +259,14 @@ export default function SignUpForm({
                                     </InputAdornment>
                                 }
                                 label="Password"
+                            />
+                            <PasswordStrengthBar
+                                password={formik.values.password}
+                                scoreWords={[]}
+                                shortScoreWord=""
+                                onChangeScore={(score) => {
+                                    setPasswordStrenght(score);
+                                }}
                             />
                             <FormHelperText>
                                 {formik.touched.password &&
