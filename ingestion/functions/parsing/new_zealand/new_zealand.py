@@ -64,8 +64,9 @@ def convert_demographics(entry):
     '''
     demo = {}
     if (age := entry[_AGE]) != "NA":
-        if '90+' in age:
-            demo["ageRange"] = {"start": 90, "end": 120}
+        if '+' in age:
+            start = int(age.rstrip('+'))
+            demo["ageRange"] = {"start": start, "end": 120}
         else:
             start, end = list(map(int, age.split(' to ')))
             demo["ageRange"] = {"start": start, "end": end}

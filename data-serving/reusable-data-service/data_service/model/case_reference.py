@@ -1,16 +1,19 @@
 import bson
 import dataclasses
 
+from data_service.model.document import Document
+
 
 @dataclasses.dataclass
-class CaseReference:
+class CaseReference(Document):
     """Represents information about the source of a given case."""
 
     _: dataclasses.KW_ONLY
-    sourceId: bson.ObjectId = dataclasses.field(init=False, default=None)
+    sourceId: str = dataclasses.field(init=False, default=None)
 
     def validate(self):
         """Check whether I am consistent. Raise ValueError if not."""
+        super().validate()
         if not hasattr(self, "sourceId"):
             raise ValueError("Source ID is mandatory")
         elif self.sourceId is None:
@@ -20,12 +23,5 @@ class CaseReference:
     def from_dict(d: dict[str, str]):
         """Create a CaseReference from a dictionary representation."""
         ref = CaseReference()
-        if "sourceId" in d:
-            theId = d["sourceId"]
-            if isinstance(theId, str):
-                ref.sourceId = bson.ObjectId(theId)
-            elif "$oid" in theId:
-                ref.sourceId = bson.ObjectId(theId["$oid"])
-            else:
-                raise ValueError(f"Cannot interpret {theId} as an ObjectId")
+        ref.sourceId = d.get("sourceId")
         return ref

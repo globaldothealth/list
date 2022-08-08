@@ -1,0 +1,13 @@
+{
+    "confirmationDate": "2022-05-01T01:23:45.678Z",
+    "caseReference": {
+        "sourceId": "fedc12345678901234567890"
+    },
+    "caseExclusion": {
+        "date": "2022-06-01T01:23:45.678Z",
+        "note": "Excluded upon this day, for reasons"
+    },
+    "caseStatus": "omit_error",
+    "pathogenStatus": "endemic",
+    "sexAtBirth": "female"
+}

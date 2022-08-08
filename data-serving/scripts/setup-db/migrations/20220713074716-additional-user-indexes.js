@@ -1,8 +1,12 @@
 const indexes = [
     {
-        name: 'googleID',
+        name: 'email',
         key: {
-            googleID: 1,
+            email: 1,
+        },
+        collation: {
+            locale: 'en_US',
+            strength: 2,
         },
     },
 ];
@@ -18,7 +22,7 @@ module.exports = {
     async down(db, client) {
         await db.command({
             dropIndexes: 'users',
-            index: ['googleID'],
+            index: ['email'],
         });
     },
 };
