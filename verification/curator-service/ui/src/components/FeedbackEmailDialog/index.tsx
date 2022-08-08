@@ -24,6 +24,8 @@ export interface FeedbackFormValues {
     message: string;
 }
 
+const RECAPTCHA_SITE_KEY = process.env.RECAPTCHA_SITE_KEY as string;
+
 const FeedbackEmailDialog = ({
     isOpen,
     handleClose,
@@ -101,7 +103,7 @@ const FeedbackEmailDialog = ({
                             <Button onClick={handleClose}>Cancel</Button>
                             <Button type="submit">Send</Button>
                             {/* <ReCAPTCHA
-                                sitekey=""
+                                sitekey={RECAPTCHA_SITE_KEY}
                                 size="invisible"
                                 ref={recaptchaRef}
                             /> */}

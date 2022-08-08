@@ -401,30 +401,33 @@ async function makeApp() {
 
     // Forward excluded case IDs fetching to data service
     apiRouter.get('/excludedCaseIds', casesController.listExcludedCaseIds);
-    
 
     app.use('/api', apiRouter);
 
     //Send feedback from user to global.health email
-    app.post('/feedback', mustBeAuthenticated, async (req: Request, res: Response) => {
-        const {message, token} = req.body;
-        
-        const recaptchaValidation = validateRecaptchaToken(token);
-        if(!recaptchaValidation) res.status(400).send({message: 'Bot'});
-        
-        try {
-            const sentEmailPromise = emailClient.send([env.EMAIL_USER_ADDRESS],'Feedback regarding Covid-19 curator portal', message);
-            res.status(200).send({message: "Email sent successfully"});
-        } catch (err) {
-            const error = err as Error;
-            logger.error(error);
-            return res.sendStatus(500);
-        }         
-    });
+    app.post(
+        '/feedback',
+        mustBeAuthenticated,
+        async (req: Request, res: Response) => {
+            const { message, token } = req.body;
 
-    
+            const recaptchaValidation = validateRecaptchaToken(token);
+            if (!recaptchaValidation) res.status(400).send({ message: 'Bot' });
 
-
+            try {
+                const sentEmailPromise = emailClient.send(
+                    [env.EMAIL_USER_ADDRESS],
+                    'Feedback regarding Covid-19 curator portal',
+                    message,
+                );
+                res.status(200).send({ message: 'Email sent successfully' });
+            } catch (err) {
+                const error = err as Error;
+                logger.error(error);
+                return res.sendStatus(500);
+            }
+        },
+    );
 
     // Basic health check handler.
     app.get('/health', async (req: Request, res: Response) => {
@@ -506,8 +509,6 @@ async function makeApp() {
             format: winston.format.json(),
         }),
     );
-
-
 
     return app;
 }
