@@ -24,14 +24,17 @@ import EmailClient from '../clients/email-client';
 import { ObjectId } from 'mongodb';
 import { baseURL, welcomeEmail } from '../util/instance-details';
 import {
-    failed_attempts,
     setupFailedAttempts,
     handleCheckFailedAttempts,
+    attemptName,
+    updateFailedAttempts,
 } from '../model/failed_attempts';
 import {
     loginLimiter,
     registerLimiter,
     resetPasswordLimiter,
+    forgotPasswordLimiter,
+    resetPasswordWithTokenLimiter,
 } from '../util/single-window-rate-limiters';
 
 // Global variable for newsletter acceptance
@@ -392,6 +395,7 @@ export class AuthController {
          */
         this.router.post(
             '/change-password',
+            resetPasswordLimiter,
             mustBeAuthenticated,
             async (req: Request, res: Response) => {
                 const oldPassword = req.body.oldPassword as string;
@@ -410,6 +414,24 @@ export class AuthController {
                     if (!currentUser) {
                         return res.sendStatus(403);
                     }
+
+                    const { success, attemptsNumber } =
+                        await handleCheckFailedAttempts(
+                            currentUser._id,
+                            attemptName.ResetPassword,
+                        );
+
+                    if (!success)
+                        return res.status(429).json({
+                            message:
+                                'Too many failed login attempts, please try again later',
+                        });
+
+                    updateFailedAttempts(
+                        currentUser._id,
+                        attemptName.ResetPassword,
+                        attemptsNumber,
+                    );
 
                     const isValidPassword = await isUserPasswordValid(
                         currentUser,
@@ -443,14 +465,14 @@ export class AuthController {
          */
         this.router.post(
             '/request-password-reset',
-            resetPasswordLimiter,
+            forgotPasswordLimiter,
             async (req: Request, res: Response): Promise<Response<any>> => {
                 const email = req.body.email as string;
 
                 try {
                     // Check if user with this email address exists
                     const userPromise = await users()
-                        .find({ email: email })
+                        .find({ email })
                         .collation({ locale: 'en_US', strength: 2 })
                         .toArray();
 
@@ -459,26 +481,23 @@ export class AuthController {
                         return res.sendStatus(200);
                     }
 
-                    const success = await handleCheckFailedAttempts(
-                        user._id,
-                        'resetPasswordAttempt',
-                    );
+                    const { success, attemptsNumber } =
+                        await handleCheckFailedAttempts(
+                            user._id,
+                            attemptName.ForgotPassword,
+                        );
 
-                    if (!success)
+                    if (!success) {
                         return res.status(429).json({
-                            message: 'Too Many Attempts try it one hour later',
+                            message:
+                                'You sent too many requests. Please wait a while then try again',
                         });
+                    }
 
-                    await failed_attempts().updateOne(
-                        { userId: user._id },
-                        {
-                            $set: {
-                                resetPasswordAttempt: {
-                                    count: 0,
-                                    createdAt: new Date(),
-                                },
-                            },
-                        },
+                    updateFailedAttempts(
+                        user._id,
+                        attemptName.ResetPassword,
+                        attemptsNumber,
                     );
 
                     // Check if user is a Gmail user and send appropriate email message in that case
@@ -549,6 +568,7 @@ export class AuthController {
          */
         this.router.post(
             '/reset-password',
+            resetPasswordWithTokenLimiter,
             async (req: Request, res: Response): Promise<void> => {
                 const userId = req.body.userId;
                 const token = req.body.token as string;
@@ -560,6 +580,24 @@ export class AuthController {
                     if (!isValidId) {
                         throw new Error('Invalid user id');
                     }
+
+                    const { success, attemptsNumber } =
+                        await handleCheckFailedAttempts(
+                            userId,
+                            attemptName.ResetPasswordWithToken,
+                        );
+
+                    if (!success)
+                        res.status(429).json({
+                            message:
+                                'Too many failed login attempts, please try again later',
+                        });
+
+                    updateFailedAttempts(
+                        userId,
+                        attemptName.ForgotPassword,
+                        attemptsNumber,
+                    );
 
                     // Check if token exists
                     const passwordResetToken = await tokens().findOne({
@@ -780,10 +818,11 @@ export class AuthController {
                             });
                         }
 
-                        const success = await handleCheckFailedAttempts(
-                            user._id,
-                            'loginAttempt',
-                        );
+                        const { success, attemptsNumber } =
+                            await handleCheckFailedAttempts(
+                                user._id,
+                                attemptName.Login,
+                            );
 
                         if (!success)
                             return done(
@@ -791,7 +830,7 @@ export class AuthController {
                                 { timeout: true },
                                 {
                                     message:
-                                        'Too Many Attempts try it one hour later',
+                                        'Too many failed login attempts, please try again later',
                                 },
                             );
 
@@ -800,22 +839,19 @@ export class AuthController {
                             password,
                         );
 
-                        if (!isValidPassword)
+                        if (!isValidPassword) {
+                            updateFailedAttempts(
+                                user._id,
+                                attemptName.Login,
+                                attemptsNumber,
+                            );
+
                             return done(null, false, {
                                 message: 'Wrong username or password',
                             });
+                        }
 
-                        await failed_attempts().updateOne(
-                            { userId: user._id },
-                            {
-                                $set: {
-                                    loginAttempt: {
-                                        count: 0,
-                                        createdAt: new Date(),
-                                    },
-                                },
-                            },
-                        );
+                        updateFailedAttempts(user._id, attemptName.Login, 0);
                         done(null, user);
                     } catch (error) {
                         done(error);
@@ -950,7 +986,7 @@ export class AuthController {
                             );
                         }
                         const userPromise = await users()
-                            .find({ email: email })
+                            .find({ email })
                             .collation({ locale: 'en_US', strength: 2 })
                             .toArray();
 

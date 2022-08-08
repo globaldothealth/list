@@ -7,14 +7,27 @@ const numberTimeLimiters = {
         timeWindowForFailedLogins: 60, //min
     },
     resetPasswordAttempt: {
-        maxNumberOfFailedLogins: 6,
-        timeWindowForFailedLogins: 30,
+        maxNumberOfFailedLogins: 8,
+        timeWindowForFailedLogins: 60,
+    },
+    forgotPasswordAttempt: {
+        maxNumberOfFailedLogins: 8,
+        timeWindowForFailedLogins: 60,
+    },
+    resetPasswordWithTokenAttempt: {
+        maxNumberOfFailedLogins: 8,
+        timeWindowForFailedLogins: 60,
     },
 };
 
-type attemptName = 'loginAttempt' | 'resetPasswordAttempt';
+export enum attemptName {
+    Login = 'loginAttempt',
+    ResetPassword = 'resetPasswordAttempt',
+    ForgotPassword = 'forgotPasswordAttempt',
+    ResetPasswordWithToken = 'resetPasswordWithTokenAttempt',
+}
 
-export type IfailedAttempts = {
+export interface IFailedAttempts {
     _id: ObjectId;
     userId: ObjectId;
     loginAttempt: {
@@ -25,13 +38,21 @@ export type IfailedAttempts = {
         count: number;
         createdAt: Date;
     };
-};
+    forgotPasswordAttempt: {
+        count: number;
+        createdAt: Date;
+    };
+    resetPasswordWithTokenAttempt: {
+        count: number;
+        createdAt: Date;
+    };
+}
 
-export const failed_attempts = () =>
-    db().collection('failed_attempts') as Collection<IfailedAttempts>;
+export const failedAttempts = () =>
+    db().collection('failedAttempts') as Collection<IFailedAttempts>;
 
 export const setupFailedAttempts = async (userId: ObjectId) => {
-    await failed_attempts().insertOne({
+    await failedAttempts().insertOne({
         _id: new ObjectId(),
         userId: userId,
         loginAttempt: {
@@ -42,6 +63,14 @@ export const setupFailedAttempts = async (userId: ObjectId) => {
             count: 0,
             createdAt: new Date(),
         },
+        forgotPasswordAttempt: {
+            count: 0,
+            createdAt: new Date(),
+        },
+        resetPasswordWithTokenAttempt: {
+            count: 0,
+            createdAt: new Date(),
+        },
     });
 };
 
@@ -49,9 +78,16 @@ export const handleCheckFailedAttempts = async (
     userId: ObjectId,
     attemptName: attemptName,
 ) => {
-    const attempts = (await failed_attempts().findOne({
-        userId: userId,
-    })) as IfailedAttempts;
+    let attempts = await failedAttempts().findOne({
+        userId,
+    });
+
+    if (!attempts) {
+        setupFailedAttempts(userId);
+        attempts = (await failedAttempts().findOne({
+            userId,
+        })) as IFailedAttempts;
+    }
 
     let attemptsNumber = attempts[attemptName].count + 1;
 
@@ -66,8 +102,21 @@ export const handleCheckFailedAttempts = async (
     )
         attemptsNumber = 1;
 
-    await failed_attempts().updateOne(
-        { userId: userId },
+    return {
+        success:
+            attemptsNumber <
+            numberTimeLimiters[attemptName].maxNumberOfFailedLogins,
+        attemptsNumber,
+    };
+};
+
+export const updateFailedAttempts = async (
+    userId: ObjectId,
+    attemptName: attemptName,
+    attemptsNumber: number,
+) => {
+    await failedAttempts().updateOne(
+        { userId },
         {
             $set: {
                 [attemptName]: {
@@ -76,9 +125,5 @@ export const handleCheckFailedAttempts = async (
                 },
             },
         },
-    );
-
-    return (
-        attemptsNumber < numberTimeLimiters[attemptName].maxNumberOfFailedLogins
     );
 };

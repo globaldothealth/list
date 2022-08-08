@@ -7,8 +7,7 @@ export const loginLimiter = rateLimit({
     legacyHeaders: false, // Disable the `X-RateLimit-*` headers
     handler: function (req, res /*next*/) {
         return res.status(429).json({
-            message:
-                'You sent too many requests. Please wait a while then try again',
+            message: 'Too many failed login attempts, please try again later',
         });
     },
 });
@@ -28,7 +27,33 @@ export const registerLimiter = rateLimit({
 
 export const resetPasswordLimiter = rateLimit({
     windowMs: 60 * 60 * 1000, // 60 minutes
-    max: 3,
+    max: 4,
+    standardHeaders: true,
+    legacyHeaders: false,
+    handler: function (req, res) {
+        return res.status(429).json({
+            message:
+                'You sent too many requests. Please wait a while then try again',
+        });
+    },
+});
+
+export const forgotPasswordLimiter = rateLimit({
+    windowMs: 60 * 60 * 1000, // 60 minutes
+    max: 4,
+    standardHeaders: true,
+    legacyHeaders: false,
+    handler: function (req, res) {
+        return res.status(429).json({
+            message:
+                'You sent too many requests. Please wait a while then try again',
+        });
+    },
+});
+
+export const resetPasswordWithTokenLimiter = rateLimit({
+    windowMs: 60 * 60 * 1000, // 60 minutes
+    max: 4,
     standardHeaders: true,
     legacyHeaders: false,
     handler: function (req, res) {

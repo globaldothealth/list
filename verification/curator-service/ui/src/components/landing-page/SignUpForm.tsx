@@ -126,13 +126,13 @@ export default function SignUpForm({
             },
         ),
         password: Yup.string()
-            .test('password-strong-enough', 'Password too weak', () => {
-                return passwordStrenght > 2;
-            })
             .matches(lowercaseRegex, 'One lowercase required')
             .matches(uppercaseRegex, 'One uppercase required')
             .matches(numericRegex, 'One number required')
             .min(8, 'Minimum 8 characters required')
+            .test('password-strong-enough', 'Password too weak', () => {
+                return passwordStrenght > 2;
+            })
             .required('This field is required'),
         passwordConfirmation: Yup.string().test(
             'passwords-match',

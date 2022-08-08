@@ -18,6 +18,7 @@ import Visibility from '@material-ui/icons/Visibility';
 import VisibilityOff from '@material-ui/icons/VisibilityOff';
 import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
+import PasswordStrengthBar from 'react-password-strength-bar';
 
 const useStyles = makeStyles((theme: Theme) => ({
     checkboxRoot: {
@@ -88,6 +89,7 @@ export default function ChangePasswordForm({
     const dispatch = useAppDispatch();
     const history = useHistory();
 
+    const [passwordStrenght, setPasswordStrenght] = useState<number>(0);
     const passwordReset = useAppSelector(selectPasswordReset);
     const [passwordVisible, setPasswordVisible] = useState(false);
     const [passwordConfirmationVisible, setPasswordConfirmationVisible] =
@@ -122,6 +124,9 @@ export default function ChangePasswordForm({
             .matches(uppercaseRegex, 'one uppercase required!')
             .matches(numericRegex, 'one number required!')
             .min(8, 'Minimum 8 characters required!')
+            .test('password-strong-enough', 'Password too weak', () => {
+                return passwordStrenght > 2;
+            })
             .required('Required!'),
         passwordConfirmation: Yup.string().test(
             'passwords-match',
@@ -202,6 +207,14 @@ export default function ChangePasswordForm({
                                     </InputAdornment>
                                 }
                                 label="Password"
+                            />
+                            <PasswordStrengthBar
+                                password={formik.values.password}
+                                scoreWords={[]}
+                                shortScoreWord=""
+                                onChangeScore={(score) => {
+                                    setPasswordStrenght(score);
+                                }}
                             />
                             <FormHelperText>
                                 {formik.touched.password &&
