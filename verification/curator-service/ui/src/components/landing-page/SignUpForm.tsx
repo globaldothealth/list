@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { useAppDispatch } from '../../hooks/redux';
@@ -21,6 +21,7 @@ import Checkbox from '@material-ui/core/Checkbox';
 import Typography from '@material-ui/core/Typography';
 import GoogleButton from 'react-google-button';
 import { sendCustomGtmEvent } from '../util/helperFunctions';
+import ReCAPTCHA from 'react-google-recaptcha';
 
 const useStyles = makeStyles((theme: Theme) => ({
     checkboxRoot: {
@@ -91,6 +92,8 @@ interface SignUpFormProps {
     setRegistrationScreenOn: (active: boolean) => void;
 }
 
+const RECAPTCHA_SITE_KEY = process.env.RECAPTCHA_SITE_KEY as string;
+
 export default function SignUpForm({
     disabled,
     setRegistrationScreenOn,
@@ -98,6 +101,7 @@ export default function SignUpForm({
     const classes = useStyles();
     const dispatch = useAppDispatch();
 
+    const recaptchaRef = useRef<ReCAPTCHA>(null);
     const [passwordVisible, setPasswordVisible] = useState(false);
     const [passwordConfirmationVisible, setPasswordConfirmationVisible] =
         useState(false);
@@ -149,13 +153,19 @@ export default function SignUpForm({
             isNewsletterChecked: false,
         },
         validationSchema,
-        onSubmit: (values) => {
+        onSubmit: async (values) => {
             const { email, password, isNewsletterChecked } = values;
+
+            const token =
+                (await recaptchaRef.current?.executeAsync()) as string;
+            recaptchaRef.current?.reset();
+
             dispatch(
                 signUpWithEmailAndPassword({
                     email,
                     password,
                     newsletterAccepted: isNewsletterChecked,
+                    token,
                 }),
             );
         },
@@ -422,6 +432,11 @@ export default function SignUpForm({
                 >
                     Sign up
                 </Button>
+                <ReCAPTCHA
+                    sitekey={RECAPTCHA_SITE_KEY}
+                    size="invisible"
+                    ref={recaptchaRef}
+                />
 
                 <Typography className={classes.title}>
                     Already have an account?{' '}

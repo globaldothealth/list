@@ -957,19 +957,19 @@ paths:
                   description: The northing coordinate (UTMY)
                   required: true
                   schema:
-                    type: number
+                      type: number
                 - name: e
                   in: query
                   description: The easting coordinate (UTMX)
                   required: true
                   schema:
-                    type: number
+                      type: number
                 - name: z
                   in: query
                   required: true
                   description: The UTM zone.
                   schema:
-                    type: number
+                      type: number
             responses:
                 '200':
                     $ref: '#/components/responses/200Position'
@@ -1126,27 +1126,23 @@ paths:
             summary: Sends feedback email to global.health
             tags: [User]
             operationId: feeback
-            responses:
-                '200':
-                    $ref: '#/components/responses/200'
-                '400':
-                    $ref: '#/components/responses/400'
-             requestBody:
+            requestBody:
                 description: Email and message of User
                 required: true
                 content:
                     application/json:
                         schema:
+                            description: Message send to global.health sa feedback
                             type: object
                             properties:
                                 message:
                                     type: string
-                                    description: Message send to global.health sa feedback
-                                    min: 1
-                                    max: 800
-                                token: 
-                                    type: string
-                                    description: ReCaptcha token 
+            responses:
+                '200':
+                    $ref: '#/components/responses/200'
+                '500':
+                    $ref: '#/components/responses/500'
+
 components:
     schemas:
         Parser:

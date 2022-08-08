@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React from 'react';
 import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
 import Dialog from '@material-ui/core/Dialog';
@@ -12,7 +12,6 @@ import { useStyles } from './styled';
 import axios from 'axios';
 import { useAppSelector } from '../../hooks/redux';
 import { selectUser } from '../../redux/auth/selectors';
-import ReCAPTCHA from 'react-google-recaptcha';
 
 interface FeedbackEmailDialogProps {
     isOpen: boolean;
@@ -24,15 +23,12 @@ export interface FeedbackFormValues {
     message: string;
 }
 
-const RECAPTCHA_SITE_KEY = process.env.RECAPTCHA_SITE_KEY as string;
-
 const FeedbackEmailDialog = ({
     isOpen,
     handleClose,
 }: FeedbackEmailDialogProps): JSX.Element => {
     const classes = useStyles();
     const user = useAppSelector(selectUser);
-    const recaptchaRef = useRef<ReCAPTCHA>();
 
     const maxSizeMessage = 800;
 
@@ -49,13 +45,9 @@ const FeedbackEmailDialog = ({
         validationSchema: validationFormSchema,
         validateOnChange: true,
         onSubmit: async (values) => {
-            const token = await recaptchaRef.current?.executeAsync();
-            recaptchaRef.current?.reset();
-
             try {
                 const response = await axios.post('/feedback', {
                     message: `From: ${user?.email}<br><br>${values.message}`,
-                    token,
                 });
                 console.log(response);
             } catch (error) {
@@ -102,11 +94,6 @@ const FeedbackEmailDialog = ({
                         <DialogActions>
                             <Button onClick={handleClose}>Cancel</Button>
                             <Button type="submit">Send</Button>
-                            {/* <ReCAPTCHA
-                                sitekey={RECAPTCHA_SITE_KEY}
-                                size="invisible"
-                                ref={recaptchaRef}
-                            /> */}
                         </DialogActions>
                     </form>
                 </DialogContent>

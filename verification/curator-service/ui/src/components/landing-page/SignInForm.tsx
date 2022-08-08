@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { useAppDispatch } from '../../hooks/redux';
@@ -19,6 +19,7 @@ import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
 import GoogleButton from 'react-google-button';
 import ForgotPasswordForm from './ForgotPasswordForm';
+import ReCAPTCHA from 'react-google-recaptcha';
 
 const useStyles = makeStyles((theme: Theme) => ({
     required: {
@@ -70,6 +71,8 @@ interface SignInFormProps {
     setRegistrationScreenOn: (active: boolean) => void;
 }
 
+const RECAPTCHA_SITE_KEY = process.env.RECAPTCHA_SITE_KEY as string;
+
 export default function SignInForm({
     disabled,
     setRegistrationScreenOn,
@@ -78,6 +81,7 @@ export default function SignInForm({
     const classes = useStyles();
 
     const [passwordVisible, setPasswordVisible] = useState(false);
+    const recaptchaRef = useRef<ReCAPTCHA>(null);
 
     const validationSchema = Yup.object().shape({
         email: Yup.string()
@@ -92,11 +96,16 @@ export default function SignInForm({
             password: '',
         },
         validationSchema,
-        onSubmit: (values) => {
+        onSubmit: async (values) => {
+            const token =
+                (await recaptchaRef.current?.executeAsync()) as string;
+            recaptchaRef.current?.reset();
+
             dispatch(
                 signInWithEmailAndPassword({
                     email: values.email,
                     password: values.password,
+                    token,
                 }),
             );
         },
@@ -230,6 +239,11 @@ export default function SignInForm({
                         {' '}
                         Sign up!
                     </span>
+                    <ReCAPTCHA
+                        sitekey={RECAPTCHA_SITE_KEY}
+                        size="invisible"
+                        ref={recaptchaRef}
+                    />
                 </Typography>
             </form>
 
