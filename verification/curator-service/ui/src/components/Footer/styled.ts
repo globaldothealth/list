@@ -62,8 +62,6 @@ export const useStyles = makeStyles((theme: Theme) => ({
         fontSize: '14px',
         margin: '0 20px',
         color: theme.palette.primary.main,
-        '&:hover': {
-            cursor: 'pointer',
-        },
+        cursor: 'pointer',
     },
 }));

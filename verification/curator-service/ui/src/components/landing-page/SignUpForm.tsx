@@ -3,7 +3,6 @@ import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { useAppDispatch } from '../../hooks/redux';
 import { signUpWithEmailAndPassword } from '../../redux/auth/thunk';
-
 import { makeStyles, Theme } from '@material-ui/core/styles';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import FormHelperText from '@material-ui/core/FormHelperText';
@@ -154,20 +153,25 @@ export default function SignUpForm({
         },
         validationSchema,
         onSubmit: async (values) => {
+            if (!recaptchaRef.current) return;
             const { email, password, isNewsletterChecked } = values;
+            // eslint-disable-next-line no-useless-catch
+            try {
+                const token =
+                    (await recaptchaRef.current.executeAsync()) as string;
+                recaptchaRef.current.reset();
 
-            const token =
-                (await recaptchaRef.current?.executeAsync()) as string;
-            recaptchaRef.current?.reset();
-
-            dispatch(
-                signUpWithEmailAndPassword({
-                    email,
-                    password,
-                    newsletterAccepted: isNewsletterChecked,
-                    token,
-                }),
-            );
+                dispatch(
+                    signUpWithEmailAndPassword({
+                        email,
+                        password,
+                        newsletterAccepted: isNewsletterChecked,
+                        token,
+                    }),
+                );
+            } catch (error) {
+                throw error;
+            }
         },
     });
 

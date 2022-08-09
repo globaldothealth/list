@@ -18,11 +18,11 @@ const Footer = ({ drawerOpen }: FooterProps): JSX.Element => {
     const classes = useStyles();
     const [feedbackModalOpen, setFeedbackModalOpen] = useState(false);
 
-    const handleClickOpen = () => {
+    const openFeedbackModal = () => {
         setFeedbackModalOpen(true);
     };
 
-    const handleClose = () => {
+    const closeFeedbackModal = () => {
         setFeedbackModalOpen(false);
     };
 
@@ -122,14 +122,14 @@ const Footer = ({ drawerOpen }: FooterProps): JSX.Element => {
                 <Typography
                     display="inline"
                     className={classes.feedbackButton}
-                    onClick={() => handleClickOpen()}
+                    onClick={openFeedbackModal}
                 >
                     Feedback
                 </Typography>
                 <FeedbackEmailDialog
                     isOpen={feedbackModalOpen}
-                    handleClose={handleClose}
-                ></FeedbackEmailDialog>
+                    closeFeedbackModal={closeFeedbackModal}
+                />
             </section>
         </footer>
     );

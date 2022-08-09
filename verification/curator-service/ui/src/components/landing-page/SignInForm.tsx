@@ -97,17 +97,23 @@ export default function SignInForm({
         },
         validationSchema,
         onSubmit: async (values) => {
-            const token =
-                (await recaptchaRef.current?.executeAsync()) as string;
-            recaptchaRef.current?.reset();
+            if (!recaptchaRef.current) return;
 
-            dispatch(
-                signInWithEmailAndPassword({
-                    email: values.email,
-                    password: values.password,
-                    token,
-                }),
-            );
+            // eslint-disable-next-line no-useless-catch
+            try {
+                const token =
+                    (await recaptchaRef.current.executeAsync()) as string;
+                recaptchaRef.current.reset();
+                dispatch(
+                    signInWithEmailAndPassword({
+                        email: values.email,
+                        password: values.password,
+                        token,
+                    }),
+                );
+            } catch (error) {
+                throw error;
+            }
         },
     });
 

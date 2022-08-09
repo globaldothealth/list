@@ -1125,14 +1125,14 @@ paths:
         post:
             summary: Sends feedback email to global.health
             tags: [User]
-            operationId: feeback
+            operationId: feedback
             requestBody:
                 description: Email and message of User
                 required: true
                 content:
                     application/json:
                         schema:
-                            description: Message send to global.health sa feedback
+                            description: Message sent to global.health as feedback
                             type: object
                             properties:
                                 message:

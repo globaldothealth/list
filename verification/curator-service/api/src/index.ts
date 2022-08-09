@@ -411,7 +411,7 @@ async function makeApp() {
             const { message } = req.body;
 
             try {
-                emailClient.send(
+                await emailClient.send(
                     [env.EMAIL_USER_ADDRESS],
                     'Feedback regarding Covid-19 curator portal',
                     message,
