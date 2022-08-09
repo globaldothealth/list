@@ -26,7 +26,7 @@ export const registerLimiter = rateLimit({
 });
 
 export const resetPasswordLimiter = rateLimit({
-    windowMs: 60 * 60 * 1000, // 60 minutes
+    windowMs: 30 * 60 * 1000, // 30 minutes
     max: 4,
     standardHeaders: true,
     legacyHeaders: false,

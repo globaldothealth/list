@@ -427,22 +427,28 @@ export class AuthController {
                                 'Too many failed login attempts, please try again later',
                         });
 
-                    updateFailedAttempts(
-                        currentUser._id,
-                        attemptName.ResetPassword,
-                        attemptsNumber,
-                    );
-
                     const isValidPassword = await isUserPasswordValid(
                         currentUser,
                         oldPassword,
                     );
 
                     if (!isValidPassword) {
+                        updateFailedAttempts(
+                            currentUser._id,
+                            attemptName.ResetPassword,
+                            attemptsNumber,
+                        );
+
                         return res
                             .status(403)
                             .json({ message: 'Old password is incorrect' });
                     }
+
+                    updateFailedAttempts(
+                        currentUser._id,
+                        attemptName.ResetPassword,
+                        0,
+                    );
 
                     const hashedPassword = await bcrypt.hash(newPassword, 10);
                     await users().updateOne(userQuery, {
@@ -593,17 +599,16 @@ export class AuthController {
                                 'Too many failed login attempts, please try again later',
                         });
 
-                    updateFailedAttempts(
-                        userId,
-                        attemptName.ForgotPassword,
-                        attemptsNumber,
-                    );
-
                     // Check if token exists
                     const passwordResetToken = await tokens().findOne({
                         userId,
                     });
                     if (!passwordResetToken) {
+                        updateFailedAttempts(
+                            userId,
+                            attemptName.ForgotPassword,
+                            attemptsNumber,
+                        );
                         throw new Error(
                             'Invalid or expired password reset token',
                         );
@@ -615,6 +620,11 @@ export class AuthController {
                         passwordResetToken.token,
                     );
                     if (!isValid) {
+                        updateFailedAttempts(
+                            userId,
+                            attemptName.ForgotPassword,
+                            attemptsNumber,
+                        );
                         throw new Error(
                             'Invalid or expired password reset token',
                         );
@@ -640,6 +650,8 @@ export class AuthController {
 
                     // Send confirmation email to the user
                     const user = result.value as IUser;
+
+                    updateFailedAttempts(userId, attemptName.ForgotPassword, 0);
 
                     await this.emailClient.send(
                         [user.email],
