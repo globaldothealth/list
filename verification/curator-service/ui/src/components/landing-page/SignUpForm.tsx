@@ -130,10 +130,10 @@ export default function SignUpForm({
             .matches(uppercaseRegex, 'One uppercase required')
             .matches(numericRegex, 'One number required')
             .min(8, 'Minimum 8 characters required')
+            .required('This field is required')
             .test('password-strong-enough', 'Password too weak', () => {
                 return passwordStrength > 2;
-            })
-            .required('This field is required'),
+            }),
         passwordConfirmation: Yup.string().test(
             'passwords-match',
             'Passwords must match',

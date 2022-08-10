@@ -124,10 +124,10 @@ export default function ChangePasswordForm({
             .matches(uppercaseRegex, 'one uppercase required!')
             .matches(numericRegex, 'one number required!')
             .min(8, 'Minimum 8 characters required!')
+            .required('Required!')
             .test('password-strong-enough', 'Password too weak', () => {
                 return passwordStrength > 2;
-            })
-            .required('Required!'),
+            }),
         passwordConfirmation: Yup.string().test(
             'passwords-match',
             'Passwords must match',

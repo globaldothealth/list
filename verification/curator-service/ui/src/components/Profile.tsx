@@ -140,9 +140,7 @@ export function ChangePasswordFormInProfile(): JSX.Element {
             .matches(uppercaseRegex, 'one uppercase required!')
             .matches(numericRegex, 'one number required!')
             .min(8, 'Minimum 8 characters required!')
-            .test('password-strong-enough', 'Password too weak', () => {
-                return passwordStrenght > 2;
-            })
+            .required('Required!')
             .test(
                 'passwords-different',
                 "New password can't be the same as old password",
@@ -150,7 +148,9 @@ export function ChangePasswordFormInProfile(): JSX.Element {
                     return this.parent.oldPassword !== value;
                 },
             )
-            .required('Required!'),
+            .test('password-strong-enough', 'Password too weak', () => {
+                return passwordStrenght > 2;
+            }),
         passwordConfirmation: Yup.string().test(
             'passwords-match',
             'Passwords must match',
