@@ -18,6 +18,12 @@ interface FeedbackEmailDialogProps {
     closeFeedbackModal: () => void;
 }
 
+interface AlertInformationValues {
+    isOpen: boolean;
+    message: string;
+    type: 'success' | 'error' | '';
+}
+
 export interface FeedbackFormValues {
     subject: string;
     message: string;
@@ -31,13 +37,12 @@ const FeedbackEmailDialog = ({
 
     const maxSizeMessage = 800;
 
-    const [alertInformationOpen, setAlertInformationOpen] =
-        useState<boolean>(false);
-    const [alertInformationMessage, setAlertInformationMessage] =
-        useState<string>('');
-    const [alertInformationType, setAlertInformationType] = useState<
-        'success' | 'error' | ''
-    >('');
+    const [alertInformation, setAlertInformation] =
+        useState<AlertInformationValues>({
+            isOpen: false,
+            message: '',
+            type: '',
+        });
 
     useEffect(() => {
         return () => {
@@ -65,17 +70,21 @@ const FeedbackEmailDialog = ({
                         message: `From: ${user?.email}<br><br>${values.message}`,
                     })
                     .then((response) => {
-                        setAlertInformationType('success');
-                        setAlertInformationMessage(response.data.message);
-                        setAlertInformationOpen(true);
+                        setAlertInformation({
+                            isOpen: true,
+                            message: response.data.message,
+                            type: 'success',
+                        });
                     });
             } catch (error) {
-                setAlertInformationMessage(
-                    error.response.data.message ||
+                setAlertInformation({
+                    isOpen: true,
+                    message:
+                        error.response.data.message ||
                         'Unfortunately, an error occurred. Please, try again later.',
-                );
-                setAlertInformationType('error');
-                setAlertInformationOpen(true);
+                    type: 'error',
+                });
+
                 throw error;
             }
 
@@ -128,10 +137,12 @@ const FeedbackEmailDialog = ({
                 </DialogContent>
             </Dialog>
             <SnackbarAlert
-                isOpen={alertInformationOpen}
-                onClose={() => setAlertInformationOpen(false)}
-                message={alertInformationMessage}
-                type={alertInformationType || 'info'}
+                isOpen={alertInformation.isOpen}
+                onClose={() =>
+                    setAlertInformation({ ...alertInformation, isOpen: false })
+                }
+                message={alertInformation.message}
+                type={alertInformation.type || 'info'}
                 durationMs={4000}
             />
         </>
