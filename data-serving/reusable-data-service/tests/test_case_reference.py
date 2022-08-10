@@ -10,4 +10,4 @@ def test_csv_row():
     ref = CaseReference()
     ref.sourceId = oid
     csv = ref.to_csv()
-    assert csv == identifier
+    assert csv == "abcd12903478565647382910\r\n"

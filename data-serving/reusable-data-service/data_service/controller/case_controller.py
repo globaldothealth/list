@@ -1,10 +1,17 @@
+import sys
+
 from flask import jsonify
 from datetime import date
-from typing import List
+from typing import List, Optional
 
-from data_service.model.case import Case
+from data_service.controller.geocode_controller import Geocoder
+
+from data_service.model.case import observe_case_class
+from data_service.model.case_exclusion_metadata import CaseExclusionMetadata
 from data_service.model.case_page import CasePage
+from data_service.model.case_reference import CaseReference
 from data_service.model.case_upsert_outcome import CaseUpsertOutcome
+from data_service.model.document_update import DocumentUpdate
 from data_service.model.filter import (
     Anything,
     Filter,
@@ -12,12 +19,20 @@ from data_service.model.filter import (
     PropertyFilter,
     FilterOperator,
 )
+from data_service.model.geojson import Feature
 from data_service.util.errors import (
     NotFoundError,
     PreconditionUnsatisfiedError,
     UnsupportedTypeError,
     ValidationError,
 )
+
+Case = None
+
+
+def case_observer(cls):
+    global Case
+    Case = cls
 
 
 class CaseController:
@@ -26,13 +41,13 @@ class CaseController:
     storage technology can be chosen.
     All methods return a tuple of (response, HTTP status code)"""
 
-    def __init__(self, app, store, outbreak_date: date):
-        """store is the flask app
-        store is an adapter to the external storage technology.
+    def __init__(self, store, outbreak_date: date, geocoder: Geocoder):
+        """store is an adapter to the external storage technology.
         outbreak_date is the earliest date on which this instance should accept cases."""
-        self.app = app
         self.store = store
         self.outbreak_date = outbreak_date
+        self.geocoder = geocoder
+        observe_case_class(case_observer)
 
     def get_case(self, id: str):
         """Implements get /cases/:id. Interpretation of ID is dependent
@@ -148,10 +163,169 @@ class CaseController:
 
         return generate_output
 
+    def valid_statuses(self):
+        return [f.values for f in Case.custom_fields if f.key == "caseStatus"][0]
+
+    def batch_status_change(
+        self,
+        status: str,
+        note: Optional[str] = None,
+        case_ids: Optional[List[str]] = None,
+        filter: Optional[str] = None,
+    ):
+        """Update all of the cases identified in case_ids to have the supplied curation status.
+        Raises PreconditionUnsatisfiedError or ValidationError on invalid input."""
+        statuses = self.valid_statuses()
+        if not status in statuses:
+            raise PreconditionUnsatisfiedError(f"status {status} not one of {statuses}")
+        if filter is not None and case_ids is not None:
+            raise PreconditionUnsatisfiedError(
+                "Do not supply both a filter and a list of IDs"
+            )
+        if status == "omit_error" and note is None:
+            raise ValidationError(f"Excluding cases must be documented in a note")
+
+        def update_status(id: str, status: str, note: str):
+            if status == "omit_error":
+                caseExclusion = CaseExclusionMetadata()
+                caseExclusion.note = note
+            else:
+                caseExclusion = None
+            self.store.update_case_status(id, status, caseExclusion)
+
+        if case_ids is not None:
+            for anId in case_ids:
+                update_status(anId, status, note)
+        else:
+            predicate = CaseController.parse_filter(filter)
+            if predicate is None:
+                raise ValidationError(f"cannot understand query {filter}")
+            case_iterator = self.store.matching_case_iterator(predicate)
+            for case in case_iterator:
+                update_status(case._id, status, note)
+
+    def excluded_case_ids(
+        self, source_id: str, query: Optional[str] = None
+    ) -> List[str]:
+        """Return the identifiers of all excluded cases for a given source."""
+        if source_id is None:
+            raise PreconditionUnsatisfiedError("No sourceId provided")
+        predicate = CaseController.parse_filter(query)
+        if predicate is None:
+            raise ValidationError(f"cannot understand query {predicate}")
+        return [c._id for c in self.store.excluded_cases(source_id, predicate)]
+
+    def update_case(self, case_id: str, update: dict) -> Case:
+        """Update the case document with the provided ID. Raises NotFoundError if
+        there is no case with that ID, or ValidationError if the case would not be
+        left in a valid state. If the update is successfully applied, returns the updated
+        form of the case."""
+        diff = DocumentUpdate.from_dict(update)
+        updated_case = self.validate_updated_case(case_id, diff)
+        # tell the store to apply the update rather than replacing the whole document:
+        # should be more efficient given a competent DB
+        self.store.update_case(case_id, diff)
+        return updated_case
+
+    def batch_update(self, updates: List[dict]) -> int:
+        """Update a collection of documents. Each dictionary in the list is a description
+        of an update, but it also carries the _id field to indicate which case to update.
+        Raises NotFoundError if any update identifies a case that isn't present, PreconditionUnsatisfiedError
+        if any update doesn't include an id, or ValidationError if any update leaves a case
+        in an inconsistent state."""
+
+        def remove_id(d: dict):
+            d2 = dict(d)
+            del d2["_id"]
+            return d2
+
+        try:
+            update_map = {
+                u["_id"]: DocumentUpdate.from_dict(remove_id(u)) for u in updates
+            }
+        except KeyError:
+            raise PreconditionUnsatisfiedError("not every update includes an _id")
+        for id, update in iter(update_map.items()):
+            self.validate_updated_case(id, update)
+        return self.store.batch_update(update_map)
+
+    def batch_update_query(self, query: str, update: dict) -> int:
+        """Update a collection of documents. Update is a description
+        of an update, and query indicates which cases to update.
+        Raises ValidationError if any update leaves a case
+        in an inconsistent state."""
+        if update is None:
+            raise PreconditionUnsatisfiedError("No update supplied")
+        cases = self.list_cases(limit=sys.maxsize, filter=query)
+        updates = []
+        for case in cases.cases:
+            an_update = dict(update)
+            an_update["_id"] = case._id
+            updates.append(an_update)
+        return self.batch_update(updates)
+
+    def delete_case(self, case_id: str):
+        """Remove a case. Raises NotFoundError if no case with the given id exists."""
+        if self.store.case_by_id(case_id) is None:
+            raise NotFoundError(f"No case with ID {case_id}")
+        self.store.delete_case(case_id)
+
+    def batch_delete(
+        self,
+        query: Optional[str] = None,
+        case_ids: Optional[list[str]] = None,
+        threshold: Optional[int] = None,
+    ):
+        if not ((query is None) ^ (case_ids is None)):
+            raise PreconditionUnsatisfiedError(
+                "Must specify exactly one of query or case ID list"
+            )
+        if case_ids is not None:
+            for case_id in case_ids:
+                self.delete_case(case_id)
+        else:  # query is not None
+            filter = self.parse_filter(query)
+            if filter is None or filter.matches_everything():
+                raise PreconditionUnsatisfiedError(
+                    f"unspported query in batch_delete: {query}"
+                )
+            target_case_count = self.store.count_cases(filter)
+            if threshold and target_case_count > threshold:
+                raise ValidationError(
+                    f"Command would delete {target_case_count} cases, above threshold of {threshold}"
+                )
+            self.store.delete_cases(filter)
+
+    def validate_updated_case(self, id: str, update: DocumentUpdate):
+        """Find out whether updating a case would result in it being invalid.
+        Raises NotFoundError if the case doesn't exist, or ValidationError if
+        the update results in an invalid case. Returns the updated, valid case
+        on success."""
+        case = self.store.case_by_id(id)
+        if case is None:
+            raise NotFoundError(f"No case with ID {id}")
+        # build the updated version of the case to validate
+        updated_case = case.updated_document(update)
+        updated_case.validate()
+        self.check_case_preconditions(updated_case)
+        return updated_case
+
     def create_case_if_valid(self, maybe_case: dict):
         """Attempts to create a case from an input dictionary and validate it against
-        the application rules. Raises ValidationError or PreconditionUnsatisfiedError on invalid input."""
+        the application rules. Raises ValidationError or PreconditionUnsatisfiedError on invalid input.
+        Raises DependencyFailedError if it has to geocode a case and the location service fails."""
+        if "location" in maybe_case:
+            loc = maybe_case["location"]
+            if "query" in loc:
+                features = self.geocoder.locate_feature(loc["query"])
+                feature = features[0]
+            else:
+                # if you aren't asking for a query, you must be telling me what it is
+                feature = Feature.from_dict(loc)
+        else:
+            feature = None
         case = Case.from_dict(maybe_case)
+        case.location = feature
         self.check_case_preconditions(case)
         return case
 
@@ -162,17 +336,20 @@ class CaseController:
     @staticmethod
     def parse_filter(filter: str) -> Filter:
         """Interpret the filter query in the incoming request."""
-        if filter is None:
+        if filter is None or len(filter) == 0:
             return Anything()
-        # split query on spaces
-        components = filter.split(" ")
-        filters = [CaseController.individual_filter(c) for c in components]
-        if None in filters:
-            return None
-        if len(filters) == 1:
-            return filters[0]
-        else:
-            return AndFilter(filters)
+        try:
+            # split query on spaces
+            components = filter.split(" ")
+            filters = [CaseController.individual_filter(c) for c in components]
+            if None in filters:
+                return None
+            if len(filters) == 1:
+                return filters[0]
+            else:
+                return AndFilter(filters)
+        except ValueError:
+            raise PreconditionUnsatisfiedError(f"Malformed query {filter}")
 
     @staticmethod
     def individual_filter(term: str) -> Filter:

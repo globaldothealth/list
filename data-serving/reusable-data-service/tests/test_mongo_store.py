@@ -4,22 +4,39 @@ import mongomock
 from bson import ObjectId
 from datetime import date
 
-from data_service.model.case import Case
+from data_service.model.case import (
+    observe_case_class,
+    remove_case_class_observer,
+    reset_custom_case_fields,
+)
 from data_service.model.case_reference import CaseReference
 from data_service.model.filter import Anything
 from data_service.stores.mongo_store import MongoStore
 
+Case = None
+
+
+def case_observer(cls):
+    global Case
+    Case = cls
+
 
 @pytest.fixture
 def mongo_store(monkeypatch):
+    reset_custom_case_fields()
+    observe_case_class(case_observer)
     db = mongomock.MongoClient()
 
     def fake_mongo(connection_string):
         return db
 
     monkeypatch.setattr("pymongo.MongoClient", fake_mongo)
-    store = MongoStore("mongodb://localhost:27017/outbreak", "outbreak", "cases")
+    store = MongoStore(
+        "mongodb://localhost:27017/outbreak", "outbreak", "cases", "schema"
+    )
     yield store
+    remove_case_class_observer(case_observer)
+    reset_custom_case_fields()
 
 
 """
