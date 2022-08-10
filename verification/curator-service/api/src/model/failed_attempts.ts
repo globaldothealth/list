@@ -20,7 +20,7 @@ const numberTimeLimiters = {
     },
 };
 
-export enum attemptName {
+export enum AttemptName {
     Login = 'loginAttempt',
     ResetPassword = 'resetPasswordAttempt',
     ForgotPassword = 'forgotPasswordAttempt',
@@ -76,7 +76,7 @@ export const setupFailedAttempts = async (userId: ObjectId) => {
 
 export const handleCheckFailedAttempts = async (
     userId: ObjectId,
-    attemptName: attemptName,
+    attemptName: AttemptName,
 ) => {
     let attempts = await failedAttempts().findOne({
         userId,
@@ -112,7 +112,7 @@ export const handleCheckFailedAttempts = async (
 
 export const updateFailedAttempts = async (
     userId: ObjectId,
-    attemptName: attemptName,
+    attemptName: AttemptName,
     attemptsNumber: number,
 ) => {
     await failedAttempts().updateOne(

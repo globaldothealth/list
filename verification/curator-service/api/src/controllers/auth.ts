@@ -26,7 +26,7 @@ import { baseURL, welcomeEmail } from '../util/instance-details';
 import {
     setupFailedAttempts,
     handleCheckFailedAttempts,
-    attemptName,
+    AttemptName,
     updateFailedAttempts,
 } from '../model/failed_attempts';
 import {
@@ -418,7 +418,7 @@ export class AuthController {
                     const { success, attemptsNumber } =
                         await handleCheckFailedAttempts(
                             currentUser._id,
-                            attemptName.ResetPassword,
+                            AttemptName.ResetPassword,
                         );
 
                     if (!success)
@@ -435,7 +435,7 @@ export class AuthController {
                     if (!isValidPassword) {
                         updateFailedAttempts(
                             currentUser._id,
-                            attemptName.ResetPassword,
+                            AttemptName.ResetPassword,
                             attemptsNumber,
                         );
 
@@ -446,7 +446,7 @@ export class AuthController {
 
                     updateFailedAttempts(
                         currentUser._id,
-                        attemptName.ResetPassword,
+                        AttemptName.ResetPassword,
                         0,
                     );
 
@@ -490,7 +490,7 @@ export class AuthController {
                     const { success, attemptsNumber } =
                         await handleCheckFailedAttempts(
                             user._id,
-                            attemptName.ForgotPassword,
+                            AttemptName.ForgotPassword,
                         );
 
                     if (!success) {
@@ -502,7 +502,7 @@ export class AuthController {
 
                     updateFailedAttempts(
                         user._id,
-                        attemptName.ResetPassword,
+                        AttemptName.ResetPassword,
                         attemptsNumber,
                     );
 
@@ -590,7 +590,7 @@ export class AuthController {
                     const { success, attemptsNumber } =
                         await handleCheckFailedAttempts(
                             userId,
-                            attemptName.ResetPasswordWithToken,
+                            AttemptName.ResetPasswordWithToken,
                         );
 
                     if (!success)
@@ -606,7 +606,7 @@ export class AuthController {
                     if (!passwordResetToken) {
                         updateFailedAttempts(
                             userId,
-                            attemptName.ForgotPassword,
+                            AttemptName.ForgotPassword,
                             attemptsNumber,
                         );
                         throw new Error(
@@ -622,7 +622,7 @@ export class AuthController {
                     if (!isValid) {
                         updateFailedAttempts(
                             userId,
-                            attemptName.ForgotPassword,
+                            AttemptName.ForgotPassword,
                             attemptsNumber,
                         );
                         throw new Error(
@@ -651,7 +651,7 @@ export class AuthController {
                     // Send confirmation email to the user
                     const user = result.value as IUser;
 
-                    updateFailedAttempts(userId, attemptName.ForgotPassword, 0);
+                    updateFailedAttempts(userId, AttemptName.ForgotPassword, 0);
 
                     await this.emailClient.send(
                         [user.email],
@@ -833,7 +833,7 @@ export class AuthController {
                         const { success, attemptsNumber } =
                             await handleCheckFailedAttempts(
                                 user._id,
-                                attemptName.Login,
+                                AttemptName.Login,
                             );
 
                         if (!success)
@@ -854,7 +854,7 @@ export class AuthController {
                         if (!isValidPassword) {
                             updateFailedAttempts(
                                 user._id,
-                                attemptName.Login,
+                                AttemptName.Login,
                                 attemptsNumber,
                             );
 
@@ -863,7 +863,7 @@ export class AuthController {
                             });
                         }
 
-                        updateFailedAttempts(user._id, attemptName.Login, 0);
+                        updateFailedAttempts(user._id, AttemptName.Login, 0);
                         done(null, user);
                     } catch (error) {
                         done(error);

@@ -100,7 +100,7 @@ export default function SignUpForm({
     const dispatch = useAppDispatch();
 
     const [passwordVisible, setPasswordVisible] = useState(false);
-    const [passwordStrenght, setPasswordStrenght] = useState<number>(0);
+    const [passwordStrength, setPasswordStrength] = useState(0);
     const [passwordConfirmationVisible, setPasswordConfirmationVisible] =
         useState(false);
 
@@ -131,7 +131,7 @@ export default function SignUpForm({
             .matches(numericRegex, 'One number required')
             .min(8, 'Minimum 8 characters required')
             .test('password-strong-enough', 'Password too weak', () => {
-                return passwordStrenght > 2;
+                return passwordStrength > 2;
             })
             .required('This field is required'),
         passwordConfirmation: Yup.string().test(
@@ -264,8 +264,8 @@ export default function SignUpForm({
                                 password={formik.values.password}
                                 scoreWords={[]}
                                 shortScoreWord=""
-                                onChangeScore={(score) => {
-                                    setPasswordStrenght(score);
+                                onChangeScore={(score: number) => {
+                                    setPasswordStrength(score);
                                 }}
                             />
                             <FormHelperText>
