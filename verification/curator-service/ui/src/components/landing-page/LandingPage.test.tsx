@@ -16,6 +16,27 @@ beforeAll(() => server.listen());
 afterEach(() => server.resetHandlers());
 afterAll(() => server.close());
 
+jest.mock('react-google-recaptcha', () => {
+    const React = require('react');
+    const RecaptchaV2 = React.forwardRef((props, ref) => {
+        React.useImperativeHandle(ref, () => ({
+            reset: jest.fn(),
+            execute: jest.fn(),
+            executeAsync: jest.fn(() => 'token'),
+        }));
+        return (
+            <input
+                ref={ref}
+                type="checkbox"
+                data-testid="mock-v2-captcha-element"
+                {...props}
+            />
+        );
+    });
+
+    return RecaptchaV2;
+});
+
 describe('<LandingPage />', () => {
     test('shows all content', async () => {
         render(<LandingPage />);
