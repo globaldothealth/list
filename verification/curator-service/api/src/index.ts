@@ -416,11 +416,16 @@ async function makeApp() {
                     'Feedback regarding Covid-19 curator portal',
                     message,
                 );
-                res.status(200).send({ message: 'Email sent successfully' });
+                return res
+                    .status(200)
+                    .json({ message: 'Email sent successfully' });
             } catch (err) {
                 const error = err as Error;
                 logger.error(error);
-                return res.sendStatus(500);
+                return res.status(500).json({
+                    message:
+                        'Unfortunately, an error occurred. Please, try again later.',
+                });
             }
         },
     );
