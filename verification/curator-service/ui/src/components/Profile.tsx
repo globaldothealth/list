@@ -120,7 +120,7 @@ export function ChangePasswordFormInProfile(): JSX.Element {
     const classes = useStyles();
     const dispatch = useAppDispatch();
 
-    const [passwordStrenght, setPasswordStrenght] = useState<number>(0);
+    const [passwordStrength, setPasswordStrength] = useState(0);
     const [oldPasswordVisible, setOldPasswordVisible] = useState(false);
     const [passwordVisible, setPasswordVisible] = useState(false);
     const [passwordConfirmationVisible, setPasswordConfirmationVisible] =
@@ -149,7 +149,7 @@ export function ChangePasswordFormInProfile(): JSX.Element {
                 },
             )
             .test('password-strong-enough', 'Password too weak', () => {
-                return passwordStrenght > 2;
+                return passwordStrength > 2;
             }),
         passwordConfirmation: Yup.string().test(
             'passwords-match',
@@ -289,8 +289,8 @@ export function ChangePasswordFormInProfile(): JSX.Element {
                         password={formik.values.password}
                         scoreWords={[]}
                         shortScoreWord=""
-                        onChangeScore={(score) => {
-                            setPasswordStrenght(score);
+                        onChangeScore={(score: number) => {
+                            setPasswordStrength(score);
                         }}
                     />
                     <FormHelperText>
