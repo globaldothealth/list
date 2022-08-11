@@ -1,10 +1,11 @@
 import { Data } from './types';
 
 export function descendingComparator<T>(a: T, b: T, orderBy: keyof T): number {
-    const aItem =
-        typeof a[orderBy] === 'string' ? a[orderBy].toUpperCase() : a[orderBy];
-    const bItem =
-        typeof b[orderBy] === 'string' ? b[orderBy].toUpperCase() : b[orderBy];
+    const valA = a[orderBy];
+    const aItem = typeof valA === 'string' ? valA.toUpperCase() : valA;
+
+    const valB = b[orderBy];
+    const bItem = typeof valB === 'string' ? valB.toUpperCase() : valB;
 
     if (bItem < aItem) {
         return -1;

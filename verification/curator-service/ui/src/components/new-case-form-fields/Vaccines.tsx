@@ -47,7 +47,7 @@ const useStyles = makeStyles(() => ({
 }));
 
 export default function Vaccines(): JSX.Element {
-    const { values } = useFormikContext<CaseFormValues>();
+    const { values, setValues } = useFormikContext<CaseFormValues>();
     const classes = useStyles();
     return (
         <Scroll.Element name="vaccines">
@@ -85,6 +85,25 @@ export default function Vaccines(): JSX.Element {
                                             <DateField
                                                 name={`vaccines[${index}].date`}
                                                 label="Vaccination date"
+                                                value={
+                                                    values.vaccines[index]
+                                                        .date || null
+                                                }
+                                                onChange={(newValue) => {
+                                                    setValues({
+                                                        ...values,
+                                                        vaccines: [
+                                                            ...values.vaccines,
+                                                            {
+                                                                ...values
+                                                                    .vaccines[
+                                                                    index
+                                                                ],
+                                                                date: newValue as Date,
+                                                            },
+                                                        ],
+                                                    });
+                                                }}
                                             ></DateField>
                                             <FastField
                                                 className={classes.field}

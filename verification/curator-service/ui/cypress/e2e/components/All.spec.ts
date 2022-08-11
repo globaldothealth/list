@@ -1,0 +1,14 @@
+// import './AcknowledgmentsPage.spec';
+// import './AppTest.spec';
+// import './AutomatedSourceForm.spec';
+// import './BulkCaseForm.spec';
+// import './Curator.spec';
+// import './EditCase.spec';
+// import './LandingPage.spec';
+// import './LinelistTableTest.spec';
+// import './NewCaseForm.spec';
+// import './ProfileTest.spec';
+// import './SourceTableTest.spec';
+// import './UploadsTableTest.spec';
+// import './UsersTest.spec';
+// import './ViewCase.spec';

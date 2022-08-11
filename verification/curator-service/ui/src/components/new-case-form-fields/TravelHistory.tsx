@@ -135,7 +135,8 @@ const TooltipText = () => (
 );
 
 export default function Events(): JSX.Element {
-    const { values, initialValues } = useFormikContext<CaseFormValues>();
+    const { values, initialValues, setValues } =
+        useFormikContext<CaseFormValues>();
     const classes = useStyles();
     return (
         <Scroll.Element name="travelHistory">
@@ -221,6 +222,40 @@ export default function Events(): JSX.Element {
                                                         <DateField
                                                             name={`travelHistory[${index}].dateRange.start`}
                                                             label="Start date"
+                                                            value={
+                                                                values
+                                                                    .travelHistory[
+                                                                    index
+                                                                ].dateRange!
+                                                                    .start ||
+                                                                null
+                                                            }
+                                                            onChange={(
+                                                                newValue,
+                                                            ) => {
+                                                                setValues({
+                                                                    ...values,
+                                                                    travelHistory:
+                                                                        [
+                                                                            ...values.travelHistory,
+                                                                            {
+                                                                                ...values
+                                                                                    .travelHistory[
+                                                                                    index
+                                                                                ],
+                                                                                dateRange:
+                                                                                    {
+                                                                                        ...values
+                                                                                            .travelHistory[
+                                                                                            index
+                                                                                        ]
+                                                                                            .dateRange,
+                                                                                        start: newValue as string,
+                                                                                    },
+                                                                            },
+                                                                        ],
+                                                                });
+                                                            }}
                                                             initialFocusedDate={
                                                                 values.confirmedDate
                                                             }
@@ -229,6 +264,38 @@ export default function Events(): JSX.Element {
                                                     <DateField
                                                         name={`travelHistory[${index}].dateRange.end`}
                                                         label="End date"
+                                                        value={
+                                                            values
+                                                                .travelHistory[
+                                                                index
+                                                            ].dateRange!.end ||
+                                                            null
+                                                        }
+                                                        onChange={(
+                                                            newValue,
+                                                        ) => {
+                                                            setValues({
+                                                                ...values,
+                                                                travelHistory: [
+                                                                    ...values.travelHistory,
+                                                                    {
+                                                                        ...values
+                                                                            .travelHistory[
+                                                                            index
+                                                                        ],
+                                                                        dateRange:
+                                                                            {
+                                                                                ...values
+                                                                                    .travelHistory[
+                                                                                    index
+                                                                                ]
+                                                                                    .dateRange,
+                                                                                end: newValue as string,
+                                                                            },
+                                                                    },
+                                                                ],
+                                                            });
+                                                        }}
                                                         initialFocusedDate={
                                                             values.confirmedDate
                                                         }

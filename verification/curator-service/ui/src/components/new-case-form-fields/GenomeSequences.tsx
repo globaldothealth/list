@@ -65,7 +65,7 @@ const TooltipText = () => (
 );
 
 export default function GenomeSequences(): JSX.Element {
-    const { values } = useFormikContext<CaseFormValues>();
+    const { values, setValues } = useFormikContext<CaseFormValues>();
     const classes = useStyles();
     return (
         <Scroll.Element name="genomeSequences">
@@ -111,6 +111,27 @@ export default function GenomeSequences(): JSX.Element {
                                             <DateField
                                                 name={`genomeSequences[${index}].sampleCollectionDate`}
                                                 label="Sample collection date"
+                                                value={
+                                                    values.genomeSequences[
+                                                        index
+                                                    ].sampleCollectionDate
+                                                }
+                                                onChange={(newValue) => {
+                                                    setValues({
+                                                        ...values,
+                                                        genomeSequences: [
+                                                            ...values.genomeSequences,
+                                                            {
+                                                                ...values
+                                                                    .genomeSequences[
+                                                                    index
+                                                                ],
+                                                                sampleCollectionDate:
+                                                                    newValue as string,
+                                                            },
+                                                        ],
+                                                    });
+                                                }}
                                             ></DateField>
                                             <FastField
                                                 className={classes.field}

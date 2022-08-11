@@ -125,7 +125,7 @@ const TooltipText = () => (
 );
 
 export default function Events(): JSX.Element {
-    const { values } = useFormikContext<CaseFormValues>();
+    const { values, setValues } = useFormikContext<CaseFormValues>();
     return (
         <Scroll.Element name="events">
             <FieldTitle
@@ -137,6 +137,10 @@ export default function Events(): JSX.Element {
             <DateField
                 name="confirmedDate"
                 label="Confirmed case date"
+                value={values.confirmedDate}
+                onChange={(newValue) => {
+                    setValues({ ...values, confirmedDate: newValue as string });
+                }}
                 required
             ></DateField>
             <SelectField
@@ -147,16 +151,37 @@ export default function Events(): JSX.Element {
             <DateField
                 name="onsetSymptomsDate"
                 label="Onset of symptoms date"
+                value={values.onsetSymptomsDate}
+                onChange={(newValue) => {
+                    setValues({
+                        ...values,
+                        onsetSymptomsDate: newValue as string,
+                    });
+                }}
                 initialFocusedDate={values.confirmedDate}
             ></DateField>
             <DateField
                 name="firstClinicalConsultationDate"
                 label="First clinical consultation date"
+                value={values.firstClinicalConsultationDate}
+                onChange={(newValue) => {
+                    setValues({
+                        ...values,
+                        firstClinicalConsultationDate: newValue as string,
+                    });
+                }}
                 initialFocusedDate={values.confirmedDate}
             ></DateField>
             <DateField
                 name="selfIsolationDate"
                 label="Self isolation date"
+                value={values.selfIsolationDate}
+                onChange={(newValue) => {
+                    setValues({
+                        ...values,
+                        selfIsolationDate: newValue as string,
+                    });
+                }}
                 initialFocusedDate={values.confirmedDate}
             ></DateField>
             <SelectField
@@ -168,6 +193,13 @@ export default function Events(): JSX.Element {
                 <DateField
                     name="hospitalAdmissionDate"
                     label="Hospital admission date"
+                    value={values.hospitalAdmissionDate}
+                    onChange={(newValue) => {
+                        setValues({
+                            ...values,
+                            hospitalAdmissionDate: newValue as string,
+                        });
+                    }}
                     initialFocusedDate={values.confirmedDate}
                 ></DateField>
             )}
@@ -180,6 +212,13 @@ export default function Events(): JSX.Element {
                 <DateField
                     name="icuAdmissionDate"
                     label="ICU admission date"
+                    value={values.icuAdmissionDate}
+                    onChange={(newValue) => {
+                        setValues({
+                            ...values,
+                            icuAdmissionDate: newValue as string,
+                        });
+                    }}
                     initialFocusedDate={values.confirmedDate}
                 ></DateField>
             )}
@@ -192,6 +231,13 @@ export default function Events(): JSX.Element {
                 <DateField
                     name="outcomeDate"
                     label="Outcome date"
+                    value={values.outcomeDate}
+                    onChange={(newValue) => {
+                        setValues({
+                            ...values,
+                            outcomeDate: newValue as string,
+                        });
+                    }}
                     initialFocusedDate={values.confirmedDate}
                 ></DateField>
             )}

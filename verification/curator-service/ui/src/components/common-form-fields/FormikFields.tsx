@@ -9,11 +9,11 @@ import CaseFormValues from '../new-case-form-fields/CaseFormValues';
 import FormControl from '@mui/material/FormControl';
 import { FormHelperText } from '@mui/material';
 import InputLabel from '@mui/material/InputLabel';
-import { DesktopDatePicker } from 'formik-mui-lab';
 import MenuItem from '@mui/material/MenuItem';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-// import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import { DesktopDatePicker } from '@mui/x-date-pickers/DesktopDatePicker';
+import MuiTextField from '@mui/material/TextField';
 import { Select, TextField } from 'formik-mui';
 import axios from 'axios';
 import { hasKey } from '../Utils';
@@ -178,6 +178,8 @@ export function SelectField(props: SelectFieldProps): JSX.Element {
 interface DateFieldProps {
     name: string;
     label: string;
+    value: Date | string | null;
+    onChange: (value: unknown) => void;
     required?: boolean;
     initialFocusedDate?: string | null;
 }
@@ -189,27 +191,25 @@ export function DateField(props: DateFieldProps): JSX.Element {
         <div className={classes.fieldRow}>
             <LocalizationProvider dateAdapter={AdapterDateFns}>
                 {/* Don't use FastField here */}
-                <Field
+                <DesktopDatePicker
                     className={classes.field}
                     data-testid={props.name}
-                    name={props.name}
+                    // name={props.name}
                     label={props.label}
                     inputFormat="yyyy/MM/dd"
                     mask="____/__/__"
                     minDate={new Date('2019/12/01')}
                     disableFuture
-                    autoOk
-                    initialFocusedDate={Date.parse(
-                        props.initialFocusedDate ?? '',
+                    // autoOk
+                    // initialFocusedDate={Date.parse(
+                    //     props.initialFocusedDate ?? '',
+                    // )}
+                    // invalidDateMessage="Invalid date format (YYYY/MM/DD)"
+                    value={props.value}
+                    onChange={props.onChange}
+                    renderInput={(params) => (
+                        <MuiTextField {...params} name={props.name} />
                     )}
-                    invalidDateMessage="Invalid date format (YYYY/MM/DD)"
-                    component={DesktopDatePicker}
-                    textField={{
-                        placeholder: 'YYYY/MM/DD',
-                        variant: 'standard',
-                        name: props.name,
-                        'data-testid': props.name,
-                    }}
                 />
             </LocalizationProvider>
             {props.required && (

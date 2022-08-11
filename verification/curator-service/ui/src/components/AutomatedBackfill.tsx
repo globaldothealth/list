@@ -229,7 +229,12 @@ export default function AutomatedBackfill(props: Props): JSX.Element {
                     return triggerBackfill(values);
                 }}
             >
-                {({ isSubmitting, submitForm, values }): JSX.Element => (
+                {({
+                    isSubmitting,
+                    submitForm,
+                    values,
+                    setValues,
+                }): JSX.Element => (
                     <StyledForm>
                         <Box sx={{ marginTop: '2em' }}>
                             <Typography data-testid="header-title" variant="h5">
@@ -269,11 +274,25 @@ export default function AutomatedBackfill(props: Props): JSX.Element {
                                 <DateField
                                     name="startDate"
                                     label="First date to backfill (inclusive)"
+                                    value={values.startDate}
+                                    onChange={(newValue) => {
+                                        setValues({
+                                            ...values,
+                                            startDate: newValue as string,
+                                        });
+                                    }}
                                     required
                                 />
                                 <DateField
                                     name="endDate"
                                     label="Last date to backfill (inclusive)"
+                                    value={values.endDate}
+                                    onChange={(newValue) => {
+                                        setValues({
+                                            ...values,
+                                            endDate: newValue as string,
+                                        });
+                                    }}
                                     required
                                 />
                             </Paper>
