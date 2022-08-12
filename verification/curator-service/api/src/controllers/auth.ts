@@ -502,7 +502,7 @@ export class AuthController {
 
                     updateFailedAttempts(
                         user._id,
-                        AttemptName.ResetPassword,
+                        AttemptName.ForgotPassword,
                         attemptsNumber,
                     );
 
@@ -606,7 +606,7 @@ export class AuthController {
                     if (!passwordResetToken) {
                         updateFailedAttempts(
                             userId,
-                            AttemptName.ForgotPassword,
+                            AttemptName.ResetPasswordWithToken,
                             attemptsNumber,
                         );
                         throw new Error(
@@ -622,7 +622,7 @@ export class AuthController {
                     if (!isValid) {
                         updateFailedAttempts(
                             userId,
-                            AttemptName.ForgotPassword,
+                            AttemptName.ResetPasswordWithToken,
                             attemptsNumber,
                         );
                         throw new Error(
@@ -651,7 +651,11 @@ export class AuthController {
                     // Send confirmation email to the user
                     const user = result.value as IUser;
 
-                    updateFailedAttempts(userId, AttemptName.ForgotPassword, 0);
+                    updateFailedAttempts(
+                        userId,
+                        AttemptName.ResetPasswordWithToken,
+                        0,
+                    );
 
                     await this.emailClient.send(
                         [user.email],

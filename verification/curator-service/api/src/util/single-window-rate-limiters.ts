@@ -1,7 +1,7 @@
 import rateLimit from 'express-rate-limit';
 
 export const loginLimiter = rateLimit({
-    windowMs: 20 * 60 * 1000, // 20 minutes
+    windowMs: 60 * 60 * 1000, // 60 minutes
     max: 4, // Limit each IP to 4 requests per `window` (here, per 20 minutes)
     standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
     legacyHeaders: false, // Disable the `X-RateLimit-*` headers
@@ -26,7 +26,7 @@ export const registerLimiter = rateLimit({
 });
 
 export const resetPasswordLimiter = rateLimit({
-    windowMs: 30 * 60 * 1000, // 30 minutes
+    windowMs: 60 * 60 * 1000, // 60 minutes
     max: 4,
     standardHeaders: true,
     legacyHeaders: false,

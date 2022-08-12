@@ -4,19 +4,19 @@ import db from './database';
 const numberTimeLimiters = {
     loginAttempt: {
         maxNumberOfFailedLogins: 8,
-        timeWindowForFailedLogins: 60, //min
+        timeWindowForFailedLoginsMinutes: 60,
     },
     resetPasswordAttempt: {
         maxNumberOfFailedLogins: 8,
-        timeWindowForFailedLogins: 60,
+        timeWindowForFailedLoginsMinutes: 60,
     },
     forgotPasswordAttempt: {
         maxNumberOfFailedLogins: 8,
-        timeWindowForFailedLogins: 60,
+        timeWindowForFailedLoginsMinutes: 60,
     },
     resetPasswordWithTokenAttempt: {
         maxNumberOfFailedLogins: 8,
-        timeWindowForFailedLogins: 60,
+        timeWindowForFailedLoginsMinutes: 60,
     },
 };
 
@@ -98,7 +98,8 @@ export const handleCheckFailedAttempts = async (
         ) / 60;
 
     if (
-        diffTimeMin >= numberTimeLimiters[attemptName].timeWindowForFailedLogins
+        diffTimeMin >=
+        numberTimeLimiters[attemptName].timeWindowForFailedLoginsMinutes
     )
         attemptsNumber = 1;
 
