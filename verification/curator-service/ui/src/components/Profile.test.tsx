@@ -193,10 +193,10 @@ describe('<Profile />', () => {
         render(<Profile />, { initialState: noUserInfoState });
 
         userEvent.type(screen.getByLabelText('Old Password'), '1234567');
-        userEvent.type(screen.getByLabelText('New password'), 'asdD?234');
+        userEvent.type(screen.getByLabelText('New password'), 'asdD?234df');
         userEvent.type(
             screen.getByLabelText('Repeat new password'),
-            'asdD?234',
+            'asdD?234df',
         );
 
         userEvent.click(
@@ -225,10 +225,10 @@ describe('<Profile />', () => {
         render(<Profile />, { initialState: noUserInfoState });
 
         userEvent.type(screen.getByLabelText('Old Password'), '1234567');
-        userEvent.type(screen.getByLabelText('New password'), 'asdD?234');
+        userEvent.type(screen.getByLabelText('New password'), 'asdD?234df');
         userEvent.type(
             screen.getByLabelText('Repeat new password'),
-            'asdD?234',
+            'asdD?234df',
         );
 
         userEvent.click(

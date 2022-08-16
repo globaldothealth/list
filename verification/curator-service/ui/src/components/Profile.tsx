@@ -33,6 +33,7 @@ import Alert from '@material-ui/lab/Alert';
 import LinearProgress from '@material-ui/core/LinearProgress';
 import { SnackbarAlert } from './SnackbarAlert';
 import Helmet from 'react-helmet';
+import PasswordStrengthBar from 'react-password-strength-bar';
 
 const styles = makeStyles((theme: Theme) => ({
     root: {
@@ -119,6 +120,7 @@ export function ChangePasswordFormInProfile(): JSX.Element {
     const classes = useStyles();
     const dispatch = useAppDispatch();
 
+    const [passwordStrength, setPasswordStrength] = useState(0);
     const [oldPasswordVisible, setOldPasswordVisible] = useState(false);
     const [passwordVisible, setPasswordVisible] = useState(false);
     const [passwordConfirmationVisible, setPasswordConfirmationVisible] =
@@ -138,6 +140,7 @@ export function ChangePasswordFormInProfile(): JSX.Element {
             .matches(uppercaseRegex, 'one uppercase required!')
             .matches(numericRegex, 'one number required!')
             .min(8, 'Minimum 8 characters required!')
+            .required('Required!')
             .test(
                 'passwords-different',
                 "New password can't be the same as old password",
@@ -145,7 +148,9 @@ export function ChangePasswordFormInProfile(): JSX.Element {
                     return this.parent.oldPassword !== value;
                 },
             )
-            .required('Required!'),
+            .test('password-strong-enough', 'Password too weak', () => {
+                return passwordStrength > 2;
+            }),
         passwordConfirmation: Yup.string().test(
             'passwords-match',
             'Passwords must match',
@@ -279,6 +284,14 @@ export function ChangePasswordFormInProfile(): JSX.Element {
                             </InputAdornment>
                         }
                         label="New password"
+                    />
+                    <PasswordStrengthBar
+                        password={formik.values.password}
+                        scoreWords={[]}
+                        shortScoreWord=""
+                        onChangeScore={(score: number) => {
+                            setPasswordStrength(score);
+                        }}
                     />
                     <FormHelperText>
                         {formik.touched.password && formik.errors.password}
