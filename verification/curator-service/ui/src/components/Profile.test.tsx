@@ -106,10 +106,10 @@ describe('<Profile />', () => {
         render(<Profile />, { initialState: noUserInfoState });
 
         await user.type(screen.getByLabelText('Old Password'), '1234567');
-        await user.type(screen.getByLabelText('New password'), 'asdD?234');
+        await user.type(screen.getByLabelText('New password'), 'asdD?234df');
         await user.type(
             screen.getByLabelText('Repeat new password'),
-            'asdD?234',
+            'asdD?234df',
         );
 
         await user.click(
@@ -136,10 +136,10 @@ describe('<Profile />', () => {
         render(<Profile />, { initialState: noUserInfoState });
 
         await user.type(screen.getByLabelText('Old Password'), '1234567');
-        await user.type(screen.getByLabelText('New password'), 'asdD?234');
+        await user.type(screen.getByLabelText('New password'), 'asdD?234df');
         await user.type(
             screen.getByLabelText('Repeat new password'),
-            'asdD?234',
+            'asdD?234df',
         );
 
         await user.click(

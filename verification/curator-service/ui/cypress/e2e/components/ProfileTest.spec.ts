@@ -20,10 +20,12 @@ describe('Profile', function () {
             email: 'alice@test.com',
             roles: ['curator'],
         });
-        cy.visit('/')
+        cy.visit('/');
         cy.visit('/profile');
 
-        cy.get('[data-testid="change-your-password-title"]').should('not.exist');
+        cy.get('[data-testid="change-your-password-title"]').should(
+            'not.exist',
+        );
     });
 
     it('Checks if the change pass form validation works well', function () {
@@ -52,6 +54,18 @@ describe('Profile', function () {
         cy.get('#password').type('tT$5');
         cy.get('button[data-testid="change-password-button"]').click();
         cy.contains('Minimum 8 characters required!');
+
+        //check score 1 strength of password
+        cy.get('#password').focus().clear();
+        cy.get('#password').type('Tt1ttttt');
+        cy.get('button[data-testid="change-password-button"]').click();
+        cy.contains('Password too weak');
+
+        //check score 2 strength of password
+        cy.get('#password').focus().clear();
+        cy.get('#password').type('tT$5aaaaa');
+        cy.get('button[data-testid="change-password-button"]').click();
+        cy.contains('Password too weak');
     });
 
     it('Checks if the validates the repeated password', function () {

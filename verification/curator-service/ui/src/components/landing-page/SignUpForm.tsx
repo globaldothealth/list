@@ -22,6 +22,7 @@ import Checkbox from '@mui/material/Checkbox';
 import Typography from '@mui/material/Typography';
 import GoogleButton from 'react-google-button';
 import { sendCustomGtmEvent } from '../util/helperFunctions';
+import PasswordStrengthBar from 'react-password-strength-bar';
 
 const useStyles = makeStyles((theme: Theme) => ({
     checkboxRoot: {
@@ -100,6 +101,7 @@ export default function SignUpForm({
     const dispatch = useAppDispatch();
 
     const [passwordVisible, setPasswordVisible] = useState(false);
+    const [passwordStrength, setPasswordStrength] = useState(0);
     const [passwordConfirmationVisible, setPasswordConfirmationVisible] =
         useState(false);
 
@@ -129,7 +131,10 @@ export default function SignUpForm({
             .matches(uppercaseRegex, 'One uppercase required')
             .matches(numericRegex, 'One number required')
             .min(8, 'Minimum 8 characters required')
-            .required('This field is required'),
+            .required('This field is required')
+            .test('password-strong-enough', 'Password too weak', () => {
+                return passwordStrength > 2;
+            }),
         passwordConfirmation: Yup.string().test(
             'passwords-match',
             'Passwords must match',
@@ -192,6 +197,7 @@ export default function SignUpForm({
                             helperText={
                                 formik.touched.email && formik.errors.email
                             }
+                            style={{ marginBottom: 17 }}
                         />
 
                         <TextField
@@ -255,6 +261,14 @@ export default function SignUpForm({
                                     </InputAdornment>
                                 }
                                 label="Password"
+                            />
+                            <PasswordStrengthBar
+                                password={formik.values.password}
+                                scoreWords={[]}
+                                shortScoreWord=""
+                                onChangeScore={(score: number) => {
+                                    setPasswordStrength(score);
+                                }}
                             />
                             <FormHelperText>
                                 {formik.touched.password &&

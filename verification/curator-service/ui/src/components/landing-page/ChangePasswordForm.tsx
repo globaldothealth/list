@@ -7,18 +7,18 @@ import { selectPasswordReset } from '../../redux/auth/selectors';
 import { resetPassword } from '../../redux/auth/thunk';
 import { toggleSnackbar } from '../../redux/auth/slice';
 
-import { Theme } from '@mui/material/styles';
-import makeStyles from '@mui/styles/makeStyles';
-import FormHelperText from '@mui/material/FormHelperText';
-import FormControl from '@mui/material/FormControl';
-import InputLabel from '@mui/material/InputLabel';
-import OutlinedInput from '@mui/material/OutlinedInput';
-import InputAdornment from '@mui/material/InputAdornment';
-import IconButton from '@mui/material/IconButton';
-import Visibility from '@mui/icons-material/Visibility';
-import VisibilityOff from '@mui/icons-material/VisibilityOff';
-import Button from '@mui/material/Button';
-import Typography from '@mui/material/Typography';
+import { makeStyles, Theme } from '@material-ui/core/styles';
+import FormHelperText from '@material-ui/core/FormHelperText';
+import FormControl from '@material-ui/core/FormControl';
+import InputLabel from '@material-ui/core/InputLabel';
+import OutlinedInput from '@material-ui/core/OutlinedInput';
+import InputAdornment from '@material-ui/core/InputAdornment';
+import IconButton from '@material-ui/core/IconButton';
+import Visibility from '@material-ui/icons/Visibility';
+import VisibilityOff from '@material-ui/icons/VisibilityOff';
+import Button from '@material-ui/core/Button';
+import Typography from '@material-ui/core/Typography';
+import PasswordStrengthBar from 'react-password-strength-bar';
 
 const useStyles = makeStyles((theme: Theme) => ({
     checkboxRoot: {
@@ -89,6 +89,7 @@ export default function ChangePasswordForm({
     const dispatch = useAppDispatch();
     const history = useHistory();
 
+    const [passwordStrength, setPasswordStrength] = useState(0);
     const passwordReset = useAppSelector(selectPasswordReset);
     const [passwordVisible, setPasswordVisible] = useState(false);
     const [passwordConfirmationVisible, setPasswordConfirmationVisible] =
@@ -123,7 +124,10 @@ export default function ChangePasswordForm({
             .matches(uppercaseRegex, 'one uppercase required!')
             .matches(numericRegex, 'one number required!')
             .min(8, 'Minimum 8 characters required!')
-            .required('Required!'),
+            .required('Required!')
+            .test('password-strong-enough', 'Password too weak', () => {
+                return passwordStrength > 2;
+            }),
         passwordConfirmation: Yup.string().test(
             'passwords-match',
             'Passwords must match',
@@ -193,7 +197,7 @@ export default function ChangePasswordForm({
                                                 )
                                             }
                                             edge="end"
-                                            size="large"
+                                            size="medium"
                                         >
                                             {passwordVisible ? (
                                                 <Visibility />
@@ -204,6 +208,14 @@ export default function ChangePasswordForm({
                                     </InputAdornment>
                                 }
                                 label="Password"
+                            />
+                            <PasswordStrengthBar
+                                password={formik.values.password}
+                                scoreWords={[]}
+                                shortScoreWord=""
+                                onChangeScore={(score: number) => {
+                                    setPasswordStrength(score);
+                                }}
                             />
                             <FormHelperText>
                                 {formik.touched.password &&
@@ -243,7 +255,7 @@ export default function ChangePasswordForm({
                                                 )
                                             }
                                             edge="end"
-                                            size="large"
+                                            size="medium"
                                         >
                                             {passwordConfirmationVisible ? (
                                                 <Visibility />

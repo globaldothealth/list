@@ -1,6 +1,7 @@
 # Env files
 .env
 .env.staging
+.env.development
 
 # Don't include CSVs, except for Cypress fixtures.
 *.csv

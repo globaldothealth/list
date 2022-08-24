@@ -53,6 +53,18 @@ describe('LandingPage', function () {
         cy.get('#password').type('tT$5');
         cy.get('button[data-testid="sign-up-button"]').click();
         cy.contains(/Minimum 8 characters required/i);
+
+        //check score 1 strength of password
+        cy.get('#password').focus().clear();
+        cy.get('#password').type('Tt1ttttt');
+        cy.get('button[data-testid="sign-up-button"]').click();
+        cy.contains(/Password too weak/i);
+
+        //check score 2 strength of password
+        cy.get('#password').focus().clear();
+        cy.get('#password').type('tT$5aaaaa');
+        cy.get('button[data-testid="sign-up-button"]').click();
+        cy.contains(/Password too weak/i);
     });
 
     it('Validates emails', function () {
@@ -123,6 +135,18 @@ describe('LandingPage', function () {
         cy.get('#password').type('tT$5');
         cy.get('button[data-testid="change-password-button"]').click();
         cy.contains('Minimum 8 characters required!');
+
+        //check score 1 strength of password
+        cy.get('#password').focus().clear();
+        cy.get('#password').type('Tt1ttttt');
+        cy.get('button[data-testid="change-password-button"]').click();
+        cy.contains('Password too weak');
+
+        //check score 2 strength of password
+        cy.get('#password').focus().clear();
+        cy.get('#password').type('tT$5aaaaa');
+        cy.get('button[data-testid="change-password-button"]').click();
+        cy.contains('Password too weak');
     });
 
     it('Homepage with logged out user', function () {
@@ -185,5 +209,28 @@ describe('LandingPage', function () {
         cy.contains('Uploads');
         cy.contains('Manage users').should('not.exist');
         cy.contains('Terms of use');
+    });
+
+    it('Limit number of requests to register and login ', function () {
+        cy.visit('/');
+        cy.get('#email').type('test@example.com');
+        cy.get('#confirmEmail').type('test@example.com');
+        cy.get('#password').type('tT$5aaaaak');
+        cy.get('#passwordConfirmation').type('tT$5aaaaak');
+        cy.get('#isAgreementChecked').check();
+        for (let i = 0; i < 5; i++) {
+            cy.get('button[data-testid="sign-up-button"]').click();
+        }
+        cy.contains(
+            /You sent too many requests. Please wait a while then try again/i,
+        );
+
+        cy.contains('Sign in!').click();
+        cy.get('#email').type('test@example.com');
+        cy.get('#password').type('test');
+        for (let i = 0; i < 5; i++) {
+            cy.get('button[data-testid="sign-in-button"]').click();
+        }
+        cy.contains(/Too many failed login attempts, please try again later/i);
     });
 });

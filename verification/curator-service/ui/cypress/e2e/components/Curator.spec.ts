@@ -9,7 +9,7 @@ describe('Curator', function () {
         cy.clearSeededLocations();
     });
 
-    it('Can Create, edit and view a full case', function () {
+    it.only('Can Create, edit and view a full case', function () {
         cy.intercept('GET', '/api/geocode/suggest?q=Spain', {
             fixture: 'geolocation_spain_suggest.json',
         }).as('geolocationSpainSuggest');

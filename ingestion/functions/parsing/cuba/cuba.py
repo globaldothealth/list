@@ -161,16 +161,22 @@ def parse_cases(raw_data_file, source_id, source_url):
         # First make dict mapping code names of diagnostic and treament centers
         # to actual locations
         hospital_map = {}
-        for centre_type in ['centros_aislamiento', 'centros_diagnostico']:
-            for centre in json_data[centre_type]:
-                hospital_map[centre] = json_data[centre_type][centre]['nombre'] + \
-                    ", " + json_data[centre_type][centre]['provincia']
+        try:
+            for centre_type in ['centros_aislamiento', 'centros_diagnostico']:
+                for centre in json_data[centre_type]:
+                    hospital_map[centre] = json_data[centre_type][centre]['nombre'] + \
+                        ", " + json_data[centre_type][centre]['provincia']
+        except KeyError:
+            logger.error(f"KeyError in Cuba parser")
 
         # Get schema_version
-        schema_version = json_data['schema-version']
-        if schema_version != 7:
-            logger.warning(
-                f'Schema version has been updated from 7 to {schema_version}')
+        try:
+            schema_version = json_data['schema-version']
+            if schema_version != 7:
+                logger.warning(
+                    f'Schema version has been updated from 7 to {schema_version}')
+        except:
+            schema_version = "(undef)"
 
         for day in json_data['casos']['dias']:
             if 'diagnosticados' in json_data['casos']['dias'][day]:
