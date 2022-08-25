@@ -538,7 +538,7 @@ export default function CaseForm(props: Props): JSX.Element {
                     color: red[500],
                     margin: '0.25em 0.5em',
                 }}
-            ></ErrorIcon>
+            />
         ) : opts.isChecked ? (
             <CheckCircleIcon
                 data-testid="check-icon"

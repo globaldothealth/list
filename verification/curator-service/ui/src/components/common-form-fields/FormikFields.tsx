@@ -190,21 +190,14 @@ export function DateField(props: DateFieldProps): JSX.Element {
     return (
         <div className={classes.fieldRow}>
             <LocalizationProvider dateAdapter={AdapterDateFns}>
-                {/* Don't use FastField here */}
                 <DesktopDatePicker
                     className={classes.field}
                     data-testid={props.name}
-                    // name={props.name}
                     label={props.label}
                     inputFormat="yyyy/MM/dd"
                     mask="____/__/__"
                     minDate={new Date('2019/12/01')}
                     disableFuture
-                    // autoOk
-                    // initialFocusedDate={Date.parse(
-                    //     props.initialFocusedDate ?? '',
-                    // )}
-                    // invalidDateMessage="Invalid date format (YYYY/MM/DD)"
                     value={props.value}
                     onChange={props.onChange}
                     renderInput={(params) => (
