@@ -61,7 +61,7 @@ describe('Uploads table', function () {
         cy.contains('2020-01-04');
     });
 
-    it('can navigate to filtered linelist', function () {
+    it.only('can navigate to filtered linelist', function () {
         cy.task('clearCasesDB', {});
 
         cy.addCase({

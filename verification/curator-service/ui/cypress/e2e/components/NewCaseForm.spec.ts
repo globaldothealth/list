@@ -390,7 +390,7 @@ describe('New case form', function () {
         cy.get('svg[data-testid="check-icon"]').should('exist');
     });
 
-    it.only('Shows error icon on field submission error', function () {
+    it('Shows error icon on field submission error', function () {
         cy.visit('/');
         cy.wait('@getProfile');
 
@@ -398,7 +398,6 @@ describe('New case form', function () {
         cy.get('svg[data-testid="error-icon"]').should('not.exist');
         cy.get('svg[data-testid="check-icon"]').should('not.exist');
 
-        cy.get('button.iubenda-cs-accept-btn').click();
         cy.get('#scroll-container').scrollTo('bottom');
 
         cy.get('button[data-testid="submit"]').click();

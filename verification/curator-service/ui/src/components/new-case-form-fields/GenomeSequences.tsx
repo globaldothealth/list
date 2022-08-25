@@ -117,19 +117,28 @@ export default function GenomeSequences(): JSX.Element {
                                                     ].sampleCollectionDate
                                                 }
                                                 onChange={(newValue) => {
+                                                    const reactId =
+                                                        values.genomeSequences[
+                                                            index
+                                                        ].reactId;
+
+                                                    const newGenomeSequences =
+                                                        values.genomeSequences.map(
+                                                            (element) =>
+                                                                element.reactId ===
+                                                                reactId
+                                                                    ? {
+                                                                          ...element,
+                                                                          sampleCollectionDate:
+                                                                              newValue as string,
+                                                                      }
+                                                                    : element,
+                                                        );
+
                                                     setValues({
                                                         ...values,
-                                                        genomeSequences: [
-                                                            ...values.genomeSequences,
-                                                            {
-                                                                ...values
-                                                                    .genomeSequences[
-                                                                    index
-                                                                ],
-                                                                sampleCollectionDate:
-                                                                    newValue as string,
-                                                            },
-                                                        ],
+                                                        genomeSequences:
+                                                            newGenomeSequences,
                                                     });
                                                 }}
                                             ></DateField>

@@ -90,18 +90,25 @@ export default function Vaccines(): JSX.Element {
                                                         .date || null
                                                 }
                                                 onChange={(newValue) => {
+                                                    const reactId =
+                                                        values.vaccines[index]
+                                                            .reactId;
+
+                                                    const newVaccines =
+                                                        values.vaccines.map(
+                                                            (element) =>
+                                                                element.reactId ===
+                                                                reactId
+                                                                    ? {
+                                                                          ...element,
+                                                                          date: newValue as Date,
+                                                                      }
+                                                                    : element,
+                                                        );
+
                                                     setValues({
                                                         ...values,
-                                                        vaccines: [
-                                                            ...values.vaccines,
-                                                            {
-                                                                ...values
-                                                                    .vaccines[
-                                                                    index
-                                                                ],
-                                                                date: newValue as Date,
-                                                            },
-                                                        ],
+                                                        vaccines: newVaccines,
                                                     });
                                                 }}
                                             ></DateField>

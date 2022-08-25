@@ -233,27 +233,34 @@ export default function Events(): JSX.Element {
                                                             onChange={(
                                                                 newValue,
                                                             ) => {
+                                                                const reactId =
+                                                                    values
+                                                                        .travelHistory[
+                                                                        index
+                                                                    ].reactId;
+
+                                                                const newTravelHistory =
+                                                                    values.travelHistory.map(
+                                                                        (
+                                                                            element,
+                                                                        ) =>
+                                                                            element.reactId ===
+                                                                            reactId
+                                                                                ? {
+                                                                                      ...element,
+                                                                                      dateRange:
+                                                                                          {
+                                                                                              ...element.dateRange,
+                                                                                              start: newValue as string,
+                                                                                          },
+                                                                                  }
+                                                                                : element,
+                                                                    );
+
                                                                 setValues({
                                                                     ...values,
                                                                     travelHistory:
-                                                                        [
-                                                                            ...values.travelHistory,
-                                                                            {
-                                                                                ...values
-                                                                                    .travelHistory[
-                                                                                    index
-                                                                                ],
-                                                                                dateRange:
-                                                                                    {
-                                                                                        ...values
-                                                                                            .travelHistory[
-                                                                                            index
-                                                                                        ]
-                                                                                            .dateRange,
-                                                                                        start: newValue as string,
-                                                                                    },
-                                                                            },
-                                                                        ],
+                                                                        newTravelHistory,
                                                                 });
                                                             }}
                                                             initialFocusedDate={
@@ -274,26 +281,32 @@ export default function Events(): JSX.Element {
                                                         onChange={(
                                                             newValue,
                                                         ) => {
+                                                            const reactId =
+                                                                values
+                                                                    .travelHistory[
+                                                                    index
+                                                                ].reactId;
+
+                                                            const newTravelHistory =
+                                                                values.travelHistory.map(
+                                                                    (element) =>
+                                                                        element.reactId ===
+                                                                        reactId
+                                                                            ? {
+                                                                                  ...element,
+                                                                                  dateRange:
+                                                                                      {
+                                                                                          ...element.dateRange,
+                                                                                          end: newValue as string,
+                                                                                      },
+                                                                              }
+                                                                            : element,
+                                                                );
+
                                                             setValues({
                                                                 ...values,
-                                                                travelHistory: [
-                                                                    ...values.travelHistory,
-                                                                    {
-                                                                        ...values
-                                                                            .travelHistory[
-                                                                            index
-                                                                        ],
-                                                                        dateRange:
-                                                                            {
-                                                                                ...values
-                                                                                    .travelHistory[
-                                                                                    index
-                                                                                ]
-                                                                                    .dateRange,
-                                                                                end: newValue as string,
-                                                                            },
-                                                                    },
-                                                                ],
+                                                                travelHistory:
+                                                                    newTravelHistory,
                                                             });
                                                         }}
                                                         initialFocusedDate={

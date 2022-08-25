@@ -8,6 +8,8 @@ interface CookieInitialiser {
 }
 
 const useCookieBanner: () => CookieInitialiser = () => {
+    const env = process.env.NODE_ENV;
+
     const theme = useTheme<Theme>();
     const configuration = {
         whitelabel: false,
@@ -49,6 +51,8 @@ const useCookieBanner: () => CookieInitialiser = () => {
     };
 
     const initCookieBanner = () => {
+        if (env !== 'production') return;
+
         insertConfiguration();
         insertScript();
     };
