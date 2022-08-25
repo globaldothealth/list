@@ -24,7 +24,7 @@ jobs:
 
     strategy:
       matrix:
-        browser: ["chrome", "firefox"]
+        browser: ["chrome"]
     name: Cypress tests on ${{ matrix.browser }}
 
     steps:

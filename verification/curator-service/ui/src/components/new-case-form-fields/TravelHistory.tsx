@@ -138,6 +138,16 @@ export default function Events(): JSX.Element {
     const { values, initialValues, setValues } =
         useFormikContext<CaseFormValues>();
     const classes = useStyles();
+
+    const getDate = (index: number, startDate: boolean) => {
+        const dateRange = values.travelHistory[index].dateRange;
+        if (!dateRange) return null;
+
+        const date = startDate ? dateRange.start : dateRange.end;
+
+        return date ? date : null;
+    };
+
     return (
         <Scroll.Element name="travelHistory">
             <FieldTitle
@@ -222,14 +232,10 @@ export default function Events(): JSX.Element {
                                                         <DateField
                                                             name={`travelHistory[${index}].dateRange.start`}
                                                             label="Start date"
-                                                            value={
-                                                                values
-                                                                    .travelHistory[
-                                                                    index
-                                                                ].dateRange!
-                                                                    .start ||
-                                                                null
-                                                            }
+                                                            value={getDate(
+                                                                index,
+                                                                true,
+                                                            )}
                                                             onChange={(
                                                                 newValue,
                                                             ) => {
@@ -271,13 +277,11 @@ export default function Events(): JSX.Element {
                                                     <DateField
                                                         name={`travelHistory[${index}].dateRange.end`}
                                                         label="End date"
-                                                        value={
-                                                            values
-                                                                .travelHistory[
-                                                                index
-                                                            ].dateRange!.end ||
-                                                            null
-                                                        }
+                                                        // eslint-disable-next-line
+                                                        value={getDate(
+                                                            index,
+                                                            false,
+                                                        )}
                                                         onChange={(
                                                             newValue,
                                                         ) => {
