@@ -53,10 +53,10 @@ it('renders form', async () => {
 
     // Date fields
     expect(
-        screen.getByText('First date to backfill (inclusive)'),
+        screen.getByLabelText('First date to backfill (inclusive)'),
     ).toBeInTheDocument();
     expect(
-        screen.getByText('Last date to backfill (inclusive)'),
+        screen.getByLabelText('Last date to backfill (inclusive)'),
     ).toBeInTheDocument();
 
     // Buttons
@@ -123,8 +123,12 @@ it('displays spinner and status post backfill', async () => {
     );
     await user.click(screen.getByText('https://example.com'));
 
-    const startDate = screen.getByTestId('startDate').querySelector('input');
-    const endDate = screen.getByTestId('endDate').querySelector('input');
+    const startDate = screen.getByRole('textbox', {
+        name: 'First date to backfill (inclusive)',
+    });
+    const endDate = screen.getByRole('textbox', {
+        name: 'Last date to backfill (inclusive)',
+    });
     if (startDate === null || endDate === null) {
         throw Error('Unable to find date selector');
     }

@@ -201,7 +201,7 @@ export function DateField(props: DateFieldProps): JSX.Element {
                     value={props.value}
                     onChange={props.onChange}
                     renderInput={(params) => (
-                        <MuiTextField {...params} name={props.name} />
+                        <MuiTextField {...params} name={props.name} fullWidth />
                     )}
                 />
             </LocalizationProvider>

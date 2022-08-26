@@ -116,10 +116,12 @@ describe('<SignInForm />', () => {
     });
 
     it('displays verification errors when email is incorrect', async () => {
+        const user = userEvent.setup();
+
         render(<SignInForm setRegistrationScreenOn={() => false} />);
 
-        userEvent.type(screen.getByRole('textbox'), 'incorrectemail');
-        userEvent.click(screen.getByTestId('sign-in-button'));
+        await user.type(screen.getByRole('textbox'), 'incorrectemail');
+        await user.click(screen.getByTestId('sign-in-button'));
 
         await waitFor(() => {
             expect(
@@ -129,9 +131,11 @@ describe('<SignInForm />', () => {
     });
 
     it('displays verification errors when both email and password are empty', async () => {
+        const user = userEvent.setup();
+
         render(<SignInForm setRegistrationScreenOn={() => false} />);
 
-        userEvent.click(screen.getByTestId('sign-in-button'));
+        await user.click(screen.getByTestId('sign-in-button'));
 
         await waitFor(() => {
             const errorMessages = screen.getAllByText(/required/i);
@@ -156,6 +160,8 @@ describe('<SignUpForm />', () => {
     });
 
     test('checks emails match', async () => {
+        const user = userEvent.setup();
+
         render(
             <SignUpForm
                 setRegistrationScreenOn={() => true}
@@ -163,12 +169,12 @@ describe('<SignUpForm />', () => {
             />,
         );
 
-        userEvent.type(screen.getByLabelText('Email *'), 'test@email.com');
-        userEvent.type(
+        await user.type(screen.getByLabelText('Email *'), 'test@email.com');
+        await user.type(
             screen.getByLabelText(/Confirm Email \*/),
             'xxx@email.com',
         );
-        userEvent.click(screen.getByTestId('sign-up-button'));
+        await user.click(screen.getByTestId('sign-up-button'));
 
         await waitFor(() => {
             expect(screen.getByText('Emails must match')).toBeInTheDocument();
@@ -176,6 +182,8 @@ describe('<SignUpForm />', () => {
     });
 
     test('checks passwords match', async () => {
+        const user = userEvent.setup();
+
         render(
             <SignUpForm
                 setRegistrationScreenOn={() => true}
@@ -183,9 +191,9 @@ describe('<SignUpForm />', () => {
             />,
         );
 
-        userEvent.type(screen.getByLabelText('Password *'), '12345');
-        userEvent.type(screen.getByLabelText(/Repeat password \*/), '6789');
-        userEvent.click(screen.getByTestId('sign-up-button'));
+        await user.type(screen.getByLabelText('Password *'), '12345');
+        await user.type(screen.getByLabelText(/Repeat password \*/), '6789');
+        await user.click(screen.getByTestId('sign-up-button'));
 
         await waitFor(() => {
             expect(
@@ -195,6 +203,8 @@ describe('<SignUpForm />', () => {
     });
 
     test('displays verification errors when checkbox is not checked', async () => {
+        const user = userEvent.setup();
+
         render(
             <SignUpForm
                 setRegistrationScreenOn={() => true}
@@ -202,14 +212,14 @@ describe('<SignUpForm />', () => {
             />,
         );
 
-        userEvent.type(screen.getByLabelText('Email *'), 'test@email.com');
-        userEvent.type(
+        await user.type(screen.getByLabelText('Email *'), 'test@email.com');
+        await user.type(
             screen.getByLabelText(/Confirm Email \*/),
             'test@email.com',
         );
-        userEvent.type(screen.getByLabelText('Password *'), '12345');
-        userEvent.type(screen.getByLabelText(/Repeat password \*/), '12345');
-        userEvent.click(screen.getByTestId('sign-up-button'));
+        await user.type(screen.getByLabelText('Password *'), '12345');
+        await user.type(screen.getByLabelText(/Repeat password \*/), '12345');
+        await user.click(screen.getByTestId('sign-up-button'));
 
         await waitFor(() => {
             expect(screen.getAllByText(/This field is required/i)).toHaveLength(
@@ -219,6 +229,8 @@ describe('<SignUpForm />', () => {
     });
 
     test('displays verification errors when email confirmation input is empty', async () => {
+        const user = userEvent.setup();
+
         render(
             <SignUpForm
                 setRegistrationScreenOn={() => true}
@@ -226,11 +238,11 @@ describe('<SignUpForm />', () => {
             />,
         );
 
-        userEvent.type(screen.getByLabelText('Email *'), 'test@email.com');
-        userEvent.type(screen.getByLabelText('Password *'), '12345');
-        userEvent.type(screen.getByLabelText(/Repeat password \*/), '12345');
-        userEvent.click(screen.getAllByRole('checkbox')[0]);
-        userEvent.click(screen.getByTestId('sign-up-button'));
+        await user.type(screen.getByLabelText('Email *'), 'test@email.com');
+        await user.type(screen.getByLabelText('Password *'), '12345');
+        await user.type(screen.getByLabelText(/Repeat password \*/), '12345');
+        await user.click(screen.getAllByRole('checkbox')[0]);
+        await user.click(screen.getByTestId('sign-up-button'));
 
         await waitFor(() => {
             expect(screen.getAllByText(/Emails must match/i)).toHaveLength(1);
@@ -238,6 +250,8 @@ describe('<SignUpForm />', () => {
     });
 
     test('displays verification errors when email is incorrect', async () => {
+        const user = userEvent.setup();
+
         render(
             <SignUpForm
                 setRegistrationScreenOn={() => true}
@@ -245,8 +259,8 @@ describe('<SignUpForm />', () => {
             />,
         );
 
-        userEvent.type(screen.getByLabelText('Email *'), 'incorrectemail');
-        userEvent.click(screen.getByTestId('sign-up-button'));
+        await user.type(screen.getByLabelText('Email *'), 'incorrectemail');
+        await user.click(screen.getByTestId('sign-up-button'));
 
         await waitFor(() => {
             expect(
@@ -256,6 +270,8 @@ describe('<SignUpForm />', () => {
     });
 
     test('displays verification errors when password in SignUp form is empty', async () => {
+        const user = userEvent.setup();
+
         render(
             <SignUpForm
                 setRegistrationScreenOn={() => true}
@@ -263,14 +279,14 @@ describe('<SignUpForm />', () => {
             />,
         );
 
-        userEvent.type(screen.getByLabelText('Email *'), 'test@email.com');
-        userEvent.type(
+        await user.type(screen.getByLabelText('Email *'), 'test@email.com');
+        await user.type(
             screen.getByLabelText(/Confirm Email \*/),
             'test@email.com',
         );
-        userEvent.type(screen.getByLabelText(/Repeat password \*/), '12345');
-        userEvent.click(screen.getAllByRole('checkbox')[0]);
-        userEvent.click(screen.getByTestId('sign-up-button'));
+        await user.type(screen.getByLabelText(/Repeat password \*/), '12345');
+        await user.click(screen.getAllByRole('checkbox')[0]);
+        await user.click(screen.getByTestId('sign-up-button'));
 
         await waitFor(() => {
             expect(
@@ -283,6 +299,8 @@ describe('<SignUpForm />', () => {
     });
 
     test('displays verification errors when both email, password and agreement checkbox are empty', async () => {
+        const user = userEvent.setup();
+
         render(
             <SignUpForm
                 setRegistrationScreenOn={() => true}
@@ -290,7 +308,7 @@ describe('<SignUpForm />', () => {
             />,
         );
 
-        userEvent.click(screen.getByTestId('sign-up-button'));
+        await user.click(screen.getByTestId('sign-up-button'));
 
         await waitFor(() => {
             const errorMessages = screen.getAllByText(/required/i);
