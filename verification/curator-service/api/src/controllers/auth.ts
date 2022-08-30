@@ -24,6 +24,20 @@ import EmailClient from '../clients/email-client';
 import { ObjectId } from 'mongodb';
 import { baseURL, welcomeEmail } from '../util/instance-details';
 import { validateRecaptchaToken } from '../util/validate-recaptcha-token';
+import {
+    setupFailedAttempts,
+    handleCheckFailedAttempts,
+    AttemptName,
+    updateFailedAttempts,
+} from '../model/failed_attempts';
+import {
+    loginLimiter,
+    registerLimiter,
+    resetPasswordLimiter,
+    forgotPasswordLimiter,
+    resetPasswordWithTokenLimiter,
+} from '../util/single-window-rate-limiters';
+
 
 // Global variable for newsletter acceptance
 let isNewsletterAccepted: boolean;
@@ -193,6 +207,7 @@ export class AuthController {
 
         this.router.post(
             '/signup',
+            registerLimiter,
             async (
                 req: Request,
                 res: Response,
@@ -207,6 +222,7 @@ export class AuthController {
                         message:
                             "Unfortunately, you didn't pass the captcha. Please, try again later.",
                     });
+
 
                 passport.authenticate(
                     'register',
@@ -229,6 +245,7 @@ export class AuthController {
 
         this.router.post(
             '/signin',
+            loginLimiter,
             async (
                 req: Request,
                 res: Response,
@@ -244,13 +261,23 @@ export class AuthController {
                             "Unfortunately, you didn't pass the captcha. Please, try again later.",
                     });
 
+
                 passport.authenticate(
                     'login',
-                    (error: Error, user: IUser, info: any) => {
+                    (
+                        error: Error,
+                        user: IUser & { timeout: boolean },
+                        info: any,
+                    ) => {
                         if (error) return next(error);
                         if (!user)
                             return res
                                 .status(403)
+                                .json({ message: info.message });
+
+                        if (user.timeout)
+                            return res
+                                .status(429)
                                 .json({ message: info.message });
 
                         req.logIn(user, (err) => {
@@ -400,6 +427,7 @@ export class AuthController {
          */
         this.router.post(
             '/change-password',
+            resetPasswordLimiter,
             mustBeAuthenticated,
             async (req: Request, res: Response) => {
                 const oldPassword = req.body.oldPassword as string;
@@ -419,16 +447,40 @@ export class AuthController {
                         return res.sendStatus(403);
                     }
 
+                    const { success, attemptsNumber } =
+                        await handleCheckFailedAttempts(
+                            currentUser._id,
+                            AttemptName.ResetPassword,
+                        );
+
+                    if (!success)
+                        return res.status(429).json({
+                            message:
+                                'Too many failed login attempts, please try again later',
+                        });
+
                     const isValidPassword = await isUserPasswordValid(
                         currentUser,
                         oldPassword,
                     );
 
                     if (!isValidPassword) {
+                        updateFailedAttempts(
+                            currentUser._id,
+                            AttemptName.ResetPassword,
+                            attemptsNumber,
+                        );
+
                         return res
                             .status(403)
                             .json({ message: 'Old password is incorrect' });
                     }
+
+                    updateFailedAttempts(
+                        currentUser._id,
+                        AttemptName.ResetPassword,
+                        0,
+                    );
 
                     const hashedPassword = await bcrypt.hash(newPassword, 10);
                     await users().updateOne(userQuery, {
@@ -451,15 +503,40 @@ export class AuthController {
          */
         this.router.post(
             '/request-password-reset',
+            forgotPasswordLimiter,
             async (req: Request, res: Response): Promise<Response<any>> => {
                 const email = req.body.email as string;
 
                 try {
                     // Check if user with this email address exists
-                    const user = await users().findOne({ email });
+                    const userPromise = await users()
+                        .find({ email })
+                        .collation({ locale: 'en_US', strength: 2 })
+                        .toArray();
+
+                    const user = userPromise[0] as IUser;
                     if (!user) {
                         return res.sendStatus(200);
                     }
+
+                    const { success, attemptsNumber } =
+                        await handleCheckFailedAttempts(
+                            user._id,
+                            AttemptName.ForgotPassword,
+                        );
+
+                    if (!success) {
+                        return res.status(429).json({
+                            message:
+                                'You sent too many requests. Please wait a while then try again',
+                        });
+                    }
+
+                    updateFailedAttempts(
+                        user._id,
+                        AttemptName.ForgotPassword,
+                        attemptsNumber,
+                    );
 
                     // Check if user is a Gmail user and send appropriate email message in that case
                     // 42 googleID was set for non Google accounts in the past just to pass mongoose validation
@@ -529,6 +606,7 @@ export class AuthController {
          */
         this.router.post(
             '/reset-password',
+            resetPasswordWithTokenLimiter,
             async (req: Request, res: Response): Promise<void> => {
                 const userId = req.body.userId;
                 const token = req.body.token as string;
@@ -541,11 +619,28 @@ export class AuthController {
                         throw new Error('Invalid user id');
                     }
 
+                    const { success, attemptsNumber } =
+                        await handleCheckFailedAttempts(
+                            userId,
+                            AttemptName.ResetPasswordWithToken,
+                        );
+
+                    if (!success)
+                        res.status(429).json({
+                            message:
+                                'Too many failed login attempts, please try again later',
+                        });
+
                     // Check if token exists
                     const passwordResetToken = await tokens().findOne({
                         userId,
                     });
                     if (!passwordResetToken) {
+                        updateFailedAttempts(
+                            userId,
+                            AttemptName.ResetPasswordWithToken,
+                            attemptsNumber,
+                        );
                         throw new Error(
                             'Invalid or expired password reset token',
                         );
@@ -557,6 +652,11 @@ export class AuthController {
                         passwordResetToken.token,
                     );
                     if (!isValid) {
+                        updateFailedAttempts(
+                            userId,
+                            AttemptName.ResetPasswordWithToken,
+                            attemptsNumber,
+                        );
                         throw new Error(
                             'Invalid or expired password reset token',
                         );
@@ -582,6 +682,12 @@ export class AuthController {
 
                     // Send confirmation email to the user
                     const user = result.value as IUser;
+
+                    updateFailedAttempts(
+                        userId,
+                        AttemptName.ResetPasswordWithToken,
+                        0,
+                    );
 
                     await this.emailClient.send(
                         [user.email],
@@ -632,6 +738,9 @@ export class AuthController {
                 const user = (await users().findOne({
                     _id: result.insertedId,
                 })) as IUser;
+
+                setupFailedAttempts(result.insertedId);
+
                 req.login(user, (err: Error) => {
                     if (!err) {
                         res.json(user);
@@ -718,6 +827,8 @@ export class AuthController {
                             _id: result.insertedId,
                         })) as IUser;
 
+                        setupFailedAttempts(result.insertedId);
+
                         // Send welcome email
                         await this.emailClient.send(
                             [email],
@@ -755,16 +866,40 @@ export class AuthController {
                             });
                         }
 
+                        const { success, attemptsNumber } =
+                            await handleCheckFailedAttempts(
+                                user._id,
+                                AttemptName.Login,
+                            );
+
+                        if (!success)
+                            return done(
+                                null,
+                                { timeout: true },
+                                {
+                                    message:
+                                        'Too many failed login attempts, please try again later',
+                                },
+                            );
+
                         const isValidPassword = await isUserPasswordValid(
                             user,
                             password,
                         );
+
                         if (!isValidPassword) {
+                            updateFailedAttempts(
+                                user._id,
+                                AttemptName.Login,
+                                attemptsNumber,
+                            );
+
                             return done(null, false, {
                                 message: 'Wrong username or password',
                             });
                         }
 
+                        updateFailedAttempts(user._id, AttemptName.Login, 0);
                         done(null, user);
                     } catch (error) {
                         done(error);
@@ -811,6 +946,8 @@ export class AuthController {
                             user = (await users().findOne({
                                 _id: result.insertedId,
                             })) as IUser;
+
+                            setupFailedAttempts(result.insertedId);
 
                             try {
                                 // Send welcome email
@@ -896,7 +1033,13 @@ export class AuthController {
                                 'Supplied bearer token must be scoped for "email"',
                             );
                         }
-                        let user = await users().findOne({ email: email });
+                        const userPromise = await users()
+                            .find({ email })
+                            .collation({ locale: 'en_US', strength: 2 })
+                            .toArray();
+
+                        let user = userPromise[0] as IUser | null;
+
                         if (!user) {
                             const result = await users().insertOne({
                                 _id: new ObjectId(),
@@ -909,7 +1052,10 @@ export class AuthController {
                             user = await users().findOne({
                                 _id: result.insertedId,
                             });
+
+                            setupFailedAttempts(result.insertedId);
                         }
+
                         return done(null, user);
                     } catch (e) {
                         return done(e);
