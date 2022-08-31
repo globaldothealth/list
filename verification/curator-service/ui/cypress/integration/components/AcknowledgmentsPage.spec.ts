@@ -43,8 +43,6 @@ describe('<AcknowledgmentsPage />', function () {
         }).as('fetchSources');
         cy.visit('/data-acknowledgments');
         cy.contains(/Data Acknowledgments/i);
-        //tmp solution
-        cy.visit('/data-acknowledgments');
 
         cy.get('[data-cy="loader"]').should('be.visible');
         cy.wait('@fetchSources');
