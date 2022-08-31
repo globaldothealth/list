@@ -58,7 +58,8 @@
         "cypress-open": "cypress open",
         "cypress-run": "cypress run",
         "cypress-run-ff": "cypress run --browser firefox",
-        "cypress-run-edge": "cypress run --browser edge"
+        "cypress-run-edge": "cypress run --browser edge",
+        "cypress-run-chrome": "cypress run --headless --browser chrome"
     },
     "eslintConfig": {
         "extends": "react-app"

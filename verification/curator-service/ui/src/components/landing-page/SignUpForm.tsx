@@ -23,7 +23,6 @@ import { sendCustomGtmEvent } from '../util/helperFunctions';
 import ReCAPTCHA from 'react-google-recaptcha';
 import PasswordStrengthBar from 'react-password-strength-bar';
 
-
 const useStyles = makeStyles((theme: Theme) => ({
     checkboxRoot: {
         display: 'block',
@@ -93,7 +92,9 @@ interface SignUpFormProps {
     setRegistrationScreenOn: (active: boolean) => void;
 }
 
-const RECAPTCHA_SITE_KEY = process.env.RECAPTCHA_SITE_KEY as string;
+const RECAPTCHA_SITE_KEY = window.Cypress
+    ? '6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI'
+    : (process.env.RECAPTCHA_SITE_KEY as string);
 
 export default function SignUpForm({
     disabled,
@@ -166,7 +167,6 @@ export default function SignUpForm({
                 const token =
                     (await recaptchaRef.current.executeAsync()) as string;
                 recaptchaRef.current.reset();
-
                 dispatch(
                     signUpWithEmailAndPassword({
                         email,

@@ -71,7 +71,9 @@ interface SignInFormProps {
     setRegistrationScreenOn: (active: boolean) => void;
 }
 
-const RECAPTCHA_SITE_KEY = process.env.RECAPTCHA_SITE_KEY as string;
+const RECAPTCHA_SITE_KEY = window.Cypress
+    ? '6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI'
+    : (process.env.RECAPTCHA_SITE_KEY as string);
 
 export default function SignInForm({
     disabled,

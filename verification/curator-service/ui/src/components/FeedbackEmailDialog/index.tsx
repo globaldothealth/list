@@ -92,9 +92,6 @@ const FeedbackEmailDialog = ({
         },
     });
 
-    // -------------------
-    // isOpen = true;
-    // -------------------
     return (
         <>
             <Dialog

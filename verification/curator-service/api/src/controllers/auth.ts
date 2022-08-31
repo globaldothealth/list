@@ -38,7 +38,6 @@ import {
     resetPasswordWithTokenLimiter,
 } from '../util/single-window-rate-limiters';
 
-
 // Global variable for newsletter acceptance
 let isNewsletterAccepted: boolean;
 
@@ -223,7 +222,6 @@ export class AuthController {
                             "Unfortunately, you didn't pass the captcha. Please, try again later.",
                     });
 
-
                 passport.authenticate(
                     'register',
                     (error: Error, user: IUser, info: any) => {
@@ -260,7 +258,6 @@ export class AuthController {
                         message:
                             "Unfortunately, you didn't pass the captcha. Please, try again later.",
                     });
-
 
                 passport.authenticate(
                     'login',

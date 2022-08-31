@@ -20,7 +20,7 @@ describe('New case form', function () {
         });
         cy.addSource('Test source', 'www.example.com');
 
-        cy.visit('/')
+        cy.visit('/');
         cy.visit('/cases/new');
         cy.contains('Create new COVID-19 line list case');
         cy.get('div[data-testid="caseReference"]').type('www.example.com');
@@ -51,7 +51,7 @@ describe('New case form', function () {
             geoResolution: 'Country',
         });
 
-        cy.visit('/')
+        cy.visit('/');
         cy.visit('/cases/new');
         cy.contains('Create new COVID-19 line list case');
         cy.get('div[data-testid="caseReference"]').type('www.new-source.com');
@@ -74,7 +74,7 @@ describe('New case form', function () {
             cy.contains('France');
             cy.contains('2020-01-01');
 
-            cy.visit('/')
+            cy.visit('/');
             cy.visit('/sources');
             cy.contains('www.new-source.com');
             cy.contains('New source');
@@ -90,7 +90,7 @@ describe('New case form', function () {
         });
         cy.addSource('Test source', 'www.example.com');
 
-        cy.visit('/')
+        cy.visit('/');
         cy.visit('/cases/new');
         cy.contains('Create new COVID-19 line list case');
         cy.get('div[data-testid="caseReference"]').type('www.example.com');
@@ -111,7 +111,7 @@ describe('New case form', function () {
     });
 
     it('Can submit events without dates', function () {
-        cy.visit('/')
+        cy.visit('/');
         cy.visit('/cases');
         cy.contains('No records to display');
         cy.seedLocation({
@@ -122,7 +122,7 @@ describe('New case form', function () {
         });
         cy.addSource('Test source', 'www.example.com');
 
-        cy.visit('/')
+        cy.visit('/');
         cy.visit('/cases/new');
         cy.get('div[data-testid="caseReference"]').type('www.example.com');
         cy.contains('li', 'www.example.com').click();
@@ -164,7 +164,7 @@ describe('New case form', function () {
         });
         cy.addSource('Test source', 'www.example.com');
 
-        cy.visit('/')
+        cy.visit('/');
         cy.visit('/cases/new');
         cy.contains('Create new COVID-19 line list case');
         cy.get('div[data-testid="caseReference"]').type('www.example.com');
@@ -246,7 +246,7 @@ describe('New case form', function () {
             symptoms: ['fever', 'cough'],
         });
 
-        cy.visit('/')
+        cy.visit('/');
         cy.visit('/cases/new');
         cy.contains('Create new COVID-19 line list case');
         cy.get('div[data-testid="caseReference"]').type('www.example.com');
@@ -301,11 +301,11 @@ describe('New case form', function () {
             geoResolution: 'Country',
         });
         cy.addSource('Test source', 'www.example.com');
-        cy.visit('/')
+        cy.visit('/');
         cy.visit('/cases');
         cy.contains('No records to display');
 
-        cy.visit('/')
+        cy.visit('/');
         cy.visit('/cases/new');
         cy.get('div[data-testid="caseReference"]').type('www.example.com');
         cy.contains('li', 'www.example.com').click();
@@ -330,7 +330,7 @@ describe('New case form', function () {
     });
 
     it('Can change source URL without changing source name', function () {
-        cy.visit('/')
+        cy.visit('/');
         cy.visit('/cases/new');
 
         cy.get('div[data-testid="caseReference"]').type('www.example.com');
@@ -345,14 +345,14 @@ describe('New case form', function () {
     });
 
     it('Check for required fields', function () {
-        cy.visit('/')
+        cy.visit('/');
         cy.visit('/cases/new');
 
         cy.get('p:contains("Required")').should('have.length', 3);
     });
 
     it('Shows checkbox on field completion', function () {
-        cy.visit('/')
+        cy.visit('/');
         cy.visit('/cases/new');
         cy.get('svg[data-testid="check-icon"]').should('not.exist');
         cy.get('div[data-testid="gender"]').click();
@@ -361,7 +361,7 @@ describe('New case form', function () {
     });
 
     it('Shows error icon on field submission error', function () {
-        cy.visit('/')
+        cy.visit('/');
         cy.visit('/cases/new');
         cy.get('svg[data-testid="error-icon"]').should('not.exist');
         cy.get('svg[data-testid="check-icon"]').should('not.exist');
