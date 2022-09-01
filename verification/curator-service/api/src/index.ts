@@ -403,6 +403,33 @@ async function makeApp() {
 
     app.use('/api', apiRouter);
 
+    //Send feedback from user to global.health email
+    app.post(
+        '/feedback',
+        mustBeAuthenticated,
+        async (req: Request, res: Response) => {
+            const { message } = req.body;
+
+            try {
+                await emailClient.send(
+                    [env.EMAIL_USER_ADDRESS],
+                    'Feedback regarding Covid-19 curator portal',
+                    message,
+                );
+                return res
+                    .status(200)
+                    .json({ message: 'Email sent successfully' });
+            } catch (err) {
+                const error = err as Error;
+                logger.error(error);
+                return res.status(500).json({
+                    message:
+                        'Unfortunately, an error occurred. Please, try again later.',
+                });
+            }
+        },
+    );
+
     // Basic health check handler.
     app.get('/health', async (req: Request, res: Response) => {
         try {
@@ -483,6 +510,7 @@ async function makeApp() {
             format: winston.format.json(),
         }),
     );
+
     return app;
 }
 

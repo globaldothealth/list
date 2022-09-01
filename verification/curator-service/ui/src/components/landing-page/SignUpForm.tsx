@@ -1,9 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { useAppDispatch } from '../../hooks/redux';
 import { signUpWithEmailAndPassword } from '../../redux/auth/thunk';
-
 import { makeStyles, Theme } from '@material-ui/core/styles';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import FormHelperText from '@material-ui/core/FormHelperText';
@@ -21,6 +20,7 @@ import Checkbox from '@material-ui/core/Checkbox';
 import Typography from '@material-ui/core/Typography';
 import GoogleButton from 'react-google-button';
 import { sendCustomGtmEvent } from '../util/helperFunctions';
+import ReCAPTCHA from 'react-google-recaptcha';
 import PasswordStrengthBar from 'react-password-strength-bar';
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -92,6 +92,10 @@ interface SignUpFormProps {
     setRegistrationScreenOn: (active: boolean) => void;
 }
 
+const RECAPTCHA_SITE_KEY = window.Cypress
+    ? '6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI'
+    : (process.env.RECAPTCHA_SITE_KEY as string);
+
 export default function SignUpForm({
     disabled,
     setRegistrationScreenOn,
@@ -99,6 +103,7 @@ export default function SignUpForm({
     const classes = useStyles();
     const dispatch = useAppDispatch();
 
+    const recaptchaRef = useRef<ReCAPTCHA>(null);
     const [passwordVisible, setPasswordVisible] = useState(false);
     const [passwordStrength, setPasswordStrength] = useState(0);
     const [passwordConfirmationVisible, setPasswordConfirmationVisible] =
@@ -154,15 +159,25 @@ export default function SignUpForm({
             isNewsletterChecked: false,
         },
         validationSchema,
-        onSubmit: (values) => {
+        onSubmit: async (values) => {
+            if (!recaptchaRef.current) return;
             const { email, password, isNewsletterChecked } = values;
-            dispatch(
-                signUpWithEmailAndPassword({
-                    email,
-                    password,
-                    newsletterAccepted: isNewsletterChecked,
-                }),
-            );
+            // eslint-disable-next-line no-useless-catch
+            try {
+                const token =
+                    (await recaptchaRef.current.executeAsync()) as string;
+                recaptchaRef.current.reset();
+                dispatch(
+                    signUpWithEmailAndPassword({
+                        email,
+                        password,
+                        newsletterAccepted: isNewsletterChecked,
+                        token,
+                    }),
+                );
+            } catch (error) {
+                throw error;
+            }
         },
     });
 
@@ -436,6 +451,11 @@ export default function SignUpForm({
                 >
                     Sign up
                 </Button>
+                <ReCAPTCHA
+                    sitekey={RECAPTCHA_SITE_KEY}
+                    size="invisible"
+                    ref={recaptchaRef}
+                />
 
                 <Typography className={classes.title}>
                     Already have an account?{' '}
