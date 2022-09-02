@@ -6,7 +6,9 @@ export const validateRecaptchaToken = async (
 ): Promise<boolean> => {
     const env = validateEnv();
     const response = await axios.post(
-        `https://www.google.com/recaptcha/api/siteverify?secret=${env.RECAPTCHA_SECRET_KEY}&response=${token}`,
+        `https://www.google.com/recaptcha/api/siteverify?secret=${
+            env.RECAPTCHA_SECRET_KEY || process.env.RECAPTCHA_SECRET_KEY
+        }&response=${token}`,
     );
 
     return response.data.success;
