@@ -94,7 +94,8 @@ interface SignUpFormProps {
 
 const RECAPTCHA_SITE_KEY = window.Cypress
     ? '6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI'
-    : (process.env.RECAPTCHA_SITE_KEY as string);
+    : ((process.env.RECAPTCHA_SITE_KEY ||
+          process.env.REACT_APP_RECAPTCHA_SITE_KEY) as string);
 
 export default function SignUpForm({
     disabled,
