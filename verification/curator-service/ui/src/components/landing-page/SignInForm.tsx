@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { useAppDispatch } from '../../hooks/redux';
@@ -20,6 +20,7 @@ import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import GoogleButton from 'react-google-button';
 import ForgotPasswordForm from './ForgotPasswordForm';
+import ReCAPTCHA from 'react-google-recaptcha';
 
 const useStyles = makeStyles((theme: Theme) => ({
     required: {
@@ -71,6 +72,11 @@ interface SignInFormProps {
     setRegistrationScreenOn: (active: boolean) => void;
 }
 
+const RECAPTCHA_SITE_KEY = window.Cypress
+    ? '6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI'
+    : ((process.env.RECAPTCHA_SITE_KEY ||
+          process.env.REACT_APP_RECAPTCHA_SITE_KEY) as string);
+
 export default function SignInForm({
     disabled,
     setRegistrationScreenOn,
@@ -79,6 +85,7 @@ export default function SignInForm({
     const classes = useStyles();
 
     const [passwordVisible, setPasswordVisible] = useState(false);
+    const recaptchaRef = useRef<ReCAPTCHA>(null);
 
     const validationSchema = Yup.object().shape({
         email: Yup.string()
@@ -93,13 +100,24 @@ export default function SignInForm({
             password: '',
         },
         validationSchema,
-        onSubmit: (values) => {
-            dispatch(
-                signInWithEmailAndPassword({
-                    email: values.email,
-                    password: values.password,
-                }),
-            );
+        onSubmit: async (values) => {
+            if (!recaptchaRef.current) return;
+
+            // eslint-disable-next-line no-useless-catch
+            try {
+                const token =
+                    (await recaptchaRef.current.executeAsync()) as string;
+                recaptchaRef.current.reset();
+                dispatch(
+                    signInWithEmailAndPassword({
+                        email: values.email,
+                        password: values.password,
+                        token,
+                    }),
+                );
+            } catch (error) {
+                throw error;
+            }
         },
     });
 
@@ -232,6 +250,11 @@ export default function SignInForm({
                         {' '}
                         Sign up!
                     </span>
+                    <ReCAPTCHA
+                        sitekey={RECAPTCHA_SITE_KEY}
+                        size="invisible"
+                        ref={recaptchaRef}
+                    />
                 </Typography>
             </form>
 

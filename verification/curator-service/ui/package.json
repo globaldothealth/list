@@ -31,6 +31,7 @@
         "react-dom": "^17.0.2",
         "react-draggable": "^4.4.5",
         "react-google-button": "^0.7.2",
+        "react-google-recaptcha": "^2.1.0",
         "react-gtm-module": "^2.0.11",
         "react-helmet": "^6.1.0",
         "react-highlight-words": "^0.17.0",
@@ -58,7 +59,8 @@
         "cypress-open": "cypress open",
         "cypress-run": "cypress run",
         "cypress-run-ff": "cypress run --browser firefox",
-        "cypress-run-edge": "cypress run --browser edge"
+        "cypress-run-edge": "cypress run --browser edge",
+        "cypress-run-chrome": "cypress run --headless --browser chrome"
     },
     "eslintConfig": {
         "extends": "react-app"
@@ -90,6 +92,7 @@
         "@types/papaparse": "^5.3.4",
         "@types/react": "^17.0.48",
         "@types/react-dom": "^17.0.16",
+        "@types/react-google-recaptcha": "^2.1.5",
         "@types/react-gtm-module": "^2.0.1",
         "@types/react-helmet": "^6.1.4",
         "@types/react-highlight-words": "^0.16.3",

@@ -118,5 +118,13 @@ export default function validateEnv(): Readonly<{
             desc: 'Name of the disease that should be displayed in Curator UI',
             devDefault: 'COVID-19',
         }),
+        RECAPTCHA_SITE_KEY: str({
+            desc: 'Key for recaptcha component',
+            devDefault: '',
+        }),
+        RECAPTCHA_SECRET_KEY: str({
+            desc: 'Key to validate recaptcha request',
+            devDefault: '',
+        }),
     });
 }

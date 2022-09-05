@@ -451,32 +451,7 @@ export default function FiltersDialog({
                                 formik.touched.variant && formik.errors.variant
                             }
                         />
-                        <TextField
-                            autoFocus={
-                                activeFilterInput === 'dateconfirmedbefore'
-                            }
-                            id="dateconfirmedbefore"
-                            label="Date confirmed before"
-                            name="dateconfirmedbefore"
-                            type="date"
-                            variant="outlined"
-                            // This makes sure that only 4 digits can be entered as a year
-                            InputProps={{
-                                inputProps: { max: getMaxDate() },
-                            }}
-                            size={inputSize}
-                            InputLabelProps={{ shrink: true }}
-                            value={formik.values.dateconfirmedbefore || ''}
-                            onChange={formik.handleChange}
-                            error={
-                                formik.touched.dateconfirmedbefore &&
-                                Boolean(formik.errors.dateconfirmedbefore)
-                            }
-                            helperText={
-                                formik.touched.dateconfirmedbefore &&
-                                formik.errors.dateconfirmedbefore
-                            }
-                        />
+
                         <TextField
                             autoFocus={
                                 activeFilterInput === 'dateconfirmedafter'
@@ -501,6 +476,32 @@ export default function FiltersDialog({
                             helperText={
                                 formik.touched.dateconfirmedafter &&
                                 formik.errors.dateconfirmedafter
+                            }
+                        />
+                        <TextField
+                            autoFocus={
+                                activeFilterInput === 'dateconfirmedbefore'
+                            }
+                            id="dateconfirmedbefore"
+                            label="Date confirmed before"
+                            name="dateconfirmedbefore"
+                            type="date"
+                            variant="outlined"
+                            // This makes sure that only 4 digits can be entered as a year
+                            InputProps={{
+                                inputProps: { max: getMaxDate() },
+                            }}
+                            size={inputSize}
+                            InputLabelProps={{ shrink: true }}
+                            value={formik.values.dateconfirmedbefore || ''}
+                            onChange={formik.handleChange}
+                            error={
+                                formik.touched.dateconfirmedbefore &&
+                                Boolean(formik.errors.dateconfirmedbefore)
+                            }
+                            helperText={
+                                formik.touched.dateconfirmedbefore &&
+                                formik.errors.dateconfirmedbefore
                             }
                         />
                     </div>

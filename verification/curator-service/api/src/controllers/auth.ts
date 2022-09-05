@@ -23,6 +23,7 @@ import * as crypto from 'crypto';
 import EmailClient from '../clients/email-client';
 import { ObjectId } from 'mongodb';
 import { baseURL, welcomeEmail } from '../util/instance-details';
+import { validateRecaptchaToken } from '../util/validate-recaptcha-token';
 import {
     setupFailedAttempts,
     handleCheckFailedAttempts,
@@ -206,7 +207,21 @@ export class AuthController {
         this.router.post(
             '/signup',
             registerLimiter,
-            (req: Request, res: Response, next: NextFunction): void => {
+            async (
+                req: Request,
+                res: Response,
+                next: NextFunction,
+            ): Promise<void> => {
+                const captchaResult = await validateRecaptchaToken(
+                    req.body.token,
+                );
+
+                if (!captchaResult)
+                    res.status(403).json({
+                        message:
+                            "Unfortunately, you didn't pass the captcha. Please, try again later.",
+                    });
+
                 passport.authenticate(
                     'register',
                     (error: Error, user: IUser, info: any) => {
@@ -229,7 +244,21 @@ export class AuthController {
         this.router.post(
             '/signin',
             loginLimiter,
-            (req: Request, res: Response, next: NextFunction): void => {
+            async (
+                req: Request,
+                res: Response,
+                next: NextFunction,
+            ): Promise<void> => {
+                const captchaResult = await validateRecaptchaToken(
+                    req.body.token,
+                );
+
+                if (!captchaResult)
+                    res.status(403).json({
+                        message:
+                            "Unfortunately, you didn't pass the captcha. Please, try again later.",
+                    });
+
                 passport.authenticate(
                     'login',
                     (
