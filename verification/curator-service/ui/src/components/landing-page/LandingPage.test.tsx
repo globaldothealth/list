@@ -2,7 +2,6 @@ import LandingPage from './LandingPage';
 import { render, screen, waitFor } from '../util/test-utils';
 import SignInForm from './SignInForm';
 import SignUpForm from './SignUpForm';
-// import ChangePasswordForm from './ChangePasswordForm';
 import userEvent from '@testing-library/user-event';
 import { rest } from 'msw';
 import { setupServer } from 'msw/node';
