@@ -6,14 +6,34 @@ import SignUpForm from './SignUpForm';
 import userEvent from '@testing-library/user-event';
 import { rest } from 'msw';
 import { setupServer } from 'msw/node';
-import '@testing-library/jest-dom/extend-expect';
 import { Route } from 'react-router-dom';
+import React from 'react';
 
 const server = setupServer();
 
 beforeAll(() => server.listen());
 afterEach(() => server.resetHandlers());
 afterAll(() => server.close());
+
+jest.mock('react-google-recaptcha', () => {
+    const RecaptchaV2 = React.forwardRef((props: any, ref: any) => {
+        React.useImperativeHandle(ref, () => ({
+            reset: jest.fn(),
+            execute: jest.fn(),
+            executeAsync: jest.fn(() => 'token'),
+        }));
+        return (
+            <input
+                ref={ref}
+                type="checkbox"
+                data-testid="mock-v2-captcha-element"
+                {...props}
+            />
+        );
+    });
+
+    return RecaptchaV2;
+});
 
 describe('<LandingPage />', () => {
     test('shows all content', async () => {

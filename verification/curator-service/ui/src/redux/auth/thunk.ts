@@ -5,15 +5,16 @@ import { sendCustomGtmEvent } from '../../components/util/helperFunctions';
 
 export const signInWithEmailAndPassword = createAsyncThunk<
     User,
-    { email: string; password: string },
+    { email: string; password: string; token: string },
     { rejectValue: string }
 >(
     'auth/signInWithEmailAndPassword',
-    async ({ email, password }, { rejectWithValue }) => {
+    async ({ email, password, token }, { rejectWithValue }) => {
         try {
             const response = await axios.post<User>('/auth/signin', {
                 email,
                 password,
+                token,
             });
 
             return response.data;
@@ -26,7 +27,12 @@ export const signInWithEmailAndPassword = createAsyncThunk<
 
 export const signUpWithEmailAndPassword = createAsyncThunk<
     User,
-    { email: string; password: string; newsletterAccepted: boolean },
+    {
+        email: string;
+        password: string;
+        newsletterAccepted: boolean;
+        token: string;
+    },
     { rejectValue: string }
 >('auth/signUpWithEmailAndPassword', async (data, { rejectWithValue }) => {
     try {

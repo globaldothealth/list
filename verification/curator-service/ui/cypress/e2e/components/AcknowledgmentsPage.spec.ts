@@ -37,7 +37,6 @@ describe('<AcknowledgmentsPage />', function () {
             delay: 2000,
             fixture: 'acknowledgment_data.json',
         }).as('fetchSources');
-
         cy.visit('/data-acknowledgments');
         cy.contains(/Data Acknowledgments/i);
 
