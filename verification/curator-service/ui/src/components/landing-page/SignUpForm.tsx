@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { useAppDispatch } from '../../hooks/redux';
@@ -90,21 +90,17 @@ interface FormValues {
 interface SignUpFormProps {
     disabled: boolean;
     setRegistrationScreenOn: (active: boolean) => void;
+    recaptchaRef?: React.RefObject<ReCAPTCHA>;
 }
-
-const RECAPTCHA_SITE_KEY = window.Cypress
-    ? '6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI'
-    : ((process.env.RECAPTCHA_SITE_KEY ||
-          process.env.REACT_APP_RECAPTCHA_SITE_KEY) as string);
 
 export default function SignUpForm({
     disabled,
     setRegistrationScreenOn,
+    recaptchaRef,
 }: SignUpFormProps): React.ReactElement {
     const classes = useStyles();
     const dispatch = useAppDispatch();
 
-    const recaptchaRef = useRef<ReCAPTCHA>(null);
     const [passwordVisible, setPasswordVisible] = useState(false);
     const [passwordStrength, setPasswordStrength] = useState(0);
     const [passwordConfirmationVisible, setPasswordConfirmationVisible] =
@@ -161,7 +157,7 @@ export default function SignUpForm({
         },
         validationSchema,
         onSubmit: async (values) => {
-            if (!recaptchaRef.current) return;
+            if (!recaptchaRef || !recaptchaRef.current) return;
             const { email, password, isNewsletterChecked } = values;
             // eslint-disable-next-line no-useless-catch
             try {
@@ -452,11 +448,20 @@ export default function SignUpForm({
                 >
                     Sign up
                 </Button>
-                <ReCAPTCHA
-                    sitekey={RECAPTCHA_SITE_KEY}
-                    size="invisible"
-                    ref={recaptchaRef}
-                />
+                <Typography
+                    variant="body2"
+                    style={{ maxWidth: '35vh', marginTop: '0.5vh' }}
+                >
+                    This site is protected by reCAPTCHA and the Google{' '}
+                    <a href="https://policies.google.com/privacy">
+                        Privacy Policy
+                    </a>{' '}
+                    and{' '}
+                    <a href="https://policies.google.com/terms">
+                        Terms of Service
+                    </a>{' '}
+                    apply.
+                </Typography>
 
                 <Typography className={classes.title}>
                     Already have an account?{' '}
