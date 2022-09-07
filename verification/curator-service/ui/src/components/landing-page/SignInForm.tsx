@@ -107,6 +107,8 @@ export default function SignInForm({
             try {
                 const token =
                     (await recaptchaRef.current.executeAsync()) as string;
+
+                console.log(token);
                 recaptchaRef.current.reset();
                 dispatch(
                     signInWithEmailAndPassword({
@@ -116,6 +118,7 @@ export default function SignInForm({
                     }),
                 );
             } catch (error) {
+                console.error(error);
                 throw error;
             }
         },

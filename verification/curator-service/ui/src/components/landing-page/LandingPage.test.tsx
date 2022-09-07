@@ -10,28 +10,29 @@ import React from 'react';
 
 const server = setupServer();
 
-beforeAll(() => server.listen());
+beforeAll(() => {
+    server.listen();
+    jest.mock('react-google-recaptcha', () => {
+        return mockRecaptchaV2;
+    });
+});
 afterEach(() => server.resetHandlers());
 afterAll(() => server.close());
 
-jest.mock('react-google-recaptcha', () => {
-    const RecaptchaV2 = React.forwardRef((props: any, ref: any) => {
-        React.useImperativeHandle(ref, () => ({
-            reset: jest.fn(),
-            execute: jest.fn(),
-            executeAsync: jest.fn(() => 'token'),
-        }));
-        return (
-            <input
-                ref={ref}
-                type="checkbox"
-                data-testid="mock-v2-captcha-element"
-                {...props}
-            />
-        );
-    });
-
-    return RecaptchaV2;
+const mockRecaptchaV2 = React.forwardRef((props: any, ref: any) => {
+    React.useImperativeHandle(ref, () => ({
+        reset: jest.fn(),
+        execute: jest.fn(),
+        executeAsync: jest.fn(() => '6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI'),
+    }));
+    return (
+        <input
+            ref={ref}
+            type="checkbox"
+            data-testid="mock-v2-captcha-element"
+            {...props}
+        />
+    );
 });
 
 describe('<LandingPage />', () => {
@@ -114,6 +115,8 @@ describe('<SignInForm />', () => {
         await user.type(screen.getByLabelText(/Email/i), 'test@email.com');
         await user.type(screen.getByLabelText('Password'), '1234567');
         await user.click(screen.getByRole('button', { name: 'Sign in' }));
+
+        screen.debug(undefined, 30000);
 
         await waitFor(() => {
             expect(

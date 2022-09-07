@@ -1,5 +1,5 @@
-import { createProxyMiddleware } from 'http-proxy-middleware';
-export default function (app) {
+const { createProxyMiddleware } = require('http-proxy-middleware');
+module.exports = function (app) {
     if (process.env.REACT_APP_PROXY_URL) {
         app.use(
             /\/(api|auth|version|env|diseaseName|feedback)/,
@@ -10,4 +10,4 @@ export default function (app) {
             }),
         );
     }
-}
+};

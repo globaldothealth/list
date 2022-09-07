@@ -4,7 +4,7 @@ import 'typeface-roboto';
 import * as serviceWorker from './serviceWorker';
 
 import React from 'react';
-import ReactDOM from 'react-dom';
+import { createRoot } from 'react-dom/client';
 import App from './components/App';
 import { BrowserRouter } from 'react-router-dom';
 import store from './redux/store';
@@ -30,20 +30,23 @@ if (process.env.NODE_ENV === 'production') {
     TagManager.initialize(tagManagerArgs);
 }
 
-ReactDOM.render(
-    <React.StrictMode>
-        <BrowserRouter>
-            <Provider store={store}>
-                <StyledEngineProvider injectFirst>
-                    <ThemeProvider theme={theme}>
-                        <App />
-                    </ThemeProvider>
-                </StyledEngineProvider>
-            </Provider>
-        </BrowserRouter>
-    </React.StrictMode>,
-    document.getElementById('root'),
-);
+const container = document.getElementById('root');
+if (container) {
+    const root = createRoot(container);
+    root.render(
+        <React.StrictMode>
+            <BrowserRouter>
+                <Provider store={store}>
+                    <StyledEngineProvider injectFirst>
+                        <ThemeProvider theme={theme}>
+                            <App />
+                        </ThemeProvider>
+                    </StyledEngineProvider>
+                </Provider>
+            </BrowserRouter>
+        </React.StrictMode>,
+    );
+}
 
 // If you want your app to work offline and load faster, you can change
 // unregister() to register() below. Note this comes with some pitfalls.
