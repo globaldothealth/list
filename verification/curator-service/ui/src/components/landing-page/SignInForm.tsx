@@ -234,20 +234,6 @@ export default function SignInForm({
                 >
                     Sign in
                 </Button>
-                <Typography
-                    variant="body2"
-                    style={{ maxWidth: '35vh', marginTop: '0.5vh' }}
-                >
-                    This site is protected by reCAPTCHA and the Google{' '}
-                    <a href="https://policies.google.com/privacy">
-                        Privacy Policy
-                    </a>{' '}
-                    and{' '}
-                    <a href="https://policies.google.com/terms">
-                        Terms of Service
-                    </a>{' '}
-                    apply.
-                </Typography>
                 <Typography className={classes.title}>
                     Don't have an account?{' '}
                     <span

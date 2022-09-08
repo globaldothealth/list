@@ -333,7 +333,6 @@ const LandingPage = (): JSX.Element => {
                 sitekey={RECAPTCHA_SITE_KEY}
                 size="invisible"
                 ref={recaptchaRef}
-                style={{ visibility: 'hidden' }}
             />
         </>
     );
