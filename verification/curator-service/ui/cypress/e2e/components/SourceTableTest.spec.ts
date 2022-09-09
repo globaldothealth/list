@@ -18,9 +18,11 @@ describe('Sources table', function () {
         cy.contains('Example source');
 
         cy.get('button[aria-label="Edit"]').click();
-        cy.get('input[placeholder="Name"]').clear().type('Edited source');
+        cy.wait(300);
+        cy.get('input[value="Example source"]').clear().type('Edited source');
         cy.get('button[aria-label="Save"]').click();
 
+        cy.wait(300);
         cy.contains('Example source').should('not.exist');
         cy.contains('Edited source');
     });
@@ -39,7 +41,8 @@ describe('Sources table', function () {
 
         // Set up date filtering.
         cy.get('button[aria-label="Edit"]').click();
-        cy.get('input[placeholder="Operator"]').parent().click();
+        cy.wait(300);
+        cy.get('div[data-testid="op-select"]').click();
         cy.get('li[data-value="LT"]').click();
         cy.get('input[placeholder="days"]').clear().type('3');
         cy.get('button[aria-label="Save"]').click();
@@ -47,7 +50,8 @@ describe('Sources table', function () {
 
         // Now change to another operator.
         cy.get('button[aria-label="Edit"]').click();
-        cy.get('input[placeholder="Operator"]').parent().click();
+        cy.wait(300);
+        cy.get('div[data-testid="op-select"]').click();
         cy.get('li[data-value="EQ"]').click();
         cy.get('input[placeholder="days"]').clear().type('5');
         cy.get('button[aria-label="Save"]').click();
@@ -55,6 +59,7 @@ describe('Sources table', function () {
 
         // Now clear date filter.
         cy.get('button[aria-label="Edit"]').click();
+        cy.wait(300);
         cy.get('button[data-testid="clear-date-filter"]').click();
         cy.get('button[aria-label="Save"]').click();
         cy.contains(/from 5 day\(s\) ago/).should('not.exist');
@@ -73,6 +78,7 @@ describe('Sources table', function () {
         cy.contains('Example source');
 
         cy.get('button[aria-label="Delete"]').click();
+        cy.wait(300);
         cy.get('button[aria-label="Save"]').click();
 
         cy.contains('Example source').should('not.exist');
