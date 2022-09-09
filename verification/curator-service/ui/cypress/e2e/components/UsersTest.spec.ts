@@ -12,7 +12,7 @@ describe('Manage users page', function () {
         });
         cy.login({ name: 'Alice', email: 'alice@test.com', roles: ['admin'] });
         cy.visit('/');
-        cy.visit('/users');
+        cy.contains('Manage users').click();
 
         cy.contains('Alice');
         cy.get('div[data-testid="Alice-select-roles"]').contains('admin');
@@ -34,7 +34,8 @@ describe('Manage users page', function () {
         });
         cy.login({ name: 'Alice', email: 'alice@test.com', roles: ['admin'] });
         cy.visit('/');
-        cy.visit('/users');
+        cy.contains('Manage users').click();
+
         cy.contains('Bob');
         cy.get('div[data-testid="Bob-select-roles"]').contains('curator');
         cy.get('div[data-testid="Bob-select-roles"]')
@@ -59,7 +60,7 @@ describe('Manage users page', function () {
 
         // Roles are maintained on refresh
         cy.visit('/');
-        cy.visit('/users');
+        cy.contains('Manage users').click();
         cy.get('div[data-testid="Bob-select-roles"]').contains('admin');
         cy.get('div[data-testid="Bob-select-roles"]')
             .contains('curator')
@@ -69,11 +70,13 @@ describe('Manage users page', function () {
     it('Updated roles propagate to other pages', function () {
         cy.login({ name: 'Alice', email: 'alice@test.com', roles: ['admin'] });
         cy.visit('/');
-        cy.visit('/users');
+        cy.contains('Manage users').click();
 
         // Select new role
         cy.intercept('PUT', '/api/users/*').as('updateUser');
+        cy.wait(300);
         cy.get('div[data-testid="Alice-select-roles"]').click();
+        cy.wait(300);
         cy.get('li[data-value="curator"]').click();
         cy.wait('@updateUser');
 
@@ -82,8 +85,8 @@ describe('Manage users page', function () {
         cy.contains('Line list');
 
         // Profile page is updated
-        cy.visit('/');
-        cy.visit('/profile');
+        cy.get('button[data-testid="profile-menu"]').click();
+        cy.contains('Profile').click();
         cy.contains('admin');
         cy.contains('curator');
     });

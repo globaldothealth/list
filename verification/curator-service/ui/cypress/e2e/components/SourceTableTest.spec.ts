@@ -14,7 +14,7 @@ describe('Sources table', function () {
             ['US', 'CA', 'MX'],
         );
         cy.visit('/');
-        cy.visit('/sources');
+        cy.contains('Sources').click();
         cy.contains('Example source');
 
         cy.get('button[aria-label="Edit"]').click();
@@ -34,7 +34,7 @@ describe('Sources table', function () {
             ['US', 'CA', 'MX'],
         );
         cy.visit('/');
-        cy.visit('/sources');
+        cy.contains('Sources').click();
         cy.contains('Example source');
 
         // Set up date filtering.
@@ -69,8 +69,7 @@ describe('Sources table', function () {
             ['US', 'CA', 'MX'],
         );
         cy.visit('/');
-        cy.visit('/');
-        cy.visit('/sources');
+        cy.contains('Sources').click();
         cy.contains('Example source');
 
         cy.get('button[aria-label="Delete"]').click();

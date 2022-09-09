@@ -7,7 +7,8 @@ describe('Profile', function () {
             roles: ['curator'],
         });
         cy.visit('/');
-        cy.visit('/profile');
+        cy.get('button[data-testid="profile-menu"]').click();
+        cy.contains('Profile').click();
 
         cy.contains('Alice Smith');
         cy.contains('alice@test.com');
@@ -21,7 +22,8 @@ describe('Profile', function () {
             roles: ['curator'],
         });
         cy.visit('/');
-        cy.visit('/profile');
+        cy.get('button[data-testid="profile-menu"]').click();
+        cy.contains('Profile').click();
 
         cy.get('[data-testid="change-your-password-title"]').should(
             'not.exist',
@@ -36,7 +38,8 @@ describe('Profile', function () {
             removeGoogleID: true,
         });
         cy.visit('/');
-        cy.visit('/profile');
+        cy.get('button[data-testid="profile-menu"]').click();
+        cy.contains('Profile').click();
 
         cy.contains('Change your password');
 
@@ -76,7 +79,8 @@ describe('Profile', function () {
             removeGoogleID: true,
         });
         cy.visit('/');
-        cy.visit('/profile');
+        cy.get('button[data-testid="profile-menu"]').click();
+        cy.contains('Profile').click();
 
         cy.contains('Change your password');
 

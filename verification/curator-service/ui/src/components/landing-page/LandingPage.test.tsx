@@ -6,33 +6,34 @@ import userEvent from '@testing-library/user-event';
 import { rest } from 'msw';
 import { setupServer } from 'msw/node';
 import { Route } from 'react-router-dom';
-import React from 'react';
 
 const server = setupServer();
 
-beforeAll(() => {
-    server.listen();
-    jest.mock('react-google-recaptcha', () => {
-        return mockRecaptchaV2;
-    });
-});
+beforeAll(() => server.listen());
 afterEach(() => server.resetHandlers());
 afterAll(() => server.close());
 
-const mockRecaptchaV2 = React.forwardRef((props: any, ref: any) => {
-    React.useImperativeHandle(ref, () => ({
-        reset: jest.fn(),
-        execute: jest.fn(),
-        executeAsync: jest.fn(() => '6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI'),
-    }));
-    return (
-        <input
-            ref={ref}
-            type="checkbox"
-            data-testid="mock-v2-captcha-element"
-            {...props}
-        />
-    );
+jest.mock('react-google-recaptcha', () => {
+    const { forwardRef, useImperativeHandle } = jest.requireActual('react');
+    const RecaptchaV2 = forwardRef((props: any, ref: any) => {
+        useImperativeHandle(ref, () => ({
+            reset: jest.fn(),
+            execute: jest.fn(),
+            executeAsync: jest.fn(
+                () => '6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI',
+            ),
+        }));
+        return (
+            <input
+                ref={ref}
+                type="checkbox"
+                data-testid="mock-v2-captcha-element"
+                {...props}
+            />
+        );
+    });
+
+    return RecaptchaV2;
 });
 
 describe('<LandingPage />', () => {
@@ -112,11 +113,9 @@ describe('<SignInForm />', () => {
         ).toBeInTheDocument();
 
         // Fill out the form
-        await user.type(screen.getByLabelText(/Email/i), 'test@email.com');
+        await user.type(screen.getByLabelText('Email'), 'test@email.com');
         await user.type(screen.getByLabelText('Password'), '1234567');
         await user.click(screen.getByRole('button', { name: 'Sign in' }));
-
-        screen.debug(undefined, 30000);
 
         await waitFor(() => {
             expect(

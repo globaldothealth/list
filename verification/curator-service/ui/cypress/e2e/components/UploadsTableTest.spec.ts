@@ -40,7 +40,7 @@ describe('Uploads table', function () {
             ],
         );
         cy.visit('/');
-        cy.visit('/uploads');
+        cy.contains('Uploads').click();
         cy.contains('www.example.com');
         cy.get('td[value="New source"]').should('have.length', 4);
         cy.contains('5ef8e943dfe6e00030892d58');
@@ -61,7 +61,7 @@ describe('Uploads table', function () {
         cy.contains('2020-01-04');
     });
 
-    it.only('can navigate to filtered linelist', function () {
+    it('can navigate to filtered linelist', function () {
         cy.task('clearCasesDB', {});
 
         cy.addCase({
@@ -102,7 +102,7 @@ describe('Uploads table', function () {
             ],
         );
         cy.visit('/');
-        cy.visit('/uploads');
+        cy.contains('Uploads').click();
         cy.contains(
             'a[href="/cases?uploadid=5ef8e943dfe6e00030892d58"]',
             '5',

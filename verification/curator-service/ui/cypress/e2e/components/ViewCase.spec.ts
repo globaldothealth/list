@@ -49,7 +49,8 @@ describe('View case', function () {
         cy.request({ method: 'GET', url: '/api/cases' }).then((resp) => {
             expect(resp.body.cases).to.have.lengthOf(1);
             cy.visit('/');
-            cy.visit(`cases/view/${resp.body.cases[0]._id}`);
+            cy.contains('France').click();
+
             cy.contains('France');
             cy.should('not.contain', 'some notes');
             cy.contains('www.example.com');
