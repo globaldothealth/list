@@ -126,25 +126,21 @@ describe('LandingPage', function () {
         cy.contains('one uppercase required!');
         cy.contains('Passwords must match');
 
-        cy.get('#password').focus().clear();
-        cy.get('#password').type('tsgasdgGasd');
+        cy.get('#password').focus().clear().type('tsgasdgGasd');
         cy.get('button[data-testid="change-password-button"]').click();
         cy.contains('one number required!');
 
-        cy.get('#password').focus().clear();
-        cy.get('#password').type('tT$5');
+        cy.get('#password').focus().clear().type('tT$5');
         cy.get('button[data-testid="change-password-button"]').click();
         cy.contains('Minimum 8 characters required!');
 
         //check score 1 strength of password
-        cy.get('#password').focus().clear();
-        cy.get('#password').type('Tt1ttttt');
+        cy.get('#password').focus().clear().type('Tt1ttttt');
         cy.get('button[data-testid="change-password-button"]').click();
         cy.contains('Password too weak');
 
         //check score 2 strength of password
-        cy.get('#password').focus().clear();
-        cy.get('#password').type('tT$5aaaaa');
+        cy.get('#password').focus().clear().type('tT$5aaaaa');
         cy.get('button[data-testid="change-password-button"]').click();
         cy.contains('Password too weak');
     });
