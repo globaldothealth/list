@@ -13,12 +13,17 @@ describe('Sources table', function () {
             'www.example.com',
             ['US', 'CA', 'MX'],
         );
+
+        cy.intercept('GET', '/api/sources/?limit=10&page=1').as('fetchSources');
+
         cy.visit('/');
         cy.contains('Sources').click();
+
+        cy.wait('@fetchSources');
+
         cy.contains('Example source');
 
         cy.get('button[aria-label="Edit"]').click();
-        cy.wait(300);
         cy.get('input[value="Example source"]').clear().type('Edited source');
         cy.get('button[aria-label="Save"]').click();
 
@@ -35,13 +40,18 @@ describe('Sources table', function () {
             'www.example.com',
             ['US', 'CA', 'MX'],
         );
+
+        cy.intercept('GET', '/api/sources/?limit=10&page=1').as('fetchSources');
+
         cy.visit('/');
         cy.contains('Sources').click();
+
+        cy.wait('@fetchSources');
+
         cy.contains('Example source');
 
         // Set up date filtering.
         cy.get('button[aria-label="Edit"]').click();
-        cy.wait(300);
         cy.get('div[data-testid="op-select"]').click();
         cy.get('li[data-value="LT"]').click();
         cy.get('input[placeholder="days"]').clear().type('3');
@@ -50,7 +60,6 @@ describe('Sources table', function () {
 
         // Now change to another operator.
         cy.get('button[aria-label="Edit"]').click();
-        cy.wait(300);
         cy.get('div[data-testid="op-select"]').click();
         cy.get('li[data-value="EQ"]').click();
         cy.get('input[placeholder="days"]').clear().type('5');
@@ -59,7 +68,6 @@ describe('Sources table', function () {
 
         // Now clear date filter.
         cy.get('button[aria-label="Edit"]').click();
-        cy.wait(300);
         cy.get('button[data-testid="clear-date-filter"]').click();
         cy.get('button[aria-label="Save"]').click();
         cy.contains(/from 5 day\(s\) ago/).should('not.exist');
@@ -73,12 +81,16 @@ describe('Sources table', function () {
             'www.example.com',
             ['US', 'CA', 'MX'],
         );
+        cy.intercept('GET', '/api/sources/?limit=10&page=1').as('fetchSources');
+
         cy.visit('/');
         cy.contains('Sources').click();
+
+        cy.wait('@fetchSources');
+
         cy.contains('Example source');
 
         cy.get('button[aria-label="Delete"]').click();
-        cy.wait(300);
         cy.get('button[aria-label="Save"]').click();
 
         cy.contains('Example source').should('not.exist');
