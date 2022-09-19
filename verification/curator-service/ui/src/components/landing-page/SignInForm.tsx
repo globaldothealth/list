@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { useAppDispatch } from '../../hooks/redux';
@@ -69,22 +69,18 @@ interface FormValues {
 interface SignInFormProps {
     disabled?: boolean;
     setRegistrationScreenOn: (active: boolean) => void;
+    recaptchaRef?: React.RefObject<ReCAPTCHA>;
 }
-
-const RECAPTCHA_SITE_KEY = window.Cypress
-    ? '6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI'
-    : ((process.env.RECAPTCHA_SITE_KEY ||
-          process.env.REACT_APP_RECAPTCHA_SITE_KEY) as string);
 
 export default function SignInForm({
     disabled,
     setRegistrationScreenOn,
+    recaptchaRef,
 }: SignInFormProps): JSX.Element {
     const dispatch = useAppDispatch();
     const classes = useStyles();
 
     const [passwordVisible, setPasswordVisible] = useState(false);
-    const recaptchaRef = useRef<ReCAPTCHA>(null);
 
     const validationSchema = Yup.object().shape({
         email: Yup.string()
@@ -100,7 +96,7 @@ export default function SignInForm({
         },
         validationSchema,
         onSubmit: async (values) => {
-            if (!recaptchaRef.current) return;
+            if (!recaptchaRef || !recaptchaRef.current) return;
 
             // eslint-disable-next-line no-useless-catch
             try {
@@ -238,7 +234,6 @@ export default function SignInForm({
                 >
                     Sign in
                 </Button>
-
                 <Typography className={classes.title}>
                     Don't have an account?{' '}
                     <span
@@ -248,11 +243,6 @@ export default function SignInForm({
                         {' '}
                         Sign up!
                     </span>
-                    <ReCAPTCHA
-                        sitekey={RECAPTCHA_SITE_KEY}
-                        size="invisible"
-                        ref={recaptchaRef}
-                    />
                 </Typography>
             </form>
 

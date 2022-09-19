@@ -216,12 +216,13 @@ export class AuthController {
                     req.body.token,
                 );
 
-                if (!captchaResult)
+                if (!captchaResult) {
                     res.status(403).json({
                         message:
                             "Unfortunately, you didn't pass the captcha. Please, try again later.",
                     });
-
+                    return;
+                }
                 passport.authenticate(
                     'register',
                     (error: Error, user: IUser, info: any) => {
@@ -253,12 +254,13 @@ export class AuthController {
                     req.body.token,
                 );
 
-                if (!captchaResult)
+                if (!captchaResult) {
                     res.status(403).json({
                         message:
                             "Unfortunately, you didn't pass the captcha. Please, try again later.",
                     });
-
+                    return;
+                }
                 passport.authenticate(
                     'login',
                     (
