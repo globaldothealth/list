@@ -64,7 +64,6 @@ export default class EmailClient {
         subject: string,
         message: string,
     ): Promise<unknown> {
-
         if (this.serviceEnv == 'locale2e') {
             return;
         }
