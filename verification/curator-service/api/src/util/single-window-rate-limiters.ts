@@ -24,7 +24,6 @@ export const registerLimiter = rateLimit({
                 'You sent too many requests. Please wait a while then try again',
         });
     },
-    skipSuccessfulRequests: true,
 });
 
 export const resetPasswordLimiter = rateLimit({
@@ -52,7 +51,6 @@ export const forgotPasswordLimiter = rateLimit({
                 'You sent too many requests. Please wait a while then try again',
         });
     },
-    skipSuccessfulRequests: true,
 });
 
 export const resetPasswordWithTokenLimiter = rateLimit({

@@ -282,7 +282,7 @@ export class AuthController {
                         req.logIn(user, (err) => {
                             if (err) return next(err);
                         });
-
+                        loginLimiter.resetKey(req.ip);
                         res.status(200).json(user);
                     },
                 )(req, res, next);
@@ -474,6 +474,8 @@ export class AuthController {
                             .status(403)
                             .json({ message: 'Old password is incorrect' });
                     }
+
+                    resetPasswordLimiter.resetKey(req.ip);
 
                     updateFailedAttempts(
                         currentUser._id,
@@ -681,6 +683,8 @@ export class AuthController {
 
                     // Send confirmation email to the user
                     const user = result.value as IUser;
+
+                    resetPasswordWithTokenLimiter.resetKey(req.ip);
 
                     updateFailedAttempts(
                         userId,
