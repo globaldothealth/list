@@ -218,7 +218,7 @@ describe('LandingPage', function () {
         cy.get('#password').type('tT$5aaaaak');
         cy.get('#passwordConfirmation').type('tT$5aaaaak');
         cy.get('#isAgreementChecked').check();
-        for (let i = 0; i < 5; i++) {
+        for (let i = 0; i < 7; i++) {
             // eslint-disable-next-line cypress/no-unnecessary-waiting
             cy.wait(1500);
             cy.get('button[data-testid="sign-up-button"]').click();
