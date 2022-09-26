@@ -42,7 +42,7 @@ export const resetPasswordLimiter = rateLimit({
 
 export const forgotPasswordLimiter = rateLimit({
     windowMs: 60 * 60 * 1000, // 60 minutes
-    max: 4,
+    max: 6,
     standardHeaders: true,
     legacyHeaders: false,
     handler: function (req, res) {
