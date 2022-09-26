@@ -230,7 +230,7 @@ describe('LandingPage', function () {
         cy.contains('Sign in!').click();
         cy.get('#email').type('test@example.com');
         cy.get('#password').type('test');
-        for (let i = 0; i < 5; i++) {
+        for (let i = 0; i < 7; i++) {
             // eslint-disable-next-line cypress/no-unnecessary-waiting
             cy.wait(1500);
             cy.get('button[data-testid="sign-in-button"]').click();
