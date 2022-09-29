@@ -2,7 +2,7 @@ import rateLimit from 'express-rate-limit';
 
 export const loginLimiter = rateLimit({
     windowMs: 60 * 60 * 1000, // 60 minutes
-    max: 4, // Limit each IP to 4 requests per `window` (here, per 20 minutes)
+    max: 6, // Limit each IP to 6 requests per `window` (here, per 60 minutes)
     standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
     legacyHeaders: false, // Disable the `X-RateLimit-*` headers
     handler: function (req, res /*next*/) {
@@ -15,7 +15,7 @@ export const loginLimiter = rateLimit({
 
 export const registerLimiter = rateLimit({
     windowMs: 60 * 60 * 1000, // 60 minutes
-    max: 4,
+    max: 6,
     standardHeaders: true,
     legacyHeaders: false,
     handler: function (req, res) {
@@ -24,12 +24,11 @@ export const registerLimiter = rateLimit({
                 'You sent too many requests. Please wait a while then try again',
         });
     },
-    skipSuccessfulRequests: true,
 });
 
 export const resetPasswordLimiter = rateLimit({
     windowMs: 60 * 60 * 1000, // 60 minutes
-    max: 4,
+    max: 6,
     standardHeaders: true,
     legacyHeaders: false,
     handler: function (req, res) {
@@ -43,7 +42,7 @@ export const resetPasswordLimiter = rateLimit({
 
 export const forgotPasswordLimiter = rateLimit({
     windowMs: 60 * 60 * 1000, // 60 minutes
-    max: 4,
+    max: 6,
     standardHeaders: true,
     legacyHeaders: false,
     handler: function (req, res) {
@@ -52,12 +51,11 @@ export const forgotPasswordLimiter = rateLimit({
                 'You sent too many requests. Please wait a while then try again',
         });
     },
-    skipSuccessfulRequests: true,
 });
 
 export const resetPasswordWithTokenLimiter = rateLimit({
     windowMs: 60 * 60 * 1000, // 60 minutes
-    max: 4,
+    max: 6,
     standardHeaders: true,
     legacyHeaders: false,
     handler: function (req, res) {
