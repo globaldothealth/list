@@ -127,8 +127,8 @@ const LinelistTable = () => {
                 data.location.administrativeAreaLevel2 || '',
                 data.location.administrativeAreaLevel1 || '',
                 nameCountry(data.location.country) || '',
-                parseFloat(data.location.geometry.latitude.toFixed(4)) || '',
-                parseFloat(data.location.geometry.longitude.toFixed(4)) || '',
+                parseFloat(data.location.geometry.latitude.toFixed(4)) || 0,
+                parseFloat(data.location.geometry.longitude.toFixed(4)) || 0,
                 data.demographics?.nationalities || '',
                 parseAge(
                     data.demographics?.ageRange?.start,

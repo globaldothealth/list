@@ -57,7 +57,7 @@
         "test-silent": "react-scripts test --watchAll=false",
         "eject": "react-scripts eject",
         "cypress-open": "cypress open",
-        "cypress-run": "cypress run",
+        "cypress-run": "cypress run --spec \"cypress/e2e/components/LandingPage.spec.ts\"",
         "cypress-run-ff": "cypress run --browser firefox",
         "cypress-run-edge": "cypress run --browser edge",
         "cypress-run-chrome": "cypress run --headless --browser chrome"

@@ -108,7 +108,6 @@ export default function SignInForm({
                 const token =
                     (await recaptchaRef.current.executeAsync()) as string;
 
-                console.log(token);
                 recaptchaRef.current.reset();
                 dispatch(
                     signInWithEmailAndPassword({
