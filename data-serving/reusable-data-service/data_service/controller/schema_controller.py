@@ -34,6 +34,7 @@ class SchemaController:
                 field.required,
                 field.default,
                 field.values,
+                field.is_list,
                 False,
             )
 
@@ -45,6 +46,7 @@ class SchemaController:
         required: bool = False,
         default: Optional[Union[bool, str, int, date]] = None,
         values: Optional[List[Any]] = None,
+        is_list: bool = False,
         store_field: bool = True,
     ):
         global Case
@@ -63,7 +65,9 @@ class SchemaController:
         If a field is required, set required = True. You must also set a default value so that
         existing cases have an initial setting for the field."""
         required = required if required is not None else False
-        field_model = Field(name, type_name, description, required, default, values)
+        field_model = Field(
+            name, type_name, description, required, default, values, is_list
+        )
         add_field_to_case_class(field_model)
         if store_field:
             self.store.add_field(field_model)

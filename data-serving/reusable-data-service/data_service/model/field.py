@@ -12,16 +12,20 @@ from data_service.util.errors import PreconditionUnsatisfiedError
 
 @dataclasses.dataclass
 class Field(Document):
-    """Represents a custom field in a Document object."""
+    """Represents a custom field in a Document object.
+    Note for future architects: I learned today that dataclasses fields can carry
+    custom metadata. It might make sense to reorganise things so that information
+    currently in the Field class is carried in that metadata instead."""
 
     key: str = dataclasses.field(init=True, default=None)
     type: str = dataclasses.field(init=True, default=None)
     data_dictionary_text: str = dataclasses.field(init=True, default=None)
     required: bool = dataclasses.field(init=True, default=False)
-    default: Optional[Union[bool, str, int, date]] = dataclasses.field(
+    default: Optional[Union[bool, str, int, date, Feature, AgeRange, CaseReference, CaseExclusionMetadata]] = dataclasses.field(
         init=True, default=None
     )
     values: Optional[List[Any]] = dataclasses.field(init=True, default=None)
+    is_list: bool = dataclasses.field(init=True, default=False)
 
     STRING = "string"
     DATE = "date"
@@ -55,9 +59,16 @@ class Field(Document):
             dictionary.get("required"),
             dictionary.get("default", None),
             dictionary.get("values", None),
+            dictionary.get("is_list", False),
         )
 
     def python_type(self) -> type:
+        if self.is_list:
+            return list
+        else:
+            return self.element_type()
+    
+    def element_type(self) -> type:
         return self.model_type(self.type)
 
     def dataclasses_tuples(self):

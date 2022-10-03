@@ -9,5 +9,7 @@
     },
     "caseStatus": "omit_error",
     "pathogenStatus": "endemic",
-    "sexAtBirth": "female"
+    "sexAtBirth": "female",
+    "gender": ["woman"],
+    "race": ["White"]
 }

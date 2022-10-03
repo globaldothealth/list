@@ -18,5 +18,8 @@
     },
     "caseStatus": "probable",
     "pathogenStatus": "unknown",
-    "sexAtBirth": "female"
+    "sexAtBirth": "female",
+    "gender": ["non-binary", "other"],
+    "gender_other": "womxn",
+    "race": []
 }

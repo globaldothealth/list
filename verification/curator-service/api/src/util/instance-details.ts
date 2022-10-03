@@ -1,5 +1,5 @@
 const urlMap: { [idx: string]: { [idx: string]: string } } = {
-    'covid-19': {
+    'COVID-19': {
         local: 'http://localhost:3002',
         dev: 'https://dev-data.covid-19.global.health',
         qa: 'https://qa-data.covid-19.global.health',
@@ -12,7 +12,7 @@ export function baseURL(disease: string, environment: string): string {
 }
 
 const welcomeMessages: { [idx: string]: string } = {
-    'covid-19': `<p>Thank you for registering with Global.health! We're thrilled to have you join our international community and mission to advance the global response to infectious diseases through the sharing of trusted and open public health data.</p>
+    'COVID-19': `<p>Thank you for registering with Global.health! We're thrilled to have you join our international community and mission to advance the global response to infectious diseases through the sharing of trusted and open public health data.</p>
         <p>Here are a few things you can do:</p>
         <ul>
             <li>Filter and export <a href="https://data.covid-19.global.health">G.h Data</a> containing detailed information on over 50 million anonymized COVID-19 cases from over 100 countries.</li>

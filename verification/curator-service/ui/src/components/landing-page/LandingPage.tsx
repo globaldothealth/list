@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useRef, useEffect, useState } from 'react';
 import { Typography, Paper } from '@mui/material';
 import { styled, Theme } from '@mui/material/styles';
 import { makeStyles } from '@mui/styles';
@@ -33,6 +33,7 @@ import {
 import { MapLink } from '../../constants/types';
 import { getReleaseNotesUrl } from '../util/helperFunctions';
 import { getDiseaseName } from '../../redux/app/thunk';
+import ReCAPTCHA from 'react-google-recaptcha';
 
 interface UrlParams {
     token?: string;
@@ -205,6 +206,11 @@ const MoreInformationLinks = ({
     );
 };
 
+const RECAPTCHA_SITE_KEY = window.Cypress
+    ? '6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI'
+    : ((process.env.RECAPTCHA_SITE_KEY ||
+          process.env.REACT_APP_RECAPTCHA_SITE_KEY) as string);
+
 const LandingPage = (): JSX.Element => {
     const dispatch = useAppDispatch();
 
@@ -212,6 +218,7 @@ const LandingPage = (): JSX.Element => {
     const classes = useStyles();
     const [registrationScreenOn, setRegistrationScreenOn] = useState(true);
     const [changePasswordScreenOn, setChangePasswordScreenOn] = useState(false);
+    const recaptchaRef = useRef<ReCAPTCHA>(null);
 
     const isLoading = useAppSelector(selectIsLoading);
     const error = useAppSelector(selectError);
@@ -272,15 +279,18 @@ const LandingPage = (): JSX.Element => {
                     <SignUpForm
                         disabled={isLoading}
                         setRegistrationScreenOn={setRegistrationScreenOn}
+                        recaptchaRef={recaptchaRef}
                     />
                 ) : (
                     !changePasswordScreenOn && (
                         <SignInForm
                             disabled={isLoading}
                             setRegistrationScreenOn={setRegistrationScreenOn}
+                            recaptchaRef={recaptchaRef}
                         />
                     )
                 )}
+
                 {changePasswordScreenOn && (
                     <ChangePasswordForm
                         token={token}
@@ -314,6 +324,11 @@ const LandingPage = (): JSX.Element => {
 
                 <PartnerLogos />
             </StyledPaper>
+            <ReCAPTCHA
+                sitekey={RECAPTCHA_SITE_KEY}
+                size="invisible"
+                ref={recaptchaRef}
+            />
         </>
     );
 };
