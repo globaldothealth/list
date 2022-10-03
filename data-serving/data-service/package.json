@@ -51,7 +51,7 @@
     "jest": "^27.2.5",
     "lint-staged": "^10.4.0",
     "msw": "^0.28.2",
-    "nodemon": "^2.0.4",
+    "nodemon": "^2.0.20",
     "prettier": "^2.1.2",
     "supertest": "^4.0.2",
     "ts-jest": "^27.0.5",
