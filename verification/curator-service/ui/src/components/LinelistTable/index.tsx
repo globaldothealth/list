@@ -123,12 +123,12 @@ const LinelistTable = () => {
             return createData(
                 data._id || '',
                 renderDate(data.confirmationDate) || '',
-                data.location.administrativeAreaLevel3 || '',
-                data.location.administrativeAreaLevel2 || '',
-                data.location.administrativeAreaLevel1 || '',
-                nameCountry(data.location.country) || '',
-                parseFloat(data.location.geometry.latitude.toFixed(4)) || 0,
-                parseFloat(data.location.geometry.longitude.toFixed(4)) || 0,
+                data.location?.administrativeAreaLevel3 || '',
+                data.location?.administrativeAreaLevel2 || '',
+                data.location?.administrativeAreaLevel1 || '',
+                nameCountry(data.location?.country) || '',
+                parseFloat(data.location?.geometry.latitude.toFixed(4)) || 0,
+                parseFloat(data.location?.geometry.longitude.toFixed(4)) || 0,
                 data.demographics?.nationalities || '',
                 parseAge(
                     data.demographics?.ageRange?.start,
@@ -136,20 +136,20 @@ const LinelistTable = () => {
                 ),
                 data.demographics?.gender || '',
                 data.importedCase?.outcome ||
-                    data.events.find((event) => event.name === 'outcome')
+                    data.events?.find((event) => event.name === 'outcome')
                         ?.value ||
                     '',
                 renderDateRange(
-                    data.events.find(
+                    data.events?.find(
                         (event) => event.name === 'hospitalAdmission',
                     )?.dateRange,
                 ),
                 renderDateRange(
-                    data.events.find((event) => event.name === 'onsetSymptoms')
+                    data.events?.find((event) => event.name === 'onsetSymptoms')
                         ?.dateRange,
                 ),
-                data.caseReference.sourceUrl || '',
-                data.caseReference.verificationStatus,
+                data.caseReference?.sourceUrl || '',
+                data.caseReference?.verificationStatus,
                 data.exclusionData,
             );
         });
