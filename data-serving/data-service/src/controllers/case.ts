@@ -164,7 +164,9 @@ export class CasesController {
                     searchQuery: req.body.query as string,
                     count: false,
                     limit: queryLimit,
-                }).cursor();
+                })
+                    .collation({ locale: 'en_US', strength: 2 })
+                    .cursor();
             } else if (req.body.caseIds && queryLimit) {
                 logger.info('Request body with case IDs and limit');
                 cursor = Case.find({
@@ -210,7 +212,9 @@ export class CasesController {
             }
 
             const date = new Date().toISOString().slice(0, 10);
-            const request_description = req.body.query ? req.body.query.replace(/[:\s]/g, '_') : 'requested_cases';
+            const request_description = req.body.query
+                ? req.body.query.replace(/[:\s]/g, '_')
+                : 'requested_cases';
             const filename = `gh_${date}_${request_description}`;
 
             let doc: CaseDocument;
@@ -341,14 +345,22 @@ export class CasesController {
             const sortedQuery = casesQuery.sort({
                 [sortByKeyword]: sortByOrder === SortByOrder.Ascending ? 1 : -1,
             });
+
             // Do a fetch of documents and another fetch in parallel for total documents
             // count used in pagination.
             const [docs, total] = await Promise.all([
                 sortedQuery
                     .skip(limit * (page - 1))
                     .limit(limit)
-                    .lean(),
-                countQuery,
+                    .lean()
+                    .collation({
+                        locale: 'en_US',
+                        strength: 2,
+                    }),
+                countQuery.collation({
+                    locale: 'en_US',
+                    strength: 2,
+                }),
             ]);
 
             const dtos = await Promise.all(docs.map(dtoFromCase));
@@ -807,7 +819,7 @@ export class CasesController {
         const casesQuery = casesMatchingSearchQuery({
             searchQuery: req.body.query,
             count: false,
-        });
+        }).collation({ locale: 'en_US', strength: 2 });
         try {
             await Case.deleteMany(casesQuery);
             await RestrictedCase.deleteMany(casesQuery);
@@ -867,7 +879,7 @@ export class CasesController {
                 updateQuery = casesMatchingSearchQuery({
                     searchQuery: req.body.query,
                     count: false,
-                });
+                }).collation({ locale: 'en_US', strength: 2 });
             } else {
                 updateQuery = {
                     _id: { $in: caseIds },
@@ -1139,19 +1151,11 @@ export const casesMatchingSearchQuery = (opts: {
     // Always search with case-insensitivity.
     const casesQuery: Query<CaseDocument[], CaseDocument> = Case.find(
         queryOpts,
-    ).collation({
-        locale: 'en_US',
-        strength: 2,
-    });
+    );
 
     const countQuery: Query<number, CaseDocument> = Case.countDocuments(
         queryOpts,
-    )
-        .limit(countLimit)
-        .collation({
-            locale: 'en_US',
-            strength: 2,
-        });
+    ).limit(countLimit);
 
     // Fill in keyword filters.
     parsedSearch.filters.forEach((f) => {
@@ -1348,8 +1352,14 @@ export const listOccupations = async (
     }
 };
 function validateCaseAges(caseStart: number, caseEnd: number) {
-    if (caseStart < 0 || caseEnd < caseStart || caseStart > 120 || caseEnd > 120) {
-        throw new InvalidParamError(`Case validation failed: age range ${caseStart}-${caseEnd} invalid (must be within 0-120)`);
+    if (
+        caseStart < 0 ||
+        caseEnd < caseStart ||
+        caseStart > 120 ||
+        caseEnd > 120
+    ) {
+        throw new InvalidParamError(
+            `Case validation failed: age range ${caseStart}-${caseEnd} invalid (must be within 0-120)`,
+        );
     }
 }
-
