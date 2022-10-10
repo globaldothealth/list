@@ -4,8 +4,8 @@
     "country": "Taiwan",
     "geoResolution": "Admin1",
     "geometry": {
-      "latitude": 23.90235,
-      "longitude": 120.6909167
+      "latitude": 23.84053335,
+      "longitude": 120.93291098389277
     },
     "name": "Nantou County"
   },
@@ -159,6 +159,16 @@
     },
     "name": "Penghu"
   },
+  "空值": {
+    "administrativeAreaLevel1": "CPC Corporation, Taiwan",
+    "country": "Taiwan",
+    "geoResolution": "Admin1",
+    "geometry": {
+      "latitude": 23.11435375,
+      "longitude": 121.38840342297793
+    },
+    "name": "CPC Corporation, Taiwan"
+  },
   "花蓮縣": {
     "administrativeAreaLevel1": "Hualien County",
     "country": "Taiwan",
@@ -188,6 +198,16 @@
       "longitude": 119.9389047
     },
     "name": "Lienchiang County"
+  },
+  "金門縣": {
+    "administrativeAreaLevel1": "Kinmen",
+    "country": "Taiwan",
+    "geoResolution": "Admin1",
+    "geometry": {
+      "latitude": 24.4480637,
+      "longitude": 118.3856331
+    },
+    "name": "Kinmen"
   },
   "雲林縣": {
     "administrativeAreaLevel1": "Yunlin County",

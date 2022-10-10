@@ -8,6 +8,8 @@ import requests
 OSM = "https://nominatim.openstreetmap.org/search?"
 
 _LOCATIONS = [
+    "空值",
+    "金門縣",
     "新北市",
     "基隆市",
     "新竹市",
