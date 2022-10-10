@@ -52,7 +52,7 @@ def convert_gender(raw_gender: str):
     elif raw_gender == "女":
         return "Female"
     elif raw_gender == "第三性":
-        return "Third gender"
+        return "Non-binary/Third gender"
     else:
         raise ValueError(f'Unhandled gender: {raw_gender}')
 
