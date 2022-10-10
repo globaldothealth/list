@@ -324,11 +324,13 @@ const LandingPage = (): JSX.Element => {
 
                 <PartnerLogos />
             </StyledPaper>
-            <ReCAPTCHA
-                sitekey={RECAPTCHA_SITE_KEY}
-                size="invisible"
-                ref={recaptchaRef}
-            />
+            {RECAPTCHA_SITE_KEY && (
+                <ReCAPTCHA
+                    sitekey={RECAPTCHA_SITE_KEY}
+                    size="invisible"
+                    ref={recaptchaRef}
+                />
+            )}
         </>
     );
 };
