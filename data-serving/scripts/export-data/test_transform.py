@@ -174,3 +174,10 @@ def test_age_bucket_row_conversion():
     converted_row = T.convert_row(row, _BUCKETS)
     assert converted_row["demographics.ageRange.start"] == 20
     assert converted_row["demographics.ageRange.end"] == 24
+
+
+@pytest.mark.parametrize("source,expected", [((22, 22),(21, 25)), ((58, 62),(56, 65)), ((130, 150), None)])
+def test_get_age_bucket_as_range(source,expected):
+    with Path(__file__).with_name("test_age_buckets.json").open() as fp:
+        AGE_BUCKETS = json.load(fp)
+    assert T.get_age_bucket_as_range(AGE_BUCKETS, *source) == expected

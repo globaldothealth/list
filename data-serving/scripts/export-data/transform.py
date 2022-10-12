@@ -18,6 +18,7 @@ from typing import Any, Optional
 
 from logger import setup_logger
 
+MINIMUM_AGE_WINDOW = 5
 
 VALID_FORMATS = ["csv", "tsv", "json"]
 
@@ -209,6 +210,22 @@ def get_headers_and_fields(fileobject) -> list[str]:
     fields = sorted(list(fields - set(__OMIT)), key=str.casefold)
     return headers, fields
 
+def get_age_bucket_as_range(buckets: list[dict[str]], age_start: int, age_end: int) -> Optional[tuple[int, int]]:
+    "Returns age bucket from demographics.ageRange.start and demographics.ageRange.end"
+
+    def which_bucket(age: int) -> int:
+        for i, bucket in enumerate(buckets):
+            if bucket["start"] <= age <= bucket["end"]:
+                return i
+        return -1
+
+    index_bucket_start = which_bucket(int(age_start))
+    index_bucket_end = which_bucket(int(age_end))
+    if index_bucket_start < 0 or index_bucket_end < 0:
+        return None
+    bounds = [buckets[index_bucket_start]["start"], buckets[index_bucket_end]["start"],
+              buckets[index_bucket_start]["end"], buckets[index_bucket_end]["end"]]
+    return (min(bounds), max(bounds))
 
 def age_range(case_buckets: str, buckets: [dict[str, Any]]) -> (int, int):
     bucket_ids = json.loads(case_buckets)
@@ -219,6 +236,26 @@ def age_range(case_buckets: str, buckets: [dict[str, Any]]) -> (int, int):
 
 
 def convert_row(row: dict[str, Any], buckets: [dict[str, Any]]) -> Optional[dict[str, Any]]:
+    """
+    Converts row for export using age buckets
+
+    To handle the transition from ageRange to ageBuckets, transform()
+    support both, with a preference to ageBuckets if that field exists.
+
+    There are three scenarios that are handled:
+
+    1. demographics.ageBuckets is present. This is the preferred option and
+       the code sets the minimum and maximum of the buckets present as the age
+       range
+
+    2. demographics.ageRange is present and the age window (difference
+       between the maximum and minimum is at least MINIMUM_AGE_WINDOW. In this
+       case, this is passed unchanged for export.
+
+    3. demographics.ageRange has a age window below MINIMUM_AGE_WINDOW. In
+       this case the code matches it to the nearest age bucket(s).
+
+    """
     if "ObjectId" not in row["_id"]:
         return None
     for arr_field in __ARRAYS:
@@ -236,8 +273,22 @@ def convert_row(row: dict[str, Any], buckets: [dict[str, Any]]) -> Optional[dict
     if row["travelHistory.traveledPrior30Days"] == "true":
         if "travelHistory.travel" in row:
             row.update(convert_travel(row["travelHistory.travel"]))
+    if (
+        row.get("demographics.ageRange.start") and
+        (
+            int(row["demographics.ageRange.end"]) -
+            int(row["demographics.ageRange.start"]) + 1 < MINIMUM_AGE_WINDOW
+        ) and
+        (bucketed_age_range := get_age_bucket_as_range(
+            buckets,
+            row["demographics.ageRange.start"],
+            row["demographics.ageRange.end"]
+        ))
+    ):
+        row["demographics.ageRange.start"], row["demographics.ageRange.end"] = bucketed_age_range
+    # prefer ageBuckets if available
     if row.get("demographics.ageBuckets", None):
-        (row["demographics.ageRange.start"], row["demographics.ageRange.end"]) = age_range(row["demographics.ageBuckets"], buckets)
+        row["demographics.ageRange.start"], row["demographics.ageRange.end"] = age_range(row["demographics.ageBuckets"], buckets)
         del row["demographics.ageBuckets"]
     return row
 
