@@ -14,7 +14,7 @@ trap 'rm -rf "$SCRATCH"' EXIT  # Cleanup before exit
 FORMAT="${FORMAT:-csv,tsv,json}"
 QUERY="{\"list\": true, \"location.country\": \"$COUNTRY\"}"
 
-mongoexport --uri="$CONN" --collection=agebuckets --type=json > "${BUCKETS}"
+mongoexport --uri="$CONN" --collection=ageBuckets --type=json --jsonArray -o "${BUCKETS}"
 mongoexport --query="$QUERY" --uri="$CONN" --collection=cases \
     --fieldFile=fields.txt --type=csv | python3 transform.py -f "$FORMAT" -b "${BUCKETS}" "$COUNTRY"
 
@@ -22,5 +22,5 @@ mongoexport --query="$QUERY" --uri="$CONN" --collection=cases \
 # shellcheck disable=SC2086
 for fmt in ${FORMAT//,/ }
 do
-    test -f "${COUNTRY}.${fmt}.gz" && aws s3 cp "${COUNTRY}.${fmt}.gz" "s3://${BUCKET}/${fmt}/"
+   test -f "${COUNTRY}.${fmt}.gz" && aws s3 cp "${COUNTRY}.${fmt}.gz" "s3://${BUCKET}/${fmt}/"
 done
