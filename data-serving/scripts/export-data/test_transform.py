@@ -175,9 +175,28 @@ def test_age_bucket_row_conversion():
     assert converted_row["demographics.ageRange.start"] == 20
     assert converted_row["demographics.ageRange.end"] == 24
 
+@pytest.fixture
+def age_buckets():
+    with Path(__file__).with_name("test_age_buckets.json").open() as fp:
+        return json.load(fp)
+
 
 @pytest.mark.parametrize("source,expected", [((22, 22),(21, 25)), ((58, 62),(56, 65)), ((130, 150), None)])
-def test_get_age_bucket_as_range(source,expected):
-    with Path(__file__).with_name("test_age_buckets.json").open() as fp:
-        AGE_BUCKETS = json.load(fp)
-    assert T.get_age_bucket_as_range(AGE_BUCKETS, *source) == expected
+def test_get_age_bucket_as_range(source, expected, age_buckets):
+    assert T.get_age_bucket_as_range(age_buckets, *source) == expected
+
+
+def convert_age_data():
+    with Path(__file__).with_name("test_convert_age.csv").open() as fp:
+        return list(csv.DictReader(fp))
+
+
+@pytest.mark.parametrize(
+    "row,expected_age",
+    zip(convert_age_data(), [
+        (20, 30), (21, 25), None, (21, 25),
+        (20, 30), (0, 0), (0, 0), (26, 35)
+    ])
+)
+def test_convert_age(row, expected_age, age_buckets):
+    assert T.convert_age(row, age_buckets) == expected_age
