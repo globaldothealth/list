@@ -4,7 +4,7 @@ const indexes = [
   {
       name: 'byCountryIfListed',
       key: {
-          'location.country': 1
+          'location.country': 1,
           list: 1,          
       },
   },
