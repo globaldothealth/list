@@ -23,16 +23,20 @@ from logger import setup_logger
 
 
 HOOKS = ["country_export", "aggregate"]
+PRUNE_UPLOADS_WEBHOOK_URL = os.getenv("PRUNE_UPLOADS_WEBHOOK_URL")
 
 
 def _ids(xs):
     return [str(x["_id"]) for x in xs]
 
 
-def notify(string, webhook_url):
-    if string:
-        response = requests.post(webhook_url, json={"text": string})
-        return response.status_code == 200
+def notify(string: str) -> bool:
+    if not PRUNE_UPLOADS_WEBHOOK_URL:
+        raise ValueError("Missing environment variable PRUNE_UPLOADS_WEBHOOK_URL")
+    if not string:
+        raise ValueError("notify() requires non-empty string")
+    response = requests.post(PRUNE_UPLOADS_WEBHOOK_URL, json={"text": string})
+    return response.status_code == 200
 
 
 def accept_reject_msg(accept, reject, success=True, prefix=' '):
@@ -322,8 +326,7 @@ if __name__ == "__main__":
     if args.dry_run:
         logging.info("\n".join(m))
 
-    if webhook_url := os.environ.get("PRUNE_UPLOADS_WEBHOOK_URL"):
-        notify("\n".join(m), webhook_url)
+    notify("\n".join(m))
 
     selected_hooks = get_selected_hooks(args.run_hooks)
     if not ingested_sources:
@@ -331,6 +334,14 @@ if __name__ == "__main__":
         sys.exit(0)
 
     if "country_export" in selected_hooks:
-        hooks.country_export.run(ingested_sources, env, args.dry_run)
+        try:
+            hooks.country_export.run(ingested_sources, env, args.dry_run)
+        except Exception as e:
+            logging.error(e)
+            notify(str(e))
     if "aggregate" in selected_hooks:
-        hooks.aggregate.run(ingested_sources, env, args.dry_run)
+        try:
+            hooks.aggregate.run(ingested_sources, env, args.dry_run)
+        except Exception as e:
+            logging.error(e)
+            notify(str(e))
