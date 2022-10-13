@@ -2,7 +2,7 @@ name: Exporter code deploy
 
 on:
   push:
-    branches: ['*-stable']
+    branches: [main]
     paths:
     - '.github/workflows/export-deploy.yml'
     - 'data-serving/scripts/export-data/**'
