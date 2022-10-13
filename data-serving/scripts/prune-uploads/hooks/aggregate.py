@@ -26,7 +26,7 @@ def run(sources: list[dict[str, Any]], env: str, dry_run: bool = False):
         )
     except Exception as e:
         logging.exception("Error occurred when fetching job definitions")
-        return
+        raise
 
     if (jobdef := f"{PREFIX}-{env}") in jobdefs:
         logging.info(f"Submitting aggregation job: {jobdef} ...")
@@ -38,5 +38,6 @@ def run(sources: list[dict[str, Any]], env: str, dry_run: bool = False):
                 logging.info(f"Successfully submitted job for {jobdef}")
         except Exception as e:
             logging.exception(f"Error occurred while trying to submit {jobdef}")
+            raise
     else:
-        logging.info(f"Could not find job definition: {jobdef}")
+        raise Exception(f"Could not find job definition: {jobdef}")
