@@ -82,7 +82,7 @@ def run(sources: list[dict[str, Any]], env: str, dry_run: bool = False):
     jobdefs = set.union(*(get_exporters(s, env) for s in sources))
     all_exporters = list_exporters(env)
     if unknown_exporters := jobdefs - all_exporters:
-        logging.warning(f"Ignoring unknown exporters {unknown_exporters}")
+        raise Exception(f"Missing exporters {unknown_exporters}")
     for jobdef in jobdefs & all_exporters:
         try:
             logging.info(f"Submitting job for {jobdef} ...")
@@ -92,3 +92,4 @@ def run(sources: list[dict[str, Any]], env: str, dry_run: bool = False):
                 )
         except Exception as e:
             logging.exception(f"Error occurred while trying to submit {jobdef}")
+            raise
