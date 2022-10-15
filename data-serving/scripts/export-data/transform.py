@@ -266,8 +266,8 @@ def convert_age(row: dict[str, Any], buckets: list[dict[str, Any]]) -> Optional[
     ):
         return None
 
-    age_start = int(row["demographics.ageRange.start"])
-    age_end = int(row["demographics.ageRange.end"])
+    age_start = int(float(row["demographics.ageRange.start"]))
+    age_end = int(float(row["demographics.ageRange.end"]))
     age_window = age_end - age_start + 1
 
     if age_window >= MINIMUM_AGE_WINDOW:

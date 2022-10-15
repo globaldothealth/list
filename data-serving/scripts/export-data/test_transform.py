@@ -195,7 +195,7 @@ def convert_age_data():
     "row,expected_age",
     zip(convert_age_data(), [
         (20, 30), (21, 25), None, (21, 25),
-        (20, 30), (0, 0), (0, 0), (26, 35)
+        (20, 30), (0, 0), (0, 0), (26, 35), (1, 5),
     ])
 )
 def test_convert_age(row, expected_age, age_buckets):
