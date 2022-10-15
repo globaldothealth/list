@@ -83,6 +83,7 @@ _CASES = [
     _c(_Bay_of_Plenty, "Female", 90, 120, "05/05/2021Z", True, "Case imported from abroad."),
     _c(_West_Coast, "Female", 20, 29, "05/06/2021Z", False),
     _c(_West_Coast, None, None, None, "07/01/2021Z", False),
+    _c(_West_Coast, None, None, None, "07/01/2021Z", False),
 ]
 
 
