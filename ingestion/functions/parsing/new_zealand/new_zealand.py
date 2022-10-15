@@ -63,7 +63,7 @@ def convert_demographics(entry):
     If age is listed as 90+, setting age range as between 90 and 120.
     '''
     demo = {}
-    if (age := entry[_AGE]) != "NA":
+    if (age := entry[_AGE]) not in ["NA", "Unknown"]:
         if '+' in age:
             start = int(age.rstrip('+'))
             demo["ageRange"] = {"start": start, "end": 120}
