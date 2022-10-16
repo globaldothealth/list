@@ -23,6 +23,8 @@ export default function validateEnv(): Readonly<{
     SESSION_COOKIE_KEY: string;
     STATIC_DIR: string;
     DISEASE_NAME: string;
+    REACT_APP_RECAPTCHA_SITE_KEY: string;
+    RECAPTCHA_SECRET_KEY: string;
 }> & {
     readonly [varName: string]: string | boolean | number | undefined;
     // eslint-disable-next-line indent
@@ -118,7 +120,7 @@ export default function validateEnv(): Readonly<{
             desc: 'Name of the disease that should be displayed in Curator UI',
             devDefault: 'COVID-19',
         }),
-        RECAPTCHA_SITE_KEY: str({
+        REACT_APP_RECAPTCHA_SITE_KEY: str({
             desc: 'Key for recaptcha component',
             devDefault: '',
         }),
