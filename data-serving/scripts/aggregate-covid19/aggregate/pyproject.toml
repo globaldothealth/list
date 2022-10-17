@@ -6,7 +6,7 @@ authors = ["Global.health <info@global.health>"]
 license = "MIT"
 
 [tool.poetry.dependencies]
-python = "^3.9"
+python = "^3.10"
 boto3 = "1.16.60"
 pymongo = "3.11.2"
 dnspython = "2.1.0"
