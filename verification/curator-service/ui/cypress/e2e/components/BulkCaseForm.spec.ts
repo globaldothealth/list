@@ -62,7 +62,7 @@ describe('Bulk upload form', function () {
         cy.contains('VERIFIED');
 
         // Demographics
-        cy.contains('41-45');
+        cy.contains('41 - 45');
         cy.contains('Male');
         cy.contains('Accountant');
         cy.contains('Bangladeshi');
