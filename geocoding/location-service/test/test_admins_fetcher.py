@@ -1,15 +1,17 @@
+import os
 import unittest
 from mock import patch
-from pymongo_inmemory import MongoClient
+from pymongo import MongoClient
 
 from src.app.admins_fetcher import AdminsFetcher
 from src.app.geocoder import Geocoder
 
-
+@unittest.skipIf(not os.environ.get("DOCKERIZED", False),
+                 "Skipping outside dockerized environment")
 class TestAdminsFetcher(unittest.TestCase):
 
     def setUp(self):
-        self.mongo = MongoClient()
+        self.mongo = MongoClient(host="mongo")
         self.db = self.mongo['testdb']
         self.fetcher = AdminsFetcher('token', self.db)
 

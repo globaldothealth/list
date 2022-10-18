@@ -215,14 +215,6 @@ optional = false
 python-versions = "*"
 
 [[package]]
-name = "lru-dict"
-version = "1.1.7"
-description = "An Dict like LRU container."
-category = "main"
-optional = false
-python-versions = "*"
-
-[[package]]
 name = "mapbox"
 version = "0.18.1"
 description = "A Python client for Mapbox services"
@@ -329,17 +321,6 @@ snappy = ["python-snappy"]
 srv = ["dnspython (>=1.16.0,<1.17.0)"]
 tls = ["ipaddress"]
 zstd = ["zstandard"]
-
-[[package]]
-name = "pymongo-inmemory"
-version = "0.2.0"
-description = "A mongo mocking library with an ephemeral MongoDB running in memory."
-category = "dev"
-optional = false
-python-versions = ">=3.4,<4.0"
-
-[package.dependencies]
-pymongo = "*"
 
 [[package]]
 name = "pyparsing"
@@ -507,7 +488,7 @@ locale = ["Babel (>=1.3)"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.10"
-content-hash = "67a3970d50649429ca118d69e0244ea771ce2dcc0b94f4c90ac236c105fecd34"
+content-hash = "5781db784a44257a48447d4024dd9ec5367255a3d200ea821d0a3e28580d5e26"
 
 [metadata.files]
 attrs = [
@@ -586,9 +567,6 @@ jmespath = [
 ]
 json_schema = [
     {file = "json_schema-0.3.tar.gz", hash = "sha256:a164efbb405f535615e58aff191b55fbfdad61d2ff0e7bfce6acf086358ca4b3"},
-]
-lru-dict = [
-    {file = "lru-dict-1.1.7.tar.gz", hash = "sha256:45b81f67d75341d4433abade799a47e9c42a9e22a118531dcb5e549864032d7c"},
 ]
 mapbox = [
     {file = "mapbox-0.18.1-py2.py3-none-any.whl", hash = "sha256:e61be76f1594c0851ec2b7c1d713d4ae8a9c07bada5fa3648ffd718b908b470b"},
@@ -762,10 +740,6 @@ pymongo = [
     {file = "pymongo-3.11.3-cp39-cp39-win32.whl", hash = "sha256:f6748c447feeadda059719ef5ab1fb9d84bd370e205b20049a0e8b45ef4ad593"},
     {file = "pymongo-3.11.3-cp39-cp39-win_amd64.whl", hash = "sha256:ee42a8f850143ae7c67ea09a183a6a4ad8d053e1dbd9a1134e21a7b5c1bc6c73"},
     {file = "pymongo-3.11.3.tar.gz", hash = "sha256:db5098587f58fbf8582d9bda2462762b367207246d3e19623782fb449c3c5fcc"},
-]
-pymongo-inmemory = [
-    {file = "pymongo_inmemory-0.2.0-py3-none-any.whl", hash = "sha256:4340f3a6264bab787aaf7846842bd20e805f10eb1c42f7e24a90c17acf800d71"},
-    {file = "pymongo_inmemory-0.2.0.tar.gz", hash = "sha256:c132829edf02d532033e4dc64f4626ba658332916cfb69997e92ef522a66f768"},
 ]
 pyparsing = [
     {file = "pyparsing-2.4.7-py2.py3-none-any.whl", hash = "sha256:ef9d7589ef3c200abe66653d3f1ab1033c3c419ae9b9bdb1240a85b024efc88b"},

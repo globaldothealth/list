@@ -1,8 +1,8 @@
 import json
 import logging
+import functools
 
 import ratelimiter
-from lru import LRU
 
 from src.integration.mapbox_client import mapbox_tile_query
 
@@ -12,18 +12,16 @@ class AdminsFetcher:
         self.rate_limit = ratelimiter.RateLimiter(max_calls=rate_limit, period=60)
         self.access_token = access_token
         self.admins = db.get_collection('admins')
-        self.cache = LRU(500)
+
+    @functools.lru_cache(maxsize=500)
+    def cached_mapbox_tile_query(self, geocode_geometry):
+        return mapbox_tile_query(self.access_token, json.loads(geocode_geometry), rate_limit=self.rate_limit)
 
     def fill_admins(self, geocode):
         if 'administrativeAreaLevel1' in geocode and \
             'administrativeAreaLevel2' in geocode and 'administrativeAreaLevel3' in geocode:
             return geocode
-        cacheKey = json.dumps(geocode)
-        if cacheKey in self.cache:
-            response = self.cache[cacheKey]
-        else:
-            response = mapbox_tile_query(self.access_token, geocode['geometry'], rate_limit=self.rate_limit)
-            self.cache[cacheKey] = response
+        response = self.cached_mapbox_tile_query(json.dumps(geocode['geometry']))
         if 'features' not in response:
             # probably your API key doesn't support the premium APIs, skip this step
             return geocode
