@@ -3,8 +3,8 @@ import json
 import logging
 import ratelimiter
 import sys
+import functools
 
-from lru import LRU
 
 from src.integration.mapbox_client import mapbox_geocode
 
@@ -25,7 +25,6 @@ class Geocoder:
         """Needs a mapbox API token."""
         self.rate_limit = ratelimiter.RateLimiter(max_calls=rate_limit, period=60)
         self.api_token = api_token
-        self.cache = LRU(500)
         self.admins_fetcher = admins_fetcher
 
     def resolutionToMapboxType(self, resolution):
@@ -114,17 +113,21 @@ class Geocoder:
         self.admins_fetcher.fill_admins(res)
         return res
 
+    @functools.lru_cache(500)
+    def cached_mapbox_geocode(self, query: str, options: str):
+        options = json.loads(options)
+        limit_resolution = options.get("limitToResolution", [])
+        limit_country = options.get("limitToCountry")
+        types = [self.resolutionToMapboxType(i) for i in limit_resolution] if limit_resolution else None
+        geoResult = mapbox_geocode(
+            self.api_token,
+            json.loads(query),
+            types=types, limit=5,
+            languages=['en'],
+            country=limit_country,
+            rate_limit=self.rate_limit
+        )
+        return [self.unpackGeoJson(feature) for feature in geoResult['features']]
+
     def geocode(self, query, options={}):
-        cacheKey = json.dumps({
-            'query': query.lower(),
-            'options': options
-        })
-        if cacheKey in self.cache:
-            return self.cache[cacheKey]
-        resolutions = options.get('limitToResolution', [])
-        types = [self.resolutionToMapboxType(i) for i in resolutions] if resolutions else None
-        countries = options.get('limitToCountry')
-        geoResult = mapbox_geocode(self.api_token, query, types=types, limit=5, languages=['en'], country=countries, rate_limit=self.rate_limit)
-        response = [self.unpackGeoJson(feature) for feature in geoResult['features']]
-        self.cache[cacheKey] = response
-        return response
+        return self.cached_mapbox_geocode(json.dumps(query), json.dumps(options))
