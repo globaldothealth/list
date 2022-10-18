@@ -39,5 +39,5 @@ export const parseAgeRange = (range?: {
     }
     return range.start === range.end
         ? `${range.start}`
-        : `${range.start}-${range.end}`;
+        : `${range.start} - ${range.end}`;
 };
