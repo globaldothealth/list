@@ -1,5 +1,5 @@
 # Dev docker file for curator UI.
-FROM node:14.17.1
+FROM node:16.18.0
 
 WORKDIR /usr/src/app/verification/curator-service/ui
 # Install app dependencies

@@ -1,5 +1,5 @@
 # Dev docker file for curator service.
-FROM node:16.14.2
+FROM node:16.18.0
 
 # set the version (this should be set from outside)
 ARG CURATOR_VERSION
