@@ -58,7 +58,7 @@ it('loads and displays case', async () => {
     expect(getByText('2020-04-13')).toBeInTheDocument();
     // Demographics.
     expect(getByText('Non-binary/Third gender')).toBeInTheDocument();
-    expect(getByText('50-59')).toBeInTheDocument();
+    expect(getByText('50 - 59')).toBeInTheDocument();
     expect(getByText('Horse breeder')).toBeInTheDocument();
     expect(getByText('Swedish')).toBeInTheDocument();
     expect(getByText('Asian')).toBeInTheDocument();

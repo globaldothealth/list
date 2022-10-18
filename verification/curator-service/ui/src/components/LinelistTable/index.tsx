@@ -18,7 +18,6 @@ import {
     selectTotalCases,
     selectRowsPerPage,
     selectSort,
-    selectSearchQuery,
     selectExcludeCasesDialogOpen,
     selectCasesSelected,
     selectDeleteCasesDialogOpen,
@@ -45,10 +44,10 @@ import Button from '@mui/material/Button';
 
 import { nameCountry } from '../util/countryNames';
 import renderDate, { renderDateRange } from '../util/date';
-import { createData, labels, parseAge } from './helperFunctions';
+import { createData, labels } from './helperFunctions';
 import { LoaderContainer, StyledAlert } from './styled';
 import { URLToSearchQuery } from '../util/searchQuery';
-import { hasAnyRole } from '../util/helperFunctions';
+import { hasAnyRole, parseAgeRange } from '../util/helperFunctions';
 import { Helmet } from 'react-helmet';
 
 import Pagination from './Pagination';
@@ -80,7 +79,6 @@ const LinelistTable = () => {
     const error = useAppSelector(selectError);
     const rowsPerPage = useAppSelector(selectRowsPerPage);
     const sort = useAppSelector(selectSort);
-    const searchQuery = useAppSelector(selectSearchQuery);
     const user = useAppSelector(selectUser);
     const excludeCasesDialogOpen = useAppSelector(selectExcludeCasesDialogOpen);
     const casesSelected = useAppSelector(selectCasesSelected);
@@ -90,6 +88,8 @@ const LinelistTable = () => {
     );
     const refetchData = useAppSelector(selectRefetchData);
     const rowsAcrossPagesSelected = useAppSelector(selectRowsAcrossPages);
+
+    const searchQuery = location.search;
 
     // Build query and fetch data
     useEffect(() => {
@@ -130,10 +130,7 @@ const LinelistTable = () => {
                 parseFloat(data.location?.geometry.latitude.toFixed(4)) || 0,
                 parseFloat(data.location?.geometry.longitude.toFixed(4)) || 0,
                 data.demographics?.nationalities || '',
-                parseAge(
-                    data.demographics?.ageRange?.start,
-                    data.demographics?.ageRange?.end,
-                ),
+                parseAgeRange(data.demographics?.ageRange),
                 data.demographics?.gender || '',
                 data.importedCase?.outcome ||
                     data.events?.find((event) => event.name === 'outcome')

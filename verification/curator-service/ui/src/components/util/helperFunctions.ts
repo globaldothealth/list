@@ -29,3 +29,15 @@ export const hasAnyRole = (
     }
     return user?.roles?.some((r: string) => requiredRoles.includes(r));
 };
+
+export const parseAgeRange = (range?: {
+    start: number;
+    end: number;
+}): string => {
+    if (!range) {
+        return '';
+    }
+    return range.start === range.end
+        ? `${range.start}`
+        : `${range.start} - ${range.end}`;
+};

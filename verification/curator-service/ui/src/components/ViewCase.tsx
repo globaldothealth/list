@@ -28,6 +28,7 @@ import { selectFilterBreadcrumbs } from '../redux/app/selectors';
 import { selectSearchQuery } from '../redux/linelistTable/selectors';
 import Chip from '@mui/material/Chip';
 import { nameCountry } from './util/countryNames';
+import { parseAgeRange } from './util/helperFunctions';
 
 const styles = makeStyles((theme) => ({
     errorMessage: {
@@ -127,15 +128,6 @@ const useStyles = makeStyles((theme) => ({
         marginRight: '8px',
     },
 }));
-
-function ageRange(range?: { start: number; end: number }): string {
-    if (!range) {
-        return '';
-    }
-    return range.start === range.end
-        ? `${range.start}`
-        : `${range.start}-${range.end}`;
-}
 
 function CaseDetails(props: CaseDetailsProps): JSX.Element {
     const theme = useTheme();
@@ -386,7 +378,9 @@ function CaseDetails(props: CaseDetailsProps): JSX.Element {
                     <Grid container className={classes.grid}>
                         <RowHeader title="Age" />
                         <RowContent
-                            content={ageRange(props.c.demographics?.ageRange)}
+                            content={parseAgeRange(
+                                props.c.demographics?.ageRange,
+                            )}
                         />
 
                         <RowHeader title="Gender" />

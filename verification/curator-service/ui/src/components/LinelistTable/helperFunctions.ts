@@ -57,13 +57,3 @@ export const createData = (
         exclusionData,
     };
 };
-
-export const parseAge = (
-    ageStart: number | undefined,
-    ageEnd: number | undefined,
-) => {
-    if (!ageStart || !ageEnd) return '';
-    if (ageStart === ageEnd) return ageStart?.toString() ?? '';
-
-    return `${ageStart} - ${ageEnd}`;
-};
