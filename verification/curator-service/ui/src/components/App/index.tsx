@@ -194,6 +194,8 @@ function ProfileMenu(props: { user: User; version: string }): JSX.Element {
                 <MenuItem
                     onClick={() => {
                         dispatch(logout());
+                        // remove previous search query from local storage
+                        localStorage.removeItem('searchQuery');
                     }}
                     className={classes.link}
                 >
