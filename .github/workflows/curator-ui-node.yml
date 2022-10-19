@@ -5,7 +5,7 @@ name: Curator UI Node.js CI
 
 on:
   push:
-    branches: [main, '*-stable']
+    branches: [main]
     paths:
       - ".github/workflows/curator-ui-node.yml"
       - "verification/curator-service/ui/**"
