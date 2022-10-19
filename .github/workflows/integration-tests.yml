@@ -28,7 +28,7 @@ jobs:
     name: Cypress tests on ${{ matrix.browser }}
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Build stack
         run: docker-compose -f dev/docker-compose.yml -f dev/docker-compose.ci.yml up --build -d -V
       - uses: cypress-io/github-action@v4
