@@ -1,0 +1,26 @@
+name: Migrate QA database schema
+
+on:
+  push:
+    tags:
+      - '*'
+  workflow_dispatch:
+
+jobs:
+  update-sources-data:
+    runs-on: ubuntu-20.04
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v1
+        with:
+          node-version: "16.x"
+      
+      - name: Migrate QA database
+        env:
+          CONN: ${{ secrets.DB_CONNECTION_URL_QA }}
+          DB: "covid19"
+        run: npm --prefix data-serving/scripts/setup-db run migrate
