@@ -2,7 +2,7 @@ name: Aggregate CI
 
 on:
   push:
-    branches: [main, '*-stable']
+    branches: [main]
     paths:
     - '.github/workflows/aggregate-ci.yml'
     - 'data-serving/scripts/aggregate-covid19/aggregate/**'

@@ -2,7 +2,7 @@ name: Ingestion functions deploy
 
 on:
   push:
-    branches: [main, '*-stable']
+    branches: [main]
     paths:
     - '.github/workflows/ingestion-functions-deploy.yml'
     - 'ingestion/functions/**'
@@ -29,7 +29,6 @@ jobs:
       uses: aws-actions/amazon-ecr-login@v1
 
     - name: Build, tag, and push image to Amazon ECR (latest)
-      if: ${{ contains(github.ref, 'main') }}
       working-directory: ingestion/functions
       env:
         NOTIFY_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_METRICS_URL }}
@@ -41,17 +40,3 @@ jobs:
         docker build --build-arg NOTIFY_WEBHOOK_URL -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG -t $ECR_REGISTRY/$ECR_REPOSITORY .
         docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
         docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
-
-    - name: Build, tag, and push image to Amazon ECR (stable)
-      if: ${{ endsWith(github.ref, '-stable') }}
-      working-directory: ingestion/functions
-      env:
-        NOTIFY_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_METRICS_URL }}
-        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-        ECR_REPOSITORY: gdh-ingestor
-        IMAGE_TAG: ${{ github.sha }}
-        SLACK_LOGS_WEBHOOK: ${{ secrets.SLACK_WEBHOOK_INGESTION_LOGS_TEST }}
-      run: |
-        docker build --build-arg NOTIFY_WEBHOOK_URL -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG -t $ECR_REGISTRY/$ECR_REPOSITORY:stable .
-        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-        docker push $ECR_REGISTRY/$ECR_REPOSITORY:stable

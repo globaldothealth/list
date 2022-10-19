@@ -2,7 +2,7 @@ name: Re-usable Data Service Python CI
 
 on:
   push:
-    branches: [main, '*-stable']
+    branches: [main]
     paths:
     - '.github/workflows/reusable-data-service-ci.yml'
     - 'data-serving/reusable-data-service/**'
