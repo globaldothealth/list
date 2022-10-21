@@ -82,7 +82,7 @@ export default class CasesController {
         try {
             const user = req.user as IUser;
             const result = await users().findOneAndUpdate(
-                { _id: new ObjectId(user._id) },
+                { _id: new ObjectId(user.id) },
                 {
                     $push: {
                         downloads: {
@@ -93,10 +93,7 @@ export default class CasesController {
                     },
                 },
             );
-            this.logOutcomeOfAppendingDownloadToUser(
-                user._id.toHexString(),
-                result,
-            );
+            this.logOutcomeOfAppendingDownloadToUser(user.id, result);
 
             axios({
                 method: 'post',
@@ -152,7 +149,7 @@ export default class CasesController {
             );
             const result = await users().findOneAndUpdate(
                 {
-                    _id: new ObjectId(user._id),
+                    _id: new ObjectId(user.id),
                 },
                 {
                     $push: {
@@ -165,10 +162,7 @@ export default class CasesController {
                 },
             );
 
-            this.logOutcomeOfAppendingDownloadToUser(
-                user._id.toHexString(),
-                result,
-            );
+            this.logOutcomeOfAppendingDownloadToUser(user.id, result);
 
             axios({
                 method: 'post',
@@ -227,7 +221,7 @@ export default class CasesController {
             });
 
             const result = await users().findOneAndUpdate(
-                { _id: new ObjectId(user._id) },
+                { _id: new ObjectId(user.id) },
                 {
                     $push: {
                         downloads: {
@@ -236,10 +230,7 @@ export default class CasesController {
                     },
                 },
             );
-            this.logOutcomeOfAppendingDownloadToUser(
-                user._id.toHexString(),
-                result,
-            );
+            this.logOutcomeOfAppendingDownloadToUser(user.id, result);
 
             res.status(200).send({ signedUrl });
         } catch (err) {
@@ -278,7 +269,7 @@ export default class CasesController {
             });
 
             const result = await users().findOneAndUpdate(
-                { _id: new ObjectId(user._id) },
+                { _id: new ObjectId(user.id) },
                 {
                     $push: {
                         downloads: {
@@ -289,10 +280,7 @@ export default class CasesController {
                     },
                 },
             );
-            this.logOutcomeOfAppendingDownloadToUser(
-                user._id.toHexString(),
-                result,
-            );
+            this.logOutcomeOfAppendingDownloadToUser(user.id, result);
 
             res.status(200).send({ signedUrl });
         } catch (err) {
