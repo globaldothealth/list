@@ -1,0 +1,23 @@
+name: Manual migration helpers CI
+
+on:
+  push:
+    branches: [main]
+    paths:
+    - '.github/workflows/manual-migration-helpers.yml'
+    - 'data-serving/scripts/setup-db/manual-migration-helpers/**'
+    - '!data-serving/scripts/setup-db/manual-migration-helpers/README.md'
+  pull_request:
+    paths:
+    - '.github/workflows/manual-migration-helpers.yml'
+    - 'data-serving/scripts/setup-db/manual-migration-helpers/**'
+    - '!data-serving/scripts/setup-db/manual-migration-helpers/README.md'
+
+jobs:
+  ci:
+    runs-on: ubuntu-20.04
+    steps:
+    - uses: actions/checkout@v3
+    - name: Test with docker
+      working-directory: data-serving/scripts/setup-db/manual-migration-helpers
+      run: ./test.sh
