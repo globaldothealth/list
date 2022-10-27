@@ -52,7 +52,7 @@ const Header = () => {
 
     return (
         <Stack direction="row" spacing={3} alignItems="center">
-            <Typography variant="body1">{diseaseName} Linelist</Typography>
+            <Typography variant="inherit">{diseaseName} Linelist</Typography>
 
             <FormControl sx={{ minWidth: 200 }} variant="standard" size="small">
                 <InputLabel id="sort-by-select-label">Sort by</InputLabel>

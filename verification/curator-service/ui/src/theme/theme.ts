@@ -73,7 +73,7 @@ export const theme = createTheme({
         },
     },
     typography: {
-        fontFamily: 'Mabry Pro, sans-serif',
+        fontFamily: 'Inter, sans-serif',
         fontSize: 14,
     },
     shape: {
@@ -118,7 +118,26 @@ export const theme = createTheme({
                     },
                     '&&& .MuiTypography-root': {
                         fontFamily: 'Inter',
-                        fontSize: '14px',
+                    },
+                },
+            },
+        },
+        MuiPaper: {
+            styleOverrides: {
+                root: {
+                    fontFamily: 'Inter',
+                    '&&& .MuiTypography-root': {
+                        fontFamily: 'Inter',
+                    },
+                },
+            },
+        },
+        MuiTypography: {
+            styleOverrides: {
+                root: {
+                    fontFamily: 'Inter',
+                    '&&& .MuiTypography-root': {
+                        fontFamily: 'Inter',
                     },
                 },
             },
