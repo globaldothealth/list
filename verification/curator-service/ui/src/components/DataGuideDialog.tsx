@@ -40,6 +40,7 @@ const styles = (theme: Theme) =>
             cursor: 'pointer',
         },
         title: {
+            fontFamily: 'Inter',
             fontSize: 22,
             fontWeight: 'bold',
         },
@@ -60,6 +61,7 @@ const styles = (theme: Theme) =>
             },
         },
         textSection: {
+            fontFamily: 'Inter',
             marginBottom: '1rem',
         },
     });

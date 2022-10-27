@@ -94,6 +94,7 @@ const useStyles = makeStyles((theme) => ({
     },
     caseTitle: {
         marginTop: '1em',
+        fontFamily: 'Inter',
     },
     grid: {
         margin: '1em',
@@ -848,7 +849,7 @@ function RowContent(props: { content: string; isLink?: boolean }): JSX.Element {
     words(searchQuery);
 
     return (
-        <Grid item xs={8}>
+        <Grid item xs={8} style={{ fontSize: 14 }}>
             {props.isLink && props.content ? (
                 <a
                     href={createHref(props.content)}
@@ -880,7 +881,7 @@ function MultilinkRowContent(props: {
     links?: { title: string; link: string }[];
 }): JSX.Element {
     return (
-        <Grid item xs={8}>
+        <Grid item xs={8} style={{ fontSize: 14 }}>
             {props.links?.map((e) => (
                 <p key={e.title} style={{ margin: 0 }}>
                     <a
