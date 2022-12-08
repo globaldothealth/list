@@ -10,7 +10,7 @@ python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
 dev = ["coverage[toml] (>=5.0.2)", "furo", "hypothesis", "pre-commit", "pympler", "pytest (>=4.3.0)", "six", "sphinx", "zope.interface"]
 docs = ["furo", "sphinx", "zope.interface"]
 tests = ["coverage[toml] (>=5.0.2)", "hypothesis", "pympler", "pytest (>=4.3.0)", "six", "zope.interface"]
-tests_no_zope = ["coverage[toml] (>=5.0.2)", "hypothesis", "pympler", "pytest (>=4.3.0)", "six"]
+tests-no-zope = ["coverage[toml] (>=5.0.2)", "hypothesis", "pympler", "pytest (>=4.3.0)", "six"]
 
 [[package]]
 name = "boto3"
@@ -59,11 +59,11 @@ redis = ["redis (>=2.10.5)"]
 
 [[package]]
 name = "certifi"
-version = "2020.12.5"
+version = "2022.12.7"
 description = "Python package for providing Mozilla's CA Bundle."
 category = "main"
 optional = false
-python-versions = "*"
+python-versions = ">=3.6"
 
 [[package]]
 name = "chardet"
@@ -488,7 +488,7 @@ locale = ["Babel (>=1.3)"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.10"
-content-hash = "5781db784a44257a48447d4024dd9ec5367255a3d200ea821d0a3e28580d5e26"
+content-hash = "3217eb695b82351b7c1cd0693c70bc6d3087e6ce8b6c89e43640ac53c1717616"
 
 [metadata.files]
 attrs = [
@@ -508,8 +508,8 @@ CacheControl = [
     {file = "CacheControl-0.12.6.tar.gz", hash = "sha256:be9aa45477a134aee56c8fac518627e1154df063e85f67d4f83ce0ccc23688e8"},
 ]
 certifi = [
-    {file = "certifi-2020.12.5-py2.py3-none-any.whl", hash = "sha256:719a74fb9e33b9bd44cc7f3a8d94bc35e4049deebe19ba7d8e108280cfd59830"},
-    {file = "certifi-2020.12.5.tar.gz", hash = "sha256:1a4995114262bffbc2413b159f2a1a480c969de6e6eb13ee966d470af86af59c"},
+    {file = "certifi-2022.12.7-py3-none-any.whl", hash = "sha256:4ad3232f5e926d6718ec31cfc1fcadfde020920e278684144551c91769c7bc18"},
+    {file = "certifi-2022.12.7.tar.gz", hash = "sha256:35824b4c3a97115964b408844d64aa14db1cc518f6562e8d7261699d1350a9e3"},
 ]
 chardet = [
     {file = "chardet-4.0.0-py2.py3-none-any.whl", hash = "sha256:f864054d66fd9118f2e67044ac8981a54775ec5b67aed0441892edb553d21da5"},
