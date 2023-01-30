@@ -1,13 +1,11 @@
-Report Date,Case Status,Sex,Age group,DHB,Overseas travel,Historical
-2021-01-11,Confirmed,Male,40 to 49,Managed Isolation & Quarantine,Yes,
-2021-01-11,Confirmed,Female,40 to 49,Managed Isolation & Quarantine,Yes,
-2021-01-11,Confirmed,Male,20 to 29,Managed Isolation & Quarantine,Yes,
-2021-01-11,Confirmed,Female,10 to 19,Managed Isolation & Quarantine,Yes,
-2021-01-10,Confirmed,Male,30 to 39,Managed Isolation & Quarantine,Yes,
-2021-01-10,Confirmed,Male,0 to 9,Managed Isolation & Quarantine,Yes,
-2021-01-10,Confirmed,Male,30 to 39,Managed Isolation & Quarantine,Yes,
-2021-01-10,Confirmed,Male,20 to 29,Managed Isolation & Quarantine,Yes,
-2021-05-05,Confirmed,Female,90+,Bay of Plenty,Yes,
-2021-05-06,Confirmed,Female,20 to 29,West Coast,No,
-2021-07-01,Confirmed,Unknown,NA,West Coast,No,
-2021-07-01,Confirmed,Unknown,Unknown,West Coast,No,
+Report Date,Case Status,Sex,Age group,District,Overseas travel,Infection status,Number of cases reported
+2021-11-01,Confirmed,Male,40 to 49,At the border,Yes,First,1
+2021-11-01,Confirmed,Female,40 to 49,At the border,Yes,First,1
+2021-11-01,Confirmed,Male,20 to 29,At the border,Yes,First,1
+2021-11-01,Confirmed,Female,10 to 19,At the border,Yes,First,1
+2021-10-01,Confirmed,Male,30 to 39,At the border,Yes,First,1
+2021-10-01,Confirmed,Male,0 to 9,At the border,Yes,First,1
+2021-10-01,Confirmed,Male,30 to 39,At the border,Yes,First,1
+2021-10-01,Confirmed,Male,20 to 29,At the border,Yes,First,1
+2021-05-05,Confirmed,Female,90 to 120,Bay of Plenty,Yes,First,1
+2021-06-05,Confirmed,Female,20 to 29,West Coast,,First,3
