@@ -20,19 +20,22 @@ except ImportError:
 _NZ = parsing_lib.geocode_country('NZ')
 _NZ["country"] = "New Zealand"
 
-_DHB = "DHB"
 _REPORT_DATE = "Report Date"
 _STATUS = "Case Status"
 _GENDER = "Sex"
 _AGE = "Age group"
+_DISTRICT = "District"
 _TRAVEL = "Overseas travel"
+_INFECTION_STATUS = "Infection status"
+_NUMBER_OF_CASES_IN_LINE = "Number of cases reported"
 
 # Geocode data © OpenStreetMap contributors https://www.openstreetmap.org/copyright
 
 # New Zealand data is organised by District Health Boards (DHBs) which are
 # mostly similar to the regions (admin1 for NZ), but do not overlap in some
 # cases. The mapping has been done manually via centroids or a city or town
-# in the region.
+# in the region. NOTE that DHBs appear to have been replaced with District in
+# the latest data downloads.
 with (Path(__file__).parent / 'geocodes.json').open() as geof:
     _GEOCODES = json.load(geof)
 _GEOCODES = {
@@ -54,7 +57,7 @@ def convert_date(raw_date: str):
 
 
 def convert_location(raw_entry):
-    dhb = raw_entry[_DHB]
+    dhb = raw_entry[_DISTRICT]
     return _GEOCODES.get(dhb) or _NZ
 
 
@@ -80,61 +83,67 @@ def parse_cases(raw_data_file, source_id, source_url):
     """
     Parses G.h-format case data from raw API data.
 
-    New Zealand case data has no UUIDs, and provides just 6 fields:
+    New Zealand case data has no UUIDs, and provides 8 fields:
 
+    Report Date -
+    Case Status - (confirmed/probable), we take only confirmed
+    Sex -
     Age group - we convert 90+ to ageRange of 90 - 120
-    Case Status - (confirmed/suspected), we take only confirmed
-    DHB (where the case lives - listed as "Managed isolation & quarantine" for border cases)
-    Overseas Travel - boolean, no details on where. We assume this means travel in last 30 days.
-    Report Date
-    Sex
+    District -
+    Overseas Travel - boolean, no details on where. We assume this means travel
+        in last 30 days.
+    Infection status -
+    Number of cases reported - We loop over this field to yield one entry per
+        case.
 
     We only count cases with a Report Date and with Status=Confirmed
 
-    Cases arriving to NZ from 'Overseas' are geocoded generically to 'New Zealand'. Cases arising in NZ should
-    have health board data (equivalent to admin1)
+    Cases arriving to NZ from 'Overseas' are geocoded generically to
+        'New Zealand'. Cases arising in NZ should have health board data
+        (equivalent to admin1)
     """
 
     with open(raw_data_file, "r") as f:
         reader = csv.DictReader(f)
         cases = []
         for entry in reader:
-             if entry[_STATUS] == 'Confirmed' and entry[_REPORT_DATE]:
-                notes = []
-                case = {
-                    "caseReference": {
-                        "sourceId": source_id,
-                        "sourceUrl": source_url
-                    },
-                    "location": convert_location(entry),
-                    "demographics": convert_demographics(entry),
-                    "events": [
-                        {
-                            "name": "confirmed",
-                            "dateRange":
-                            {
-                                "start": convert_date(entry[_REPORT_DATE]),
-                                "end": convert_date(entry[_REPORT_DATE])
-                            }
+            if entry[_STATUS] == 'Confirmed' and entry[_REPORT_DATE]:
+                for _ in range(int(entry[_NUMBER_OF_CASES_IN_LINE])):
+                    notes = []
+                    case = {
+                        "caseReference": {
+                            "sourceId": source_id,
+                            "sourceUrl": source_url
                         },
-                    ]
-                }
-                if case["demographics"] is None:
-                    del case["demographics"]
-                if entry[_TRAVEL] == 'Yes':
-                    case["travelHistory"] = {
-                        "traveledPrior30Days": True
+                        "location": convert_location(entry),
+                        "demographics": convert_demographics(entry),
+                        "events": [
+                            {
+                                "name": "confirmed",
+                                "dateRange":
+                                {
+                                    "start": convert_date(entry[_REPORT_DATE]),
+                                    "end": convert_date(entry[_REPORT_DATE])
+                                }
+                            },
+                        ]
                     }
-                    notes.append('Case imported from abroad.')
+                    if case["demographics"] is None:
+                        del case["demographics"]
+                    if entry[_TRAVEL] == 'Yes':
+                        case["travelHistory"] = {
+                            "traveledPrior30Days": True
+                        }
+                        notes.append('Case imported from abroad.')
 
-                if 'Managed Isolation' in entry[_DHB]:
-                    notes.append(
-                        'Case identified at border and placed into managed quarantine.')
+                    if 'Managed Isolation' in entry[_DISTRICT]:
+                        notes.append(
+                            'Case identified at border and placed into managed quarantine.')
 
-                if notes:
-                    case["notes"] = " ".join(notes)
+                    if notes:
+                        case["notes"] = " ".join(notes)
 
-                yield case
+                    yield case
 
 
 
