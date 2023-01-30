@@ -135,9 +135,9 @@ def parse_cases(raw_data_file, source_id, source_url):
                         }
                         notes.append('Case imported from abroad.')
 
-                    if 'Managed Isolation' in entry[_DISTRICT]:
+                    if 'At the border' in entry[_DISTRICT]:
                         notes.append(
-                            'Case identified at border and placed into managed quarantine.')
+                            'Case identified at border.')
 
                     if notes:
                         case["notes"] = " ".join(notes)
