@@ -14,7 +14,7 @@ except ImportError:
     sys.path.append(
         os.path.join(
             os.path.dirname(os.path.abspath(__file__)),
-            os.pardir,os.pardir, 'common'))
+            os.pardir, os.pardir, 'common'))
     import parsing_lib
 
 _NZ = parsing_lib.geocode_country('NZ')
@@ -105,7 +105,6 @@ def parse_cases(raw_data_file, source_id, source_url):
 
     with open(raw_data_file, "r") as f:
         reader = csv.DictReader(f)
-        cases = []
         for entry in reader:
             if entry[_STATUS] == 'Confirmed' and entry[_REPORT_DATE]:
                 for _ in range(int(entry[_NUMBER_OF_CASES_IN_LINE])):
@@ -144,7 +143,6 @@ def parse_cases(raw_data_file, source_id, source_url):
                         case["notes"] = " ".join(notes)
 
                     yield case
-
 
 
 def event_handler(event):
