@@ -5,8 +5,8 @@ import boto3
 import requests
 
 
-LOCALSTACK_URL = environ.get("AWS_ENDPOINT", "http://localstack:4566")
-BATCH_READY = '"batch": "running"'
+LOCALSTACK_URL = environ.get("AWS_ENDPOINT", "https://localhost.localstack.cloud")
+BATCH_READY = '"batch": "available"'
 
 IAM_PROFILE_NAME = "ecsInstanceRole"
 IAM_PROFILE_ARN = "".join(["arn:aws:iam::000000000000:instance-profile/", "ecsInstanceRole"])
@@ -148,7 +148,8 @@ class LocalstackWrangler(object):
     def create_s3_bucket(self, bucket_name):
         print(f"Creating bucket {bucket_name}")
         self.s3_client.create_bucket(
-            Bucket=bucket_name
+            Bucket=bucket_name,
+            CreateBucketConfiguration={"LocationConstraint": "eu-central-1"}
         )
         print("Created bucket")
 

@@ -13,7 +13,7 @@ import docker
 import requests
 
 
-LOCALSTACK_URL = environ.get("AWS_ENDPOINT", "http://localstack:4566")
+LOCALSTACK_URL = environ.get("AWS_ENDPOINT", "https://localhost.localstack.cloud")
 AWS_REGION = environ.get("AWS_DEFAULT_REGION", "eu-central-1")
 AWS_ACCOUNT_ID = environ.get("AWS_ACCOUNT_ID", "000000000000")
 AWS_ACCESS_KEY_ID = environ.get("AWS_ACCESS_KEY_ID", "fake")

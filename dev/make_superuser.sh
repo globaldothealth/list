@@ -7,6 +7,10 @@ pushd `pwd`
 # We have to run docker-compose from this directory for it to pick up the .env file.
 cd `dirname "$0"`
 
+if ! type "docker-compose" > /dev/null; then
+	alias docker-compose='docker compose'
+fi
+
 # Tell us what database to use — default is covid19 but you can override it for other instances
 DB="${GDH_DATABASE:-covid19}"
 docker-compose -f docker-compose.yml -f docker-compose.dev.yml exec mongo mongo "${DB}" --eval "var email='$1'; var roles=['admin', 'curator'];" /verification/scripts/roles.js
