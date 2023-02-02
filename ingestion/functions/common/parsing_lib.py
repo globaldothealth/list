@@ -14,7 +14,10 @@ import requests
 import requests.exceptions
 import iso3166
 
-import common_lib
+try:
+    import common_lib
+except ModuleNotFoundError:
+    import common.common_lib as common_lib
 
 try:
     import common.ingestion_logging as logging
@@ -63,7 +66,7 @@ if os.environ.get("DOCKERIZED"):
         aws_access_key_id=os.environ.get("AWS_ACCESS_KEY_ID", "test"),
         aws_secret_access_key=os.environ.get("AWS_SECRET_ACCESS_KEY", "test"),
         region_name=os.environ.get("AWS_REGION", "eu-central-1")
-    )
+                             )
 
 
 def safe_int(x):
@@ -109,6 +112,7 @@ def retrieve_raw_data_file(s3_bucket: str, s3_key: str, out_file):
     try:
         logger.info(f"Retrieving raw data from s3://{s3_bucket}/{s3_key}")
         s3_client.download_fileobj(s3_bucket, s3_key, out_file)
+        out_file.seek(0)
     except Exception as e:
         common_lib.complete_with_error(e)
 
@@ -491,13 +495,17 @@ def run(
         retrieve_raw_data_file(s3_bucket, s3_key, local_data_file)
         logger.info(f"Raw file retrieved at {local_data_file_name}")
 
+        logger.info("Running parsing function...")
         case_data = parsing_function(
             local_data_file_name, source_id,
             source_url)
+        logger.info("Retrieving excluded case IDs...")
         excluded_case_ids = retrieve_excluded_case_ids(source_id, date_filter, date_range, env,
                                                        headers=api_creds, cookies=cookies)
+        logger.info("Preparing cases...")
         final_cases = prepare_cases(case_data, upload_id, excluded_case_ids)
 
+        logger.info("Writing to server...")
         count_created, count_updated, count_error = write_to_server(
             filter_cases_by_date(
                 final_cases,
@@ -510,6 +518,7 @@ def run(
             CASES_BATCH_SIZE)
 
         for _ in range(5):  # Maximum number of attempts to finalize upload
+            logger.info("Attempting to finalise upload...")
             status, text = common_lib.finalize_upload(
                 env, source_id, upload_id, api_creds, cookies, count_created,
                 count_updated, count_error
@@ -522,7 +531,7 @@ def run(
                 continue
             else:
                 raise RuntimeError(f"Error updating upload record, status={status}, response={text}")
-
+        logger.info(f"count_created={count_created}, count_updated={count_updated}")
         return {"count_created": count_created, "count_updated": count_updated}
     except Exception as e:
         common_lib.complete_with_error(
