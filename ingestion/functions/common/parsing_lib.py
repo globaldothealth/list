@@ -112,7 +112,7 @@ def retrieve_raw_data_file(s3_bucket: str, s3_key: str, out_file):
     try:
         logger.info(f"Retrieving raw data from s3://{s3_bucket}/{s3_key}")
         s3_client.download_fileobj(s3_bucket, s3_key, out_file)
-        out_file.seek(0)
+        out_file.flush()
     except Exception as e:
         common_lib.complete_with_error(e)
 

@@ -31,11 +31,7 @@ _NUMBER_OF_CASES_IN_LINE = "Number of cases reported"
 
 # Geocode data © OpenStreetMap contributors https://www.openstreetmap.org/copyright
 
-# New Zealand data is organised by District Health Boards (DHBs) which are
-# mostly similar to the regions (admin1 for NZ), but do not overlap in some
-# cases. The mapping has been done manually via centroids or a city or town
-# in the region. NOTE that DHBs appear to have been replaced with District in
-# the latest data downloads.
+# Regions are identified as 'District's in the source data
 with (Path(__file__).parent / 'geocodes.json').open() as geof:
     _GEOCODES = json.load(geof)
 _GEOCODES = {
@@ -57,8 +53,8 @@ def convert_date(raw_date: str):
 
 
 def convert_location(raw_entry):
-    dhb = raw_entry[_DISTRICT]
-    return _GEOCODES.get(dhb) or _NZ
+    district = raw_entry[_DISTRICT]
+    return _GEOCODES.get(district) or _NZ
 
 
 def convert_demographics(entry):
@@ -107,41 +103,41 @@ def parse_cases(raw_data_file, source_id, source_url):
         reader = csv.DictReader(f)
         for entry in reader:
             if entry[_STATUS] == 'Confirmed' and entry[_REPORT_DATE]:
-                for _ in range(int(entry[_NUMBER_OF_CASES_IN_LINE])):
-                    notes = []
-                    case = {
-                        "caseReference": {
-                            "sourceId": source_id,
-                            "sourceUrl": source_url
-                        },
-                        "location": convert_location(entry),
-                        "demographics": convert_demographics(entry),
-                        "events": [
+                notes = []
+                case = {
+                    "caseReference": {
+                        "sourceId": source_id,
+                        "sourceUrl": source_url
+                    },
+                    "location": convert_location(entry),
+                    "demographics": convert_demographics(entry),
+                    "events": [
+                        {
+                            "name": "confirmed",
+                            "dateRange":
                             {
-                                "name": "confirmed",
-                                "dateRange":
-                                {
-                                    "start": convert_date(entry[_REPORT_DATE]),
-                                    "end": convert_date(entry[_REPORT_DATE])
-                                }
-                            },
-                        ]
+                                "start": convert_date(entry[_REPORT_DATE]),
+                                "end": convert_date(entry[_REPORT_DATE])
+                            }
+                        },
+                    ]
+                }
+                if case["demographics"] is None:
+                    del case["demographics"]
+                if entry[_TRAVEL] == 'Yes':
+                    case["travelHistory"] = {
+                        "traveledPrior30Days": True
                     }
-                    if case["demographics"] is None:
-                        del case["demographics"]
-                    if entry[_TRAVEL] == 'Yes':
-                        case["travelHistory"] = {
-                            "traveledPrior30Days": True
-                        }
-                        notes.append('Case imported from abroad.')
+                    notes.append('Case imported from abroad.')
 
-                    if 'At the border' in entry[_DISTRICT]:
-                        notes.append(
-                            'Case identified at border.')
+                if 'At the border' in entry[_DISTRICT]:
+                    notes.append(
+                        'Case identified at border.')
 
-                    if notes:
-                        case["notes"] = " ".join(notes)
+                if notes:
+                    case["notes"] = " ".join(notes)
 
+                for _ in range(int(entry[_NUMBER_OF_CASES_IN_LINE])):
                     yield case
 
 
