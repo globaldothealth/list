@@ -129,14 +129,48 @@ def raw_content(url: str, content: bytes, tempdir: str = TEMP_PATH) -> io.BytesI
     return io.BytesIO(content)
 
 
-def retrieve_content(
-        env, source_id, upload_id, url, source_format, api_headers, cookies, chunk_bytes=CSV_CHUNK_BYTES, tempdir=TEMP_PATH):
+def raw_content_fileconvert(url: str, local_filename: str, tempdir: str = TEMP_PATH) -> str:
+    """Convert file to UTF-8 (and decompress) as needed
+
+    Whereas raw_content takes a binary stream as input, this function takes a
+    a filename on the local system and returns another filename"""
+    # Detect the mimetype of a given URL.
+    logger.info(f"Guessing mimetype of {url}")
+    mimetype, _ = mimetypes.guess_type(url)
+    if mimetype == "application/zip":
+        logger.info("File seems to be a zip file, decompressing it now")
+        # Writing the zip file to temp dir.
+        with tempfile.NamedTemporaryFile(dir=tempdir, delete=False) as f, \
+             os.fdopen(local_filename, 'rb') as infile:
+            while content := infile.read(READ_CHUNK_BYTES):
+                f.write(content)
+            f.flush()
+        with tempfile.TemporaryDirectory(dir=tempdir) as xf:
+            # extract into temporary folder using unzip
+            try:
+                subprocess.run(["/usr/bin/unzip", "-d", xf, f.name], check=True)
+                largest_file = max(
+                    ((f, f.stat().st_size) for f in Path(xf).iterdir()
+                     if f.is_file()),
+                    key=operator.itemgetter(1)
+                )[0]
+                return largest_file.open("rb")
+            except subprocess.CalledProcessError as e:
+                raise ValueError(f"Error in extracting zip file with exception:\n{e}")
+        Path(f.name).unlink(missing_ok=True)
+    elif not mimetype:
+        logger.warning("Could not determine mimetype")
+    return local_filename
+
+
+def retrieve_content(env, source_id, upload_id, url, source_format,
+                     api_headers, cookies, chunk_bytes=CSV_CHUNK_BYTES,
+                     tempdir=TEMP_PATH):
     """ Retrieves and locally persists the content at the provided URL. """
     try:
-        if (
-            source_format != "JSON"
+        if (source_format != "JSON"
             and source_format != "CSV"
-            and source_format != "XLSX"):
+             and source_format != "XLSX"):
             e = ValueError(f"Unsupported source format: {source_format}")
             common_lib.complete_with_error(
                 e, env, common_lib.UploadError.SOURCE_CONFIGURATION_ERROR,
@@ -148,12 +182,18 @@ def retrieve_content(
             # split at the first /
             [s3Bucket, s3Key] = s3Location.split('/', 1)
             # get it!
-            content = s3_client.get_object(Bucket=s3Bucket, Key=s3Key)['Body'].read()
+            _, local_filename = tempfile.mkstemp(dir=tempdir)
+            s3_client.download_file(s3Bucket, s3Key, local_filename)
         else:
             headers = {"user-agent": "GHDSI/1.0 (https://global.health)"}
-            r = requests.get(url, headers=headers)
-            r.raise_for_status()
-            content = r.content
+            # stream from source to avoid MemoryError for very large (>10Gb) files
+            fd, local_filename = tempfile.mkstemp(dir=tempdir)
+            with requests.get(url, headers=headers, stream=True) as r:
+                r.raise_for_status()
+                with os.fdopen(fd, 'wb') as f:
+                    for chunk in r.iter_content(chunk_size=chunk_bytes):
+                        if chunk:
+                            f.write(chunk)
         logger.info("Download finished")
 
         key_filename_part = f"content.{source_format.lower()}"
@@ -162,24 +202,17 @@ def retrieve_content(
             f"{datetime.now(timezone.utc).strftime(TIME_FILEPART_FORMAT)}"
             f"{key_filename_part}"
         )
-        # Lambda limitations: 512MB ephemeral disk space.
-        # Memory range is from 128 to 3008 MB so we could switch to
-        # https://docs.python.org/3/library/io.html#io.StringIO for bigger
-        # sources.
         # Make the encoding of retrieved content consistent (UTF-8) for all
         # parsers as per https://github.com/globaldothealth/list/issues/867.
-        bytesio = raw_content(url, content, tempdir)
+        bytes_filename = raw_content_fileconvert(url, local_filename, tempdir)
         if source_format == "XLSX":
             # do not convert XLSX into another encoding, leave for parsers
             logger.warning("Skipping encoding detection for XLSX")
-            fd, outfile_name = tempfile.mkstemp(dir=tempdir)
-            with os.fdopen(fd, "wb") as outfile:
-                while content := bytesio.read(READ_CHUNK_BYTES):
-                    outfile.write(content)
-            return [(outfile_name, s3_object_key)]
+            return [(bytes_filename, s3_object_key)]
 
         logger.info("Detecting encoding of retrieved content")
         # Read 2MB to be quite sure about the encoding.
+        bytesio = open(bytes_filename, "rb")
         detected_enc = detect(bytesio.read(2 << 20))
         bytesio.seek(0)
         if detected_enc["encoding"]:
