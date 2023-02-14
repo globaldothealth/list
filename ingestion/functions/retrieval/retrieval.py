@@ -8,6 +8,7 @@ import tempfile
 import operator
 import subprocess
 import importlib
+import time
 import logging
 from chardet import detect
 from pathlib import Path
@@ -139,28 +140,51 @@ def raw_content_fileconvert(url: str, local_filename: str, tempdir: str = TEMP_P
     mimetype, _ = mimetypes.guess_type(url)
     if mimetype == "application/zip":
         logger.info("File seems to be a zip file, decompressing it now")
-        # Writing the zip file to temp dir.
-        with tempfile.NamedTemporaryFile(dir=tempdir, delete=False) as f, \
-             os.fdopen(local_filename, 'rb') as infile:
-            while content := infile.read(READ_CHUNK_BYTES):
-                f.write(content)
-            f.flush()
-        with tempfile.TemporaryDirectory(dir=tempdir) as xf:
-            # extract into temporary folder using unzip
-            try:
-                subprocess.run(["/usr/bin/unzip", "-d", xf, f.name], check=True)
-                largest_file = max(
-                    ((f, f.stat().st_size) for f in Path(xf).iterdir()
-                     if f.is_file()),
-                    key=operator.itemgetter(1)
-                )[0]
-                return largest_file.open("rb")
-            except subprocess.CalledProcessError as e:
-                raise ValueError(f"Error in extracting zip file with exception:\n{e}")
-        Path(f.name).unlink(missing_ok=True)
+        xf = tempfile.mkdtemp(dir=tempdir)
+        # extract into temporary folder using unzip
+        try:
+            subprocess.run(["/usr/bin/unzip", "-d", xf, local_filename], check=True)
+            largest_file = max(
+                ((f, f.stat().st_size) for f in Path(xf).iterdir()
+                 if f.is_file()),
+                key=operator.itemgetter(1)
+            )[0]
+            return '/'.join([xf, largest_file.name])
+        except subprocess.CalledProcessError as e:
+            raise ValueError(f"Error in extracting zip file with exception:\n{e}")
     elif not mimetype:
         logger.warning("Could not determine mimetype")
     return local_filename
+
+
+def download_file_stream(url: str, headers: dict, tempdir: str,
+                         reps: int = 5, sleeptime: float = 30.,
+                         chunk_bytes: int = CSV_CHUNK_BYTES) -> str:
+    """Download file as stream checking filesize and retrying (if able)"""
+    for _ in range(reps):
+        # stream from source to avoid MemoryError for very large (>10Gb) files
+        fd, local_filename = tempfile.mkstemp(dir=tempdir)
+        with requests.get(url, headers=headers, stream=True) as r:
+            r.raise_for_status()
+            # check if filesize reported and validate download if possible
+            expected_size = int(r.headers["content-length"]
+                             if "content-length" in r.headers.keys()
+                            else 0)
+            logger.info(f"Starting file download, expected size: {expected_size}")
+            with os.fdopen(fd, 'wb') as f:
+                for chunk in r.iter_content(chunk_size=chunk_bytes):
+                    if chunk:
+                        f.write(chunk)
+                f.flush()
+        # confirm download completed successfully
+        received_size = os.path.getsize(local_filename)
+        if expected_size == 0 or received_size >= expected_size:
+            return local_filename
+        logger.info(f"File download incomplete (expected {expected_size} got {received_size})")
+        logger.info(f"Sleeping for {sleeptime} secs...")
+        os.remove(local_filename)
+        time.sleep(sleeptime)
+    raise requests.exceptions.RequestException("File download failed.")
 
 
 def retrieve_content(env, source_id, upload_id, url, source_format,
@@ -169,8 +193,8 @@ def retrieve_content(env, source_id, upload_id, url, source_format,
     """ Retrieves and locally persists the content at the provided URL. """
     try:
         if (source_format != "JSON"
-            and source_format != "CSV"
-             and source_format != "XLSX"):
+                and source_format != "CSV"
+                and source_format != "XLSX"):
             e = ValueError(f"Unsupported source format: {source_format}")
             common_lib.complete_with_error(
                 e, env, common_lib.UploadError.SOURCE_CONFIGURATION_ERROR,
@@ -186,14 +210,7 @@ def retrieve_content(env, source_id, upload_id, url, source_format,
             s3_client.download_file(s3Bucket, s3Key, local_filename)
         else:
             headers = {"user-agent": "GHDSI/1.0 (https://global.health)"}
-            # stream from source to avoid MemoryError for very large (>10Gb) files
-            fd, local_filename = tempfile.mkstemp(dir=tempdir)
-            with requests.get(url, headers=headers, stream=True) as r:
-                r.raise_for_status()
-                with os.fdopen(fd, 'wb') as f:
-                    for chunk in r.iter_content(chunk_size=chunk_bytes):
-                        if chunk:
-                            f.write(chunk)
+            local_filename = download_file_stream(url, headers, tempdir)
         logger.info("Download finished")
 
         key_filename_part = f"content.{source_format.lower()}"
@@ -205,6 +222,7 @@ def retrieve_content(env, source_id, upload_id, url, source_format,
         # Make the encoding of retrieved content consistent (UTF-8) for all
         # parsers as per https://github.com/globaldothealth/list/issues/867.
         bytes_filename = raw_content_fileconvert(url, local_filename, tempdir)
+        logging.info(f"Filename after conversion: {bytes_filename}")
         if source_format == "XLSX":
             # do not convert XLSX into another encoding, leave for parsers
             logger.warning("Skipping encoding detection for XLSX")

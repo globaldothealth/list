@@ -112,7 +112,7 @@ def retrieve_raw_data_file(s3_bucket: str, s3_key: str, out_file):
     try:
         logger.info(f"Retrieving raw data from s3://{s3_bucket}/{s3_key}")
         s3_client.download_fileobj(s3_bucket, s3_key, out_file)
-        out_file.flush()
+        out_file.seek(0)
     except Exception as e:
         common_lib.complete_with_error(e)
 
@@ -140,11 +140,14 @@ def retrieve_excluded_case_ids(source_id: str, date_filter: Dict, date_range: Di
         end_date = datetime.datetime.strftime(now, "%Y-%m-%d")
         date_limits = f"&dateFrom={start_date}&dateTo={end_date}"
 
-    excluded_case_ids_endpoint_url =  f"{common_lib.get_source_api_url(env)}/excludedCaseIds?sourceId={source_id}{date_limits}"
+    excluded_case_ids_endpoint_url = f"{common_lib.get_source_api_url(env)}/excludedCaseIds?sourceId={source_id}{date_limits}"
+    logger.info(f"Excluded cases: Querying excluded cases (GET): {excluded_case_ids_endpoint_url}")
     res = requests.get(excluded_case_ids_endpoint_url, headers=headers, cookies=cookies)
     if res and res.status_code == 200:
         res_json = res.json()
+        logger.info("Excluded cases: Returning excluded cases.")
         return res_json["cases"]
+    logger.info("Excluded cases: Returning None.")
     return None
 
 # This structure is needed for the partial name matching below.
