@@ -10,6 +10,8 @@ import subprocess
 import importlib
 import time
 import logging
+import dateutil.parser
+from itertools import compress
 from chardet import detect
 from pathlib import Path
 
@@ -36,7 +38,7 @@ s3_client = boto3.client("s3")
 
 if os.environ.get("DOCKERIZED"):
     s3_client = boto3.client("s3",
-        endpoint_url=os.environ.get("AWS_ENDPOINT", "http://localhost:4566"),
+        endpoint_url=os.environ.get("AWS_ENDPOINT", "https://localhost.localstack.cloud:4566"),
         aws_access_key_id=os.environ.get("AWS_ACCESS_KEY_ID", "test"),
         aws_secret_access_key=os.environ.get("AWS_SECRET_ACCESS_KEY", "test"),
         region_name=os.environ.get("AWS_REGION", "eu-central-1")
@@ -87,7 +89,8 @@ def get_source_details(env, source_id, upload_id, api_headers, cookies):
                 "parser", {}).get(
                 "awsLambdaArn", ""), api_json.get(
                 "dateFilter", {}), api_json.get(
-                "hasStableIdentifiers", False)
+                "hasStableIdentifiers", False), api_json.get(
+                "uploads", {})
         upload_error = (
             common_lib.UploadError.SOURCE_CONFIGURATION_NOT_FOUND
             if r.status_code == 404 else common_lib.UploadError.INTERNAL_ERROR)
@@ -187,9 +190,102 @@ def download_file_stream(url: str, headers: dict, tempdir: str,
     raise requests.exceptions.RequestException("File download failed.")
 
 
+def generate_deltas(latest_filename: str, uploads: dict, s3_bucket: str,
+                  source_id: str, source_format: str) -> str:
+    """Check last valid ingestion and return filename of deltas
+
+    If the previous successful ingestion cannot be reconciled with the most
+    recent source then abandon the deltas and ingest the full dataset.
+
+    Be wary that batch processes may be active, and should be checked
+    before resolving the delta file.
+    """
+    logger.info("Deltas: Attempting to generate ingestion deltas file...")
+    if source_format != 'CSV':
+        logger.info(f"Deltas: upsupported filetype ({source_format}) for deltas generation")
+        return latest_filename
+    # snapshot ingestion-queue for active processes
+    logger.info("Deltas: Snapshot batch processes")
+    batch_client = boto3.client("batch")
+    jobs = []
+    for jobStatus in ['SUBMITTED', 'PENDING', 'RUNNABLE', 'STARTING', 'RUNNING']:
+        r = batch_client.list_jobs(
+            jobQueue='ingestion-queue',
+            jobStatus=jobStatus)
+        jobs.append(r['jobSummaryList'])
+    # TODO: Ensure no source_id relevant processes are cued or running
+
+    # identify last good ingestion source
+    if not (last_successful_ingest := list(compress(uploads,
+            map(lambda x: x['status'] == 'SUCCESS', uploads)))):
+        logger.info("Deltas: No previous successful ingestions found.")
+        return latest_filename
+    last_successful_ingest = last_successful_ingest[-1]
+    # TODO: Cross-reference job log with source file in gdh-sources;
+    #       for now isolate date-time and pull from corresponding S3 bucket
+    d = dateutil.parser.parse(last_successful_ingest['created'])
+    # retrieve last good ingestion source
+    _, last_ingested_file_name = tempfile.mkstemp()
+    s3_key = f"{source_id}{d.strftime(TIME_FILEPART_FORMAT)}content.csv"
+    logger.info(f"Deltas: Identified last good ingestion source at: {s3_bucket}/{s3_key}")
+    s3_client.download_file(s3_bucket, s3_key, last_ingested_file_name)
+    logger.info(f"Deltas: Retrieved last good ingestion source: {last_ingested_file_name}")
+    # confirm that headers match and copy header line to the new deltas file
+    #  that will serve as the input source
+    with open(last_ingested_file_name, "r") as last_ingested_file:
+        last_ingested_header = last_ingested_file.readline()
+    with open(latest_filename, "r") as lastest_file:
+        latest_header = lastest_file.readline()
+    if latest_header != last_ingested_header:
+        logger.info("Deltas: Headers do not match - abandoning deltas")
+        return latest_filename
+    # check that no lines exist in the previous file that
+    # do not appear in the latest download; if so, reject attempt at deltas
+    try:
+        fd, removed_cases_file_name = tempfile.mkstemp()
+        removed_cases_file = os.fdopen(fd, "w")
+        if subprocess.run(["/usr/bin/env",
+                           "comm",
+                           "-23",  # Suppress unique lines from file2 and common
+                           last_ingested_file_name,
+                           latest_filename],
+                          stdout=removed_cases_file).returncode > 0:
+            logger.error("Deltas: first comm command returned an error code")
+            return latest_filename
+        # TODO: This will reject files where any Suspected cases are updated to
+        #       Confirmed cases; but dealing with this in any other way requires
+        #       source specific knowledge.
+        removed_cases_file_size = removed_cases_file.tell()
+        removed_cases_file.close()
+        os.remove(removed_cases_file_name)
+        if removed_cases_file_size > 0:
+            logger.info("Deltas: Removed cases detected, abandoning deltas approach")
+            return latest_filename
+        # generate deltas file containing only lines unique to the latest file
+        fd, deltas_file_name = tempfile.mkstemp()
+        with os.fdopen(fd, "w") as deltas_file:
+            deltas_file.writelines(latest_header)
+        deltas_file.close()
+        deltas_file = open(deltas_file_name, "a")
+        if subprocess.run(["/usr/bin/env",
+                           "comm",
+                           "-13",  # Suppress unique lines from file1 and common
+                           last_ingested_file_name,
+                           latest_filename],
+                          stdout=deltas_file).returncode > 0:
+            logger.error("Deltas: second comm command returned an error code")
+            return latest_filename
+    except subprocess.CalledProcessError as e:
+        logger.error(f"Deltas: Process error during call to comm command: {e}")
+        return latest_filename
+    deltas_file.close()
+    return deltas_file_name
+
+
 def retrieve_content(env, source_id, upload_id, url, source_format,
                      api_headers, cookies, chunk_bytes=CSV_CHUNK_BYTES,
-                     tempdir=TEMP_PATH):
+                     tempdir=TEMP_PATH, uploads_history={},
+                     bucket=OUTPUT_BUCKET):
     """ Retrieves and locally persists the content at the provided URL. """
     try:
         if (source_format != "JSON"
@@ -226,28 +322,49 @@ def retrieve_content(env, source_id, upload_id, url, source_format,
         if source_format == "XLSX":
             # do not convert XLSX into another encoding, leave for parsers
             logger.warning("Skipping encoding detection for XLSX")
-            return [(bytes_filename, s3_object_key)]
-
-        logger.info("Detecting encoding of retrieved content")
-        # Read 2MB to be quite sure about the encoding.
-        bytesio = open(bytes_filename, "rb")
-        detected_enc = detect(bytesio.read(2 << 20))
-        bytesio.seek(0)
-        if detected_enc["encoding"]:
-            logger.info(f"Source encoding is presumably {detected_enc}")
+            outfile = bytes_filename
         else:
-            detected_enc["encoding"] = DEFAULT_ENCODING
-            logger.warning(f"Source encoding detection failed, setting to {DEFAULT_ENCODING}")
-        fd, outfile_name = tempfile.mkstemp(dir=tempdir)
-        with os.fdopen(fd, "w", encoding="utf-8") as outfile:
-            text_stream = codecs.getreader(detected_enc["encoding"])(bytesio)
-            # Write the output file as utf-8 in chunks because decoding the
-            # whole data in one shot becomes really slow with big files.
-            content = text_stream.read(READ_CHUNK_BYTES)
-            while content:
-                outfile.write(content)
+            logger.info("Detecting encoding of retrieved content")
+            # Read 2MB to be quite sure about the encoding.
+            bytesio = open(bytes_filename, "rb")
+            detected_enc = detect(bytesio.read(2 << 20))
+            bytesio.seek(0)
+            if detected_enc["encoding"]:
+                logger.info(f"Source encoding is presumably {detected_enc}")
+            else:
+                detected_enc["encoding"] = DEFAULT_ENCODING
+                logger.warning(f"Source encoding detection failed, setting to {DEFAULT_ENCODING}")
+            fd, outfile_name = tempfile.mkstemp(dir=tempdir)
+            with os.fdopen(fd, "w", encoding="utf-8") as outfile:
+                text_stream = codecs.getreader(detected_enc["encoding"])(bytesio)
+                # Write the output file as utf-8 in chunks because decoding the
+                # whole data in one shot becomes really slow with big files.
                 content = text_stream.read(READ_CHUNK_BYTES)
-            return [(outfile_name, s3_object_key)]
+                while content:
+                    outfile.write(content)
+                    content = text_stream.read(READ_CHUNK_BYTES)
+        # attempt to generate deltas file
+        deltas_file_name = generate_deltas(
+            outfile_name,
+            uploads_history,
+            bucket,
+            source_id,
+            source_format,
+        )
+        if deltas_file_name != outfile_name:
+            logger.info("Successfully replaced source with deltas comparing "
+                        "against last successful ingestion")
+            key_deltas_filename_part = f"deltas.{source_format.lower()}"
+            s3_deltas_object_key = (
+                f"{source_id}"
+                f"{datetime.now(timezone.utc).strftime(TIME_FILEPART_FORMAT)}"
+                f"{key_deltas_filename_part}"
+            )
+            logger.info(f"Updated working filename (now a deltas file): {deltas_file_name}")
+            return [(outfile_name, s3_object_key, {'parseit': False}),
+                    (deltas_file_name, s3_deltas_object_key, {'deltas': True})]
+        logger.info("Deltas generation failed, using full source file")
+        return [(outfile_name, s3_object_key)]
     except requests.exceptions.RequestException as e:
         upload_error = (
             common_lib.UploadError.SOURCE_CONTENT_NOT_FOUND
@@ -275,7 +392,7 @@ def upload_to_s3(
 
 def invoke_parser(
     env, parser_module, source_id, upload_id, api_headers, cookies, s3_object_key,
-        source_url, date_filter, parsing_date_range):
+        source_url, date_filter, parsing_date_range, deltas=False):
     auth = {"email": os.getenv("EPID_INGESTION_EMAIL", "")} if cookies else None
     payload = {
         "env": env,
@@ -286,7 +403,8 @@ def invoke_parser(
         "uploadId": upload_id,
         "dateFilter": date_filter,
         "dateRange": parsing_date_range,
-        "auth": auth
+        "auth": auth,
+        "deltas": deltas,
     }
     logger.info(f"Invoking parser ({parser_module})")
     sys.path.append(str(Path(__file__).parent.parent))  # ingestion/functions
@@ -370,7 +488,7 @@ def run_retrieval(tempdir=TEMP_PATH):
         auth_headers = common_lib.obtain_api_credentials(s3_client)
     upload_id = common_lib.create_upload_record(
         env, source_id, auth_headers, cookies)
-    url, source_format, parser, date_filter, stable_identifiers = get_source_details(
+    url, source_format, parser, date_filter, stable_identifiers, uploads_history = get_source_details(
         env, source_id, upload_id, auth_headers, cookies)
 
     if not stable_identifiers:
@@ -380,17 +498,28 @@ def run_retrieval(tempdir=TEMP_PATH):
         parsing_date_range = {}
     url = format_source_url(url)
     file_names_s3_object_keys = retrieve_content(
-        env, source_id, upload_id, url, source_format, auth_headers, cookies, tempdir=tempdir)
-    for file_name, s3_object_key in file_names_s3_object_keys:
+        env, source_id, upload_id, url, source_format, auth_headers, cookies,
+        tempdir=tempdir, uploads_history=uploads_history)
+    for file_name, s3_object_key, *opts in file_names_s3_object_keys:
         upload_to_s3(file_name, s3_object_key, env,
                      source_id, upload_id, auth_headers, cookies)
     if parser:
-        for _, s3_object_key in file_names_s3_object_keys:
-            parser_module = common_lib.get_parser_module(parser)
-            invoke_parser(
-                env, parser_module,
-                source_id, upload_id, auth_headers, cookies,
-                s3_object_key, url, date_filter, parsing_date_range)
+        for _, s3_object_key, *opts in file_names_s3_object_keys:
+            # check which files to parse (default: yes); relevant when deltas
+            # files are generated, but full source should also be uploaded for
+            # future comparisons
+            if opts:
+                parseit = opts[0]['parseit'] if 'parseit' in opts[0] else True
+                deltas = opts[0]['deltas'] if 'deltas' in opts[0] else False
+            else:
+                parseit = True
+                deltas = False
+            if parseit:
+                parser_module = common_lib.get_parser_module(parser)
+                invoke_parser(
+                    env, parser_module,
+                    source_id, upload_id, auth_headers, cookies, s3_object_key,
+                    url, date_filter, parsing_date_range, deltas)
 
     else:
         common_lib.complete_with_error(

@@ -11,6 +11,7 @@ import logging
 import os
 import re
 import sys
+from itertools import compress
 from typing import Optional, List, Tuple, Dict, Any
 
 from bson.objectid import ObjectId
@@ -63,9 +64,35 @@ def is_acceptable(upload: Dict[str, Any], threshold: float,
     created = upload['summary'].get('numCreated', 0)
     updated = upload['summary'].get('numUpdated', 0)
     errors = upload['summary'].get('numError', 0)
+    deltas = upload.get('deltas', False)
     return (
         upload['status'] == "SUCCESS"
+        and not deltas
         and created > prev_created_count
+        and updated == 0  # non-UUID sources should never update a case
+        and errors / (errors + created) <= threshold
+        and "accepted" not in upload  # skip already accepted cases
+    )
+
+
+def is_deltas_acceptable(upload: Dict[str, Any], threshold: float,
+                  prev_created_count: int = 0) -> bool:
+    """Whether a deltas upload is acceptable
+
+    :param upload: Upload data as a dictionary
+    :param threshold: Threshold ratio of errors above which an upload
+    is not accepted
+    :param prev_created_count: Created count of previous upload
+
+    :return: Whether the upload is acceptable
+    """
+    created = upload['summary'].get('numCreated', 0)
+    updated = upload['summary'].get('numUpdated', 0)
+    errors = upload['summary'].get('numError', 0)
+    deltas = upload.get('deltas', False)
+    return (
+        upload['status'] == "SUCCESS"
+        and deltas
         and updated == 0  # non-UUID sources should never update a case
         and errors / (errors + created) <= threshold
         and "accepted" not in upload  # skip already accepted cases
@@ -85,8 +112,8 @@ def find_acceptable_upload(
     :param allow_decrease: Whether uploads with fewer cases are allowed
 
     epoch is the initial datetime after which we should consider non-UUID
-    sources to have data only corresponding to a single upload. Prior to
-    this date, data does not correspond to a single upload.
+    sources to either have data only corresponding to a single upload, or
+    consist of a single batch upload followed by multiple 'deltas' uploads.
 
     If not specified, considers the last acceptable upload to be
     contain the entire dataset.
@@ -121,14 +148,18 @@ def find_acceptable_upload(
         accept_idx = accept_uploads.index(True)
     except ValueError:
         accept_idx = -1  # no acceptable upload found
+    #import code; code.interact(local=dict(globals(), **locals()))
+    accept_uploads[:accept_idx] = [is_deltas_acceptable(u, threshold,
+                                                        prev_created_count)
+                                     for u in uploads[:accept_idx]]
     if accept_idx > -1 and (not epoch or uploads[accept_idx]["created"] > epoch):
-        # Return uploads older than last successful upload
-        return [str(uploads[accept_idx]["_id"])], _ids(
-            uploads[accept_idx + 1 :]
-            # Also mark for deletion uploads after accepted upload
-            # that are not IN_PROGRESS
-            + [u for u in uploads[:accept_idx] if u["status"] != "IN_PROGRESS"]
-        )
+        accept_list = _ids(list(compress(uploads, accept_uploads)))
+        # Reject uploads older than last successful upload
+        # Also mark for deletion later non-accepted uploads that are not IN_PROGRESS
+        reject_list = _ids(uploads[accept_idx+1:] +
+                           [u for u in filter(lambda x: not x, uploads[:accept_idx])
+                            if u["status"] != "IN_PROGRESS"])
+        return accept_list, reject_list
     return None
 
 
@@ -139,7 +170,6 @@ def mark_cases_non_uuid(
     accept: List[str],
     reject: List[str],
 ):
-    assert len(accept) == 1
     if reject:
         logging.info("  ... reject")
         cases.update_many(

@@ -33,6 +33,7 @@ UPLOAD_ID_FIELD = "uploadId"
 DATE_FILTER_FIELD = "dateFilter"
 DATE_RANGE_FIELD = "dateRange"
 AUTH_FIELD = "auth"
+DELTAS_FIELD = "deltas"
 
 # Maximum exponential backoff times
 MAX_WAIT_TIME = 600  # 5xx errors from data service
@@ -62,7 +63,7 @@ s3_client = boto3.client("s3")
 
 if os.environ.get("DOCKERIZED"):
     s3_client = boto3.client("s3",
-        endpoint_url=os.environ.get("AWS_ENDPOINT", "http://localhost:4566"),
+        endpoint_url=os.environ.get("AWS_ENDPOINT", "https://localhost.localstack.cloud:4566"),
         aws_access_key_id=os.environ.get("AWS_ACCESS_KEY_ID", "test"),
         aws_secret_access_key=os.environ.get("AWS_SECRET_ACCESS_KEY", "test"),
         region_name=os.environ.get("AWS_REGION", "eu-central-1")
@@ -104,8 +105,17 @@ def extract_event_fields(event: Dict):
             f"{SOURCE_ID_FIELD}; {S3_KEY_FIELD} not found in input event json.")
         e = ValueError(error_message)
         common_lib.complete_with_error(e)
-    return event[ENV_FIELD], event[SOURCE_URL_FIELD], event[SOURCE_ID_FIELD], event.get(UPLOAD_ID_FIELD), event[
-        S3_BUCKET_FIELD], event[S3_KEY_FIELD], event.get(DATE_FILTER_FIELD, None), event.get(DATE_RANGE_FIELD, None), event.get(AUTH_FIELD, None)
+    return event[
+        ENV_FIELD], event[
+        SOURCE_URL_FIELD], event[
+        SOURCE_ID_FIELD], event.get(
+        UPLOAD_ID_FIELD), event[
+        S3_BUCKET_FIELD], event[
+        S3_KEY_FIELD], event.get(
+        DATE_FILTER_FIELD, None), event.get(
+        DATE_RANGE_FIELD, None), event.get(
+        AUTH_FIELD, None), event.get(
+        DELTAS_FIELD, None)
 
 
 def retrieve_raw_data_file(s3_bucket: str, s3_key: str, out_file):
@@ -140,8 +150,7 @@ def retrieve_excluded_case_ids(source_id: str, date_filter: Dict, date_range: Di
         end_date = datetime.datetime.strftime(now, "%Y-%m-%d")
         date_limits = f"&dateFrom={start_date}&dateTo={end_date}"
 
-    excluded_case_ids_endpoint_url = f"{common_lib.get_source_api_url(env)}/excludedCaseIds?sourceId={source_id}{date_limits}"
-    logger.info(f"Excluded cases: Querying excluded cases (GET): {excluded_case_ids_endpoint_url}")
+    excluded_case_ids_endpoint_url =  f"{common_lib.get_source_api_url(env)}/excludedCaseIds?sourceId={source_id}{date_limits}"
     res = requests.get(excluded_case_ids_endpoint_url, headers=headers, cookies=cookies)
     if res and res.status_code == 200:
         res_json = res.json()
@@ -469,7 +478,7 @@ def run(
         https://docs.aws.amazon.com/lambda/latest/dg/python-handler.html
     """
 
-    env, source_url, source_id, upload_id, s3_bucket, s3_key, date_filter, date_range, local_auth = extract_event_fields(
+    env, source_url, source_id, upload_id, s3_bucket, s3_key, date_filter, date_range, local_auth, deltas = extract_event_fields(
         event)
     logger.info(f"Event fields extracted in parsing_lib.run...env: {env}, source_url: {source_url}, source_id: {source_id}, \
         upload_id: {upload_id}, s3_bucket: {s3_bucket}, s3_key: {s3_key}, date_filter: {date_filter}, date_range: {date_range}, local_auth: {local_auth}")
@@ -493,11 +502,12 @@ def run(
             env, common_lib.UploadError.INTERNAL_ERROR, source_id, upload_id,
             api_creds, cookies)
     try:
+        # retrieve source from s3 bucket
         fd, local_data_file_name = tempfile.mkstemp()
         local_data_file = os.fdopen(fd, "wb")
         retrieve_raw_data_file(s3_bucket, s3_key, local_data_file)
         logger.info(f"Raw file retrieved at {local_data_file_name}")
-
+        # construct parsing generator
         logger.info("Running parsing function...")
         case_data = parsing_function(
             local_data_file_name, source_id,
@@ -524,7 +534,7 @@ def run(
             logger.info("Attempting to finalise upload...")
             status, text = common_lib.finalize_upload(
                 env, source_id, upload_id, api_creds, cookies, count_created,
-                count_updated, count_error
+                count_updated, count_error, deltas=deltas
             )
             if status == 200:
                 break

@@ -22,7 +22,7 @@ except ImportError:
 
 
 s3_client = boto3.client("s3",
-    endpoint_url=os.environ.get("AWS_ENDPOINT", "http://localstack:4566"),
+    endpoint_url=os.environ.get("AWS_ENDPOINT", "http://localhost.localstack.cloud:4566"),
     aws_access_key_id=os.environ.get("AWS_ACCESS_KEY_ID", "test"),
     aws_secret_access_key=os.environ.get("AWS_SECRET_ACCESS_KEY", "test"),
     region_name=os.environ.get("AWS_REGION", "eu-central-1")
@@ -150,7 +150,8 @@ def test_e2e(source, valid_event, mock_source_api_url_fixture, setup_e2e, tempdi
         response["key"],
         origin_url,
         date_filter if has_stable_ids else {},
-        valid_event["parsingDateRange"] if has_stable_ids else {})
+        valid_event["parsingDateRange"] if has_stable_ids else {},
+        False)
     assert requests_mock.request_history[0].url == create_upload_url(source_id)
     assert requests_mock.request_history[1].url == full_source_url
     assert requests_mock.request_history[2].url == origin_url
