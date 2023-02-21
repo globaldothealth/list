@@ -151,13 +151,13 @@ def test_e2e(source, valid_event, mock_source_api_url_fixture, setup_e2e, tempdi
         origin_url,
         date_filter if has_stable_ids else {},
         valid_event["parsingDateRange"] if has_stable_ids else {},
-        False)
+        None)
     assert requests_mock.request_history[0].url == create_upload_url(source_id)
     assert requests_mock.request_history[1].url == full_source_url
     assert requests_mock.request_history[2].url == origin_url
     assert response["bucket"] == retrieval.OUTPUT_BUCKET
     assert source_id in response["key"]
-    assert response["upload_id"] == upload_id
+    assert response["upload_id"][0] == upload_id    # returns a list to support deltas
 
 
 def test_extract_event_fields_returns_env_source_id_and_date_range(valid_event):
@@ -313,8 +313,8 @@ def test_retrieve_content_returns_local_and_s3_object_names(requests_mock):
     requests_mock.get(content_url, json={"data": "yes"})
     results = retrieval.retrieve_content(
         "env", source_id, "upload_id", content_url, "JSON", {}, {}, tempdir="/tmp")
-    assert all("/tmp/" in fn for fn, s3key in results)
-    assert all(source_id in s3key for fn, s3key in results)
+    assert all("/tmp/" in fn for fn, s3key, *opts in results)
+    assert all(source_id in s3key for fn, s3key, *opts in results)
 
 
 def test_retrieve_content_raises_error_for_non_supported_format(

@@ -9,7 +9,7 @@ from botocore.exceptions import ClientError
 import clean_old_ingestion_source_files
 import aws_access.globaldothealth_configuration as gdoth
 
-localstack = 'http://localstack:4566'
+localstack = 'http://localhost.localstack.cloud:4566'
 rate_event_id = '5f7796ece78c6866f6f676e0'
 file_content = "blah blah blah" # this is unimportant
 file_time = '1130' # also unimportant
