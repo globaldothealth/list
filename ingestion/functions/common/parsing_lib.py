@@ -62,12 +62,13 @@ except json.decoder.JSONDecodeError as e:
 s3_client = boto3.client("s3")
 
 if os.environ.get("DOCKERIZED"):
-    s3_client = boto3.client("s3",
+    s3_client = boto3.client(
+        "s3",
         endpoint_url=os.environ.get("AWS_ENDPOINT", "https://localhost.localstack.cloud:4566"),
         aws_access_key_id=os.environ.get("AWS_ACCESS_KEY_ID", "test"),
         aws_secret_access_key=os.environ.get("AWS_SECRET_ACCESS_KEY", "test"),
         region_name=os.environ.get("AWS_REGION", "eu-central-1")
-                             )
+    )
 
 
 def safe_int(x):
@@ -126,6 +127,7 @@ def retrieve_raw_data_file(s3_bucket: str, s3_key: str, out_file):
     except Exception as e:
         common_lib.complete_with_error(e)
 
+
 def retrieve_excluded_case_ids(source_id: str, date_filter: Dict, date_range: Dict, env: str,
                                headers=None, cookies=None):
     if env == "locale2e":
@@ -150,7 +152,9 @@ def retrieve_excluded_case_ids(source_id: str, date_filter: Dict, date_range: Di
         end_date = datetime.datetime.strftime(now, "%Y-%m-%d")
         date_limits = f"&dateFrom={start_date}&dateTo={end_date}"
 
-    excluded_case_ids_endpoint_url =  f"{common_lib.get_source_api_url(env)}/excludedCaseIds?sourceId={source_id}{date_limits}"
+    excluded_case_ids_endpoint_url = (
+        f"{common_lib.get_source_api_url(env)}"
+        f"/excludedCaseIds?sourceId={source_id}{date_limits}")
     res = requests.get(excluded_case_ids_endpoint_url, headers=headers, cookies=cookies)
     if res and res.status_code == 200:
         res_json = res.json()
@@ -158,6 +162,7 @@ def retrieve_excluded_case_ids(source_id: str, date_filter: Dict, date_range: Di
         return res_json["cases"]
     logger.info("Excluded cases: Returning None.")
     return None
+
 
 # This structure is needed for the partial name matching below.
 countries_index = {c.name.upper(): c.alpha2 for c in iso3166.countries}
@@ -172,6 +177,7 @@ country_to_iso_fixes = {
     "REPUBLIC OF CONGO": "CG",
     "COTE D'IVOIRE": "CI",
 }
+
 
 def iso3166_country_code(country_name: str) -> str:
     """
@@ -212,7 +218,9 @@ def prepare_cases(cases: Generator[Dict, None, None], upload_id: str, excluded_c
         for travel in common_lib.deep_get(case, "travelHistory.travel", default=[]):
             if travel_country := common_lib.deep_get(travel, "location.country"):
                 travel["location"]["country"] = iso3166_country_code(travel_country)
-        if (excluded_case_ids is None) or ("sourceEntryId" not in case["caseReference"]) or (not case["caseReference"]["sourceEntryId"] in excluded_case_ids):
+        if ((excluded_case_ids is None)
+                or ("sourceEntryId" not in case["caseReference"])
+                or (not case["caseReference"]["sourceEntryId"] in excluded_case_ids)):
             yield remove_nested_none_and_empty(case)
 
 
@@ -220,8 +228,10 @@ def remove_nested_none_and_empty(d):
     if not isinstance(d, (dict, list)):
         return d
     if isinstance(d, list):
-        return [v for v in (remove_nested_none_and_empty(v) for v in d) if v is not None and v != ""]
-    return {k: v for k, v in ((k, remove_nested_none_and_empty(v)) for k, v in d.items()) if v is not None and v != ""}
+        return [v for v in (remove_nested_none_and_empty(v)
+                            for v in d) if v is not None and v != ""]
+    return {k: v for k, v in ((k, remove_nested_none_and_empty(v))
+                              for k, v in d.items()) if v is not None and v != ""}
 
 
 def batch_of(cases: Generator[Dict, None, None], max_items: int) -> List[Dict]:
@@ -282,10 +292,12 @@ def write_to_server(
             if res.status_code in [200, 207]:  # 207 is used for validation error
                 break
             if res.status_code == 500 and "401" in res.text:
-                logger.warning(f"Request failed, status={res.status_code}, response={res.text}, reauthenticating...")
+                logger.warning(f"Request failed, status={res.status_code}, "
+                               f"response={res.text}, reauthenticating...")
                 headers = common_lib.obtain_api_credentials(s3_client)
                 continue
-            logger.warning(f"Request failed, status={res.status_code}, response={res.text}, retrying in {wait} seconds...")
+            logger.warning(f"Request failed, status={res.status_code}, "
+                           f"response={res.text}, retrying in {wait} seconds...")
             time.sleep(wait)
             total_wait += wait
             wait *= 2
@@ -310,7 +322,10 @@ def write_to_server(
         if res and res.status_code in [200, 207]:
             counter["total"] += len(batch)
             now = time.time()
-            cps = int(counter["total"] / (now - start_time))
+            try:
+                cps = int(counter["total"] / (now - start_time))
+            except ZeroDivisionError:
+                cps = 0
             logger.info(f"\tCurrent speed: {cps} cases/sec")
             res_json = res.json()
             counter["numCreated"] += res_json["numCreated"]
@@ -319,10 +334,12 @@ def write_to_server(
                 # 207 encompasses both geocoding and case schema validation errors.
                 # We can consider separating geocoding issues, but for now classifying it
                 # as a validation problem is pretty reasonable.
-                # The motivation for continuing past 207 errors is https://github.com/globaldothealth/list/issues/1849
+                # The motivation for continuing past 207 errors is
+                #  https://github.com/globaldothealth/list/issues/1849
 
-                # The errors from the backend tell us which cases failed and for what reason. Make it
-                # easier to diagnose by extracting the failing case and attaching it to the error message.
+                # The errors from the backend tell us which cases failed and
+                # for what reason. Make it easier to diagnose by extracting the
+                # failing case and attaching it to the error message.
                 res_json = res.json()
                 if "errors" in res_json:
                     def add_input_to_error(error):
@@ -332,7 +349,8 @@ def write_to_server(
                     augmented_errors = [add_input_to_error(e) for e in res_json['errors']]
                     reported_error = dict(res_json)
                     reported_error["errors"] = augmented_errors
-                    logger.warning(f"Validation error in batch {batch_num}: {json.dumps(reported_error)}")
+                    logger.warning(f"Validation error in batch {batch_num}: "
+                                   f"{json.dumps(reported_error)}")
                     counter["numError"] += len(res_json["errors"])
                 else:
                     logger.warning(f"Validation error in batch {batch_num}: {res.text}")
@@ -345,7 +363,8 @@ def write_to_server(
                 }
             }
             with contextlib.suppress(requests.exceptions.RequestException):
-                requests.put(upload_status_url, json=update_status, headers=headers, cookies=cookies)
+                requests.put(upload_status_url, json=update_status,
+                             headers=headers, cookies=cookies)
             continue
 
         # Response can contain an 'error' field which describe each error that
@@ -478,10 +497,14 @@ def run(
         https://docs.aws.amazon.com/lambda/latest/dg/python-handler.html
     """
 
-    env, source_url, source_id, upload_id, s3_bucket, s3_key, date_filter, date_range, local_auth, deltas = extract_event_fields(
-        event)
-    logger.info(f"Event fields extracted in parsing_lib.run...env: {env}, source_url: {source_url}, source_id: {source_id}, \
-        upload_id: {upload_id}, s3_bucket: {s3_bucket}, s3_key: {s3_key}, date_filter: {date_filter}, date_range: {date_range}, local_auth: {local_auth}")
+    (env, source_url, source_id, upload_id, s3_bucket, s3_key, date_filter,
+     date_range, local_auth, deltas) = extract_event_fields(event)
+    logger.info(
+        f"Event fields extracted in parsing_lib.run...env: {env}, "
+        f"source_url: {source_url}, source_id: {source_id}, "
+        f"upload_id: {upload_id}, s3_bucket: {s3_bucket}, s3_key: {s3_key}, "
+        f"date_filter: {date_filter}, date_range: {date_range}, "
+        f"local_auth: {local_auth}")
     api_creds = None
     cookies = None
     if local_auth and env in ["local", "locale2e"]:
@@ -496,9 +519,10 @@ def run(
     source_info_url = f"{base_url}/sources/{source_id}"
     source_info_request = requests.get(source_info_url, headers=api_creds, cookies=cookies)
     # if that failed then just bail, we can't ingest the cases
-    if source_info_request.status_code > 299: # yes I'm ignoring redirects
+    if source_info_request.status_code > 299:  # yes I'm ignoring redirects
         common_lib.complete_with_error(
-            ParserError(f"Retrieving source info for source {source_id} yielded HTTP status {source_info_request.status_code}"),
+            ParserError(f"Retrieving source info for source {source_id} "
+                        f"yielded HTTP status {source_info_request.status_code}"),
             env, common_lib.UploadError.INTERNAL_ERROR, source_id, upload_id,
             api_creds, cookies)
     try:
@@ -543,7 +567,8 @@ def run(
                 api_creds = common_lib.obtain_api_credentials(s3_client)
                 continue
             else:
-                raise RuntimeError(f"Error updating upload record, status={status}, response={text}")
+                raise RuntimeError(f"Error updating upload record, "
+                                   f"status={status}, response={text}")
         logger.info(f"count_created={count_created}, count_updated={count_updated}")
         return {"count_created": count_created, "count_updated": count_updated}
     except Exception as e:

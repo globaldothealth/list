@@ -11,6 +11,8 @@ import importlib
 import time
 import logging
 import dateutil.parser
+from typing import Tuple, List, Any
+from sys import platform
 from chardet import detect
 from pathlib import Path
 
@@ -37,7 +39,8 @@ IN_PROGRESS_STATUS = ['SUBMITTED', 'PENDING', 'RUNNABLE', 'STARTING', 'RUNNING']
 s3_client = boto3.client("s3")
 
 if os.environ.get("DOCKERIZED"):
-    s3_client = boto3.client("s3",
+    s3_client = boto3.client(
+        "s3",
         endpoint_url=os.environ.get("AWS_ENDPOINT", "https://localhost.localstack.cloud:4566"),
         aws_access_key_id=os.environ.get("AWS_ACCESS_KEY_ID", "test"),
         aws_secret_access_key=os.environ.get("AWS_SECRET_ACCESS_KEY", "test"),
@@ -171,8 +174,7 @@ def download_file_stream(url: str, headers: dict, tempdir: str,
             r.raise_for_status()
             # check if filesize reported and validate download if possible
             expected_size = int(r.headers["content-length"]
-                             if "content-length" in r.headers.keys()
-                            else 0)
+                                if "content-length" in r.headers.keys() else 0)
             logger.info(f"Starting file download, expected size: {expected_size}")
             with os.fdopen(fd, 'wb') as f:
                 for chunk in r.iter_content(chunk_size=chunk_bytes):
@@ -190,8 +192,31 @@ def download_file_stream(url: str, headers: dict, tempdir: str,
     raise requests.exceptions.RequestException("File download failed.")
 
 
-def generate_deltas(latest_filename: str, uploads: dict, s3_bucket: str,
-                  source_id: str, source_format: str) -> str:
+def new_file_with_header(header):
+    '''Initialise a new temp file with the given header line'''
+    fd, file_name = tempfile.mkstemp()
+    with os.fdopen(fd, "w") as file:
+        file.writelines(header)
+    file.close()
+    return file_name
+
+
+def sort_file_preserve_header(out_filename, in_filename):
+    '''Sort input file to output file, preserving the header'''
+    with open(in_filename, "r") as infile:
+        header = infile.readline()
+    with open(out_filename, "w") as outfile:
+        outfile.writelines(header)
+    with open(out_filename, "a") as outfile:
+        body = subprocess.Popen(('tail', '--lines', '+2', in_filename),
+                                stdout=subprocess.PIPE)
+        subprocess.run(('sort'), stdin=body.stdout, stdout=outfile)
+        body.wait()
+
+
+def generate_deltas(latest_filename: str, uploads: List[dict], s3_bucket: str,
+                    source_id: str, source_format: str,
+                    sort_sources: bool = True) -> Tuple[str | None, str | None]:
     """Check last valid ingestion and return filename of deltas
 
     If the previous successful ingestion cannot be reconciled with the most
@@ -210,7 +235,7 @@ def generate_deltas(latest_filename: str, uploads: dict, s3_bucket: str,
         # snapshot ingestion-queue for active processes
         logger.info("Deltas: Snapshot batch processes")
         batch_client = boto3.client("batch")
-        jobs = []
+        jobs: List[Any] = []
         for jobStatus in IN_PROGRESS_STATUS:
             r = batch_client.list_jobs(
                 jobQueue='ingestion-queue',
@@ -220,31 +245,35 @@ def generate_deltas(latest_filename: str, uploads: dict, s3_bucket: str,
         if False:
             source_name = ''     # TODO: ###################### GET SOURCE NAME ###
             if filter(lambda x: x['jobName'].startswith(
-                f'{source_name}-{source_name}-ingestor'), jobs):
-                logger.info("Deltas: Ongoing batch jobs relating to source found. Abandoning deltas generation.")
+                    f'{source_name}-{source_name}-ingestor'), jobs):
+                logger.info("Deltas: Ongoing batch jobs relating to source found. "
+                            "Abandoning deltas generation.")
             return reject_deltas
     # identify last good ingestion source
-    if not (last_successful_ingest := list(filter(
+    if not (last_successful_ingest_list := list(filter(
             lambda x: x['status'] == 'SUCCESS', uploads))):
         logger.info("Deltas: No previous successful ingestions found.")
         return reject_deltas
-    last_successful_ingest = last_successful_ingest[-1]
-    d = dateutil.parser.parse(last_successful_ingest['created'])
-    # ensure no rejected deltas exist after the initial successful bulk upload
-    # as this would desynchronise the database; if so, revert to bulk ingestion
-    uploads.sort(key=lambda x: x["created"], reverse=False)  # chronological
+    last_successful_ingest = last_successful_ingest_list[-1]
+    d = parse_datetime_lastgoodingestion(last_successful_ingest['created'])
+    uploads.sort(key=lambda x: x["created"], reverse=False)  # sort chronological
     if not (bulk_ingestion := list(filter(
             lambda x: (x['status'] == 'SUCCESS')
             and (('deltas' not in x) or (x['deltas'] is None)),
             uploads))):
         logger.info("Deltas: Cannot identify last successful bulk upload")
         return reject_deltas
-    if list(filter(
+    # ensure no rejected deltas exist after the initial successful bulk upload
+    # as this would desynchronise the database; if so, revert to bulk ingestion
+    # NB: This is very conservative as rejected ingestion should rollback and
+    #     any further deltas will match to previous files
+    bulk_ingest_on_reject = False
+    if bulk_ingest_on_reject and list(filter(
             lambda x: ('deltas' in x) and x['deltas']
             and ('accepted' in x) and not x['accepted'],
             uploads[uploads.index(bulk_ingestion[0]) + 1:])):
         logger.info("Deltas: rejected deltas identified in upload history, "
-                "abandoning deltas generation")
+                    "abandoning deltas generation")
         return reject_deltas
     # retrieve last good ingestion source
     _, last_ingested_file_name = tempfile.mkstemp()
@@ -263,20 +292,35 @@ def generate_deltas(latest_filename: str, uploads: dict, s3_bucket: str,
         return reject_deltas
     # generate deltas files (additions and removals) with correct headers
     try:
+        if sort_sources:
+            logger.info("Deltas: Sorting source files (initially slower but "
+                        "produces fewer deltas)")
+            # sort the source files - this is slower but produces fewer deltas
+            _, early_file_name = tempfile.mkstemp()
+            sort_file_preserve_header(early_file_name, last_ingested_file_name)
+            logger.info("Deltas: Sorted file for last successful ingestion: "
+                        f"{early_file_name}")
+            _, later_file_name = tempfile.mkstemp()
+            sort_file_preserve_header(later_file_name, latest_filename)
+            logger.info("Deltas: Sorted file for latest source file: "
+                        f"{later_file_name}")
+        else:
+            early_file_name = last_ingested_file_name
+            later_file_name = latest_filename
+        # 'comm' command has an annoying incompatibility between linux and mac
+        nocheck_flag = ["--nocheck-order"]  # linux requires this if not sorted
+        if platform == "darwin":  # but mac does not support the flag
+            nocheck_flag = []
         # generate additions file (or return filename: None)
-        fd, deltas_add_file_name = tempfile.mkstemp()
-        initial_file_size = 0
-        with os.fdopen(fd, "w") as deltas_add_file:
-            deltas_add_file.writelines(latest_header)
-            intial_file_size = deltas_add_file.tell()
-        deltas_add_file.close()
+        deltas_add_file_name = new_file_with_header(latest_header)
         deltas_add_file = open(deltas_add_file_name, "a")
+        initial_file_size = deltas_add_file.tell()
         if subprocess.run(["/usr/bin/env",
                            "comm",
                            "-13",  # Suppress unique lines from file1 and common
-                           last_ingested_file_name,
-                           latest_filename,
-                           '--nocheck-order'],
+                           early_file_name,
+                           later_file_name
+                           ] + nocheck_flag,
                           stdout=deltas_add_file).returncode > 0:
             logger.error("Deltas: second comm command returned an error code")
             return reject_deltas
@@ -284,18 +328,15 @@ def generate_deltas(latest_filename: str, uploads: dict, s3_bucket: str,
             deltas_add_file_name = None
         deltas_add_file.close()
         # generate removals file (or return filename: None)
-        fd, deltas_del_file_name = tempfile.mkstemp()
-        initial_file_size = 0
-        with os.fdopen(fd, "w") as deltas_del_file:
-            deltas_del_file.writelines(latest_header)
-            initial_file_size = deltas_del_file.tell()
+        deltas_del_file_name = new_file_with_header(latest_header)
         deltas_del_file = open(deltas_del_file_name, "a")
+        initial_file_size = deltas_del_file.tell()
         if subprocess.run(["/usr/bin/env",
                            "comm",
                            "-23",  # Suppress unique lines from file2 and common
-                           last_ingested_file_name,
-                           latest_filename,
-                           '--nocheck-order'],
+                           early_file_name,
+                           later_file_name
+                           ] + nocheck_flag,
                           stdout=deltas_del_file).returncode > 0:
             logger.error("Deltas: first comm command returned an error code")
             return reject_deltas
@@ -305,7 +346,24 @@ def generate_deltas(latest_filename: str, uploads: dict, s3_bucket: str,
     except subprocess.CalledProcessError as e:
         logger.error(f"Deltas: Process error during call to comm command: {e}")
         return reject_deltas
+    # finally, check that the deltas aren't replacing most of the source file,
+    # wherein we would be better to simply re-ingest the full source and reset
+    # delta tracking (remembering that Del deltas accumulate records in the DB)
+    if deltas_del_file_name:
+        if (os.path.getsize(deltas_del_file_name)
+                > (0.5 * os.path.getsize(last_ingested_file_name))):
+            return reject_deltas
     return deltas_add_file_name, deltas_del_file_name
+
+
+def parse_datetime_current(date_str: str) -> datetime:
+    """Isolate functionality to facilitate easier mocking"""
+    return dateutil.parser.parse(date_str)
+
+
+def parse_datetime_lastgoodingestion(date_str: str) -> datetime:
+    """Isolate functionality to facilitate easier mocking"""
+    return dateutil.parser.parse(date_str)
 
 
 def retrieve_content(env, source_id, upload_id, url, source_format,
@@ -334,11 +392,18 @@ def retrieve_content(env, source_id, upload_id, url, source_format,
             headers = {"user-agent": "GHDSI/1.0 (https://global.health)"}
             local_filename = download_file_stream(url, headers, tempdir)
         logger.info("Download finished")
-
+        # Match upload s3 key (bucket folder) to upload timestamp (if available)
+        try:
+            today = parse_datetime_current(
+                list(filter(lambda x: x['_id'] == upload_id,
+                            uploads_history))[-1]['created'])
+        except (IndexError, TypeError, KeyError) as e:
+            logger.error(f"Error retrieving file upload datetime stamp: {e}")
+            today = datetime.now(timezone.utc)
         key_filename_part = f"content.{source_format.lower()}"
         s3_object_key = (
             f"{source_id}"
-            f"{datetime.now(timezone.utc).strftime(TIME_FILEPART_FORMAT)}"
+            f"{today.strftime(TIME_FILEPART_FORMAT)}"
             f"{key_filename_part}"
         )
         # Make the encoding of retrieved content consistent (UTF-8) for all
@@ -378,11 +443,12 @@ def retrieve_content(env, source_id, upload_id, url, source_format,
             bucket,
             source_id,
             source_format,
+            sort_sources=True
         )
         if deltas_add_file_name:
             s3_deltas_add_object_key = (
                 f"{source_id}"
-                f"{datetime.now(timezone.utc).strftime(TIME_FILEPART_FORMAT)}"
+                f"{today.strftime(TIME_FILEPART_FORMAT)}"
                 f"deltasAdd.{source_format.lower()}"
             )
             logger.info(f"Delta file (ADD): f{deltas_add_file_name}")
@@ -393,7 +459,7 @@ def retrieve_content(env, source_id, upload_id, url, source_format,
         if deltas_del_file_name:
             s3_deltas_del_object_key = (
                 f"{source_id}"
-                f"{datetime.now(timezone.utc).strftime(TIME_FILEPART_FORMAT)}"
+                f"{today.strftime(TIME_FILEPART_FORMAT)}"
                 f"deltasDel.{source_format.lower()}"
             )
             logger.info(f"Delta file (DEL): {deltas_del_file_name}")
@@ -493,7 +559,7 @@ def run_retrieval(tempdir=TEMP_PATH):
         This must contain a `sourceId` field specifying the canonical epid
         system source UUID.
         For more information, see:
-          https://docs.aws.amazon.com/AmazonCloudWatch/latest/events/EventTypes.html#schedule_event_type
+
 
     context: object, required
         Lambda Context runtime methods and attributes.
@@ -525,41 +591,55 @@ def run_retrieval(tempdir=TEMP_PATH):
         auth_headers = common_lib.obtain_api_credentials(s3_client)
     upload_id = common_lib.create_upload_record(
         env, source_id, auth_headers, cookies)
-    url, source_format, parser, date_filter, stable_identifiers, uploads_history = get_source_details(
-        env, source_id, upload_id, auth_headers, cookies)
+    (url, source_format, parser, date_filter, stable_identifiers,
+     uploads_history) = get_source_details(
+         env, source_id, upload_id, auth_headers, cookies)
 
     if not stable_identifiers:
         logger.info(f"Source {source_id} does not have stable identifiers\n"
-              "Ingesting entire dataset and ignoring date filter and date ranges")
+                    "Ingesting entire dataset and ignoring date filter and date ranges")
         date_filter = {}
         parsing_date_range = {}
     url = format_source_url(url)
     file_names_s3_object_keys = retrieve_content(
         env, source_id, upload_id, url, source_format, auth_headers, cookies,
         tempdir=tempdir, uploads_history=uploads_history)
+    file_opts = {}
     for file_name, s3_object_key, *opts in file_names_s3_object_keys:
         upload_to_s3(file_name, s3_object_key, env,
                      source_id, upload_id, auth_headers, cookies)
-    del_upload_id = []
+        # parse options while we're here
+        key = s3_object_key
+        file_opts[s3_object_key] = {}
+        if opts:
+            file_opts[key]['parseit'] = (opts[0]['parseit']
+                                         if 'parseit' in opts[0]
+                                         else True)
+            file_opts[key]['deltas'] = (opts[0]['deltas']
+                                        if 'deltas' in opts[0]
+                                        else None)
+        else:
+            file_opts[key]['parseit'] = True
+            file_opts[key]['deltas'] = None
+    second_upload_id = []
+    deltas_present = [x['deltas'] for x in file_opts.values()]
+    both_deltas_present = ('Add' in deltas_present
+                           and 'Del' in deltas_present)
     if parser:
-        for _, s3_object_key, *opts in file_names_s3_object_keys:
+        for _, s3_object_key, _ in file_names_s3_object_keys:
             # check which files to parse (default: yes); relevant when deltas
             # files are generated, but full source should also be uploaded for
             # future comparisons
-            if opts:
-                parseit = opts[0]['parseit'] if 'parseit' in opts[0] else True
-                deltas = opts[0]['deltas'] if 'deltas' in opts[0] else None
-            else:
-                parseit = True
-                deltas = None
-            if parseit:
+            key = s3_object_key
+            if file_opts[key]['parseit']:
                 parser_module = common_lib.get_parser_module(parser)
-                if deltas == "Del":
-                    # create new uploadId for Deletes
-                    del_upload_id = [common_lib.create_upload_record(
+                deltas = file_opts[key]['deltas']
+                if (both_deltas_present and deltas == "Del"):
+                    # create new uploadId so that it doesn't clash with Add
+                    second_upload_id = [common_lib.create_upload_record(
                         env, source_id, auth_headers, cookies)]
                     invoke_parser(
-                        env, parser_module, source_id, del_upload_id[0],
+                        env, parser_module, source_id, second_upload_id[0],
                         auth_headers, cookies, s3_object_key, url, date_filter,
                         parsing_date_range, deltas)
                 else:
@@ -577,7 +657,7 @@ def run_retrieval(tempdir=TEMP_PATH):
     return {
         "bucket": OUTPUT_BUCKET,
         "key": s3_object_key,
-        "upload_id": [upload_id] + del_upload_id,
+        "upload_id": [upload_id] + second_upload_id,
     }
 
 

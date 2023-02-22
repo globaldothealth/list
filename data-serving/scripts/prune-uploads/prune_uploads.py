@@ -83,7 +83,7 @@ def is_acceptable(upload: Dict[str, Any], threshold: float,
 
 
 def is_deltas_acceptable(upload: Dict[str, Any], threshold: float,
-                  prev_created_count: int = 0) -> bool:
+                         prev_created_count: int = 0) -> bool:
     """Whether a deltas upload is acceptable
 
     :param upload: Upload data as a dictionary
@@ -150,16 +150,18 @@ def find_acceptable_upload(
     accepted_nondelta_indices = [ix for ix, u in enumerate(uploads)
                                  if 'deltas' not in u
                                  or not u['deltas']]
-    accepted_nondelta_indices = accepted_nondelta_indices[0] if accepted_nondelta_indices else []
+    accepted_nondelta_indices = (accepted_nondelta_indices[0]
+                                 if accepted_nondelta_indices else [])
     if accepted_uploads and not allow_decrease:
         prev_created_count = accepted_uploads[0]["summary"].get("numCreated", 0)
     else:
         prev_created_count = 0
-    accept_uploads = [is_acceptable(u, threshold, prev_created_count) for u in uploads]
+    accept_uploads = [is_acceptable(u, threshold, prev_created_count)
+                      for u in uploads]
     if accepted_nondelta_indices:
         accept_uploads[:accepted_nondelta_indices] = [
-                is_deltas_acceptable(u, threshold, prev_created_count)
-                for u in uploads[:accepted_nondelta_indices]]
+            is_deltas_acceptable(u, threshold, prev_created_count)
+            for u in uploads[:accepted_nondelta_indices]]
     try:
         accept_idx = accept_uploads.index(True)
     except ValueError:
@@ -210,9 +212,9 @@ def mark_cases_non_uuid_deltas_del(deltas_del_cases, cases, source_id,
             {"$set": {"list": list_post}}
         )
         if response.modified_count != 1:
-            logging.error(f"Could not mark False (DEL) "\
-                    f"line from the line list, response: "\
-                    f"{print_fields(response)}")
+            logging.error(f"Could not mark False (DEL) "
+                          f"line from the line list, response: "
+                          f"{print_fields(response)}")
             return count
         count += 1
         if count == number_to_process:  # used for rollback
@@ -228,7 +230,8 @@ def mark_cases_non_uuid(
     reject: List[str],
     accept_deltas: List[str | None]
 ):
-    assert len(accept)==len(accept_deltas), "Delta states length does not match accept length."
+    assert len(accept) == len(accept_deltas), ("Delta states length "
+                                               "does not match accept length.")
     if reject:
         logging.info("  ... reject")
         cases.update_many(
@@ -257,12 +260,13 @@ def mark_cases_non_uuid(
                 # DEL item in previous sucessful 'main' and 'delta' uploads, then
                 # mark that item as list=False. This DEL upload will then be
                 # marked as accepted.
-                logging.debug("Removal deltas: find last compatible entry and mark as list=False")
+                logging.debug("Removal deltas: find last compatible entry "
+                              "and mark as list=False")
                 # Traverse and process each DEL case in the upload
                 deltas_del_cases = cases.find({
-                        "caseReference.sourceId": source_id,
-                        "caseReference.uploadIds": accept_item
-                        })
+                    "caseReference.sourceId": source_id,
+                    "caseReference.uploadIds": accept_item
+                })
                 if count := mark_cases_non_uuid_deltas_del(
                         deltas_del_cases,
                         cases,
@@ -270,23 +274,26 @@ def mark_cases_non_uuid(
                         list_pre=True,      # <- Look for items in the list
                         list_post=False,    # <- ... and remove them
                         number_to_process=None):
-                    logging.info(f"Performing ROLLBACK of deltas... "\
-                            f"(source_id={source_id}, upload_id={accept_item})")
+                    logging.info("Performing ROLLBACK of deltas... "
+                                 f"(source_id={source_id}, "
+                                 f"upload_id={accept_item})")
                     mark_cases_non_uuid_deltas_del(
-                            deltas_del_cases,
-                            cases,
-                            source_id,
-                            list_pre=False,  # <- Find set items
-                            list_post=True,  # <- ... and revert them
-                            number_to_process=count)  # <- ... to the point of failure
-                    # set deltas upload to 'reject', which will force whole source
-                    # ingestion during next retrieval
-                    logging.info("Marking deltas file as 'reject' - this will "\
-                            "force whole source ingestion during next retrieval")
+                        deltas_del_cases,
+                        cases,
+                        source_id,
+                        list_pre=False,  # <- Find set items
+                        list_post=True,  # <- ... and revert them
+                        number_to_process=count)  # <- ... to point of failure
+                    # set deltas upload to 'reject', which will force whole
+                    # source ingestion during next retrieval
+                    logging.info("Marking deltas file as 'reject' - this will "
+                                 "force whole source ingestion during next "
+                                 "retrieval")
                     mark_upload(sources, source_id, [accept_item], accept=False)
                     return   # stop ingesting
             else:
-                assert False, f"Unknown deltas state encountered: {deltas_state}"
+                assert False, ("Unknown deltas state encountered: "
+                               "{deltas_state}")
             logging.info("\n".join(accept_reject_msg([accept_item], [])))
             mark_upload(sources, source_id, [accept_item], accept=True)
 
@@ -339,7 +346,7 @@ def prune_uploads(
     _id = str(source["_id"])
     msgs = []
     if (m := find_acceptable_upload(source, threshold, epoch,
-                                    allow_decrease = allow_decrease)) is None:
+                                    allow_decrease=allow_decrease)) is None:
         return []
     accept, accept_deltas_list, reject = m
     if not dry_run:
@@ -454,8 +461,8 @@ if __name__ == "__main__":
     ingested_sources = []
     for s in sources:
         if result := prune_uploads(db.cases, db.sources, s, threshold, epoch,
-                                   dry_run = args.dry_run,
-                                   allow_decrease = True):  # Needed to permit processing of deltas
+                                   dry_run=args.dry_run,
+                                   allow_decrease=True):  # Needed to permit processing of deltas
             ingested_sources.append(s)
             list_msgs = "\n".join(result)
             m.append(f"*{s['name']}* ({str(s['_id'])}):\n{list_msgs}")
