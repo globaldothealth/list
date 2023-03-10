@@ -11,7 +11,7 @@ import importlib
 import time
 import logging
 import dateutil.parser
-from typing import Tuple, List, Any
+from typing import Tuple, List, Dict
 from sys import platform
 from chardet import detect
 from pathlib import Path
@@ -214,41 +214,67 @@ def sort_file_preserve_header(out_filename, in_filename):
         body.wait()
 
 
+def find_source_name_in_ingestion_queue(source_name: str | None = None) -> bool:
+    """Check for running or queued batch processes with source_name
+
+    Already running (or queued) processes could compromise the delta-ingestion
+    processes
+    """
+    # snapshot ingestion-queue for active processes
+    if source_name:
+        logger.info("Deltas: Snapshot batch processes")
+        batch_client = boto3.client("batch")
+        jobs: List[Dict] = []
+        for jobStatus in IN_PROGRESS_STATUS:
+            r = batch_client.list_jobs(
+                jobQueue='ingestion-queue',
+                jobStatus=jobStatus)
+            jobs.append(*r['jobSummaryList'])
+        logger.info(jobs)
+        if list(filter(lambda x: x['jobName'].startswith(
+                f'{source_name}-{source_name}-ingestor'), jobs)):
+            logger.info("Deltas: Ongoing batch jobs relating to source found. "
+                        "Abandoning deltas generation.")
+            return True
+    return False
+
+
 def generate_deltas(latest_filename: str, uploads: List[dict], s3_bucket: str,
                     source_id: str, source_format: str,
-                    sort_sources: bool = True) -> Tuple[str | None, str | None]:
-    """Check last valid ingestion and return filename of deltas
+                    sort_sources: bool = True,
+                    bulk_ingest_on_reject: bool = False,
+                    ) -> Tuple[str | None, str | None]:
+    """Check last valid ingestion and return the filenames of ADD/DEL deltas
 
-    If the previous successful ingestion cannot be reconciled with the most
-    recent source then abandon the deltas and ingest the full dataset.
+    :param latest_filename: Filename of latest source line list from country (local copy)
+    :param uploads: List of uploads history for this source
+    :param s3_bucket: S3 bucket used to store retrieved line lists and deltas
+    :param source_id: UUID for the upload ingestor
+    :param source_format: Format of source file ('CSV', 'JSON', 'XLSX',...)
+    :param sort_sources: Should sources be sorted before computing deltas. This
+      is initially slower, but can drastically reduce the number of lines
+      added and removed following difference determination (recommended).
+    :param bulk_ingest_on_reject: Should we revert to bulk ingestion if the
+        most recent delta ingestion failed?
 
-    Be wary that batch processes may be active, and should be checked
-    before resolving the delta file.
+    'delta' refers to the difference between the full upload at the previous
+    successful ingestion, whether that ingestion was a 'bulk' upload (overwriting
+    all line list content), or a delta update. As such the 'current' full source
+    file is always uploaded, whether delta files are generated or not.
+
+    return: (deltas_add_file_name, deltas_del_file_name)
+      Both, either or neither of these can be None, signifying no deltas,
+      or a processing issue which defaults to bulk ingestion
     """
     logger.info("Deltas: Attempting to generate ingestion deltas file...")
     reject_deltas = None, None
     if source_format != 'CSV':
         logger.info(f"Deltas: upsupported filetype ({source_format}) for deltas generation")
         return reject_deltas
-    snapshot_ingestion_queue = False
-    if snapshot_ingestion_queue:
-        # snapshot ingestion-queue for active processes
-        logger.info("Deltas: Snapshot batch processes")
-        batch_client = boto3.client("batch")
-        jobs: List[Any] = []
-        for jobStatus in IN_PROGRESS_STATUS:
-            r = batch_client.list_jobs(
-                jobQueue='ingestion-queue',
-                jobStatus=jobStatus)
-            jobs.append(*r['jobSummaryList'])
-        # TODO: Ensure no source_id relevant processes are cued or running
-        if False:
-            source_name = ''     # TODO: ###################### GET SOURCE NAME ###
-            if filter(lambda x: x['jobName'].startswith(
-                    f'{source_name}-{source_name}-ingestor'), jobs):
-                logger.info("Deltas: Ongoing batch jobs relating to source found. "
-                            "Abandoning deltas generation.")
-            return reject_deltas
+    # Check that no source_id relevant processes are cued or running
+    source_name = None      # TODO: Identify source name for batch checks (be careful here - names are not always immediately obvious)
+    if find_source_name_in_ingestion_queue(source_name):
+        return reject_deltas
     # identify last good ingestion source
     if not (last_successful_ingest_list := list(filter(
             lambda x: x['status'] == 'SUCCESS', uploads))):
@@ -256,7 +282,7 @@ def generate_deltas(latest_filename: str, uploads: List[dict], s3_bucket: str,
         return reject_deltas
     last_successful_ingest = last_successful_ingest_list[-1]
     d = parse_datetime_lastgoodingestion(last_successful_ingest['created'])
-    uploads.sort(key=lambda x: x["created"], reverse=False)  # sort chronological
+    uploads.sort(key=lambda x: x["created"], reverse=False)  # TODO: Chcek that this sort is correct chronological (since datetime is parsed just above), and that sorting is not required for 'last_successful_ingest', which is isolated above
     if not (bulk_ingestion := list(filter(
             lambda x: (x['status'] == 'SUCCESS')
             and (('deltas' not in x) or (x['deltas'] is None)),
@@ -265,9 +291,9 @@ def generate_deltas(latest_filename: str, uploads: List[dict], s3_bucket: str,
         return reject_deltas
     # ensure no rejected deltas exist after the initial successful bulk upload
     # as this would desynchronise the database; if so, revert to bulk ingestion
-    # NB: This is very conservative as rejected ingestion should rollback and
-    #     any further deltas will match to previous files
-    bulk_ingest_on_reject = False
+    # NB: This is very conservative and probably unnecessary as rejected
+    #     ingestions should rollback so that further deltas will match to
+    #     previous bulk ingested files
     if bulk_ingest_on_reject and list(filter(
             lambda x: ('deltas' in x) and x['deltas']
             and ('accepted' in x) and not x['accepted'],
@@ -281,8 +307,7 @@ def generate_deltas(latest_filename: str, uploads: List[dict], s3_bucket: str,
     logger.info(f"Deltas: Identified last good ingestion source at: {s3_bucket}/{s3_key}")
     s3_client.download_file(s3_bucket, s3_key, last_ingested_file_name)
     logger.info(f"Deltas: Retrieved last good ingestion source: {last_ingested_file_name}")
-    # confirm that headers match and copy header line to the new deltas file
-    #  that will serve as the input source
+    # confirm that reference (previously ingested file) and latest headers match
     with open(last_ingested_file_name, "r") as last_ingested_file:
         last_ingested_header = last_ingested_file.readline()
     with open(latest_filename, "r") as lastest_file:
@@ -434,9 +459,9 @@ def retrieve_content(env, source_id, upload_id, url, source_format,
                 while content:
                     outfile.write(content)
                     content = text_stream.read(READ_CHUNK_BYTES)
-        # always return full source file (but don't necessarily parse it)
+        # always return full source file (but don't parse if deltas generated)
         return_list = [(outfile_name, s3_object_key, {})]
-        # attempt to generate deltas file
+        # attempt to generate deltas files
         deltas_add_file_name, deltas_del_file_name = generate_deltas(
             outfile_name,
             uploads_history,
@@ -452,7 +477,7 @@ def retrieve_content(env, source_id, upload_id, url, source_format,
                 f"deltasAdd.{source_format.lower()}"
             )
             logger.info(f"Delta file (ADD): f{deltas_add_file_name}")
-            return_list[0][2]['parseit'] = False
+            return_list[0][2]['parseit'] = False  # Turn off bulk upload parsing
             return_list.append((deltas_add_file_name,
                                 s3_deltas_add_object_key,
                                 {'deltas': "Add"}))
@@ -463,7 +488,7 @@ def retrieve_content(env, source_id, upload_id, url, source_format,
                 f"deltasDel.{source_format.lower()}"
             )
             logger.info(f"Delta file (DEL): {deltas_del_file_name}")
-            return_list[0][2]['parseit'] = False
+            return_list[0][2]['parseit'] = False  # Turn off bulk upload parsing
             return_list.append((deltas_del_file_name,
                                 s3_deltas_del_object_key,
                                 {'deltas': "Del"}))
@@ -612,9 +637,11 @@ def run_retrieval(tempdir=TEMP_PATH):
         key = s3_object_key
         file_opts[s3_object_key] = {}
         if opts:
+            # Should the file be parsed?
             file_opts[key]['parseit'] = (opts[0]['parseit']
                                          if 'parseit' in opts[0]
                                          else True)
+            # Does the file correspond to a deltas, or bulk upload?
             file_opts[key]['deltas'] = (opts[0]['deltas']
                                         if 'deltas' in opts[0]
                                         else None)

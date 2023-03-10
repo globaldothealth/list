@@ -12,7 +12,7 @@ import os
 import re
 import sys
 from itertools import compress
-from typing import Optional, List, Tuple, Dict, Any
+from typing import List, Tuple, Dict, Any
 
 from bson.objectid import ObjectId
 import requests
@@ -58,7 +58,8 @@ def accept_reject_msg(accept, reject, success=True, prefix=' '):
 
 
 def is_acceptable(upload: Dict[str, Any], threshold: float,
-                  prev_created_count: int = 0) -> bool:
+                  prev_created_count: int = 0,
+                  epoch: None | datetime = None) -> bool:
     """Whether an upload is acceptable
 
     :param upload: Upload data as a dictionary
@@ -79,11 +80,13 @@ def is_acceptable(upload: Dict[str, Any], threshold: float,
         and updated == 0  # non-UUID sources should never update a case
         and errors / (errors + created) <= threshold
         and "accepted" not in upload  # skip already accepted cases
+        and (not epoch or upload["created"] > epoch)
     )
 
 
 def is_deltas_acceptable(upload: Dict[str, Any], threshold: float,
-                         prev_created_count: int = 0) -> bool:
+                         prev_created_count: int = 0,
+                         epoch: None | datetime = None) -> bool:
     """Whether a deltas upload is acceptable
 
     :param upload: Upload data as a dictionary
@@ -104,13 +107,14 @@ def is_deltas_acceptable(upload: Dict[str, Any], threshold: float,
         and created + updated > 0
         and errors / (errors + created) <= threshold
         and "accepted" not in upload  # skip already accepted cases
+        and (not epoch or upload["created"] > epoch)
     )
 
 
 def find_acceptable_upload(
-    source: Dict[str, Any], threshold: float, epoch: datetime = None,
-    allow_decrease: bool = False
-) -> Optional[Tuple[List[str], List[str]]]:
+    source: Dict[str, Any], threshold: float, epoch: None | datetime = None,
+    allow_decrease: bool = True
+) -> None | Tuple[List[str], List[None | str], List[str]]:
     """Finds uploads that can be accepted for inclusion in line list
 
     :param source: Source data
@@ -126,8 +130,12 @@ def find_acceptable_upload(
     If not specified, considers the last acceptable upload to be
     contain the entire dataset.
 
-    :return: A tuple of
-      (last acceptable upload, list of uploads to mark for deletion).
+    :return: A 3-element tuple consisting of
+      (last accepted non-delta/bulk upload along with subsequent deltas [as list],
+       deltas annotations list ("Add", "Del", None) [list]
+       upload ids to mark for deletion [list])
+
+      The tuple elements are returned in chronological (by 'created') order
       If no acceptable upload is found, returns None
     """
     if not (uploads := source.get("uploads", [])):
@@ -139,47 +147,88 @@ def find_acceptable_upload(
             if u['status'] != "IN_PROGRESS"
             and "accepted" not in u
         )
-        return (pending_upload_ids, []) if pending_upload_ids else None
+        return (pending_upload_ids,
+                [None] * len(pending_upload_ids),   # non-deltas
+                []) if pending_upload_ids else None
 
-    # skip rejected uploads
+    # skip rejected uploads (keep accepted and unprocessed)
     uploads = [u for u in uploads if "accepted" not in u or u['accepted']]
 
-    # sort uploads, with most recent being the first
+    # sort uploads by created date, with the most recent first
     uploads.sort(key=lambda x: x["created"], reverse=True)
-    accepted_uploads = [u for u in uploads if u.get("accepted", False)]
+    # get list of already accepted uploads (includes bulk and deltas)
     accepted_nondelta_indices = [ix for ix, u in enumerate(uploads)
-                                 if 'deltas' not in u
-                                 or not u['deltas']]
-    accepted_nondelta_indices = (accepted_nondelta_indices[0]
-                                 if accepted_nondelta_indices else [])
-    if accepted_uploads and not allow_decrease:
-        prev_created_count = accepted_uploads[0]["summary"].get("numCreated", 0)
+                                 if ('deltas' not in u or not u['deltas']) and
+                                 u.get("accepted", False)]
+    last_accepted_nondelta_index = (accepted_nondelta_indices[0]
+                                    if accepted_nondelta_indices else None)
+
+    # if decreases in count numbers are not allowed, get the last count
+    # (only relevant for bulk uploads replacing other bulk uploads)
+    if (last_accepted_nondelta_index is not None) and (not allow_decrease):
+        prev_created_count = \
+            uploads[last_accepted_nondelta_index]["summary"]\
+            .get("numCreated", 0)
     else:
         prev_created_count = 0
-    accept_uploads = [is_acceptable(u, threshold, prev_created_count)
-                      for u in uploads]
-    if accepted_nondelta_indices:
-        accept_uploads[:accepted_nondelta_indices] = [
-            is_deltas_acceptable(u, threshold, prev_created_count)
-            for u in uploads[:accepted_nondelta_indices]]
+
+    # check whether any new bulk uploads have been parsed
+    new_bulk_uploads = [is_acceptable(u, threshold, prev_created_count, epoch)
+                        for u in uploads]
     try:
-        accept_idx = accept_uploads.index(True)
+        new_bulk_ix = new_bulk_uploads.index(True)
     except ValueError:
-        accept_idx = -1  # no acceptable upload found
-    if accept_idx > -1 and (not epoch or uploads[accept_idx]["created"] > epoch):
-        accept_list = _ids(list(compress(uploads, accept_uploads)))
-        accept_deltas_list = list(compress(
-            [u.get("deltas", None) for u in uploads],
-            accept_uploads))
-        # Reject uploads that are not accepted, and not IN_PROGRESS
-        reject_list = _ids(list(
-            filter(lambda u: not u and u['status'] != 'IN PROGRESS', uploads)))
-        # Reverse to chronological order preserve deltas during marking
-        accept_list.reverse()
-        accept_deltas_list.reverse()
-        reject_list.reverse()
-        return accept_list, accept_deltas_list, reject_list
-    return None
+        new_bulk_ix = None
+
+    # construct boolean vector of uploads to accept, defaulting all to False
+    accept_new_uploads = [False] * len(uploads)
+
+    # is a new bulk upload available?
+    if new_bulk_ix is not None:
+        # accept new bulk upload
+        accept_new_uploads[new_bulk_ix] = True
+        # reject all uploads prior to this upload
+        accept_new_uploads[(new_bulk_ix + 1):] = \
+            [False] * (len(uploads) - new_bulk_ix - 1)
+        # test whether newer uploads are acceptable as deltas
+        accept_new_uploads[:new_bulk_ix] = [
+            is_deltas_acceptable(u, threshold, prev_created_count, epoch)
+            for u in uploads[:new_bulk_ix]]
+    elif last_accepted_nondelta_index:
+        # reject all uploads prior to the last accepted bulk upload
+        accept_new_uploads[(last_accepted_nondelta_index + 1):] = \
+            [False] * (len(uploads) - last_accepted_nondelta_index - 1)
+        # test whether newer uploads are acceptable as deltas
+        accept_new_uploads[:last_accepted_nondelta_index] = [
+            is_deltas_acceptable(u, threshold, prev_created_count, epoch)
+            for u in uploads[:last_accepted_nondelta_index]]
+    else:
+        # no new bulk upload available, and no existing bulk upload identified
+        return None
+
+    # build acceptance list, delta annotations
+    accept_list = _ids(list(compress(uploads, accept_new_uploads)))
+    deltas_annot = list(compress([u.get("deltas", None) for u in uploads],
+                                 accept_new_uploads))
+    # reject all uploads that are not accepted, but are also not in-progress
+    #  (prefer list comprehension over sets to preserve ordering)
+    uploads_not_accepted = _ids(compress(uploads,
+                                         map(lambda x: not x,
+                                             accept_new_uploads)))
+    uploads_in_progress = _ids(filter(
+        lambda u: u['status'] == 'IN_PROGRESS', uploads))
+    reject_list = \
+        [x for x in uploads_not_accepted if x not in uploads_in_progress]
+
+    # Revert to chronological order
+    accept_list.reverse()
+    deltas_annot.reverse()
+    reject_list.reverse()
+
+    # don't reject anything if nothing is being accepted
+    if not accept_list:
+        return None
+    return accept_list, deltas_annot, reject_list
 
 
 def print_fields(response):
@@ -228,10 +277,10 @@ def mark_cases_non_uuid(
     source_id: str,
     accept: List[str],
     reject: List[str],
-    accept_deltas: List[str | None]
+    deltas_annot: List[str | None]
 ):
-    assert len(accept) == len(accept_deltas), ("Delta states length "
-                                               "does not match accept length.")
+    assert len(accept) == len(deltas_annot), \
+        "Delta states length does not match accept length."
     if reject:
         logging.info("  ... reject")
         cases.update_many(
@@ -246,7 +295,7 @@ def mark_cases_non_uuid(
     if accept:
         logging.info("  ... accept")
         # deltas can be Add, Del, or None(treat as Add), so traverse uploads
-        for accept_item, deltas_state in zip(accept, accept_deltas):
+        for accept_item, deltas_state in zip(accept, deltas_annot):
             if (not deltas_state) or (deltas_state == 'Add'):
                 cases.update_many(
                     {
@@ -338,9 +387,9 @@ def prune_uploads(
     sources: pymongo.collection.Collection,
     source: Dict[str, Any],
     threshold: float,
-    epoch: datetime = None,
+    epoch: None | datetime = None,
     dry_run: bool = False,
-    allow_decrease: bool = False,
+    allow_decrease: bool = True,
 ) -> List[str]:
     "Prune uploads for a source"
     _id = str(source["_id"])
@@ -348,7 +397,7 @@ def prune_uploads(
     if (m := find_acceptable_upload(source, threshold, epoch,
                                     allow_decrease=allow_decrease)) is None:
         return []
-    accept, accept_deltas_list, reject = m
+    accept, deltas_annot_list, reject = m
     if not dry_run:
         logging.info(f"source {_id} {source['name']}")
     if not s.get("hasStableIdentifiers", False):
@@ -359,7 +408,7 @@ def prune_uploads(
                                     _id,
                                     accept,
                                     reject,
-                                    accept_deltas_list)
+                                    deltas_annot_list)
             msgs.extend(accept_reject_msg(accept, reject, True, prefix='-'))
         except pymongo.errors.PyMongoError:
             logging.info(accept_reject_msg(accept, reject, False))
@@ -409,8 +458,11 @@ if __name__ == "__main__":
         help="Error threshold percentage below which uploads are accepted",
     )
     parser.add_argument("-n", "--dry-run", help="Dry run", action="store_true")
-    parser.add_argument("-d", "--allow-decrease",
-                        help="Allow decrease in cases (non-UUID)", action="store_true")
+    parser.add_argument(
+        "-d", "--allow-decrease",
+        help="Allow decrease in cases (non-UUID) "
+             "(redundant: this is the default behaviour since ingestion "
+             "deltas were introduced)", action="store_true")
     parser.add_argument("-r", "--run-hooks",
                         help="Run hooks after prune finishes. Specify 'all' to run all hooks")
     parser.add_argument("--env",
