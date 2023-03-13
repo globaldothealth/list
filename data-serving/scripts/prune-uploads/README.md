@@ -1,4 +1,6 @@
-# prune uploads
+# Prune uploads
+
+Script: `prune_upload.py`
 
 This is a script that should be run periodically that sets every upload older
 than the last acceptable upload to *list = false* (for non-UUID sources). For
@@ -105,3 +107,29 @@ an example: US would map to `exporter_united_states`). These job definitions
 export country-specific data to an S3 bucket. This hook submits jobs to the
 `export-queue` jom queue, triggering the country export process for the sources
 it just ingested.
+
+# Prune database
+
+Script: `prune_db.py`
+
+***ENSURE INGESTION PROCESSES ARE SWITCHED OFF BEFORE RUNNING THIS SCRIPT***
+
+This script is designed to be run manually to prune the database of all cases
+that are unprocessed, or have been marked for removal (i.e. where `list=False`
+or `list` does not exist as a field in the record). It is
+intended to be run infrequently when a database clean-up is required, such
+as after a prolonged period of failed ingestions (this can lead to uncontrolled
+growth in the number of records).
+
+Note that it is not strictly necessary to run this script, as any
+successful ingestion will trigger pruning of the source/country-specific records
+anyway, but the ingestion process itself may be running too slowly by that time
+to complete within a reasonable timeframe, and this script will clean-up across
+ALL sources.
+
+To dry-run, setup the Python virtual environment and ensure that the database
+connection (`CONN`) has been specified, as above, then run `python3 prune_db.py`
+with no arguments (always do this first, it will provide statistics on how many
+records are in the database, how many records match deletion criteria, and how
+long these queries took to run). To commit changes, run the script with the
+`--live` command line argument: `python3 prune_db.py --live`.

@@ -246,14 +246,12 @@ SD3_expected = (
 )
 
 TD = [
-    (SD1, SD1_expected),
-    (SD2, SD2_expected),
-    (SD3, SD3_expected),
+    (SD1, SD1_expected),  # bulk+deltas (with prior bulk upload)
+    (SD2, SD2_expected),  # bulk+deltas (no previous bulk upload)
+    (SD3, SD3_expected),  # add a new bulk upload at the end
 ]
 
 
 @pytest.mark.parametrize("source,expected", TD)
 def test_find_acceptable_upload_deltas(source, expected):
-    print(find_acceptable_upload(source, ERROR_THRESHOLD))
-    print(expected)
     assert find_acceptable_upload(source, ERROR_THRESHOLD) == expected

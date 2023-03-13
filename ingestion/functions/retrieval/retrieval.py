@@ -229,10 +229,24 @@ def find_source_name_in_ingestion_queue(source_name: str | None = None) -> bool:
             r = batch_client.list_jobs(
                 jobQueue='ingestion-queue',
                 jobStatus=jobStatus)
-            jobs.append(*r['jobSummaryList'])
+            jobs.extend(r['jobSummaryList'])
         logger.info(jobs)
+        # Be careful here - names are not always immediately obvious:
+        # e.g. 'ch_zurich-zurich-ingestor-prod'
+        #      'brazil_srag-srag-ingestor-prod'
+        # workaround: check variations in naming
         if list(filter(lambda x: x['jobName'].startswith(
                 f'{source_name}-{source_name}-ingestor'), jobs)):
+            logger.info("Deltas: Ongoing batch jobs relating to source found. "
+                        "Abandoning deltas generation.")
+            return True
+        if list(filter(lambda x: x['jobName'].endswith(
+                f'-{source_name}-ingestor-prod'), jobs)):
+            logger.info("Deltas: Ongoing batch jobs relating to source found. "
+                        "Abandoning deltas generation.")
+            return True
+        if list(filter(lambda x: x['jobName'].startswith(
+                f'{source_name}-'), jobs)):
             logger.info("Deltas: Ongoing batch jobs relating to source found. "
                         "Abandoning deltas generation.")
             return True
@@ -242,7 +256,7 @@ def find_source_name_in_ingestion_queue(source_name: str | None = None) -> bool:
 def generate_deltas(latest_filename: str, uploads: List[dict], s3_bucket: str,
                     source_id: str, source_format: str,
                     sort_sources: bool = True,
-                    bulk_ingest_on_reject: bool = False,
+                    bulk_ingest_on_reject: bool = True,
                     ) -> Tuple[str | None, str | None]:
     """Check last valid ingestion and return the filenames of ADD/DEL deltas
 
@@ -271,29 +285,35 @@ def generate_deltas(latest_filename: str, uploads: List[dict], s3_bucket: str,
     if source_format != 'CSV':
         logger.info(f"Deltas: upsupported filetype ({source_format}) for deltas generation")
         return reject_deltas
+    # Check for an uploads history before attempting to process
+    if not uploads:
+        return reject_deltas
     # Check that no source_id relevant processes are cued or running
-    source_name = None      # TODO: Identify source name for batch checks (be careful here - names are not always immediately obvious)
+    source_name = source_id
     if find_source_name_in_ingestion_queue(source_name):
         return reject_deltas
-    # identify last good ingestion source
+    # identify last successful ingestion source
+    uploads.sort(key=lambda x: x["created"], reverse=False)  # most recent last
     if not (last_successful_ingest_list := list(filter(
             lambda x: x['status'] == 'SUCCESS', uploads))):
         logger.info("Deltas: No previous successful ingestions found.")
         return reject_deltas
     last_successful_ingest = last_successful_ingest_list[-1]
     d = parse_datetime_lastgoodingestion(last_successful_ingest['created'])
-    uploads.sort(key=lambda x: x["created"], reverse=False)  # TODO: Chcek that this sort is correct chronological (since datetime is parsed just above), and that sorting is not required for 'last_successful_ingest', which is isolated above
+    # identify last successful 'bulk' ingestion
     if not (bulk_ingestion := list(filter(
             lambda x: (x['status'] == 'SUCCESS')
             and (('deltas' not in x) or (x['deltas'] is None)),
             uploads))):
         logger.info("Deltas: Cannot identify last successful bulk upload")
         return reject_deltas
-    # ensure no rejected deltas exist after the initial successful bulk upload
+    # check that no rejected deltas exist after the last successful bulk upload
     # as this would desynchronise the database; if so, revert to bulk ingestion
-    # NB: This is very conservative and probably unnecessary as rejected
-    #     ingestions should rollback so that further deltas will match to
-    #     previous bulk ingested files
+    # this time around.
+    # Note: This is necessary since Add and Del deltas are given different upload
+    #   id's so that both are processed during pruning. A failure in one (but not
+    #   the other) would desynchonise the database from their associated
+    #   retrieval sources.
     if bulk_ingest_on_reject and list(filter(
             lambda x: ('deltas' in x) and x['deltas']
             and ('accepted' in x) and not x['accepted'],

@@ -158,8 +158,8 @@ def find_acceptable_upload(
     uploads.sort(key=lambda x: x["created"], reverse=True)
     # get list of already accepted uploads (includes bulk and deltas)
     accepted_nondelta_indices = [ix for ix, u in enumerate(uploads)
-                                 if ('deltas' not in u or not u['deltas']) and
-                                 u.get("accepted", False)]
+                                 if ('deltas' not in u or not u['deltas'])
+                                 and u.get("accepted", False)]
     last_accepted_nondelta_index = (accepted_nondelta_indices[0]
                                     if accepted_nondelta_indices else None)
 
@@ -333,11 +333,8 @@ def mark_cases_non_uuid(
                         list_pre=False,  # <- Find set items
                         list_post=True,  # <- ... and revert them
                         number_to_process=count)  # <- ... to point of failure
-                    # set deltas upload to 'reject', which will force whole
-                    # source ingestion during next retrieval
-                    logging.info("Marking deltas file as 'reject' - this will "
-                                 "force whole source ingestion during next "
-                                 "retrieval")
+                    # set deltas upload to 'reject'
+                    logging.info("Marking deltas file as 'reject'.")
                     mark_upload(sources, source_id, [accept_item], accept=False)
                     return   # stop ingesting
             else:
