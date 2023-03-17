@@ -407,8 +407,9 @@ def prune_uploads(
                                     reject,
                                     deltas_annot_list)
             msgs.extend(accept_reject_msg(accept, reject, True, prefix='-'))
-        except pymongo.errors.PyMongoError:
+        except pymongo.errors.PyMongoError as err:
             logging.info(accept_reject_msg(accept, reject, False))
+            logging.debug(err)
             msgs.extend(accept_reject_msg(accept, reject, False, prefix='-'))
         try:
             if reject and not dry_run:
@@ -426,8 +427,9 @@ def prune_uploads(
             if not dry_run:
                 mark_cases_uuid(cases, sources, _id, accept)
             return accept_reject_msg(accept, [], True, prefix='-')
-        except pymongo.errors.PyMongoError:
+        except pymongo.errors.PyMongoError as err:
             logging.info(accept_reject_msg(accept, [], False))
+            logging.debug(err)
             return accept_reject_msg(accept, [], False, prefix='-')
     return msgs
 
