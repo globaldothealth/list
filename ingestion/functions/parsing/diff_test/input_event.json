@@ -1,0 +1,7 @@
+{
+    "env": "local",
+    "s3Bucket": "gdh-sources",
+    "s3Key": "diff_test.csv",
+    "sourceUrl": "s3://gdh-sources/diff_test.csv",
+    "sourceId": "63eea944d043c2e91d6eabee"
+}

@@ -6,7 +6,9 @@ import pytest
 import tempfile
 import sys
 import zipfile
+import shutil
 
+from enum import Enum
 from unittest.mock import MagicMock, patch
 
 SOURCES_BUCKET = "gdh-sources"
@@ -21,8 +23,9 @@ except ImportError:
     import common_lib
 
 
-s3_client = boto3.client("s3",
-    endpoint_url=os.environ.get("AWS_ENDPOINT", "http://localstack:4566"),
+s3_client = boto3.client(
+    "s3",
+    endpoint_url=os.environ.get("AWS_ENDPOINT", "http://localhost.localstack.cloud:4566"),
     aws_access_key_id=os.environ.get("AWS_ACCESS_KEY_ID", "test"),
     aws_secret_access_key=os.environ.get("AWS_SECRET_ACCESS_KEY", "test"),
     region_name=os.environ.get("AWS_REGION", "eu-central-1")
@@ -116,6 +119,7 @@ def test_format_url(mock_today):
     assert retrieval.format_source_url(
         url) == "http://foo.bar/2020-06-08/6/8.json"
 
+
 @patch('retrieval.retrieval.get_today')
 def test_format_url_daysbefore(mock_today):
     from retrieval import retrieval  # Import locally to avoid superseding mock
@@ -150,13 +154,14 @@ def test_e2e(source, valid_event, mock_source_api_url_fixture, setup_e2e, tempdi
         response["key"],
         origin_url,
         date_filter if has_stable_ids else {},
-        valid_event["parsingDateRange"] if has_stable_ids else {})
+        valid_event["parsingDateRange"] if has_stable_ids else {},
+        None)
     assert requests_mock.request_history[0].url == create_upload_url(source_id)
     assert requests_mock.request_history[1].url == full_source_url
     assert requests_mock.request_history[2].url == origin_url
     assert response["bucket"] == retrieval.OUTPUT_BUCKET
     assert source_id in response["key"]
-    assert response["upload_id"] == upload_id
+    assert response["upload_id"][0] == upload_id    # returns a list to support deltas
 
 
 def test_extract_event_fields_returns_env_source_id_and_date_range(valid_event):
@@ -305,6 +310,7 @@ def test_retrieve_content_persists_downloaded_csv_locally(requests_mock):
     with open(files_s3_keys[0][0], "r") as f:
         assert f.read().strip() == "foo,bar\nbaz,quux"
 
+
 def test_retrieve_content_returns_local_and_s3_object_names(requests_mock):
     from retrieval import retrieval  # Import locally to avoid superseding mock
     source_id = "id"
@@ -312,8 +318,8 @@ def test_retrieve_content_returns_local_and_s3_object_names(requests_mock):
     requests_mock.get(content_url, json={"data": "yes"})
     results = retrieval.retrieve_content(
         "env", source_id, "upload_id", content_url, "JSON", {}, {}, tempdir="/tmp")
-    assert all("/tmp/" in fn for fn, s3key in results)
-    assert all(source_id in s3key for fn, s3key in results)
+    assert all("/tmp/" in fn for fn, s3key, *opts in results)
+    assert all(source_id in s3key for fn, s3key, *opts in results)
 
 
 def test_retrieve_content_raises_error_for_non_supported_format(
@@ -448,3 +454,157 @@ def test_raw_content_ignores_unknown_mimetypes():
     url = 'http://mock/url'
     wrappedBytes = retrieval.raw_content(url, b'foo', tempdir="/tmp")
     assert wrappedBytes.read() == b'foo'
+
+
+def test_find_source_name_in_ingestion_queue():
+    from retrieval import retrieval
+
+    # Mock boto3.client("batch") and .list_jobs()
+    class b3batch:
+        def list_jobs(*args, **kwargs):
+            return {"jobSummaryList": [
+                {"jobName": "testcountry-testcountry-ingestor-prod",
+                 "status": "RUNNING"
+                 }]}
+    env = 'test'
+    with patch('retrieval.retrieval.boto3.client') as mock:
+        mock.return_value = b3batch()
+        # Null case should return False
+        assert not retrieval.find_source_name_in_ingestion_queue(None, env)
+        # Miss should return false
+        assert not retrieval.find_source_name_in_ingestion_queue(
+            'country-not-found', env)
+        # Hit should return true
+        assert retrieval.find_source_name_in_ingestion_queue('testcountry', env)
+
+
+# Helper function to compare output files to expected (string)
+def compare_files(filename1: str, filename2: str):
+    try:
+        with open(filename1, "r") as file1, \
+                open(filename2, 'r') as file2:
+            for (line1, line2) in zip(file1, file2, strict=True):
+                if line1 != line2:
+                    return False
+    except ValueError:  # zip-strict
+        return False
+    return True
+
+
+def test_compare_files():
+    # Make sure compare_files works as expected...
+    assert compare_files(  # compare to self
+        './parsing/diff_test/file1_initial.csv',
+        './parsing/diff_test/file1_initial.csv')
+    assert not compare_files(  # same length, diff content
+        './parsing/diff_test/file2_add4.csv',
+        './parsing/diff_test/file2_add4_sorted.csv')
+    assert not compare_files(  # different length
+        './parsing/diff_test/file1_initial.csv',
+        './parsing/diff_test/file2_add4.csv')
+
+
+@pytest.mark.skipif(not os.environ.get("DOCKERIZED", False),
+                    reason="Running integration tests outside of mock environment disabled")
+def test_generate_deltas():
+    '''Generate delta files from current and previous successful source'''
+    from retrieval import retrieval
+
+    # Helper function to create upload records
+    def _u(i, status, date, created=0, errors=0, updated=0, accepted=None, deltas=None):
+        u = {
+            "_id": i,
+            "status": status.name,
+            "created": str(datetime.datetime.fromisoformat(date)),
+            "summary": {"numCreated": created, "numUpdated": updated, "numError": errors},
+        }
+        if accepted is not None:
+            u["accepted"] = accepted
+        if deltas is not None:
+            u["deltas"] = deltas
+        return u
+    UploadStatus = Enum("UploadStatus", "SUCCESS IN_PROGRESS ERROR")
+
+    # Mock download_file() function --- used for last-successful-ingestion
+    last_successful_ingestion = ''  # Set before calling download_file_mock
+    def download_file_mock(bucket, key, filename):  # noqa: E306
+        shutil.copyfile(last_successful_ingestion, filename)
+        pass
+
+    with patch('retrieval.retrieval.find_source_name_in_ingestion_queue') \
+            as find_source_name_in_ingestion_queue, \
+            patch('retrieval.retrieval.s3_client.download_file') as download_file:
+        find_source_name_in_ingestion_queue.return_value = False
+        download_file.side_effect = download_file_mock
+        # Default paramters for generate_deltas call
+        env = 'test'
+        latest_filename = ''  # populate as we go
+        uploads = []  # populate as we go
+        s3_bucket = 's3_bucket'  # only used for download_file (mocked above)
+        source_id = 'source_id'  # only used for download_file (mocked above)
+        source_format = 'CSV'  # only CSV supported (others tested below)
+        sort_sources = True  # (default); unsorted results are machine dependent on 'comm'
+
+        # ### Test normal process ###
+        #
+        # Outputs are (add_filename, del_filename),
+        # or (None, None) upon fail / bulk ingestion.
+        # Both, either or neither can be None.
+        #
+        # Run these tests in order as they examine differences from one
+        # upload to the next.
+
+        # 1: Test initial (bulk) upload (no delta outputs to check)
+        reject_deltas = None, None
+        last_successful_ingestion = ''
+        latest_filename = './parsing/diff_test/file1_initial.csv'
+        assert retrieval.generate_deltas(
+            env, latest_filename, uploads, s3_bucket, source_id, source_format,
+            sort_sources) == reject_deltas
+        uploads.append(_u("60f734296e50eb2592992fb0", UploadStatus.SUCCESS,
+                          "2020-12-31", 8))
+
+        # 2: Add initial upload to history, test ADD-only delta
+        last_successful_ingestion = latest_filename
+        latest_filename = './parsing/diff_test/file2_add4.csv'
+        (file_add, file_del) = retrieval.generate_deltas(
+            env, latest_filename, uploads, s3_bucket, source_id, source_format,
+            sort_sources)
+        assert file_add and not file_del
+        assert compare_files(file_add, './parsing/diff_test/file2_add4_mindiff.csv')
+        uploads.append(_u("60f733dcfae8bf76717d598e", UploadStatus.SUCCESS,
+                          "2021-01-01", 4, deltas=True))
+
+        # 3: Test DEL-only delta
+        last_successful_ingestion = latest_filename
+        latest_filename = './parsing/diff_test/file3_rem3.csv'
+        (file_add, file_del) = retrieval.generate_deltas(
+            env, latest_filename, uploads, s3_bucket, source_id, source_format,
+            sort_sources)
+        assert file_del and not file_add
+        assert compare_files(file_del, './parsing/diff_test/file3_rem3_mindiff.csv')
+        uploads.append(_u("60f733dcfae8bf76717d111a", UploadStatus.SUCCESS,
+                          "2021-01-10", 5, deltas=True))
+
+        # 4: Headers do not match (occurs when source formats change)
+        last_successful_ingestion = latest_filename
+        latest_filename = './parsing/diff_test/file_badheader.csv'
+        assert retrieval.generate_deltas(
+            env, latest_filename, uploads, s3_bucket, source_id, source_format,
+            sort_sources) == reject_deltas
+
+        # ### Failure cases ###
+
+        # Non-supported file-type
+        last_successful_ingestion = ''
+        latest_filename = './parsing/diff_test/file_does_not_exist.json'
+        assert retrieval.generate_deltas(
+            env, latest_filename, uploads, s3_bucket, source_id, source_format='JSON',
+            sort_sources=sort_sources) == reject_deltas
+
+        # Deltas larger than half the record (revert to bulk upload)
+        last_successful_ingestion = './parsing/diff_test/file1_initial.csv'
+        latest_filename = './parsing/diff_test/file4_headeronly.csv'
+        assert retrieval.generate_deltas(
+            env, latest_filename, uploads, s3_bucket, source_id, source_format,
+            sort_sources=sort_sources) == reject_deltas

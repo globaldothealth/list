@@ -9,11 +9,12 @@ from botocore.exceptions import ClientError
 import clean_old_ingestion_source_files
 import aws_access.globaldothealth_configuration as gdoth
 
-localstack = 'http://localstack:4566'
+localstack = os.environ.get("AWS_ENDPOINT", "http://localhost.localstack.cloud:4566")
 rate_event_id = '5f7796ece78c6866f6f676e0'
-file_content = "blah blah blah" # this is unimportant
-file_time = '1130' # also unimportant
-file_name = 'slartibartfast.json' # "my name is not important"
+file_content = "blah blah blah"  # this is unimportant
+file_time = '1130'  # also unimportant
+file_name = 'slartibartfast.json'  # "my name is not important"
+
 
 def s3_object_key_helper(source_id, date, file_name):
     return f"{source_id}/{date.year}/{date.month}/{date.day}/{file_time}/{file_name}"
@@ -69,6 +70,7 @@ class CleanupScriptTests(unittest.TestCase):
             assert self.s3.Object(gdoth.INGESTION_SOURCES_BUCKET, self.day_before_key).load()
         with self.assertRaises(ClientError):
             assert self.s3.Object(gdoth.INGESTION_SOURCES_BUCKET, self.day_of_key).load()
+
 
 if __name__ == '__main__':
     unittest.main()

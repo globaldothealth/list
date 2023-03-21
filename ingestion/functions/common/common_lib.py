@@ -77,7 +77,7 @@ def create_upload_record(env, source_id, headers, cookies):
 
 def finalize_upload(
         env, source_id, upload_id, headers, cookies, count_created=None,
-        count_updated=None, count_error=None, error=None):
+        count_updated=None, count_error=None, error=None, deltas=None):
     """Records the results of an upload via the G.h Source API."""
     put_api_url = f"{get_source_api_url(env)}/sources/{source_id}/uploads/{upload_id}"
     logger.info(f"Updating upload via {put_api_url}")
@@ -93,6 +93,8 @@ def finalize_upload(
         update["summary"]["numUpdated"] = count_updated
     if count_error:
         update["summary"]["numError"] = count_error
+    if deltas:
+        update["deltas"] = deltas
 
     res = requests.put(put_api_url,
                        json=update,

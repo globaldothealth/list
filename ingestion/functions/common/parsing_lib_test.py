@@ -325,7 +325,8 @@ def test_extract_event_fields_returns_all_present_fields(input_event):
         input_event[parsing_lib.S3_KEY_FIELD],
         None,
         input_event[parsing_lib.DATE_RANGE_FIELD],
-        input_event[parsing_lib.AUTH_FIELD])
+        input_event[parsing_lib.AUTH_FIELD],
+        None)
 
 
 def test_extract_event_fields_errors_if_missing_bucket_field(input_event):
