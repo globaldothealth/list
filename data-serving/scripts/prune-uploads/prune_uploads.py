@@ -240,35 +240,58 @@ def print_fields(response):
     return ', '.join(out_str)
 
 
-def mark_cases_non_uuid_deltas_del(deltas_del_cases, cases, source_id,
-                                   list_pre, list_post, number_to_process=None):
-    '''Mark individual cases for list inclusion of removal
+def mark_cases_non_uuid_deltas_del(
+        deltas_del_cases: pymongo.cursor.Cursor,
+        cases: pymongo.collection.Collection,
+        source_id: str) -> List[ObjectId]:
+    '''Traverse cases and mark each case for list removal
 
-    This function can be used to 1) mark cases for removal [DEL deltas], but
-    also to reverse the operation in the event of an error (specify the number
-    of cases to revert.
+    Sets cases for removal by marking list=False for all items specified in
+    deltas_del_cases.
 
-    Returns the number of cases successfully processed
+    Returns the number of cases successfully processed, along with their
+    associated caseId's (which can be used for rollback if needed)
     '''
-    count = 0
+    modified_cases: List[ObjectId] = []
     for item in deltas_del_cases:
         match_criteria = dict(zip(DELTAS_MATCH_FIELDS,
                                   [item[it] for it in DELTAS_MATCH_FIELDS]))
         match_criteria['caseReference.sourceId'] = source_id
-        match_criteria['list'] = list_pre
+        match_criteria['list'] = True
+        # 1. Identify a specific case to change (caseId can be used for rollback)
+        respFindCase = cases.find_one(match_criteria)
+        match_criteria['_id'] = respFindCase['_id']
+        # 2. Modify the identified case
         response = cases.update_one(
             match_criteria,
-            {"$set": {"list": list_post}}
+            {"$set": {"list": False}}
         )
         if response.modified_count != 1:
-            logging.error(f"Could not mark False (DEL) "
-                          f"line from the line list, response: "
-                          f"{print_fields(response)}")
-            return count
-        count += 1
-        if count == number_to_process:  # used for rollback
-            return count
-    return 0
+            # Failed to update record
+            logging.error("Could not DELETE delta item from line list, "
+                          f"response: {print_fields(response)}")
+            return modified_cases
+        modified_cases.append(match_criteria['_id'])
+    return modified_cases
+
+
+def mark_cases_non_uuid_deltas_del_rollback(
+        cases: pymongo.collection.Collection,
+        modified_cases: List[ObjectId]) -> List[ObjectId]:
+    rollback_cases: List[ObjectId] = []
+    for item in modified_cases:
+        match_criteria = {'_id': item}
+        response = cases.update_one(
+            match_criteria,
+            {"$set": {"list": True}}
+        )
+        if response.modified_count != 1:
+            # Failed to rollback record
+            logging.error("Could not ROLLBACK delta item from line list, "
+                          f"response: {print_fields(response)}")
+            return rollback_cases
+        rollback_cases.append(item)
+    return rollback_cases
 
 
 def mark_cases_non_uuid(
@@ -300,7 +323,7 @@ def mark_cases_non_uuid(
                 cases.update_many(
                     {
                         "caseReference.sourceId": source_id,
-                        "caseReference.uploadIds": accept_item
+                        "caseReference.uploadIds": [accept_item]
                     },
                     {"$set": {"list": True}},
                 )
@@ -312,31 +335,27 @@ def mark_cases_non_uuid(
                 logging.debug("Removal deltas: find last compatible entry "
                               "and mark as list=False")
                 # Traverse and process each DEL case in the upload
+                deltas_del_cases_count = cases.count_documents({
+                    "caseReference.sourceId": source_id,
+                    "caseReference.uploadIds": [accept_item]
+                })
                 deltas_del_cases = cases.find({
                     "caseReference.sourceId": source_id,
-                    "caseReference.uploadIds": accept_item
+                    "caseReference.uploadIds": [accept_item]
                 })
-                if count := mark_cases_non_uuid_deltas_del(
-                        deltas_del_cases,
-                        cases,
-                        source_id,
-                        list_pre=True,      # <- Look for items in the list
-                        list_post=False,    # <- ... and remove them
-                        number_to_process=None):
+                modified_cases = mark_cases_non_uuid_deltas_del(
+                    deltas_del_cases, cases, source_id)
+                if len(modified_cases) != deltas_del_cases_count:
                     logging.info("Performing ROLLBACK of deltas... "
                                  f"(source_id={source_id}, "
-                                 f"upload_id={accept_item})")
-                    mark_cases_non_uuid_deltas_del(
-                        deltas_del_cases,
-                        cases,
-                        source_id,
-                        list_pre=False,  # <- Find set items
-                        list_post=True,  # <- ... and revert them
-                        number_to_process=count)  # <- ... to point of failure
+                                 f"upload_id={accept_item}, "
+                                 f"cases={modified_cases})")
+                    mark_cases_non_uuid_deltas_del_rollback(cases,
+                                                            modified_cases)
                     # set deltas upload to 'reject'
                     logging.info("Marking deltas file as 'reject'.")
                     mark_upload(sources, source_id, [accept_item], accept=False)
-                    return   # stop ingesting
+                    return   # stop ingesting (wait for next bulk upload)
             else:
                 assert False, ("Unknown deltas state encountered: "
                                "{deltas_state}")
@@ -457,11 +476,6 @@ if __name__ == "__main__":
         help="Error threshold percentage below which uploads are accepted",
     )
     parser.add_argument("-n", "--dry-run", help="Dry run", action="store_true")
-    parser.add_argument(
-        "-d", "--allow-decrease",
-        help="Allow decrease in cases (non-UUID) "
-             "(redundant: this is the default behaviour since ingestion "
-             "deltas were introduced)", action="store_true")
     parser.add_argument("-r", "--run-hooks",
                         help="Run hooks after prune finishes. Specify 'all' to run all hooks")
     parser.add_argument("--env",

@@ -66,11 +66,6 @@ Remove the -n to actually prune uploads.
 
 * **-n**, **--dry-run**: Dry run, do not change the database
 
-* **-d**, **--allow-decrease**: Allow cases to decrease in ingestion for non-UUID
-  uploads. By default, non-UUID uploads are only accepted if they increase the number
-  of cases. This option has no effect on UUID source uploads, which are always
-  ingested.
-
 * **-r**, **--run-hooks**=*hook1*[,*hook2*]: Runs hooks after prune finishes. Specify
   *all* to run all hooks configured to run.
 

@@ -466,11 +466,16 @@ def test_find_source_name_in_ingestion_queue():
                 {"jobName": "testcountry-testcountry-ingestor-prod",
                  "status": "RUNNING"
                  }]}
+    env = 'test'
     with patch('retrieval.retrieval.boto3.client') as mock:
         mock.return_value = b3batch()
-        assert not retrieval.find_source_name_in_ingestion_queue(None)  # Null case should return False
-        assert not retrieval.find_source_name_in_ingestion_queue('country-not-found')  # Miss should return false
-        assert retrieval.find_source_name_in_ingestion_queue('testcountry')  # Hit should return true
+        # Null case should return False
+        assert not retrieval.find_source_name_in_ingestion_queue(None, env)
+        # Miss should return false
+        assert not retrieval.find_source_name_in_ingestion_queue(
+            'country-not-found', env)
+        # Hit should return true
+        assert retrieval.find_source_name_in_ingestion_queue('testcountry', env)
 
 
 # Helper function to compare output files to expected (string)
@@ -518,7 +523,7 @@ def test_generate_deltas():
         if deltas is not None:
             u["deltas"] = deltas
         return u
-    UploadStatus = Enum("Status", "SUCCESS IN_PROGRESS ERROR")
+    UploadStatus = Enum("UploadStatus", "SUCCESS IN_PROGRESS ERROR")
 
     # Mock download_file() function --- used for last-successful-ingestion
     last_successful_ingestion = ''  # Set before calling download_file_mock
@@ -532,6 +537,7 @@ def test_generate_deltas():
         find_source_name_in_ingestion_queue.return_value = False
         download_file.side_effect = download_file_mock
         # Default paramters for generate_deltas call
+        env = 'test'
         latest_filename = ''  # populate as we go
         uploads = []  # populate as we go
         s3_bucket = 's3_bucket'  # only used for download_file (mocked above)
@@ -553,7 +559,7 @@ def test_generate_deltas():
         last_successful_ingestion = ''
         latest_filename = './parsing/diff_test/file1_initial.csv'
         assert retrieval.generate_deltas(
-            latest_filename, uploads, s3_bucket, source_id, source_format,
+            env, latest_filename, uploads, s3_bucket, source_id, source_format,
             sort_sources) == reject_deltas
         uploads.append(_u("60f734296e50eb2592992fb0", UploadStatus.SUCCESS,
                           "2020-12-31", 8))
@@ -562,7 +568,7 @@ def test_generate_deltas():
         last_successful_ingestion = latest_filename
         latest_filename = './parsing/diff_test/file2_add4.csv'
         (file_add, file_del) = retrieval.generate_deltas(
-            latest_filename, uploads, s3_bucket, source_id, source_format,
+            env, latest_filename, uploads, s3_bucket, source_id, source_format,
             sort_sources)
         assert file_add and not file_del
         assert compare_files(file_add, './parsing/diff_test/file2_add4_mindiff.csv')
@@ -573,7 +579,7 @@ def test_generate_deltas():
         last_successful_ingestion = latest_filename
         latest_filename = './parsing/diff_test/file3_rem3.csv'
         (file_add, file_del) = retrieval.generate_deltas(
-            latest_filename, uploads, s3_bucket, source_id, source_format,
+            env, latest_filename, uploads, s3_bucket, source_id, source_format,
             sort_sources)
         assert file_del and not file_add
         assert compare_files(file_del, './parsing/diff_test/file3_rem3_mindiff.csv')
@@ -584,21 +590,21 @@ def test_generate_deltas():
         last_successful_ingestion = latest_filename
         latest_filename = './parsing/diff_test/file_badheader.csv'
         assert retrieval.generate_deltas(
-            latest_filename, uploads, s3_bucket, source_id, source_format,
+            env, latest_filename, uploads, s3_bucket, source_id, source_format,
             sort_sources) == reject_deltas
 
         # ### Failure cases ###
 
         # Non-supported file-type
         last_successful_ingestion = ''
-        latest_filename = './parsing/diff_test/file1_initial.csv'
+        latest_filename = './parsing/diff_test/file_does_not_exist.json'
         assert retrieval.generate_deltas(
-            latest_filename, uploads, s3_bucket, source_id, source_format='JSON',
+            env, latest_filename, uploads, s3_bucket, source_id, source_format='JSON',
             sort_sources=sort_sources) == reject_deltas
 
         # Deltas larger than half the record (revert to bulk upload)
         last_successful_ingestion = './parsing/diff_test/file1_initial.csv'
         latest_filename = './parsing/diff_test/file4_headeronly.csv'
         assert retrieval.generate_deltas(
-            latest_filename, uploads, s3_bucket, source_id, source_format,
+            env, latest_filename, uploads, s3_bucket, source_id, source_format,
             sort_sources=sort_sources) == reject_deltas

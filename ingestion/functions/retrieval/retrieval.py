@@ -214,7 +214,9 @@ def sort_file_preserve_header(out_filename, in_filename):
         body.wait()
 
 
-def find_source_name_in_ingestion_queue(source_name: str | None = None) -> bool:
+def find_source_name_in_ingestion_queue(
+        source_name: str | None,
+        env: str) -> bool:
     """Check for running or queued batch processes with source_name
 
     Already running (or queued) processes could compromise the delta-ingestion
@@ -241,7 +243,7 @@ def find_source_name_in_ingestion_queue(source_name: str | None = None) -> bool:
                         "Abandoning deltas generation.")
             return True
         if list(filter(lambda x: x['jobName'].endswith(
-                f'-{source_name}-ingestor-prod'), jobs)):
+                f'-{source_name}-ingestor-{env}'), jobs)):
             logger.info("Deltas: Ongoing batch jobs relating to source found. "
                         "Abandoning deltas generation.")
             return True
@@ -253,8 +255,8 @@ def find_source_name_in_ingestion_queue(source_name: str | None = None) -> bool:
     return False
 
 
-def generate_deltas(latest_filename: str, uploads: List[dict], s3_bucket: str,
-                    source_id: str, source_format: str,
+def generate_deltas(env: str, latest_filename: str, uploads: List[dict],
+                    s3_bucket: str, source_id: str, source_format: str,
                     sort_sources: bool = True,
                     bulk_ingest_on_reject: bool = True,
                     ) -> Tuple[str | None, str | None]:
@@ -290,7 +292,7 @@ def generate_deltas(latest_filename: str, uploads: List[dict], s3_bucket: str,
         return reject_deltas
     # Check that no source_id relevant processes are cued or running
     source_name = source_id
-    if find_source_name_in_ingestion_queue(source_name):
+    if find_source_name_in_ingestion_queue(source_name, env):
         return reject_deltas
     # identify last successful ingestion source
     uploads.sort(key=lambda x: x["created"], reverse=False)  # most recent last
@@ -299,7 +301,7 @@ def generate_deltas(latest_filename: str, uploads: List[dict], s3_bucket: str,
         logger.info("Deltas: No previous successful ingestions found.")
         return reject_deltas
     last_successful_ingest = last_successful_ingest_list[-1]
-    d = parse_datetime_lastgoodingestion(last_successful_ingest['created'])
+    d = parse_datetime(last_successful_ingest['created'])
     # identify last successful 'bulk' ingestion
     if not (bulk_ingestion := list(filter(
             lambda x: (x['status'] == 'SUCCESS')
@@ -401,12 +403,7 @@ def generate_deltas(latest_filename: str, uploads: List[dict], s3_bucket: str,
     return deltas_add_file_name, deltas_del_file_name
 
 
-def parse_datetime_current(date_str: str) -> datetime:
-    """Isolate functionality to facilitate easier mocking"""
-    return dateutil.parser.parse(date_str)
-
-
-def parse_datetime_lastgoodingestion(date_str: str) -> datetime:
+def parse_datetime(date_str: str) -> datetime:
     """Isolate functionality to facilitate easier mocking"""
     return dateutil.parser.parse(date_str)
 
@@ -439,7 +436,7 @@ def retrieve_content(env, source_id, upload_id, url, source_format,
         logger.info("Download finished")
         # Match upload s3 key (bucket folder) to upload timestamp (if available)
         try:
-            today = parse_datetime_current(
+            today = parse_datetime(
                 list(filter(lambda x: x['_id'] == upload_id,
                             uploads_history))[-1]['created'])
         except (IndexError, TypeError, KeyError) as e:
@@ -483,6 +480,7 @@ def retrieve_content(env, source_id, upload_id, url, source_format,
         return_list = [(outfile_name, s3_object_key, {})]
         # attempt to generate deltas files
         deltas_add_file_name, deltas_del_file_name = generate_deltas(
+            env,
             outfile_name,
             uploads_history,
             bucket,
@@ -658,13 +656,9 @@ def run_retrieval(tempdir=TEMP_PATH):
         file_opts[s3_object_key] = {}
         if opts:
             # Should the file be parsed?
-            file_opts[key]['parseit'] = (opts[0]['parseit']
-                                         if 'parseit' in opts[0]
-                                         else True)
+            file_opts[key]['parseit'] = opts[0].get('parseit', True)
             # Does the file correspond to a deltas, or bulk upload?
-            file_opts[key]['deltas'] = (opts[0]['deltas']
-                                        if 'deltas' in opts[0]
-                                        else None)
+            file_opts[key]['deltas'] = opts[0].get('deltas', None)
         else:
             file_opts[key]['parseit'] = True
             file_opts[key]['deltas'] = None
