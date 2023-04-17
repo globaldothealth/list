@@ -106,4 +106,5 @@ for filename, mocktime, expected_count in file_list:
         record_count = get_record_count()
         assert record_count == expected_count, \
             "Source does not contain the expected number of records " \
-            f"(expected {expected_count}, got {record_count})"
+            f"(expected {expected_count}, got {record_count})\n" \
+            "CHECK: Are Delta ingestions enabled in the stack?"

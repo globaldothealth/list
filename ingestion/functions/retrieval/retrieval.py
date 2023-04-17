@@ -411,7 +411,7 @@ def parse_datetime(date_str: str) -> datetime:
 def retrieve_content(env, source_id, upload_id, url, source_format,
                      api_headers, cookies, chunk_bytes=CSV_CHUNK_BYTES,
                      tempdir=TEMP_PATH, uploads_history={},
-                     bucket=OUTPUT_BUCKET):
+                     bucket=OUTPUT_BUCKET, enable_deltas=True):
     """ Retrieves and locally persists the content at the provided URL. """
     try:
         if (source_format != "JSON"
@@ -479,15 +479,19 @@ def retrieve_content(env, source_id, upload_id, url, source_format,
         # always return full source file (but don't parse if deltas generated)
         return_list = [(outfile_name, s3_object_key, {})]
         # attempt to generate deltas files
-        deltas_add_file_name, deltas_del_file_name = generate_deltas(
-            env,
-            outfile_name,
-            uploads_history,
-            bucket,
-            source_id,
-            source_format,
-            sort_sources=True
-        )
+        if enable_deltas:
+            deltas_add_file_name, deltas_del_file_name = generate_deltas(
+                env,
+                outfile_name,
+                uploads_history,
+                bucket,
+                source_id,
+                source_format,
+                sort_sources=True
+            )
+        else:
+            deltas_add_file_name = None
+            deltas_del_file_name = None
         if deltas_add_file_name:
             s3_deltas_add_object_key = (
                 f"{source_id}"
@@ -646,7 +650,7 @@ def run_retrieval(tempdir=TEMP_PATH):
     url = format_source_url(url)
     file_names_s3_object_keys = retrieve_content(
         env, source_id, upload_id, url, source_format, auth_headers, cookies,
-        tempdir=tempdir, uploads_history=uploads_history)
+        tempdir=tempdir, uploads_history=uploads_history, enable_deltas=False)
     file_opts = {}
     for file_name, s3_object_key, *opts in file_names_s3_object_keys:
         upload_to_s3(file_name, s3_object_key, env,
