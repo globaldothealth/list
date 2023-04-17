@@ -127,4 +127,17 @@ connection (`CONN`) has been specified, as above, then run `python3 prune_db.py`
 with no arguments (always do this first, it will provide statistics on how many
 records are in the database, how many records match deletion criteria, and how
 long these queries took to run). To commit changes, run the script with the
-`--live` command line argument: `python3 prune_db.py --live`.
+`--live` command line argument: `python3 prune_db.py --live`. For larger
+databases it is recommended to limit the query scope to single sources by
+specifying the `sourceid="<SourceId>"` parameter.
+
+The script can also be used to get:
+- Projected removal counts (`--get_removal_count`), can be used in conjunction
+with `sourceid`.
+- List all sources (`--get_source_ids`)
+- List all sources along with counts for the number of uploads per source
+(`--get_sources_with_upload_counts`)
+- List all orphaned source IDs (`--get_orphaned_source_ids`). Returns all unique
+sources associated with cases where `list=False`. **Warning**: this queries all
+records in the `cases` collection and is likely to be ***very slow***.
+- List all uploads ids associated with a source (`--get_upload_ids`)
