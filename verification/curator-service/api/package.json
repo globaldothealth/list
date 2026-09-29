@@ -88,7 +88,7 @@
     "mimemessage": "^1.0.5",
     "mongodb": "^4.1.4",
     "mongodb-memory-server": "^6.6.7",
-    "nodemailer": "^6.4.16",
+    "nodemailer": "^10.0.2",
     "passport": "^0.4.1",
     "passport-google-oauth20": "^2.0.0",
     "passport-http-bearer": "^1.0.1",
